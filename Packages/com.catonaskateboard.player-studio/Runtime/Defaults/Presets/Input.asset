@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c3572a4c81d1f447b871f5888794bb4, type: 3}
+  m_Name: Input
+  m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerInputPreset
+  movementAction: {fileID: 11400000, guid: 463df87f84d11c7478cb2d195a5e498f, type: 2}
+  jumpAction: {fileID: 11400000, guid: 2ec6d35c7b259084685c87b1fef8981f, type: 2}
+  lookDeltaAction: {fileID: 11400000, guid: e7ce71da2c7a50544a256bbf0ea2309f, type: 2}
+  lookRateAction: {fileID: 11400000, guid: cee8e1bfcbddb274fa1d24d3b8fd4521, type: 2}
+  cursorToggleAction: {fileID: 11400000, guid: 1f3f6b53c00c2354d9bed09a2ef45a61, type: 2}

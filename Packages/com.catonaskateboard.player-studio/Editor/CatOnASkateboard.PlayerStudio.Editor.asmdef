@@ -1,0 +1,19 @@
+{
+    "name": "CatOnASkateboard.PlayerStudio.Editor",
+    "rootNamespace": "CatOnASkateboard.PlayerStudio.Editor",
+    "references": [
+        "CatOnASkateboard.PlayerStudio.Runtime",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,5 +1,19 @@
 {
   "dependencies": {
+    "com.catonaskateboard.player-studio": {
+      "version": "file:com.catonaskateboard.player-studio",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.inputsystem": "1.20.0"
+      }
+    },
+    "com.catonaskateboard.player-studio.content": {
+      "version": "file:com.catonaskateboard.player-studio.content",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.14",
       "depth": 0,

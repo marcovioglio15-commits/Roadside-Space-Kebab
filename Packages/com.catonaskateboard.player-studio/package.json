@@ -1,0 +1,10 @@
+{
+  "name": "com.catonaskateboard.player-studio",
+  "version": "0.16.1",
+  "displayName": "Player Studio",
+  "description": "Reusable GameObject-based player configuration and editing tools.",
+  "unity": "6000.6",
+  "dependencies": {
+    "com.unity.inputsystem": "1.20.0"
+  }
+}

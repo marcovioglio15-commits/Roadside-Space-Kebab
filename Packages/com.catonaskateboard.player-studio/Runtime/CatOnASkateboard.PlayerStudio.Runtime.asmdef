@@ -1,0 +1,5 @@
+{
+  "name": "CatOnASkateboard.PlayerStudio.Runtime",
+  "rootNamespace": "CatOnASkateboard.PlayerStudio",
+  "references": ["Unity.InputSystem"]
+}

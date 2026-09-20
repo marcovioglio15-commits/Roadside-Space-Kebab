@@ -1,0 +1,6 @@
+﻿<Solution>
+  <Project Path="CatOnASkateboard.PlayerStudio.Editor.csproj" />
+  <Project Path="CatOnASkateboard.PlayerStudio.Runtime.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+</Solution>
