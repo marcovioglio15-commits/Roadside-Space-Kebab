@@ -1,0 +1,265 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172cc92e5181476408fe0e234c123a2f, type: 3}
+  m_Name: MenuPreset
+  m_EditorClassIdentifier: CatOnASkateboard.MenuStudio.Runtime::CatOnASkateboard.MenuStudio.MenuPreset
+  Title: GAME TITLE
+  PauseTitle: PAUSED
+  GameplayScene: Assets/Scenes/SCN_PlayerStudioMovement.unity
+  MainMenuScene: Assets/Scenes/SCN_MainMenu.unity
+  IncludeSettings: 1
+  IncludeCredits: 1
+  IncludeRestart: 1
+  ConfirmQuit: 1
+  Credits: 'Credits
+
+
+    Your team here'
+  ControlsText: 'Move: WASD / Left stick
+
+    Look: Mouse / Right stick
+
+    Pause: Esc / Start'
+  ReferenceResolution: {x: 1920, y: 1080}
+  ButtonSize: {x: 360, y: 58}
+  ButtonSpacing: 12
+  SortingOrder: 100
+  Background: {r: 0.025, g: 0.045, b: 0.07, a: 0.96}
+  BackgroundSprite: {fileID: 0}
+  Font: {fileID: 0}
+  MainButtons:
+    Enabled: 1
+    ContentMode: 0
+    Images: []
+    Motion: 1
+    MotionTarget: 0
+    TransitionSeconds: 0.12
+    UnscaledTime: 1
+    HoverPulse: 0
+    PulseSeconds: 0.34
+    PulseCycles: 1
+    LoopPulse: 0
+    OverrideSprites: 0
+    AllowEmptySprites: 0
+    OverrideGraphicColors: 1
+    OverrideText: 1
+    Normal:
+      Scale: {x: 1, y: 1, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.09, g: 0.15, b: 0.21, a: 1}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Hover:
+      Scale: {x: 1.04, y: 1.04, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.18, g: 0.35, b: 0.45, a: 1}
+      Font: {fileID: 0}
+      FontSize: 26
+      FontStyle: 1
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Pressed:
+      Scale: {x: 0.97, y: 0.97, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.15, g: 0.6, b: 0.65, a: 1}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Disabled:
+      Scale: {x: 1, y: 1, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.1, g: 0.12, b: 0.15, a: 0.45}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    HoverCue: 
+    PressCue: 
+  PauseButtons:
+    Enabled: 1
+    ContentMode: 0
+    Images: []
+    Motion: 1
+    MotionTarget: 0
+    TransitionSeconds: 0.12
+    UnscaledTime: 1
+    HoverPulse: 0
+    PulseSeconds: 0.34
+    PulseCycles: 1
+    LoopPulse: 0
+    OverrideSprites: 0
+    AllowEmptySprites: 0
+    OverrideGraphicColors: 1
+    OverrideText: 1
+    Normal:
+      Scale: {x: 1, y: 1, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.09, g: 0.15, b: 0.21, a: 1}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Hover:
+      Scale: {x: 1.04, y: 1.04, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.18, g: 0.35, b: 0.45, a: 1}
+      Font: {fileID: 0}
+      FontSize: 26
+      FontStyle: 1
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Pressed:
+      Scale: {x: 0.97, y: 0.97, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.15, g: 0.6, b: 0.65, a: 1}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Disabled:
+      Scale: {x: 1, y: 1, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.1, g: 0.12, b: 0.15, a: 0.45}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    HoverCue: 
+    PressCue: 
+  SettingsButtons:
+    Enabled: 1
+    ContentMode: 0
+    Images: []
+    Motion: 1
+    MotionTarget: 0
+    TransitionSeconds: 0.12
+    UnscaledTime: 1
+    HoverPulse: 0
+    PulseSeconds: 0.34
+    PulseCycles: 1
+    LoopPulse: 0
+    OverrideSprites: 0
+    AllowEmptySprites: 0
+    OverrideGraphicColors: 1
+    OverrideText: 1
+    Normal:
+      Scale: {x: 1, y: 1, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.09, g: 0.15, b: 0.21, a: 1}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Hover:
+      Scale: {x: 1.04, y: 1.04, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.18, g: 0.35, b: 0.45, a: 1}
+      Font: {fileID: 0}
+      FontSize: 26
+      FontStyle: 1
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Pressed:
+      Scale: {x: 0.97, y: 0.97, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.15, g: 0.6, b: 0.65, a: 1}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 1}
+    Disabled:
+      Scale: {x: 1, y: 1, z: 1}
+      Offset: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Clip: {fileID: 0}
+      Sprite: {fileID: 0}
+      GraphicColor: {r: 0.1, g: 0.12, b: 0.15, a: 0.45}
+      Font: {fileID: 0}
+      FontSize: 24
+      FontStyle: 0
+      TextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    HoverCue: 
+    PressCue: 
+  Navigation:
+    Enabled: 1
+    WrapButtons: 1
+    FollowPointer: 1
+    Move: {fileID: 0}
+    Submit: {fileID: 0}
+    Cancel: {fileID: 0}
+    Pause: {fileID: 0}
+    PreviousTab: {fileID: 0}
+    NextTab: {fileID: 0}
+    CreditsClose: {fileID: 0}
+    WrapTabs: 1
+    RepeatDelay: 0.32
+    RepeatInterval: 0.1
+    Deadzone: 0.55
+    CustomizeFocus: 1
+    FocusGraphic: 1
+    UnselectedGraphic: {r: 0.09, g: 0.13, b: 0.16, a: 1}
+    SelectedGraphic: {r: 0.18, g: 0.31, b: 0.39, a: 1}
+    FocusText: 1
+    UnselectedText: {r: 0.82, g: 0.86, b: 0.9, a: 1}
+    SelectedText: {r: 1, g: 1, b: 1, a: 1}
+    UnselectedStyle: 0
+    SelectedStyle: 1
+    FocusScale: 1
+    UnselectedScale: {x: 1, y: 1, z: 1}
+    SelectedScale: {x: 1.025, y: 1.025, z: 1}
+    FocusOutline: 1
+    OutlineColor: {r: 0.98, g: 0.78, b: 0.15, a: 1}
+    OutlineDistance: {x: 3, y: -3}
+  Settings:
+    PreferenceKey: MenuStudio
+    Audio: 1
+    Video: 1
+    Controls: 1
+    UseUnityAudioListener: 1
+    Fullscreen: 1
+    Resolution: 1
+    VSync: 1
+    FrameRate: 1
+    FrameRates: 1e0000003c0000005a0000007800000090000000f0000000ffffffffi

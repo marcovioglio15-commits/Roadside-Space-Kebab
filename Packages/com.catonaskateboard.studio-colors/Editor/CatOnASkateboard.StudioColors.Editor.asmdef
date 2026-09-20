@@ -1,0 +1,6 @@
+{
+  "name": "CatOnASkateboard.StudioColors.Editor",
+  "rootNamespace": "CatOnASkateboard.StudioColors.Editor",
+  "references": ["CatOnASkateboard.StudioColors.Runtime"],
+  "includePlatforms": ["Editor"]
+}

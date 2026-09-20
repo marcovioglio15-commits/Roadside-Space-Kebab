@@ -1,0 +1,15 @@
+{
+  "name": "com.catonaskateboard.menu-studio",
+  "version": "1.0.0",
+  "displayName": "Menu Studio",
+  "description": "Preauthored main and pause menus, settings, credits and independent interaction profiles.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Cat On A Skateboard"
+  },
+  "dependencies": {
+    "com.catonaskateboard.studio-colors": "1.0.0",
+    "com.unity.ugui": "2.0.0",
+    "com.unity.inputsystem": "1.11.2"
+  }
+}

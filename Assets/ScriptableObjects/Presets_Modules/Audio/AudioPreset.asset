@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5856b27a8398c9d4fad0a2faf21fc9bb, type: 3}
+  m_Name: AudioPreset
+  m_EditorClassIdentifier: CatOnASkateboard.AudioStudio.Runtime::CatOnASkateboard.AudioStudio.AudioPreset
+  Description: 
+  Version: 1.0.0
+  Connection:
+    UseStudioProject: 1
+    ProjectPath: 
+    BankPath: 
+    BanksHavePlatforms: 1
+    AutomaticBankLoading: 1
+  Playback:
+    Enabled: 1
+    MasterVolume: 1
+    MinimumDistance: 8
+    MaximumDistance: 45
+    LogMissingEvents: 1
+  Routing:
+    MasterBus: bus:/
+    SfxBus: bus:/SFX
+    MusicBus: bus:/Music
+    SfxVolume: 1
+    MusicVolume: 1
+  MusicCrossfadeSeconds: 1.5
+  Music: []
+  Events: []

@@ -1,0 +1,13 @@
+{
+  "name": "com.catonaskateboard.audio-studio",
+  "version": "1.0.0",
+  "displayName": "Audio Studio",
+  "description": "FMOD project connection, catalog and portable audio authoring without gameplay coupling.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Cat On A Skateboard"
+  },
+  "dependencies": {
+    "com.catonaskateboard.studio-colors": "1.0.0"
+  }
+}

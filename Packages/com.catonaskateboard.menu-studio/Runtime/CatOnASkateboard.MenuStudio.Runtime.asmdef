@@ -1,0 +1,8 @@
+{
+  "name": "CatOnASkateboard.MenuStudio.Runtime",
+  "rootNamespace": "CatOnASkateboard.MenuStudio",
+  "references": [
+    "UnityEngine.UI",
+    "Unity.InputSystem"
+  ]
+}

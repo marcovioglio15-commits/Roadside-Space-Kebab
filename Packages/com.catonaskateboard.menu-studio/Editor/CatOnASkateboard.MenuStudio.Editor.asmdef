@@ -1,0 +1,13 @@
+{
+  "name": "CatOnASkateboard.MenuStudio.Editor",
+  "rootNamespace": "CatOnASkateboard.MenuStudio.Editor",
+  "references": [
+    "CatOnASkateboard.MenuStudio.Runtime",
+    "CatOnASkateboard.StudioColors.Editor",
+    "UnityEngine.UI",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

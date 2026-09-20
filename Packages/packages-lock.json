@@ -1,5 +1,23 @@
 {
   "dependencies": {
+    "com.catonaskateboard.audio-studio": {
+      "version": "file:com.catonaskateboard.audio-studio",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.catonaskateboard.studio-colors": "1.0.0"
+      }
+    },
+    "com.catonaskateboard.menu-studio": {
+      "version": "file:com.catonaskateboard.menu-studio",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.catonaskateboard.studio-colors": "1.0.0",
+        "com.unity.ugui": "2.0.0",
+        "com.unity.inputsystem": "1.11.2"
+      }
+    },
     "com.catonaskateboard.player-studio": {
       "version": "file:com.catonaskateboard.player-studio",
       "depth": 0,
@@ -13,6 +31,14 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
+    },
+    "com.catonaskateboard.studio-colors": {
+      "version": "file:com.catonaskateboard.studio-colors",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.ugui": "2.0.0"
+      }
     },
     "com.unity.ai.navigation": {
       "version": "2.0.14",

@@ -1,0 +1,9 @@
+{
+  "name": "com.catonaskateboard.studio-colors",
+  "version": "1.0.0",
+  "displayName": "Studio Colors",
+  "description": "Stable folder colors, reusable UI palettes and compact editor workspaces.",
+  "unity": "6000.0",
+  "author": { "name": "Cat On A Skateboard" },
+  "dependencies": { "com.unity.ugui": "2.0.0" }
+}

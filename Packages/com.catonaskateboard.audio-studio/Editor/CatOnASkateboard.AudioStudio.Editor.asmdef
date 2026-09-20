@@ -1,0 +1,11 @@
+{
+  "name": "CatOnASkateboard.AudioStudio.Editor",
+  "rootNamespace": "CatOnASkateboard.AudioStudio.Editor",
+  "references": [
+    "CatOnASkateboard.AudioStudio.Runtime",
+    "CatOnASkateboard.StudioColors.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}
