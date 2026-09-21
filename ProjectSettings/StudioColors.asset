@@ -18,31 +18,31 @@ MonoBehaviour:
     Mode: 2
     Inherit: 1
     Enabled: 1
-  - Guid: 37e24e6a78fa1f81f8c5c28d5214fa86
-    Color: {r: 0.3817124, g: 1, b: 0.2980392, a: 1}
-    Mode: 2
-    Inherit: 1
-    Enabled: 0
   - Guid: fda6940dc89c46765c07f66492c67165
-    Color: {r: 0.3817124, g: 1, b: 0.2980392, a: 1}
-    Mode: 2
-    Inherit: 1
-    Enabled: 0
-  - Guid: eccf96fa46763f342905246976f87267
-    Color: {r: 0.3817124, g: 1, b: 0.2980392, a: 1}
+    Color: {r: 0, g: 1, b: 0.08817625, a: 1}
     Mode: 2
     Inherit: 1
     Enabled: 1
-  - Guid: 6dcac8f836ff9ec40916518ee35ebdfe
-    Color: {r: 0.3817124, g: 1, b: 0.2980392, a: 1}
+  - Guid: 06951c7d50c19064013311033ff2ac85
+    Color: {r: 0.39717376, g: 1, b: 0.2980392, a: 1}
     Mode: 2
     Inherit: 1
-    Enabled: 0
-  - Guid: f5544ddb1e58cf74a8d131a47d44ea19
-    Color: {r: 0.3817124, g: 1, b: 0.2980392, a: 1}
+    Enabled: 1
+  - Guid: 1a469d230dd6bad70de30a4d8a3f750d
+    Color: {r: 0.070988, g: 1, b: 0, a: 1}
     Mode: 2
     Inherit: 1
-    Enabled: 0
+    Enabled: 1
+  - Guid: c6e3ff9e9f011f4efac7f41829bf77ee
+    Color: {r: 0.11399722, g: 1, b: 0, a: 1}
+    Mode: 2
+    Inherit: 1
+    Enabled: 1
+  - Guid: cae963759b9c004485a7d63a3f7c0908
+    Color: {r: 0.025201082, g: 1, b: 0, a: 1}
+    Mode: 2
+    Inherit: 1
+    Enabled: 1
   elements:
   - Key: Movement
     OverrideText: 1

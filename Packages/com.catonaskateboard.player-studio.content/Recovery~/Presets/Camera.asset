@@ -34,6 +34,7 @@ MonoBehaviour:
     lockCursor: 1
     showCenteredCursor: 0
     cursorTexture: {fileID: 0}
+    cursorScale: 1
     fieldOfView: 65
     nearClip: 0.05
     farClip: 500

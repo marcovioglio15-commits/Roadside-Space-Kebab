@@ -1,7 +1,7 @@
 {
     "name": "CatOnASkateboard.PlayerStudio.Editor",
     "rootNamespace": "CatOnASkateboard.PlayerStudio.Editor",
-    "references": [
+    "references": ["CatOnASkateboard.StudioInput.Editor",
         "CatOnASkateboard.PlayerStudio.Runtime",
         "Unity.InputSystem"
     ],

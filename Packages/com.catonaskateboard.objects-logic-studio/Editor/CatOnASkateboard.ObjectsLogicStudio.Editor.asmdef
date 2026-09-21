@@ -1,0 +1,6 @@
+{
+  "name": "CatOnASkateboard.ObjectsLogicStudio.Editor",
+  "rootNamespace": "CatOnASkateboard.ObjectsLogicStudio.Editor",
+  "references": ["CatOnASkateboard.StudioInput.Editor", "CatOnASkateboard.ObjectsLogicStudio.Runtime", "UnityEngine.UI", "Unity.InputSystem"],
+  "includePlatforms": ["Editor"]
+}

@@ -5,6 +5,9 @@ using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+#if UNITY_6000_5_OR_NEWER
+using UnityEngine.Assemblies;
+#endif
 
 namespace CatOnASkateboard.AudioStudio.Editor
 {
@@ -179,13 +182,17 @@ namespace CatOnASkateboard.AudioStudio.Editor
         /// <returns>Loaded type or null when the SDK is absent.</returns>
         private static Type FindType(string name)
         {
-            // Optional editor references keep the authoring package importable before installing FMOD.
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                Type type = assembly.GetType(name, false);
-                if (type != null)
+            // Unity's current context excludes assemblies left behind by code reloads.
+#if UNITY_6000_5_OR_NEWER
+            foreach (Assembly assembly in CurrentAssemblies.GetLoadedAssemblies())
+                if (assembly.GetType(name, false) is Type type)
                     return type;
-            }
+#else
+            // Earlier supported editors expose the same active types through their native cache.
+            foreach (Type type in TypeCache.GetTypesDerivedFrom<object>())
+                if (type.FullName == name)
+                    return type;
+#endif
             return null;
         }
 

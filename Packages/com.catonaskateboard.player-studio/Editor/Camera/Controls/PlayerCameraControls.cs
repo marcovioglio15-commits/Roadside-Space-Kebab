@@ -77,7 +77,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 {
                     Field(settings, "showCenteredCursor");
                     if (settings.FindPropertyRelative("showCenteredCursor").boolValue)
+                    {
                         Field(settings, "cursorTexture");
+                        Field(settings, "cursorScale");
+                    }
                 }
             }
             if (mode == PlayerCameraMode.ThirdPerson && sections.Draw("Camera.Obstacles", "Obstacles"))

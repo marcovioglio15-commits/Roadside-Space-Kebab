@@ -91,9 +91,13 @@ namespace CatOnASkateboard.PlayerStudio
         [SerializeField]
         private bool showCenteredCursor;
 
-        [Tooltip("Optional centered cursor texture, drawn at its pixel size. Empty uses a small contrasting crosshair.")]
+        [Tooltip("Optional centered cursor texture. Cursor Scale multiplies its pixel dimensions; empty uses a contrasting crosshair.")]
         [SerializeField]
         private Texture2D cursorTexture;
+
+        [Tooltip("Positive multiplier for the texture's pixel dimensions or the default 14-pixel crosshair. One retains the original size.")]
+        [SerializeField]
+        private float cursorScale;
 
         [Header("Lens")]
         [Tooltip("Vertical field of view in degrees; must be between 1 and 179.")]
@@ -226,6 +230,9 @@ namespace CatOnASkateboard.PlayerStudio
         /// <summary>Optional graphic drawn at the camera viewport center.</summary>
         public readonly Texture2D CursorTexture => cursorTexture;
 
+        /// <summary>Uniform size multiplier for the selected centered cursor graphic.</summary>
+        public readonly float CursorScale => cursorScale;
+
         /// <summary>Vertical field of view in degrees; must be between 1 and 179.</summary>
         public readonly float FieldOfView => fieldOfView;
 
@@ -293,6 +300,7 @@ namespace CatOnASkateboard.PlayerStudio
             lockCursor = true,
             showCenteredCursor = false,
             cursorTexture = null,
+            cursorScale = 1f,
             fieldOfView = 65f,
             nearClip = 0.05f,
             farClip = 500f,
@@ -350,6 +358,8 @@ namespace CatOnASkateboard.PlayerStudio
                 warning = "Smooth Look needs a finite positive response time in seconds.";
             else if (mode != PlayerCameraMode.Fixed && lookEnabled && smoothLook && adaptiveLookSmoothing && !Positive(lookSmoothingSpeed))
                 warning = "Adaptive smoothing needs a finite positive angular speed.";
+            else if (mode != PlayerCameraMode.Fixed && lookEnabled && lockCursor && showCenteredCursor && !Positive(cursorScale))
+                warning = "Centered Cursor requires a finite positive Cursor Scale.";
             else if (mode == PlayerCameraMode.ThirdPerson && (!Positive(distance)
                 || (avoidObstacles && (!Positive(collisionRadius) || !float.IsFinite(collisionPadding) || collisionPadding < 0f))))
                 warning = "Distance and collision radius must be positive; clearance must be nonnegative.";

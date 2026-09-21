@@ -1,0 +1,8 @@
+{
+  "name": "com.catonaskateboard.studio-input",
+  "version": "0.1.0",
+  "displayName": "Studio Input",
+  "description": "Shared editor action navigation for Studio tools.",
+  "unity": "6000.6",
+  "dependencies": { "com.unity.inputsystem": "1.20.0" }
+}

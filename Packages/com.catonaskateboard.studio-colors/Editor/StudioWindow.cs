@@ -30,7 +30,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         private Button discard;
         private ObjectField selector;
         private readonly List<string> warnings = new List<string>();
-        private const HideFlags DraftFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
+        private const HideFlags draftFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
         #endregion
 
         #region Properties
@@ -53,7 +53,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             if (draft != null)
             {
                 // HideAndDontSave includes NotEditable, which disables SerializedProperty controls.
-                draft.hideFlags = DraftFlags;
+                draft.hideFlags = draftFlags;
                 serialized = new SerializedObject(draft);
             }
         }
@@ -278,7 +278,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             if (draft != null)
             {
                 draft.name = source.name;
-                draft.hideFlags = DraftFlags;
+                draft.hideFlags = draftFlags;
                 baseline = JsonUtility.ToJson(source);
                 serialized = new SerializedObject(draft);
             }

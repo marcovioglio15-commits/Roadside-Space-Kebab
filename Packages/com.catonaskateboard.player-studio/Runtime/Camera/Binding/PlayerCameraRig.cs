@@ -117,7 +117,7 @@ namespace CatOnASkateboard.PlayerStudio
             // Released focus and disabled views must never leave a floating marker over another screen.
             if (initialized && capturesCursor && settings.ShowCenteredCursor && Application.isFocused
                 && Cursor.lockState == CursorLockMode.Locked && view != null && view.isActiveAndEnabled)
-                PlayerCenteredCursor.Draw(view, settings.CursorTexture);
+                PlayerCenteredCursor.Draw(view, settings.CursorTexture, settings.CursorScale);
         }
 
         /// <summary>Consumes look before movement so the motor uses this frame's camera heading.</summary>

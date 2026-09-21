@@ -29,7 +29,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             EditorGUI.BeginChangeCheck();
             mode = PlayerStudioSourceMode.Master;
             body = null;
-            master = (PlayerMasterPreset)EditorGUILayout.ObjectField(masterLabel, selection.Master, typeof(PlayerMasterPreset), false);
+            master = PlayerPresetPicker.Draw(masterLabel, selection.Master);
             return EditorGUI.EndChangeCheck();
         }
 

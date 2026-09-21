@@ -1,0 +1,5 @@
+{
+  "name": "CatOnASkateboard.ObjectsLogicStudio.Runtime",
+  "rootNamespace": "CatOnASkateboard.ObjectsLogicStudio",
+  "references": ["UnityEngine.UI", "Unity.InputSystem"]
+}

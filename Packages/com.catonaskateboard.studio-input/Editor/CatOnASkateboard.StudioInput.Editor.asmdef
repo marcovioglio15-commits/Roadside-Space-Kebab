@@ -1,0 +1,6 @@
+{
+  "name": "CatOnASkateboard.StudioInput.Editor",
+  "rootNamespace": "CatOnASkateboard.StudioInput.Editor",
+  "references": ["Unity.InputSystem"],
+  "includePlatforms": ["Editor"]
+}

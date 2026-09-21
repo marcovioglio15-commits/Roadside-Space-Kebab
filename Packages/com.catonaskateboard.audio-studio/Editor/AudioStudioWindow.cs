@@ -33,7 +33,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
         #region Methods
         #region Lifecycle
         /// <summary>Opens the standalone Audio Studio workspace.</summary>
-        [MenuItem("Tools/Audio Studio")]
+        //[MenuItem("Tools/Audio Studio")]
         public static void Open()
         {
             // The source preset is selected explicitly; no old gameplay events are imported.
