@@ -248,6 +248,8 @@ GameObject:
   - component: {fileID: 7453324229196261112}
   - component: {fileID: 3396007529122320231}
   - component: {fileID: 1460862822874226250}
+  - component: {fileID: 2928927207047886698}
+  - component: {fileID: 8853063626676904675}
   m_Layer: 0
   m_Name: PF_HoverGrabObject
   m_TagString: Untagged
@@ -406,7 +408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectGrab
   interactionName: Grab
-  action: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   settings:
     Distance: 3
     TargetMode: 0
@@ -424,3 +426,67 @@ MonoBehaviour:
     FollowSpeed: 12
     ShowHover: 1
   drawGizmos: 1
+--- !u!114 &2928927207047886698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9017165495754910650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63cd3bb8ff753194e9d968eeca2fcf2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDrop
+  interactionName: Drop
+  action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  physics:
+    OverrideBody: 1
+    Mass: 1
+    LinearDamping: 0.05
+    AngularDamping: 0.05
+    Gravity: 1
+    Constraints: 0
+    CollisionDetection: 2
+    MaxAngularSpeed: 20
+    OverrideSurface: 1
+    StaticFriction: 0.5
+    DynamicFriction: 0.4
+    Bounciness: 0.2
+    FrictionCombine: 0
+    BounceCombine: 3
+--- !u!114 &8853063626676904675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9017165495754910650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f11348f8e44759459d9557849333bf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectThrow
+  interactionName: Throw
+  action: {fileID: -1996764827017877772, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  physics:
+    OverrideBody: 1
+    Mass: 1
+    LinearDamping: 0.05
+    AngularDamping: 0.05
+    Gravity: 1
+    Constraints: 0
+    CollisionDetection: 2
+    MaxAngularSpeed: 20
+    OverrideSurface: 1
+    StaticFriction: 0.5
+    DynamicFriction: 0.4
+    Bounciness: 0.2
+    FrictionCombine: 0
+    BounceCombine: 3
+  trajectory:
+    Mode: 1
+    Strength: 8
+    Yaw: 0
+    Elevation: 10
+    Spin: {x: 0, y: 0, z: 0}

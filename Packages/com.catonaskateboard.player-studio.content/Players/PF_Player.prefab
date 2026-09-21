@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 7191164700220224227}
   serializedVersion: 2
   m_LocalRotation: {x: 0.1305262, y: -0, z: -0, w: 0.9914449}
-  m_LocalPosition: {x: 0, y: 1.6, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5999999, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -258,7 +258,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: Player
+  m_DefaultActionMap: fb6bd279-596c-44d5-bea8-6d10543ae29b
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!114 &2017691531927634199

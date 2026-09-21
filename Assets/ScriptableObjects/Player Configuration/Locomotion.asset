@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ea0e467c8547f4a8305c33557add0b, type: 3}
   m_Name: Locomotion
   m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerLocomotionPreset
-  speed: 5
+  speed: 4
   acceleration: 20
-  deceleration: 30
+  deceleration: 40
   useGravity: 1
   gravityAcceleration: 20
   terminalSpeed: 50
   groundSpeed: 2
-  useJump: 1
+  useJump: 0
   jumpHeight: 1.5
   jumpBufferTime: 0.1
   coyoteTime: 0.1
