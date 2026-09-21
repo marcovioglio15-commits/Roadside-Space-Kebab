@@ -41,7 +41,7 @@ MonoBehaviour:
       textSizeOffset: {x: -24, y: -12}
       textOffset: {x: 0, y: 0}
       sortingOrder: 20
-      showBackground: 1
+      showBackground: 0
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
