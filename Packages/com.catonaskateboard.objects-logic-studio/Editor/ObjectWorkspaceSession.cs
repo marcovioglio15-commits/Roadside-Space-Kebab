@@ -1,6 +1,5 @@
 using System;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
@@ -14,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Opens an object's hover without replacing another unfinished draft.</summary>
         /// <param name="state">Durable workspace.</param>
-        /// <param name="target">Object selected in a scene, prefab stage or asset.</param>
+        /// <param name="target">Object selected in a prefab stage or asset.</param>
         /// <param name="index">Hover index on the selected object.</param>
         /// <param name="warning">Receives an unfinished-session warning.</param>
         /// <returns>True when the selection was accepted.</returns>
@@ -27,7 +26,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 warning = "Apply or Discard before changing objects or interactions.";
                 return false;
             }
+            if (target != null && !ObjectAuthoringSave.TryValidate(target, out warning))
+                return false;
             state.Target.Capture(target, index);
+            state.Prefab = target != null
+                ? AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(state.Target.PrefabGuid)) : null;
             state.Single.Read(target);
             ObjectHover hover = Resolve(state);
             state.HasBinding = hover != null;
@@ -67,13 +70,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="state">Workspace whose source objects remain untouched.</param>
         internal static void Discard(ObjectWorkspace state)
         {
-            // A missing target retains its identity so reopening its scene or prefab can recover navigation.
+            // A missing target retains its identity so reopening its prefab can recover navigation.
             Undo.RecordObject(state, "Discard object interaction draft");
             ObjectHover hover = Resolve(state);
             state.OriginalPreset = hover != null ? hover.Preset : null;
             state.Binding = HoverBindingDraft.Capture(hover);
             state.OriginalBinding = ObjectWorkspace.Copy(state.Binding);
             state.Hierarchy = hover != null ? HoverHierarchy.Signature(hover.transform) : string.Empty;
+            state.HasBinding = hover != null;
             LoadPreset(state, state.HasBinding ? state.OriginalPreset : state.Source);
             state.Observer.Discard();
             state.Single.Read(state.Target.Resolve());
@@ -92,6 +96,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Observer-only setup does not require a hover preset selection.
             warning = string.Empty;
+            if (state.HasChanges && !state.Target.IsOpen)
+            {
+                warning = "Open the selected prefab before applying its retained changes.";
+                return false;
+            }
+            if ((state.Single.HasChanges || state.HasBinding && state.InteractionChanged)
+                && !ObjectAuthoringSave.TryValidate(state.Target.Resolve(), out warning))
+                return false;
             if (!state.Single.TryValidate(state.Target.Resolve(), out warning))
                 return false;
             if (!state.InteractionChanged)
@@ -141,6 +153,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             int group = Undo.GetCurrentGroup();
             Undo.SetCurrentGroupName("Apply object interaction");
             Undo.RecordObject(state, "Apply object interaction");
+            GameObject target = state.Target.Resolve();
+            bool savePrefab = state.Single.HasChanges || state.HasBinding && state.InteractionChanged;
             try
             {
                 // The preset remains the single source of reusable settings and appearance.
@@ -154,11 +168,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (state.InteractionChanged && hover != null && state.Source != null)
                     ApplyBinding(state, hover);
                 state.Observer.Apply();
-                state.Single.Apply(state.Target.Resolve());
-                if (state.Single.HasChanges || state.InteractionChanged && hover != null)
-                    ObjectAuthoringSave.Save(state.Target.Resolve());
+                state.Single.Apply(target);
                 if (state.Source != null)
                     AssetDatabase.SaveAssetIfDirty(state.Source);
+                if (savePrefab)
+                    ObjectAuthoringSave.Save(target);
                 Undo.FlushUndoRecordObjects();
                 Discard(state);
                 Undo.CollapseUndoOperations(group);
@@ -166,11 +180,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             catch (Exception exception)
             {
-                // Roll back component and preset writes before reporting a save failure.
+                // Restore both in-memory edits and any asset already written before a later save failed.
                 Undo.RevertAllDownToGroup(group);
-                if (state.Source != null)
-                    AssetDatabase.SaveAssetIfDirty(state.Source);
                 warning = "Apply failed: " + exception.Message;
+                try
+                {
+                    if (state.Source != null)
+                        AssetDatabase.SaveAssetIfDirty(state.Source);
+                    if (savePrefab && target != null)
+                        ObjectAuthoringSave.Save(target);
+                }
+                catch (Exception rollback)
+                {
+                    warning += " Restoring saved data also failed: " + rollback.Message;
+                }
                 return false;
             }
         }

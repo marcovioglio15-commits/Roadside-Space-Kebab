@@ -53,20 +53,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Recovery
 
-        /// <summary>Reopens saved scene references when restoring the tool after an Editor restart.</summary>
-        internal void RestoreScenes()
-        {
-            // Only scenes explicitly referenced by the retained connection are eligible for recovery.
-            foreach (string value in new[] { ObserverId, CameraId, PlayerId })
-                if (GlobalObjectId.TryParse(value, out GlobalObjectId identity))
-                {
-                    string path = AssetDatabase.GUIDToAssetPath(identity.assetGUID.ToString());
-                    if (path.EndsWith(".unity", StringComparison.OrdinalIgnoreCase)
-                        && !UnityEngine.SceneManagement.SceneManager.GetSceneByPath(path).isLoaded)
-                        EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                }
-        }
-
         /// <summary>Restores references and discovers an existing observer without resetting an unfinished proposal.</summary>
         internal void Refresh()
         {

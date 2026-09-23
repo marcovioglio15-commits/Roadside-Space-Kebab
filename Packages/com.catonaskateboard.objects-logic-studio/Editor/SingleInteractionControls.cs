@@ -34,15 +34,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case SingleInteractionKind.Drop:
                 case SingleInteractionKind.Throw:
                     DrawRelease(draft.FindPropertyRelative("Release"), state.Sections);
-                    if (state.Single.Kind == SingleInteractionKind.Throw && state.Sections.Draw("Trajectory", "Configure launch strength, direction and spin relative to the gameplay camera."))
-                    {
-                        SerializedProperty trajectory = draft.FindPropertyRelative("Throw");
-                        Field(trajectory, "Mode");
-                        Field(trajectory, "Strength");
-                        Field(trajectory, "Yaw");
-                        Field(trajectory, "Elevation");
-                        Field(trajectory, "Spin");
-                    }
+                    if (state.Single.Kind == SingleInteractionKind.Throw)
+                        DrawTrajectory(draft.FindPropertyRelative("Throw"), state.Sections);
                     break;
             }
             bool changed = data.ApplyModifiedProperties();
@@ -63,7 +56,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Draws targeting and carry settings with dependent controls hidden.</summary>
         /// <param name="grab">Detached Grab settings.</param>
         /// <param name="sections">Persistent foldout navigation.</param>
-        private static void DrawGrab(SerializedProperty grab, ObjectStudioSections sections)
+        internal static void DrawGrab(SerializedProperty grab, ObjectStudioSections sections)
         {
             // Grab targeting is independent of Hover and remains available on objects without labels.
             if (sections.Draw("Grab Detection", "Choose the object's grab range and view targeting."))
@@ -85,14 +78,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Field(grab, "TransitionDuration");
             Field(grab, "WorldCollisions");
             if (grab.FindPropertyRelative("WorldCollisions").boolValue)
+            {
                 Field(grab, "FollowSpeed");
+                Field(grab, "RecoveryResponse");
+                Field(grab, "RotationSpeed");
+                Field(grab, "CollisionPadding");
+                Field(grab, "ContactRotation");
+                if (grab.FindPropertyRelative("ContactRotation").boolValue)
+                {
+                    Field(grab, "ContactAngle");
+                    Field(grab, "ContactResponse");
+                }
+            }
             Field(grab, "ShowHover");
         }
 
         /// <summary>Draws release body and surface settings shared by Drop and Throw.</summary>
         /// <param name="release">Detached release physics configuration.</param>
         /// <param name="sections">Persistent foldout navigation.</param>
-        private static void DrawRelease(SerializedProperty release, ObjectStudioSections sections)
+        internal static void DrawRelease(SerializedProperty release, ObjectStudioSections sections)
         {
             // Overrides expose their coefficients only when they will actually affect a release.
             if (sections.Draw("Release Body", "Configure mass, air resistance, gravity, constraints and continuous collision detection."))
@@ -119,6 +123,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Field(release, "Bounciness");
             Field(release, "FrictionCombine");
             Field(release, "BounceCombine");
+        }
+
+        /// <summary>Shares launch controls between the Throw card and its reusable preset.</summary>
+        /// <param name="trajectory">Serialized launch settings.</param>
+        /// <param name="sections">Retained foldout visibility.</param>
+        internal static void DrawTrajectory(SerializedProperty trajectory, ObjectStudioSections sections)
+        {
+            // Drop never exposes a trajectory because it releases the body from rest.
+            if (!sections.Draw("Trajectory", "Configure launch strength, direction and spin relative to the gameplay camera."))
+                return;
+            Field(trajectory, "Mode");
+            Field(trajectory, "Strength");
+            Field(trajectory, "Yaw");
+            Field(trajectory, "Elevation");
+            Field(trajectory, "Spin");
         }
 
         /// <summary>Uses native tooltips and full vector controls for one serialized setting.</summary>

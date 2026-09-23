@@ -5,21 +5,21 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Identifies the selected prefab branch or saved scene object across workspace and Editor restarts.</summary>
+    /// <summary>Retains prefab-only selection across stage reopening, reimports and Editor restarts.</summary>
     [Serializable]
     internal sealed class ObjectWorkspaceTarget
     {
         #region Fields
 
         [Header("Identity")]
-        [Tooltip("Stable source prefab GUID; empty when the selected object belongs to a gameplay scene.")]
+        [Tooltip("Stable GUID of the prefab asset containing the selected branch.")]
         public string PrefabGuid = string.Empty;
         [Tooltip("Sibling-index route from the prefab root to the selected object.")]
         public string ObjectPath = string.Empty;
-        [Tooltip("Global identity of a selected scene object.")]
-        public string SceneObject = string.Empty;
-        [Tooltip("Saved scene GUID used to reopen the same scene additively on workspace recovery.")]
-        public string SceneGuid = string.Empty;
+        [Tooltip("Serialized object ID used to recover the same branch after hierarchy reordering.")]
+        public long ObjectFileId;
+        [Tooltip("Hierarchy signature protecting a new unsaved branch from ambiguous route changes.")]
+        public string Hierarchy = string.Empty;
         [Tooltip("Selected hover component index on the chosen object.")]
         public int InteractionIndex;
         [Tooltip("Name captured to reject an unrelated branch after hierarchy changes.")]
@@ -27,10 +27,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #endregion
 
-        #region State
+        #region Properties
 
-        [NonSerialized]
-        private GameObject sceneObject;
+        /// <summary>Whether the selected asset is the prefab currently open in the native workspace.</summary>
+        internal bool IsOpen => PrefabStageUtility.GetCurrentPrefabStage() is PrefabStage stage
+            && stage.assetPath == AssetDatabase.GUIDToAssetPath(PrefabGuid);
 
         #endregion
 
@@ -39,34 +40,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Selection
 
         /// <summary>Records one target independently of the native prefab editing stage.</summary>
-        /// <param name="target">Selected prefab-stage, persistent prefab or scene object.</param>
+        /// <param name="target">Validated prefab-stage or asset object; null clears selection.</param>
         /// <param name="index">Selected hover component index.</param>
         internal void Capture(GameObject target, int index)
         {
-            // Clear the previous route before deciding which identity system owns this object.
-            PrefabGuid = SceneObject = SceneGuid = ObjectPath = string.Empty;
-            sceneObject = null;
+            // Gameplay scene objects cannot become interaction authoring targets.
+            PrefabGuid = ObjectPath = Hierarchy = string.Empty;
+            ObjectFileId = 0;
             InteractionIndex = index;
             ObjectName = target != null ? target.name : string.Empty;
-            if (target == null)
+            if (target == null || !ObjectAuthoringSave.TryValidate(target, out _))
                 return;
             PrefabStage stage = PrefabStageUtility.GetPrefabStage(target);
-            if (stage != null || EditorUtility.IsPersistent(target))
-            {
-                GameObject root = stage != null ? stage.prefabContentsRoot : target.transform.root.gameObject;
-                PrefabGuid = AssetDatabase.AssetPathToGUID(stage != null ? stage.assetPath : AssetDatabase.GetAssetPath(root));
-                ObjectPath = HoverHierarchy.Path(root.transform, target.transform);
-                return;
-            }
-            SceneObject = GlobalObjectId.GetGlobalObjectIdSlow(target).ToString();
-            SceneGuid = AssetDatabase.AssetPathToGUID(target.scene.path);
-            sceneObject = target;
+            GameObject root = stage != null ? stage.prefabContentsRoot : target.transform.root.gameObject;
+            PrefabGuid = AssetDatabase.AssetPathToGUID(stage != null ? stage.assetPath : AssetDatabase.GetAssetPath(root));
+            ObjectPath = HoverHierarchy.Path(root.transform, target.transform);
+            Hierarchy = HoverHierarchy.Signature(root.transform);
+            ObjectFileId = FileId(target);
         }
 
-        /// <summary>Finds the same object in the active stage, prefab asset or loaded scene.</summary>
-        /// <param name="loadScene">Whether recovery may reopen the referenced saved scene additively.</param>
+        /// <summary>Resolves the selected prefab branch without opening or modifying gameplay scenes.</summary>
         /// <returns>The same object, or null when its recorded branch is unavailable.</returns>
-        internal GameObject Resolve(bool loadScene = false)
+        internal GameObject Resolve()
         {
             // Asset references resolve through GUIDs, preserving selection after file moves.
             if (PrefabGuid.Length > 0)
@@ -75,31 +70,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
                 GameObject root = stage != null && stage.assetPath == path ? stage.prefabContentsRoot
                     : AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                Transform branch = root != null ? HoverHierarchy.Resolve(root.transform, ObjectPath) : null;
-                return branch != null && branch.name == ObjectName ? branch.gameObject : null;
+                if (root == null)
+                    return null;
+                if (ObjectFileId != 0)
+                {
+                    foreach (Transform branch in root.GetComponentsInChildren<Transform>(true))
+                        if (FileId(branch.gameObject) == ObjectFileId)
+                            return branch.gameObject;
+                    return null;
+                }
+                Transform candidate = HoverHierarchy.Signature(root.transform) == Hierarchy
+                    ? HoverHierarchy.Resolve(root.transform, ObjectPath) : null;
+                return candidate != null && candidate.name == ObjectName ? candidate.gameObject : null;
             }
 
-            // Saved scenes can be restored without replacing or saving the user's other loaded scenes.
-            string scenePath = AssetDatabase.GUIDToAssetPath(SceneGuid);
-            if (loadScene && scenePath.EndsWith(".unity", StringComparison.OrdinalIgnoreCase)
-                && !UnityEngine.SceneManagement.SceneManager.GetSceneByPath(scenePath).isLoaded)
-                EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
-            GameObject resolved = GlobalObjectId.TryParse(SceneObject, out GlobalObjectId identity)
-                ? GlobalObjectId.GlobalObjectIdentifierToObjectSlow(identity) as GameObject : null;
-            if (resolved != null)
-                sceneObject = resolved;
-            else if (sceneObject != null && SceneGuid.Length > 0
-                && GlobalObjectId.GetGlobalObjectIdSlow(sceneObject).ToString() != SceneObject)
-                sceneObject = null;
-            return sceneObject;
+            return null;
         }
 
-        /// <summary>Updates the durable identity after a previously unsaved scene receives its asset path.</summary>
+        /// <summary>Promotes a newly saved branch to its serialized prefab identity.</summary>
         internal void RefreshIdentity()
         {
-            // An unsaved scene remains editable in this process; scene Save makes its reference durable.
-            if (PrefabGuid.Length == 0 && Resolve() != null)
-                Capture(sceneObject, InteractionIndex);
+            // A missing saved ID never redirects to another similarly named object.
+            if (ObjectFileId == 0 && Resolve() is GameObject target)
+                ObjectFileId = FileId(target);
+        }
+
+        /// <summary>Reads local prefab identity in either persistent asset or native stage form.</summary>
+        /// <param name="target">Object belonging to the selected prefab.</param>
+        /// <returns>The saved local file ID, or zero for a new unsaved object.</returns>
+        private static long FileId(GameObject target)
+        {
+            // Stage instances expose source and instance IDs separately; combine them to match the asset-local ID.
+            if (EditorUtility.IsPersistent(target))
+                return AssetDatabase.TryGetGUIDAndLocalFileIdentifier(target, out string _, out long identifier) ? identifier : 0;
+            GlobalObjectId identity = GlobalObjectId.GetGlobalObjectIdSlow(target);
+            return unchecked((long)(identity.targetObjectId ^ identity.targetPrefabId));
         }
 
         #endregion

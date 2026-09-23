@@ -28,7 +28,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 retained = PlayerWorkspaceStore.Load();
                 if (retained == null)
                     return;
-                PlayerWorkspaceStore.LoadScenes(retained);
                 PlayerStudioState restored = PlayerWorkspaceStore.Restore(retained, out warning);
                 if (IsBlocked)
                     return;

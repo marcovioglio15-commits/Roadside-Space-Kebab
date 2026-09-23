@@ -16,6 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private ObjectHover[] interactions = Array.Empty<ObjectHover>();
         private GUIContent[] names = Array.Empty<GUIContent>();
         private string status = string.Empty;
+        private bool openingPrefab;
         private readonly SingleInteractionView singles = new SingleInteractionView();
 
         #endregion
@@ -23,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Labels
 
         private static readonly GUIContent addHoverLabel = new GUIContent("+ Add Hover",
-            "Add a First Person Hover and its UI to the selected scene object or open prefab workspace.");
+            "Add a First Person Hover and its UI to the selected object in the open prefab workspace.");
         private static readonly GUIContent removeHoverLabel = new GUIContent("Remove",
             "Remove this hover and its unshared UI. Undo restores both.");
         private static readonly GUIContent openPrefabLabel = new GUIContent("Open",
@@ -36,6 +37,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Selected component from the hierarchy cache, refreshed only when the target changes.</summary>
         private ObjectHover CurrentInteraction => state.Target.InteractionIndex >= 0 && state.Target.InteractionIndex < interactions.Length
             ? interactions[state.Target.InteractionIndex] : null;
+
+        /// <summary>Controls belong only to the retained branch inside the matching open prefab.</summary>
+        private bool CanEdit => state.Target.IsOpen && currentObject != null && !EditorUtility.IsPersistent(currentObject);
 
         #endregion
 
@@ -57,9 +61,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Explicit navigation uses the same unfinished-session guard as the object picker.
             ObjectsLogicStudioWindow window = GetWindow<ObjectsLogicStudioWindow>("Objects Logic Studio");
-            if (ObjectWorkspaceSession.Resolve(window.state) != hover)
-                ObjectWorkspaceSession.Select(window.state, hover.gameObject,
-                    Array.IndexOf(hover.GetComponents<ObjectHover>(), hover), out window.status);
+            if (!ObjectAuthoringSave.TryValidate(hover.gameObject, out window.status))
+                return;
+            if (ObjectWorkspaceSession.Resolve(window.state) != hover
+                && !ObjectWorkspaceSession.Select(window.state, hover.gameObject,
+                    Array.IndexOf(hover.GetComponents<ObjectHover>(), hover), out window.status))
+                return;
             window.state.Category = ObjectInteractionCategory.Hover;
             window.state.InteractionExpanded = true;
             window.Refresh();
@@ -71,6 +78,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Selecting the same retained card also works while its proposal is pending.
             ObjectsLogicStudioWindow window = GetWindow<ObjectsLogicStudioWindow>("Objects Logic Studio");
+            if (!ObjectAuthoringSave.TryValidate(feature.gameObject, out window.status))
+                return;
             if (window.state.HasChanges && (window.currentObject != feature.gameObject || window.state.Single.Kind != feature.Kind))
             {
                 window.status = "Apply or Discard before changing objects or interactions.";
@@ -99,18 +108,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (state.Position.width >= minSize.x && state.Position.height >= minSize.y)
                 position = state.Position;
             if (!EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                state.Target.Resolve(true);
-                state.Observer.RestoreScenes();
                 state.Observer.Refresh();
-                if (!state.HasChanges && (!state.HasBinding || ObjectWorkspaceSession.Resolve(state) != null))
-                    ObjectWorkspaceSession.Discard(state);
-            }
             Undo.undoRedoPerformed += HandleUndo;
             EditorApplication.hierarchyChanged += Refresh;
+            EditorApplication.projectChanged += Refresh;
             EditorApplication.quitting += Persist;
             EditorApplication.playModeStateChanged += HandlePlayMode;
             Selection.selectionChanged += FollowSelection;
+            PrefabStage.prefabStageOpened += HandleStageChanged;
+            PrefabStage.prefabStageClosing += HandleStageChanged;
             Refresh();
         }
 
@@ -121,9 +127,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Persist();
             Undo.undoRedoPerformed -= HandleUndo;
             EditorApplication.hierarchyChanged -= Refresh;
+            EditorApplication.projectChanged -= Refresh;
             EditorApplication.quitting -= Persist;
             EditorApplication.playModeStateChanged -= HandlePlayMode;
             Selection.selectionChanged -= FollowSelection;
+            PrefabStage.prefabStageOpened -= HandleStageChanged;
+            PrefabStage.prefabStageClosing -= HandleStageChanged;
+            EditorApplication.delayCall -= Refresh;
             data?.Dispose();
             data = null;
         }
@@ -160,6 +170,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Undo changes the serialized singleton, so its saved copy must follow the restored values.
             state.Observer.Refresh();
+            GameObject target = state.Target.Resolve();
+            if (target != null && ObjectAuthoringSave.TryValidate(target, out _))
+                try
+                {
+                    // Applied prefab Undo must reach disk just like the original Apply operation.
+                    ObjectAuthoringSave.Save(target);
+                }
+                catch (Exception exception)
+                {
+                    status = "Could not save prefab Undo: " + exception.Message;
+                }
             Refresh();
             state.Persist();
         }
@@ -171,10 +192,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Updates cached component names after structural changes instead of searching on each repaint.</summary>
         private void Refresh()
         {
-            // A closed prefab stage resolves to its source asset without losing the selected branch.
+            // Hidden source assets retain their draft but never populate controls outside their native stage.
             if (state == null)
                 return;
-            currentObject = state.Target.Resolve();
+            currentObject = state.Target.IsOpen ? state.Target.Resolve() : null;
+            if (currentObject != null && !state.HasChanges && !EditorApplication.isPlayingOrWillChangePlaymode)
+                ObjectWorkspaceSession.Discard(state);
             singles.Refresh(currentObject);
             interactions = currentObject != null ? currentObject.GetComponents<ObjectHover>() : Array.Empty<ObjectHover>();
             names = new GUIContent[interactions.Length];
@@ -184,25 +207,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Repaint();
         }
 
+        /// <summary>Refreshes once native stage navigation has finished replacing its contents.</summary>
+        /// <param name="stage">Prefab workspace being opened or closed.</param>
+        private void HandleStageChanged(PrefabStage stage)
+        {
+            // Closing fires before Unity leaves the stage; defer resolution until the new context is active.
+            EditorApplication.delayCall -= Refresh;
+            EditorApplication.delayCall += Refresh;
+            Repaint();
+        }
+
         /// <summary>Follows explicit hierarchy selections only when no proposal would be lost.</summary>
         private void FollowSelection()
         {
             // Merely selecting a font or preset while editing must not redirect an unfinished session.
-            if (state == null || state.HasChanges || EditorApplication.isPlayingOrWillChangePlaymode)
+            if (state == null || openingPrefab || state.HasChanges || EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             GameObject selected = Selection.activeGameObject;
-            if (selected == null || selected == currentObject)
+            PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
+            if (selected == null || selected == currentObject || stage == null || !stage.IsPartOfPrefabContents(selected)
+                || !ObjectAuthoringSave.TryValidate(selected, out _))
                 return;
-            if (EditorUtility.IsPersistent(selected))
-            {
-                if (PrefabUtility.GetPrefabAssetType(selected) != PrefabAssetType.NotAPrefab)
-                    state.Prefab = selected.transform.root.gameObject;
-            }
-            else
-            {
-                ObjectHover owner = selected.GetComponentInParent<ObjectHover>();
-                ObjectWorkspaceSession.Select(state, owner != null ? owner.gameObject : selected, 0, out status);
-            }
+            ObjectHover owner = selected.GetComponentInParent<ObjectHover>();
+            ObjectWorkspaceSession.Select(state, owner != null ? owner.gameObject : selected, 0, out status);
             state.Persist();
             Refresh();
         }
@@ -221,6 +248,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Scroll = EditorGUILayout.BeginScrollView(state.Scroll);
             using (new EditorGUI.DisabledScope(locked))
                 DrawSelection();
+            if (!CanEdit)
+            {
+                // A retained draft stays untouched while its prefab is closed or another asset is being previewed.
+                DrawClosedWorkspace(locked);
+                EditorGUILayout.EndScrollView();
+                return;
+            }
             ObjectInteractionTabs.Draw(state);
             using (new EditorGUI.DisabledScope(locked))
                 switch (state.Category)
@@ -243,32 +277,58 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             DrawFooter(locked);
         }
 
+        /// <summary>Keeps hidden drafts recoverable when their prefab closes or their branch is removed.</summary>
+        /// <param name="locked">Whether Play suspends navigation and draft changes.</param>
+        private void DrawClosedWorkspace(bool locked)
+        {
+            // A deleted branch cannot expose settings, but its retained proposal must still be discardable.
+            if (status.Length > 0)
+                EditorGUILayout.LabelField(status, EditorStyles.wordWrappedLabel);
+            EditorGUILayout.LabelField(state.Target.IsOpen ? "The selected prefab object is no longer available."
+                : state.HasChanges ? "Open the selected prefab to resume pending changes."
+                : "Open a prefab to edit its interactions.", EditorStyles.wordWrappedLabel);
+            if (!state.Target.IsOpen || !state.HasChanges)
+                return;
+            using (new EditorGUI.DisabledScope(locked))
+                if (GUILayout.Button(new GUIContent("Discard Missing Object Draft", "Discard only the retained proposal and select the open prefab root.")))
+                {
+                    ObjectWorkspaceSession.Discard(state);
+                    ObjectWorkspaceSession.Select(state, PrefabStageUtility.GetCurrentPrefabStage().prefabContentsRoot, 0, out status);
+                    Refresh();
+                }
+        }
+
         /// <summary>Shows prefab, object and interaction navigation without editing their applied contents.</summary>
         private void DrawSelection()
         {
             // All navigation is guarded while any domain has pending changes.
-            if (state.Sections.Draw("Prefab & Object", "Choose a source prefab or an existing scene object."))
-                using (new EditorGUI.DisabledScope(state.HasChanges))
+            if (state.Sections.Draw("Prefab", "Choose a prefab asset; use its workspace hierarchy to select a child."))
+            {
+                using (new EditorGUILayout.HorizontalScope())
                 {
-                    using (new EditorGUILayout.HorizontalScope())
+                    using (new EditorGUI.DisabledScope(state.HasChanges))
                     {
-                        state.Prefab = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Prefab", "Source prefab opened by the native prefab workspace."), state.Prefab, typeof(GameObject), false);
-                        if (state.Prefab != null && GUILayout.Button(openPrefabLabel, EditorStyles.miniButton, GUILayout.Width(44f)))
-                            OpenPrefab();
+                        GameObject requested = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Prefab", "Source prefab edited by this tool. Scene instances are not accepted."), state.Prefab, typeof(GameObject), false);
+                        if (requested != state.Prefab && (requested == null || ObjectAuthoringSave.TryValidate(requested, out status)))
+                        {
+                            state.Prefab = requested;
+                            ObjectWorkspaceSession.Select(state, requested, 0, out status);
+                            Refresh();
+                        }
                     }
-                    GameObject requested = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Object", "Root or child receiving independently configured interactions."), currentObject, typeof(GameObject), true);
-                    if (requested != currentObject)
-                    {
-                        ObjectWorkspaceSession.Select(state, requested, 0, out status);
-                        Refresh();
-                    }
+                    if (state.Prefab != null && GUILayout.Button(openPrefabLabel, EditorStyles.miniButton, GUILayout.Width(44f)))
+                        OpenPrefab();
                 }
+                if (CanEdit)
+                    using (new EditorGUI.DisabledScope(true))
+                        EditorGUILayout.ObjectField(new GUIContent("Prefab Object", "Selected root or child inside the prefab workspace."), currentObject, typeof(GameObject), true);
+            }
         }
 
         /// <summary>Lists independently configured hover components as expandable feature cards.</summary>
         private void DrawHovers()
         {
-            // Structural changes require a writable scene or prefab stage and a completed draft.
+            // Structural changes use the native prefab stage and are saved immediately to its asset.
             using (new EditorGUILayout.HorizontalScope())
             {
                 using (new EditorGUI.DisabledScope(state.HasChanges || currentObject == null || EditorUtility.IsPersistent(currentObject)))
@@ -402,6 +462,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (hover.Label == null && GUILayout.Button(new GUIContent("Create Hover UI", "Author missing label objects in the prefab workspace or a loaded scene.")))
                 {
                     HoverAuthoring.CreateLabel(hover);
+                    ObjectAuthoringSave.Save(hover.gameObject);
                     state.Hierarchy = HoverHierarchy.Signature(hover.transform);
                     state.Persist();
                 }
@@ -418,10 +479,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new EditorGUI.DisabledScope(locked || !state.HasChanges))
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button(new GUIContent("Apply", "Validate and save the preset and prefab binding; scene changes remain ready for scene Save.")))
+                    if (GUILayout.Button(new GUIContent("Apply", "Validate and save interaction settings directly to the prefab; observer setup follows scene Save.")))
                     {
                         if (ObjectWorkspaceSession.Apply(state, out status))
-                            status = "Applied. Save any modified gameplay scenes.";
+                            status = "Applied to prefab. Save the gameplay scene if its Observer setup changed.";
                         Refresh();
                     }
                     if (GUILayout.Button(new GUIContent("Discard", "Reload applied data without changing a preset, prefab or scene.")))
@@ -447,8 +508,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 status = "Choose a writable .prefab asset; create a variant for imported models first.";
                 return;
             }
-            PrefabStage stage = PrefabStageUtility.OpenPrefab(path);
-            ObjectWorkspaceSession.Select(state, stage.prefabContentsRoot, 0, out status);
+            openingPrefab = true;
+            try
+            {
+                // Opening the native stage must not replace a retained child or pending interaction with the root.
+                PrefabStage stage = PrefabStageUtility.OpenPrefab(path);
+                Selection.activeGameObject = state.Target.Resolve();
+                if (Selection.activeGameObject == null && !state.HasChanges)
+                    ObjectWorkspaceSession.Select(state, stage.prefabContentsRoot, 0, out status);
+            }
+            finally
+            {
+                openingPrefab = false;
+            }
             Refresh();
         }
 

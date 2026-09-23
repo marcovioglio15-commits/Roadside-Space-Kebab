@@ -21,7 +21,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 EditorGUILayout.ObjectField(new GUIContent("Preset", "Applied reusable hover configuration."), hover.Preset, typeof(HoverPreset), false);
                 EditorGUILayout.ObjectField(new GUIContent("Label", "Preauthored UI owned by this interaction."), hover.Label, typeof(HoverLabel), true);
             }
-            using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+            using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
+                || !ObjectAuthoringSave.TryValidate(hover.gameObject, out _)))
                 if (GUILayout.Button(new GUIContent("Open Objects Logic Studio", "Edit this interaction in a persistent Apply/Discard session.")))
                     ObjectsLogicStudioWindow.Open(hover);
             if (!hover.TryValidate(out string warning))

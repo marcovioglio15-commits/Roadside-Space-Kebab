@@ -421,9 +421,15 @@ MonoBehaviour:
     Offset: {x: 0.35, y: -0.2, z: 1.5}
     Rotation: {x: 0, y: 0, z: 0}
     Instant: 0
-    TransitionDuration: 0.2
+    TransitionDuration: 0.5
     WorldCollisions: 1
-    FollowSpeed: 12
+    FollowSpeed: 8
+    RecoveryResponse: 12
+    RotationSpeed: 360
+    CollisionPadding: 0.015
+    ContactRotation: 1
+    ContactAngle: 20
+    ContactResponse: 8
     ShowHover: 1
   drawGizmos: 1
 --- !u!114 &2928927207047886698

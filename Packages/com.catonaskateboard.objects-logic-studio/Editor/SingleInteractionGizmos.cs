@@ -28,6 +28,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Handles.SphereHandleCap(0, anchor, Quaternion.identity, size, EventType.Repaint);
                 Handles.Label(anchor + Vector3.up * size, "Grab · " + grab.Settings.Distance.ToString("0.##") + " m");
             }
+            if (grab.IsHeld)
+                using (new Handles.DrawingScope(new Color(0.3f, 1f, 0.55f)))
+                {
+                    // The gap between requested and resolved pose makes blocking contacts easy to inspect.
+                    Handles.DrawDottedLine(grab.transform.position, grab.CarryTarget, 4f);
+                    Handles.SphereHandleCap(0, grab.CarryTarget, Quaternion.identity, size, EventType.Repaint);
+                    Handles.Label(grab.CarryTarget, "Carry target");
+                }
             ObjectThrow launch = grab.GetComponent<ObjectThrow>();
             Camera camera = Camera.main;
             if (launch == null || !launch.enabled || camera == null || launch.Trajectory == null

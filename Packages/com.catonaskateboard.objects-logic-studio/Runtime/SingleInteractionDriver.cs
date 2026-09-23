@@ -22,6 +22,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
 
+        #region Properties
+
+        /// <summary>The occupied carry slot, cleared immediately when its object stops being held.</summary>
+        internal ObjectGrab Held => held != null && held.IsHeld ? held : null;
+
+        #endregion
+
         #region Methods
 
         #region Ownership
@@ -165,8 +172,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
             if (selected == null)
                 return;
-            selected.Begin(observer);
-            held = selected;
+            if (selected.Begin(observer))
+                held = selected;
         }
 
         /// <summary>Clears every signal after one arbitration pass, including currently ineligible requests.</summary>

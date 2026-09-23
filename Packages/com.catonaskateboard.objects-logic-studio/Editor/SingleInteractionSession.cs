@@ -17,6 +17,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public bool Expanded = true;
         [Tooltip("Whether this session began with an existing component.")]
         public bool HasBinding;
+        [Tooltip("Reusable settings asset selected for explicit import or export on this interaction card.")]
+        public SingleInteractionPreset Preset;
         [Header("Draft")]
         [Tooltip("Retained proposed settings, applied only through the common footer.")]
         public SingleInteractionDraft Draft = new SingleInteractionDraft();
@@ -60,6 +62,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // An absent feature stays absent rather than changing an unfinished proposal's identity.
             ObjectSingleInteraction feature = Resolve(target, Kind);
+            if (Preset != null && Preset.Kind != Kind)
+                Preset = null;
             HasBinding = feature != null;
             Draft = SingleInteractionDraft.Capture(feature);
             Baseline = ObjectWorkspace.Copy(Draft);

@@ -4,8 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
-using UnityEditor.SceneManagement;
-using UnityEngine.SceneManagement;
 using UnityEngine;
 
 namespace CatOnASkateboard.PlayerStudio.Editor
@@ -161,22 +159,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             });
             warning = missing > 0 ? "Some workspace sources are unavailable. Load their saved scenes and retry recovery, or explicitly discard the saved workspace." : string.Empty;
             return JsonUtility.FromJson<PlayerStudioState>(json);
-        }
-
-        /// <summary>Reopens saved source scenes additively without replacing or saving the current scene setup.</summary>
-        /// <param name="snapshot">Snapshot whose object identities identify the required scenes.</param>
-        internal static void LoadScenes(Snapshot snapshot)
-        {
-            // Only scene assets referenced by the retained session are eligible for recovery.
-            HashSet<string> paths = new HashSet<string>();
-            foreach (Reference reference in snapshot.References)
-                if (GlobalObjectId.TryParse(reference.Global, out GlobalObjectId identity))
-                {
-                    string path = AssetDatabase.GUIDToAssetPath(identity.assetGUID.ToString());
-                    if (path.EndsWith(".unity", StringComparison.OrdinalIgnoreCase) && paths.Add(path)
-                        && !SceneManager.GetSceneByPath(path).isLoaded)
-                        EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                }
         }
 
         /// <summary>Returns an Editor-session token that survives reload but changes after a process restart.</summary>

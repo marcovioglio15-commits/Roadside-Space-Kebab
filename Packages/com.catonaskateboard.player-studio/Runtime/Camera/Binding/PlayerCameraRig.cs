@@ -50,6 +50,7 @@ namespace CatOnASkateboard.PlayerStudio
         private Vector2 angles;
         private PlayerCameraLookState look;
         private PlayerCameraFollowState follow;
+        private PlayerHeadTiltMotion headTilt;
         private Quaternion orbit;
         private bool initialized;
         private bool hasStarted;
@@ -200,6 +201,9 @@ namespace CatOnASkateboard.PlayerStudio
             // Collision uses the real player focus; smoothing never lengthens an obstructed camera arm.
             if (settings.Mode == PlayerCameraMode.ThirdPerson && settings.AvoidObstacles)
                 position = obstacles.Resolve(host, settings, focus, position, Time.deltaTime);
+            if (settings.Mode == PlayerCameraMode.FirstPerson && settings.HeadTilt.Enabled)
+                headTilt.Apply(settings.HeadTilt, motor != null && motor.isActiveAndEnabled ? motor.ActualVelocity : Vector3.zero,
+                    motor != null && motor.isActiveAndEnabled && motor.IsGrounded, Time.deltaTime, ref position, ref rotation);
             view.transform.SetPositionAndRotation(position, rotation);
         }
 
@@ -244,6 +248,14 @@ namespace CatOnASkateboard.PlayerStudio
                 return false;
             }
 
+            if (settings.Mode == PlayerCameraMode.FirstPerson && settings.HeadTilt.Enabled
+                && (motor == null || motor.gameObject != gameObject))
+            {
+                warning = initializationWarning = "First-person Head Tilt requires this player's Character Controller Motor on the Camera Rig.";
+                commands.Dispose();
+                return false;
+            }
+            headTilt = default;
             ApplyConfiguration(settings);
             initialHeading = host.transform.eulerAngles.y;
             angles = settings.InitialAngles;

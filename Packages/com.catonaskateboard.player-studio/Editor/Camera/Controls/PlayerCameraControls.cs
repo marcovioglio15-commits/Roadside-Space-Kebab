@@ -94,6 +94,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     Field(settings, "obstacleReturnTime");
                 }
             }
+            if (mode == PlayerCameraMode.FirstPerson && sections.Draw("Camera.HeadTilt", "Head Tilt"))
+                PlayerHeadTiltControls.Draw(settings.FindPropertyRelative("headTilt"));
             if (sections.Draw("Camera.Lens", "Lens"))
             {
                 Field(settings, "fieldOfView");

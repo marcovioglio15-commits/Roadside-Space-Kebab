@@ -11,11 +11,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Interactions
 
-        /// <summary>Adds an independent hover interaction to the selected prefab stage or scene object.</summary>
+        /// <summary>Adds an independent hover interaction to the selected prefab stage and saves its asset.</summary>
         /// <param name="root">Editable object receiving the new component and UI child.</param>
         /// <returns>The newly configured hover interaction.</returns>
         internal static ObjectHover AddHover(GameObject root)
         {
+            // Only the native prefab stage may receive structural interaction edits.
+            if (!ObjectAuthoringSave.TryValidate(root, out string warning) || EditorUtility.IsPersistent(root))
+                throw new System.InvalidOperationException(warning.Length > 0 ? warning : "Open the prefab workspace before adding Hover.");
             // One Undo group restores the complete hierarchy and binding.
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
@@ -27,6 +30,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.ApplyModifiedProperties();
             }
             CreateLabel(hover);
+            ObjectAuthoringSave.Save(root);
             Undo.CollapseUndoOperations(group);
             return hover;
         }
@@ -36,6 +40,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void RemoveHover(ObjectHover hover)
         {
             // Never remove unrelated or shared UI after a manually edited binding.
+            if (!ObjectAuthoringSave.TryValidate(hover.gameObject, out string warning) || EditorUtility.IsPersistent(hover))
+                throw new System.InvalidOperationException(warning.Length > 0 ? warning : "Open the prefab workspace before removing Hover.");
+            GameObject target = hover.gameObject;
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
             HoverLabel label = hover.Label;
@@ -47,6 +54,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.DestroyObjectImmediate(hover);
             if (removeLabel)
                 Undo.DestroyObjectImmediate(label.gameObject);
+            ObjectAuthoringSave.Save(target);
             Undo.CollapseUndoOperations(group);
         }
 

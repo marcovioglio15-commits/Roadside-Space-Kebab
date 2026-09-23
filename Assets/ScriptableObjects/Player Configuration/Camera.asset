@@ -52,3 +52,18 @@ MonoBehaviour:
     modelFacing: 1
     turnSpeed: 540
     hideVisualInFirstPerson: 1
+    headTilt:
+      Enabled: 1
+      GroundedOnly: 1
+      StrideLength: 4
+      ReferenceSpeed: 5
+      Height: 0.1
+      SideAmplitude: 0.012
+      Lean: 5
+      RollAmplitude: 0.5
+      Response: 12
+      Irregular: 0
+      AmplitudeVariation: 0.2
+      CadenceVariation: 0.15
+      VariationRate: 0.7
+      Seed: 17

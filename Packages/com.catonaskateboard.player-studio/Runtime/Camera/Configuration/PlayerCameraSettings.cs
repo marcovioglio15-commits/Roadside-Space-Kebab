@@ -163,6 +163,11 @@ namespace CatOnASkateboard.PlayerStudio
         [SerializeField]
         private bool hideVisualInFirstPerson;
 
+        [Header("First Person Head Tilt")]
+        [Tooltip("Optional footsteps applied only to the first-person camera after movement and view following.")]
+        [SerializeField]
+        private PlayerHeadTiltSettings headTilt;
+
         #endregion
 
         #region Properties
@@ -278,6 +283,9 @@ namespace CatOnASkateboard.PlayerStudio
         /// <summary>Hide configured model renderers only for this first-person player camera.</summary>
         public readonly bool HideVisualInFirstPerson => hideVisualInFirstPerson;
 
+        /// <summary>Optional first-person footsteps and directional lean.</summary>
+        public readonly PlayerHeadTiltSettings HeadTilt => headTilt;
+
         /// <summary>Supplies a complete third-person configuration for new assets.</summary>
         public static PlayerCameraSettings Default => new PlayerCameraSettings
         {
@@ -315,7 +323,8 @@ namespace CatOnASkateboard.PlayerStudio
             movementFrame = PlayerMovementFrame.Camera,
             modelFacing = PlayerModelFacing.Movement,
             turnSpeed = 540f,
-            hideVisualInFirstPerson = true
+            hideVisualInFirstPerson = true,
+            headTilt = PlayerHeadTiltSettings.Default
         };
 
         #endregion
@@ -368,7 +377,7 @@ namespace CatOnASkateboard.PlayerStudio
                 warning = "Obstacle return time must be finite and nonnegative.";
             else if (modelFacing != PlayerModelFacing.Authored && !Positive(turnSpeed))
                 warning = "Visual turning speed must be finite and positive.";
-            return warning.Length == 0;
+            return warning.Length == 0 && (mode != PlayerCameraMode.FirstPerson || headTilt.TryValidate(out warning));
         }
 
         /// <summary>Checks distances and response values at initialization boundaries.</summary>

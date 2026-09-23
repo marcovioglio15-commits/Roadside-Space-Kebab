@@ -5,6 +5,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Carries one authored rigidbody without parenting it to the player or creating runtime objects.</summary>
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(100)]
     [RequireComponent(typeof(Rigidbody))]
     [AddComponentMenu("Objects Logic Studio/Object Grab")]
     public sealed class ObjectGrab : ObjectSingleInteraction
@@ -25,6 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly CarryCollisions collisions = new CarryCollisions();
+        private readonly CarryMotion motion = new CarryMotion();
         private Rigidbody body;
         private Collider[] colliders;
         private PhysicsMaterial[] surfaces;
@@ -34,6 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector3 startPosition;
         private Quaternion startRotation;
         private float started;
+        private bool firstFollow;
 
         #endregion
 
@@ -49,6 +52,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Rigidbody Body => body;
         /// <summary>Whether selected-object debug geometry is enabled.</summary>
         public bool DrawGizmos => drawGizmos;
+        /// <summary>Current unobstructed carry anchor for selected-object diagnostics.</summary>
+        public Vector3 CarryTarget => carryFrame != null ? CarryPosition() : transform.position;
         /// <summary>World point tested against grab distance and camera targeting.</summary>
         public Vector3 WorldTarget => transform.TransformPoint(settings.TargetOffset);
         /// <summary>Cached solid and trigger colliders owned by this body.</summary>
@@ -65,6 +70,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Compound colliders belonging to another rigidbody must never inherit these overrides.
             body = GetComponent<Rigidbody>();
+            CacheGeometry();
+            hovers = GetComponentsInChildren<ObjectHover>(true);
+            base.OnEnable();
+        }
+
+        /// <summary>Reads current collider ownership at activation and pickup boundaries.</summary>
+        private void CacheGeometry()
+        {
+            // Restore release-owned materials before remembering authored references again.
+            RestoreSurface(null);
             List<Collider> owned = new List<Collider>();
             foreach (Collider collider in GetComponentsInChildren<Collider>(true))
                 if (collider.attachedRigidbody == body)
@@ -73,8 +88,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             surfaces = new PhysicsMaterial[colliders.Length];
             for (int index = 0; index < colliders.Length; index++)
                 surfaces[index] = colliders[index].sharedMaterial;
-            hovers = GetComponentsInChildren<ObjectHover>(true);
-            base.OnEnable();
         }
 
         /// <summary>Releases temporary physics and visibility ownership before pooling or teardown.</summary>
@@ -87,16 +100,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             base.OnDisable();
         }
 
-        /// <summary>Moves only held bodies and checks outstanding player separation after a release.</summary>
+        /// <summary>Checks outstanding player separation only after an object has been released.</summary>
         private void FixedUpdate()
         {
-            // Idle objects perform no physics queries or hierarchy searches.
-            if (!IsHeld)
-            {
-                if (collisions.Pending)
-                    collisions.Restore(false);
+            // Held presentation is aligned to the camera's render frame, not to physics interpolation.
+            if (!IsHeld && collisions.Pending)
+                collisions.Restore(false);
+        }
+
+        /// <summary>Follows after the player camera has produced its final pose for this render frame.</summary>
+        private void LateUpdate()
+        {
+            // Idle objects never query world geometry or rebuild hierarchy caches.
+            if (!IsHeld || Time.deltaTime <= 0f)
                 return;
-            }
             if (body == null || carryFrame == null || !carryFrame.gameObject.activeInHierarchy)
             {
                 Cancel();
@@ -137,12 +154,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 bool solid = false;
                 foreach (Collider collider in target.GetComponentsInChildren<Collider>(true))
                 {
-                    if (collider is not (BoxCollider or SphereCollider or CapsuleCollider or MeshCollider { convex: true }))
+                    if (!collider.enabled || collider.isTrigger)
+                        continue;
+                    if (collider is not (BoxCollider or SphereCollider or CapsuleCollider or MeshCollider { convex: true, sharedMesh: not null }))
                     {
                         warning = "Grab supports Box, Sphere, Capsule and convex Mesh Colliders.";
                         break;
                     }
-                    solid |= !collider.isTrigger && collider.enabled && collider.attachedRigidbody == rigidbody;
+                    solid |= collider.GetComponentInParent<Rigidbody>(true) == rigidbody;
                 }
                 if (warning.Length == 0 && !solid)
                     warning = "Add at least one enabled solid 3D collider before using Grab.";
@@ -156,38 +175,42 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Claims this body after the shared observer has chosen a single eligible target.</summary>
         /// <param name="observer">Player and camera controlling the carry pose.</param>
-        internal void Begin(HoverObserver observer)
+        /// <returns>True when this object acquired the previously empty carry slot.</returns>
+        internal bool Begin(HoverObserver observer)
         {
             // Capture current body policy so release never assumes the prefab's original defaults.
+            if (IsHeld || observer == null || observer.HeldObject != null || observer.Player == null || observer.View == null)
+                return false;
+            if (!ValidateBody(gameObject, out string warning))
+            {
+                Debug.LogWarning(warning, this);
+                return false;
+            }
+            CacheGeometry();
             original = new CarryBodyState(body);
             carryFrame = settings.Space == CarrySpace.Camera ? observer.View.transform : observer.Player;
             startPosition = body.position;
             startRotation = body.rotation;
             started = Time.time;
+            firstFollow = true;
             collisions.Ignore(colliders, observer.Player);
-            body.collisionDetectionMode = CollisionDetectionMode.Discrete;
-            body.isKinematic = !settings.WorldCollisions;
-            body.detectCollisions = settings.WorldCollisions;
-            body.useGravity = false;
-            body.constraints = RigidbodyConstraints.None;
-            body.interpolation = RigidbodyInterpolation.Interpolate;
-            body.linearDamping = 0f;
-            body.angularDamping = 0f;
-            body.maxAngularVelocity = 30f;
-            body.collisionDetectionMode = settings.WorldCollisions
-                ? CollisionDetectionMode.ContinuousDynamic : CollisionDetectionMode.ContinuousSpeculative;
-            IsHeld = true;
-            SetHoverSuppression(!settings.ShowHover);
-            if (settings.Instant)
-            {
-                body.position = CarryPosition();
-                body.rotation = carryFrame.rotation * Quaternion.Euler(settings.Rotation);
-            }
+            motion.Bind(body, colliders, observer.Player);
             if (!body.isKinematic)
             {
                 body.linearVelocity = Vector3.zero;
                 body.angularVelocity = Vector3.zero;
             }
+            body.collisionDetectionMode = CollisionDetectionMode.Discrete;
+            body.isKinematic = true;
+            body.detectCollisions = settings.WorldCollisions;
+            body.useGravity = false;
+            body.constraints = RigidbodyConstraints.None;
+            body.interpolation = RigidbodyInterpolation.None;
+            IsHeld = true;
+            SetHoverSuppression(!settings.ShowHover);
+            if (settings.Instant)
+                Follow();
+            return true;
         }
 
         /// <summary>Computes a world pose without inheriting the player's scale or hierarchy.</summary>
@@ -198,26 +221,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return carryFrame.position + carryFrame.rotation * settings.Offset;
         }
 
-        /// <summary>Follows the moving pose with a eased pickup transition and physical collision response.</summary>
+        /// <summary>Applies pickup easing and constrained motion on the same frame as the camera.</summary>
         private void Follow()
         {
-            // Physics-enabled carrying uses velocity so walls can stop the object instead of being teleported through.
+            // Queries constrain the kinematic pose before committing it; release restores dynamic simulation.
             float progress = settings.Instant ? 1f : Mathf.SmoothStep(0f, 1f, (Time.time - started) / settings.TransitionDuration);
             Vector3 position = Vector3.Lerp(startPosition, CarryPosition(), progress);
             Quaternion rotation = Quaternion.Slerp(startRotation, carryFrame.rotation * Quaternion.Euler(settings.Rotation), progress);
-            if (!settings.WorldCollisions)
-            {
-                body.MovePosition(position);
-                body.MoveRotation(rotation);
-                return;
-            }
-            body.linearVelocity = Vector3.ClampMagnitude((position - body.position) / Time.fixedDeltaTime, settings.FollowSpeed);
-            Quaternion difference = rotation * Quaternion.Inverse(body.rotation);
-            difference.ToAngleAxis(out float angle, out Vector3 axis);
-            if (angle > 180f)
-                angle -= 360f;
-            body.angularVelocity = InteractionValues.Finite(axis)
-                ? Vector3.ClampMagnitude(axis * (angle * Mathf.Deg2Rad / Time.fixedDeltaTime), body.maxAngularVelocity) : Vector3.zero;
+            Pose pose = new Pose(position, rotation);
+            if (settings.WorldCollisions)
+                pose = motion.Resolve(pose, settings, Time.deltaTime, firstFollow && settings.Instant);
+            body.position = pose.position;
+            body.rotation = pose.rotation;
+            // Rigidbody setters update the physics pose first; commit the visible Transform in this same render frame.
+            transform.SetPositionAndRotation(pose.position, pose.rotation);
+            firstFollow = false;
         }
 
         /// <summary>Restores authored carry overrides when context or component ownership disappears.</summary>

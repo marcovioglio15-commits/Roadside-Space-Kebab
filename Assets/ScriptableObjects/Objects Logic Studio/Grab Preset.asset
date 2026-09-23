@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8f04106e6e60a7409c5e9bc32915c26, type: 3}
+  m_Name: Grab Preset
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.GrabPreset
+  Settings:
+    Distance: 3
+    TargetMode: 0
+    CenterRadius: 0.15
+    TargetOffset: {x: 0, y: 0, z: 0}
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    Space: 0
+    Offset: {x: 0.35, y: -0.2, z: 1.5}
+    Rotation: {x: 0, y: 0, z: 0}
+    Instant: 0
+    TransitionDuration: 0.2
+    WorldCollisions: 1
+    FollowSpeed: 12
+    RecoveryResponse: 12
+    RotationSpeed: 360
+    CollisionPadding: 0.015
+    ContactRotation: 1
+    ContactAngle: 20
+    ContactResponse: 8
+    ShowHover: 1

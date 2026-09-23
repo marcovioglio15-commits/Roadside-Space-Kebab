@@ -18,7 +18,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectSingleInteraction feature = (ObjectSingleInteraction)target;
             using (new EditorGUI.DisabledScope(true))
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("action"));
-            using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+            using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
+                || !ObjectAuthoringSave.TryValidate(feature.gameObject, out _)))
                 if (GUILayout.Button(new GUIContent("Open Objects Logic Studio", "Edit this feature's binding and settings with Apply and Discard.")))
                     ObjectsLogicStudioWindow.Open(feature);
             if (!feature.TryValidate(out string warning))

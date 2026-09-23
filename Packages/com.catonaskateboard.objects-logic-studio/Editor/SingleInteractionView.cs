@@ -47,7 +47,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="data">Serialized workspace used by the settings controls.</param>
         internal void Draw(ObjectWorkspace state, SerializedObject data)
         {
-            // Structural changes operate only on scene objects or native prefab stages.
+            // Structural changes operate in the native prefab stage and immediately save its asset.
             using (new EditorGUI.DisabledScope(state.HasChanges || target == null || EditorUtility.IsPersistent(target)))
                 if (GUILayout.Button(addLabel, EditorStyles.miniButton, GUILayout.Width(135f)))
                     ShowAddMenu(state);
@@ -82,6 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                     if (features[index].Kind == state.Single.Kind && state.Single.Expanded)
                     {
+                        SingleInteractionPresetView.Draw(state);
                         if (SingleInteractionControls.Draw(data, state) || validated != features[index])
                         {
                             validated = features[index];
@@ -124,6 +125,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Recheck menu prerequisites because an open native menu can outlive a selection change.
             if (state.HasChanges || target == null || EditorUtility.IsPersistent(target)
+                || !ObjectAuthoringSave.TryValidate(target, out _)
                 || SingleInteractionSession.Resolve(target, kind) != null
                 || kind != SingleInteractionKind.Grab && target.GetComponent<ObjectGrab>() is not { enabled: true })
                 return;
@@ -143,6 +145,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 serialized.FindProperty("interactionName").stringValue = kind.ToString();
                 serialized.ApplyModifiedProperties();
             }
+            ObjectAuthoringSave.Save(target);
             state.Single.Kind = kind;
             state.Single.Expanded = true;
             state.Single.Read(target);
@@ -158,12 +161,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // A Grab remains the required dependency until both releases are removed.
             if (state.HasChanges || feature == null || EditorUtility.IsPersistent(feature)
+                || !ObjectAuthoringSave.TryValidate(target, out _)
                 || feature is ObjectGrab && target.GetComponents<ObjectRelease>().Length > 0)
                 return;
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
             Undo.RecordObject(state, "Remove single interaction");
             Undo.DestroyObjectImmediate(feature);
+            ObjectAuthoringSave.Save(target);
             Refresh(target);
             if (SingleInteractionSession.Resolve(target, state.Single.Kind) == null && features.Length > 0)
                 state.Single.Kind = features[0].Kind;

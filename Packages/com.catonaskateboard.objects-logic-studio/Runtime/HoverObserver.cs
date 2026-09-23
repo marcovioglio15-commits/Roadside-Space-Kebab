@@ -47,6 +47,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string PlayerTag => playerTag;
         /// <summary>Most recent unavailable-context diagnostic.</summary>
         public string Warning => lastWarning;
+        /// <summary>The player's single occupied carry slot; null after Drop, Throw or loss of context.</summary>
+        public ObjectGrab HeldObject => singles.Held;
 
         #endregion
 
