@@ -17,6 +17,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Whether an enabled button has performed since the last observer dispatch.</summary>
         internal bool Pending => pending && action.enabled;
+        /// <summary>Whether the owning PlayerInput currently enables this action.</summary>
+        internal bool Enabled => action.enabled;
 
         #endregion
 

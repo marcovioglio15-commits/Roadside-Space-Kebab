@@ -69,19 +69,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Existing authored UI is never replaced by a setup button.
             if (hover.Label != null)
                 return;
-            RectTransform root = CreateRect("Hover UI", hover.transform);
+            RectTransform root = ObjectUiAuthoring.CreateRect("Hover UI", hover.transform);
             Canvas canvas = root.gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 20;
             canvas.enabled = false;
-            RectTransform panel = CreateRect("Label", root);
+            RectTransform panel = ObjectUiAuthoring.CreateRect("Label", root);
             panel.sizeDelta = new Vector2(280f, 64f);
             Image background = panel.gameObject.AddComponent<Image>();
             background.color = new Color(0.04f, 0.06f, 0.08f, 0.88f);
             background.raycastTarget = false;
 
             // Text and background are existing native graphics; no runtime builder is necessary.
-            RectTransform textRect = CreateRect("Text", panel);
+            RectTransform textRect = ObjectUiAuthoring.CreateRect("Text", panel);
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
             textRect.offsetMin = new Vector2(12f, 6f);
@@ -113,20 +113,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("label").objectReferenceValue = label;
                 data.ApplyModifiedProperties();
             }
-        }
-
-        /// <summary>Creates a centered rectangle under an existing editor-owned hierarchy.</summary>
-        /// <param name="name">Hierarchy name assigned to the new object.</param>
-        /// <param name="parent">Existing parent in a scene or prefab stage.</param>
-        /// <returns>The new layout rectangle.</returns>
-        private static RectTransform CreateRect(string name, Transform parent)
-        {
-            // Unity's UI layer remains local to the authored graphics.
-            RectTransform rect = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();
-            rect.gameObject.layer = LayerMask.NameToLayer("UI");
-            rect.SetParent(parent, false);
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-            return rect;
         }
 
         #endregion

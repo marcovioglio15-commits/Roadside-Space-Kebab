@@ -79,7 +79,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 EditorGUILayout.FloatField(radiusLabel, settings.Radius);
                 EditorGUILayout.FloatField(heightLabel, settings.Height);
             }
-
         }
 
         #endregion

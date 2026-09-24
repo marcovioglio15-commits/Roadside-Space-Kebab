@@ -19,6 +19,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public bool HasBinding;
         [Tooltip("Reusable settings asset selected for explicit import or export on this interaction card.")]
         public SingleInteractionPreset Preset;
+        [Tooltip("Preset assigned to the component when this proposal was opened.")]
+        public SingleInteractionPreset OriginalPreset;
+        [Tooltip("Selected preset state used to protect against outside edits.")]
+        public string PresetBaseline = string.Empty;
         [Header("Draft")]
         [Tooltip("Retained proposed settings, applied only through the common footer.")]
         public SingleInteractionDraft Draft = new SingleInteractionDraft();
@@ -30,7 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Properties
 
         /// <summary>Whether this proposal differs from its applied baseline.</summary>
-        internal bool HasChanges => HasBinding && JsonUtility.ToJson(Draft) != JsonUtility.ToJson(Baseline);
+        internal bool HasChanges => HasBinding && (Preset != OriginalPreset || JsonUtility.ToJson(Draft) != JsonUtility.ToJson(Baseline));
 
         #endregion
 
@@ -62,8 +66,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // An absent feature stays absent rather than changing an unfinished proposal's identity.
             ObjectSingleInteraction feature = Resolve(target, Kind);
-            if (Preset != null && Preset.Kind != Kind)
-                Preset = null;
+            Preset = OriginalPreset = feature != null ? feature.SettingsPreset : null;
+            PresetBaseline = InteractionPresetWrites.Capture(Preset);
             HasBinding = feature != null;
             Draft = SingleInteractionDraft.Capture(feature);
             Baseline = ObjectWorkspace.Copy(Draft);
@@ -83,8 +87,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             warning = string.Empty;
             if (!HasChanges)
                 return true;
+            if (!InteractionPresetWrites.Validate(this, out warning))
+                return false;
             ObjectSingleInteraction feature = Resolve(target, Kind);
-            if (feature == null || JsonUtility.ToJson(SingleInteractionDraft.Capture(feature)) != JsonUtility.ToJson(Baseline))
+            if (feature == null || feature.SettingsPreset != OriginalPreset || JsonUtility.ToJson(SingleInteractionDraft.Capture(feature)) != JsonUtility.ToJson(Baseline))
                 warning = "The selected single interaction changed outside this session. Discard to reload it.";
             else if (EditorUtility.IsPersistent(feature) && !AssetDatabase.IsOpenForEdit(feature))
                 warning = "The selected prefab is not writable.";
@@ -102,6 +108,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.RecordObject(feature, "Apply " + Kind);
             using (SerializedObject data = new SerializedObject(feature))
             {
+                data.FindProperty("settingsPreset").objectReferenceValue = Preset;
                 data.FindProperty("interactionName").stringValue = Draft.Name;
                 data.FindProperty("action").objectReferenceValue = Draft.Action;
                 data.FindProperty("m_Enabled").boolValue = Draft.Enabled;
@@ -113,7 +120,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ? "\"settings\":" + JsonUtility.ToJson(Draft.Grab) : "\"physics\":" + JsonUtility.ToJson(Draft.Release);
             if (Kind == SingleInteractionKind.Throw)
                 settings += ",\"trajectory\":" + JsonUtility.ToJson(Draft.Throw);
-            JsonUtility.FromJsonOverwrite("{" + settings + "}", feature);
+            JsonUtility.FromJsonOverwrite("{" + settings + ",\"tagChange\":" + JsonUtility.ToJson(Draft.TagChange) + "}", feature);
             EditorUtility.SetDirty(feature);
             if (!EditorUtility.IsPersistent(feature))
                 PrefabUtility.RecordPrefabInstancePropertyModifications(feature);

@@ -18,8 +18,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float contactClearTime;
         private float reach;
         private Vector3 previousTarget;
+        private Vector3 recoveryVelocity;
         private bool tracking;
-        private const float separationMargin = 0.0001f;
+        private const float separationMargin = 0.001f;
 
         #endregion
 
@@ -41,6 +42,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             contactClearTime = 0f;
             reach = 0f;
             tracking = false;
+            recoveryVelocity = Vector3.zero;
             shapes = new CarryShape[colliders.Length];
             for (int index = 0; index < colliders.Length; index++)
             {
@@ -66,7 +68,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Pose pose = new Pose(body.position, body.rotation);
             // Follow this frame's anchor displacement directly, easing only the error retained from earlier contact.
             Vector3 remaining = tracking && !instant ? target.position - previousTarget
-                + (previousTarget - pose.position) * (1f - Mathf.Exp(-settings.RecoveryResponse * deltaTime)) : target.position - pose.position;
+                + Vector3.SmoothDamp(pose.position, previousTarget, ref recoveryVelocity,
+                    2f / settings.RecoveryResponse, settings.FollowSpeed, deltaTime) - pose.position : target.position - pose.position;
             previousTarget = target.position;
             tracking = true;
             float budget = instant ? float.PositiveInfinity : settings.FollowSpeed * deltaTime;
@@ -85,6 +88,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 budget = Mathf.Max(0f, budget - travel);
                 if (travel >= distance)
                     break;
+                // Do not store recovery velocity into a blocked plane and release it suddenly at an edge.
+                recoveryVelocity = Vector3.ProjectOnPlane(recoveryVelocity, normal);
                 if (settings.ContactRotation && pass == 0)
                 {
                     // Keep one response per contact plane; changing sweep hit points must not retrigger an impact every frame.
@@ -97,6 +102,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
                 remaining = Vector3.ProjectOnPlane(remaining * (1f - travel / distance), normal);
             }
+            if (!Separate(ref pose, ref budget))
+                return pose;
             // Intermediate orientations stop long objects from rotating through thin walls.
             if (contactClearTime <= 0f)
                 contactTarget = Vector3.zero;
@@ -144,12 +151,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (count == hits.Length)
                     return 0f;
                 for (int index = 0; index < count; index++)
-                    if (Blocks(shape.Collider, hits[index].collider) && Vector3.Dot(direction, hits[index].normal) < -0.0001f
-                        && hits[index].distance - padding < allowed)
+                    if (Blocks(shape.Collider, hits[index].collider) && Vector3.Dot(direction, hits[index].normal) < -0.0001f)
                     {
-                        allowed = Mathf.Max(0f, hits[index].distance - padding);
+                        float travel = Mathf.Max(0f, hits[index].distance
+                            - (padding + shape.Inset(pose, hits[index].normal)) / -Vector3.Dot(direction, hits[index].normal));
+                        if (travel >= allowed)
+                            continue;
+                        allowed = travel;
                         normal = hits[index].normal;
-                        point = hits[index].point;
+                        point = hits[index].distance > 0f ? hits[index].point : pose.position;
                     }
             }
             return allowed;

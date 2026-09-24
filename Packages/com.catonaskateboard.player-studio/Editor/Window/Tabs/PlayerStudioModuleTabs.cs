@@ -137,7 +137,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 switch (active)
                 {
                     case 0 when state.Body.Source != null:
-                        return sections.Draw("Body.Shape", "Collision Shape") && PlayerBodyDraftView.Draw(state.Body, owner);
+                        if (!sections.Draw("Body.Shape", "Collision Shape"))
+                            return false;
+                        using (new EditorGUI.IndentLevelScope())
+                            return PlayerBodyDraftView.Draw(state.Body, owner);
                     case 1 when state.Locomotion.Source != null || state.Locomotion.HasChanges:
                         return PlayerLocomotionDraftView.Draw(state.Locomotion, owner, sections);
                     case 2:
@@ -146,7 +149,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                         return DrawModule(state.Input, owner, false);
                     case 4 when state.Camera.Source != null || state.Camera.HasChanges:
                         bool changed = DrawModule(state.Camera, owner, true);
-                        return (sections.Draw("Camera.Binding", "Scene Binding") && state.CameraScene.Draw(owner)) || changed;
+                        if (sections.Draw("Camera.Binding", "Scene Binding"))
+                            using (new EditorGUI.IndentLevelScope())
+                                changed |= state.CameraScene.Draw(owner);
+                        return changed;
                     default:
                         EditorGUILayout.LabelField("Assign and apply this module's preset to edit it.", EditorStyles.wordWrappedLabel);
                         return false;
@@ -170,15 +176,18 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             else
             {
                 if (sections.Draw("Input.Movement", "Movement"))
-                    PlayerPresetField.DrawAction(serialized, "movementAction");
+                    using (new EditorGUI.IndentLevelScope())
+                        PlayerPresetField.DrawAction(serialized, "movementAction");
                 if (sections.Draw("Input.Jump", "Jump"))
-                    PlayerPresetField.DrawAction(serialized, "jumpAction");
+                    using (new EditorGUI.IndentLevelScope())
+                        PlayerPresetField.DrawAction(serialized, "jumpAction");
                 if (sections.Draw("Input.Camera", "Camera"))
-                {
-                    PlayerPresetField.DrawAction(serialized, "lookDeltaAction");
-                    PlayerPresetField.DrawAction(serialized, "lookRateAction");
-                    PlayerPresetField.DrawAction(serialized, "cursorToggleAction");
-                }
+                    using (new EditorGUI.IndentLevelScope())
+                    {
+                        PlayerPresetField.DrawAction(serialized, "lookDeltaAction");
+                        PlayerPresetField.DrawAction(serialized, "lookRateAction");
+                        PlayerPresetField.DrawAction(serialized, "cursorToggleAction");
+                    }
             }
             if (!EditorGUI.EndChangeCheck())
                 return false;

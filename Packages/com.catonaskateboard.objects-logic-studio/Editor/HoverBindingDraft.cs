@@ -19,6 +19,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Prefab-local anchor route retained across closing and reopening the workspace.")]
         public string AnchorPath = "-";
 
+        [Tooltip("Optional item tag change retained independently of reusable settings presets.")]
+        public InteractionTagChange TagChange = new InteractionTagChange();
+
         #endregion
 
         #region Methods
@@ -33,6 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Null supports editing a preset before attaching it to an object.
             return hover == null ? new HoverBindingDraft() : new HoverBindingDraft
             {
+                TagChange = ObjectWorkspace.Copy(hover.TagChange),
                 Name = hover.InteractionName,
                 Enabled = hover.enabled,
                 DrawGizmos = hover.DrawGizmos,

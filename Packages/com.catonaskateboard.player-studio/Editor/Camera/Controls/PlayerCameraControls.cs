@@ -19,98 +19,105 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             SerializedProperty settings = serialized.FindProperty("settings");
             PlayerCameraMode mode = (PlayerCameraMode)settings.FindPropertyRelative("mode").enumValueIndex;
             if (sections.Draw("Camera.View", "View"))
-            {
-                Field(settings, "mode");
-                mode = (PlayerCameraMode)settings.FindPropertyRelative("mode").enumValueIndex;
-                if (mode != PlayerCameraMode.Fixed || settings.FindPropertyRelative("fixedTrackTarget").boolValue)
-                    Field(settings, "targetOffset");
-                if (mode != PlayerCameraMode.Fixed)
+                using (new EditorGUI.IndentLevelScope())
                 {
-                    Field(settings, "follow");
-                    if ((PlayerCameraFollow)settings.FindPropertyRelative("follow").enumValueIndex == PlayerCameraFollow.Damped)
+                    Field(settings, "mode");
+                    mode = (PlayerCameraMode)settings.FindPropertyRelative("mode").enumValueIndex;
+                    if (mode != PlayerCameraMode.Fixed || settings.FindPropertyRelative("fixedTrackTarget").boolValue)
+                        Field(settings, "targetOffset");
+                    if (mode != PlayerCameraMode.Fixed)
                     {
-                        Field(settings, "followResponse");
-                        if (mode == PlayerCameraMode.ThirdPerson)
-                            Field(settings, "dampOrbit");
+                        Field(settings, "follow");
+                        if ((PlayerCameraFollow)settings.FindPropertyRelative("follow").enumValueIndex == PlayerCameraFollow.Damped)
+                        {
+                            Field(settings, "followResponse");
+                            if (mode == PlayerCameraMode.ThirdPerson)
+                                Field(settings, "dampOrbit");
+                        }
+                        Field(settings, "initialAngles");
                     }
-                    Field(settings, "initialAngles");
+                    else
+                    {
+                        Field(settings, "fixedPosition");
+                        Field(settings, "fixedTrackTarget");
+                        if (!settings.FindPropertyRelative("fixedTrackTarget").boolValue)
+                            Field(settings, "fixedEuler");
+                    }
+                    if (mode == PlayerCameraMode.ThirdPerson)
+                        Field(settings, "distance");
                 }
-                else
-                {
-                    Field(settings, "fixedPosition");
-                    Field(settings, "fixedTrackTarget");
-                    if (!settings.FindPropertyRelative("fixedTrackTarget").boolValue)
-                        Field(settings, "fixedEuler");
-                }
-                if (mode == PlayerCameraMode.ThirdPerson)
-                    Field(settings, "distance");
-            }
             if (mode != PlayerCameraMode.Fixed && sections.Draw("Camera.Look", "Look"))
-            {
-                Field(settings, "lookEnabled");
-                if (settings.FindPropertyRelative("lookEnabled").boolValue)
+                using (new EditorGUI.IndentLevelScope())
                 {
-                    Sensitivity(settings, "deltaSensitivity", new Vector2(0.12f, 0.12f), "Mouse Sensitivity",
-                        "Per-axis multiplier: 1 = 0.12 degrees per mouse delta unit. Mouse travel is independent of frame duration and depends on device DPI.");
-                    Sensitivity(settings, "rateSensitivity", new Vector2(160f, 120f), "Stick Sensitivity",
-                        "Per-axis multiplier: 1 = 160 degrees/second horizontally and 120 vertically at full deflection. The stick value is integrated over time.");
-                    Field(settings, "smoothLook");
-                    if (settings.FindPropertyRelative("smoothLook").boolValue)
+                    Field(settings, "lookEnabled");
+                    if (settings.FindPropertyRelative("lookEnabled").boolValue)
                     {
-                        Field(settings, "lookSmoothingTime");
-                        Field(settings, "adaptiveLookSmoothing");
-                        if (settings.FindPropertyRelative("adaptiveLookSmoothing").boolValue)
-                            Field(settings, "lookSmoothingSpeed");
+                        Sensitivity(settings, "deltaSensitivity", new Vector2(0.12f, 0.12f), "Mouse Sensitivity",
+                            "Per-axis multiplier: 1 = 0.12 degrees per mouse delta unit. Mouse travel is independent of frame duration and depends on device DPI.");
+                        Sensitivity(settings, "rateSensitivity", new Vector2(160f, 120f), "Stick Sensitivity",
+                            "Per-axis multiplier: 1 = 160 degrees/second horizontally and 120 vertically at full deflection. The stick value is integrated over time.");
+                        Field(settings, "smoothLook");
+                        if (settings.FindPropertyRelative("smoothLook").boolValue)
+                        {
+                            Field(settings, "lookSmoothingTime");
+                            Field(settings, "adaptiveLookSmoothing");
+                            if (settings.FindPropertyRelative("adaptiveLookSmoothing").boolValue)
+                                Field(settings, "lookSmoothingSpeed");
+                        }
+                        Field(settings, "invertY");
+                        Field(settings, "pitchLimits");
+                        Field(settings, "limitYaw");
+                        if (settings.FindPropertyRelative("limitYaw").boolValue)
+                            Field(settings, "yawLimits");
                     }
-                    Field(settings, "invertY");
-                    Field(settings, "pitchLimits");
-                    Field(settings, "limitYaw");
-                    if (settings.FindPropertyRelative("limitYaw").boolValue)
-                        Field(settings, "yawLimits");
                 }
-            }
             if (mode != PlayerCameraMode.Fixed && settings.FindPropertyRelative("lookEnabled").boolValue
                 && sections.Draw("Camera.Cursor", "Cursor"))
-            {
-                Field(settings, "lockCursor");
-                if (settings.FindPropertyRelative("lockCursor").boolValue)
+                using (new EditorGUI.IndentLevelScope())
                 {
-                    Field(settings, "showCenteredCursor");
-                    if (settings.FindPropertyRelative("showCenteredCursor").boolValue)
+                    Field(settings, "lockCursor");
+                    if (settings.FindPropertyRelative("lockCursor").boolValue)
                     {
-                        Field(settings, "cursorTexture");
-                        Field(settings, "cursorScale");
+                        Field(settings, "showCenteredCursor");
+                        if (settings.FindPropertyRelative("showCenteredCursor").boolValue)
+                        {
+                            Field(settings, "cursorTexture");
+                            Field(settings, "cursorScale");
+                        }
                     }
                 }
-            }
             if (mode == PlayerCameraMode.ThirdPerson && sections.Draw("Camera.Obstacles", "Obstacles"))
-            {
-                Field(settings, "avoidObstacles");
-                if (settings.FindPropertyRelative("avoidObstacles").boolValue)
+                using (new EditorGUI.IndentLevelScope())
                 {
-                    Field(settings, "obstacleMask");
-                    Field(settings, "collisionRadius");
-                    Field(settings, "collisionPadding");
-                    Field(settings, "obstacleReturnTime");
+                    Field(settings, "avoidObstacles");
+                    if (settings.FindPropertyRelative("avoidObstacles").boolValue)
+                    {
+                        Field(settings, "obstacleMask");
+                        Field(settings, "collisionRadius");
+                        Field(settings, "collisionPadding");
+                        Field(settings, "obstacleReturnTime");
+                    }
                 }
-            }
             if (mode == PlayerCameraMode.FirstPerson && sections.Draw("Camera.HeadTilt", "Head Tilt"))
-                PlayerHeadTiltControls.Draw(settings.FindPropertyRelative("headTilt"));
+                using (new EditorGUI.IndentLevelScope())
+                    PlayerHeadTiltControls.Draw(settings.FindPropertyRelative("headTilt"));
             if (sections.Draw("Camera.Lens", "Lens"))
-            {
-                Field(settings, "fieldOfView");
-                Field(settings, "nearClip");
-                Field(settings, "farClip");
-            }
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(settings, "fieldOfView");
+                    Field(settings, "nearClip");
+                    Field(settings, "farClip");
+                }
             if (sections.Draw("Camera.Presentation", "Player Presentation"))
-            {
-                Field(settings, "movementFrame");
-                Field(settings, "modelFacing");
-                if ((PlayerModelFacing)settings.FindPropertyRelative("modelFacing").enumValueIndex != PlayerModelFacing.Authored)
-                    Field(settings, "turnSpeed");
-                if (mode == PlayerCameraMode.FirstPerson)
-                    Field(settings, "hideVisualInFirstPerson");
-            }
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(settings, "movementFrame");
+                    Field(settings, "modelFacing");
+                    if ((PlayerModelFacing)settings.FindPropertyRelative("modelFacing").enumValueIndex != PlayerModelFacing.Authored)
+                        Field(settings, "turnSpeed");
+                    if (mode == PlayerCameraMode.FirstPerson)
+                        Field(settings, "hideVisualInFirstPerson");
+                }
         }
 
         /// <summary>Draws a field with its serialized tooltip and a consistent layout.</summary>

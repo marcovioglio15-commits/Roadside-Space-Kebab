@@ -25,6 +25,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Registration
 
+        /// <summary>Revalidates existing bindings after an explicit compound-geometry change.</summary>
+        internal static void Invalidate()
+        {
+            // Assembly may make a previously collider-free product grabbable.
+            Revision++;
+        }
+
         /// <summary>Recovers enabled components when domain or scene reload is disabled.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Rebuild()

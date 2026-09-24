@@ -14,6 +14,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly Vector3 extents;
         private readonly Vector3 segment;
         private readonly float radius;
+        private readonly float inset;
 
         #endregion
 
@@ -71,6 +72,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             center = Quaternion.Inverse(collider.transform.rotation)
                 * (collider.transform.TransformPoint(localCenter) - collider.transform.position);
+            // A small query core avoids PhysX's synthetic initial-overlap normals at resting contact.
+            inset = Mathf.Min(0.001f, Mathf.Min(extents.x, extents.y, extents.z) * 0.01f);
         }
 
         /// <summary>Tests a translated shape without moving its actual collider.</summary>
@@ -81,16 +84,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>The number of hits, or the buffer length when results may be truncated.</returns>
         internal int Cast(Pose pose, Vector3 direction, float distance, RaycastHit[] hits)
         {
-            // Primitive casts preserve authored dimensions; mesh bounds err towards earlier contact.
+            // Sweep a slightly inset core; the solver restores its support distance along the hit normal.
             Quaternion orientation = pose.rotation * rotation;
             Vector3 origin = pose.position + pose.rotation * position + orientation * center;
             return Collider switch
             {
-                SphereCollider => Physics.SphereCastNonAlloc(origin, radius, direction, hits, distance, ~0, QueryTriggerInteraction.Ignore),
+                SphereCollider => Physics.SphereCastNonAlloc(origin, radius - inset, direction, hits, distance, ~0, QueryTriggerInteraction.Ignore),
                 CapsuleCollider => Physics.CapsuleCastNonAlloc(origin + orientation * segment, origin - orientation * segment,
-                    radius, direction, hits, distance, ~0, QueryTriggerInteraction.Ignore),
-                _ => Physics.BoxCastNonAlloc(origin, extents, direction, hits, orientation, distance, ~0, QueryTriggerInteraction.Ignore)
+                    radius - inset, direction, hits, distance, ~0, QueryTriggerInteraction.Ignore),
+                _ => Physics.BoxCastNonAlloc(origin, extents - Vector3.one * inset, direction, hits, orientation, distance, ~0, QueryTriggerInteraction.Ignore)
             };
+        }
+
+        /// <summary>Restores the support distance removed from a sweep to keep its origin outside numerical contact.</summary>
+        /// <param name="pose">Body orientation used by the sweep.</param>
+        /// <param name="normal">Surface normal returned by the sweep.</param>
+        /// <returns>Support distance removed along the contact normal.</returns>
+        internal float Inset(Pose pose, Vector3 normal)
+        {
+            // Boxes lose support on each local axis; round shapes lose only their radius inset.
+            if (Collider is SphereCollider or CapsuleCollider)
+                return inset;
+            Vector3 local = Quaternion.Inverse(pose.rotation * rotation) * normal;
+            return inset * (Mathf.Abs(local.x) + Mathf.Abs(local.y) + Mathf.Abs(local.z));
         }
 
         /// <summary>Finds potential penetrations for a proposed rotation or external moving obstacle.</summary>

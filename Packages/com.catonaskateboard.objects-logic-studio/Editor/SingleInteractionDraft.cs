@@ -27,6 +27,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Launch strength, direction and spin for Throw.")]
         public ThrowSettings Throw = new ThrowSettings();
 
+        [Tooltip("Optional item tag change retained independently of reusable settings presets.")]
+        public InteractionTagChange TagChange = new InteractionTagChange();
+
         #endregion
 
         #region Methods
@@ -42,6 +45,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SingleInteractionDraft draft = new SingleInteractionDraft();
             if (feature == null)
                 return draft;
+            draft.TagChange = ObjectWorkspace.Copy(feature.TagChange);
             draft.Name = feature.InteractionName;
             draft.Enabled = feature.enabled;
             draft.Action = feature.Action;
@@ -80,6 +84,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         }
                 return true;
             }
+            if (!TagChange.TryValidate(feature.gameObject, out warning))
+                return false;
             if (Action == null || Action.action == null || Action.action.type != InputActionType.Button)
                 warning = "Choose a Button action from the player's Input Actions asset.";
             else if (feature is ObjectGrab)

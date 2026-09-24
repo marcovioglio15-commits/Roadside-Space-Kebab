@@ -31,23 +31,26 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             float acceleration = session.Acceleration;
             float deceleration = session.Deceleration;
             if (sections.Draw("Locomotion.Movement", "Movement"))
-            {
-                speed = EditorGUILayout.FloatField(speedLabel, speed);
-                acceleration = EditorGUILayout.FloatField(accelerationLabel, acceleration);
-                deceleration = EditorGUILayout.FloatField(decelerationLabel, deceleration);
-            }
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    speed = EditorGUILayout.FloatField(speedLabel, speed);
+                    acceleration = EditorGUILayout.FloatField(accelerationLabel, acceleration);
+                    deceleration = EditorGUILayout.FloatField(decelerationLabel, deceleration);
+                }
             bool useGravity = session.UseGravity;
             float gravityAcceleration = session.GravityAcceleration;
             float terminalSpeed = session.TerminalSpeed;
             float groundSpeed = session.GroundSpeed;
             if (sections.Draw("Locomotion.Gravity", "Gravity"))
-                PlayerGravityControls.Draw(ref useGravity, ref gravityAcceleration, ref terminalSpeed, ref groundSpeed);
+                using (new EditorGUI.IndentLevelScope())
+                    PlayerGravityControls.Draw(ref useGravity, ref gravityAcceleration, ref terminalSpeed, ref groundSpeed);
             bool useJump = session.UseJump;
             float height = session.JumpHeight;
             float bufferTime = session.JumpBufferTime;
             float coyoteTime = session.CoyoteTime;
             if ((useGravity || useJump) && sections.Draw("Locomotion.Jump", "Jump"))
-                PlayerJumpControls.Draw(useGravity, ref useJump, ref height, ref bufferTime, ref coyoteTime);
+                using (new EditorGUI.IndentLevelScope())
+                    PlayerJumpControls.Draw(useGravity, ref useJump, ref height, ref bufferTime, ref coyoteTime);
             if (!EditorGUI.EndChangeCheck())
                 return false;
 

@@ -1,13 +1,16 @@
 {
   "name": "com.catonaskateboard.objects-logic-studio",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "displayName": "Objects Logic Studio",
-  "description": "Prefab-based object interactions with authored hover labels and editor setup tools.",
+  "description": "Prefab object interactions with contact progress, dialogue, outlines, unlock rules and ingredient-based assembly.",
   "unity": "6000.6",
-  "author": { "name": "Cat On A Skateboard" },
+  "author": {
+    "name": "Cat On A Skateboard"
+  },
   "dependencies": {
     "com.catonaskateboard.studio-input": "0.1.0",
     "com.unity.inputsystem": "1.20.0",
-    "com.unity.ugui": "2.6.0"
+    "com.unity.ugui": "2.6.0",
+    "com.unity.render-pipelines.universal": "17.6.0"
   }
 }

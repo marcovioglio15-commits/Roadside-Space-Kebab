@@ -24,29 +24,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Closing a section changes only navigation; hidden values remain in the draft.
             SerializedProperty settings = configuration.FindPropertyRelative("settings");
             if (sections.Draw("Detection", "Choose targeting, player range and visibility checks."))
-            {
-                Field(settings, "targetMode");
-                Field(settings, "playerDistance");
-                if ((HoverTargetMode)settings.FindPropertyRelative("targetMode").enumValueIndex == HoverTargetMode.ViewCenter)
-                    Field(settings, "centerRadius");
-                Field(settings, "queryInterval");
-                Field(settings, "obstacleMask");
-            }
-            if (sections.Draw("Placement", "Offset the detection anchor and final label."))
-            {
-                Field(settings, "anchorOffset");
-                Field(settings, "worldOffset");
-                Field(settings, "screenOffset");
-            }
-            if (sections.Draw("Appearance", "Choose instant appearance or an animated pop-up."))
-            {
-                Field(settings, "appearance");
-                if ((HoverAppearance)settings.FindPropertyRelative("appearance").enumValueIndex == HoverAppearance.PopUp)
+                using (new EditorGUI.IndentLevelScope())
                 {
-                    Field(settings, "duration");
-                    Field(settings, "startScale");
+                    Field(settings, "targetMode");
+                    Field(settings, "playerDistance");
+                    if ((HoverTargetMode)settings.FindPropertyRelative("targetMode").enumValueIndex == HoverTargetMode.ViewCenter)
+                        Field(settings, "centerRadius");
+                    Field(settings, "queryInterval");
+                    Field(settings, "obstacleMask");
                 }
-            }
+            if (sections.Draw("Placement", "Offset the detection anchor and final label."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(settings, "anchorOffset");
+                    Field(settings, "worldOffset");
+                    Field(settings, "screenOffset");
+                }
+            if (sections.Draw("Appearance", "Choose instant appearance or an animated pop-up."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(settings, "appearance");
+                    if ((HoverAppearance)settings.FindPropertyRelative("appearance").enumValueIndex == HoverAppearance.PopUp)
+                    {
+                        Field(settings, "duration");
+                        Field(settings, "startScale");
+                    }
+                }
             DrawStyle(configuration.FindPropertyRelative("style"), sections);
         }
 
@@ -57,40 +60,43 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Appearance has one reusable source instead of independent native-graphic edits.
             if (sections.Draw("Text", "Edit the content, font and text rendering options."))
-            {
-                SerializedProperty content = style.FindPropertyRelative("content");
-                EditorGUILayout.LabelField(new GUIContent("Content", content.tooltip));
-                content.stringValue = EditorGUILayout.TextArea(content.stringValue, GUILayout.MinHeight(42f));
-                Field(style, "font");
-                Field(style, "fontSize");
-                Field(style, "fontStyle");
-                Field(style, "textColor");
-                Field(style, "alignment");
-                Field(style, "richText");
-                Field(style, "horizontalOverflow");
-                Field(style, "verticalOverflow");
-            }
-            if (sections.Draw("Layout", "Size and inset the preauthored label in reference pixels."))
-            {
-                Field(style, "size");
-                Field(style, "textSizeOffset");
-                Field(style, "textOffset");
-                Field(style, "sortingOrder");
-            }
-            if (sections.Draw("Background", "Enable and configure the existing background graphic."))
-            {
-                Field(style, "showBackground");
-                if (style.FindPropertyRelative("showBackground").boolValue)
+                using (new EditorGUI.IndentLevelScope())
                 {
-                    Field(style, "backgroundColor");
-                    Field(style, "backgroundSprite");
-                    if (style.FindPropertyRelative("backgroundSprite").objectReferenceValue != null)
+                    SerializedProperty content = style.FindPropertyRelative("content");
+                    EditorGUILayout.LabelField(new GUIContent("Content", content.tooltip));
+                    content.stringValue = EditorGUILayout.TextArea(content.stringValue, GUILayout.MinHeight(42f));
+                    Field(style, "font");
+                    Field(style, "fontSize");
+                    Field(style, "fontStyle");
+                    Field(style, "textColor");
+                    Field(style, "alignment");
+                    Field(style, "richText");
+                    Field(style, "horizontalOverflow");
+                    Field(style, "verticalOverflow");
+                }
+            if (sections.Draw("Layout", "Size and inset the preauthored label in reference pixels."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(style, "size");
+                    Field(style, "textSizeOffset");
+                    Field(style, "textOffset");
+                    Field(style, "sortingOrder");
+                }
+            if (sections.Draw("Background", "Enable and configure the existing background graphic."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(style, "showBackground");
+                    if (style.FindPropertyRelative("showBackground").boolValue)
                     {
-                        SerializedProperty type = style.FindPropertyRelative("backgroundType");
-                        type.enumValueIndex = EditorGUILayout.Popup(new GUIContent(type.displayName, type.tooltip), type.enumValueIndex, backgroundTypes);
+                        Field(style, "backgroundColor");
+                        Field(style, "backgroundSprite");
+                        if (style.FindPropertyRelative("backgroundSprite").objectReferenceValue != null)
+                        {
+                            SerializedProperty type = style.FindPropertyRelative("backgroundType");
+                            type.enumValueIndex = EditorGUILayout.Popup(new GUIContent(type.displayName, type.tooltip), type.enumValueIndex, backgroundTypes);
+                        }
                     }
                 }
-            }
         }
 
         #endregion

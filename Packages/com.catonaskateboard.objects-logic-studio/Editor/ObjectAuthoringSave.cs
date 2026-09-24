@@ -23,6 +23,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (target == null)
                 return false;
             PrefabStage stage = PrefabStageUtility.GetPrefabStage(target);
+            if (stage != null && !stage.IsPartOfPrefabContents(target))
+                return false;
             string path = stage != null ? stage.assetPath : EditorUtility.IsPersistent(target) ? AssetDatabase.GetAssetPath(target) : string.Empty;
             if (!path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase) || !AssetDatabase.IsOpenForEdit(path))
                 return false;
@@ -40,9 +42,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             PrefabStage stage = PrefabStageUtility.GetPrefabStage(target);
             if (stage != null)
             {
-                PrefabUtility.SaveAsPrefabAsset(stage.prefabContentsRoot, stage.assetPath, out bool saved);
-                if (!saved)
-                    throw new InvalidOperationException("The prefab stage could not be saved.");
+                // Native Save also updates preview-environment visibility and stage import bookkeeping.
+                if (stage != PrefabStageUtility.GetCurrentPrefabStage())
+                    throw new InvalidOperationException("Return to this prefab's workspace before saving its changes.");
+                Undo.FlushUndoRecordObjects();
+                EditorSceneManager.MarkSceneDirty(stage.scene);
+                if (!EditorApplication.ExecuteMenuItem("File/Save") || stage.scene.isDirty)
+                    throw new InvalidOperationException("Unity could not complete the native prefab save. Check the Console and retry Apply.");
             }
             else
             {

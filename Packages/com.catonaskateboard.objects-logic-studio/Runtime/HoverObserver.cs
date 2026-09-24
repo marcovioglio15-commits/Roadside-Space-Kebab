@@ -27,6 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private static HoverObserver active;
         private readonly HoverPhysics physics = new HoverPhysics();
         private readonly SingleInteractionDriver singles = new SingleInteractionDriver();
+        private readonly DialogueDriver dialogues = new DialogueDriver();
         private Camera resolvedView;
         private Transform player;
         private float nextResolve;
@@ -76,10 +77,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Input subscriptions belong to this observer even when another observer owns the view.
             singles.Reset();
+            dialogues.Reset();
             // A duplicate observer must not hide the active observer's output.
             if (active != this)
                 return;
             active = null;
+            InteractionUnlockRegistry.Reset();
+            AssemblyInteractionRegistry.Reset();
             HoverRegistry.HideAll();
         }
 
@@ -102,12 +106,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && player.gameObject.activeInHierarchy;
             if (available)
             {
-                singles.Tick(this);
+                InteractionUnlockRegistry.Tick(this);
+                AssemblyInteractionRegistry.Tick(this);
+                singles.Tick(this, dialogues.Tick(this));
                 HoverRegistry.Tick(this);
             }
             else if (hadContext)
             {
                 singles.Reset();
+                dialogues.Reset();
+                InteractionUnlockRegistry.Reset();
+                AssemblyInteractionRegistry.Reset();
                 HoverRegistry.HideAll();
             }
             hadContext = available;
@@ -122,6 +131,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Camera replacement also releases held objects and old PlayerInput subscriptions.
             singles.Reset();
+            dialogues.Reset();
+            InteractionUnlockRegistry.Reset();
+            AssemblyInteractionRegistry.Reset();
             // Reset cached ownership without looking through the scene every frame.
             resolvedView = null;
             player = null;

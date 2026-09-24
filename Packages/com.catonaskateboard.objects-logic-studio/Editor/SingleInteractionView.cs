@@ -82,6 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                     if (features[index].Kind == state.Single.Kind && state.Single.Expanded)
                     {
+                        using EditorGUI.IndentLevelScope cardIndent = new EditorGUI.IndentLevelScope();
                         SingleInteractionPresetView.Draw(state);
                         if (SingleInteractionControls.Draw(data, state) || validated != features[index])
                         {

@@ -113,7 +113,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "The hover anchor must belong to this object's prefab hierarchy.";
             else if (!preset.Configuration.TryValidate(out warning) || !label.TryValidate(transform, out warning))
                 return false;
-            else if (preset.Configuration.Settings.TargetMode == HoverTargetMode.Cursor && GetComponentInChildren<Collider>(true) == null)
+            else if (preset.Configuration.Settings.TargetMode == HoverTargetMode.Cursor && GetComponentInChildren<Collider>(true) == null
+                && (Application.isPlaying || GetComponent<ObjectAssemblyProduct>() == null))
                 warning = "Cursor hover requires a 3D collider on this object or one of its children.";
 
             // Shared graphics would make independent hover modes overwrite one another.
@@ -137,7 +138,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Tick(HoverObserver observer, float time)
         {
             // Deleted UI or invalid initialization leaves the component dormant until Refresh.
-            if (!ready || carrySuppressed || label == null || !label.isActiveAndEnabled)
+            if (!ready || carrySuppressed || !Available(InteractionChannels.Hover) || label == null || !label.isActiveAndEnabled)
             {
                 Hide();
                 return;
@@ -145,7 +146,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (time >= nextQuery)
             {
                 nextQuery = time + settings.QueryInterval;
+                bool previous = hovered;
                 hovered = observer.Evaluate(this, colliders);
+                if (hovered && !previous)
+                {
+                    Signal(InteractionMoment.Started);
+                    Signal(InteractionMoment.Completed);
+                }
                 if (!hovered)
                     label.Hide();
             }

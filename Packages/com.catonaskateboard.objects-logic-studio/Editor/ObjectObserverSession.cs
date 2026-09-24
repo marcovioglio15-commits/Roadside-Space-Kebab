@@ -39,6 +39,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private Camera camera;
         [NonSerialized]
         private GameObject player;
+        [NonSerialized]
+        private GameObject cameraPrefab;
+        [NonSerialized]
+        private Camera[] cameraChoices = Array.Empty<Camera>();
+        [NonSerialized]
+        private GUIContent[] cameraNames = Array.Empty<GUIContent>();
 
         #endregion
 
@@ -56,10 +62,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Restores references and discovers an existing observer without resetting an unfinished proposal.</summary>
         internal void Refresh()
         {
+            cameraPrefab = null;
             // Global IDs recover saved scene objects; cached references also support unsaved objects in this Editor session.
-            observer = ObserverId.Length > 0 ? Resolve<HoverObserver>(ObserverId) ?? observer : null;
-            camera = CameraId.Length > 0 ? Resolve<Camera>(CameraId) ?? camera : null;
-            player = PlayerId.Length > 0 ? Resolve<GameObject>(PlayerId) ?? player : null;
+            observer = ObserverId.Length > 0 ? Recover(ObserverId, observer) : null;
+            camera = CameraId.Length > 0 ? Recover(CameraId, camera) : null;
+            player = PlayerId.Length > 0 ? Recover(PlayerId, player) : null;
             if (HasChanges)
                 return;
             if (observer == null && ObserverId.Length > 0)
@@ -96,7 +103,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         player = parent.gameObject;
                         break;
                     }
-            if (player == null && Array.IndexOf(UnityEditorInternal.InternalEditorUtility.tags, PlayerTag) >= 0)
+            if (player == null && !EditorUtility.IsPersistent(observer) && Array.IndexOf(UnityEditorInternal.InternalEditorUtility.tags, PlayerTag) >= 0)
             {
                 GameObject[] candidates = GameObject.FindGameObjectsWithTag(PlayerTag);
                 if (candidates.Length == 1)
@@ -106,6 +113,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             PlayerId = OriginalPlayer = Capture(player);
             OriginalTag = PlayerTag;
             ExistingPlayerTag = player != null ? player.tag : string.Empty;
+        }
+
+        /// <summary>Recovers an ID without allowing a destroyed Unity wrapper to hide the live cached reference.</summary>
+        /// <typeparam name="T">Expected Unity reference type.</typeparam>
+        /// <param name="identity">Saved scene or asset identity.</param>
+        /// <param name="cached">Reference retained for an unsaved object.</param>
+        /// <returns>The resolved object or a still-live cached object.</returns>
+        private static T Recover<T>(string identity, T cached) where T : UnityEngine.Object
+        {
+            // Unity's destroyed-object semantics require an explicit null check.
+            T resolved = Resolve<T>(identity);
+            return resolved != null ? resolved : cached != null ? cached : null;
         }
 
         /// <summary>Resolves a stored Unity identity without selecting similar objects by name.</summary>
@@ -136,12 +155,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="owner">Workspace receiving Undo records.</param>
         internal void Draw(ObjectWorkspace owner)
         {
+            // A prefab picker makes asset-contained cameras accessible without a scene instance.
+            DrawPrefab(owner);
             // Selecting an existing observer is navigation; a pending proposal must be resolved first.
             using (new EditorGUI.DisabledScope(HasChanges))
             {
-                HoverObserver selected = (HoverObserver)EditorGUILayout.ObjectField(new GUIContent("Observer", "Existing scene component that supplies the camera and player to all object hovers."), observer, typeof(HoverObserver), true);
-                if (selected != observer && (selected == null || !EditorUtility.IsPersistent(selected)
-                    && !EditorSceneManager.IsPreviewScene(selected.gameObject.scene)))
+                HoverObserver selected = (HoverObserver)EditorGUILayout.ObjectField(new GUIContent("Observer", "Existing scene or prefab component that supplies camera and player context."), observer, typeof(HoverObserver), true);
+                if (selected != observer && (selected == null || EditorUtility.IsPersistent(selected) || !EditorSceneManager.IsPreviewScene(selected.gameObject.scene)))
                 {
                     observer = selected;
                     ObserverId = Capture(observer);
@@ -150,7 +170,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             }
             EditorGUI.BeginChangeCheck();
-            Camera view = (Camera)EditorGUILayout.ObjectField(new GUIContent("Camera", "Existing gameplay camera; Apply connects it without requiring the MainCamera tag."), camera, typeof(Camera), true);
+            Camera view = (Camera)EditorGUILayout.ObjectField(new GUIContent("Camera", "Gameplay camera in the same scene or prefab as the player; no MainCamera tag is required."), camera, typeof(Camera), true);
             GameObject root = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Player Root", "Existing player root; Apply assigns the chosen tag with Undo support."), player, typeof(GameObject), true);
             string tag = EditorGUILayout.TagField(new GUIContent("Player Tag", "Tag used to identify the player during gameplay."), PlayerTag);
             if (EditorGUI.EndChangeCheck())
@@ -168,6 +188,65 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorGUILayout.LabelField(observer != null ? "Connected · changes are committed with Apply." : "Choose a camera and player, then Apply once.", EditorStyles.miniLabel);
         }
 
+        /// <summary>Selects a player prefab and exposes every camera contained in that asset.</summary>
+        /// <param name="owner">Workspace retaining the selected asset and proposed connection.</param>
+        private void DrawPrefab(ObjectWorkspace owner)
+        {
+            // Selection remains independent of the interaction prefab edited in the other tabs.
+            GameObject current = player != null && EditorUtility.IsPersistent(player)
+                ? AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(player)) : null;
+            using (new EditorGUI.DisabledScope(HasChanges))
+            {
+                GameObject selected = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Player Prefab",
+                    "Optional player prefab to configure directly. Leave empty to configure loaded scene objects."), current, typeof(GameObject), false);
+                if (selected != current && (selected == null || ObjectAuthoringSave.TryValidate(selected, out _)))
+                {
+                    observer = selected != null ? selected.GetComponentInChildren<HoverObserver>(true) : null;
+                    ObserverId = Capture(observer);
+                    camera = null;
+                    player = selected;
+                    CameraId = OriginalCamera = OriginalPlayer = string.Empty;
+                    PlayerId = Capture(player);
+                    PlayerTag = OriginalTag = "Player";
+                    ExistingPlayerTag = player != null ? player.tag : string.Empty;
+                    if (observer != null)
+                        ReadApplied();
+                    else if (selected != null)
+                    {
+                        Camera[] cameras = selected.GetComponentsInChildren<Camera>(true);
+                        if (cameras.Length == 1)
+                        {
+                            camera = cameras[0];
+                            CameraId = Capture(camera);
+                        }
+                    }
+                    current = selected;
+                    owner.Persist();
+                }
+            }
+            if (current == null)
+                return;
+            if (cameraPrefab != current)
+            {
+                cameraPrefab = current;
+                cameraChoices = current.GetComponentsInChildren<Camera>(true);
+                cameraNames = new GUIContent[cameraChoices.Length + 1];
+                cameraNames[0] = new GUIContent("Select camera", "Choose an existing camera in this player prefab.");
+                for (int index = 0; index < cameraChoices.Length; index++)
+                    cameraNames[index + 1] = new GUIContent(AnimationUtility.CalculateTransformPath(cameraChoices[index].transform, current.transform),
+                        "Camera inside the selected player prefab.");
+            }
+            EditorGUI.BeginChangeCheck();
+            int requested = EditorGUILayout.Popup(new GUIContent("Prefab Camera", "Existing cameras in the selected asset."), Array.IndexOf(cameraChoices, camera) + 1, cameraNames);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(owner, "Select observer prefab camera");
+                camera = requested > 0 ? cameraChoices[requested - 1] : null;
+                CameraId = Capture(camera);
+                owner.Persist();
+            }
+        }
+
         #endregion
 
         #region Confirmation
@@ -181,11 +260,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             warning = string.Empty;
             if (!HasChanges)
                 return true;
-            if (camera == null || player == null || EditorUtility.IsPersistent(camera) || EditorUtility.IsPersistent(player)
-                || EditorSceneManager.IsPreviewScene(camera.gameObject.scene) || EditorSceneManager.IsPreviewScene(player.scene)
+            if (camera == null || player == null
+                || !EditorUtility.IsPersistent(camera) && EditorSceneManager.IsPreviewScene(camera.gameObject.scene)
+                || !EditorUtility.IsPersistent(player) && EditorSceneManager.IsPreviewScene(player.scene)
                 || PlayerTag == "Untagged" || Array.IndexOf(UnityEditorInternal.InternalEditorUtility.tags, PlayerTag) < 0)
                 warning = "Choose a loaded gameplay camera, player root and a defined player tag.";
-            else if (camera.gameObject.scene != player.scene || observer != null && observer.gameObject.scene != camera.gameObject.scene)
+            else if (EditorUtility.IsPersistent(camera) != EditorUtility.IsPersistent(player)
+                || EditorUtility.IsPersistent(player) && (AssetDatabase.GetAssetPath(camera) != AssetDatabase.GetAssetPath(player)
+                    || observer != null && AssetDatabase.GetAssetPath(observer) != AssetDatabase.GetAssetPath(player)
+                    || !ObjectAuthoringSave.TryValidate(player, out warning)))
+                warning = "Choose camera, player and observer from the same writable prefab, or all from the same loaded scene.";
+            else if (!EditorUtility.IsPersistent(player) && (camera.gameObject.scene != player.scene
+                || observer != null && observer.gameObject.scene != camera.gameObject.scene))
                 warning = "Choose an observer, camera and player in the same gameplay scene so their references can be saved.";
             else if (ObserverId.Length > 0 && observer == null)
                 warning = "The original scene observer is unavailable. Restore its scene or Discard before reconnecting.";
@@ -201,9 +287,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Reuse the same authored component instead of requiring setup whenever the tool reopens.
             if (!HasChanges)
                 return;
-            observer = HoverAuthoring.SetupObserver(camera, player, PlayerTag, observer);
-            EditorSceneManager.MarkSceneDirty(camera.gameObject.scene);
-            EditorSceneManager.MarkSceneDirty(player.scene);
+            if (EditorUtility.IsPersistent(player))
+                observer = ObjectObserverAssets.Apply(camera, player, PlayerTag, observer);
+            else
+            {
+                observer = HoverAuthoring.SetupObserver(camera, player, PlayerTag, observer);
+                EditorSceneManager.MarkSceneDirty(camera.gameObject.scene);
+                EditorSceneManager.MarkSceneDirty(player.scene);
+            }
             ReadApplied();
         }
 

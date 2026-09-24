@@ -32,6 +32,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Prefab = target != null
                 ? AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(state.Target.PrefabGuid)) : null;
             state.Single.Read(target);
+            state.Extended.ComponentId = 0;
+            state.Extended.Read(target);
             ObjectHover hover = Resolve(state);
             state.HasBinding = hover != null;
             state.OriginalPreset = hover != null ? hover.Preset : null;
@@ -81,6 +83,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             LoadPreset(state, state.HasBinding ? state.OriginalPreset : state.Source);
             state.Observer.Discard();
             state.Single.Read(state.Target.Resolve());
+            state.Extended.Read(state.Target.Resolve());
             state.Persist();
         }
 
@@ -96,15 +99,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Observer-only setup does not require a hover preset selection.
             warning = string.Empty;
-            if (state.HasChanges && !state.Target.IsOpen)
+            if ((state.InteractionChanged || state.Single.HasChanges || state.Extended.HasChanges) && !state.Target.IsOpen)
             {
                 warning = "Open the selected prefab before applying its retained changes.";
                 return false;
             }
-            if ((state.Single.HasChanges || state.HasBinding && state.InteractionChanged)
+            if ((state.Single.HasChanges || state.Extended.HasChanges || state.HasBinding && state.InteractionChanged)
                 && !ObjectAuthoringSave.TryValidate(state.Target.Resolve(), out warning))
                 return false;
             if (!state.Single.TryValidate(state.Target.Resolve(), out warning))
+                return false;
+            if (!state.Extended.TryValidate(state.Target.Resolve(), out warning))
                 return false;
             if (!state.InteractionChanged)
                 return state.Observer.TryValidate(out warning);
@@ -117,6 +122,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (warning.Length > 0)
                 return false;
             ObjectHover hover = Resolve(state);
+            if (state.HasBinding && hover != null && !state.Binding.TagChange.TryValidate(hover.gameObject, out warning))
+                return false;
             if (state.HasBinding)
             {
                 // Binding and hierarchy checks protect changes made by another inspector or prefab stage.
@@ -128,7 +135,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     warning = warning.Length > 0 ? warning : "Create the dedicated hover label before Apply.";
                 else if (state.Binding.AnchorPath != "-" && HoverHierarchy.Resolve(hover.transform, state.Binding.AnchorPath) == null)
                     warning = "The proposed anchor is no longer inside the selected object.";
-                else if (state.Draft.Settings.TargetMode == HoverTargetMode.Cursor && hover.GetComponentInChildren<Collider>(true) == null)
+                else if (state.Draft.Settings.TargetMode == HoverTargetMode.Cursor && hover.GetComponentInChildren<Collider>(true) == null
+                    && hover.GetComponent<ObjectAssemblyProduct>() == null)
                     warning = "Cursor hover requires an existing 3D collider on the object or its children.";
                 else if (EditorUtility.IsPersistent(hover) && !AssetDatabase.IsOpenForEdit(hover))
                     warning = "The selected prefab is not writable.";
@@ -154,7 +162,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.SetCurrentGroupName("Apply object interaction");
             Undo.RecordObject(state, "Apply object interaction");
             GameObject target = state.Target.Resolve();
-            bool savePrefab = state.Single.HasChanges || state.HasBinding && state.InteractionChanged;
+            bool savePrefab = state.Single.HasChanges || state.Extended.HasChanges || state.HasBinding && state.InteractionChanged;
             try
             {
                 // The preset remains the single source of reusable settings and appearance.
@@ -167,12 +175,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectHover hover = state.HasBinding ? Resolve(state) : null;
                 if (state.InteractionChanged && hover != null && state.Source != null)
                     ApplyBinding(state, hover);
-                state.Observer.Apply();
+                if (state.Single.HasChanges)
+                    InteractionPresetWrites.UpdateSingle(state);
+                if (state.Extended.HasChanges)
+                    InteractionPresetWrites.UpdateExtended(state);
                 state.Single.Apply(target);
+                state.Extended.Apply(target);
                 if (state.Source != null)
                     AssetDatabase.SaveAssetIfDirty(state.Source);
                 if (savePrefab)
                     ObjectAuthoringSave.Save(target);
+                state.Observer.Apply();
                 Undo.FlushUndoRecordObjects();
                 Discard(state);
                 Undo.CollapseUndoOperations(group);
@@ -187,6 +200,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     if (state.Source != null)
                         AssetDatabase.SaveAssetIfDirty(state.Source);
+                    if (state.Single.Preset != null)
+                        AssetDatabase.SaveAssetIfDirty(state.Single.Preset);
+                    if (state.Extended.Preset != null)
+                        AssetDatabase.SaveAssetIfDirty(state.Extended.Preset);
                     if (savePrefab && target != null)
                         ObjectAuthoringSave.Save(target);
                 }
@@ -213,6 +230,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("anchor").objectReferenceValue = HoverHierarchy.Resolve(hover.transform, state.Binding.AnchorPath);
                 data.ApplyModifiedProperties();
             }
+            Undo.RecordObject(hover, "Apply hover tag change");
+            JsonUtility.FromJsonOverwrite("{\"tagChange\":" + JsonUtility.ToJson(state.Binding.TagChange) + "}", hover);
             HoverLabel label = hover.Label;
             UnityEngine.Object[] graphics = label.Background != null
                 ? new UnityEngine.Object[] { label.Text, label.Text.rectTransform, label.Panel, label.Canvas, label.Background }
@@ -225,7 +244,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (!EditorUtility.IsPersistent(graphic))
                     PrefabUtility.RecordPrefabInstancePropertyModifications(graphic);
             }
-
         }
 
         #endregion

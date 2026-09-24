@@ -27,6 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     Undo.RecordObject(state, "Select interaction preset");
                     session.Preset = selected;
+                    session.PresetBaseline = InteractionPresetWrites.Capture(selected);
                     state.Persist();
                 }
                 using (new EditorGUI.DisabledScope(session.Preset == null))
@@ -37,6 +38,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         else
                             Debug.LogWarning(warning, session.Preset);
                     }
+                using (new EditorGUI.DisabledScope(session.Preset == null))
+                    if (GUILayout.Button(new GUIContent("Update", "Write the current settings to the selected preset. Apply also performs this update."), GUILayout.Width(58f)))
+                        try
+                        {
+                            InteractionPresetWrites.UpdateSingle(state);
+                        }
+                        catch (Exception exception)
+                        {
+                            Debug.LogWarning(exception.Message, session.Preset);
+                        }
                 if (GUILayout.Button(new GUIContent("Export", "Save the current draft settings as a new preset asset. Existing presets and other items are unchanged."), GUILayout.Width(54f)))
                     Export(state);
             }
@@ -71,6 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     state.Single.Draft.Throw = ObjectWorkspace.Copy(launch.Trajectory);
                     break;
             }
+            state.Single.PresetBaseline = InteractionPresetWrites.Capture(state.Single.Preset);
             state.Persist();
             return true;
         }
@@ -118,6 +130,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 AssetDatabase.CreateAsset(created, AssetDatabase.GenerateUniqueAssetPath(path));
                 AssetDatabase.SaveAssetIfDirty(created);
                 state.Single.Preset = created;
+                state.Single.PresetBaseline = InteractionPresetWrites.Capture(created);
                 state.Persist();
             }
             finally

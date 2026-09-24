@@ -9,15 +9,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region State
 
-        private readonly Dictionary<InputAction, InteractionButton> buttons = new Dictionary<InputAction, InteractionButton>();
+        private readonly InteractionInputRouter input = new InteractionInputRouter();
         private readonly Dictionary<ObjectSingleInteraction, InteractionButton> bindings = new Dictionary<ObjectSingleInteraction, InteractionButton>();
         private readonly HoverPhysics physics = new HoverPhysics();
-        private PlayerInput input;
-        private InputActionAsset asset;
         private Transform player;
         private ObjectGrab held;
         private int revision = -1;
-        private float nextInputSearch;
+        private int inputRevision = -1;
         private bool missingInputReported;
 
         #endregion
@@ -42,9 +40,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             held = null;
             ClearBindings();
             player = null;
-            input = null;
-            asset = null;
-            nextInputSearch = 0f;
+            input.Reset();
+            inputRevision = -1;
             missingInputReported = false;
         }
 
@@ -52,9 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void ClearBindings()
         {
             // Disposing signals never changes PlayerInput's maps or device pairing.
-            foreach (InteractionButton button in buttons.Values)
-                button.Dispose();
-            buttons.Clear();
+            input.ClearBindings();
             bindings.Clear();
             revision = -1;
         }
@@ -69,18 +64,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Reset();
                 player = observer.Player;
             }
-            if (input == null && Time.unscaledTime >= nextInputSearch)
-            {
-                nextInputSearch = Time.unscaledTime + 1f;
-                input = player.GetComponentInChildren<PlayerInput>();
-            }
-            InputActionAsset current = input != null && input.isActiveAndEnabled ? input.actions : null;
-            if (revision == SingleInteractionRegistry.Revision && asset == current)
+            input.Refresh(player);
+            if (revision == SingleInteractionRegistry.Revision && inputRevision == input.Revision)
                 return;
             ClearBindings();
-            asset = current;
+            inputRevision = input.Revision;
             revision = SingleInteractionRegistry.Revision;
-            if (asset == null)
+            if (input.Asset == null)
             {
                 if (!missingInputReported && SingleInteractionRegistry.Items.Count > 0)
                 {
@@ -101,14 +91,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     Debug.LogWarning(feature.Kind + ": " + warning, feature);
                     continue;
                 }
-                InputAction action = asset.FindAction(feature.Action.action.id.ToString());
-                if (action == null || action.type != InputActionType.Button)
+                InteractionButton button = input.Bind(feature.Action);
+                if (button == null)
                 {
                     Debug.LogWarning(feature.Kind + " action is not a Button in the Observer player's Input Actions asset.", feature);
                     continue;
                 }
-                if (!buttons.TryGetValue(action, out InteractionButton button))
-                    buttons.Add(action, button = new InteractionButton(action));
                 bindings.Add(feature, button);
             }
         }
@@ -119,22 +107,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Processes one pickup or release after the gameplay camera has finished moving.</summary>
         /// <param name="observer">Shared camera/player context.</param>
-        internal void Tick(HoverObserver observer)
+        /// <param name="consumed">Action already used by dialogue in this frame, if any.</param>
+        internal void Tick(HoverObserver observer, InputActionReference consumed = null)
         {
             // Rebinding is triggered by ownership and registry changes, not by ordinary repaints or frames.
             Bind(observer);
+            input.Consume(AssemblyInteractionRegistry.Consumed);
+            input.Consume(consumed);
+            foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
+                input.Consume(action);
             if (held != null && !held.IsHeld)
                 held = null;
-            if (input == null || !input.isActiveAndEnabled || !input.inputIsActive || asset == null || Time.timeScale <= 0f)
+            if (!input.Usable || Time.timeScale <= 0f)
             {
-                ClearSignals();
+                input.ClearSignals();
                 return;
             }
             if (held != null)
                 Release(observer);
             else
                 Grab(observer);
-            ClearSignals();
+            input.ClearSignals();
         }
 
         /// <summary>Chooses the highest-priority eligible release without grabbing again in the same event.</summary>
@@ -144,12 +137,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Throw wins simultaneous Drop/Throw requests; using one action for Grab and Drop provides a toggle.
             ObjectRelease selected = null;
             foreach (KeyValuePair<ObjectSingleInteraction, InteractionButton> pair in bindings)
-                if (pair.Value.Pending && pair.Key is ObjectRelease release && release.isActiveAndEnabled
+                if (pair.Value.Pending && pair.Key is ObjectRelease release && release.Available(InteractionChannels.Release)
                     && release.Grab == held && (selected == null || release.Kind == SingleInteractionKind.Throw))
                     selected = release;
             if (selected == null)
                 return;
+            selected.Signal(InteractionMoment.Started);
             selected.Execute(observer.View.transform);
+            selected.Signal(InteractionMoment.Completed);
             held = null;
         }
 
@@ -161,7 +156,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ObjectGrab selected = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectSingleInteraction, InteractionButton> pair in bindings)
-                if (pair.Value.Pending && pair.Key is ObjectGrab candidate && candidate.isActiveAndEnabled
+                if (pair.Value.Pending && pair.Key is ObjectGrab candidate && candidate.Available(InteractionChannels.Grab)
                     && !candidate.IsHeld && !candidate.transform.IsChildOf(observer.Player)
                     && Eligible(observer, candidate, out float score)
                     && (score < distance || score == distance && selected != null
@@ -174,14 +169,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             if (selected.Begin(observer))
                 held = selected;
-        }
-
-        /// <summary>Clears every signal after one arbitration pass, including currently ineligible requests.</summary>
-        private void ClearSignals()
-        {
-            // An out-of-range press must never trigger later merely because the object moved closer.
-            foreach (InteractionButton button in buttons.Values)
-                button.Clear();
         }
 
         #endregion

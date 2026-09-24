@@ -98,7 +98,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Reads local prefab identity in either persistent asset or native stage form.</summary>
         /// <param name="target">Object belonging to the selected prefab.</param>
         /// <returns>The saved local file ID, or zero for a new unsaved object.</returns>
-        private static long FileId(GameObject target)
+        internal static long FileId(UnityEngine.Object target)
         {
             // Stage instances expose source and instance IDs separately; combine them to match the asset-local ID.
             if (EditorUtility.IsPersistent(target))

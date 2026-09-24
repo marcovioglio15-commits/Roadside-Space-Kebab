@@ -18,6 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private string status = string.Empty;
         private bool openingPrefab;
         private readonly SingleInteractionView singles = new SingleInteractionView();
+        private readonly ExtendedInteractionView extended = new ExtendedInteractionView();
 
         #endregion
 
@@ -93,6 +94,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             window.state.Category = ObjectInteractionCategory.SingleInteraction;
             window.state.Single.Expanded = true;
+            window.state.Persist();
+            window.Refresh();
+        }
+
+        /// <summary>Opens a specific contact or dialogue component without replacing another pending proposal.</summary>
+        /// <param name="feature">Prefab component requested by its inspector.</param>
+        internal static void Open(ObjectExtendedInteraction feature)
+        {
+            // Native component IDs distinguish multiple dialogues on the same branch.
+            ObjectsLogicStudioWindow window = GetWindow<ObjectsLogicStudioWindow>("Objects Logic Studio");
+            if (!ObjectAuthoringSave.TryValidate(feature.gameObject, out window.status))
+                return;
+            if (window.state.HasChanges && window.state.Extended.Resolve(window.currentObject) != feature)
+            {
+                window.status = "Apply or Discard before changing objects or interactions.";
+                return;
+            }
+            if (!window.state.HasChanges)
+            {
+                ObjectWorkspaceSession.Select(window.state, feature.gameObject, 0, out window.status);
+                window.state.Extended.Select(feature);
+            }
+            window.state.Category = feature.Kind switch
+            {
+                ExtendedInteractionKind.Dialogue => ObjectInteractionCategory.MultipleInteraction,
+                ExtendedInteractionKind.AssemblyStation or ExtendedInteractionKind.AssemblyProduct => ObjectInteractionCategory.ObjectAssemble,
+                ExtendedInteractionKind.Unlock => ObjectInteractionCategory.UnlockInteractions,
+                _ => ObjectInteractionCategory.PassiveInteraction
+            };
+            window.state.Extended.Expanded = true;
             window.state.Persist();
             window.Refresh();
         }
@@ -198,7 +229,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             currentObject = state.Target.IsOpen ? state.Target.Resolve() : null;
             if (currentObject != null && !state.HasChanges && !EditorApplication.isPlayingOrWillChangePlaymode)
                 ObjectWorkspaceSession.Discard(state);
+            UnlockInteractionControls.Refresh(currentObject);
             singles.Refresh(currentObject);
+            extended.Refresh(currentObject);
             interactions = currentObject != null ? currentObject.GetComponents<ObjectHover>() : Array.Empty<ObjectHover>();
             names = new GUIContent[interactions.Length];
             for (int index = 0; index < interactions.Length; index++)
@@ -225,7 +258,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             GameObject selected = Selection.activeGameObject;
             PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
-            if (selected == null || selected == currentObject || stage == null || !stage.IsPartOfPrefabContents(selected)
+            if (state.Category == ObjectInteractionCategory.SceneObserver || selected == null || selected == currentObject || stage == null || !stage.IsPartOfPrefabContents(selected)
                 || !ObjectAuthoringSave.TryValidate(selected, out _))
                 return;
             ObjectHover owner = selected.GetComponentInParent<ObjectHover>();
@@ -248,17 +281,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Scroll = EditorGUILayout.BeginScrollView(state.Scroll);
             using (new EditorGUI.DisabledScope(locked))
                 DrawSelection();
-            if (!CanEdit)
+            ObjectInteractionTabs.Draw(state);
+            if (!CanEdit && state.Category != ObjectInteractionCategory.SceneObserver)
             {
                 // A retained draft stays untouched while its prefab is closed or another asset is being previewed.
                 DrawClosedWorkspace(locked);
                 EditorGUILayout.EndScrollView();
                 return;
             }
-            ObjectInteractionTabs.Draw(state);
             using (new EditorGUI.DisabledScope(locked))
                 switch (state.Category)
                 {
+                    case ObjectInteractionCategory.SceneObserver:
+                        state.Observer.Draw(state);
+                        break;
                     case ObjectInteractionCategory.Hover:
                         DrawHovers();
                         break;
@@ -266,13 +302,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         singles.Draw(state, data);
                         break;
                     case ObjectInteractionCategory.MultipleInteraction:
-                        EditorGUILayout.LabelField("No features available yet.", EditorStyles.centeredGreyMiniLabel);
+                        extended.Draw(state, data, ExtendedInteractionKind.Dialogue);
+                        break;
+                    case ObjectInteractionCategory.UnlockInteractions:
+                        extended.Draw(state, data, ExtendedInteractionKind.Unlock);
+                        break;
+                    case ObjectInteractionCategory.ObjectAssemble:
+                        extended.Draw(state, data, ExtendedInteractionKind.AssemblyStation);
+                        break;
+                    case ObjectInteractionCategory.PassiveInteraction:
+                        extended.Draw(state, data, ExtendedInteractionKind.ModifyByContact);
                         break;
                 }
-            using (new EditorGUI.DisabledScope(locked))
-                if (state.Category != ObjectInteractionCategory.MultipleInteraction
-                    && state.Sections.Draw("Scene Observer", "One scene component shares the camera and tagged player with hover and single interactions. Single interactions use that player's PlayerInput."))
-                    state.Observer.Draw(state);
             EditorGUILayout.EndScrollView();
             DrawFooter(locked);
         }
@@ -303,26 +344,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // All navigation is guarded while any domain has pending changes.
             if (state.Sections.Draw("Prefab", "Choose a prefab asset; use its workspace hierarchy to select a child."))
-            {
-                using (new EditorGUILayout.HorizontalScope())
+                using (new EditorGUI.IndentLevelScope())
                 {
-                    using (new EditorGUI.DisabledScope(state.HasChanges))
+                    using (new EditorGUILayout.HorizontalScope())
                     {
-                        GameObject requested = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Prefab", "Source prefab edited by this tool. Scene instances are not accepted."), state.Prefab, typeof(GameObject), false);
-                        if (requested != state.Prefab && (requested == null || ObjectAuthoringSave.TryValidate(requested, out status)))
+                        using (new EditorGUI.DisabledScope(state.HasChanges))
                         {
-                            state.Prefab = requested;
-                            ObjectWorkspaceSession.Select(state, requested, 0, out status);
-                            Refresh();
+                            GameObject requested = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Prefab", "Source prefab edited by this tool. Scene instances are not accepted."), state.Prefab, typeof(GameObject), false);
+                            if (requested != state.Prefab && (requested == null || ObjectAuthoringSave.TryValidate(requested, out status)))
+                            {
+                                state.Prefab = requested;
+                                ObjectWorkspaceSession.Select(state, requested, 0, out status);
+                                Refresh();
+                            }
                         }
+                        if (state.Prefab != null && GUILayout.Button(openPrefabLabel, EditorStyles.miniButton, GUILayout.Width(44f)))
+                            OpenPrefab();
                     }
-                    if (state.Prefab != null && GUILayout.Button(openPrefabLabel, EditorStyles.miniButton, GUILayout.Width(44f)))
-                        OpenPrefab();
+                    if (CanEdit)
+                    {
+                        using (new EditorGUI.DisabledScope(true))
+                            EditorGUILayout.ObjectField(new GUIContent("Prefab Object", "Selected root or child inside the prefab workspace."), currentObject, typeof(GameObject), true);
+                        using (new EditorGUI.DisabledScope(state.HasChanges))
+                            if (currentObject.GetComponent<ObjectItem>() == null && GUILayout.Button(new GUIContent("Prepare Contact Item",
+                                "Add shared item state so this prefab can be a tagged contact participant and retain consumption receipts.")))
+                            {
+                                ExtendedInteractionAuthoring.Prepare(currentObject);
+                                Refresh();
+                            }
+                    }
                 }
-                if (CanEdit)
-                    using (new EditorGUI.DisabledScope(true))
-                        EditorGUILayout.ObjectField(new GUIContent("Prefab Object", "Selected root or child inside the prefab workspace."), currentObject, typeof(GameObject), true);
-            }
         }
 
         /// <summary>Lists independently configured hover components as expandable feature cards.</summary>
@@ -362,7 +413,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             }
                     }
                     if (index == state.Target.InteractionIndex && state.InteractionExpanded)
-                        DrawHoverSettings();
+                        using (new EditorGUI.IndentLevelScope())
+                            DrawHoverSettings();
                 }
 
             // Presets remain editable without a component; retained drafts also survive missing objects.
@@ -377,11 +429,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             DrawPreset();
             data.Update();
             if (state.HasBinding && state.Sections.Draw("Binding", "Edit this object's interaction name, enabled state and optional anchor."))
-                DrawBinding();
+                using (new EditorGUI.IndentLevelScope())
+                    DrawBinding();
             if (state.Source != null)
                 HoverControls.Draw(data.FindProperty("Draft"), state.Sections);
             if (state.HasBinding && state.Sections.Draw("Debug", "Control selected-object debug geometry."))
-                HoverControls.Field(data.FindProperty("Binding"), "DrawGizmos");
+                using (new EditorGUI.IndentLevelScope())
+                    HoverControls.Field(data.FindProperty("Binding"), "DrawGizmos");
             if (data.ApplyModifiedProperties())
                 state.Persist();
         }
@@ -420,6 +474,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Asset creation is explicit; assigning the result remains a pending component binding.
             if (!state.Sections.Draw("Preset", "Select the reusable detection and text configuration edited by this session."))
                 return;
+            using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
             using (new EditorGUI.DisabledScope(state.HasChanges))
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -445,6 +500,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SerializedProperty binding = data.FindProperty("Binding");
             HoverControls.Field(binding, "Name");
             HoverControls.Field(binding, "Enabled");
+            InteractionTagControls.Draw(binding.FindPropertyRelative("TagChange"), state.Sections);
             ObjectHover hover = CurrentInteraction;
             if (hover == null)
                 return;

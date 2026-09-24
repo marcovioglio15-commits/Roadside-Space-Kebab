@@ -33,10 +33,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectHover[] hovers;
         private CarryBodyState original;
         private Transform carryFrame;
+        private Transform carryPlayer;
         private Vector3 startPosition;
         private Quaternion startRotation;
         private float started;
         private bool firstFollow;
+        private bool pickupCompleted;
 
         #endregion
 
@@ -146,7 +148,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Separate physical children require separate grab roots instead of being silently detached.
             warning = string.Empty;
             Rigidbody rigidbody = target.GetComponent<Rigidbody>();
-            if (target.isStatic || rigidbody == null || target.GetComponentsInChildren<Rigidbody>(true).Length != 1
+            if (target.isStatic || rigidbody == null || HasNestedBody(target, rigidbody)
                 || target.transform.parent != null && target.transform.parent.GetComponentInParent<Rigidbody>() != null)
                 warning = "Grab needs a non-static root with one Rigidbody and no nested grabbed bodies.";
             else
@@ -163,10 +165,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     }
                     solid |= collider.GetComponentInParent<Rigidbody>(true) == rigidbody;
                 }
-                if (warning.Length == 0 && !solid)
+                if (warning.Length == 0 && !solid && (Application.isPlaying || target.GetComponent<ObjectAssemblyProduct>() == null))
                     warning = "Add at least one enabled solid 3D collider before using Grab.";
             }
             return warning.Length == 0;
+        }
+
+        /// <summary>Rejects competing bodies while allowing suspended ingredient bodies owned by this assembly.</summary>
+        /// <param name="target">Proposed grab root.</param>
+        /// <param name="owner">Root body that will own every active solid shape.</param>
+        /// <returns>True when another active physical owner is nested under the grab root.</returns>
+        internal static bool HasNestedBody(GameObject target, Rigidbody owner)
+        {
+            // Assembly retains original components but disables their colliders and collision participation.
+            foreach (Rigidbody candidate in target.GetComponentsInChildren<Rigidbody>(true))
+                if (candidate != owner && (!candidate.TryGetComponent(out ObjectAssemblyPart part)
+                    || part.Product == null || part.Product.gameObject != target || candidate.detectCollisions || !candidate.isKinematic))
+                    return true;
+            return false;
         }
 
         #endregion
@@ -179,7 +195,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool Begin(HoverObserver observer)
         {
             // Capture current body policy so release never assumes the prefab's original defaults.
-            if (IsHeld || observer == null || observer.HeldObject != null || observer.Player == null || observer.View == null)
+            if (!Available(InteractionChannels.Grab) || IsHeld || observer == null || observer.HeldObject != null || observer.Player == null || observer.View == null)
                 return false;
             if (!ValidateBody(gameObject, out string warning))
             {
@@ -189,10 +205,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             CacheGeometry();
             original = new CarryBodyState(body);
             carryFrame = settings.Space == CarrySpace.Camera ? observer.View.transform : observer.Player;
+            carryPlayer = observer.Player;
             startPosition = body.position;
             startRotation = body.rotation;
             started = Time.time;
             firstFollow = true;
+            pickupCompleted = false;
             collisions.Ignore(colliders, observer.Player);
             motion.Bind(body, colliders, observer.Player);
             if (!body.isKinematic)
@@ -207,7 +225,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             body.constraints = RigidbodyConstraints.None;
             body.interpolation = RigidbodyInterpolation.None;
             IsHeld = true;
+            if (TryGetComponent(out ObjectAssemblyProduct product))
+                product.ReleaseTable();
             SetHoverSuppression(!settings.ShowHover);
+            Signal(InteractionMoment.Started);
             if (settings.Instant)
                 Follow();
             return true;
@@ -219,6 +240,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Carry offsets are metres, even when the player or camera hierarchy has authored scale.
             return carryFrame.position + carryFrame.rotation * settings.Offset;
+        }
+
+        /// <summary>Recaches an explicitly replaced mesh collider without releasing the occupied carry slot.</summary>
+        internal void RefreshCarryGeometry()
+        {
+            // Contact effects invoke this only after committing geometry, never during ordinary following.
+            if (!IsHeld || carryPlayer == null)
+                return;
+            CacheGeometry();
+            motion.Bind(body, colliders, carryPlayer);
         }
 
         /// <summary>Applies pickup easing and constrained motion on the same frame as the camera.</summary>
@@ -236,6 +267,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Rigidbody setters update the physics pose first; commit the visible Transform in this same render frame.
             transform.SetPositionAndRotation(pose.position, pose.rotation);
             firstFollow = false;
+            if (!pickupCompleted && progress >= 1f)
+            {
+                pickupCompleted = true;
+                Signal(InteractionMoment.Completed);
+            }
         }
 
         /// <summary>Restores authored carry overrides when context or component ownership disappears.</summary>
@@ -246,6 +282,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             IsHeld = false;
             carryFrame = null;
+            carryPlayer = null;
             if (body != null)
                 original.Restore(body, false);
             SetHoverSuppression(false);
@@ -261,6 +298,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             IsHeld = false;
             carryFrame = null;
+            carryPlayer = null;
             original.Restore(body, true);
             profile.Apply(body);
             for (int index = 0; index < colliders.Length; index++)

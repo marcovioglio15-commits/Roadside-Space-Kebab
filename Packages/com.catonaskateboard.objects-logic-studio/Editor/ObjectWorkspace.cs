@@ -34,6 +34,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public bool HasBinding;
         [Tooltip("Retained Grab, Drop or Throw proposal sharing the common Apply and Discard transaction.")]
         public SingleInteractionSession Single = new SingleInteractionSession();
+        [Tooltip("Retained contact or dialogue proposal sharing the common Apply and Discard transaction.")]
+        public ExtendedInteractionSession Extended = new ExtendedInteractionSession();
 
         [Header("Workspace")]
         [Tooltip("Interaction category currently displayed in the workspace.")]
@@ -59,7 +61,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal bool InteractionChanged => PresetChanged || HasBinding && (Source != OriginalPreset
             || JsonUtility.ToJson(Binding) != JsonUtility.ToJson(OriginalBinding));
         /// <summary>Whether any domain requires the common Apply action.</summary>
-        internal bool HasChanges => InteractionChanged || Single.HasChanges || Observer.HasChanges;
+        internal bool HasChanges => InteractionChanged || Single.HasChanges || Extended.HasChanges || Observer.HasChanges;
 
         #endregion
 

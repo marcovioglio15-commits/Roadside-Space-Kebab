@@ -53,10 +53,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             bool wasChanged = GUI.changed;
             sourceOpen = EditorGUILayout.Foldout(sourceOpen, "Model", true, EditorStyles.foldoutHeader);
             GUI.changed = wasChanged;
-            GameObject prefab = sourceOpen
-                ? (GameObject)EditorGUILayout.ObjectField(prefabLabel, draft.Prefab, typeof(GameObject), false) : draft.Prefab;
+            GameObject prefab = draft.Prefab;
+            if (sourceOpen)
+                using (new EditorGUI.IndentLevelScope())
+                    prefab = (GameObject)EditorGUILayout.ObjectField(prefabLabel, draft.Prefab, typeof(GameObject), false);
             bool sourceChanged = EditorGUI.EndChangeCheck();
-            if (draft.IsMissing && GUILayout.Button(clearLabel))
+            if (sourceOpen && draft.IsMissing && GUILayout.Button(clearLabel))
             {
                 prefab = null;
                 sourceChanged = true;
@@ -69,20 +71,21 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             {
                 bindingOpen = EditorGUILayout.Foldout(bindingOpen, bindingLabel, true);
                 if (bindingOpen)
-                {
-                    EditorGUI.BeginChangeCheck();
-                    bool managed = EditorGUILayout.Toggle(managedLabel, scene.Managed);
-                    GameObject existing = scene.Existing;
-                    if (managed && prefab == null)
-                        using (new EditorGUI.DisabledScope(scene.Binding != null))
-                            existing = (GameObject)EditorGUILayout.ObjectField(existingLabel, existing, typeof(GameObject), true);
-                    sceneChanged = EditorGUI.EndChangeCheck();
-                    if (sceneChanged)
+                    using (new EditorGUI.IndentLevelScope())
                     {
-                        Undo.RecordObject(owner, "Edit Visual Binding Draft");
-                        scene.SetDraft(managed, existing);
+                        EditorGUI.BeginChangeCheck();
+                        bool managed = EditorGUILayout.Toggle(managedLabel, scene.Managed);
+                        GameObject existing = scene.Existing;
+                        if (managed && prefab == null)
+                            using (new EditorGUI.DisabledScope(scene.Binding != null))
+                                existing = (GameObject)EditorGUILayout.ObjectField(existingLabel, existing, typeof(GameObject), true);
+                        sceneChanged = EditorGUI.EndChangeCheck();
+                        if (sceneChanged)
+                        {
+                            Undo.RecordObject(owner, "Edit Visual Binding Draft");
+                            scene.SetDraft(managed, existing);
+                        }
                     }
-                }
             }
 
             if (sourceChanged)
