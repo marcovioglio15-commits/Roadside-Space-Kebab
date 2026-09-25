@@ -99,7 +99,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Observer-only setup does not require a hover preset selection.
             warning = string.Empty;
-            if ((state.InteractionChanged || state.Single.HasChanges || state.Extended.HasChanges) && !state.Target.IsOpen)
+            if (state.PrefabChanged && !state.Target.IsOpen)
             {
                 warning = "Open the selected prefab before applying its retained changes.";
                 return false;

@@ -268,6 +268,45 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Refresh();
         }
 
+        /// <summary>Changes the prefab only after the previous proposal has been explicitly resolved.</summary>
+        /// <param name="requested">Prefab asset to select, or null to clear selection.</param>
+        private void SelectPrefab(GameObject requested)
+        {
+            // Validate before offering to discard anything; rejected scene objects leave the session intact.
+            if (requested != null && !ObjectAuthoringSave.TryValidate(requested, out status))
+                return;
+            if (state.HasChanges)
+            {
+                // Closed or missing targets still allow recovery without opening or recreating their assets.
+                if (state.PrefabChanged && !CanEdit)
+                {
+                    if (!EditorUtility.DisplayDialog("Change prefab?",
+                        "The previous session has pending changes. Discard them to change prefab.",
+                        "Discard and Switch", "Cancel"))
+                        return;
+                    ObjectWorkspaceSession.Discard(state);
+                }
+                else
+                    switch (EditorUtility.DisplayDialogComplex("Change prefab?",
+                        "Apply or discard the pending interaction and Scene Observer changes before changing prefab. Cancel keeps the current session.",
+                        "Apply and Switch", "Cancel", "Discard and Switch"))
+                    {
+                        case 0:
+                            if (!ObjectWorkspaceSession.Apply(state, out status))
+                                return;
+                            break;
+                        case 2:
+                            ObjectWorkspaceSession.Discard(state);
+                            break;
+                        default:
+                            return;
+                    }
+            }
+            // Select commits both the asset field and its durable route together after the guard succeeds.
+            if (ObjectWorkspaceSession.Select(state, requested, 0, out status))
+                Refresh();
+        }
+
         #endregion
 
         #region Drawing
@@ -286,8 +325,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!CanEdit && state.Category != ObjectInteractionCategory.SceneObserver)
             {
                 // A retained draft stays untouched while its prefab is closed or another asset is being previewed.
-                DrawClosedWorkspace(locked);
+                DrawClosedWorkspace();
                 EditorGUILayout.EndScrollView();
+                DrawFooter(locked);
                 return;
             }
             using (new EditorGUI.DisabledScope(locked))
@@ -323,45 +363,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         }
 
         /// <summary>Keeps hidden drafts recoverable when their prefab closes or their branch is removed.</summary>
-        /// <param name="locked">Whether Play suspends navigation and draft changes.</param>
-        private void DrawClosedWorkspace(bool locked)
+        private void DrawClosedWorkspace()
         {
-            // A deleted branch cannot expose settings, but its retained proposal must still be discardable.
-            if (status.Length > 0)
-                EditorGUILayout.LabelField(status, EditorStyles.wordWrappedLabel);
+            // The common footer remains available even if an old prefab or selected branch no longer exists.
             EditorGUILayout.LabelField(state.Target.IsOpen ? "The selected prefab object is no longer available."
-                : state.HasChanges ? "Open the selected prefab to resume pending changes."
+                : state.PrefabChanged ? "Open the selected prefab to resume pending changes, or Discard to clear the retained draft."
                 : "Open a prefab to edit its interactions.", EditorStyles.wordWrappedLabel);
-            if (!state.Target.IsOpen || !state.HasChanges)
-                return;
-            using (new EditorGUI.DisabledScope(locked))
-                if (GUILayout.Button(new GUIContent("Discard Missing Object Draft", "Discard only the retained proposal and select the open prefab root.")))
-                {
-                    ObjectWorkspaceSession.Discard(state);
-                    ObjectWorkspaceSession.Select(state, PrefabStageUtility.GetCurrentPrefabStage().prefabContentsRoot, 0, out status);
-                    Refresh();
-                }
         }
 
         /// <summary>Shows prefab, object and interaction navigation without editing their applied contents.</summary>
         private void DrawSelection()
         {
-            // All navigation is guarded while any domain has pending changes.
+            // The picker stays usable; selecting another prefab explicitly resolves any retained proposal.
             if (state.Sections.Draw("Prefab", "Choose a prefab asset; use its workspace hierarchy to select a child."))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        using (new EditorGUI.DisabledScope(state.HasChanges))
-                        {
-                            GameObject requested = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Prefab", "Source prefab edited by this tool. Scene instances are not accepted."), state.Prefab, typeof(GameObject), false);
-                            if (requested != state.Prefab && (requested == null || ObjectAuthoringSave.TryValidate(requested, out status)))
-                            {
-                                state.Prefab = requested;
-                                ObjectWorkspaceSession.Select(state, requested, 0, out status);
-                                Refresh();
-                            }
-                        }
+                        GameObject requested = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Prefab", "Source prefab edited by this tool. Changing prefab asks how to handle pending changes."), state.Prefab, typeof(GameObject), false);
+                        if (requested != state.Prefab)
+                            SelectPrefab(requested);
                         if (state.Prefab != null && GUILayout.Button(openPrefabLabel, EditorStyles.miniButton, GUILayout.Width(44f)))
                             OpenPrefab();
                     }
@@ -540,15 +561,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new EditorGUI.DisabledScope(locked || !state.HasChanges))
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    if (GUILayout.Button(new GUIContent("Apply", "Validate and save interaction settings directly to the prefab; observer setup follows scene Save.")))
-                    {
-                        if (ObjectWorkspaceSession.Apply(state, out status))
-                            status = "Applied to prefab. Save the gameplay scene if its Observer setup changed.";
-                        Refresh();
-                    }
+                    using (new EditorGUI.DisabledScope(state.PrefabChanged && !CanEdit))
+                        if (GUILayout.Button(new GUIContent("Apply", "Validate and save interaction settings directly to the open prefab; observer setup follows scene Save.")))
+                        {
+                            if (ObjectWorkspaceSession.Apply(state, out status))
+                                status = "Applied to prefab. Save the gameplay scene if its Observer setup changed.";
+                            Refresh();
+                        }
                     if (GUILayout.Button(new GUIContent("Discard", "Reload applied data without changing a preset, prefab or scene.")))
                     {
                         ObjectWorkspaceSession.Discard(state);
+                        if (state.Target.IsOpen && state.Target.Resolve() == null)
+                            ObjectWorkspaceSession.Select(state, PrefabStageUtility.GetCurrentPrefabStage().prefabContentsRoot, 0, out status);
                         status = string.Empty;
                         Refresh();
                     }

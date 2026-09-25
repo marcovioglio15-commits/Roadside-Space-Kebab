@@ -60,8 +60,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Pending data survives a missing source or temporarily closed prefab stage.</summary>
         internal bool InteractionChanged => PresetChanged || HasBinding && (Source != OriginalPreset
             || JsonUtility.ToJson(Binding) != JsonUtility.ToJson(OriginalBinding));
+        /// <summary>Pending object settings requiring the retained prefab to be open before Apply.</summary>
+        internal bool PrefabChanged => InteractionChanged || Single.HasChanges || Extended.HasChanges;
         /// <summary>Whether any domain requires the common Apply action.</summary>
-        internal bool HasChanges => InteractionChanged || Single.HasChanges || Extended.HasChanges || Observer.HasChanges;
+        internal bool HasChanges => PrefabChanged || Observer.HasChanges;
 
         #endregion
 
