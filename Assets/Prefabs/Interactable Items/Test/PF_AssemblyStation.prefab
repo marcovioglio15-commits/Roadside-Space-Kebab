@@ -14,6 +14,13 @@ GameObject:
   - component: {fileID: 4868176712737699762}
   - component: {fileID: 6442020716540934087}
   - component: {fileID: 6881026261950981432}
+  - component: {fileID: 3443057550944193706}
+  - component: {fileID: 2798474087887490427}
+  - component: {fileID: 2621871232495502539}
+  - component: {fileID: 5042641088118785220}
+  - component: {fileID: 514522494084000845}
+  - component: {fileID: 8844747950507493214}
+  - component: {fileID: 9185591113544376183}
   m_Layer: 0
   m_Name: PF_AssemblyStation
   m_TagString: Untagged
@@ -144,6 +151,16 @@ MonoBehaviour:
     Enabled: 0
     Tag: Untagged
     Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
   settingsPreset: {fileID: 11400000, guid: 5ac46ec16f119ee4696b9d9a5961457b, type: 2}
   drawGizmos: 1
   settings:
@@ -158,6 +175,326 @@ MonoBehaviour:
     AcceptReturnedProduct: 1
   action: {fileID: 7328134972526443641, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   staging: {fileID: 292989205600492734}
+--- !u!54 &3443057550944193706
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &2798474087887490427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf674ee0148e6d4b8ec13de002ad056, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectGrab
+  interactionName: Grab
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  action: {fileID: 0}
+  settings:
+    Distance: 3
+    TargetMode: 0
+    CenterRadius: 0.15
+    TargetOffset: {x: 0, y: 0, z: 0}
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    Units: 1
+    Space: 0
+    Offset: {x: 0.35, y: -0.2, z: 1.5}
+    Rotation: {x: 0, y: 0, z: 0}
+    Instant: 0
+    TransitionDuration: 0.2
+    WorldCollisions: 1
+    FollowSpeed: 12
+    RecoveryResponse: 12
+    RotationSpeed: 360
+    CollisionPadding: 0.015
+    ContactRotation: 1
+    ContactAngle: 20
+    ContactResponse: 8
+    ShowHover: 1
+  drawGizmos: 1
+--- !u!114 &2621871232495502539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63cd3bb8ff753194e9d968eeca2fcf2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDrop
+  interactionName: Drop
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  action: {fileID: 0}
+  physics:
+    OverrideBody: 1
+    Mass: 1
+    LinearDamping: 0.05
+    AngularDamping: 0.05
+    Gravity: 1
+    Constraints: 0
+    CollisionDetection: 2
+    MaxAngularSpeed: 20
+    OverrideSurface: 1
+    StaticFriction: 0.5
+    DynamicFriction: 0.4
+    Bounciness: 0.2
+    FrictionCombine: 0
+    BounceCombine: 3
+--- !u!114 &5042641088118785220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f11348f8e44759459d9557849333bf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectThrow
+  interactionName: Throw
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  action: {fileID: 0}
+  physics:
+    OverrideBody: 1
+    Mass: 1
+    LinearDamping: 0.05
+    AngularDamping: 0.05
+    Gravity: 1
+    Constraints: 0
+    CollisionDetection: 2
+    MaxAngularSpeed: 20
+    OverrideSurface: 1
+    StaticFriction: 0.5
+    DynamicFriction: 0.4
+    Bounciness: 0.2
+    FrictionCombine: 0
+    BounceCombine: 3
+  trajectory:
+    Mode: 1
+    Strength: 8
+    Yaw: 0
+    Elevation: 10
+    Spin: {x: 0, y: 0, z: 0}
+--- !u!114 &514522494084000845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d69ddefe9b2499095a570e106dd4e91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+  interactionName: Dispenser
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  action: {fileID: -2272886066808267144, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    UseContainer: 0
+    Prefab: {fileID: 4182828039336747428, guid: 12d7c2bcec933bc41a7f6316142863a1, type: 3}
+    Unlimited: 1
+    Stock: 1
+    PickupDuration: 0.35
+    OutputRotation: {x: 0, y: 0, z: 0}
+--- !u!114 &8844747950507493214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89758c4d4eb24359b9fa12c3ef130a73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContainer
+  interactionName: Container
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  action: {fileID: -2272886066808267144, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    AllowedTags:
+    - Untagged
+    Unlimited: 1
+    Capacity: 10
+    KeepVisible: 0
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Spacing: {x: 0, y: 0.2, z: 0}
+--- !u!114 &9185591113544376183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
+  interactionName: Dialogue
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Trigger: 0
+    Distance: 3
+    ExitDistance: 4
+    Priority: 0
+    RequireSightToStart: 0
+    RequireSightToContinue: 0
+    HideWhenSightLost: 0
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    SightOffset: {x: 0, y: 0, z: 0}
+    Selection: 0
+    Interruption: 0
+    ReplayOnReturn: 1
+    Entries:
+    - Name: Dialogue
+      Weight: 1
+      RequiredTags: []
+      RequireAll: 1
+      Lines:
+      - Speaker: 
+        Text: 
+  startAction: {fileID: 0}
+  advanceAction: {fileID: 0}
 --- !u!1 &9011601380015881436
 GameObject:
   m_ObjectHideFlags: 0

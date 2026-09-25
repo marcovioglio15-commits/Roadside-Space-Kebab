@@ -9,4 +9,4 @@ EditorBuildSettings:
     path: Assets/Scenes/Tool Testing Scenes/SCN_PlayerStudioMovement.unity
     guid: 66feab5d8bda5be45aba1ce79d501712
   m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 373bc7d4561224349ad4ff720d827d47, type: 3}
