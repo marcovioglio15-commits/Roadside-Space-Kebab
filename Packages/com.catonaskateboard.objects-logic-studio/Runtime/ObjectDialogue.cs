@@ -21,9 +21,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Button used to display the next explicit dialogue page and close after the final page.")]
         [SerializeField]
         private InputActionReference advanceAction;
-        [Tooltip("Existing prefab-local Dialogue HUD authored before Play. Several dialogue components may share one HUD.")]
-        [SerializeField]
-        private DialogueHud hud;
+        #endregion
+
+        #region Stored Progress
+
+        /// <summary>Keeps the current page and selection cursor while inventory temporarily suspends this component.</summary>
+        internal readonly struct StoredProgress
+        {
+            internal readonly int Entry;
+            internal readonly int Line;
+            internal readonly int NextEntry;
+            internal readonly int StartedRevision;
+            internal readonly bool Armed;
+            internal readonly bool Retained;
+            internal readonly bool AwaitingSight;
+
+            /// <summary>Captures progress after applying the configured dialogue interruption policy.</summary>
+            /// <param name="dialogue">Dialogue entering temporary inventory storage.</param>
+            internal StoredProgress(ObjectDialogue dialogue)
+            {
+                // Presentation is hidden; only future selection and page progress are retained.
+                Entry = dialogue.entry;
+                Line = dialogue.line;
+                NextEntry = dialogue.nextEntry;
+                StartedRevision = dialogue.startedRevision;
+                Armed = dialogue.armed;
+                Retained = dialogue.retained;
+                AwaitingSight = dialogue.awaitingSight;
+            }
+        }
 
         #endregion
 
@@ -37,6 +63,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int nextEntry;
         private bool armed = true;
         private bool retained;
+        private bool awaitingSight;
+        private DialogueHud hud;
 
         #endregion
 
@@ -48,8 +76,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public InputActionReference StartAction => startAction;
         /// <summary>Imported action used for page advancement.</summary>
         public InputActionReference AdvanceAction => advanceAction;
-        /// <summary>Existing overlay assigned by the prefab authoring tool.</summary>
-        public DialogueHud Hud => hud;
         /// <summary>Whether this interaction currently owns the visible dialogue.</summary>
         public bool IsSpeaking { get; private set; }
         /// <summary>Whether the latest activation validation passed.</summary>
@@ -86,7 +112,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (IsSpeaking && hud != null)
                 hud.Hide();
             IsSpeaking = false;
+            hud = null;
             retained = false;
+            awaitingSight = false;
             armed = true;
             entry = consumptionRevision = startedRevision = -1;
             line = nextEntry = 0;
@@ -100,7 +128,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Validation
 
-        /// <summary>Checks pages, project tags, input references and the existing local HUD.</summary>
+        /// <summary>Checks pages, project tags and input references independently of the shared presentation.</summary>
         /// <param name="warning">Receives the first missing dependency.</param>
         /// <returns>True when the observer can run this dialogue without creating runtime UI.</returns>
         public override bool TryValidate(out string warning)
@@ -109,11 +137,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return TryValidate(settings, startAction, advanceAction, out warning);
         }
 
-        /// <summary>Checks a detached dialogue proposal against the existing prefab-local HUD.</summary>
+        /// <summary>Checks a detached dialogue proposal before the observer supplies shared presentation.</summary>
         /// <param name="configuration">Proposed range, conditions and dialogue pages.</param>
         /// <param name="start">Proposed optional activation Button.</param>
         /// <param name="advance">Proposed page-advance Button.</param>
-        /// <param name="warning">Receives missing input, HUD or tag dependencies.</param>
+        /// <param name="warning">Receives missing input or tag dependencies.</param>
         /// <returns>True when the proposal can run on this object.</returns>
         public bool TryValidate(DialogueSettings configuration, InputActionReference start, InputActionReference advance, out string warning)
         {
@@ -124,8 +152,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (advance == null || advance.action is not { type: InputActionType.Button }
                 || configuration.Trigger == DialogueTrigger.InputAction && (start == null || start.action is not { type: InputActionType.Button }))
                 warning = "Assign an advance Button action and, for input activation, a start Button action.";
-            else if (hud == null || !hud.IsValid(transform))
-                warning = "Create or assign a complete Dialogue HUD inside this object's prefab hierarchy.";
             else
                 try
                 {
@@ -150,7 +176,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanStart(Transform player)
         {
             // Conditions are recomputed only when receipts change, while distance remains responsive each frame.
-            if (!Ready || !Available(InteractionChannels.Dialogue) || Item == null || hud == null || !hud.isActiveAndEnabled)
+            if (!Ready || !Available(InteractionChannels.Dialogue) || Item == null)
                 return false;
             float distance = (transform.position - player.position).sqrMagnitude;
             if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
@@ -166,7 +192,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanContinue(Transform player)
         {
             // No controller, cursor or movement state is changed when range is lost.
-            return Available(InteractionChannels.Dialogue) && hud != null && hud.isActiveAndEnabled
+            return Available(InteractionChannels.Dialogue) && hud != null && hud.Ready
                 && (transform.position - player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance;
         }
 
@@ -184,14 +210,68 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     eligible.Add(index);
         }
 
+        /// <summary>Checks startup or HUD visibility without repeatedly reopening an interrupted dialogue behind a wall.</summary>
+        /// <param name="observer">Current camera and player context.</param>
+        /// <param name="visibility">Observer-owned query cache shared by eligible dialogues.</param>
+        /// <param name="continuing">Whether this dialogue already owns the HUD.</param>
+        /// <returns>True when the requested presentation boundary satisfies its sight policy.</returns>
+        internal bool CanPresent(HoverObserver observer, DialogueVisibility visibility, bool continuing)
+        {
+            // After sight interrupts a running page, wait for visibility before applying its resume/restart policy.
+            if (continuing ? !settings.HideWhenSightLost : !settings.RequireSightToStart && !awaitingSight)
+                return true;
+            bool visible = visibility.HasSight(observer, this);
+            if (visible || continuing)
+                awaitingSight = !visible;
+            return visible;
+        }
+
+        /// <summary>Checks page advancement independently of whether the current page remains visible in the HUD.</summary>
+        /// <param name="observer">Camera and player currently owning the dialogue.</param>
+        /// <param name="visibility">Shared cache for this observer frame.</param>
+        /// <returns>True when an advance press may change or close the current page.</returns>
+        internal bool CanAdvance(HoverObserver observer, DialogueVisibility visibility)
+        {
+            // Blocking an advance does not interrupt presentation or change its retained page.
+            return !settings.RequireSightToContinue || visibility.HasSight(observer, this);
+        }
+
         #endregion
 
         #region Flow
 
+        /// <summary>Interrupts presentation and captures progress before temporary inventory deactivation.</summary>
+        /// <returns>The page and selection state to restore after retrieval.</returns>
+        internal StoredProgress CaptureStoredProgress()
+        {
+            // Resume, restart and next-entry behavior follow the existing interruption setting.
+            Interrupt();
+            return new StoredProgress(this);
+        }
+
+        /// <summary>Restores saved dialogue flow after reactivation without opening a HUD or emitting events.</summary>
+        /// <param name="progress">Snapshot captured before storage.</param>
+        internal void RestoreStoredProgress(StoredProgress progress)
+        {
+            // Eligibility is recomputed from current receipts before the next dialogue starts.
+            entry = progress.Entry;
+            line = progress.Line;
+            nextEntry = progress.NextEntry;
+            startedRevision = progress.StartedRevision;
+            armed = progress.Armed;
+            retained = progress.Retained;
+            awaitingSight = progress.AwaitingSight;
+            consumptionRevision = -1;
+        }
+
         /// <summary>Resumes retained progress or selects an eligible entry when this component wins arbitration.</summary>
-        internal void Begin()
+        /// <param name="presentation">Observer-owned overlay already bound and ready to display.</param>
+        internal void Begin(DialogueHud presentation)
         {
             // Random selection occurs once per new dialogue, never during eligibility polling.
+            if (presentation == null || !presentation.Ready)
+                return;
+            hud = presentation;
             RefreshEntries();
             if (!retained || !eligible.Contains(entry))
             {
@@ -208,6 +288,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             hud.Show(settings.Entries[entry].Lines[line]);
             if (!resumed)
                 Signal(InteractionMoment.Started);
+            // A start-triggered replacement can withdraw this dialogue before arbitration returns.
+            if (!Available(InteractionChannels.Dialogue))
+                Interrupt();
         }
 
         /// <summary>Selects the next eligible entry according to the configured ordering policy.</summary>

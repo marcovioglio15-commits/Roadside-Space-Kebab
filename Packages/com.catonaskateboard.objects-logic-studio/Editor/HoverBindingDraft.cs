@@ -19,6 +19,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Prefab-local anchor route retained across closing and reopening the workspace.")]
         public string AnchorPath = "-";
 
+        [Tooltip("Independent optional start effect retained on this exact interaction, including its own prefab and timing.")]
+        public InteractionVfxSettings VisualEffect = new InteractionVfxSettings();
+
         [Tooltip("Optional item tag change retained independently of reusable settings presets.")]
         public InteractionTagChange TagChange = new InteractionTagChange();
 
@@ -37,6 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return hover == null ? new HoverBindingDraft() : new HoverBindingDraft
             {
                 TagChange = ObjectWorkspace.Copy(hover.TagChange),
+                VisualEffect = ObjectWorkspace.Copy(hover.VisualEffect),
                 Name = hover.InteractionName,
                 Enabled = hover.enabled,
                 DrawGizmos = hover.DrawGizmos,

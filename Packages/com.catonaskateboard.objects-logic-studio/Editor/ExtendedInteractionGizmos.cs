@@ -26,6 +26,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Handles.color = new Color(1f, 0.65f, 0.25f, 0.65f);
             if (dialogue.Settings.ExitDistance > 0f)
                 Handles.DrawWireDisc(dialogue.transform.position, Vector3.up, dialogue.Settings.ExitDistance);
+            if ((dialogue.Settings.RequireSightToStart || dialogue.Settings.RequireSightToContinue || dialogue.Settings.HideWhenSightLost)
+                && dialogue.Settings.TryValidate(out _))
+            {
+                // Mark the exact anchor used by the visibility check without drawing across the entire scene.
+                Vector3 point = dialogue.transform.TransformPoint(dialogue.Settings.SightOffset);
+                Handles.color = new Color(0.4f, 1f, 0.6f, 0.8f);
+                Handles.DrawDottedLine(dialogue.transform.position, point, 4f);
+                Handles.SphereHandleCap(0, point, Quaternion.identity, HandleUtility.GetHandleSize(point) * 0.06f, EventType.Repaint);
+            }
             Handles.color = previous;
         }
 

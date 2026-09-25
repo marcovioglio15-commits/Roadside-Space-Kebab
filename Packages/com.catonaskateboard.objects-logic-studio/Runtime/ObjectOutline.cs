@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Presents preauthored outline geometry while this passive interaction is available.</summary>
+    /// <summary>Enables edge glow on original renderers through a shared depth-tested URP pass.</summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(300)]
     [AddComponentMenu("Objects Logic Studio/Outline")]
@@ -12,39 +12,31 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region Serialized Fields
 
-        [Header("Outline")]
-        [Tooltip("Color, width and depth behavior of the outline shells.")]
+        [Header("Edge Glow")]
+        [Tooltip("Visible-edge color, pixel width, intensity and crease angle.")]
         [SerializeField]
         private OutlineSettings settings = new OutlineSettings();
-        [Tooltip("Prefab-local shell bindings prepared by Objects Logic Studio before Play.")]
+        [Tooltip("Original renderers collected by prefab authoring. No duplicate shell geometry is required.")]
         [SerializeField]
-        private OutlineBinding[] bindings = Array.Empty<OutlineBinding>();
-        [Tooltip("Shared authored material for depth-tested outlines; no runtime material clone is required.")]
-        [SerializeField]
-        private Material occludedMaterial;
-        [Tooltip("Shared authored material for outlines visible through other geometry.")]
-        [SerializeField]
-        private Material throughWallsMaterial;
+        private Renderer[] renderers = Array.Empty<Renderer>();
 
         #endregion
 
         #region State
 
-        private static readonly int colorId = Shader.PropertyToID("_OutlineColor");
-        private static readonly int thicknessId = Shader.PropertyToID("_OutlineThickness");
-        private MaterialPropertyBlock properties;
+        private OutlineRendererState[] bindings = Array.Empty<OutlineRendererState>();
+        private readonly Dictionary<ObjectAssemblyPart, OutlineRendererState[]> assembly = new Dictionary<ObjectAssemblyPart, OutlineRendererState[]>();
         private bool ready;
         private bool visible;
-        private readonly Dictionary<ObjectAssemblyPart, OutlineBinding[]> assembly = new Dictionary<ObjectAssemblyPart, OutlineBinding[]>();
 
         #endregion
 
         #region Properties
 
-        /// <summary>Saved shader parameters exposed by the passive card.</summary>
+        /// <summary>Saved glow parameters shown in the passive card.</summary>
         public OutlineSettings Settings => settings;
-        /// <summary>Authored geometry used by editor rebuild and cleanup operations.</summary>
-        public OutlineBinding[] Bindings => bindings;
+        /// <summary>Original renderers referenced by this object's authored glow.</summary>
+        public Renderer[] Renderers => renderers;
         /// <summary>Identifies this passive feature.</summary>
         public override ExtendedInteractionKind Kind => ExtendedInteractionKind.Outline;
 
@@ -54,54 +46,48 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Lifecycle
 
-        /// <summary>Initializes shader properties once when the component becomes active.</summary>
+        /// <summary>Prepares source registration without creating meshes, renderers or materials.</summary>
         private void OnEnable()
         {
-            // Materials, renderers and meshes are authored before Play.
+            // Explicit refresh also handles settings changed while the component was disabled.
             Refresh();
         }
 
-        /// <summary>Refreshes retained shader state when entering Play without reloading scene objects.</summary>
+        /// <summary>Restores registrations once for retained objects when entering Play.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Rebuild()
         {
-            // Scene discovery occurs once per Play session, never per rendered frame.
+            // Ordinary frames use cached bindings only.
             foreach (ObjectOutline outline in FindObjectsByType<ObjectOutline>())
                 if (outline.isActiveAndEnabled)
                     outline.Refresh();
         }
 
-        /// <summary>Hides only this interaction's dedicated shells.</summary>
+        /// <summary>Releases only this interaction's rendering membership.</summary>
         private void OnDisable()
         {
-            // The surface renderer remains independent of the outline's lifetime.
+            // Original surface rendering remains enabled.
             SetVisible(false);
         }
 
-        /// <summary>Follows availability, changed meshes and animated blend shapes after object movement.</summary>
+        /// <summary>Changes rendering membership only when locks or restrictions change availability.</summary>
         private void LateUpdate()
         {
-            // Disabled outlines avoid all geometry synchronization.
-            bool show = ready && settings.Thickness > 0f && settings.Color.a > 0f && Available(InteractionChannels.Passive);
+            // URP performs camera culling, LOD selection, skinning and depth testing on the original renderers.
+            bool show = ready && settings.Thickness > 0f && settings.Intensity > 0f && settings.Color.a > 0f
+                && Available(InteractionChannels.Passive);
             if (visible != show)
                 SetVisible(show);
-            if (!visible)
-                return;
-            foreach (OutlineBinding binding in bindings)
-                binding.Sync(true, settings.ThroughWalls ? throughWallsMaterial : occludedMaterial);
-            foreach (OutlineBinding[] group in assembly.Values)
-                foreach (OutlineBinding binding in group)
-                    binding.Sync(true, settings.ThroughWalls ? throughWallsMaterial : occludedMaterial);
         }
 
         #endregion
 
         #region Configuration
 
-        /// <summary>Applies explicitly changed shader values to cached shells without material instantiation.</summary>
+        /// <summary>Applies explicit settings changes to cached source renderers.</summary>
         public void Refresh()
         {
-            // A caller may request this once after changing settings at runtime.
+            // This boundary allocates binding state once, never while the effect animates.
             SetVisible(false);
             ready = TryValidate(out string warning);
             if (!ready)
@@ -109,106 +95,91 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning(warning, this);
                 return;
             }
-            properties ??= new MaterialPropertyBlock();
-            properties.SetColor(colorId, settings.Color);
-            properties.SetFloat(thicknessId, settings.Thickness / 250f);
-            foreach (OutlineBinding binding in bindings)
-                binding.Shell.SetPropertyBlock(properties);
-            foreach (OutlineBinding[] group in assembly.Values)
-                foreach (OutlineBinding binding in group)
-                    if (binding.Shell != null)
-                        binding.Shell.SetPropertyBlock(properties);
+            bindings = Bind(renderers);
+            foreach (OutlineRendererState[] group in assembly.Values)
+                foreach (OutlineRendererState binding in group)
+                    binding.Apply(settings);
         }
 
-        /// <summary>Adds outline geometry once for an ingredient joining this composite product.</summary>
-        /// <param name="part">Newly attached ingredient whose original interactions are suspended.</param>
+        /// <summary>Prepares one group of original source renderers.</summary>
+        /// <param name="sources">Original static or skinned geometry.</param>
+        /// <returns>Cached membership and property state for those renderers.</returns>
+        private OutlineRendererState[] Bind(Renderer[] sources)
+        {
+            // No source mesh access is required, including meshes with Read/Write disabled.
+            List<OutlineRendererState> result = new List<OutlineRendererState>(sources.Length);
+            foreach (Renderer source in sources)
+                if (source is MeshRenderer or SkinnedMeshRenderer && source.GetComponentInParent<InteractionVfxInstance>(true) == null)
+                {
+                    OutlineRendererState binding = new OutlineRendererState(source);
+                    binding.Apply(settings);
+                    binding.SetVisible(visible);
+                    result.Add(binding);
+                }
+            return result.ToArray();
+        }
+
+        /// <summary>Includes an actual ingredient's visuals after its own interactions are suspended.</summary>
+        /// <param name="part">Ingredient joining this product.</param>
         internal void AddPart(ObjectAssemblyPart part)
         {
-            // Existing ingredient shells stay untouched so detachment can restore their own settings.
-            if (assembly.ContainsKey(part))
-                return;
-            HashSet<Renderer> excluded = new HashSet<Renderer>();
-            foreach (ObjectOutline outline in part.GetComponentsInChildren<ObjectOutline>(true))
-                foreach (OutlineBinding binding in outline.Bindings)
-                    if (binding != null)
-                        excluded.Add(binding.Shell);
-            List<OutlineBinding> added = new List<OutlineBinding>();
-            foreach (Renderer renderer in part.GetComponentsInChildren<Renderer>(true))
-                if (!excluded.Contains(renderer))
-                {
-                    OutlineBinding binding = OutlineGeometry.Create(renderer, settings.ThroughWalls ? throughWallsMaterial : occludedMaterial);
-                    if (binding != null)
-                        added.Add(binding);
-                }
-            assembly.Add(part, added.ToArray());
-            OutlineGeometry.UpdateLods(part.gameObject, added, true);
+            // Membership changes once per insertion; the existing renderer keeps its materials and LOD membership.
+            if (!assembly.ContainsKey(part))
+                assembly.Add(part, Bind(part.GetComponentsInChildren<Renderer>(true)));
             if (!ready)
                 Refresh();
-            else
-                foreach (OutlineBinding binding in added)
-                    binding.Shell.SetPropertyBlock(properties);
         }
 
-        /// <summary>Removes only this product's shells before an ingredient returns to standalone behavior.</summary>
+        /// <summary>Releases product-owned glow before an ingredient restores standalone interactions.</summary>
         /// <param name="part">Ingredient leaving the product.</param>
         internal void RemovePart(ObjectAssemblyPart part)
         {
-            // Deferred destruction is safe because each shell is hidden immediately.
-            if (!assembly.Remove(part, out OutlineBinding[] group))
-                return;
-            OutlineGeometry.UpdateLods(part.gameObject, group, false);
-            foreach (OutlineBinding binding in group)
-                if (binding.Shell != null)
-                {
-                    binding.Shell.enabled = false;
-                    Destroy(binding.Shell.gameObject);
-                }
+            // Detached items can restore their own independent outline settings afterward.
+            if (assembly.Remove(part, out OutlineRendererState[] group))
+                foreach (OutlineRendererState binding in group)
+                    binding.SetVisible(false);
         }
 
-        /// <summary>Checks saved parameters and required prefab-local geometry.</summary>
-        /// <param name="warning">Receives missing geometry or invalid shader settings.</param>
-        /// <returns>True when preauthored shells can be rendered.</returns>
+        /// <summary>Validates settings and original source references without generating replacement geometry.</summary>
+        /// <param name="warning">Receives a missing renderer or invalid glow setting.</param>
+        /// <returns>True when this effect can register its source geometry.</returns>
         public override bool TryValidate(out string warning)
         {
-            // Rebuilding shell geometry is an explicit editor operation.
-            warning = "Prepare outline geometry in Objects Logic Studio.";
+            // Empty product prefabs receive their geometry from inserted ingredients.
+            warning = "Collect the original outline renderers in Objects Logic Studio.";
             if (settings == null || !settings.TryValidate(out warning))
                 return false;
-            if (bindings == null || bindings.Length == 0 && assembly.Count == 0 && GetComponent<ObjectAssemblyProduct>() == null
-                || occludedMaterial == null || throughWallsMaterial == null)
+            if (renderers == null || renderers.Length == 0 && assembly.Count == 0 && GetComponent<ObjectAssemblyProduct>() == null)
             {
-                warning = "Prepare outline geometry in Objects Logic Studio.";
+                warning = "Collect the original outline renderers in Objects Logic Studio.";
                 return false;
             }
-            foreach (OutlineBinding binding in bindings)
-                if (binding == null || binding.Source == null || binding.Shell == null
-                    || !binding.Source.transform.IsChildOf(transform) || !binding.Shell.transform.IsChildOf(binding.Source.transform))
+            foreach (Renderer source in renderers)
+                if (source == null || source is not (MeshRenderer or SkinnedMeshRenderer) || !source.transform.IsChildOf(transform))
                 {
-                    warning = "An outline renderer changed or was removed. Rebuild its geometry in Objects Logic Studio.";
+                    warning = "An outline source changed. Collect the current renderers in Objects Logic Studio.";
                     return false;
                 }
             warning = string.Empty;
             return true;
         }
 
-        /// <summary>Changes shell availability at activation, restriction and disable boundaries.</summary>
-        /// <param name="value">Whether the outline should be visible.</param>
+        /// <summary>Publishes successful activation and updates every owned source's rendering membership.</summary>
+        /// <param name="value">Requested glow availability.</param>
         private void SetVisible(bool value)
         {
-            // Null entries can exist temporarily during prefab editing.
+            // There is no completion on cancellation or loss of availability.
             visible = value;
+            foreach (OutlineRendererState binding in bindings)
+                binding.SetVisible(value);
+            foreach (OutlineRendererState[] group in assembly.Values)
+                foreach (OutlineRendererState binding in group)
+                    binding.SetVisible(value);
             if (value)
             {
                 Signal(InteractionMoment.Started);
                 Signal(InteractionMoment.Completed);
             }
-            if (bindings == null)
-                return;
-            foreach (OutlineBinding binding in bindings)
-                binding?.Sync(value, settings.ThroughWalls ? throughWallsMaterial : occludedMaterial);
-            foreach (OutlineBinding[] group in assembly.Values)
-                foreach (OutlineBinding binding in group)
-                    binding.Sync(value, settings.ThroughWalls ? throughWallsMaterial : occludedMaterial);
         }
 
         #endregion

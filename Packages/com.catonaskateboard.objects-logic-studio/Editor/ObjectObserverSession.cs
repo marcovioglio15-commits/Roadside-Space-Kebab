@@ -185,7 +185,44 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 PlayerTag = tag;
                 owner.Persist();
             }
+            DrawDialogueHud(owner);
             EditorGUILayout.LabelField(observer != null ? "Connected · changes are committed with Apply." : "Choose a camera and player, then Apply once.", EditorStyles.miniLabel);
+        }
+
+        /// <summary>Opens or prepares the single shared dialogue overlay for the selected observer.</summary>
+        /// <param name="owner">Workspace guarding unapplied observer changes.</param>
+        private void DrawDialogueHud(ObjectWorkspace owner)
+        {
+            // Presentation is configured on the observer, independently of every dialogue-bearing item.
+            using (new EditorGUI.DisabledScope(owner.HasChanges || observer == null || EditorApplication.isPlayingOrWillChangePlaymode))
+            {
+                DialogueHud hud = observer != null ? observer.DialogueHud : null;
+                using (new EditorGUI.DisabledScope(true))
+                    EditorGUILayout.ObjectField(new GUIContent("Dialogue HUD", "One overlay shared by all object dialogues for this observer."), hud, typeof(DialogueHud), true);
+                if (!GUILayout.Button(new GUIContent(hud != null ? "Select Dialogue HUD" : "Create Shared Dialogue HUD",
+                    "Edit the shared panel and text in its authored hierarchy; no UI is created during gameplay.")))
+                    return;
+                if (hud != null)
+                {
+                    Selection.activeObject = hud;
+                    EditorGUIUtility.PingObject(hud);
+                    return;
+                }
+                if (EditorUtility.IsPersistent(observer) && (camera == null || player == null))
+                {
+                    Debug.LogWarning("Select the observer prefab's camera and player before creating its shared HUD.");
+                    return;
+                }
+                if (EditorUtility.IsPersistent(observer))
+                    observer = ObjectObserverAssets.Apply(camera, player, PlayerTag, observer, true);
+                else
+                {
+                    DialogueAuthoring.CreateHud(observer);
+                    EditorSceneManager.MarkSceneDirty(observer.gameObject.scene);
+                }
+                ReadApplied();
+                owner.Persist();
+            }
         }
 
         /// <summary>Selects a player prefab and exposes every camera contained in that asset.</summary>

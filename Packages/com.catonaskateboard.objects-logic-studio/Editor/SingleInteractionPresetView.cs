@@ -71,6 +71,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.RecordObject(state, "Import " + state.Single.Kind + " settings");
             switch (state.Single.Preset)
             {
+                case DispenserPreset dispenser:
+                    state.Single.Draft.Dispenser = ObjectWorkspace.Copy(dispenser.Settings);
+                    break;
+                case ContainerPreset container:
+                    state.Single.Draft.Container = ObjectWorkspace.Copy(container.Settings);
+                    break;
                 case GrabPreset grab:
                     state.Single.Draft.Grab = ObjectWorkspace.Copy(grab.Settings);
                     break;
@@ -96,6 +102,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SingleInteractionPreset preset = (SingleInteractionPreset)ScriptableObject.CreateInstance(PresetType(session.Kind));
             switch (preset)
             {
+                case DispenserPreset dispenser:
+                    dispenser.Settings = ObjectWorkspace.Copy(session.Draft.Dispenser);
+                    break;
+                case ContainerPreset container:
+                    container.Settings = ObjectWorkspace.Copy(session.Draft.Container);
+                    break;
                 case GrabPreset grab:
                     grab.Settings = ObjectWorkspace.Copy(session.Draft.Grab);
                     break;
@@ -152,6 +164,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Grab => typeof(GrabPreset),
                 SingleInteractionKind.Drop => typeof(DropPreset),
                 SingleInteractionKind.Throw => typeof(ThrowPreset),
+                SingleInteractionKind.Dispenser => typeof(DispenserPreset),
+                SingleInteractionKind.Container => typeof(ContainerPreset),
                 _ => throw new ArgumentOutOfRangeException(nameof(kind))
             };
         }

@@ -26,6 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly CarryCollisions collisions = new CarryCollisions();
+        private readonly CarryCollisions sourceCollisions = new CarryCollisions();
         private readonly CarryMotion motion = new CarryMotion();
         private Rigidbody body;
         private Collider[] colliders;
@@ -37,6 +38,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector3 startPosition;
         private Quaternion startRotation;
         private float started;
+        private float pickupDuration;
+        private Transform pickupSource;
         private bool firstFollow;
         private bool pickupCompleted;
 
@@ -44,8 +47,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Properties
 
+        /// <summary>Pickup transition duration available to this interaction's automatic start effect.</summary>
+        internal override float VfxDuration => IsHeld ? pickupDuration : settings.Instant ? 0f : settings.TransitionDuration;
+        /// <summary>Whether pickup is still progressing rather than already carried or cancelled.</summary>
+        internal override bool VfxRunning => IsHeld && !pickupCompleted;
+
         /// <summary>Settings used for targeting and carrying.</summary>
         public GrabSettings Settings => settings;
+        /// <summary>Logical recipe and consumption units contributed by this physical object.</summary>
+        public int Units => settings.Units;
         /// <summary>Identifies the Grab feature in the tool.</summary>
         public override SingleInteractionKind Kind => SingleInteractionKind.Grab;
         /// <summary>Whether this object currently belongs to the observer's carry slot.</summary>
@@ -98,6 +108,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Disabling a carried component must not leave a kinematic or collision-free object behind.
             Cancel();
             collisions.Restore(true);
+            sourceCollisions.Restore(true);
             RestoreSurface(null);
             base.OnDisable();
         }
@@ -106,8 +117,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void FixedUpdate()
         {
             // Held presentation is aligned to the camera's render frame, not to physics interpolation.
-            if (!IsHeld && collisions.Pending)
+            if (IsHeld)
+                return;
+            if (collisions.Pending)
                 collisions.Restore(false);
+            if (sourceCollisions.Pending)
+                sourceCollisions.Restore(false);
         }
 
         /// <summary>Follows after the player camera has produced its final pose for this render frame.</summary>
@@ -122,6 +137,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             collisions.Maintain();
+            if (!pickupCompleted)
+                sourceCollisions.Maintain();
+            else if (sourceCollisions.Pending)
+                sourceCollisions.Restore(false);
             Follow();
         }
 
@@ -177,11 +196,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when another active physical owner is nested under the grab root.</returns>
         internal static bool HasNestedBody(GameObject target, Rigidbody owner)
         {
-            // Assembly retains original components but disables their colliders and collision participation.
+            // Assembly and inventory retain original bodies while suspending their physical participation.
             foreach (Rigidbody candidate in target.GetComponentsInChildren<Rigidbody>(true))
-                if (candidate != owner && (!candidate.TryGetComponent(out ObjectAssemblyPart part)
-                    || part.Product == null || part.Product.gameObject != target || candidate.detectCollisions || !candidate.isKinematic))
+            {
+                if (candidate == owner)
+                    continue;
+                bool suspended = candidate.isKinematic && !candidate.detectCollisions;
+                bool assembly = candidate.TryGetComponent(out ObjectAssemblyPart part)
+                    && part.Product != null && part.Product.gameObject == target;
+                ObjectContainer container = candidate.transform.parent.GetComponentInParent<ObjectContainer>(true);
+                bool stored = container != null && container.transform.IsChildOf(target.transform) && container.OwnsStoredBody(candidate);
+                if (!suspended || !assembly && !stored)
                     return true;
+            }
             return false;
         }
 
@@ -191,8 +218,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Claims this body after the shared observer has chosen a single eligible target.</summary>
         /// <param name="observer">Player and camera controlling the carry pose.</param>
+        /// <param name="source">Optional dispenser whose collisions are excluded during pickup.</param>
+        /// <param name="duration">Dispenser transition duration; ordinary pickup uses the Grab settings.</param>
         /// <returns>True when this object acquired the previously empty carry slot.</returns>
-        internal bool Begin(HoverObserver observer)
+        internal bool Begin(HoverObserver observer, Transform source = null, float duration = 0f)
         {
             // Capture current body policy so release never assumes the prefab's original defaults.
             if (!Available(InteractionChannels.Grab) || IsHeld || observer == null || observer.HeldObject != null || observer.Player == null || observer.View == null)
@@ -202,6 +231,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning(warning, this);
                 return false;
             }
+            if (source != null && !InteractionValues.Positive(duration))
+                return false;
+            sourceCollisions.Restore(true);
+            pickupSource = source;
+            pickupDuration = source != null ? duration : settings.Instant ? 0f : settings.TransitionDuration;
             CacheGeometry();
             original = new CarryBodyState(body);
             carryFrame = settings.Space == CarrySpace.Camera ? observer.View.transform : observer.Player;
@@ -212,6 +246,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             firstFollow = true;
             pickupCompleted = false;
             collisions.Ignore(colliders, observer.Player);
+            if (pickupSource != null)
+                sourceCollisions.Ignore(colliders, pickupSource);
             motion.Bind(body, colliders, observer.Player);
             if (!body.isKinematic)
             {
@@ -229,7 +265,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 product.ReleaseTable();
             SetHoverSuppression(!settings.ShowHover);
             Signal(InteractionMoment.Started);
-            if (settings.Instant)
+            if (pickupDuration <= 0f)
                 Follow();
             return true;
         }
@@ -242,13 +278,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return carryFrame.position + carryFrame.rotation * settings.Offset;
         }
 
-        /// <summary>Recaches an explicitly replaced mesh collider without releasing the occupied carry slot.</summary>
+        /// <summary>Refreshes pickup geometry after assembly or mesh replacement, including while the object rests on a table.</summary>
         internal void RefreshCarryGeometry()
         {
             // Contact effects invoke this only after committing geometry, never during ordinary following.
+            CacheGeometry();
             if (!IsHeld || carryPlayer == null)
                 return;
-            CacheGeometry();
+            collisions.Ignore(colliders, carryPlayer);
+            if (!pickupCompleted && pickupSource != null)
+                sourceCollisions.Ignore(colliders, pickupSource);
             motion.Bind(body, colliders, carryPlayer);
         }
 
@@ -256,12 +295,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Follow()
         {
             // Queries constrain the kinematic pose before committing it; release restores dynamic simulation.
-            float progress = settings.Instant ? 1f : Mathf.SmoothStep(0f, 1f, (Time.time - started) / settings.TransitionDuration);
+            float progress = pickupDuration <= 0f ? 1f : Mathf.SmoothStep(0f, 1f, (Time.time - started) / pickupDuration);
             Vector3 position = Vector3.Lerp(startPosition, CarryPosition(), progress);
             Quaternion rotation = Quaternion.Slerp(startRotation, carryFrame.rotation * Quaternion.Euler(settings.Rotation), progress);
             Pose pose = new Pose(position, rotation);
             if (settings.WorldCollisions)
-                pose = motion.Resolve(pose, settings, Time.deltaTime, firstFollow && settings.Instant);
+                pose = motion.Resolve(pose, settings, Time.deltaTime, firstFollow && pickupDuration <= 0f);
             body.position = pose.position;
             body.rotation = pose.rotation;
             // Rigidbody setters update the physics pose first; commit the visible Transform in this same render frame.
@@ -270,6 +309,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!pickupCompleted && progress >= 1f)
             {
                 pickupCompleted = true;
+                sourceCollisions.Restore(false);
+                pickupSource = null;
                 Signal(InteractionMoment.Completed);
             }
         }
@@ -281,6 +322,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!IsHeld)
                 return;
             IsHeld = false;
+            // Early release inside the dispenser restores contact only after safe separation.
+            sourceCollisions.Restore(false);
+            pickupSource = null;
             carryFrame = null;
             carryPlayer = null;
             if (body != null)
@@ -297,6 +341,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!IsHeld || body == null)
                 return;
             IsHeld = false;
+            // Early release inside the dispenser restores contact only after safe separation.
+            sourceCollisions.Restore(false);
+            pickupSource = null;
             carryFrame = null;
             carryPlayer = null;
             original.Restore(body, true);

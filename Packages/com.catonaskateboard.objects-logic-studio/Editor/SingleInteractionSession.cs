@@ -56,6 +56,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Grab => target.GetComponent<ObjectGrab>(),
                 SingleInteractionKind.Drop => target.GetComponent<ObjectDrop>(),
                 SingleInteractionKind.Throw => target.GetComponent<ObjectThrow>(),
+                SingleInteractionKind.Dispenser => target.GetComponent<ObjectDispenser>(),
+                SingleInteractionKind.Container => target.GetComponent<ObjectContainer>(),
                 _ => null
             };
         }
@@ -116,11 +118,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     data.FindProperty("drawGizmos").boolValue = Draft.DrawGizmos;
                 data.ApplyModifiedPropertiesWithoutUndo();
             }
-            string settings = Kind == SingleInteractionKind.Grab
-                ? "\"settings\":" + JsonUtility.ToJson(Draft.Grab) : "\"physics\":" + JsonUtility.ToJson(Draft.Release);
+            string settings = Kind switch
+            {
+                SingleInteractionKind.Grab => "\"settings\":" + JsonUtility.ToJson(Draft.Grab),
+                SingleInteractionKind.Dispenser => "\"settings\":" + JsonUtility.ToJson(Draft.Dispenser),
+                SingleInteractionKind.Container => "\"settings\":" + JsonUtility.ToJson(Draft.Container),
+                _ => "\"physics\":" + JsonUtility.ToJson(Draft.Release)
+            };
             if (Kind == SingleInteractionKind.Throw)
                 settings += ",\"trajectory\":" + JsonUtility.ToJson(Draft.Throw);
-            JsonUtility.FromJsonOverwrite("{" + settings + ",\"tagChange\":" + JsonUtility.ToJson(Draft.TagChange) + "}", feature);
+            JsonUtility.FromJsonOverwrite("{" + settings + ",\"tagChange\":" + JsonUtility.ToJson(Draft.TagChange)
+                + ",\"visualEffect\":" + JsonUtility.ToJson(Draft.VisualEffect) + "}", feature);
             EditorUtility.SetDirty(feature);
             if (!EditorUtility.IsPersistent(feature))
                 PrefabUtility.RecordPrefabInstancePropertyModifications(feature);

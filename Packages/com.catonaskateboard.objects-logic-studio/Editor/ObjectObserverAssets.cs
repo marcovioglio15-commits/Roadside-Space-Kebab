@@ -17,8 +17,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="player">Tagged player root in that same asset.</param>
         /// <param name="tag">Project tag assigned to the player.</param>
         /// <param name="existing">Optional existing observer in the same asset.</param>
+        /// <param name="createHud">Prepare the observer's one shared dialogue overlay when requested.</param>
         /// <returns>The saved observer component in the persistent prefab asset.</returns>
-        internal static HoverObserver Apply(Camera camera, GameObject player, string tag, HoverObserver existing)
+        internal static HoverObserver Apply(Camera camera, GameObject player, string tag, HoverObserver existing, bool createHud = false)
         {
             // An already open stage remains authoritative, including its unsaved collider and hierarchy edits.
             string path = AssetDatabase.GetAssetPath(player);
@@ -33,10 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (view == null || target == null || existing != null && observer == null)
                     throw new InvalidOperationException("The observer prefab hierarchy changed. Discard and select its current camera and player.");
                 if (opened)
-                {
                     observer = HoverAuthoring.SetupObserver(view, target, tag, observer);
-                    ObjectAuthoringSave.Save(root);
-                }
                 else
                 {
                     // Isolated contents are temporary, so no Undo entry may retain references to their destroyed scene.
@@ -51,6 +49,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         data.FindProperty("playerTag").stringValue = tag;
                         data.ApplyModifiedPropertiesWithoutUndo();
                     }
+                }
+                if (createHud)
+                    DialogueAuthoring.CreateHud(observer, opened);
+                if (opened)
+                    ObjectAuthoringSave.Save(root);
+                else
+                {
                     PrefabUtility.SaveAsPrefabAsset(root, path, out bool saved);
                     if (!saved)
                         throw new InvalidOperationException("The observer prefab could not be saved.");

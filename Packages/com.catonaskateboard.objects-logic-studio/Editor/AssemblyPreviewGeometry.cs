@@ -72,14 +72,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Computes bounds for framing all geometry and empty magnet positions.</summary>
         /// <param name="settings">Current slot layout.</param>
-        /// <returns>Product-local bounds enclosing the preview.</returns>
-        internal Bounds Bounds(AssemblyProductSettings settings)
+        /// <param name="selected">Optional magnet index to frame only its guide and position.</param>
+        /// <returns>Product-local bounds enclosing the requested geometry.</returns>
+        internal Bounds Bounds(AssemblyProductSettings settings, int selected = -1)
         {
             // Transform all eight local corners so rotated or scaled meshes are fully framed.
-            Bounds result = new Bounds(Vector3.zero, Vector3.one * 0.1f);
+            Bounds result = new Bounds(selected >= 0 ? settings.Magnets[selected].Position : Vector3.zero, Vector3.one * 0.1f);
             foreach (Entry entry in entries)
             {
-                if (entry.Mesh == null || entry.Magnet >= 0 && (entry.Magnet >= settings.Magnets.Length || !AssemblyValidation.ValidMagnet(settings.Magnets[entry.Magnet])))
+                if (selected >= 0 && entry.Magnet != selected || entry.Mesh == null || entry.Magnet >= 0 && (entry.Magnet >= settings.Magnets.Length || !AssemblyValidation.ValidMagnet(settings.Magnets[entry.Magnet])))
                     continue;
                 Matrix4x4 matrix = Placement(entry, settings);
                 Bounds bounds = entry.Mesh.bounds;
@@ -87,9 +88,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     result.Encapsulate(matrix.MultiplyPoint3x4(bounds.center + Vector3.Scale(bounds.extents,
                         new Vector3((corner & 1) == 0 ? -1f : 1f, (corner & 2) == 0 ? -1f : 1f, (corner & 4) == 0 ? -1f : 1f))));
             }
-            foreach (AssemblyMagnet magnet in settings.Magnets)
-                if (AssemblyValidation.ValidMagnet(magnet))
-                    result.Encapsulate(magnet.Position);
+            if (selected < 0)
+                foreach (AssemblyMagnet magnet in settings.Magnets)
+                    if (AssemblyValidation.ValidMagnet(magnet))
+                        result.Encapsulate(magnet.Position);
             return result;
         }
 
@@ -99,16 +101,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="includeRootScale">Include the guide's root scale used by actual ingredient insertion.</param>
         private void Add(GameObject source, int magnet, bool includeRootScale)
         {
-            // Authored outline shells and inactive renderers are excluded from neutral placement guides.
+            // Inactive renderers are excluded from neutral placement guides.
             Matrix4x4 basis = (includeRootScale ? Matrix4x4.Scale(source.transform.localScale) : Matrix4x4.identity)
                 * source.transform.worldToLocalMatrix;
-            HashSet<Renderer> shells = new HashSet<Renderer>();
-            foreach (ObjectOutline outline in source.GetComponentsInChildren<ObjectOutline>(true))
-                foreach (OutlineBinding binding in outline.Bindings)
-                    shells.Add(binding.Shell);
             foreach (Renderer renderer in source.GetComponentsInChildren<Renderer>())
             {
-                if (!renderer.enabled || shells.Contains(renderer))
+                if (!renderer.enabled)
                     continue;
                 Mesh mesh = renderer switch
                 {

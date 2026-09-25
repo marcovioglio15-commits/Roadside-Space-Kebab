@@ -35,6 +35,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return session.Kind switch
             {
                 SingleInteractionKind.Grab => session.Draft.Grab.TryValidate(out warning),
+                SingleInteractionKind.Dispenser => session.Draft.Dispenser.TryValidate(out warning),
+                SingleInteractionKind.Container => session.Draft.Container.TryValidate(out warning),
                 SingleInteractionKind.Drop => session.Draft.Release.TryValidate(out warning),
                 SingleInteractionKind.Throw => session.Draft.Release.TryValidate(out warning) && session.Draft.Throw.TryValidate(out warning),
                 _ => false
@@ -57,7 +59,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.ModifyByContact => session.Draft.Contact.TryValidate(out warning),
                 ExtendedInteractionKind.Dialogue => session.Draft.Dialogue.TryValidate(out warning),
+                ExtendedInteractionKind.Slice => session.Draft.Slice.TryValidate(out warning),
                 ExtendedInteractionKind.Outline => session.Draft.Outline.TryValidate(out warning),
+                ExtendedInteractionKind.SpawnManagement => session.Draft.SpawnManagement.TryValidate(out warning),
                 ExtendedInteractionKind.AssemblyStation => session.Draft.AssemblyStation.TryValidate(out warning),
                 _ => false
             };
@@ -93,7 +97,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             if (!Validate(session, out string warning))
                 throw new InvalidOperationException(warning);
-            string settings = session.Kind == SingleInteractionKind.Grab ? JsonUtility.ToJson(session.Draft.Grab) : JsonUtility.ToJson(session.Draft.Release);
+            string settings = session.Kind switch
+            {
+                SingleInteractionKind.Grab => JsonUtility.ToJson(session.Draft.Grab),
+                SingleInteractionKind.Dispenser => JsonUtility.ToJson(session.Draft.Dispenser),
+                SingleInteractionKind.Container => JsonUtility.ToJson(session.Draft.Container),
+                _ => JsonUtility.ToJson(session.Draft.Release)
+            };
             string payload = "{\"Settings\":" + settings + (session.Kind == SingleInteractionKind.Throw
                 ? ",\"Trajectory\":" + JsonUtility.ToJson(session.Draft.Throw) : string.Empty) + "}";
             Write(state, session.Preset, payload);
@@ -115,7 +125,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.ModifyByContact => JsonUtility.ToJson(session.Draft.Contact),
                 ExtendedInteractionKind.Dialogue => JsonUtility.ToJson(session.Draft.Dialogue),
+                ExtendedInteractionKind.Slice => JsonUtility.ToJson(session.Draft.Slice),
                 ExtendedInteractionKind.Outline => JsonUtility.ToJson(session.Draft.Outline),
+                ExtendedInteractionKind.SpawnManagement => JsonUtility.ToJson(SpawnSourceAuthoring.Resolve(session.Draft.SpawnManagement)),
                 ExtendedInteractionKind.AssemblyStation => JsonUtility.ToJson(session.Draft.AssemblyStation),
                 _ => throw new InvalidOperationException("This configuration has no transferable preset.")
             };

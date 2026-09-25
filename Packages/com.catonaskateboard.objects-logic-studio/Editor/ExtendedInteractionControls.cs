@@ -25,8 +25,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Field(draft, "Enabled");
             switch (state.Extended.Kind)
             {
+                case ExtendedInteractionKind.Slice:
+                    SliceControls.Draw(draft.FindPropertyRelative("Slice"), state.Sections);
+                    StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Slice", Button);
+                    break;
+                case ExtendedInteractionKind.SpawnManagement:
+                    SpawnManagementControls.Draw(draft.FindPropertyRelative("SpawnManagement"), state.Sections);
+                    break;
                 case ExtendedInteractionKind.AssemblyProduct:
-                    AssemblyControls.DrawProduct(draft.FindPropertyRelative("AssemblyProduct"), state.Sections);
+                    AssemblyControls.DrawProduct(draft.FindPropertyRelative("AssemblyProduct"), state.Sections, state);
                     break;
                 case ExtendedInteractionKind.AssemblyStation:
                     AssemblyControls.DrawStation(draft.FindPropertyRelative("AssemblyStation"), state.Sections);
@@ -56,6 +63,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUI.IndentLevelScope())
                     Field(draft, "DrawGizmos");
             InteractionTagControls.Draw(draft.FindPropertyRelative("TagChange"), state.Sections);
+            InteractionVfxControls.Draw(draft.FindPropertyRelative("VisualEffect"), state.Sections, state.Extended.Draft.VfxDuration(state.Extended.Kind));
             bool changed = data.ApplyModifiedProperties();
             if (changed)
                 state.Persist();
@@ -80,15 +88,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained foldout visibility.</param>
         internal static void DrawOutline(SerializedProperty settings, ObjectStudioSections sections)
         {
-            // Shell creation remains a prefab authoring operation.
-            if (sections.Draw("Outline Appearance", "Configure world-space thickness, color and depth visibility."))
+            // The shared render pass uses the original visible surfaces.
+            if (sections.Draw("Outline Appearance", "Configure visible-edge width in pixels, color, light intensity and crease angle."))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "Thickness");
                     if (settings.FindPropertyRelative("Thickness").floatValue > 0f)
                     {
                         Field(settings, "Color");
-                        Field(settings, "ThroughWalls");
+                        Field(settings, "Intensity");
+                        Field(settings, "EdgeAngle");
                     }
                 }
         }
@@ -111,8 +120,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "ContactTolerance");
                     Field(settings, "QueryInterval");
                     Field(settings, "IncludeTriggers");
-                    Field(settings, "AllowCarriedSelf");
-                    Field(settings, "AllowCarriedOther");
+                }
+            if (sections.Draw("Carried Items", "Exclude carried participants from both contact activation and ongoing modification."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    ExcludeCarried(settings, "AllowCarriedSelf", "Exclude Carried Self");
+                    ExcludeCarried(settings, "AllowCarriedOther", "Exclude Carried Contact Item");
                 }
             if (sections.Draw("Modification", "Control transition timing and interruption behavior."))
                 using (new EditorGUI.IndentLevelScope())
@@ -134,7 +147,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     DrawEffects(settings.FindPropertyRelative("Self"));
             if (sections.Draw("Contact Item Effects", "Modify the other item using paths relative to its root."))
                 using (new EditorGUI.IndentLevelScope())
+                {
                     DrawEffects(settings.FindPropertyRelative("Other"));
+                    Field(settings, "ChangeContactTag");
+                    if (settings.FindPropertyRelative("ChangeContactTag").boolValue)
+                        Tag(settings.FindPropertyRelative("ContactTag"));
+                }
             if (sections.Draw("Temporary Restrictions", "Suspend interaction families while effects run; pausing releases these restrictions."))
                 using (new EditorGUI.IndentLevelScope())
                 {
@@ -160,6 +178,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Field(effects, "Consume");
         }
 
+        /// <summary>Displays existing carry eligibility as an explicit exclusion without changing saved defaults.</summary>
+        /// <param name="settings">Contact settings retaining the original eligibility fields.</param>
+        /// <param name="field">Serialized allow-carried flag to edit.</param>
+        /// <param name="label">Participant-specific exclusion label.</param>
+        private static void ExcludeCarried(SerializedProperty settings, string field, string label)
+        {
+            // Invert only the control's presentation; existing prefab and preset values retain their meaning.
+            SerializedProperty property = settings.FindPropertyRelative(field);
+            EditorGUI.BeginChangeCheck();
+            bool excluded = EditorGUILayout.Toggle(new GUIContent(label,
+                "Do not start or continue this modification while this participant is carried. Picking it up interrupts using the configured restart or resume policy."), !property.boolValue);
+            if (EditorGUI.EndChangeCheck())
+                property.boolValue = !excluded;
+        }
+
         #endregion
 
         #region Dialogue
@@ -177,6 +210,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "Distance");
                     Field(settings, "ExitDistance");
                     Field(settings, "Priority");
+                }
+            if (sections.Draw("Dialogue Visibility", "Configure startup, page advancement and hiding independently."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(settings, "RequireSightToStart");
+                    Field(settings, "RequireSightToContinue");
+                    Field(settings, "HideWhenSightLost");
+                    if (settings.FindPropertyRelative("RequireSightToStart").boolValue
+                        || settings.FindPropertyRelative("RequireSightToContinue").boolValue
+                        || settings.FindPropertyRelative("HideWhenSightLost").boolValue)
+                    {
+                        Field(settings, "ObstacleMask");
+                        Field(settings, "SightOffset");
+                    }
                 }
             if (sections.Draw("Dialogue Flow", "Choose entry order and what happens when the player returns."))
                 using (new EditorGUI.IndentLevelScope())

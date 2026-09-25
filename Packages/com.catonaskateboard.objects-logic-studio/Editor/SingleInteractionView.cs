@@ -14,7 +14,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private GUIContent[] names = Array.Empty<GUIContent>();
         private ObjectSingleInteraction validated;
         private string validationWarning = string.Empty;
-        private static readonly GUIContent addLabel = new GUIContent("+ Add Interaction", "Add Grab, or add Drop/Throw after an enabled Grab exists.");
+        private static readonly GUIContent addLabel = new GUIContent("+ Add Interaction", "Add Grab, Dispenser or Container. Drop and Throw require an enabled Grab.");
         private static readonly GUIContent removeLabel = new GUIContent("Remove", "Remove this feature with Undo. Remove Drop and Throw before removing Grab.");
 
         #endregion
@@ -73,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             }
                         }
                         using (new EditorGUI.DisabledScope(state.HasChanges || EditorUtility.IsPersistent(target)
-                            || features[index] is ObjectGrab && features.Length > 1))
+                            || features[index] is ObjectGrab && target.GetComponents<ObjectRelease>().Length > 0))
                             if (GUILayout.Button(removeLabel, EditorStyles.miniButton, GUILayout.Width(60f)))
                             {
                                 Remove(state, features[index]);
@@ -94,7 +94,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 }
             if (features.Length == 0)
-                EditorGUILayout.LabelField("Add Grab to configure object carrying.", EditorStyles.centeredGreyMiniLabel);
+                EditorGUILayout.LabelField("Add an interaction to configure carrying or item transfers.", EditorStyles.centeredGreyMiniLabel);
         }
 
         /// <summary>Builds the small feature menu only when its button is clicked.</summary>
@@ -107,7 +107,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             foreach (SingleInteractionKind kind in Enum.GetValues(typeof(SingleInteractionKind)))
             {
                 GUIContent label = new GUIContent(kind.ToString(), "Add the " + kind + " feature to this object.");
-                if (SingleInteractionSession.Resolve(target, kind) != null || kind != SingleInteractionKind.Grab && (grab == null || !grab.enabled))
+                if (SingleInteractionSession.Resolve(target, kind) != null || kind is (SingleInteractionKind.Drop or SingleInteractionKind.Throw) && (grab == null || !grab.enabled))
                     menu.AddDisabledItem(label);
                 else
                     menu.AddItem(label, false, () => Add(state, kind));
@@ -128,7 +128,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (state.HasChanges || target == null || EditorUtility.IsPersistent(target)
                 || !ObjectAuthoringSave.TryValidate(target, out _)
                 || SingleInteractionSession.Resolve(target, kind) != null
-                || kind != SingleInteractionKind.Grab && target.GetComponent<ObjectGrab>() is not { enabled: true })
+                || kind is (SingleInteractionKind.Drop or SingleInteractionKind.Throw) && target.GetComponent<ObjectGrab>() is not { enabled: true })
                 return;
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
@@ -139,6 +139,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Grab => Undo.AddComponent<ObjectGrab>(target),
                 SingleInteractionKind.Drop => Undo.AddComponent<ObjectDrop>(target),
                 SingleInteractionKind.Throw => Undo.AddComponent<ObjectThrow>(target),
+                SingleInteractionKind.Dispenser => Undo.AddComponent<ObjectDispenser>(target),
+                SingleInteractionKind.Container => Undo.AddComponent<ObjectContainer>(target),
                 _ => throw new ArgumentOutOfRangeException(nameof(kind))
             };
             using (SerializedObject serialized = new SerializedObject(feature))

@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -14,7 +15,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="requirements">Serialized array containing Tag and Count on each element.</param>
         /// <param name="addLabel">Context-specific add button label.</param>
         /// <param name="optional">Expose the recipe ingredient's Optional flag.</param>
-        internal static void Draw(SerializedProperty requirements, string addLabel, bool optional)
+        /// <param name="drawTag">Optional recipe-specific selector; absent uses the project tag catalog.</param>
+        internal static void Draw(SerializedProperty requirements, string addLabel, bool optional, Action<SerializedProperty> drawTag = null)
         {
             // Invalid quantities remain visible instead of being silently clamped.
             for (int index = 0; index < requirements.arraySize; index++)
@@ -24,7 +26,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        ExtendedInteractionControls.Tag(requirement.FindPropertyRelative("Tag"));
+                        if (drawTag != null)
+                            drawTag(requirement.FindPropertyRelative("Tag"));
+                        else
+                            ExtendedInteractionControls.Tag(requirement.FindPropertyRelative("Tag"));
                         if (GUILayout.Button(new GUIContent("−", "Remove this tag requirement."), GUILayout.Width(28f)))
                         {
                             requirements.DeleteArrayElementAtIndex(index);

@@ -3,19 +3,21 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Controls an inverted-hull outline independently of the object's surface materials.</summary>
+    /// <summary>Controls the glow on visible silhouettes and geometric creases.</summary>
     [Serializable]
     public sealed class OutlineSettings
     {
         #region Fields
 
-        [Header("Outline")]
-        [Tooltip("Outline thickness in units of 1/250 metre. Zero hides the outline; world-space thickness is independent of object scale.")]
-        public float Thickness = 1f;
-        [Tooltip("Outline color and opacity. The object's texture and original materials remain untouched.")]
-        public Color Color = Color.black;
-        [Tooltip("Display the outline through other geometry. Disable for normal depth-tested silhouettes.")]
-        public bool ThroughWalls;
+        [Header("Edge Glow")]
+        [Tooltip("Glow width in render pixels, from zero to sixteen. Zero hides the effect.")]
+        public float Thickness = 3f;
+        [Tooltip("Glow tint and opacity. Black emits no light; the original surface material is preserved.")]
+        public Color Color = Color.white;
+        [Tooltip("Light added at the edge. Values above one can feed the camera's configured Bloom effect.")]
+        public float Intensity = 2f;
+        [Tooltip("Minimum normal change, in degrees, treated as a geometric crease. Silhouettes remain visible independently.")]
+        public float EdgeAngle = 30f;
 
         #endregion
 
@@ -23,17 +25,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Validation
 
-        /// <summary>Rejects invalid thickness or color without rewriting saved values.</summary>
-        /// <param name="warning">Receives the first invalid setting.</param>
-        /// <returns>True when the shader parameters are usable.</returns>
+        /// <summary>Reports invalid shader parameters without rewriting authored values.</summary>
+        /// <param name="warning">Receives the first invalid quantity.</param>
+        /// <returns>True when all enabled glow settings can be rendered.</returns>
         public bool TryValidate(out string warning)
         {
-            // HDR RGB values are allowed; opacity remains a normalized blend factor.
+            // The width bound limits shader sampling while keeping invalid input visible for correction.
             warning = string.Empty;
-            if (!InteractionValues.Finite(Thickness) || Thickness < 0f
+            if (!InteractionValues.Finite(Thickness) || Thickness < 0f || Thickness > 16f
+                || !InteractionValues.Finite(Intensity) || Intensity < 0f
+                || !InteractionValues.Finite(EdgeAngle) || EdgeAngle <= 0f || EdgeAngle > 180f
                 || !InteractionValues.Finite(new Vector3(Color.r, Color.g, Color.b))
                 || !InteractionValues.Finite(Color.a) || Color.a < 0f || Color.a > 1f)
-                warning = "Use finite non-negative thickness, finite color and opacity between zero and one.";
+                warning = "Use width from 0 to 16 pixels, non-negative intensity, an edge angle above 0 up to 180, and finite color/opacity.";
             return warning.Length == 0;
         }
 

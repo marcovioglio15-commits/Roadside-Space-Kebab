@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c50280941a4743a48c31f044cd0f3062, type: 3}
+  m_Name: AssemblyStation Preset Test
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.AssemblyStationPreset
+  Settings:
+    ProductPrefab: {fileID: 4182828039336747428, guid: 12d7c2bcec933bc41a7f6316142863a1, type: 3}
+    Distance: 3
+    RequireSight: 1
+    Obstacles:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    OutputPosition: {x: 0, y: 0.5, z: 0}
+    OutputRotation: {x: 0, y: 0, z: 0}
+    AcceptReturnedProduct: 1

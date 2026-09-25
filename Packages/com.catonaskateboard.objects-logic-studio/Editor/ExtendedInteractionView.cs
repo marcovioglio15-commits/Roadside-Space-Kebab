@@ -53,18 +53,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal void Draw(ObjectWorkspace state, SerializedObject data, ExtendedInteractionKind kind)
         {
             // Structural actions save immediately; settings retain the existing Apply/Discard workflow.
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                AddButton(state, kind);
-                if (kind == ExtendedInteractionKind.AssemblyStation)
-                    AddButton(state, ExtendedInteractionKind.AssemblyProduct);
-                if (kind == ExtendedInteractionKind.ModifyByContact)
-                    AddButton(state, ExtendedInteractionKind.Outline);
-            }
+            using (new EditorGUI.DisabledScope(state.HasChanges || target == null || EditorUtility.IsPersistent(target)))
+                if (GUILayout.Button(new GUIContent("+ Add Interaction", "Choose an available interaction in this category."), EditorStyles.miniButton))
+                    ShowAddMenu(state, kind);
             for (int index = 0; index < features.Length; index++)
             {
-                if (features[index].Kind != kind && !(kind == ExtendedInteractionKind.ModifyByContact && features[index].Kind == ExtendedInteractionKind.Outline)
-                    && !(kind == ExtendedInteractionKind.AssemblyStation && features[index].Kind == ExtendedInteractionKind.AssemblyProduct))
+                if (!InCategory(features[index].Kind, kind))
                     continue;
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
@@ -101,37 +95,82 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
         }
 
-        /// <summary>Adds a feature or unlock rule only where its required existing components allow it.</summary>
-        /// <param name="state">Workspace guarding unfinished proposals.</param>
-        /// <param name="kind">Requested feature or rule type.</param>
-        private void AddButton(ObjectWorkspace state, ExtendedInteractionKind kind)
+        /// <summary>Shares category membership between card filtering and the creation menu.</summary>
+        /// <param name="feature">Candidate interaction kind.</param>
+        /// <param name="category">First interaction identifying the selected category.</param>
+        /// <returns>True when the feature belongs in this category.</returns>
+        private static bool InCategory(ExtendedInteractionKind feature, ExtendedInteractionKind category)
         {
-            // Unlock only configures existing features; one outline owns an object's shell geometry.
-            bool unavailable = kind switch
+            // Single-kind categories use the same menu behavior without separate button layouts.
+            return feature == category || (category switch
             {
-                ExtendedInteractionKind.Outline => target.GetComponent<ObjectOutline>() != null,
-                ExtendedInteractionKind.AssemblyProduct => target.GetComponent<ObjectAssemblyProduct>() != null,
+                ExtendedInteractionKind.Dialogue => feature == ExtendedInteractionKind.Slice,
+                ExtendedInteractionKind.ModifyByContact => feature == ExtendedInteractionKind.Outline,
+                ExtendedInteractionKind.AssemblyStation => feature == ExtendedInteractionKind.AssemblyProduct,
                 _ => false
-            };
-            if (kind == ExtendedInteractionKind.Unlock)
+            });
+        }
+
+        /// <summary>Builds the category's dependency-aware menu only when requested.</summary>
+        /// <param name="state">Workspace retaining the selected prefab.</param>
+        /// <param name="category">First feature in this category.</param>
+        private void ShowAddMenu(ObjectWorkspace state, ExtendedInteractionKind category)
+        {
+            // Capture the actual target so an older menu cannot act on a newly selected object.
+            GenericMenu menu = new GenericMenu();
+            GameObject owner = target;
+            foreach (ExtendedInteractionKind kind in Enum.GetValues(typeof(ExtendedInteractionKind)))
             {
-                unavailable = true;
-                foreach (ObjectInteraction interaction in target.transform.root.GetComponentsInChildren<ObjectInteraction>(true))
-                    if (interaction is not ObjectInteractionUnlock)
-                    {
-                        unavailable = false;
-                        break;
-                    }
+                if (!InCategory(kind, category))
+                    continue;
+                GUIContent label = new GUIContent(kind == ExtendedInteractionKind.Unlock ? "Availability Rule" : ObjectNames.NicifyVariableName(kind.ToString()),
+                    "Add this interaction to the selected prefab object.");
+                if (!CanAdd(kind))
+                    menu.AddDisabledItem(label);
+                else
+                    menu.AddItem(label, false, () => Add(state, owner, kind));
             }
-            using (new EditorGUI.DisabledScope(state.HasChanges || unavailable))
-                if (GUILayout.Button(new GUIContent("+ Add " + (kind == ExtendedInteractionKind.Unlock ? "Unlock Rule" : ObjectNames.NicifyVariableName(kind.ToString())),
-                    "Add this configuration to the current prefab object."), EditorStyles.miniButton))
-                {
-                    state.Extended.Select(ExtendedInteractionAuthoring.Add(target, kind));
-                    state.Extended.Expanded = true;
-                    state.Persist();
-                    Refresh(target);
-                }
+            menu.ShowAsContext();
+        }
+
+        /// <summary>Checks uniqueness and existing-target dependencies for the selected object.</summary>
+        /// <param name="kind">Feature offered by the menu.</param>
+        /// <returns>True when its structural prerequisites are satisfied.</returns>
+        private bool CanAdd(ExtendedInteractionKind kind)
+        {
+            // Only ordinary feature components can become unlock targets.
+            if (target == null)
+                return false;
+            switch (kind)
+            {
+                case ExtendedInteractionKind.Outline:
+                    return target.GetComponent<ObjectOutline>() == null;
+                case ExtendedInteractionKind.AssemblyProduct:
+                    return target.GetComponent<ObjectAssemblyProduct>() == null;
+                case ExtendedInteractionKind.Unlock:
+                    foreach (ObjectInteraction interaction in target.transform.root.GetComponentsInChildren<ObjectInteraction>(true))
+                        if (interaction is not ObjectInteractionUnlock)
+                            return true;
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
+        /// <summary>Rechecks a menu selection before creating and saving its exact feature.</summary>
+        /// <param name="state">Workspace receiving the new component draft.</param>
+        /// <param name="owner">Object that opened the menu.</param>
+        /// <param name="kind">Requested interaction kind.</param>
+        private void Add(ObjectWorkspace state, GameObject owner, ExtendedInteractionKind kind)
+        {
+            // Native menus can outlive a selection change or prefab-stage closure.
+            if (target != owner || state.HasChanges || !CanAdd(kind) || !ObjectAuthoringSave.TryValidate(owner, out _)
+                || EditorUtility.IsPersistent(owner) || EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+            state.Extended.Select(ExtendedInteractionAuthoring.Add(owner, kind));
+            state.Extended.Expanded = true;
+            state.Persist();
+            Refresh(owner);
         }
 
         /// <summary>Draws reusable configuration, local bindings and one actionable validation message.</summary>
@@ -159,11 +198,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         ObjectAuthoringSave.Save(target);
                         Refresh(target);
                     }
-            if (feature is ObjectDialogue dialogue)
-                DrawHud(state, dialogue);
+            if (feature is ObjectDialogue
+                && GUILayout.Button(new GUIContent("Configure Shared Dialogue HUD", "Open Scene Observer to edit the overlay used by every dialogue.")))
+            {
+                state.Category = ObjectInteractionCategory.SceneObserver;
+                state.Persist();
+            }
             if (feature is ObjectOutline outline)
                 using (new EditorGUI.DisabledScope(state.HasChanges))
-                    if (GUILayout.Button(new GUIContent("Rebuild Outline Geometry", "Refresh authored shells after adding, removing or replacing source renderers.")))
+                    if (GUILayout.Button(new GUIContent("Collect Outline Renderers", "Collect original renderers after changing this prefab hierarchy.")))
                     {
                         OutlineAuthoring.Rebuild(outline);
                         ObjectAuthoringSave.Save(target);
@@ -173,47 +216,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
             if (warning.Length > 0)
                 EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
-        }
-
-        /// <summary>Exposes the prefab-local HUD and repairs missing presentation before Play.</summary>
-        /// <param name="state">Workspace guarding structural changes while settings are pending.</param>
-        /// <param name="dialogue">Selected dialogue component.</param>
-        private void DrawHud(ObjectWorkspace state, ObjectDialogue dialogue)
-        {
-            // HUD creation and rebinding are explicit saved prefab operations, separate from content presets.
-            if (!state.Sections.Draw("Dialogue HUD", "Use an existing local HUD; edit its text, font and panel in the prefab hierarchy."))
-                return;
-            using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
-            using (new EditorGUI.DisabledScope(state.HasChanges))
-            {
-                DialogueHud requested = (DialogueHud)EditorGUILayout.ObjectField(new GUIContent("HUD", "Existing complete HUD inside this object's prefab branch."),
-                    dialogue.Hud, typeof(DialogueHud), true);
-                if (requested != dialogue.Hud)
-                {
-                    if (requested != null && !requested.IsValid(dialogue.transform))
-                        warning = "Choose a complete Dialogue HUD inside this object's hierarchy.";
-                    else
-                    {
-                        using (SerializedObject binding = new SerializedObject(dialogue))
-                        {
-                            binding.FindProperty("hud").objectReferenceValue = requested;
-                            binding.ApplyModifiedProperties();
-                        }
-                        ObjectAuthoringSave.Save(target);
-                        state.Extended.Read(target);
-                        state.Persist();
-                        validated = null;
-                    }
-                }
-                if (dialogue.Hud == null && GUILayout.Button(new GUIContent("Create Dialogue HUD", "Author or reuse local presentation before Play; no runtime UI construction.")))
-                {
-                    DialogueAuthoring.CreateHud(dialogue);
-                    ObjectAuthoringSave.Save(target);
-                    state.Extended.Read(target);
-                    state.Persist();
-                    validated = null;
-                }
-            }
         }
 
         #endregion

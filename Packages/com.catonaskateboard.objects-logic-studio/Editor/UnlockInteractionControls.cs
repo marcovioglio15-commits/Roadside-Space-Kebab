@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using CatOnASkateboard.StudioInput.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -37,11 +35,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty draft, ObjectStudioSections sections)
         {
             // This category never creates Grab, Dialogue, Contact or other source interactions.
-            choices.Draw(draft.FindPropertyRelative("TargetId"), "Locked Interaction", 0);
-            if (!sections.Draw("Unlock Conditions", "Release this initial lock after the selected existing interactions or player commands."))
+            SerializedProperty settings = draft.FindPropertyRelative("Settings");
+            HoverControls.Field(settings, "Operation");
+            InteractionAvailabilityChange operation = (InteractionAvailabilityChange)settings.FindPropertyRelative("Operation").enumValueIndex;
+            choices.Draw(draft.FindPropertyRelative("TargetId"), operation switch
+            {
+                InteractionAvailabilityChange.Unlock => "Interaction To Unlock",
+                InteractionAvailabilityChange.Lock => "Interaction To Lock",
+                _ => "Outgoing Interaction"
+            });
+            long target = draft.FindPropertyRelative("TargetId").longValue;
+            long replacement = draft.FindPropertyRelative("ReplacementId").longValue;
+            if (operation == InteractionAvailabilityChange.Replace)
+                choices.Draw(draft.FindPropertyRelative("ReplacementId"), "Incoming Interaction", target, target != 0 ? target : -1);
+            if (!sections.Draw("Conditions", "Apply this availability change after existing interaction events or player commands."))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
-            SerializedProperty settings = draft.FindPropertyRelative("Settings");
             SerializedProperty conditions = settings.FindPropertyRelative("Conditions");
             SerializedProperty sources = draft.FindPropertyRelative("SourceIds");
             if (conditions.arraySize > 1)
@@ -55,7 +64,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         EditorGUILayout.LabelField("Condition " + (index + 1), EditorStyles.boldLabel);
-                        if (GUILayout.Button(new GUIContent("Remove", "Remove only this unlock condition."), GUILayout.Width(60f)))
+                        if (GUILayout.Button(new GUIContent("Remove", "Remove only this condition."), GUILayout.Width(60f)))
                         {
                             conditions.DeleteArrayElementAtIndex(index);
                             sources.DeleteArrayElementAtIndex(index);
@@ -66,7 +75,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     switch ((UnlockTrigger)condition.FindPropertyRelative("Trigger").enumValueIndex)
                     {
                         case UnlockTrigger.Interaction:
-                            choices.Draw(sources.GetArrayElementAtIndex(index), "Source Interaction", draft.FindPropertyRelative("TargetId").longValue);
+                            choices.Draw(sources.GetArrayElementAtIndex(index), "Source Interaction", operation switch
+                            {
+                                InteractionAvailabilityChange.Unlock => target,
+                                InteractionAvailabilityChange.Replace => replacement,
+                                _ => 0
+                            });
                             HoverControls.Field(condition, "Moment");
                             break;
                         case UnlockTrigger.InputAction:

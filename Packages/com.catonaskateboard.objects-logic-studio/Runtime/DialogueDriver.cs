@@ -31,11 +31,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly InteractionInputRouter input = new InteractionInputRouter();
+        private readonly DialogueVisibility visibility = new DialogueVisibility();
         private readonly Dictionary<ObjectDialogue, Buttons> bindings = new Dictionary<ObjectDialogue, Buttons>();
         private ObjectDialogue active;
         private Transform player;
         private int revision = -1;
         private int inputRevision = -1;
+        private bool missingHudReported;
 
         #endregion
 
@@ -51,9 +53,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 active.Interrupt();
             active = null;
             input.Reset();
+            visibility.Reset();
             bindings.Clear();
             player = null;
             revision = inputRevision = -1;
+            missingHudReported = false;
         }
 
         /// <summary>Rebuilds button associations only when the feature catalog or player asset changes.</summary>
@@ -102,14 +106,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             input.Consume(AssemblyInteractionRegistry.Consumed);
             foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
                 input.Consume(action);
-            if (!input.Usable || Time.timeScale <= 0f)
+            bool presentationReady = observer.DialogueHud != null && observer.DialogueHud.IsOwnedBy(observer);
+            if (!presentationReady && bindings.Count > 0 && !missingHudReported)
             {
-                if (active != null && !input.Usable)
+                Debug.LogWarning(observer.DialogueHud == null
+                    ? "Create the shared Dialogue HUD in Objects Logic Studio > Scene Observer."
+                    : "The assigned Dialogue HUD is unavailable. Check that its hierarchy is active, its UI references are valid, and another observer is not using it.", observer);
+                missingHudReported = true;
+            }
+            if (presentationReady)
+                missingHudReported = false;
+            if (!input.Usable || !presentationReady || Time.timeScale <= 0f)
+            {
+                if (active != null && (!input.Usable || !presentationReady))
                     active.Interrupt();
                 input.ClearSignals();
                 return null;
             }
-            if (active != null && (!active.IsSpeaking || !active.CanContinue(player)
+            if (active != null && (!active.IsSpeaking || !active.CanContinue(player) || !active.CanPresent(observer, visibility, true)
                 || !bindings.TryGetValue(active, out Buttons current) || !current.Advance.Enabled))
             {
                 active.Interrupt();
@@ -123,19 +137,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     && (pair.Key.Settings.Trigger != DialogueTrigger.InputAction || pair.Value.Start.Pending)
                     && (selected == null || pair.Key.Settings.Priority > selected.Settings.Priority
                         || pair.Key.Settings.Priority == selected.Settings.Priority
-                        && EntityId.ToULong(pair.Key.GetEntityId()) < EntityId.ToULong(selected.GetEntityId())))
+                        && EntityId.ToULong(pair.Key.GetEntityId()) < EntityId.ToULong(selected.GetEntityId()))
+                    && pair.Key.CanPresent(observer, visibility, false))
                     selected = pair.Key;
             if (active != null)
             {
                 if (bindings[active].Advance.Pending)
                 {
                     consumed = active.AdvanceAction;
-                    active.Advance();
+                    // Consume a blocked dialogue press so the same action cannot unexpectedly grab or drop an item.
+                    if (active.CanAdvance(observer, visibility))
+                        active.Advance();
                 }
             }
             else if (selected != null)
             {
-                selected.Begin();
+                selected.Begin(observer.DialogueHud);
                 if (selected.IsSpeaking)
                 {
                     active = selected;

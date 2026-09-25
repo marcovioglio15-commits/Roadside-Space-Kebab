@@ -53,7 +53,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ObjectInteraction Target;
         [Tooltip("Wait until every mandatory recipe ingredient has been supplied.")]
         public bool RequireComplete = true;
-        [Tooltip("Minimum total number of ingredients before this interaction becomes available.")]
+        [Tooltip("Minimum total ingredient units before this interaction becomes available. Uses the Grab value of each inserted object.")]
         public int MinimumIngredients = 1;
         [Tooltip("Additional required ingredient tags and positive quantities. Every listed requirement must be met.")]
         public ItemTagRequirement[] Ingredients = Array.Empty<ItemTagRequirement>();
@@ -70,7 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Recipe")]
         [Tooltip("Distinct ingredient tags and quantities. Mandatory entries must be filled; optional entries can be omitted.")]
         public AssemblyIngredient[] Ingredients = Array.Empty<AssemblyIngredient>();
-        [Tooltip("Placement slots in product-local space. Provide enough compatible slots for the complete recipe, including optional quantities.")]
+        [Tooltip("Placement slots in product-local space. Each physical object occupies one slot regardless of its Grab units; provide enough slots for the intended ingredient prefabs.")]
         public AssemblyMagnet[] Magnets = Array.Empty<AssemblyMagnet>();
         [Tooltip("Existing product interactions with custom availability requirements. Unlisted interactions wait for recipe completion.")]
         public AssemblyInteractionRule[] InteractionRules = Array.Empty<AssemblyInteractionRule>();

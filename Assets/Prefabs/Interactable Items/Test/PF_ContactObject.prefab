@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1221021494922871339}
   - component: {fileID: 3795208358589089416}
   - component: {fileID: 7583478503244569733}
+  - component: {fileID: 2953059259199201431}
   m_Layer: 0
   m_Name: PF_ContactObject
   m_TagString: ContactTest
@@ -139,6 +140,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
   interactionName: Modify by contact
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Tag: HoverGrabTest
@@ -146,8 +162,11 @@ MonoBehaviour:
     ContactTolerance: 0.02
     QueryInterval: 0.02
     IncludeTriggers: 0
+    AllowCarriedSelf: 1
+    AllowCarriedOther: 0
     Duration: 1
     CompleteAfterSeparation: 0
+    ResumeAfterInterruption: 0
     RepeatAfterSeparation: 1
     Self:
       Tint: 0
@@ -165,5 +184,43 @@ MonoBehaviour:
       MaterialSlot: -1
       Meshes: []
       Consume: 0
+    ChangeContactTag: 1
+    ContactTag: HoverGrabTest_Cooked
     BlockSelf: 1
     BlockOther: 1
+--- !u!114 &2953059259199201431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2328595015402774380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: a7567f77c3095ae4193cae8fb5439c19, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 1
+    Color: {r: 0.8207547, g: 0.80139726, b: 0.80139726, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+  renderers:
+  - {fileID: 1221021494922871339}

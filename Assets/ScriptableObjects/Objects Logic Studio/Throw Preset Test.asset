@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9241b71900d6a304fb6170c972b4bad5, type: 3}
+  m_Name: Throw Preset Test
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ThrowPreset
+  Settings:
+    OverrideBody: 1
+    Mass: 1
+    LinearDamping: 0.05
+    AngularDamping: 0.05
+    Gravity: 1
+    Constraints: 0
+    CollisionDetection: 2
+    MaxAngularSpeed: 20
+    OverrideSurface: 1
+    StaticFriction: 0.5
+    DynamicFriction: 0.4
+    Bounciness: 0.2
+    FrictionCombine: 0
+    BounceCombine: 3
+  Trajectory:
+    Mode: 1
+    Strength: 8
+    Yaw: 0
+    Elevation: 10
+    Spin: {x: 0, y: 0, z: 0}

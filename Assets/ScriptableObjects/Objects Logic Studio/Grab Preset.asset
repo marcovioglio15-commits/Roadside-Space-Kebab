@@ -33,4 +33,4 @@ MonoBehaviour:
     ContactRotation: 1
     ContactAngle: 20
     ContactResponse: 8
-    ShowHover: 1
+    ShowHover: 0

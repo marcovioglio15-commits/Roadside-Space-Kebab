@@ -122,7 +122,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (warning.Length > 0)
                 return false;
             ObjectHover hover = Resolve(state);
-            if (state.HasBinding && hover != null && !state.Binding.TagChange.TryValidate(hover.gameObject, out warning))
+            if (state.HasBinding && hover != null && (!state.Binding.TagChange.TryValidate(hover.gameObject, out warning)
+                || state.Binding.Enabled && !state.Binding.VisualEffect.TryValidate(false, out warning)))
                 return false;
             if (state.HasBinding)
             {
@@ -162,6 +163,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.SetCurrentGroupName("Apply object interaction");
             Undo.RecordObject(state, "Apply object interaction");
             GameObject target = state.Target.Resolve();
+            SpawnSourceAuthoring spawnSources = new SpawnSourceAuthoring();
             bool savePrefab = state.Single.HasChanges || state.Extended.HasChanges || state.HasBinding && state.InteractionChanged;
             try
             {
@@ -181,11 +183,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     InteractionPresetWrites.UpdateExtended(state);
                 state.Single.Apply(target);
                 state.Extended.Apply(target);
+                if (state.Extended.HasChanges && state.Extended.Resolve(target) is ObjectSpawnManager manager && state.Extended.Draft.Enabled)
+                    spawnSources.Prepare(manager.Settings);
                 if (state.Source != null)
                     AssetDatabase.SaveAssetIfDirty(state.Source);
                 if (savePrefab)
                     ObjectAuthoringSave.Save(target);
                 state.Observer.Apply();
+                spawnSources.Save();
                 Undo.FlushUndoRecordObjects();
                 Discard(state);
                 Undo.CollapseUndoOperations(group);
@@ -198,6 +203,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 warning = "Apply failed: " + exception.Message;
                 try
                 {
+                    spawnSources.Save();
                     if (state.Source != null)
                         AssetDatabase.SaveAssetIfDirty(state.Source);
                     if (state.Single.Preset != null)
@@ -231,7 +237,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.ApplyModifiedProperties();
             }
             Undo.RecordObject(hover, "Apply hover tag change");
-            JsonUtility.FromJsonOverwrite("{\"tagChange\":" + JsonUtility.ToJson(state.Binding.TagChange) + "}", hover);
+            JsonUtility.FromJsonOverwrite("{\"tagChange\":" + JsonUtility.ToJson(state.Binding.TagChange)
+                + ",\"visualEffect\":" + JsonUtility.ToJson(state.Binding.VisualEffect) + "}", hover);
             HoverLabel label = hover.Label;
             UnityEngine.Object[] graphics = label.Background != null
                 ? new UnityEngine.Object[] { label.Text, label.Text.rectTransform, label.Panel, label.Canvas, label.Background }

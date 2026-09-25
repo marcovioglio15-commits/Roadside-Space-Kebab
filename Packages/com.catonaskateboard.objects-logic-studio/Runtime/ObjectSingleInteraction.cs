@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Identifies the mutually exclusive single-action feature cards.</summary>
-    public enum SingleInteractionKind { Grab, Drop, Throw }
+    public enum SingleInteractionKind { Grab, Drop, Throw, Dispenser, Container }
 
     /// <summary>Registers one button-triggered object feature with the shared scene observer.</summary>
     public abstract class ObjectSingleInteraction : ObjectInteraction

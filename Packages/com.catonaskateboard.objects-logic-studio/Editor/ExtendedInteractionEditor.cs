@@ -17,8 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Scene instances expose status while editing remains restricted to their source prefab.
             ObjectExtendedInteraction feature = (ObjectExtendedInteraction)target;
             EditorGUILayout.LabelField(feature.InteractionName, EditorStyles.boldLabel);
-            EditorGUILayout.LabelField(feature.Kind == ExtendedInteractionKind.Dialogue ? "Multiple Interaction · Dialogue"
-                : "Passive Interaction · Modify by contact", EditorStyles.miniLabel);
+            EditorGUILayout.LabelField(ObjectNames.NicifyVariableName(feature.Kind.ToString()), EditorStyles.miniLabel);
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
                 || !ObjectAuthoringSave.TryValidate(feature.gameObject, out _)))
                 if (GUILayout.Button(new GUIContent("Open Objects Logic Studio", "Select this exact component in the tool; use Open to enter its prefab workspace.")))
@@ -26,6 +25,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (Application.isPlaying)
                 EditorGUILayout.LabelField(feature switch
                 {
+                    ObjectInteractionUnlock rule => rule.IsApplied ? rule.Settings.Operation + " applied" : "Waiting for conditions",
+                    ObjectSlice slice => slice.IsComplete ? "Completed" : "Steps: " + slice.CompletedSteps + " / " + slice.Settings.Steps.Length,
                     ObjectDialogue dialogue => dialogue.IsSpeaking ? "Speaking" : "Waiting",
                     ObjectContactModifier contact => contact.IsModifying ? "Modifying" : "Waiting for contact",
                     _ => string.Empty

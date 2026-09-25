@@ -47,6 +47,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal ObjectAssemblyStation Table { get; set; }
         /// <summary>Number of actual ingredient roots currently attached to the product.</summary>
         public int IngredientCount => parts.Count;
+        /// <summary>Total logical units supplied by the attached physical ingredients.</summary>
+        public long IngredientUnits { get; private set; }
         /// <summary>Whether all mandatory quantities have been supplied and at least one ingredient is present.</summary>
         public bool IsComplete { get; private set; }
         /// <summary>Recipe counts recorded independently of consumption receipts.</summary>
@@ -144,6 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             initializationSession = session;
             initialized = destroying = pendingStart = pendingCompletion = IsComplete = false;
             counts.Clear();
+            IngredientUnits = 0;
             parts.Clear();
             Table = null;
             SourcePrefab = null;
@@ -193,7 +196,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             string tag = grab.gameObject.tag;
             bool allowed = false;
             foreach (AssemblyIngredient ingredient in settings.Ingredients)
-                if (ingredient.Tag == tag && Count(tag) < ingredient.Count)
+                if (ingredient.Tag == tag && grab.Units > 0 && grab.Units <= ingredient.Count - Count(tag))
                 {
                     allowed = true;
                     break;
@@ -201,18 +204,47 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!allowed)
                 return false;
             for (int index = 0; index < settings.Magnets.Length; index++)
-                if ((!initialized || !occupied[index]) && !settings.Magnets[index].AnyIngredient && settings.Magnets[index].Tag == tag)
+                if ((!initialized || !occupied[index]) && !settings.Magnets[index].AnyIngredient && settings.Magnets[index].Tag == tag
+                    && CanFinishAfterInsertion(index, tag, grab.Units))
                 {
                     magnet = index;
                     return true;
                 }
             for (int index = 0; index < settings.Magnets.Length; index++)
-                if ((!initialized || !occupied[index]) && settings.Magnets[index].AnyIngredient)
+                if ((!initialized || !occupied[index]) && settings.Magnets[index].AnyIngredient
+                    && CanFinishAfterInsertion(index, tag, grab.Units))
                 {
                     magnet = index;
                     return true;
                 }
             return false;
+        }
+
+        /// <summary>Preserves at least one compatible slot for each mandatory tag still needing units.</summary>
+        /// <param name="selected">Magnet occupied by the proposed physical ingredient.</param>
+        /// <param name="tag">Incoming ingredient tag.</param>
+        /// <param name="units">Units supplied by this insertion.</param>
+        /// <returns>True when remaining mandatory units can still receive physical ingredients.</returns>
+        private bool CanFinishAfterInsertion(int selected, string tag, int units)
+        {
+            // Unknown future item values need only one slot per unfinished tag; never assume one unit per object.
+            int generic = 0;
+            int required = 0;
+            for (int index = 0; index < settings.Magnets.Length; index++)
+                if (index != selected && (!initialized || !occupied[index]) && settings.Magnets[index].AnyIngredient)
+                    generic++;
+            foreach (AssemblyIngredient ingredient in settings.Ingredients)
+            {
+                if (ingredient.Optional || Count(ingredient.Tag) + (ingredient.Tag == tag ? units : 0) >= ingredient.Count)
+                    continue;
+                bool specific = false;
+                for (int index = 0; index < settings.Magnets.Length && !specific; index++)
+                    specific = index != selected && (!initialized || !occupied[index])
+                        && !settings.Magnets[index].AnyIngredient && settings.Magnets[index].Tag == ingredient.Tag;
+                if (!specific)
+                    required++;
+            }
+            return required <= generic;
         }
 
         #endregion
@@ -249,7 +281,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     outline.AddPart(part);
             occupied[magnet] = true;
             counts.TryGetValue(part.IngredientTag, out int count);
-            counts[part.IngredientTag] = count + 1;
+            counts[part.IngredientTag] = count + part.Units;
+            IngredientUnits += part.Units;
             RefreshGeometry();
             RefreshLocks();
             pendingStart |= first;
@@ -283,7 +316,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (destroying || !parts.Remove(part))
                 return;
             occupied[part.MagnetIndex] = false;
-            counts[part.IngredientTag]--;
+            counts[part.IngredientTag] -= part.Units;
+            IngredientUnits -= part.Units;
             foreach (ObjectInteraction feature in features)
                 if (feature is ObjectOutline outline)
                     outline.RemovePart(part);
@@ -293,7 +327,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Reads a recipe count without exposing mutable progress.</summary>
         /// <param name="tag">Ingredient tag captured at insertion.</param>
-        /// <returns>The number of attached ingredients bearing that recipe tag.</returns>
+        /// <returns>The logical units supplied by attached ingredients bearing that recipe tag.</returns>
         public int Count(string tag)
         {
             // An absent tag never acts as a wildcard.
@@ -344,7 +378,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 foreach (AssemblyInteractionRule rule in settings.InteractionRules)
                     if (rule.Target == feature)
                     {
-                        available = rule.RequireComplete ? IsComplete : parts.Count >= rule.MinimumIngredients;
+                        available = rule.RequireComplete ? IsComplete : IngredientUnits >= rule.MinimumIngredients;
                         foreach (ItemTagRequirement requirement in rule.Ingredients)
                             available &= Count(requirement.Tag) >= requirement.Count;
                         break;

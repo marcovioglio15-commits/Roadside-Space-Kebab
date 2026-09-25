@@ -14,10 +14,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="owner">Product root containing its existing interactions.</param>
         /// <param name="settings">Recipe and product-local layout proposal.</param>
         /// <param name="warning">Receives an invalid quantity, impossible layout or missing interaction.</param>
-        /// <returns>True when the complete recipe can fit its magnets and unlock rules.</returns>
+        /// <returns>True when the recipe has compatible physical slots and attainable unit requirements.</returns>
         public static bool TryValidate(GameObject owner, AssemblyProductSettings settings, out string warning)
         {
-            // Every optional quantity must also fit, so early optional choices cannot prevent completion later.
+            // Validate physical slots separately from unit quantities, which depend on each incoming Grab.
             warning = "Configure at least one ingredient and enough compatible magnets.";
             if (owner == null || settings == null || settings.Ingredients == null || settings.Ingredients.Length == 0
                 || settings.Magnets == null || settings.Magnets.Length == 0 || settings.InteractionRules == null)
@@ -35,13 +35,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
                 total += ingredient.Count;
             }
-            if (total > settings.Magnets.Length)
-            {
-                warning = "Add a magnet for every allowed ingredient, including optional quantities.";
-                return false;
-            }
             int generic = 0;
-            Dictionary<string, int> specific = new Dictionary<string, int>();
+            HashSet<string> specific = new HashSet<string>();
             HashSet<string> names = new HashSet<string>();
             foreach (Transform child in owner.transform)
                 if (!child.TryGetComponent(out ObjectAssemblyPart part) || part.Product == null || part.Product.gameObject != owner)
@@ -66,18 +61,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
                 }
                 else
-                {
-                    specific.TryGetValue(magnet.Tag, out int count);
-                    specific[magnet.Tag] = count + 1;
-                }
+                    specific.Add(magnet.Tag);
             }
-            // Specific slots are filled first; generic slots cover the remaining per-tag capacities.
-            long remaining = 0;
-            foreach (KeyValuePair<string, int> quantity in quantities)
-            {
-                specific.TryGetValue(quantity.Key, out int count);
-                remaining += Mathf.Max(0, quantity.Value - count);
-            }
+            // One physical ingredient can supply multiple units; require a compatible slot for each tag.
+            // Additional unit-one ingredients still need additional physical magnets at insertion.
+            int remaining = 0;
+            foreach (string tag in quantities.Keys)
+                if (!specific.Contains(tag))
+                    remaining++;
             if (remaining > generic)
             {
                 warning = "The recipe needs more compatible magnets. Add generic slots or slots for its missing tags.";

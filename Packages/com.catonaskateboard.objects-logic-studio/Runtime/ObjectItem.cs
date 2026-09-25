@@ -6,7 +6,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Interaction families that a running modification can temporarily suspend.</summary>
     [Flags]
-    public enum InteractionChannels { None = 0, Grab = 1, Release = 2, Hover = 4, Dialogue = 8, Passive = 16, Assembly = 32 }
+    public enum InteractionChannels { None = 0, Grab = 1, Release = 2, Hover = 4, Dialogue = 8, Passive = 16, Assembly = 32, Transfer = 64, Spawn = 128, Slice = 256 }
 
     /// <summary>Owns runtime consumption receipts and independent temporary locks for one object.</summary>
     [DisallowMultipleComponent]
@@ -85,6 +85,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool Owns(Transform branch)
         {
             // Disabled ingredient items retain their receipts while their product owns visual effects.
+            if (branch.GetComponentInParent<InteractionVfxInstance>(true) != null)
+                return false;
             ObjectItem nearest = branch.GetComponentInParent<ObjectItem>();
             if (nearest == this)
                 return true;
@@ -159,7 +161,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             string tag = victim.gameObject.tag;
             consumedTags.TryGetValue(tag, out int count);
-            consumedTags[tag] = count + 1;
+            int units = victim.TryGetComponent(out ObjectGrab grab) ? grab.Units : 1;
+            if (units <= 0 || units > int.MaxValue - count)
+            {
+                Debug.LogWarning("Consumption requires positive units that fit the remaining tag counter.", victim);
+                return false;
+            }
+            consumedTags[tag] = count + units;
             ConsumptionRevision++;
             victim.IsConsumed = true;
             victim.gameObject.SetActive(false);

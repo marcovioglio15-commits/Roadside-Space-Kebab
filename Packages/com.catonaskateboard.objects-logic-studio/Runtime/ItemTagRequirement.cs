@@ -12,7 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Tag and Quantity")]
         [Tooltip("Project tag identifying the items counted by this condition.")]
         public string Tag = "Untagged";
-        [Tooltip("Positive whole number of matching items required by this condition.")]
+        [Tooltip("Positive whole number of matching units required. A Grab contributes its configured Units; other items count as one.")]
         public int Count = 1;
 
         #endregion

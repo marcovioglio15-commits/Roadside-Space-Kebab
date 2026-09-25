@@ -4,40 +4,37 @@ using UnityEngine.UI;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Authors a reusable prefab-local dialogue overlay before gameplay begins.</summary>
+    /// <summary>Authors one shared dialogue overlay for an observer before gameplay begins.</summary>
     internal static class DialogueAuthoring
     {
         #region Methods
 
         #region Construction
 
-        /// <summary>Connects an existing local HUD or creates one complete overlay with native UI components.</summary>
-        /// <param name="dialogue">Prefab-stage interaction missing its HUD.</param>
-        internal static void CreateHud(ObjectDialogue dialogue)
+        /// <summary>Creates one shared overlay on an observer before any dialogue enters Play.</summary>
+        /// <param name="observer">Scene or prefab observer that owns presentation lifetime.</param>
+        /// <param name="undo">Record Undo for persistent scene or native prefab-stage edits.</param>
+        internal static void CreateHud(HoverObserver observer, bool undo = true)
         {
-            // Prefer sharing this object's valid authored overlay among its dialogue components.
-            if (dialogue.Hud != null)
+            // Dialogue objects contain only content and conditions; every page uses this existing overlay.
+            if (observer.DialogueHud != null)
                 return;
-            DialogueHud hud = null;
-            foreach (DialogueHud candidate in dialogue.GetComponentsInChildren<DialogueHud>(true))
-                if (candidate.GetComponentInParent<ObjectItem>() == dialogue.GetComponent<ObjectItem>() && candidate.IsValid(dialogue.transform))
-                {
-                    hud = candidate;
-                    break;
-                }
-            if (hud == null)
-                hud = Build(dialogue.transform);
-            using (SerializedObject data = new SerializedObject(dialogue))
+            DialogueHud hud = Build(observer.transform, undo);
+            using (SerializedObject data = new SerializedObject(observer))
             {
-                data.FindProperty("hud").objectReferenceValue = hud;
-                data.ApplyModifiedProperties();
+                data.FindProperty("dialogueHud").objectReferenceValue = hud;
+                if (undo)
+                    data.ApplyModifiedProperties();
+                else
+                    data.ApplyModifiedPropertiesWithoutUndo();
             }
         }
 
         /// <summary>Builds an editable bottom-screen panel that never intercepts player input.</summary>
         /// <param name="owner">Prefab branch that owns the overlay.</param>
+        /// <param name="undo">Whether the caller retains the authored hierarchy for Undo.</param>
         /// <returns>The complete HUD with all presentation references assigned.</returns>
-        private static DialogueHud Build(Transform owner)
+        private static DialogueHud Build(Transform owner, bool undo)
         {
             // Screen-space layout is authored once and scales against a reference resolution.
             RectTransform root = ObjectUiAuthoring.CreateRect("Dialogue HUD", owner);
@@ -73,7 +70,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("speaker").objectReferenceValue = speaker;
                 data.ApplyModifiedPropertiesWithoutUndo();
             }
-            Undo.RegisterCreatedObjectUndo(root.gameObject, "Create dialogue HUD");
+            if (undo)
+                Undo.RegisterCreatedObjectUndo(root.gameObject, "Create dialogue HUD");
             return hud;
         }
 

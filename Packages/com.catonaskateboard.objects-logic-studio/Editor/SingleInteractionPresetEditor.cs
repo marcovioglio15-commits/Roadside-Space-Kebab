@@ -21,13 +21,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Native serialized editing supplies asset Undo; importing remains a separate item operation.
             serializedObject.Update();
-            if (target is GrabPreset)
-                SingleInteractionControls.DrawGrab(serializedObject.FindProperty("Settings"), sections);
-            else
+            switch (target)
             {
-                SingleInteractionControls.DrawRelease(serializedObject.FindProperty("Settings"), sections);
-                if (target is ThrowPreset)
-                    SingleInteractionControls.DrawTrajectory(serializedObject.FindProperty("Trajectory"), sections);
+                case GrabPreset:
+                    SingleInteractionControls.DrawGrab(serializedObject.FindProperty("Settings"), sections);
+                    break;
+                case DispenserPreset:
+                    TransferInteractionControls.Dispenser(serializedObject.FindProperty("Settings"), sections);
+                    break;
+                case ContainerPreset:
+                    TransferInteractionControls.Container(serializedObject.FindProperty("Settings"), sections);
+                    break;
+                default:
+                    SingleInteractionControls.DrawRelease(serializedObject.FindProperty("Settings"), sections);
+                    if (target is ThrowPreset)
+                        SingleInteractionControls.DrawTrajectory(serializedObject.FindProperty("Trajectory"), sections);
+                    break;
             }
             serializedObject.ApplyModifiedProperties();
         }

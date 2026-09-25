@@ -40,6 +40,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Undo.AddComponent<ObjectItem>(target);
             ObjectExtendedInteraction feature = kind switch
             {
+                ExtendedInteractionKind.Slice => Undo.AddComponent<ObjectSlice>(target),
+                ExtendedInteractionKind.SpawnManagement => Undo.AddComponent<ObjectSpawnManager>(target),
                 ExtendedInteractionKind.AssemblyStation => Undo.AddComponent<ObjectAssemblyStation>(target),
                 ExtendedInteractionKind.AssemblyProduct => Undo.AddComponent<ObjectAssemblyProduct>(target),
                 ExtendedInteractionKind.ModifyByContact => Undo.AddComponent<ObjectContactModifier>(target),
@@ -50,15 +52,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             };
             using (SerializedObject data = new SerializedObject(feature))
             {
-                data.FindProperty("interactionName").stringValue = ObjectNames.NicifyVariableName(kind.ToString());
+                data.FindProperty("interactionName").stringValue = kind == ExtendedInteractionKind.Unlock
+                    ? "Availability Rule" : ObjectNames.NicifyVariableName(kind.ToString());
                 data.ApplyModifiedProperties();
             }
             if (feature is ObjectOutline outline)
                 OutlineAuthoring.Rebuild(outline);
             if (feature is ObjectAssemblyStation station)
                 AssemblyAuthoring.Prepare(station);
-            if (feature is ObjectDialogue dialogue)
-                DialogueAuthoring.CreateHud(dialogue);
             ObjectAuthoringSave.Save(target);
             Undo.CollapseUndoOperations(group);
             return feature;
@@ -71,8 +72,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // A shared HUD may still belong to another dialogue and remains available for later reuse.
             Validate(feature.gameObject);
             GameObject target = feature.gameObject;
-            if (feature is ObjectOutline outline)
-                OutlineAuthoring.Clear(outline);
             Undo.DestroyObjectImmediate(feature);
             ObjectAuthoringSave.Save(target);
         }

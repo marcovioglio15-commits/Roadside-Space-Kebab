@@ -118,7 +118,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             window.state.Category = feature.Kind switch
             {
-                ExtendedInteractionKind.Dialogue => ObjectInteractionCategory.MultipleInteraction,
+                ExtendedInteractionKind.Dialogue or ExtendedInteractionKind.Slice => ObjectInteractionCategory.MultipleInteraction,
+                ExtendedInteractionKind.SpawnManagement => ObjectInteractionCategory.SpawnManagement,
                 ExtendedInteractionKind.AssemblyStation or ExtendedInteractionKind.AssemblyProduct => ObjectInteractionCategory.ObjectAssemble,
                 ExtendedInteractionKind.Unlock => ObjectInteractionCategory.UnlockInteractions,
                 _ => ObjectInteractionCategory.PassiveInteraction
@@ -306,6 +307,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     case ObjectInteractionCategory.UnlockInteractions:
                         extended.Draw(state, data, ExtendedInteractionKind.Unlock);
+                        break;
+                    case ObjectInteractionCategory.SpawnManagement:
+                        extended.Draw(state, data, ExtendedInteractionKind.SpawnManagement);
                         break;
                     case ObjectInteractionCategory.ObjectAssemble:
                         extended.Draw(state, data, ExtendedInteractionKind.AssemblyStation);
@@ -501,6 +505,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(binding, "Name");
             HoverControls.Field(binding, "Enabled");
             InteractionTagControls.Draw(binding.FindPropertyRelative("TagChange"), state.Sections);
+            InteractionVfxControls.Draw(binding.FindPropertyRelative("VisualEffect"), state.Sections, 0f);
             ObjectHover hover = CurrentInteraction;
             if (hover == null)
                 return;

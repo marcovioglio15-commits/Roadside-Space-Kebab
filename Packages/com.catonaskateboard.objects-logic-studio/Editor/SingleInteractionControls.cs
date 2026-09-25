@@ -26,6 +26,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             StudioInputActionMenu.Draw(data, "Single.Draft.Action", "ObjectsLogicStudio.Button", Button);
             switch (state.Single.Kind)
             {
+                case SingleInteractionKind.Dispenser:
+                    TransferInteractionControls.Dispenser(draft.FindPropertyRelative("Dispenser"), state.Sections);
+                    break;
+                case SingleInteractionKind.Container:
+                    TransferInteractionControls.Container(draft.FindPropertyRelative("Container"), state.Sections);
+                    break;
                 case SingleInteractionKind.Grab:
                     DrawGrab(draft.FindPropertyRelative("Grab"), state.Sections);
                     if (state.Sections.Draw("Grab Debug", "Draw selected-object targeting and carry guides."))
@@ -40,6 +46,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
             }
             InteractionTagControls.Draw(draft.FindPropertyRelative("TagChange"), state.Sections);
+            InteractionVfxControls.Draw(draft.FindPropertyRelative("VisualEffect"), state.Sections, state.Single.Draft.VfxDuration(state.Single.Kind));
             bool changed = data.ApplyModifiedProperties();
             if (changed)
                 state.Persist();
@@ -71,6 +78,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(grab, "TargetOffset");
                     Field(grab, "ObstacleMask");
                 }
+            if (sections.Draw("Item Value", "Configure recipe and consumption units represented by one object."))
+                using (new EditorGUI.IndentLevelScope())
+                    Field(grab, "Units");
             if (!sections.Draw("Carry", "Configure the held pose, pickup transition, world collisions and hover visibility."))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();

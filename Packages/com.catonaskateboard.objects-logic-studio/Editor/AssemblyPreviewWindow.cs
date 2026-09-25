@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Provides isolated orbit navigation and transform handles for the retained product magnet draft.</summary>
+    /// <summary>Provides isolated 3D navigation and transform handles for the retained product magnet draft.</summary>
     internal sealed class AssemblyPreviewWindow : EditorWindow
     {
         #region Serialized Fields
@@ -15,7 +15,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Currently selected magnet index.")]
         [SerializeField]
         private int selected;
-        [Tooltip("Move, rotate or scale handle mode.")]
+        [Tooltip("Move, rotate, scale or hand tool mode.")]
         [SerializeField]
         private int mode;
         [Tooltip("Orbit angles retained when the preview reloads.")]
@@ -36,8 +36,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             new GUIContent("Move", "Move the selected magnet in product-local space."),
             new GUIContent("Rotate", "Rotate the selected ingredient placement."),
-            new GUIContent("Scale", "Scale the ingredient relative to its original prefab scale.")
+            new GUIContent("Scale", "Scale the ingredient relative to its original prefab scale."),
+            new GUIContent("Hand", "Pan the view with the left mouse button (Q).")
         };
+        private readonly AssemblyPreviewNavigation navigation = new AssemblyPreviewNavigation();
         private readonly AssemblyPreviewGeometry geometry = new AssemblyPreviewGeometry();
         private PreviewRenderUtility preview;
         private SerializedObject data;
@@ -82,6 +84,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorApplication.hierarchyChanged += Refresh;
             EditorApplication.projectChanged += Refresh;
             Undo.undoRedoPerformed += Refresh;
+            EditorApplication.update += UpdateNavigation;
         }
 
         /// <summary>Disposes preview resources and saves the pending layout when closing or reloading.</summary>
@@ -91,6 +94,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorApplication.hierarchyChanged -= Refresh;
             EditorApplication.projectChanged -= Refresh;
             Undo.undoRedoPerformed -= Refresh;
+            EditorApplication.update -= UpdateNavigation;
+            navigation.Release();
             data?.Dispose();
             data = null;
             preview?.Cleanup();
@@ -105,6 +110,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Mesh and material discovery is deferred until the next visible preview pass.
             dirty = true;
             Repaint();
+        }
+
+        /// <summary>Stops keyboard flight when the preview loses focus.</summary>
+        private void OnLostFocus()
+        {
+            // Pointer capture and pressed keys belong only to the focused preview.
+            navigation.Release();
+        }
+
+        /// <summary>Repaints only while captured keyboard flight moves the preview camera.</summary>
+        private void UpdateNavigation()
+        {
+            // The editor update supplies continuous motion between IMGUI keyboard events.
+            if (navigation.Tick(orbit, ref pivot))
+                Repaint();
         }
 
         #endregion
@@ -136,11 +156,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                mode = GUILayout.Toolbar(mode, modes, EditorStyles.toolbarButton, GUILayout.Width(210f));
+                mode = GUILayout.Toolbar(mode, modes, EditorStyles.toolbarButton, GUILayout.Width(240f));
                 if (GUILayout.Button(new GUIContent("Frame All", "Fit the product and all guide prefabs in the viewport."), EditorStyles.toolbarButton, GUILayout.Width(80f)))
                     Frame(settings);
                 GUILayout.FlexibleSpace();
-                GUILayout.Label("Alt + drag: orbit · Middle drag: pan · Wheel: zoom", EditorStyles.miniLabel);
+                GUILayout.Label(new GUIContent("RMB + WASD/QE · Alt + drag · F", "RMB: look and fly with WASD/QE; Shift: faster; wheel while flying: speed. Alt+LMB: orbit; MMB: pan; Alt+RMB or wheel: zoom. F: frame selected; Q/W/E/R: hand/move/rotate/scale."), EditorStyles.miniLabel);
             }
             Rect viewport = new Rect(0f, 22f, Mathf.Max(200f, position.width - 310f), position.height - 46f);
             DrawViewport(viewport, settings);
@@ -198,7 +218,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // A local GUI group keeps input and render coordinates aligned at arbitrary editor DPI.
             GUI.BeginGroup(rect);
             Rect local = new Rect(0f, 0f, rect.width, rect.height);
-            Navigate(local);
+            if (navigation.Handle(local, ref orbit, ref pivot, ref distance, ref mode))
+                FrameSelection(settings);
+            if (Event.current.type == EventType.Used)
+                Repaint();
             Quaternion rotation = Quaternion.Euler(orbit.x, orbit.y, 0f);
             preview.camera.transform.SetPositionAndRotation(pivot - rotation * Vector3.forward * distance, rotation);
             preview.camera.nearClipPlane = Mathf.Max(0.001f, distance * 0.001f);
@@ -247,7 +270,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
                 Handles.Label(marker.Position + Vector3.up * size * 2f, marker.Name);
             }
-            if (selected < 0 || selected >= settings.Magnets.Length || Event.current.alt)
+            if (selected < 0 || selected >= settings.Magnets.Length || Event.current.alt || navigation.Active || mode == 3)
                 return;
             AssemblyMagnet magnet = settings.Magnets[selected];
             if (!AssemblyValidation.ValidMagnet(magnet))
@@ -278,33 +301,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Repaint();
         }
 
-        /// <summary>Provides orbit, pan and zoom without changing editor scene cameras.</summary>
-        /// <param name="rect">Local preview input area.</param>
-        private void Navigate(Rect rect)
+        /// <summary>Frames the selected guide while keeping the current viewing direction.</summary>
+        /// <param name="settings">Current recipe and guide layout.</param>
+        private void FrameSelection(AssemblyProductSettings settings)
         {
-            // Navigation is view state only, so bounds never rewrite recipe values.
-            Event current = Event.current;
-            if (!rect.Contains(current.mousePosition))
-                return;
-            switch (current.type)
+            // Empty slots still have a useful focus; no selection falls back to the whole product.
+            if (selected < 0 || selected >= settings.Magnets.Length)
             {
-                case EventType.ScrollWheel:
-                    distance = Mathf.Clamp(distance * Mathf.Exp(current.delta.y * 0.06f), 0.02f, 10000f);
-                    current.Use();
-                    Repaint();
-                    break;
-                case EventType.MouseDrag when current.button == 2 || current.alt && current.button == 0:
-                    if (current.button == 2)
-                        pivot += Quaternion.Euler(orbit.x, orbit.y, 0f) * new Vector3(-current.delta.x, current.delta.y, 0f) * distance * 0.0015f;
-                    else
-                    {
-                        orbit.x = Mathf.Clamp(orbit.x + current.delta.y * 0.4f, -89f, 89f);
-                        orbit.y += current.delta.x * 0.4f;
-                    }
-                    current.Use();
-                    Repaint();
-                    break;
+                Frame(settings);
+                return;
             }
+            Bounds bounds = geometry.Bounds(settings, selected);
+            pivot = bounds.center;
+            distance = Mathf.Max(0.2f, bounds.extents.magnitude * 3.5f);
+            Repaint();
         }
 
         /// <summary>Fits all visible guides and slot positions in the preview.</summary>

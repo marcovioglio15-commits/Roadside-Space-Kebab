@@ -40,6 +40,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Properties
 
+        /// <summary>Modification duration, excluding the contact dwell before a successful start.</summary>
+        internal override float VfxDuration => settings.Duration;
+        /// <summary>Whether the effect still belongs to a running or retained transition.</summary>
+        internal override bool VfxRunning => running || paused;
+        /// <summary>Whether automatic effect timing must pause with the contact transition.</summary>
+        internal override bool VfxPaused => paused;
+
         /// <summary>Reusable settings edited by the passive-interaction card.</summary>
         public ContactModificationSettings Settings => settings;
         /// <summary>Whether effects currently own both participants.</summary>
@@ -111,7 +118,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (Time.timeScale <= 0f)
                 return;
-            if (Time.time >= nextQuery)
+            // Locked effects skip contact queries but still release a lost counterpart or interrupt their active transition.
+            if (!IsLocked && Time.time >= nextQuery)
             {
                 nextQuery = Time.time + settings.QueryInterval;
                 detection.Query(Item, settings, contacts);
@@ -124,7 +132,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (!running)
                 return;
-            if (!Eligible(other) || !settings.CompleteAfterSeparation && !contacts.Contains(other))
+            if (IsLocked || !Eligible(other) || !settings.CompleteAfterSeparation && !contacts.Contains(other))
             {
                 Interrupt();
                 return;
@@ -170,6 +178,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // An invalid tag is reported once before CompareTag reaches a recurring query.
             warning = "Modify by contact requires an Object Item and complete settings.";
             if (GetComponent<ObjectItem>() == null || configuration == null || !configuration.TryValidate(out warning))
+                return false;
+            if (configuration.ChangeContactTag && !InteractionTagChange.TryValidateTag(gameObject, configuration.ContactTag, out warning))
                 return false;
             try
             {
@@ -325,6 +335,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 other.Consume(Item, this);
             else if (settings.Other.Consume)
                 Item.Consume(other, this);
+            // Receipts describe what was consumed; completion listeners observe the counterpart's final tag.
+            if (settings.ChangeContactTag && other != null
+                && !InteractionTagChange.TryApplyTag(other.gameObject, settings.ContactTag, out string warning))
+                Report(warning);
             Release();
             Signal(InteractionMoment.Completed);
         }

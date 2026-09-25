@@ -124,7 +124,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("interactionName").stringValue = Draft.Name;
                 data.FindProperty("m_Enabled").boolValue = Draft.Enabled;
                 data.FindProperty("drawGizmos").boolValue = Draft.DrawGizmos;
-                if (feature is ObjectAssemblyStation)
+                if (feature is ObjectAssemblyStation or ObjectSlice)
                     data.FindProperty("action").objectReferenceValue = Draft.StartAction;
                 if (feature is ObjectDialogue)
                 {
@@ -135,6 +135,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             string settings = Kind switch
             {
+                ExtendedInteractionKind.Slice => JsonUtility.ToJson(Draft.Slice),
+                ExtendedInteractionKind.SpawnManagement => JsonUtility.ToJson(SpawnSourceAuthoring.Resolve(Draft.SpawnManagement)),
                 ExtendedInteractionKind.AssemblyStation => JsonUtility.ToJson(Draft.AssemblyStation),
                 ExtendedInteractionKind.AssemblyProduct => JsonUtility.ToJson(Draft.AssemblyProduct.Resolve(feature.transform)),
                 ExtendedInteractionKind.ModifyByContact => JsonUtility.ToJson(Draft.Contact),
@@ -143,7 +145,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ExtendedInteractionKind.Unlock => JsonUtility.ToJson(Draft.Unlock.Resolve(feature.transform.root)),
                 _ => string.Empty
             };
-            JsonUtility.FromJsonOverwrite("{\"settings\":" + settings + ",\"tagChange\":" + JsonUtility.ToJson(Draft.TagChange) + "}", feature);
+            JsonUtility.FromJsonOverwrite("{\"settings\":" + settings + ",\"tagChange\":" + JsonUtility.ToJson(Draft.TagChange)
+                + ",\"visualEffect\":" + JsonUtility.ToJson(Draft.VisualEffect) + "}", feature);
+            if (feature is ObjectSpawnManager manager && Draft.SpawnManagement.Animation.Enabled)
+                InteractionStagingAuthoring.Prepare(manager, "Spawn Staging");
             if (feature is ObjectOutline outline)
                 OutlineAuthoring.Rebuild(outline);
             EditorUtility.SetDirty(feature);

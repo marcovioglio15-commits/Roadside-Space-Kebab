@@ -24,6 +24,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Solid layers that prevent grabbing through walls. The player and this object are excluded.")]
         public LayerMask ObstacleMask = ~0;
 
+        [Header("Item Value")]
+        [Tooltip("Whole units represented by this one physical object in recipes and consumption requirements. Does not duplicate geometry or multiply mass.")]
+        public int Units = 1;
+
         [Header("Carry Pose")]
         [Tooltip("Reference frame followed while carrying. Camera follows aim; Player follows the tagged root.")]
         public CarrySpace Space;
@@ -67,7 +71,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Check only settings used by the selected modes.
             warning = string.Empty;
-            if (!InteractionValues.Positive(Distance) || !InteractionValues.Finite(TargetOffset)
+            if (Units <= 0)
+                warning = "Grab Units must be a positive whole number.";
+            else if (!InteractionValues.Positive(Distance) || !InteractionValues.Finite(TargetOffset)
                 || !InteractionValues.Finite(Offset) || !InteractionValues.Finite(Rotation))
                 warning = "Grab needs a positive finite distance and finite position/rotation values.";
             else if (TargetMode is not (HoverTargetMode.ViewCenter or HoverTargetMode.Cursor)

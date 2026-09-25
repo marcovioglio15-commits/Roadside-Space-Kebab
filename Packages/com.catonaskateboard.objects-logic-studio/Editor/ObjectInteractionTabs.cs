@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
     /// <summary>Separates observation, direct actions, dialogue and automatic contact effects.</summary>
-    internal enum ObjectInteractionCategory { Hover, SingleInteraction, MultipleInteraction, PassiveInteraction, UnlockInteractions, SceneObserver, ObjectAssemble }
+    internal enum ObjectInteractionCategory { Hover, SingleInteraction, MultipleInteraction, PassiveInteraction, UnlockInteractions, SceneObserver, ObjectAssemble, SpawnManagement }
 
     /// <summary>Draws category navigation without changing the retained interaction draft.</summary>
     internal static class ObjectInteractionTabs
@@ -14,12 +14,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static readonly GUIContent[] labels =
         {
             new GUIContent("Hover", "Add and configure hover interactions for the selected object."),
-            new GUIContent("Single", "Single Interaction: configure Grab, Drop and Throw actions."),
+            new GUIContent("Single", "Single Interaction: configure carrying, Dispenser and Container actions."),
             new GUIContent("Multiple", "Multiple Interaction: configure prioritized dialogues and explicit text pages."),
             new GUIContent("Passive", "Passive Interaction: configure contact modifications and object outlines."),
             new GUIContent("Unlock Interactions", "Lock existing interactions until their configured conditions are met."),
             new GUIContent("Scene Observer", "Connect a camera and player independently of the edited interaction prefab."),
-            new GUIContent("Object Assemble", "Configure assembly tables, product recipes and ingredient magnets.")
+            new GUIContent("Object Assemble", "Configure assembly tables, product recipes and ingredient magnets."),
+            new GUIContent("Spawn Management", "Generate prefab outputs when individual source instances complete the configured interactions.")
         };
 
         #endregion

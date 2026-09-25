@@ -27,6 +27,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Launch strength, direction and spin for Throw.")]
         public ThrowSettings Throw = new ThrowSettings();
 
+        [Tooltip("Prefab supply or recovery from a linked Container.")]
+        public DispenserSettings Dispenser = new DispenserSettings();
+        [Tooltip("Accepted tags, capacity and retained item appearance.")]
+        public ContainerSettings Container = new ContainerSettings();
+
+        [Tooltip("Independent optional start effect retained on this exact interaction, including its own prefab and timing.")]
+        public InteractionVfxSettings VisualEffect = new InteractionVfxSettings();
+
         [Tooltip("Optional item tag change retained independently of reusable settings presets.")]
         public InteractionTagChange TagChange = new InteractionTagChange();
 
@@ -46,9 +54,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (feature == null)
                 return draft;
             draft.TagChange = ObjectWorkspace.Copy(feature.TagChange);
+            draft.VisualEffect = ObjectWorkspace.Copy(feature.VisualEffect);
             draft.Name = feature.InteractionName;
             draft.Enabled = feature.enabled;
             draft.Action = feature.Action;
+            if (feature is ObjectDispenser dispenser)
+                draft.Dispenser = ObjectWorkspace.Copy(dispenser.Settings);
+            if (feature is ObjectContainer container)
+                draft.Container = ObjectWorkspace.Copy(container.Settings);
             if (feature is ObjectGrab grab)
             {
                 draft.Grab = ObjectWorkspace.Copy(grab.Settings);
@@ -64,6 +77,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #endregion
 
         #region Validation
+
+        /// <summary>Resolves automatic effect timing from the current detached settings.</summary>
+        /// <param name="kind">Feature represented by this draft.</param>
+        /// <returns>Positive predefined duration, or zero when timing must remain manual.</returns>
+        internal float VfxDuration(SingleInteractionKind kind)
+        {
+            // Unused feature payloads never determine the selected card's timing.
+            return kind == SingleInteractionKind.Grab && Grab != null && !Grab.Instant ? Grab.TransitionDuration : 0f;
+        }
 
         /// <summary>Validates the proposal against the existing object without editing its components.</summary>
         /// <param name="feature">Applied component that will receive this proposal.</param>
@@ -84,12 +106,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         }
                 return true;
             }
-            if (!TagChange.TryValidate(feature.gameObject, out warning))
+            if (!VisualEffect.TryValidate(VfxDuration(feature.Kind) > 0f, out warning)
+                || !TagChange.TryValidate(feature.gameObject, out warning))
                 return false;
             if (Action == null || Action.action == null || Action.action.type != InputActionType.Button)
                 warning = "Choose a Button action from the player's Input Actions asset.";
             else if (feature is ObjectGrab)
                 return Grab != null && Grab.TryValidate(out warning) && ObjectGrab.ValidateBody(feature.gameObject, out warning);
+            else if (feature is ObjectDispenser dispenser)
+                return dispenser.TryValidate(Dispenser, out warning);
+            else if (feature is ObjectContainer container)
+                return container.TryValidate(Container, out warning);
             else if (feature.GetComponent<ObjectGrab>() is not ObjectGrab owner || !owner.enabled)
                 warning = "Drop and Throw require an enabled Grab on the same object.";
             else if (Release == null || !Release.TryValidate(out warning))

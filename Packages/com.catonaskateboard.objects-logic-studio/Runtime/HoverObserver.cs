@@ -20,6 +20,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private string playerTag = "Player";
 
+        [Tooltip("Single authored dialogue overlay shared by every object seen by this observer. Create it in Scene Observer before Play.")]
+        [SerializeField]
+        private DialogueHud dialogueHud;
+
         #endregion
 
         #region State
@@ -42,6 +46,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Camera View => resolvedView;
         /// <summary>Authored camera reference available to editor setup before Play begins.</summary>
         public Camera ConfiguredView => view;
+        /// <summary>Shared dialogue presentation authored on the player or in the scene.</summary>
+        public DialogueHud DialogueHud => dialogueHud;
         /// <summary>Cached tagged root used for distance and player-collider filtering.</summary>
         public Transform Player => player;
         /// <summary>Tag used by the observer's player lookup.</summary>
@@ -70,6 +76,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Reacquisition never instantiates a player, camera or UI.
             RefreshContext();
+            if (dialogueHud != null)
+                dialogueHud.Bind(this);
         }
 
         /// <summary>Releases ownership and hides all labels before another observer takes over.</summary>
@@ -78,6 +86,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Input subscriptions belong to this observer even when another observer owns the view.
             singles.Reset();
             dialogues.Reset();
+            if (dialogueHud != null)
+                dialogueHud.Unbind(this);
             // A duplicate observer must not hide the active observer's output.
             if (active != this)
                 return;
@@ -96,6 +106,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Report("Only one Hover Observer can be active. Disable the previous observer before switching views.");
                 return;
             }
+            if (active != this && dialogueHud != null)
+                dialogueHud.Bind(this);
             active = this;
             if (Time.unscaledTime >= nextResolve)
             {
@@ -106,6 +118,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && player.gameObject.activeInHierarchy;
             if (available)
             {
+                // Preparation precedes the dialogue readiness check without reparenting during activation callbacks.
+                if (dialogueHud != null)
+                    dialogueHud.Prepare(this);
                 InteractionUnlockRegistry.Tick(this);
                 AssemblyInteractionRegistry.Tick(this);
                 singles.Tick(this, dialogues.Tick(this));

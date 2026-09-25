@@ -14,6 +14,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public InteractionUnlockSettings Settings = new InteractionUnlockSettings();
         [Tooltip("Stable identity of the existing interaction to lock.")]
         public long TargetId;
+        [Tooltip("Stable identity of the incoming interaction when Replace is selected.")]
+        public long ReplacementId;
         [Tooltip("Stable source component identity for each condition.")]
         public long[] SourceIds = Array.Empty<long>();
 
@@ -33,9 +35,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 Settings = ObjectWorkspace.Copy(source),
                 TargetId = source.Target != null ? ObjectWorkspaceTarget.FileId(source.Target) : 0,
+                ReplacementId = source.Replacement != null ? ObjectWorkspaceTarget.FileId(source.Replacement) : 0,
                 SourceIds = new long[source.Conditions.Length]
             };
             draft.Settings.Target = null;
+            draft.Settings.Replacement = null;
             for (int index = 0; index < source.Conditions.Length; index++)
             {
                 draft.SourceIds[index] = source.Conditions[index].Source != null ? ObjectWorkspaceTarget.FileId(source.Conditions[index].Source) : 0;
@@ -53,6 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             InteractionUnlockSettings result = ObjectWorkspace.Copy(Settings);
             ObjectInteraction[] candidates = root.GetComponentsInChildren<ObjectInteraction>(true);
             result.Target = Find(candidates, TargetId);
+            result.Replacement = Find(candidates, ReplacementId);
             for (int index = 0; index < result.Conditions.Length; index++)
                 result.Conditions[index].Source = index < SourceIds.Length ? Find(candidates, SourceIds[index]) : null;
             return result;

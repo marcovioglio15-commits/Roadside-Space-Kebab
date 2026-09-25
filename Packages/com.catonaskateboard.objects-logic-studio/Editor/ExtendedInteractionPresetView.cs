@@ -58,6 +58,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.RecordObject(state, "Import interaction preset");
             switch (state.Extended.Preset)
             {
+                case SlicePreset slice:
+                    state.Extended.Draft.Slice = ObjectWorkspace.Copy(slice.Settings);
+                    break;
+                case SpawnManagementPreset spawn:
+                    state.Extended.Draft.SpawnManagement = ObjectWorkspace.Copy(spawn.Settings);
+                    break;
                 case AssemblyStationPreset station:
                     state.Extended.Draft.AssemblyStation = ObjectWorkspace.Copy(station.Settings);
                     break;
@@ -86,6 +92,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ExtendedInteractionPreset preset = (ExtendedInteractionPreset)ScriptableObject.CreateInstance(PresetType(state.Extended.Kind));
             switch (preset)
             {
+                case SlicePreset slice:
+                    slice.Settings = ObjectWorkspace.Copy(state.Extended.Draft.Slice);
+                    break;
+                case SpawnManagementPreset spawn:
+                    spawn.Settings = SpawnSourceAuthoring.Resolve(state.Extended.Draft.SpawnManagement);
+                    break;
                 case AssemblyStationPreset station:
                     station.Settings = ObjectWorkspace.Copy(state.Extended.Draft.AssemblyStation);
                     break;
@@ -115,8 +127,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Unlock references remain local to the prefab and have no transferable preset.
             return kind switch
             {
+                ExtendedInteractionKind.Slice => typeof(SlicePreset),
                 ExtendedInteractionKind.ModifyByContact => typeof(ContactModificationPreset),
                 ExtendedInteractionKind.Outline => typeof(OutlinePreset),
+                ExtendedInteractionKind.SpawnManagement => typeof(SpawnManagementPreset),
                 ExtendedInteractionKind.AssemblyStation => typeof(AssemblyStationPreset),
                 _ => typeof(DialoguePreset)
             };

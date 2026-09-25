@@ -33,6 +33,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ObjectAssemblyProduct Product => attached ? product : null;
         /// <summary>Recipe tag recorded at insertion, independent of later product tag changes.</summary>
         public string IngredientTag { get; private set; }
+        /// <summary>Logical units captured at insertion, independent of later Grab setting changes.</summary>
+        public int Units { get; private set; }
         /// <summary>Occupied slot in the product's recipe layout.</summary>
         public int MagnetIndex { get; private set; }
         /// <summary>Mass contributed to the assembled body's total.</summary>
@@ -54,6 +56,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             grab.Cancel();
             product = owner;
             IngredientTag = gameObject.tag;
+            Units = grab.Units;
             MagnetIndex = index;
             body = grab.Body;
             original = new CarryBodyState(body);

@@ -84,6 +84,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float ExitDistance = 4f;
         [Tooltip("Higher values start first when several eligible dialogue interactions compete for the HUD.")]
         public int Priority;
+        [Header("Visibility")]
+        [Tooltip("Require an unobstructed line from the observer camera to this object when starting or resuming a dialogue.")]
+        public bool RequireSightToStart;
+        [Tooltip("Require visibility to advance to the next page or close the final page. While blocked, the current page remains unless Hide When Sight Lost is enabled.")]
+        public bool RequireSightToContinue;
+        [Tooltip("Hide an active dialogue when visibility is lost, independently of the start and page-advance requirements. Use the selected interruption policy when sight returns.")]
+        public bool HideWhenSightLost;
+        [Tooltip("Solid layers blocking dialogue visibility. Player and dialogue-object colliders, and all triggers, are excluded.")]
+        public LayerMask ObstacleMask = ~0;
+        [Tooltip("Local point checked for dialogue visibility. Use an offset when the object pivot is inside a surface or near its feet.")]
+        public Vector3 SightOffset;
         [Header("Dialogue Flow")]
         [Tooltip("Choose eligible entries in array order, uniformly at random, or using their relative weights.")]
         public DialogueSelection Selection;
@@ -109,6 +120,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = string.Empty;
             if (!InteractionValues.Positive(Distance) || !InteractionValues.Positive(ExitDistance) || ExitDistance < Distance)
                 warning = "Dialogue needs positive finite distances; Exit Distance must be at least Distance.";
+            else if ((RequireSightToStart || RequireSightToContinue || HideWhenSightLost) && !InteractionValues.Finite(SightOffset))
+                warning = "Dialogue Sight Offset must be finite.";
             else if (Trigger is not (DialogueTrigger.Proximity or DialogueTrigger.InputAction or DialogueTrigger.Consumption)
                 || Selection is not (DialogueSelection.Sequence or DialogueSelection.Random or DialogueSelection.WeightedRandom)
                 || Interruption is not (DialogueInterruption.Resume or DialogueInterruption.Restart or DialogueInterruption.SelectNext))

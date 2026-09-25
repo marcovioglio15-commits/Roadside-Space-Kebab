@@ -18,8 +18,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats:
-    - _DepthTest: 4
-    - _OutlineThickness: 0.004
+    m_Floats: []
     m_Colors:
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ObjectGlowColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ObjectGlowShape: {r: 3, g: 0.8660254, b: 0, a: 0}

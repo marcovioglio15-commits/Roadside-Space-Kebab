@@ -10,12 +10,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly InteractionInputRouter input = new InteractionInputRouter();
-        private readonly Dictionary<ObjectSingleInteraction, InteractionButton> bindings = new Dictionary<ObjectSingleInteraction, InteractionButton>();
-        private readonly HoverPhysics physics = new HoverPhysics();
+        private readonly Dictionary<ObjectInteraction, InteractionButton> bindings = new Dictionary<ObjectInteraction, InteractionButton>();
+        private readonly InteractionTargeting targeting = new InteractionTargeting();
         private Transform player;
         private ObjectGrab held;
         private int revision = -1;
         private int inputRevision = -1;
+        private int sliceRevision = -1;
         private bool missingInputReported;
 
         #endregion
@@ -51,7 +52,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Disposing signals never changes PlayerInput's maps or device pairing.
             input.ClearBindings();
             bindings.Clear();
-            revision = -1;
+            revision = sliceRevision = -1;
         }
 
         /// <summary>Resolves PlayerInput only when player ownership changes or a missing component is retried.</summary>
@@ -65,16 +66,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 player = observer.Player;
             }
             input.Refresh(player);
-            if (revision == SingleInteractionRegistry.Revision && inputRevision == input.Revision)
+            if (revision == SingleInteractionRegistry.Revision && sliceRevision == SliceRegistry.Revision && inputRevision == input.Revision)
                 return;
             ClearBindings();
             inputRevision = input.Revision;
             revision = SingleInteractionRegistry.Revision;
+            sliceRevision = SliceRegistry.Revision;
             if (input.Asset == null)
             {
-                if (!missingInputReported && SingleInteractionRegistry.Items.Count > 0)
+                if (!missingInputReported && (SingleInteractionRegistry.Items.Count > 0 || SliceRegistry.Items.Count > 0))
                 {
-                    Debug.LogWarning("Single interactions need an active PlayerInput with an Input Actions asset under the Observer's player root.", observer);
+                    Debug.LogWarning("Input interactions need an active PlayerInput with an Input Actions asset under the Observer's player root.", observer);
                     missingInputReported = true;
                 }
                 return;
@@ -83,22 +85,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Bind by stable action ID against the private runtime asset, never the project asset's action instance.
             foreach (ObjectSingleInteraction feature in SingleInteractionRegistry.Items)
+                BindFeature(feature, feature.Action);
+            foreach (ObjectSlice feature in SliceRegistry.Items)
+                BindFeature(feature, feature.Action);
+        }
+
+        /// <summary>Registers a valid single action or Slice sequence in the shared input router.</summary>
+        /// <param name="feature">Enabled interaction receiving performed presses.</param>
+        /// <param name="action">Authored Button reference resolved against the player's private asset.</param>
+        private void BindFeature(ObjectInteraction feature, InputActionReference action)
+        {
+            // One router arbitrates Slice and Grab so a shared press cannot perform both.
+            if (feature == null || !feature.isActiveAndEnabled)
+                return;
+            string warning = string.Empty;
+            bool valid = feature switch
             {
-                if (feature == null || !feature.isActiveAndEnabled)
-                    continue;
-                if (!feature.TryValidate(out string warning))
-                {
-                    Debug.LogWarning(feature.Kind + ": " + warning, feature);
-                    continue;
-                }
-                InteractionButton button = input.Bind(feature.Action);
-                if (button == null)
-                {
-                    Debug.LogWarning(feature.Kind + " action is not a Button in the Observer player's Input Actions asset.", feature);
-                    continue;
-                }
-                bindings.Add(feature, button);
+                ObjectSingleInteraction single => single.TryValidate(out warning),
+                ObjectSlice slice => slice.TryValidate(out warning),
+                _ => false
+            };
+            if (!valid)
+            {
+                Debug.LogWarning(feature.InteractionName + ": " + warning, feature);
+                return;
             }
+            InteractionButton button = input.Bind(action);
+            if (button != null)
+                bindings.Add(feature, button);
+            else
+                Debug.LogWarning(feature.InteractionName + " action is not a Button in the Observer player's Input Actions asset.", feature);
         }
 
         #endregion
@@ -123,20 +139,69 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 input.ClearSignals();
                 return;
             }
-            if (held != null)
-                Release(observer);
-            else
-                Grab(observer);
+            bool pending = false;
+            foreach (InteractionButton button in bindings.Values)
+                pending |= button.Pending;
+            if (!pending)
+                return;
+            Physics.SyncTransforms();
+            if (!Slice(observer))
+                if (held != null)
+                    Release(observer);
+                else
+                    Grab(observer);
             input.ClearSignals();
+        }
+
+        /// <summary>Advances the highest-priority visible Slice before considering pickup or release.</summary>
+        /// <param name="observer">Player and camera supplying reach and visibility.</param>
+        /// <returns>True when one step consumed this frame's performed input.</returns>
+        private bool Slice(HoverObserver observer)
+        {
+            // Restrict geometry queries to performed presses on eligible unfinished sequences.
+            ObjectSlice selected = null;
+            float distance = float.PositiveInfinity;
+            foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
+            {
+                if (!pair.Value.Pending || pair.Key is not ObjectSlice candidate || !candidate.CanAdvance()
+                    || candidate.transform.IsChildOf(observer.Player))
+                    continue;
+                TransferTargetSettings target = candidate.Settings.Target;
+                if (targeting.Eligible(observer, candidate.transform, candidate.Colliders, candidate.transform.TransformPoint(target.Offset),
+                    target.Distance, target.Mode, target.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : target.CenterRadius,
+                    target.ObstacleMask, out float score)
+                    && (selected == null || candidate.Settings.Priority > selected.Settings.Priority
+                        || candidate.Settings.Priority == selected.Settings.Priority && Nearer(candidate, selected, score, distance)))
+                {
+                    selected = candidate;
+                    distance = score;
+                }
+            }
+            return selected != null && selected.Advance();
         }
 
         /// <summary>Chooses the highest-priority eligible release without grabbing again in the same event.</summary>
         /// <param name="observer">Camera defining the release aim.</param>
         private void Release(HoverObserver observer)
         {
+            // A successful deposit consumes this event before a same-key Drop can release the item.
+            ObjectContainer container = null;
+            float distance = float.PositiveInfinity;
+            foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
+                if (pair.Value.Pending && pair.Key is ObjectContainer candidate && candidate.CanStore(held)
+                    && Eligible(observer, candidate, out float score) && Nearer(candidate, container, score, distance))
+                {
+                    container = candidate;
+                    distance = score;
+                }
+            if (container != null && container.Store(held))
+            {
+                held = null;
+                return;
+            }
             // Throw wins simultaneous Drop/Throw requests; using one action for Grab and Drop provides a toggle.
             ObjectRelease selected = null;
-            foreach (KeyValuePair<ObjectSingleInteraction, InteractionButton> pair in bindings)
+            foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
                 if (pair.Value.Pending && pair.Key is ObjectRelease release && release.Available(InteractionChannels.Release)
                     && release.Grab == held && (selected == null || release.Kind == SingleInteractionKind.Throw))
                     selected = release;
@@ -152,28 +217,67 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="observer">Camera, player and visibility context.</param>
         private void Grab(HoverObserver observer)
         {
-            // Expensive visibility queries run only on a performed Grab, not continuously while idle.
-            ObjectGrab selected = null;
+            // Only one eligible feature can claim the empty carry slot for this input event.
+            ObjectInteraction selected = null;
             float distance = float.PositiveInfinity;
-            foreach (KeyValuePair<ObjectSingleInteraction, InteractionButton> pair in bindings)
-                if (pair.Value.Pending && pair.Key is ObjectGrab candidate && candidate.Available(InteractionChannels.Grab)
-                    && !candidate.IsHeld && !candidate.transform.IsChildOf(observer.Player)
-                    && Eligible(observer, candidate, out float score)
-                    && (score < distance || score == distance && selected != null
-                        && EntityId.ToULong(candidate.GetEntityId()) < EntityId.ToULong(selected.GetEntityId())))
+            foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
+            {
+                if (!pair.Value.Pending || pair.Key == null || pair.Key.transform.IsChildOf(observer.Player))
+                    continue;
+                float score = float.PositiveInfinity;
+                bool eligible = pair.Key switch
                 {
-                    selected = candidate;
+                    ObjectGrab grab => grab.Available(InteractionChannels.Grab) && !grab.IsHeld && Eligible(observer, grab, out score),
+                    ObjectDispenser dispenser => dispenser.CanTake() && Eligible(observer, dispenser, out score),
+                    _ => false
+                };
+                if (eligible && Nearer(pair.Key, selected, score, distance))
+                {
+                    selected = pair.Key;
                     distance = score;
                 }
-            if (selected == null)
-                return;
-            if (selected.Begin(observer))
-                held = selected;
+            }
+            switch (selected)
+            {
+                case ObjectGrab grab when grab.Begin(observer):
+                    held = grab;
+                    break;
+                case ObjectDispenser dispenser when dispenser.TryTake(observer, out ObjectGrab supplied):
+                    held = supplied;
+                    break;
+            }
+        }
+
+        /// <summary>Breaks equal-distance ties consistently without depending on registry enumeration order.</summary>
+        /// <param name="candidate">Feature being considered.</param>
+        /// <param name="selected">Previously selected feature, if any.</param>
+        /// <param name="score">Candidate squared distance.</param>
+        /// <param name="distance">Current best squared distance.</param>
+        /// <returns>True when the candidate should replace the current selection.</returns>
+        private static bool Nearer(ObjectInteraction candidate, ObjectInteraction selected, float score, float distance)
+        {
+            // Stable entity identity resolves overlapping eligible objects deterministically.
+            return score < distance || score == distance && selected != null
+                && EntityId.ToULong(candidate.GetEntityId()) < EntityId.ToULong(selected.GetEntityId());
         }
 
         #endregion
 
         #region Targeting
+
+        /// <summary>Applies shared visible-surface targeting to a deposit or withdrawal.</summary>
+        /// <param name="observer">Active camera and player.</param>
+        /// <param name="target">Inventory interaction responding to an input event.</param>
+        /// <param name="score">Receives squared player distance.</param>
+        /// <returns>True when the target is reachable and unobstructed.</returns>
+        private bool Eligible(HoverObserver observer, ObjectTransferInteraction target, out float score)
+        {
+            // Transfer interactions have their own range and aim settings, independent of Grab.
+            TransferTargetSettings settings = target.Target;
+            return targeting.Eligible(observer, target.transform, target.Colliders, target.transform.TransformPoint(settings.Offset),
+                settings.Distance, settings.Mode, settings.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
+                settings.ObstacleMask, out score);
+        }
 
         /// <summary>Applies independent Grab targeting even when the object has no Hover feature.</summary>
         /// <param name="observer">Observer with valid camera and player.</param>
@@ -182,35 +286,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the candidate is in range, visible and unobstructed.</returns>
         private bool Eligible(HoverObserver observer, ObjectGrab target, out float score)
         {
-            // Range is measured from the player; a third-person camera does not extend reach.
-            Vector3 point = target.WorldTarget;
-            score = (point - observer.Player.position).sqrMagnitude;
+            // Test actual compound geometry as well as the authored pivot.
             GrabSettings settings = target.Settings;
-            Camera view = observer.View;
-            if (score > settings.Distance * settings.Distance || (view.cullingMask & (1 << target.gameObject.layer)) == 0)
-                return false;
-            Vector3 projected = view.WorldToScreenPoint(point);
-            Rect viewport = view.pixelRect;
-            if (projected.z < view.nearClipPlane || projected.z > view.farClipPlane || !viewport.Contains(projected))
-                return false;
-            switch (settings.TargetMode)
-            {
-                case HoverTargetMode.ViewCenter:
-                    float radius = viewport.height * settings.CenterRadius;
-                    if (((Vector2)projected - viewport.center).sqrMagnitude > radius * radius)
-                        return false;
-                    break;
-                case HoverTargetMode.Cursor:
-                    if (Mouse.current == null || Cursor.lockState == CursorLockMode.Locked || view.targetDisplay != 0
-                        || !viewport.Contains(Mouse.current.position.ReadValue())
-                        || !HoverPhysics.TryCursorHit(view.ScreenPointToRay(Mouse.current.position.ReadValue()), target.Colliders,
-                            view.cullingMask, Vector3.Distance(view.transform.position, observer.Player.position) + settings.Distance, out point))
-                        return false;
-                    break;
-                default:
-                    return false;
-            }
-            return physics.HasSight(observer, target.transform, point, settings.ObstacleMask);
+            return targeting.Eligible(observer, target.transform, target.Colliders, target.WorldTarget, settings.Distance,
+                settings.TargetMode, settings.TargetMode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius, settings.ObstacleMask, out score);
         }
 
         #endregion

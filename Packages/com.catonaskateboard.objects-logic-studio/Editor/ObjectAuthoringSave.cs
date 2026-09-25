@@ -22,6 +22,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             warning = "Select a writable prefab asset or an object inside its Prefab workspace.";
             if (target == null)
                 return false;
+            if (target.GetComponentInParent<Canvas>(true) != null)
+            {
+                warning = "Select the object root or a 3D child. HUD graphics cannot own object interactions.";
+                return false;
+            }
             PrefabStage stage = PrefabStageUtility.GetPrefabStage(target);
             if (stage != null && !stage.IsPartOfPrefabContents(target))
                 return false;

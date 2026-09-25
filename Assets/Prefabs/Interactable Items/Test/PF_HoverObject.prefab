@@ -127,6 +127,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
   interactionName: First Person Hover
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
   anchor: {fileID: 0}
   label: {fileID: 8408381805660075422}
   preset: {fileID: 11400000, guid: 1682b5c0ab264eddb14c8b91d5ccb881, type: 2}

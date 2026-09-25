@@ -110,6 +110,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ContactEffects Self = new ContactEffects();
         [Tooltip("Effects applied to the matching item in contact.")]
         public ContactEffects Other = new ContactEffects();
+        [Header("Contact Item Tag")]
+        [Tooltip("Assign a new tag to the contacted item only after this modification completes. Interrupted or cancelled effects do not change its tag.")]
+        public bool ChangeContactTag;
+        [Tooltip("Project tag assigned to the contacted item's root at completion. Consumption receipts retain the tag recorded before this change.")]
+        public string ContactTag = "Untagged";
         [Header("Temporary Restrictions")]
         [Tooltip("Interaction families suspended on this item while effects run. Blocking Grab releases an already held item safely.")]
         public InteractionChannels BlockSelf = InteractionChannels.Grab;
@@ -141,7 +146,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Consume only one participant so the other can retain its receipt.";
             else if (!ValidChannels(BlockSelf) || !ValidChannels(BlockOther))
                 warning = "Choose supported interaction families for temporary restrictions.";
-            else if (!Self.Tint && Self.Meshes.Length == 0 && !Self.Consume && !Other.Tint && Other.Meshes.Length == 0 && !Other.Consume)
+            else if (ChangeContactTag && string.IsNullOrWhiteSpace(ContactTag))
+                warning = "Choose a project tag for the contacted item.";
+            else if (!ChangeContactTag && !Self.Tint && Self.Meshes.Length == 0 && !Self.Consume && !Other.Tint && Other.Meshes.Length == 0 && !Other.Consume)
                 warning = "Enable at least one modification effect.";
             return warning.Length == 0;
         }
@@ -153,7 +160,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Enum flag controls may serialize Everything as all bits set, including unused bits.
             return channels == (InteractionChannels)(-1) || (channels & ~(InteractionChannels.Grab | InteractionChannels.Release
-                | InteractionChannels.Hover | InteractionChannels.Dialogue | InteractionChannels.Passive)) == 0;
+                | InteractionChannels.Hover | InteractionChannels.Dialogue | InteractionChannels.Passive
+                | InteractionChannels.Assembly | InteractionChannels.Transfer | InteractionChannels.Spawn | InteractionChannels.Slice)) == 0;
         }
 
         #endregion

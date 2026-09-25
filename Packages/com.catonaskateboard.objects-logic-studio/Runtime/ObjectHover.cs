@@ -156,7 +156,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (!hovered)
                     label.Hide();
             }
-            if (hovered)
+            // A rule may lock or replace this hover synchronously from its own start event.
+            if (!Available(InteractionChannels.Hover))
+                Hide();
+            else if (hovered)
                 label.Present(observer.View, WorldAnchor, settings, time);
         }
 

@@ -35,39 +35,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
         }
 
-        /// <summary>Stores existing mesh components so completion performs no hierarchy discovery.</summary>
-        private readonly struct MeshBinding
-        {
-            internal readonly MeshFilter Filter;
-            internal readonly SkinnedMeshRenderer Skin;
-            internal readonly MeshCollider Collider;
-            internal readonly MeshCollider Proxy;
-            internal readonly Mesh Mesh;
-
-            /// <summary>Binds a validated replacement to its existing components.</summary>
-            /// <param name="target">Validated mesh branch.</param>
-            /// <param name="replacement">Replacement and collider policy.</param>
-            internal MeshBinding(Transform target, ContactMeshReplacement replacement)
-            {
-                // Component discovery belongs to contact activation, never color-animation frames.
-                Filter = target.GetComponent<MeshFilter>();
-                Skin = target.GetComponent<SkinnedMeshRenderer>();
-                Collider = replacement.UpdateCollider ? target.GetComponent<MeshCollider>() : null;
-                ObjectAssemblyPart part = Collider != null ? target.GetComponentInParent<ObjectAssemblyPart>() : null;
-                Proxy = part != null ? part.Proxy(Collider) as MeshCollider : null;
-                Mesh = replacement.Mesh;
-            }
-        }
-
         #endregion
 
         #region State
 
         private readonly List<TintBinding> tints = new List<TintBinding>();
-        private readonly List<MeshBinding> meshes = new List<MeshBinding>();
+        private ItemMeshChanges meshes;
         private readonly Color multiplier;
         private readonly int property;
-        private readonly ObjectGrab grab;
 
         #endregion
 
@@ -76,14 +51,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Preparation
 
         /// <summary>Creates an empty prepared effect after configuration validation.</summary>
-        /// <param name="item">Participant owning all affected geometry.</param>
         /// <param name="effects">Validated color and mesh settings.</param>
-        private ContactEffectRun(ObjectItem item, ContactEffects effects)
+        private ContactEffectRun(ContactEffects effects)
         {
             // Shader names are converted once; shared materials are never instantiated or edited.
             property = Shader.PropertyToID(effects.ColorProperty ?? string.Empty);
             multiplier = effects.Multiplier;
-            grab = item.GetComponent<ObjectGrab>();
         }
 
         /// <summary>Validates every affected branch before either participant is changed.</summary>
@@ -95,11 +68,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal static bool TryPrepare(ObjectItem item, ContactEffects effects, out ContactEffectRun run, out string warning)
         {
             // Reject ambiguous paths instead of changing an unrelated, similarly named child.
-            run = new ContactEffectRun(item, effects);
+            run = new ContactEffectRun(effects);
             warning = string.Empty;
             if (effects.Tint)
             {
-                Transform branch = Resolve(item.transform, effects.RendererPath);
+                Transform branch = ItemMeshChanges.Resolve(item.transform, effects.RendererPath);
                 if (branch != null)
                     foreach (Renderer renderer in branch.GetComponentsInChildren<Renderer>(true))
                         if (item.Owns(renderer.transform))
@@ -113,45 +86,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (run.tints.Count == 0)
                     warning = "No owned renderer/material slot exposes the selected tint color property.";
             }
-            foreach (ContactMeshReplacement replacement in effects.Meshes)
-            {
-                Transform branch = Resolve(item.transform, replacement.Path);
-                if (branch == null || !item.Owns(branch)
-                    || branch.GetComponent<MeshFilter>() == null && branch.GetComponent<SkinnedMeshRenderer>() == null
-                    || replacement.UpdateCollider && branch.GetComponent<MeshCollider>() == null)
-                {
-                    warning = "A mesh replacement path is missing, ambiguous, or lacks its requested mesh component.";
-                    break;
-                }
-                run.meshes.Add(new MeshBinding(branch, replacement));
-            }
-            return warning.Length == 0;
-        }
-
-        /// <summary>Resolves a reusable named route only when each segment identifies exactly one child.</summary>
-        /// <param name="root">Affected item root.</param>
-        /// <param name="path">Slash-separated child names; empty selects the root.</param>
-        /// <returns>The unique matching branch, or null.</returns>
-        private static Transform Resolve(Transform root, string path)
-        {
-            // Parsing occurs only when the contact starts; no per-frame path allocations are needed.
-            if (string.IsNullOrEmpty(path))
-                return root;
-            foreach (string segment in path.Split('/'))
-            {
-                Transform found = null;
-                foreach (Transform child in root)
-                    if (child.name == segment)
-                    {
-                        if (found != null)
-                            return null;
-                        found = child;
-                    }
-                if (found == null)
-                    return null;
-                root = found;
-            }
-            return root;
+            if (warning.Length == 0)
+                return ItemMeshChanges.TryPrepare(item, effects.Meshes, out run.meshes, out warning);
+            return false;
         }
 
         #endregion
@@ -178,19 +115,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Commit()
         {
             // Reuse authored components; no renderer, collider or UI object is instantiated at runtime.
-            foreach (MeshBinding mesh in meshes)
-            {
-                if (mesh.Filter != null)
-                    mesh.Filter.sharedMesh = mesh.Mesh;
-                if (mesh.Skin != null)
-                    mesh.Skin.sharedMesh = mesh.Mesh;
-                if (mesh.Collider != null)
-                    mesh.Collider.sharedMesh = mesh.Mesh;
-                if (mesh.Proxy != null)
-                    mesh.Proxy.sharedMesh = mesh.Mesh;
-            }
-            if (meshes.Count > 0 && grab != null && grab.IsHeld)
-                grab.RefreshCarryGeometry();
+            meshes.Commit();
         }
 
         /// <summary>Restores the pre-transition appearance when continuous contact is interrupted.</summary>
