@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1990294007828327956}
   - component: {fileID: 1853890267087374558}
   - component: {fileID: 5345840842517313584}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   - component: {fileID: -223255509274549693}
   - component: {fileID: -4224281006891219117}
   - component: {fileID: 1082582575293119777}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PF_Test_BurgerBun
   m_TagString: HoverGrabTest
   m_Icon: {fileID: 0}
@@ -366,7 +366,7 @@ GameObject:
   - component: {fileID: 590036808591984677}
   - component: {fileID: 8756370134806969058}
   - component: {fileID: 459704337668838561}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Hover UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -444,7 +444,7 @@ GameObject:
   - component: {fileID: 8797449655840961491}
   - component: {fileID: 7190274967584595416}
   - component: {fileID: 907409423715231930}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -511,7 +511,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: I'm a salad!
+  m_Text: Burger Bun
 --- !u!1001 &3316677175905720367
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -563,6 +563,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 9afe1d5614dc58f4e900005a94f385b0, type: 3}
       propertyPath: m_Name
       value: SM_Test_BunUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 9afe1d5614dc58f4e900005a94f385b0, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -625,6 +629,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: a829493c66c08ef46836574868dbb655, type: 3}
       propertyPath: m_Name
       value: SM_Test_BunBelow
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a829493c66c08ef46836574868dbb655, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

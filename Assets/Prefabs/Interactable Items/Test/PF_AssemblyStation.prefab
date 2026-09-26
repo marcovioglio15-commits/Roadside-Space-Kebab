@@ -9,15 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1757242934722147787}
-  - component: {fileID: 2207213956821537308}
   - component: {fileID: 3464830694783968524}
-  - component: {fileID: 4868176712737699762}
   - component: {fileID: 6442020716540934087}
   - component: {fileID: 6881026261950981432}
-  - component: {fileID: 3443057550944193706}
-  - component: {fileID: 2798474087887490427}
-  - component: {fileID: 2621871232495502539}
-  - component: {fileID: 5042641088118785220}
   - component: {fileID: 514522494084000845}
   - component: {fileID: 8844747950507493214}
   - component: {fileID: 9185591113544376183}
@@ -36,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 379141897293873495}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.71, y: -0.5, z: 0.54}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -45,14 +39,6 @@ Transform:
   - {fileID: 292989205600492734}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &2207213956821537308
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!65 &3464830694783968524
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -72,57 +58,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1, y: 0.1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &4868176712737699762
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Enabled: 0
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: b4c54499bfa63404e83ec53945686245, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &6442020716540934087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,186 +107,12 @@ MonoBehaviour:
     RequireSight: 1
     Obstacles:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 55
     OutputPosition: {x: 0, y: 0.7, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
     AcceptReturnedProduct: 1
   action: {fileID: 7328134972526443641, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   staging: {fileID: 292989205600492734}
---- !u!54 &3443057550944193706
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &2798474087887490427
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cf674ee0148e6d4b8ec13de002ad056, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectGrab
-  interactionName: Grab
-  tagChange:
-    Enabled: 0
-    Tag: Untagged
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 0}
-  action: {fileID: 0}
-  settings:
-    Distance: 3
-    TargetMode: 0
-    CenterRadius: 0.15
-    TargetOffset: {x: 0, y: 0, z: 0}
-    ObstacleMask:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    Units: 1
-    Space: 0
-    Offset: {x: 0.35, y: -0.2, z: 1.5}
-    Rotation: {x: 0, y: 0, z: 0}
-    Instant: 0
-    TransitionDuration: 0.2
-    WorldCollisions: 1
-    FollowSpeed: 12
-    RecoveryResponse: 12
-    RotationSpeed: 360
-    CollisionPadding: 0.015
-    ContactRotation: 1
-    ContactAngle: 20
-    ContactResponse: 8
-    ShowHover: 1
-  drawGizmos: 1
---- !u!114 &2621871232495502539
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63cd3bb8ff753194e9d968eeca2fcf2f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDrop
-  interactionName: Drop
-  tagChange:
-    Enabled: 0
-    Tag: Untagged
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 0}
-  action: {fileID: 0}
-  physics:
-    OverrideBody: 1
-    Mass: 1
-    LinearDamping: 0.05
-    AngularDamping: 0.05
-    Gravity: 1
-    Constraints: 0
-    CollisionDetection: 2
-    MaxAngularSpeed: 20
-    OverrideSurface: 1
-    StaticFriction: 0.5
-    DynamicFriction: 0.4
-    Bounciness: 0.2
-    FrictionCombine: 0
-    BounceCombine: 3
---- !u!114 &5042641088118785220
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f11348f8e44759459d9557849333bf6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectThrow
-  interactionName: Throw
-  tagChange:
-    Enabled: 0
-    Tag: Untagged
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 0}
-  action: {fileID: 0}
-  physics:
-    OverrideBody: 1
-    Mass: 1
-    LinearDamping: 0.05
-    AngularDamping: 0.05
-    Gravity: 1
-    Constraints: 0
-    CollisionDetection: 2
-    MaxAngularSpeed: 20
-    OverrideSurface: 1
-    StaticFriction: 0.5
-    DynamicFriction: 0.4
-    Bounciness: 0.2
-    FrictionCombine: 0
-    BounceCombine: 3
-  trajectory:
-    Mode: 1
-    Strength: 8
-    Yaw: 0
-    Elevation: 10
-    Spin: {x: 0, y: 0, z: 0}
 --- !u!114 &514522494084000845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,7 +270,6 @@ GameObject:
   - component: {fileID: 2124796900399184045}
   - component: {fileID: 1874581204936468140}
   - component: {fileID: 9045327093255445404}
-  - component: {fileID: 3062282129618846586}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -524,9 +286,9 @@ Transform:
   m_GameObject: {fileID: 4447989023699945343}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.17357016, y: 0.50000006, z: -0.11097902}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.75, y: 0.05, z: 0.75}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1757242934722147787}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -587,27 +349,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3062282129618846586
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4447989023699945343}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &9011601380015881436
 GameObject:
   m_ObjectHideFlags: 0

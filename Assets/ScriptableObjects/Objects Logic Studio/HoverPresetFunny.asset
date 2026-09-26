@@ -28,7 +28,7 @@ MonoBehaviour:
       duration: 0.18
       startScale: 0.2
     style:
-      content: Burger
+      content: Burger Bun
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0
