@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: AssemblyStation Preset Test
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.AssemblyStationPreset
   Settings:
-    ProductPrefab: {fileID: 4182828039336747428, guid: 12d7c2bcec933bc41a7f6316142863a1, type: 3}
+    ProductPrefab: {fileID: 4182828039336747428, guid: cb83fdee05565914083f160286ab031a, type: 3}
     Distance: 3
     RequireSight: 1
     Obstacles:
       serializedVersion: 2
       m_Bits: 4294967295
-    OutputPosition: {x: 0, y: 0.5, z: 0}
+    OutputPosition: {x: 0, y: 0.7, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
     AcceptReturnedProduct: 1
