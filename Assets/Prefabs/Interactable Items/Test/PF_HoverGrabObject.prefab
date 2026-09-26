@@ -702,6 +702,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
   interactionName: First Person Hover
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
   anchor: {fileID: 0}
   label: {fileID: 4098635400771546155}
   preset: {fileID: 11400000, guid: 6e20b92e59afa4d4aa7ccb3480766605, type: 2}
@@ -746,6 +760,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectGrab
   interactionName: Grab
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
   action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   settings:
     Distance: 3
@@ -755,8 +784,9 @@ MonoBehaviour:
     ObstacleMask:
       serializedVersion: 2
       m_Bits: 4294967295
+    Units: 1
     Space: 0
-    Offset: {x: 0.35, y: -0.2, z: 1.5}
+    Offset: {x: 0, y: -0.2, z: 1.5}
     Rotation: {x: 0, y: 0, z: 0}
     Instant: 1
     TransitionDuration: 0.5
@@ -783,6 +813,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDrop
   interactionName: Drop
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
   action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   physics:
     OverrideBody: 1
@@ -812,6 +857,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectThrow
   interactionName: Throw
+  tagChange:
+    Enabled: 0
+    Tag: Untagged
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
   action: {fileID: -1996764827017877772, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   physics:
     OverrideBody: 1

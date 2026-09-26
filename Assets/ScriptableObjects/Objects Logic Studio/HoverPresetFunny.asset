@@ -28,7 +28,7 @@ MonoBehaviour:
       duration: 0.18
       startScale: 0.2
     style:
-      content: Hi, "I'm being hovered", I'm Dad.
+      content: Burger
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0

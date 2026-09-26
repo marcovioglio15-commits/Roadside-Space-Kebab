@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f8f04106e6e60a7409c5e9bc32915c26, type: 3}
-  m_Name: Grab Preset
+  m_Name: Grab Small Items Preset
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.GrabPreset
   Settings:
     Distance: 3
@@ -22,7 +22,7 @@ MonoBehaviour:
       m_Bits: 4294967295
     Units: 1
     Space: 0
-    Offset: {x: 0.35, y: -0.2, z: 1.5}
+    Offset: {x: 0.35, y: -0.02, z: 0.7}
     Rotation: {x: 0, y: 0, z: 0}
     Instant: 0
     TransitionDuration: 0.2
@@ -34,4 +34,4 @@ MonoBehaviour:
     ContactRotation: 1
     ContactAngle: 20
     ContactResponse: 8
-    ShowHover: 1
+    ShowHover: 0

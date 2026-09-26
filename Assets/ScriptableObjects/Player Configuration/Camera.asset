@@ -60,7 +60,7 @@ MonoBehaviour:
       Height: 0.1
       SideAmplitude: 0.012
       Lean: 5
-      RollAmplitude: 0.5
+      RollAmplitude: 0.25
       Response: 12
       Irregular: 0
       AmplitudeVariation: 0.2
