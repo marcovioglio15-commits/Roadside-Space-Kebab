@@ -85,6 +85,16 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "Drop",
+                    "type": "Button",
+                    "id": "c104f20f-5435-4134-a8e7-bd29aed59a7f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -212,7 +222,7 @@
                 {
                     "name": "",
                     "id": "75f674d0-0317-49ef-a101-b5c42dede8dc",
-                    "path": "<Keyboard>/e",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -234,7 +244,7 @@
                 {
                     "name": "",
                     "id": "c434ae8b-a146-4ee0-942b-79550c247e65",
-                    "path": "<Keyboard>/t",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -245,7 +255,7 @@
                 {
                     "name": "",
                     "id": "79650ef6-a5c1-4b77-8502-46494a369919",
-                    "path": "<Gamepad>/buttonEast",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -256,7 +266,7 @@
                 {
                     "name": "",
                     "id": "2b79b2b6-783a-4058-ade4-000a32dafb28",
-                    "path": "<Keyboard>/q",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -272,6 +282,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Assemble",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b47ba609-582a-4eb2-93ea-a7c7f498a066",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d644e9af-2b50-4ed2-8a05-257d4875b472",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drop",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

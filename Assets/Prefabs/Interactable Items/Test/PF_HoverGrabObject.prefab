@@ -828,7 +828,7 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   settingsPreset: {fileID: 0}
-  action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  action: {fileID: 3214988103402303364, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   physics:
     OverrideBody: 1
     Mass: 1
