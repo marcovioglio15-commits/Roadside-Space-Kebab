@@ -75,6 +75,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     out SerializedObject camera, out warning))
                 return false;
             Add(camera);
+            if (!state.Tools.TryPrepare(state.Selection.Master != null ? state.Selection.Master.ToolsPreset : null,
+                    out SerializedObject tools, out warning))
+                return false;
+            Add(tools);
             return true;
         }
 
@@ -142,7 +146,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             {
                 PlayerPresetDraftCopy.Apply(Find(master), candidate);
                 using SerializedObject slots = new SerializedObject(candidate);
-                foreach (string slot in new[] { "bodyPreset", "inputPreset", "locomotionPreset", "visualPreset", "cameraPreset" })
+                foreach (string slot in new[] { "bodyPreset", "inputPreset", "locomotionPreset", "visualPreset", "cameraPreset", "toolsPreset" })
                 {
                     SerializedProperty property = slots.FindProperty(slot);
                     if (!(property.objectReferenceValue is ScriptableObject source) || Find(source) == null)

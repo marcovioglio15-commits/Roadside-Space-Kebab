@@ -56,6 +56,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [SerializeField]
         private bool hadOriginalCamera;
 
+        [Tooltip("Tools assigned when the master session last opened.")]
+        [SerializeField]
+        private PlayerToolsPreset originalTools;
+
+        [Tooltip("Whether the original Tools asset existed before deletion.")]
+        [SerializeField]
+        private bool hadOriginalTools;
+
         [Header("Draft")]
         [Tooltip("Body proposed for the master's slot. Selecting it does not change either asset.")]
         [SerializeField]
@@ -85,6 +93,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [SerializeField]
         private bool hadCamera;
 
+        [Tooltip("Optional manual tools proposed for this master.")]
+        [SerializeField]
+        private PlayerToolsPreset toolsPreset;
+
+        [Tooltip("Whether the proposed Tools asset existed before deletion.")]
+        [SerializeField]
+        private bool hadTools;
+
         [Tooltip("Retains pending assignments even if a referenced preset becomes unavailable during a reload.")]
         [SerializeField]
         private bool hasChanges;
@@ -111,6 +127,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>The optional Camera preset proposed in this master session.</summary>
         public PlayerCameraPreset CameraPreset => cameraPreset;
 
+        /// <summary>Optional manual tools proposed for this player.</summary>
+        public PlayerToolsPreset ToolsPreset => toolsPreset;
+
         /// <summary>Pending assignment state, preserved when an asset reference is lost.</summary>
         public bool HasChanges => hasChanges;
 
@@ -135,7 +154,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="locomotion">Optional movement configuration requested for the same master.</param>
         /// <param name="visual">Optional source and offset configuration requested for the same master.</param>
         /// <param name="camera">Optional view configuration requested for this master.</param>
-        public void SetDraft(PlayerBodyPreset body, PlayerInputPreset input, PlayerLocomotionPreset locomotion, PlayerVisualPreset visual, PlayerCameraPreset camera)
+        /// <param name="tools">Optional manual tool configuration requested for this master.</param>
+        public void SetDraft(PlayerBodyPreset body, PlayerInputPreset input, PlayerLocomotionPreset locomotion, PlayerVisualPreset visual, PlayerCameraPreset camera, PlayerToolsPreset tools)
         {
             // Recompute only on an explicit edit; asset deletion must not silently clear pending state.
             bodyPreset = body;
@@ -147,11 +167,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (!ReferenceEquals(cameraPreset, camera))
                 hadCamera = camera != null;
             cameraPreset = camera;
+            if (!ReferenceEquals(toolsPreset, tools))
+                hadTools = tools != null;
+            toolsPreset = tools;
             hasChanges = bodyPreset != originalBody || inputPreset != originalInput || locomotionPreset != originalLocomotion || visualPreset != originalVisual
                 || (hadOriginalBody && originalBody == null) || (hadOriginalInput && originalInput == null)
                 || (hadOriginalLocomotion && originalLocomotion == null) || (hadOriginalVisual && originalVisual == null)
                 || (hadVisual && visualPreset == null) || cameraPreset != originalCamera
-                || (hadOriginalCamera && originalCamera == null) || (hadCamera && cameraPreset == null);
+                || (hadOriginalCamera && originalCamera == null) || (hadCamera && cameraPreset == null || hadTools && toolsPreset == null)
+                || toolsPreset != originalTools || hadOriginalTools && originalTools == null || hadTools && toolsPreset == null;
         }
 
         /// <summary>Reloads the currently applied slot and forgets only the pending assignment.</summary>
@@ -175,6 +199,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             hadOriginalCamera = originalCamera != null;
             cameraPreset = originalCamera;
             hadCamera = hadOriginalCamera;
+            originalTools = source != null ? source.ToolsPreset : null;
+            hadOriginalTools = originalTools != null;
+            toolsPreset = originalTools;
+            hadTools = hadOriginalTools;
             hasChanges = false;
         }
 
@@ -216,12 +244,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
 
             // Module values are validated together with their independent drafts by the batch coordinator.
-            if (bodyPreset == null || hadVisual && visualPreset == null || hadCamera && cameraPreset == null)
+            if (bodyPreset == null || hadVisual && visualPreset == null || hadCamera && cameraPreset == null || hadTools && toolsPreset == null)
             {
                 warning = "Choose an available Body and replace or explicitly clear any deleted optional preset.";
                 return false;
             }
-            foreach (ScriptableObject asset in new ScriptableObject[] { bodyPreset, inputPreset, locomotionPreset, visualPreset, cameraPreset })
+            foreach (ScriptableObject asset in new ScriptableObject[] { bodyPreset, inputPreset, locomotionPreset, visualPreset, cameraPreset, toolsPreset })
                 if (asset != null && !EditorUtility.IsPersistent(asset))
                 {
                     warning = "Choose preset assets saved in the Project window.";
@@ -233,6 +261,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // A deleted baseline preset is also a conflict, including after script reload.
             if (source.BodyPreset != originalBody || source.InputPreset != originalInput || source.LocomotionPreset != originalLocomotion
                 || source.VisualPreset != originalVisual || source.CameraPreset != originalCamera
+                || source.ToolsPreset != originalTools || hadOriginalTools && originalTools == null
                 || (hadOriginalCamera && originalCamera == null)
                 || (hadOriginalBody && originalBody == null) || (hadOriginalInput && originalInput == null)
                 || (hadOriginalLocomotion && originalLocomotion == null) || (hadOriginalVisual && originalVisual == null))
@@ -248,6 +277,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             changes.FindProperty("locomotionPreset").objectReferenceValue = locomotionPreset;
             changes.FindProperty("visualPreset").objectReferenceValue = visualPreset;
             changes.FindProperty("cameraPreset").objectReferenceValue = cameraPreset;
+            changes.FindProperty("toolsPreset").objectReferenceValue = toolsPreset;
             return true;
         }
 

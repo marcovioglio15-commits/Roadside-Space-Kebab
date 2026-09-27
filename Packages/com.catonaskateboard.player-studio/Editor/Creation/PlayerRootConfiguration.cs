@@ -55,6 +55,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 SetReferences(motor, ("host", host), ("input", bridge));
             }
             SetEnabled(motor, master.LocomotionPreset != null);
+            PlayerTools tools = host.GetComponent<PlayerTools>();
+            if (master.ToolsPreset != null)
+                tools = GetOrAdd<PlayerTools>(host.gameObject);
+            SetEnabled(tools, master.ToolsPreset != null);
         }
 
         /// <summary>Reuses a component or adds it with Undo at the explicit configuration boundary.</summary>

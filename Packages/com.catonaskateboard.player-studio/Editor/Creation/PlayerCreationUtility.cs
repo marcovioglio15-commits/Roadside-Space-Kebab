@@ -36,12 +36,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (master.VisualPreset != null && master.VisualPreset.TryGetSettings(out PlayerVisualSettings visual, out _)
                 && visual.Prefab != null && !PlayerVisualModelValidation.TryValidate(visual.Prefab, out warning))
                 return false;
+            if (master.ToolsPreset != null && !master.ToolsPreset.TryValidate(out warning))
+                return false;
             if (master.InputPreset != null)
             {
                 using SerializedObject input = new SerializedObject(master.InputPreset);
                 if (!master.InputPreset.TryGetMovementId(out _, out warning)
                     || !master.InputPreset.TryGetJumpId(out _, out warning)
-                    || !master.InputPreset.TryGetLookIds(out _, out _, out _, out warning))
+                    || !master.InputPreset.TryGetLookIds(out _, out _, out _, out warning)
+                    || !PlayerToolsAuthoring.ValidateInput(master, out warning))
                     return false;
                 InputActionReference movement = (InputActionReference)input.FindProperty("movementAction").objectReferenceValue;
                 actions = movement.asset;
@@ -126,6 +129,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     }
                 }
                 PlayerVisualBinding visual = CreateVisual(master, host);
+                if (master.ToolsPreset != null)
+                    root.AddComponent<PlayerTools>();
                 if (master.CameraPreset != null)
                 {
                     GameObject cameraObject = new GameObject("Player Camera", typeof(Camera), typeof(AudioListener));

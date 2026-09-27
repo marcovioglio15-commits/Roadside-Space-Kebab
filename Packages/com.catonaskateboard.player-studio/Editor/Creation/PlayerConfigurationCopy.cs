@@ -26,7 +26,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 CopyActions(input, folder);
             PlayerCreationUtility.SetReferences(master, ("bodyPreset", Copy(source.BodyPreset, folder, "Body")),
                 ("inputPreset", input), ("locomotionPreset", Copy(source.LocomotionPreset, folder, "Locomotion")),
-                ("visualPreset", Copy(source.VisualPreset, folder, "Visual")), ("cameraPreset", Copy(source.CameraPreset, folder, "Camera")));
+                ("visualPreset", Copy(source.VisualPreset, folder, "Visual")), ("cameraPreset", Copy(source.CameraPreset, folder, "Camera")), ("toolsPreset", Copy(source.ToolsPreset, folder, "Tools")));
             AssetDatabase.SaveAssetIfDirty(master);
             return master;
         }
@@ -60,14 +60,17 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             File.WriteAllText(path, movement.asset.ToJson());
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
             InputActionAsset actions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(path);
-            foreach (string role in new[] { "movementAction", "jumpAction", "lookDeltaAction", "lookRateAction", "cursorToggleAction" })
+            using SerializedProperty property = serialized.GetIterator();
+            int role = 0;
+            while (property.NextVisible(true))
             {
-                SerializedProperty property = serialized.FindProperty(role);
-                InputActionReference reference = (InputActionReference)property.objectReferenceValue;
-                if (reference == null)
+                // Descend into tool bindings as well as the top-level movement and camera roles.
+                if (property.propertyType != SerializedPropertyType.ObjectReference
+                    || property.objectReferenceValue is not InputActionReference reference || reference.action == null
+                    || reference.asset != movement.asset)
                     continue;
                 InputActionReference copy = InputActionReference.Create(actions.FindAction(reference.action.id));
-                AssetDatabase.CreateAsset(copy, folder + "/" + ObjectNames.NicifyVariableName(role) + ".asset");
+                AssetDatabase.CreateAsset(copy, folder + "/Action Role " + role++ + ".asset");
                 property.objectReferenceValue = copy;
             }
             serialized.ApplyModifiedPropertiesWithoutUndo();

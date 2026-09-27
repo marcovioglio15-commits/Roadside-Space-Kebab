@@ -32,6 +32,10 @@ namespace CatOnASkateboard.PlayerStudio
         [SerializeField]
         private PlayerCameraPreset cameraPreset;
 
+        [Tooltip("Optional manual tools, switching animations and visual slot layout.")]
+        [SerializeField]
+        private PlayerToolsPreset toolsPreset;
+
         #endregion
 
         #region Properties
@@ -50,6 +54,9 @@ namespace CatOnASkateboard.PlayerStudio
 
         /// <summary>The optional view configuration consumed by an explicitly connected camera rig.</summary>
         public PlayerCameraPreset CameraPreset => cameraPreset;
+
+        /// <summary>Optional manual tool module consumed by Player Tools.</summary>
+        public PlayerToolsPreset ToolsPreset => toolsPreset;
 
         #endregion
 

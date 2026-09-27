@@ -147,6 +147,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             quickPlayView = null;
             state.Input.Dispose();
             state.Camera.Dispose();
+            state.Tools.Dispose();
             visualPreview = null;
             workspace = null;
             base.OnDisable();
@@ -341,9 +342,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (!state.PreviewOpen)
                 return;
 
-            if (state.TransformView.Pick(state.PreviewHost, state.VisualScene, state.Visual.Draft, state.Transform, visualPreview))
+            if (!state.Recording.Enabled && state.TransformView.Pick(state.PreviewHost, state.VisualScene, state.Visual.Draft, state.Transform, visualPreview))
                 Repaint();
-            if (state.TransformView.DrawHandles(state.Transform, state.Visual, state.VisualScene, this))
+            if (state.Recording.Enabled ? state.Recording.DrawHandles(state, this)
+                : state.TransformView.DrawHandles(state.Transform, state.Visual, state.VisualScene, this))
                 HandleDraftChanged();
         }
 
@@ -407,9 +409,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // The applied model stays visible; only this camera receives the amber proposal.
             if (view == this && state.PreviewOpen && !EditorApplication.isPlayingOrWillChangePlaymode
                 && Event.current.type == EventType.Repaint && state.VisualScene.Host != null
-                && (state.Visual.HasChanges || state.VisualScene.HasChanges || state.Transform.HasChanges)
+                && (state.Visual.HasChanges || state.VisualScene.HasChanges || state.Transform.HasChanges || state.Recording.Enabled)
                 && state.Transform.TryValidateNumbers(out _))
-                visualPreview?.Draw(state.VisualScene, state.Visual.Draft, state.Transform.WorldMatrix);
+                visualPreview?.Draw(state.VisualScene, state.Visual.Draft, state.Transform.WorldMatrix, state.Recording);
         }
 
         /// <summary>Checks that the chosen instance belongs to the current asset route.</summary>
@@ -502,10 +504,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             state.VisualScene.Discard();
             state.Input.Discard();
             state.Camera.Discard();
+            state.Tools.Discard();
             state.CameraScene.Discard();
             RefreshModules();
             state.Transform.Discard();
             visualPreview?.Invalidate();
+            state.Recording.Invalidate();
             Undo.ClearUndo(this);
         }
 
@@ -547,6 +551,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
 
             visualPreview?.Invalidate();
+            state.Recording.Invalidate();
             hasUnsavedChanges = false;
             UpdateActions();
             Repaint();
@@ -560,6 +565,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             state.Visual.Refresh(state.Selection.Master);
             state.Input.Refresh(state.Selection.Master != null ? state.Selection.Master.InputPreset : null);
             state.Camera.Refresh(state.Selection.Master != null ? state.Selection.Master.CameraPreset : null);
+            state.Tools.Refresh(state.Selection.Master != null ? state.Selection.Master.ToolsPreset : null);
             if (!state.Camera.HasChanges && !state.Selection.MasterSession.HasChanges)
                 state.CameraScene.Refresh(state.Selection.Mode == PlayerStudioSourceMode.Master && state.PreviewHost != null
                     && state.PreviewHost.MasterPreset == state.Selection.Master ? state.PreviewHost : null);

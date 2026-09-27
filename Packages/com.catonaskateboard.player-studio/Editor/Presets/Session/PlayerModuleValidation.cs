@@ -19,11 +19,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             warning = string.Empty;
             switch (asset)
             {
+                case PlayerToolsPreset tools:
+                    return tools.TryValidate(out warning);
                 case PlayerCameraPreset camera:
                     return camera.TryGetSettings(out _, out warning);
                 case PlayerInputPreset input:
                     return input.TryGetMovementId(out _, out warning) && input.TryGetJumpId(out _, out warning)
-                        && input.TryGetLookIds(out _, out _, out _, out warning);
+                        && input.TryGetLookIds(out _, out _, out _, out warning) && input.Tools.TryValidate(out warning);
                 default:
                     warning = "Assign an Input or Camera preset before editing this module.";
                     return false;

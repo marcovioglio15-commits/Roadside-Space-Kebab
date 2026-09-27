@@ -43,7 +43,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     || camera != null && camera.HasChanges && camera.Host == host;
                 if (!selected && preset.Find(master) == null && !preset.Affects(master, "bodyPreset", master.BodyPreset)
                     && !preset.Affects(master, "inputPreset", master.InputPreset) && !preset.Affects(master, "locomotionPreset", master.LocomotionPreset)
-                    && !preset.Affects(master, "visualPreset", master.VisualPreset) && !preset.Affects(master, "cameraPreset", master.CameraPreset))
+                    && !preset.Affects(master, "visualPreset", master.VisualPreset) && !preset.Affects(master, "cameraPreset", master.CameraPreset)
+                    && !preset.Affects(master, "toolsPreset", master.ToolsPreset))
                     continue;
                 if (!PlayerVisualPrefabUtility.TryGetPath(host, out _, out warning)
                     || !preset.TryValidate(master, out warning))
@@ -144,12 +145,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
             foreach (Component component in host.GetComponents<Component>())
                 if (component is PlayerInput || component is PlayerInputBridge || component is PlayerCharacterControllerMotor
-                    || component is PlayerCameraRig || component is CharacterController)
+                    || component is PlayerCameraRig || component is PlayerTools || component is CharacterController)
                     if (PrefabUtility.GetCorrespondingObjectFromSourceAtPath(component, path) == null)
                         PrefabUtility.ApplyAddedComponent(component, path, InteractionMode.UserAction);
             ApplyComponent(host.BodyController, path);
             ApplyComponent(host.GetComponent<PlayerInput>(), path);
             ApplyComponent(host.GetComponent<PlayerInputBridge>(), path);
+            ApplyComponent(host.GetComponent<PlayerTools>(), path);
             ApplyComponent(host.GetComponent<PlayerCharacterControllerMotor>(), path);
             ApplyComponent(rig, path);
             ApplyComponent(host, path);

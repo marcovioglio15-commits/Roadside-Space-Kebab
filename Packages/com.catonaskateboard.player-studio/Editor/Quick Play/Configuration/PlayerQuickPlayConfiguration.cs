@@ -33,7 +33,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 PlayerMasterPreset master = PlayerConfigurationCopy.Copy(candidate, folder, false);
                 using SerializedObject source = new SerializedObject(candidate);
                 using SerializedObject copy = new SerializedObject(master);
-                foreach (string slot in new[] { "bodyPreset", "inputPreset", "locomotionPreset", "visualPreset", "cameraPreset" })
+                foreach (string slot in new[] { "bodyPreset", "inputPreset", "locomotionPreset", "visualPreset", "cameraPreset", "toolsPreset" })
                 {
                     // A draft on a replaced slot remains pending but is not used by the proposed test configuration.
                     ScriptableObject original = source.FindProperty(slot).objectReferenceValue as ScriptableObject;

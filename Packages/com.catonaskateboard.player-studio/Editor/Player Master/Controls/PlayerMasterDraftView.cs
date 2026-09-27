@@ -33,12 +33,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             PlayerLocomotionPreset locomotion = PlayerPresetPicker.Draw(locomotionLabel, session.LocomotionPreset);
             PlayerVisualPreset visual = PlayerPresetPicker.Draw(visualLabel, session.VisualPreset);
             PlayerCameraPreset camera = PlayerPresetPicker.Draw(new GUIContent("Camera Slot", "Optional view and follow configuration."), session.CameraPreset);
+            PlayerToolsPreset tools = PlayerPresetPicker.Draw(new GUIContent("Tools Slot", "Optional manual tools and visual switching configuration."), session.ToolsPreset);
             if (!EditorGUI.EndChangeCheck())
                 return false;
 
             // Choosing references edits the window state, never the master's serialized slots.
             Undo.RecordObject(undoTarget, "Edit Preset Assignments");
-            session.SetDraft(body, input, locomotion, visual, camera);
+            session.SetDraft(body, input, locomotion, visual, camera, tools);
             return true;
         }
 

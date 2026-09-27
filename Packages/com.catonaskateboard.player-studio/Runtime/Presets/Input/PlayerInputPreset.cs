@@ -33,6 +33,18 @@ namespace CatOnASkateboard.PlayerStudio
         [SerializeField]
         private InputActionReference cursorToggleAction;
 
+        [Header("Tools")]
+        [Tooltip("Use Tool commands select one tool or cycle through the configured tools.")]
+        [SerializeField]
+        private PlayerToolInputSettings tools = new PlayerToolInputSettings();
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Tool selection roles resolved in the player's private action asset.</summary>
+        public PlayerToolInputSettings Tools => tools;
+
         #endregion
 
         #region Methods

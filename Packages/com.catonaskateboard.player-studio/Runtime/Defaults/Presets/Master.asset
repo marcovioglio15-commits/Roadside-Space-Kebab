@@ -17,3 +17,4 @@ MonoBehaviour:
   locomotionPreset: {fileID: 11400000, guid: 94705b4d9b66cac428c36cb89344d28f, type: 2}
   visualPreset: {fileID: 11400000, guid: bc0186cf5ead8734c842aa1de776971c, type: 2}
   cameraPreset: {fileID: 11400000, guid: 7fa1d2e78c1c9664a96e5c1702ac9091, type: 2}
+  toolsPreset: {fileID: 11400000, guid: a47f16b8b6fc4ca594baaaf534692cbd, type: 2}

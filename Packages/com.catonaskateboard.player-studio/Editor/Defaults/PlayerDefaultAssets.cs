@@ -109,12 +109,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     ("jumpAction", CreateReference(actions, "Jump", folder)),
                     ("lookDeltaAction", CreateReference(actions, "LookDelta", folder)),
                     ("lookRateAction", CreateReference(actions, "LookRate", folder)),
-                    ("cursorToggleAction", CreateReference(actions, "Cursor", folder)));
+                    ("cursorToggleAction", CreateReference(actions, "Cursor", folder)), ("tools.UseTool", CreateReference(actions, "UseTool", folder)));
             });
             PlayerCameraPreset camera = Preset<PlayerCameraPreset>(folder, "Camera", null);
+            PlayerToolsPreset tools = Preset<PlayerToolsPreset>(folder, "Tools", null);
             PlayerMasterPreset master = Preset<PlayerMasterPreset>(folder, "Master",
                 value => PlayerCreationUtility.SetReferences(value, ("bodyPreset", body), ("locomotionPreset", movement),
-                    ("visualPreset", visual), ("inputPreset", input), ("cameraPreset", camera)));
+                    ("visualPreset", visual), ("inputPreset", input), ("cameraPreset", camera), ("toolsPreset", tools)));
             string prefabPath = folder + "/Player/Player.prefab";
             if (!File.Exists(prefabPath))
             {
@@ -193,6 +194,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     map.AddAction("LookDelta", InputActionType.PassThrough, "<Mouse>/delta", expectedControlLayout: "Vector2");
                     map.AddAction("LookRate", InputActionType.Value, "<Gamepad>/rightStick", expectedControlLayout: "Vector2");
                     map.AddAction("Cursor", InputActionType.Button, "<Keyboard>/escape");
+                    InputAction useTool = map.AddAction("UseTool", InputActionType.Button, "<Keyboard>/tab");
+                    useTool.AddBinding("<Gamepad>/dpad/right");
                     File.WriteAllText(path, asset.ToJson());
                     AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
                 }

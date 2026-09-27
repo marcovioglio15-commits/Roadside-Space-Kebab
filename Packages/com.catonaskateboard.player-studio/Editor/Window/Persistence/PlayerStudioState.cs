@@ -31,6 +31,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [Tooltip("Camera settings edited in an isolated draft.")]
         public PlayerModuleEditSession Camera = new PlayerModuleEditSession();
 
+        [Tooltip("Manual tool definitions and visual slots edited in an isolated draft.")]
+        public PlayerModuleEditSession Tools = new PlayerModuleEditSession();
+
+        [Tooltip("Animation recording state retained by the existing scene preview.")]
+        public PlayerToolRecording Recording = new PlayerToolRecording();
+
         [Tooltip("Proposed camera and target references.")]
         public PlayerCameraSceneSession CameraScene = new PlayerCameraSceneSession();
 
@@ -64,7 +70,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         /// <summary>All editable domains share selection guards, Apply and Discard.</summary>
         public bool HasChanges => Selection.HasChanges(Body) || Locomotion.HasChanges || Visual.HasChanges
-            || VisualScene.HasChanges || Transform.HasChanges || Input.HasChanges || Camera.HasChanges || CameraScene.HasChanges;
+            || VisualScene.HasChanges || Transform.HasChanges || Input.HasChanges || Camera.HasChanges || CameraScene.HasChanges || Tools.HasChanges;
 
         #endregion
     }

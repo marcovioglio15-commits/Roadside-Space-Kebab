@@ -20,6 +20,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             PlayerInputActionMenu.Draw(serializedObject, "lookDeltaAction");
             PlayerInputActionMenu.Draw(serializedObject, "lookRateAction");
             PlayerInputActionMenu.Draw(serializedObject, "cursorToggleAction");
+            PlayerToolsControls.DrawInput(serializedObject);
             serializedObject.ApplyModifiedProperties();
             if (!PlayerModuleValidation.TryValidate((PlayerInputPreset)target, out string warning))
                 EditorGUILayout.HelpBox(warning, MessageType.Warning);

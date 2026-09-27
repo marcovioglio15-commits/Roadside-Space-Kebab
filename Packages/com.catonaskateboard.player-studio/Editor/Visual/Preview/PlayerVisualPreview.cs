@@ -31,6 +31,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private readonly struct MeshEntry
         {
             public readonly Mesh Mesh;
+            public readonly Transform Target;
             public readonly Matrix4x4 Matrix;
 
             #region Methods
@@ -38,10 +39,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             /// <summary>Captures the geometry once while the source cache is rebuilt.</summary>
             /// <param name="mesh">Original shared mesh; never duplicated or changed.</param>
             /// <param name="matrix">Pose relative to the source root.</param>
-            public MeshEntry(Mesh mesh, Matrix4x4 matrix)
+            /// <param name="target">Existing renderer transform used by the animation preview.</param>
+            public MeshEntry(Mesh mesh, Matrix4x4 matrix, Transform target)
             {
                 // The cached entry contains no scene instance or material clone.
                 Mesh = mesh;
+                Target = target;
                 Matrix = matrix;
             }
 
@@ -82,7 +85,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 if (!renderer.enabled || !IsActive(renderer.transform, model.transform))
                     continue;
                 meshes.Add(new MeshEntry(renderer.GetComponent<MeshFilter>().sharedMesh,
-                    model.transform.worldToLocalMatrix * renderer.transform.localToWorldMatrix));
+                    model.transform.worldToLocalMatrix * renderer.transform.localToWorldMatrix, renderer.transform));
             }
 
             // One Editor-only material serves all cached submeshes and is released on window disable.
@@ -125,7 +128,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="scene">Selected player's pending binding choices.</param>
         /// <param name="draft">Raw proposed source and offset.</param>
         /// <param name="rootMatrix">Player root pose, including its separate Transform draft.</param>
-        public void Draw(PlayerVisualSceneSession scene, PlayerVisualDraft draft, Matrix4x4 rootMatrix)
+        /// <param name="recording">Optional transform animation overrides owned by this viewport.</param>
+        public void Draw(PlayerVisualSceneSession scene, PlayerVisualDraft draft, Matrix4x4 rootMatrix, PlayerToolRecording recording)
         {
             // Invalid values remain visible in controls but never reach a render matrix.
             if (!scene.Managed || (draft.Prefab == null && scene.Binding != null && scene.Binding.SourcePrefab != null)
@@ -137,6 +141,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (model == null || material == null || meshes.Count == 0)
                 return;
 
+            recording.Prepare(model);
             // Source root transforms are preserved; adoption contributes its captured original pose.
             Matrix4x4 authored = PlayerVisualPose.Authored(scene, draft);
             Matrix4x4 matrix = rootMatrix * Matrix4x4.TRS(settings.Position, settings.Rotation, Vector3.one * settings.Scale) * authored;
@@ -149,14 +154,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 return;
             foreach (MeshEntry entry in meshes)
                 for (int submesh = 0; submesh < entry.Mesh.subMeshCount; submesh++)
-                    Graphics.DrawMeshNow(entry.Mesh, matrix * entry.Matrix, submesh);
+                    Graphics.DrawMeshNow(entry.Mesh, matrix * (recording.Enabled ? recording.RelativeMatrix(entry.Target) : entry.Matrix), submesh);
         }
 
         /// <summary>Resolves the same model for drawing and picking, including an unapplied replacement.</summary>
         /// <param name="scene">Current binding proposal.</param>
         /// <param name="draft">Source chosen in the Visual preset draft.</param>
         /// <returns>The model supplying cached meshes, or null when the proposal removes it.</returns>
-        private static GameObject ResolveModel(PlayerVisualSceneSession scene, PlayerVisualDraft draft)
+        internal static GameObject ResolveModel(PlayerVisualSceneSession scene, PlayerVisualDraft draft)
         {
             // Clearing a previously assigned prefab proposes removal, not adoption of that old model.
             if (!scene.Managed || (draft.Prefab == null && scene.Binding != null && scene.Binding.SourcePrefab != null))

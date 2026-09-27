@@ -13,9 +13,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [Header("Tabs")]
         [Tooltip("Open module tabs; closing one does not discard its values.")]
         [SerializeField]
-        private int openMask = 31;
+        private int openMask = 63;
 
-        [Tooltip("Currently displayed module: Body, Locomotion, Visual, Input or Camera.")]
+        [Tooltip("Currently displayed module: Body, Locomotion, Visual, Input, Camera or Tools.")]
         [SerializeField]
         private int active;
 
@@ -39,7 +39,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             new GUIContent("Locomotion", "Edit movement, gravity and jump values."),
             new GUIContent("Visual", "Edit model source, offsets and the scene binding."),
             new GUIContent("Input", "Select compatible actions by map and action name."),
-            new GUIContent("Camera", "Configure the view, follow and movement orientation.")
+            new GUIContent("Camera", "Configure the view, follow and movement orientation."),
+            new GUIContent("Tools", "Configure manual tools, switching and visual slots.")
         };
 
         #endregion
@@ -126,6 +127,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 2 => state.Visual.Source,
                 3 => state.Input.Source,
                 4 => state.Camera.Source,
+                5 => state.Tools.Source,
                 _ => null
             };
             if (source != null)
@@ -147,6 +149,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                         return visualView.Draw(state.Visual, state.VisualScene, owner);
                     case 3 when state.Input.Source != null || state.Input.HasChanges:
                         return DrawModule(state.Input, owner, false);
+                    case 5 when state.Tools.Source != null || state.Tools.HasChanges:
+                        return PlayerToolsControls.Draw(state, owner);
                     case 4 when state.Camera.Source != null || state.Camera.HasChanges:
                         bool changed = DrawModule(state.Camera, owner, true);
                         if (sections.Draw("Camera.Binding", "Scene Binding"))
@@ -181,6 +185,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 if (sections.Draw("Input.Jump", "Jump"))
                     using (new EditorGUI.IndentLevelScope())
                         PlayerPresetField.DrawAction(serialized, "jumpAction");
+                if (sections.Draw("Input.Tools", "Use Tool"))
+                    PlayerToolsControls.DrawInput(serialized);
                 if (sections.Draw("Input.Camera", "Camera"))
                     using (new EditorGUI.IndentLevelScope())
                     {

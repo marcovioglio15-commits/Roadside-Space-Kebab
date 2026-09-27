@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1506555881205389161}
   - component: {fileID: 4051877401244386362}
   - component: {fileID: 54085641269774196}
+  - component: {fileID: 7149374316024815532}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -177,6 +178,18 @@ MonoBehaviour:
   target: {fileID: 0}
   visual: {fileID: 4051877401244386362}
   motor: {fileID: 1506555881205389161}
+--- !u!114 &7149374316024815532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3710358342869928148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bbdee93bc761394ba7c1bce6bcef02c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerTools
 --- !u!1 &8534969480920943159
 GameObject:
   m_ObjectHideFlags: 0
