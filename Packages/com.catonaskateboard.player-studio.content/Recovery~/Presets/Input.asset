@@ -17,3 +17,7 @@ MonoBehaviour:
   lookDeltaAction: {fileID: 11400000, guid: 24e4de031f0b81345b536ffe176f1ed5, type: 2}
   lookRateAction: {fileID: 11400000, guid: 3f9f19653b85c194dac4f4ae0e75a0fc, type: 2}
   cursorToggleAction: {fileID: 11400000, guid: 8b6e648d572d7af41907d1a271f0b9be, type: 2}
+  tools:
+    Mode: 0
+    UseTool: {fileID: 11400000, guid: da6b04de167a4cf083ef66efcaa25830, type: 2}
+    Bindings: []

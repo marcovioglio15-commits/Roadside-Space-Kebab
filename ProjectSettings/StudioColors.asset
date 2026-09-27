@@ -13,21 +13,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.StudioColors.Editor::CatOnASkateboard.StudioColors.Editor.ColorSettings
   folders:
-  - Guid: e2471c1ce70123f4eaf2e3e9b81467cf
-    Color: {r: 0.3, g: 0.8, b: 1, a: 1}
-    Mode: 2
-    Inherit: 1
-    Enabled: 1
-  - Guid: fda6940dc89c46765c07f66492c67165
-    Color: {r: 0, g: 1, b: 0.08817625, a: 1}
-    Mode: 2
-    Inherit: 1
-    Enabled: 1
-  - Guid: 06951c7d50c19064013311033ff2ac85
-    Color: {r: 0.39717376, g: 1, b: 0.2980392, a: 1}
-    Mode: 2
-    Inherit: 1
-    Enabled: 1
   - Guid: 1a469d230dd6bad70de30a4d8a3f750d
     Color: {r: 0.070988, g: 1, b: 0, a: 1}
     Mode: 2
@@ -40,6 +25,11 @@ MonoBehaviour:
     Enabled: 1
   - Guid: cae963759b9c004485a7d63a3f7c0908
     Color: {r: 0.025201082, g: 1, b: 0, a: 1}
+    Mode: 2
+    Inherit: 1
+    Enabled: 1
+  - Guid: e2471c1ce70123f4eaf2e3e9b81467cf
+    Color: {r: 0.3, g: 0.8, b: 1, a: 1}
     Mode: 2
     Inherit: 1
     Enabled: 1
