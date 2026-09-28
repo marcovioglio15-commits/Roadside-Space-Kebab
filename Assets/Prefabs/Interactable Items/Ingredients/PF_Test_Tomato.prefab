@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 691637315696684043}
   - component: {fileID: 4302797868310137595}
   - component: {fileID: 8121659629588198734}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Hover UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 50206318603902332}
   - component: {fileID: 3974342789145053721}
   - component: {fileID: 2374324416806917221}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -171,7 +171,7 @@ GameObject:
   - component: {fileID: 5719771275867385545}
   - component: {fileID: 5521453723754277542}
   - component: {fileID: 7771571357949756999}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PF_Test_Tomato
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -318,15 +318,15 @@ MonoBehaviour:
       Offset: {x: 0, y: 0, z: 0}
       ObstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967295
+        m_Bits: 55
       DrawGizmos: 1
-    Priority: 0
+    Priority: 99
     Contact:
       Enabled: 1
       Flags:
       - {fileID: 11400000, guid: 502cd1abface4603a56e2231e33003ff, type: 2}
       Match: 0
-      Tolerance: 0.005
+      Tolerance: 0.1
       IncludeTriggers: 1
     Interval: 0.15
     Steps:
@@ -424,7 +424,7 @@ MonoBehaviour:
       m_Bits: 4294967295
     Units: 1
     Space: 0
-    Offset: {x: 0, y: 0, z: 1.5}
+    Offset: {x: 0, y: 0, z: 0.7}
     Rotation: {x: 0, y: 0, z: 0}
     Instant: 0
     TransitionDuration: 0.2
@@ -553,7 +553,7 @@ GameObject:
   - component: {fileID: 3869405802283675132}
   - component: {fileID: 4230425105314647070}
   - component: {fileID: 1232970438018473990}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -634,7 +634,7 @@ GameObject:
   - component: {fileID: 6243601882805062418}
   - component: {fileID: 3389891168950248608}
   - component: {fileID: 3120875972193478039}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}

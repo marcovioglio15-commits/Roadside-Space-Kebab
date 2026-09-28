@@ -178,9 +178,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
   interactionName: First Person Hover
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -195,7 +200,6 @@ MonoBehaviour:
   anchor: {fileID: 0}
   label: {fileID: 459704337668838561}
   preset: {fileID: 11400000, guid: 6e20b92e59afa4d4aa7ccb3480766605, type: 2}
-  drawGizmos: 1
   configuration:
     settings:
       targetMode: 0
@@ -229,6 +233,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  drawGizmos: 1
 --- !u!114 &5794248098843545310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,9 +247,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectGrab
   interactionName: Grab
+  toolRequirement:
+    Mode: 2
+    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -295,9 +305,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDrop
   interactionName: Drop
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -339,9 +354,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectThrow
   interactionName: Throw
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -388,6 +408,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
+--- !u!114 &3869467706724934050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4593334166877187736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flags:
+  - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
 --- !u!1 &5623698135074143705
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,17 +645,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 65ade4c43542cbe4cbf667bed0624c74, type: 3}
   m_PrefabInstance: {fileID: 3316677175905720367}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3869467706724934050
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4593334166877187736}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  flags:
-  - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
