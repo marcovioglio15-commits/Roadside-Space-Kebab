@@ -12,12 +12,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c2c9aed371b85949beef82413028264, type: 3}
   m_Name: Tools
   m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerToolsPreset
-  Tools: []
-  InitialTool: {fileID: 0}
+  RootPath: 
+  Tools:
+  - Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    MoveVisual: 0
+    Path: 
+    PassivePose:
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+  - Tool: {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
+    MoveVisual: 0
+    Path: 
+    PassivePose:
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+  - Tool: {fileID: 11400000, guid: 07cdba6c534bc36429a324061e639905, type: 2}
+    MoveVisual: 0
+    Path: 
+    PassivePose:
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+  InitialTool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
   Layout: 0
   ActivePose:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   Slots: []
+  SlotMotion: 0
+  Pivot: {x: 0, y: 0, z: 0}
+  Axis: {x: 0, y: 0, z: 1}
+  Clockwise: 1
   SwitchDuration: 0.3

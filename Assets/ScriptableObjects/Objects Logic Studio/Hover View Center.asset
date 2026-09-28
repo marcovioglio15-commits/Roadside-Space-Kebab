@@ -45,3 +45,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  ToolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []

@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.HoverObserver
   view: {fileID: 4478434006657166066}
-  playerTag: Player
+  playerFlag: {fileID: 11400000, guid: 281d8342d7ff4b9c8c600666d1bf4d00, type: 2}
   dialogueHud: {fileID: 5394582002165645665}
 --- !u!1 &2849737364704771310
 GameObject:
@@ -505,6 +505,7 @@ GameObject:
   - component: {fileID: 1380264321079561331}
   - component: {fileID: 4132413250036278720}
   - component: {fileID: 8098388425116107572}
+  - component: {fileID: 4408144419648882459}
   m_Layer: 0
   m_Name: PF_Player
   m_TagString: Player
@@ -645,3 +646,17 @@ MonoBehaviour:
   target: {fileID: 0}
   visual: {fileID: 0}
   motor: {fileID: 4132413250036278720}
+--- !u!114 &4408144419648882459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8566306066050499826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  flags:
+  - {fileID: 11400000, guid: 281d8342d7ff4b9c8c600666d1bf4d00, type: 2}

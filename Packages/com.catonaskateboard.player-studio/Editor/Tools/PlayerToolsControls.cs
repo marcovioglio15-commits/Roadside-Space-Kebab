@@ -1,3 +1,4 @@
+using System;
 using CatOnASkateboard.StudioInput.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -12,39 +13,43 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         #region Module
 
-        /// <summary>Edits the retained Tools draft and exposes recording in the existing scene preview.</summary>
-        /// <param name="state">Workspace owning the module and recording state.</param>
+        /// <summary>Edits tool identities, hierarchy targets and interchangeable slots.</summary>
+        /// <param name="state">Workspace owning the Tools proposal.</param>
         /// <param name="owner">Window recorded for draft Undo.</param>
         /// <returns>True when module values changed.</returns>
-        internal static bool Draw(PlayerStudioState state, Object owner)
+        internal static bool Draw(PlayerStudioState state, UnityEngine.Object owner)
         {
             // All module values follow the common Apply/Discard transaction.
             SerializedObject data = state.Tools.GetEditor();
             if (data == null)
                 return false;
             EditorGUI.BeginChangeCheck();
-            DrawSettings(data);
+            DrawSettings(data, state.PreviewHost != null ? state.PreviewHost.transform : null, owner, state.Tools.Capture);
             bool changed = EditorGUI.EndChangeCheck();
             if (changed)
             {
                 Undo.RecordObject(owner, "Edit Player Tools");
                 state.Tools.Capture();
             }
-            EditorGUI.BeginChangeCheck();
-            state.Recording.Draw(state, owner);
-            return EditorGUI.EndChangeCheck() || changed;
+            return changed;
         }
 
         /// <summary>Shows only the slot values used by each selected layout.</summary>
         /// <param name="data">Tools preset or detached module draft.</param>
-        internal static void DrawSettings(SerializedObject data)
+        /// <param name="player">Selected player hierarchy, or an Inspector sample.</param>
+        /// <param name="owner">Optional workspace owning draft Undo.</param>
+        /// <param name="capture">Captures delayed menu choices into the detached proposal.</param>
+        internal static void DrawSettings(SerializedObject data, Transform player, UnityEngine.Object owner = null, Action capture = null)
         {
             // Empty arrays are valid for players whose tools are assigned later.
+            PlayerHierarchyMenu.DrawPath(data.FindProperty("RootPath"), player,
+                new GUIContent("Hierarchy Root", data.FindProperty("RootPath").tooltip), true, owner, capture);
+            Transform root = PlayerHierarchy.Resolve(player, data.FindProperty("RootPath").stringValue);
             EditorGUILayout.PropertyField(data.FindProperty("InitialTool"));
             bool cyclic = data.FindProperty("Layout").enumValueIndex == (int)PlayerToolLayout.Cyclic;
             bool moving = false;
             SerializedProperty entries = data.FindProperty("Tools");
-            EditorGUILayout.PropertyField(entries.FindPropertyRelative("Array.size"), new GUIContent("Tools", entries.tooltip));
+            DrawCount(entries, "Tools", () => new PlayerToolEntry());
             for (int index = 0; index < entries.arraySize; index++)
             {
                 SerializedProperty entry = entries.GetArrayElementAtIndex(index);
@@ -59,12 +64,16 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     entry.FindPropertyRelative("Tool").objectReferenceValue = PlayerToolsAuthoring.Create<PlayerTool>("Player Tool");
                 if (tool != null && GUILayout.Button(new GUIContent("Edit Tool Asset", "Select the tool to edit its name and switch-in/switch-out animations.")))
                     Selection.activeObject = tool;
-                EditorGUILayout.PropertyField(entry.FindPropertyRelative("MoveVisual"));
+                EditorGUILayout.PropertyField(entry.FindPropertyRelative("MoveVisual"), new GUIContent("Use Slots", entry.FindPropertyRelative("MoveVisual").tooltip));
                 if (!entry.FindPropertyRelative("MoveVisual").boolValue)
                     continue;
-                EditorGUILayout.PropertyField(entry.FindPropertyRelative("Path"));
-                if (!cyclic || data.FindProperty("InitialTool").objectReferenceValue == null)
-                    EditorGUILayout.PropertyField(entry.FindPropertyRelative("PassivePose"), true);
+                PlayerHierarchyMenu.DrawPath(entry.FindPropertyRelative("Path"), root,
+                    new GUIContent("Target", entry.FindPropertyRelative("Path").tooltip), root != player, owner, capture);
+                EditorGUILayout.PropertyField(entry.FindPropertyRelative("PassivePose"), new GUIContent("Parked Pose", entry.FindPropertyRelative("PassivePose").tooltip), true);
+                Transform target = PlayerHierarchy.Resolve(root, entry.FindPropertyRelative("Path").stringValue);
+                using (new EditorGUI.DisabledScope(target == null || target == player))
+                    if (GUILayout.Button(new GUIContent("Read Parked Pose", "Use this target's current local position, rotation and scale as its parked pose.")))
+                        entry.FindPropertyRelative("PassivePose").boxedValue = PlayerToolPose.Read(target);
             }
             if (!moving)
                 return;
@@ -72,7 +81,16 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             EditorGUILayout.PropertyField(data.FindProperty("Layout"));
             EditorGUILayout.PropertyField(data.FindProperty("SwitchDuration"));
             cyclic = data.FindProperty("Layout").enumValueIndex == (int)PlayerToolLayout.Cyclic;
-            EditorGUILayout.PropertyField(data.FindProperty(cyclic ? "Slots" : "ActivePose"), true);
+            if (cyclic)
+            {
+                SerializedProperty slots = data.FindProperty("Slots");
+                DrawCount(slots, "Slots", () => PlayerToolPose.Identity);
+                for (int index = 0; index < slots.arraySize; index++)
+                    EditorGUILayout.PropertyField(slots.GetArrayElementAtIndex(index),
+                        new GUIContent(index == 0 ? "Slot 0 (Active)" : "Slot " + index, "Pose relative to the shared parent of all tool targets."), true);
+            }
+            else
+                EditorGUILayout.PropertyField(data.FindProperty("ActivePose"), true);
             if (!cyclic)
                 return;
             EditorGUILayout.PropertyField(data.FindProperty("SlotMotion"));
@@ -82,6 +100,22 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 EditorGUILayout.PropertyField(data.FindProperty("Axis"));
                 EditorGUILayout.PropertyField(data.FindProperty("Clockwise"));
             }
+        }
+
+        /// <summary>Initializes newly added entries with usable scale instead of Unity's zeroed struct values.</summary>
+        /// <param name="array">Serialized tools or slots array.</param>
+        /// <param name="label">Compact count label.</param>
+        /// <param name="create">Initial value for an explicitly added entry.</param>
+        internal static void DrawCount(SerializedProperty array, string label, Func<object> create)
+        {
+            // Existing entries are never normalized when the count changes.
+            int count = EditorGUILayout.IntField(new GUIContent(label, array.tooltip), array.arraySize);
+            if (count < 0 || count == array.arraySize)
+                return;
+            int previous = array.arraySize;
+            array.arraySize = count;
+            for (int index = previous; index < count; index++)
+                array.GetArrayElementAtIndex(index).boxedValue = create();
         }
 
         #endregion
@@ -94,7 +128,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Hidden action roles retain their values when switching authoring mode.
             SerializedProperty settings = data.FindProperty("tools");
-            EditorGUILayout.PropertyField(settings.FindPropertyRelative("Mode"));
+            SerializedProperty mode = settings.FindPropertyRelative("Mode");
+            mode.enumValueIndex = (int)(PlayerToolInputMode)EditorGUILayout.EnumPopup(new GUIContent("Mode", mode.tooltip),
+                (PlayerToolInputMode)mode.enumValueIndex);
             if (settings.FindPropertyRelative("Mode").enumValueIndex == (int)PlayerToolInputMode.SharedCycle)
                 StudioInputActionMenu.Draw(data, "tools.UseTool", "PlayerStudio.UseTool", IsButton);
             else

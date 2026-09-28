@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 5254269728490429368}
   - component: {fileID: 1024598874194639592}
   - component: {fileID: 2534361684040139323}
+  - component: {fileID: 962167144239944056}
   m_Layer: 0
   m_Name: PF_Customer
   m_TagString: Untagged
@@ -124,9 +125,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
   interactionName: Dialogue Test
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -158,7 +159,7 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredTags: []
+      RequiredFlags: []
       RequireAll: 1
       Lines:
       - Speaker: Gino
@@ -180,9 +181,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
   interactionName: Modify by contact
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -197,7 +198,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Tag: Finish
+    Flag: {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
     ContactDuration: 1
     ContactTolerance: 0.02
     QueryInterval: 0.02
@@ -224,8 +225,8 @@ MonoBehaviour:
       MaterialSlot: -1
       Meshes: []
       Consume: 1
-    ChangeContactTag: 0
-    ContactTag: Untagged
+    ChangeContactFlag: 0
+    ContactFlag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     BlockSelf: 1
     BlockOther: 1
 --- !u!114 &4771604094856511517
@@ -241,9 +242,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
   interactionName: Dialogue Test Consumption
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -275,8 +276,8 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredTags:
-      - Tag: Finish
+      RequiredFlags:
+      - Flag: {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
         Count: 2
       RequireAll: 1
       Lines:
@@ -341,9 +342,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
   interactionName: Dialogue Test Post Consumption
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -375,7 +376,7 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredTags: []
+      RequiredFlags: []
       RequireAll: 1
       Lines:
       - Speaker: Gino
@@ -384,7 +385,7 @@ MonoBehaviour:
         Text: I want my money back!
     - Name: Dialogue
       Weight: 1
-      RequiredTags: []
+      RequiredFlags: []
       RequireAll: 1
       Lines:
       - Speaker: Gino
@@ -406,9 +407,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
   interactionName: Availability Rule
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -446,9 +447,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
   interactionName: Availability Rule
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -473,3 +474,17 @@ MonoBehaviour:
       Moment: 1
       Action: {fileID: 0}
       Distance: 3
+--- !u!114 &962167144239944056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  flags:
+  - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}

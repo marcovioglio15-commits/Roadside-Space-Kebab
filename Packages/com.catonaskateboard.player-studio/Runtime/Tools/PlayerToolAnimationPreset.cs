@@ -13,20 +13,20 @@ namespace CatOnASkateboard.PlayerStudio
         [Header("Key")]
         [Tooltip("Seconds from the start of the animation. Keys must be strictly ordered.")]
         public float Time;
-        [Tooltip("Local pose recorded at this time.")]
+        [Tooltip("Local pose reached at this time.")]
         public PlayerToolPose Pose = PlayerToolPose.Identity;
 
         #endregion
     }
 
-    /// <summary>Animates one child resolved relative to the Player Visual Binding model.</summary>
+    /// <summary>Animates one child resolved relative to the Tools hierarchy root.</summary>
     [Serializable]
     public sealed class PlayerToolTrack
     {
         #region Fields
 
         [Header("Track")]
-        [Tooltip("Child path relative to the visual model, for example Arm/Drill. Empty addresses the model root.")]
+        [Tooltip("Target selected below the Tools hierarchy root. Empty selects that root when it is a player child.")]
         public string Path = string.Empty;
         [Tooltip("Local transform keys in increasing time order. The current pose is used before the first key.")]
         public PlayerToolKey[] Keys = Array.Empty<PlayerToolKey>();
@@ -83,7 +83,7 @@ namespace CatOnASkateboard.PlayerStudio
         /// <summary>Reports invalid direct Inspector edits without changing the animation.</summary>
         private void OnValidate()
         {
-            // Recording and manual editing use the same validation contract.
+            // All authored keys use the same validation contract.
             if (!TryValidate(out string warning))
                 Debug.LogWarning(warning, this);
         }

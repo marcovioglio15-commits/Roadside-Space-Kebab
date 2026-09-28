@@ -14,9 +14,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="workspace">Constructed controls, or null before UI initialization.</param>
         /// <param name="blocked">Whether workspace recovery has an unresolved conflict.</param>
         /// <param name="operationWarning">Warning from the latest deliberate action.</param>
-        /// <param name="previewWarning">Optional warning from cached preview geometry.</param>
         internal static void Update(PlayerStudioState state, PlayerStudioWorkspace workspace, bool blocked,
-            string operationWarning, string previewWarning)
+            string operationWarning)
         {
             // Recovery and Play suspend writes, while panel visibility leaves draft ownership unchanged.
             if (workspace == null)
@@ -29,8 +28,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 || state.Locomotion.HasChanges && !state.Locomotion.TryValidate(out warning)
                 || state.Input.HasChanges && !state.Input.TryValidate(out warning)
                 || state.Camera.HasChanges && !state.Camera.TryValidate(out warning)
-                || state.Tools.HasChanges && !state.Tools.TryValidate(out warning)
-                || state.Visual.HasChanges && !state.Visual.Draft.TryGetSettings(out _, out warning)))
+                || state.Tools.HasChanges && !state.Tools.TryValidate(out warning)))
                 isValid = false;
             string targetWarning = "The master is unavailable. Discard before choosing another source.";
             bool hasTarget = isAssigning
@@ -44,8 +42,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 warning = operationWarning;
             else if (!hasTarget)
                 warning = state.Body.Source != null || state.Selection.HasChanges(state.Body) ? targetWarning : string.Empty;
-            if (warning.Length == 0)
-                warning = previewWarning;
             workspace.UpdateActions(!blocked && !isPlaying && state.HasChanges && isValid && hasTarget,
                 !blocked && !isPlaying && (state.Body.Source != null || state.Selection.Master != null || state.HasChanges),
                 warning);

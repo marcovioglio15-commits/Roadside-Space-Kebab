@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
-  m_Name: Cursor
+  m_Name: Player/Cursor
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
-  m_Asset: {fileID: -944628639613478452, guid: c6412b74d26e6ee4faad31bcdc815903, type: 3}
-  m_ActionId: ad812616-5a66-465c-bdab-027bda71851a
+  m_Asset: {fileID: -944628639613478452, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  m_ActionId: 0deffe97-50ed-43f1-9ff7-1265c0f9fa98

@@ -49,8 +49,8 @@ MonoBehaviour:
     fixedEuler: {x: 20, y: 0, z: 0}
     fixedTrackTarget: 1
     movementFrame: 2
-    modelFacing: 1
-    turnSpeed: 540
+    modelFacing: 2
+    turnSpeed: 2080
     hideVisualInFirstPerson: 1
     headTilt:
       Enabled: 1

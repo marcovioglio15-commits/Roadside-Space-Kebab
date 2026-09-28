@@ -43,9 +43,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     throw new InvalidOperationException("Add one Player Test Spawn to the editable test scene.");
                 if (master.CameraPreset == null)
                     throw new InvalidOperationException("Assign a Camera preset before Quick Play so the test has a player view.");
-                PrepareVisual(state, master, scene, folder);
                 AssetDatabase.SaveAssetIfDirty(master);
-                GameObject player = PlayerCreationUtility.Create(master, scene, "Test Player");
+                GameObject player = CreatePlayer(state, master, scene);
                 Position(state, player.transform, spawn.transform);
                 ConfigureCamera(state, player.GetComponent<PlayerCameraRig>(), master);
                 // Preview scenes cannot be saved; the isolated prefab is inserted when the copied environment loads.
@@ -59,58 +58,37 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             return AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
         }
 
-        /// <summary>Transfers adopted geometry and released management without modifying the original model.</summary>
-        /// <param name="state">Workspace containing the visual proposal.</param>
-        /// <param name="master">Temporary configuration that may receive a geometry snapshot.</param>
-        /// <param name="scene">Temporary scene used to build the snapshot.</param>
-        /// <param name="folder">Owned folder receiving an optional static model prefab.</param>
-        private static void PrepareVisual(PlayerStudioState state, PlayerMasterPreset master, Scene scene, string folder)
+        /// <summary>Copies the selected hierarchy so tool targets and authored children remain available.</summary>
+        /// <param name="state">Workspace with an optional scene player.</param>
+        /// <param name="master">Isolated test configuration.</param>
+        /// <param name="scene">Temporary preview scene.</param>
+        /// <returns>A configured player whose internal references belong to the copy.</returns>
+        private static GameObject CreatePlayer(PlayerStudioState state, PlayerMasterPreset master, Scene scene)
         {
-            // Prefab-backed managed models already have all their proposed offsets in the copied preset.
-            PlayerVisualSceneSession visual = state.VisualScene;
-            if (visual.Host == null || master.VisualPreset == null)
-                return;
-            master.VisualPreset.TryGetSettings(out PlayerVisualSettings settings, out _);
-            bool released = visual.HasChanges && !visual.Managed;
-            if (!released && settings.Prefab != null)
-                return;
-            if (!released && visual.Binding != null && visual.Binding.SourcePrefab != null
-                && visual.Existing == visual.Binding.Model)
-                return;
-            GameObject source = released ? visual.Binding != null ? visual.Binding.Model : null : visual.Existing;
-            if (source == null)
-            {
-                if (released)
-                    PlayerCreationUtility.SetReferences(master, ("visualPreset", null));
-                return;
-            }
-            if (!PlayerVisualModelValidation.TryValidate(source, out string warning))
-                throw new InvalidOperationException(warning);
-            GameObject copy = UnityEngine.Object.Instantiate(source);
+            // A master alone creates only configured components; geometry belongs to the selected hierarchy.
+            if (state.PreviewHost == null)
+                return PlayerCreationUtility.Create(master, scene, "Test Player");
+            GameObject copy = UnityEngine.Object.Instantiate(state.PreviewHost.gameObject);
+            copy.name = "Test Player";
             SceneManager.MoveGameObjectToScene(copy, scene);
-            try
+            PlayerHost host = copy.GetComponent<PlayerHost>();
+            PlayerCreationUtility.SetReferences(host, ("masterPreset", master));
+            PlayerRootConfiguration.Apply(host);
+            PlayerCameraRig rig = copy.GetComponent<PlayerCameraRig>();
+            if (rig == null)
+                rig = copy.AddComponent<PlayerCameraRig>();
+            Camera view = rig.View;
+            if (view == null || !view.transform.IsChildOf(copy.transform))
             {
-                Matrix4x4 pose = released ? visual.Host.transform.worldToLocalMatrix * source.transform.localToWorldMatrix
-                    : visual.Binding != null ? visual.Binding.BaseMatrix : visual.AdoptedMatrix;
-                copy.transform.SetPositionAndRotation(pose.GetColumn(3), pose.rotation);
-                copy.transform.localScale = pose.lossyScale;
-                GameObject prefab = PrefabUtility.SaveAsPrefabAsset(copy, folder + "/Visual.prefab");
-                PlayerCreationUtility.SetReferences(master.VisualPreset, ("prefab", prefab));
-                if (released)
-                {
-                    using SerializedObject properties = new SerializedObject(master.VisualPreset);
-                    PlayerVisualDraft draft = PlayerVisualDraft.Read(properties);
-                    draft.SetOffset(Vector3.zero, Vector3.zero, 1f);
-                    draft.Write(properties);
-                    properties.ApplyModifiedPropertiesWithoutUndo();
-                }
-                AssetDatabase.SaveAssetIfDirty(master.VisualPreset);
-                AssetDatabase.SaveAssetIfDirty(master);
+                GameObject child = new GameObject("Player Camera", typeof(Camera), typeof(AudioListener));
+                child.transform.SetParent(copy.transform, false);
+                view = child.GetComponent<Camera>();
             }
-            finally
-            {
-                UnityEngine.Object.DestroyImmediate(copy);
-            }
+            PlayerCreationUtility.SetReferences(rig, ("host", host), ("view", view),
+                ("input", copy.GetComponent<UnityEngine.InputSystem.PlayerInput>()),
+                ("motor", copy.GetComponent<PlayerCharacterControllerMotor>()));
+            rig.enabled = true;
+            return copy;
         }
 
         /// <summary>Uses the test spawn as the origin while retaining proposed orientation, scale and displacement.</summary>
@@ -145,17 +123,20 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             if (state.CameraScene.View != null)
                 EditorUtility.CopySerialized(state.CameraScene.View, rig.View);
-            Transform source = state.CameraScene.Target;
-            if (source != null && state.PreviewHost != null)
+            // Remap explicit scene choices into the copied hierarchy without creating substitute anchors.
+            foreach ((string Name, Transform Source) role in new[]
+                { ("target", state.CameraScene.Target), ("model", state.CameraScene.Model) })
             {
-                if (!source.IsChildOf(state.PreviewHost.transform))
-                    throw new InvalidOperationException("The test focus anchor must belong to the selected player.");
-                Transform target = new GameObject("Focus Anchor").transform;
-                target.SetParent(rig.transform, false);
-                target.localPosition = state.PreviewHost.transform.InverseTransformPoint(source.position);
-                target.localRotation = Quaternion.Inverse(state.PreviewHost.transform.rotation) * source.rotation;
-                target.localScale = (state.PreviewHost.transform.worldToLocalMatrix * source.localToWorldMatrix).lossyScale;
-                PlayerCreationUtility.SetReferences(rig, ("target", target));
+                Transform selected = null;
+                if (role.Source != null && state.PreviewHost != null)
+                {
+                    if (!role.Source.IsChildOf(state.PreviewHost.transform))
+                        throw new InvalidOperationException("Camera targets must belong to the selected player for Quick Play.");
+                    selected = PlayerHierarchy.Resolve(rig.transform, AnimationUtility.CalculateTransformPath(role.Source, state.PreviewHost.transform));
+                    if (selected == null)
+                        throw new InvalidOperationException("Use unique hierarchy names for the camera targets before Quick Play.");
+                }
+                PlayerCreationUtility.SetReferences(rig, (role.Name, selected));
             }
             master.CameraPreset.TryGetSettings(out PlayerCameraSettings camera, out _);
             rig.View.enabled = true;

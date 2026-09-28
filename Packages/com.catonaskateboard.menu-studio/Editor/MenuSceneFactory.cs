@@ -17,11 +17,11 @@ namespace CatOnASkateboard.MenuStudio.Editor
         /// <param name="preset">Saved project preset.</param>
         /// <param name="kind">Main or pause structure.</param>
         /// <param name="scene">Loaded destination scene.</param>
-        /// <param name="assetDirectory">Existing Assets folder receiving input assets.</param>
+        /// <param name="assetDirectory">Existing Assets folder selected for the menu configuration.</param>
         /// <returns>The generated host, ready for scene save or prefab export.</returns>
         public static MenuHost Create(MenuPreset preset, MenuKind kind, Scene scene, string assetDirectory)
         {
-            // Validate before creating any scene object or input asset.
+            // Validate before creating any scene object.
             List<string> warnings = new List<string>();
             MenuValidation.Collect(preset, warnings);
             if (warnings.Count > 0 || !scene.IsValid() || !scene.isLoaded || !AssetDatabase.IsValidFolder(assetDirectory))
@@ -49,7 +49,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
             host.Pages = pages.ToArray();
             foreach (MenuPage page in pages)
                 page.Root.SetActive(kind == MenuKind.Main && page.Kind == MenuPageKind.Home);
-            MenuInputFactory.Configure(host, assetDirectory);
+            MenuInputFactory.Configure(host);
             EditorSceneManager.MarkSceneDirty(scene);
             Selection.activeGameObject = root;
             return host;

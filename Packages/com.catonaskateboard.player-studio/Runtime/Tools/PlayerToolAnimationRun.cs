@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CatOnASkateboard.PlayerStudio
@@ -35,27 +36,22 @@ namespace CatOnASkateboard.PlayerStudio
             targets = source != null ? new Transform[source.Tracks.Length] : Array.Empty<Transform>();
             initial = source != null ? new PlayerToolPose[targets.Length] : Array.Empty<PlayerToolPose>();
             for (int index = 0; index < targets.Length; index++)
-                targets[index] = Resolve(model, source.Tracks[index].Path);
-        }
-
-        /// <summary>Resolves a model-local path without hierarchy searches during playback.</summary>
-        /// <param name="model">Bound model root.</param>
-        /// <param name="path">Relative child path, or empty for the model.</param>
-        /// <returns>The existing target, or null for a missing binding.</returns>
-        internal static Transform Resolve(Transform model, string path)
-        {
-            // Optional visual modules never cause implicit object creation.
-            return model == null ? null : string.IsNullOrEmpty(path) ? model : model.Find(path);
+                targets[index] = PlayerHierarchy.Resolve(model, source.Tracks[index].Path);
         }
 
         /// <summary>Rejects missing targets before any visual pose is modified.</summary>
-        /// <returns>True when every animated child exists.</returns>
-        internal bool IsBound()
+        /// <param name="moved">Unique transforms whose original poses must be retained.</param>
+        /// <param name="player">Player root, which must never be animated by Tools.</param>
+        /// <returns>True when every animated child exists outside the player root.</returns>
+        internal bool CollectTargets(HashSet<Transform> moved, Transform player)
         {
             // Destroyed targets are also caught at the start of later switches.
             foreach (Transform target in targets)
-                if (target == null)
+            {
+                if (target == null || target == player)
                     return false;
+                moved.Add(target);
+            }
             return true;
         }
 

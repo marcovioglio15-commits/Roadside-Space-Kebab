@@ -1,1 +1,9 @@
-{"name":"com.catonaskateboard.player-studio.content","version":"1.0.0","displayName":"Player Studio Content","description":"Editable Player Studio defaults owned by this project."}
+{
+  "name": "com.catonaskateboard.player-studio.content",
+  "version": "1.0.0",
+  "displayName": "Player Studio Content",
+  "description": "Editable Player Studio defaults owned by this project.",
+  "dependencies": {
+    "com.catonaskateboard.studio-identity": "0.1.0"
+  }
+}

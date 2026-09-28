@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.HoverObserver
   view: {fileID: 1254635992}
-  playerTag: Player
+  playerFlag: {fileID: 11400000, guid: 281d8342d7ff4b9c8c600666d1bf4d00, type: 2}
 --- !u!1001 &1330444393
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -276,6 +276,7 @@ GameObject:
   - component: {fileID: 1367258564}
   - component: {fileID: 1367258563}
   - component: {fileID: 1367258562}
+  - component: {fileID: 544135550739224231}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -515,6 +516,7 @@ GameObject:
   - component: {fileID: 2044298534}
   - component: {fileID: 2044298533}
   - component: {fileID: 2044298532}
+  - component: {fileID: 2468365446004780171}
   m_Layer: 0
   m_Name: "Occlusion Wall \xB7 Walk Around"
   m_TagString: Untagged
@@ -682,3 +684,31 @@ SceneRoots:
   - {fileID: 1367258565}
   - {fileID: 2044298535}
   - {fileID: 1918114881}
+--- !u!114 &544135550739224231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367258561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  flags:
+  - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+--- !u!114 &2468365446004780171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044298531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  flags:
+  - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}

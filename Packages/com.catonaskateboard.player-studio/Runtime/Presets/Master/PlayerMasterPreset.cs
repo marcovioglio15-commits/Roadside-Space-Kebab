@@ -24,10 +24,6 @@ namespace CatOnASkateboard.PlayerStudio
         [SerializeField]
         private PlayerLocomotionPreset locomotionPreset;
 
-        [Tooltip("Optional visual source and local offset shared by players using this master.")]
-        [SerializeField]
-        private PlayerVisualPreset visualPreset;
-
         [Tooltip("Optional camera, follow and view-relative movement configuration.")]
         [SerializeField]
         private PlayerCameraPreset cameraPreset;
@@ -48,9 +44,6 @@ namespace CatOnASkateboard.PlayerStudio
 
         /// <summary>The optional movement configuration; an existing motor explicitly chooses to consume it.</summary>
         public PlayerLocomotionPreset LocomotionPreset => locomotionPreset;
-
-        /// <summary>The optional visual configuration; assigning it does not create a scene instance.</summary>
-        public PlayerVisualPreset VisualPreset => visualPreset;
 
         /// <summary>The optional view configuration consumed by an explicitly connected camera rig.</summary>
         public PlayerCameraPreset CameraPreset => cameraPreset;

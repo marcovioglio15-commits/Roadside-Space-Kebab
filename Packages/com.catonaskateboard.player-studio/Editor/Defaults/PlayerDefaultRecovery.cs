@@ -24,6 +24,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             bool restored = false;
             foreach (string source in Directory.GetFiles(backupRoot, "*", SearchOption.AllDirectories))
             {
+                if (source.EndsWith(".inputactions", StringComparison.OrdinalIgnoreCase))
+                    continue;
                 string relative = Path.GetRelativePath(backupRoot, source);
                 string destination = Path.Combine(PlayerDefaultAssets.DefaultsRoot, relative);
                 if (File.Exists(destination))
@@ -49,6 +51,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Existing backups remain original defaults even after the live assets are personalized.
             foreach (string source in Directory.GetFiles(PlayerDefaultAssets.DefaultsRoot, "*", SearchOption.AllDirectories))
             {
+                if (source.EndsWith(".inputactions", StringComparison.OrdinalIgnoreCase)
+                    || source.EndsWith(".inputactions.meta", StringComparison.OrdinalIgnoreCase))
+                    continue;
                 string destination = Path.Combine(backupRoot, Path.GetRelativePath(PlayerDefaultAssets.DefaultsRoot, source));
                 if (File.Exists(destination))
                     continue;

@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.PlayerStudio.Editor
 {
-    /// <summary>Copies a complete configuration without sharing mutable presets or input bindings.</summary>
+    /// <summary>Copies a complete configuration while retaining the selected input actions.</summary>
     internal static class PlayerConfigurationCopy
     {
         #region Methods
@@ -15,18 +15,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>Copies every assigned preset and rewires the master before constructing the new player.</summary>
         /// <param name="source">Default master whose stored choices supply the initial values.</param>
         /// <param name="folder">New configuration folder owned by this creation attempt.</param>
-        /// <param name="copyActions">False when a draft will replace action roles before they are copied.</param>
         /// <returns>The saved independent master.</returns>
-        internal static PlayerMasterPreset Copy(PlayerMasterPreset source, string folder, bool copyActions = true)
+        internal static PlayerMasterPreset Copy(PlayerMasterPreset source, string folder)
         {
             // Null slots stay optional, and each copied asset retains its original values.
             PlayerMasterPreset master = Copy(source, folder, "Master");
             PlayerInputPreset input = Copy(source.InputPreset, folder, "Input");
-            if (input != null && copyActions)
-                CopyActions(input, folder);
             PlayerCreationUtility.SetReferences(master, ("bodyPreset", Copy(source.BodyPreset, folder, "Body")),
                 ("inputPreset", input), ("locomotionPreset", Copy(source.LocomotionPreset, folder, "Locomotion")),
-                ("visualPreset", Copy(source.VisualPreset, folder, "Visual")), ("cameraPreset", Copy(source.CameraPreset, folder, "Camera")), ("toolsPreset", Copy(source.ToolsPreset, folder, "Tools")));
+                ("cameraPreset", Copy(source.CameraPreset, folder, "Camera")), ("toolsPreset", Copy(source.ToolsPreset, folder, "Tools")));
             AssetDatabase.SaveAssetIfDirty(master);
             return master;
         }
@@ -48,34 +45,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             return copy;
         }
 
-        /// <summary>Copies the action asset and resolves each assigned role by ID into that copy.</summary>
-        /// <param name="input">New Input preset whose roles are being redirected.</param>
-        /// <param name="folder">Owned folder receiving actions and their role references.</param>
-        internal static void CopyActions(PlayerInputPreset input, string folder)
-        {
-            // No action name or binding is assumed; customized defaults preserve their identifiers and controls.
-            using SerializedObject serialized = new SerializedObject(input);
-            InputActionReference movement = (InputActionReference)serialized.FindProperty("movementAction").objectReferenceValue;
-            string path = folder + "/Controls.inputactions";
-            File.WriteAllText(path, movement.asset.ToJson());
-            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
-            InputActionAsset actions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(path);
-            using SerializedProperty property = serialized.GetIterator();
-            int role = 0;
-            while (property.NextVisible(true))
-            {
-                // Descend into tool bindings as well as the top-level movement and camera roles.
-                if (property.propertyType != SerializedPropertyType.ObjectReference
-                    || property.objectReferenceValue is not InputActionReference reference || reference.action == null
-                    || reference.asset != movement.asset)
-                    continue;
-                InputActionReference copy = InputActionReference.Create(actions.FindAction(reference.action.id));
-                AssetDatabase.CreateAsset(copy, folder + "/Action Role " + role++ + ".asset");
-                property.objectReferenceValue = copy;
-            }
-            serialized.ApplyModifiedPropertiesWithoutUndo();
-            AssetDatabase.SaveAssetIfDirty(input);
-        }
+
 
         #endregion
 

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 9195871525651147916}
   - component: {fileID: 2326014492238964528}
   - component: {fileID: 6084086214577113263}
+  - component: {fileID: 1374417912557854080}
   m_Layer: 0
   m_Name: PF_AssemblyProduct
   m_TagString: Untagged
@@ -89,9 +90,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyProduct
   interactionName: Assembly Product
-  tagChange:
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
     Enabled: 1
-    Tag: Finish
+    Flag: {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
     Moment: 0
   visualEffect:
     Enabled: 0
@@ -107,26 +112,34 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Ingredients:
-    - Tag: HoverGrabTest
+    - Flag: {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
       Count: 1
       Optional: 0
-    - Tag: HoverGrabTest_Cooked
+    - Flag: {fileID: 11400000, guid: d3074bb85b754906b57c3c98cde17a97, type: 2}
       Count: 1
       Optional: 0
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 1
-      Tag: Untagged
+      Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+      Order: 0
       Position: {x: -0.546581, y: 0.5, z: 0.052991092}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
       PreviewPrefab: {fileID: 9017165495754910650, guid: eb773dd05cd83df4aa5ef91eb4a1abac, type: 3}
     - Name: Magnet 2
       AnyIngredient: 1
-      Tag: Untagged
+      Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+      Order: 0
       Position: {x: 0, y: 0.5, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 0.7, y: 0.7, z: 0.7}
+      Appearance:
+        Meshes: []
+        Materials: []
       PreviewPrefab: {fileID: 9017165495754910650, guid: eb773dd05cd83df4aa5ef91eb4a1abac, type: 3}
     InteractionRules:
     - Target: {fileID: 9195871525651147916}
@@ -141,6 +154,9 @@ MonoBehaviour:
       RequireComplete: 1
       MinimumIngredients: 1
       Ingredients: []
+    CompletedAppearance:
+      Meshes: []
+      Materials: []
 --- !u!114 &9195871525651147916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -154,9 +170,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectGrab
   interactionName: Grab
-  tagChange:
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -207,9 +227,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDrop
   interactionName: Drop
-  tagChange:
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -251,9 +275,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectThrow
   interactionName: Throw
-  tagChange:
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -288,3 +316,17 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+--- !u!114 &1374417912557854080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4182828039336747428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  flags:
+  - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}

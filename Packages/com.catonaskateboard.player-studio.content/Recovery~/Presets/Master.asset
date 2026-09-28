@@ -15,6 +15,5 @@ MonoBehaviour:
   bodyPreset: {fileID: 11400000, guid: f936e5f8fceedcd42a62d22ef098822b, type: 2}
   inputPreset: {fileID: 11400000, guid: 55c178610dbfd45418a7ec8c1ae85eb4, type: 2}
   locomotionPreset: {fileID: 11400000, guid: 33dbafd115b44ec41835a5e56517371b, type: 2}
-  visualPreset: {fileID: 11400000, guid: 3c4ad71dbb791a24e8c323272caeda5b, type: 2}
   cameraPreset: {fileID: 11400000, guid: 8e3cebcade0625a42b4b157e0fc4b04f, type: 2}
   toolsPreset: {fileID: 11400000, guid: fec4f362e7a84067b2728951f5bb7877, type: 2}

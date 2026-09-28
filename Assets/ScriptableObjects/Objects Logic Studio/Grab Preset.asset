@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8f04106e6e60a7409c5e9bc32915c26, type: 3}
   m_Name: Grab Preset
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.GrabPreset
+  ToolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   Settings:
     Distance: 3
     TargetMode: 0
@@ -22,7 +26,7 @@ MonoBehaviour:
       m_Bits: 4294967295
     Units: 1
     Space: 0
-    Offset: {x: 0.35, y: -0.2, z: 1.5}
+    Offset: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
     Instant: 0
     TransitionDuration: 0.2

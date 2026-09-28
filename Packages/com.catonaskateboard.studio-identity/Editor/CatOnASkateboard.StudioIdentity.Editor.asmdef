@@ -1,0 +1,6 @@
+{
+  "name": "CatOnASkateboard.StudioIdentity.Editor",
+  "rootNamespace": "CatOnASkateboard.StudioIdentity.Editor",
+  "references": ["CatOnASkateboard.StudioIdentity.Runtime"],
+  "includePlatforms": ["Editor"]
+}

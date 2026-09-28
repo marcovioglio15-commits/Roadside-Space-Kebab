@@ -11,7 +11,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         #region Serialized State
 
         [Header("Source")]
-        [Tooltip("Master whose Body, Input, Locomotion and Visual slots receive the confirmed assignments.")]
+        [Tooltip("Master whose Body, Input and Locomotion slots receive the confirmed assignments.")]
         [SerializeField]
         private PlayerMasterPreset source;
 
@@ -39,14 +39,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [Tooltip("Whether a Locomotion reference existed before a possible deletion.")]
         [SerializeField]
         private bool hadOriginalLocomotion;
-
-        [Tooltip("Visual assigned when the session last read this master.")]
-        [SerializeField]
-        private PlayerVisualPreset originalVisual;
-
-        [Tooltip("Whether the baseline contained a Visual reference before a possible deletion.")]
-        [SerializeField]
-        private bool hadOriginalVisual;
 
         [Tooltip("Camera assigned when this master session last opened.")]
         [SerializeField]
@@ -76,14 +68,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [Tooltip("Optional movement preset proposed for this master; its contents remain unchanged by a slot assignment.")]
         [SerializeField]
         private PlayerLocomotionPreset locomotionPreset;
-
-        [Tooltip("Optional visual preset proposed for this master; its source and offsets remain unchanged by assignment.")]
-        [SerializeField]
-        private PlayerVisualPreset visualPreset;
-
-        [Tooltip("Whether the proposed Visual existed before a possible deletion while editing.")]
-        [SerializeField]
-        private bool hadVisual;
 
         [Tooltip("Optional Camera preset proposed for this master.")]
         [SerializeField]
@@ -121,9 +105,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>The movement preset proposed for the same master.</summary>
         public PlayerLocomotionPreset LocomotionPreset => locomotionPreset;
 
-        /// <summary>The optional visual preset proposed for this master.</summary>
-        public PlayerVisualPreset VisualPreset => visualPreset;
-
         /// <summary>The optional Camera preset proposed in this master session.</summary>
         public PlayerCameraPreset CameraPreset => cameraPreset;
 
@@ -152,29 +133,25 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="body">Requested Body, including null so incomplete input can remain visible.</param>
         /// <param name="input">Optional Input mapping requested for the same master.</param>
         /// <param name="locomotion">Optional movement configuration requested for the same master.</param>
-        /// <param name="visual">Optional source and offset configuration requested for the same master.</param>
         /// <param name="camera">Optional view configuration requested for this master.</param>
         /// <param name="tools">Optional manual tool configuration requested for this master.</param>
-        public void SetDraft(PlayerBodyPreset body, PlayerInputPreset input, PlayerLocomotionPreset locomotion, PlayerVisualPreset visual, PlayerCameraPreset camera, PlayerToolsPreset tools)
+        public void SetDraft(PlayerBodyPreset body, PlayerInputPreset input, PlayerLocomotionPreset locomotion, PlayerCameraPreset camera, PlayerToolsPreset tools)
         {
             // Recompute only on an explicit edit; asset deletion must not silently clear pending state.
             bodyPreset = body;
             inputPreset = input;
             locomotionPreset = locomotion;
-            if (!ReferenceEquals(visualPreset, visual))
-                hadVisual = visual != null;
-            visualPreset = visual;
             if (!ReferenceEquals(cameraPreset, camera))
                 hadCamera = camera != null;
             cameraPreset = camera;
             if (!ReferenceEquals(toolsPreset, tools))
                 hadTools = tools != null;
             toolsPreset = tools;
-            hasChanges = bodyPreset != originalBody || inputPreset != originalInput || locomotionPreset != originalLocomotion || visualPreset != originalVisual
+            hasChanges = bodyPreset != originalBody || inputPreset != originalInput || locomotionPreset != originalLocomotion
                 || (hadOriginalBody && originalBody == null) || (hadOriginalInput && originalInput == null)
-                || (hadOriginalLocomotion && originalLocomotion == null) || (hadOriginalVisual && originalVisual == null)
-                || (hadVisual && visualPreset == null) || cameraPreset != originalCamera
-                || (hadOriginalCamera && originalCamera == null) || (hadCamera && cameraPreset == null || hadTools && toolsPreset == null)
+                || (hadOriginalLocomotion && originalLocomotion == null)
+                || cameraPreset != originalCamera
+                || (hadOriginalCamera && originalCamera == null) || (hadCamera && cameraPreset == null)
                 || toolsPreset != originalTools || hadOriginalTools && originalTools == null || hadTools && toolsPreset == null;
         }
 
@@ -191,10 +168,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             originalLocomotion = source != null ? source.LocomotionPreset : null;
             hadOriginalLocomotion = originalLocomotion != null;
             locomotionPreset = originalLocomotion;
-            originalVisual = source != null ? source.VisualPreset : null;
-            hadOriginalVisual = originalVisual != null;
-            visualPreset = originalVisual;
-            hadVisual = hadOriginalVisual;
             originalCamera = source != null ? source.CameraPreset : null;
             hadOriginalCamera = originalCamera != null;
             cameraPreset = originalCamera;
@@ -244,12 +217,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
 
             // Module values are validated together with their independent drafts by the batch coordinator.
-            if (bodyPreset == null || hadVisual && visualPreset == null || hadCamera && cameraPreset == null || hadTools && toolsPreset == null)
+            if (bodyPreset == null || hadCamera && cameraPreset == null || hadTools && toolsPreset == null)
             {
                 warning = "Choose an available Body and replace or explicitly clear any deleted optional preset.";
                 return false;
             }
-            foreach (ScriptableObject asset in new ScriptableObject[] { bodyPreset, inputPreset, locomotionPreset, visualPreset, cameraPreset, toolsPreset })
+            foreach (ScriptableObject asset in new ScriptableObject[] { bodyPreset, inputPreset, locomotionPreset, cameraPreset, toolsPreset })
                 if (asset != null && !EditorUtility.IsPersistent(asset))
                 {
                     warning = "Choose preset assets saved in the Project window.";
@@ -260,11 +233,11 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
             // A deleted baseline preset is also a conflict, including after script reload.
             if (source.BodyPreset != originalBody || source.InputPreset != originalInput || source.LocomotionPreset != originalLocomotion
-                || source.VisualPreset != originalVisual || source.CameraPreset != originalCamera
+                || source.CameraPreset != originalCamera
                 || source.ToolsPreset != originalTools || hadOriginalTools && originalTools == null
                 || (hadOriginalCamera && originalCamera == null)
                 || (hadOriginalBody && originalBody == null) || (hadOriginalInput && originalInput == null)
-                || (hadOriginalLocomotion && originalLocomotion == null) || (hadOriginalVisual && originalVisual == null))
+                || (hadOriginalLocomotion && originalLocomotion == null))
             {
                 warning = "The master's preset slots changed outside this session. Discard to reload their current assignments.";
                 return false;
@@ -275,7 +248,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             changes.FindProperty("bodyPreset").objectReferenceValue = bodyPreset;
             changes.FindProperty("inputPreset").objectReferenceValue = inputPreset;
             changes.FindProperty("locomotionPreset").objectReferenceValue = locomotionPreset;
-            changes.FindProperty("visualPreset").objectReferenceValue = visualPreset;
             changes.FindProperty("cameraPreset").objectReferenceValue = cameraPreset;
             changes.FindProperty("toolsPreset").objectReferenceValue = toolsPreset;
             return true;

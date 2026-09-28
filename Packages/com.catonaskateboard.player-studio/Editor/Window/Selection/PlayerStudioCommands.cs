@@ -37,10 +37,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 return false;
             Undo.RecordObject(owner, "Load Player Defaults");
             state.Selection.MasterSession.SetDraft(defaults.BodyPreset, defaults.InputPreset, defaults.LocomotionPreset,
-                defaults.VisualPreset, defaults.CameraPreset, defaults.ToolsPreset);
-            state.VisualScene.Refresh(state.PreviewHost);
-            state.VisualScene.SetDraft(true, state.VisualScene.Existing);
-            state.VisualScene.RequestSynchronization();
+                defaults.CameraPreset, defaults.ToolsPreset);
             state.CameraScene.Refresh(state.PreviewHost);
             state.CameraScene.RequestSynchronization();
             return true;

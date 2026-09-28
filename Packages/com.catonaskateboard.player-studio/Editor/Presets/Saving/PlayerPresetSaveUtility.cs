@@ -14,12 +14,11 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>Confirms all prepared modules and scene proposals within one validation and Undo boundary.</summary>
         /// <param name="batch">Independent unapplied properties for every changed preset.</param>
         /// <param name="transformSession">Root pose proposal.</param>
-        /// <param name="visualSession">Selected visual binding proposal.</param>
         /// <param name="cameraSession">Selected camera binding proposal.</param>
         /// <param name="warning">Receives a validation or save failure while retaining the drafts.</param>
         /// <returns>True after all preset writes and scene changes have completed.</returns>
         public static bool TrySaveBatch(PlayerPresetBatch batch, PlayerTransformEditSession transformSession,
-            PlayerVisualSceneSession visualSession, PlayerCameraSceneSession cameraSession, out string warning)
+            PlayerCameraSceneSession cameraSession, out string warning)
         {
             // The caller validates the draft and baseline before preparing these properties.
             warning = string.Empty;
@@ -32,11 +31,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 }
 
             // Reject incompatible scene instances before saving the preset or changing any capsule.
-            if (!PlayerPrefabConfiguration.TryPrepare(batch, visualSession, cameraSession, out PlayerPrefabConfiguration prefabChange, out warning)
+            if (!PlayerPrefabConfiguration.TryPrepare(batch, cameraSession, out PlayerPrefabConfiguration prefabChange, out warning)
                 || !transformSession.TryValidate(null, out warning, batch)
                 || !PlayerBodySceneChange.TryPrepare(batch, transformSession, out PlayerBodySceneChange sceneChange, out warning)
-                || !PlayerVisualSceneChange.TryPrepare(batch, visualSession, transformSession, out PlayerVisualSceneChange visualChange, out warning)
-                || !PlayerCameraSceneChange.TryPrepare(batch, cameraSession, visualSession, out PlayerCameraSceneChange cameraChange, out warning))
+                || !PlayerCameraSceneChange.TryPrepare(batch, cameraSession, out PlayerCameraSceneChange cameraChange, out warning))
                 return false;
 
             // Isolate this asset edit from previous and subsequent Undo operations.
@@ -55,7 +53,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     serialized.ApplyModifiedProperties();
                 prefabChange.Configure();
                 sceneChange?.Apply();
-                visualChange.Apply();
                 cameraChange.Apply();
                 // Finish deferred scene snapshots before prefab application remaps component references.
                 Undo.FlushUndoRecordObjects();

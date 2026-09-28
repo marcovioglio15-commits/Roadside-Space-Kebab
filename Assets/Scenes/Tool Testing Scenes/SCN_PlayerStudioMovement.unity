@@ -258,6 +258,7 @@ GameObject:
   - component: {fileID: 1276272960}
   - component: {fileID: 1276272959}
   - component: {fileID: 1276272958}
+  - component: {fileID: 3007062468737074182}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -454,3 +455,17 @@ SceneRoots:
   - {fileID: 1068236417}
   - {fileID: 291428719740982808}
   - {fileID: 1314616280}
+--- !u!114 &3007062468737074182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1276272957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  flags:
+  - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}

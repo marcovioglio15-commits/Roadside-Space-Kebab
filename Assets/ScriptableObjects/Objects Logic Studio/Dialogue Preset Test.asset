@@ -23,7 +23,7 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredTags: []
+      RequiredFlags: []
       RequireAll: 1
       Lines:
       - Speaker: 

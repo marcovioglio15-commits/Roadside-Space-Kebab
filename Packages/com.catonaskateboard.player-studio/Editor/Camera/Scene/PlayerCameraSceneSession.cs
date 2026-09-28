@@ -32,6 +32,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [SerializeField]
         private Transform target;
 
+        [Tooltip("Optional player child used for facing and first-person visibility.")]
+        [SerializeField]
+        private Transform model;
+
         [Tooltip("Explicit request to configure or resynchronize the scene camera.")]
         [SerializeField]
         private bool synchronize;
@@ -46,8 +50,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         public Camera View => view;
         /// <summary>Proposed target, or null for the player root.</summary>
         public Transform Target => target;
+        /// <summary>Proposed model child for facing and visibility.</summary>
+        public Transform Model => model;
         /// <summary>Whether camera setup must join Apply even without preset edits.</summary>
-        public bool HasChanges => synchronize || (original != null && (original.View != view || original.Target != target));
+        public bool HasChanges => synchronize || (original != null && (original.View != view || original.Target != target || original.Model != model));
 
         #endregion
 
@@ -73,6 +79,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             original = host != null ? host.GetComponent<PlayerCameraRig>() : null;
             view = original != null ? original.View : null;
             target = original != null ? original.Target : null;
+            model = original != null ? original.Model : null;
             baseline = Capture(original);
             synchronize = false;
         }
@@ -100,22 +107,26 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         /// <summary>Draws reference choices below the Camera preset's conditional settings.</summary>
         /// <param name="owner">Window recorded before changing the proposal.</param>
+        /// <param name="usesModel">Whether camera presentation currently uses a model child.</param>
         /// <returns>True when a scene camera setup was proposed.</returns>
-        public bool Draw(UnityEngine.Object owner)
+        public bool Draw(UnityEngine.Object owner, bool usesModel)
         {
             // Scene references are irrelevant while editing only an asset.
             if (host == null)
                 return false;
+            if (usesModel)
+                PlayerHierarchyMenu.DrawTransform(new GUIContent("Model", "Player child used for facing and first-person visibility."),
+                    host.transform, model, false, owner, value => { model = value; synchronize = true; });
+            PlayerHierarchyMenu.DrawTransform(new GUIContent("Focus Anchor", "Empty uses the player root and the preset offset."),
+                host.transform, target, true, owner, value => { target = value; synchronize = true; });
             EditorGUILayout.Space();
             EditorGUI.BeginChangeCheck();
             Camera camera = (Camera)EditorGUILayout.ObjectField(new GUIContent("Scene Camera", "Empty creates a camera child during Apply."), view, typeof(Camera), true);
-            Transform anchor = (Transform)EditorGUILayout.ObjectField(new GUIContent("Focus Anchor", "Optional head or camera point; empty uses the player root."), target, typeof(Transform), true);
             bool changed = EditorGUI.EndChangeCheck();
             if (!changed)
                 return false;
             Undo.RecordObject(owner, "Edit Camera Setup Draft");
             view = camera;
-            target = anchor;
             synchronize = true;
             return true;
         }
@@ -129,7 +140,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (rig == null)
                 return string.Empty;
             string result = PlayerStudioSceneReference.Capture(rig) + PlayerStudioSceneReference.Capture(rig.View)
-                + PlayerStudioSceneReference.Capture(rig.Target);
+                + PlayerStudioSceneReference.Capture(rig.Target) + PlayerStudioSceneReference.Capture(rig.Model);
             return rig.View != null ? result + rig.View.transform.localPosition.ToString("R")
                 + rig.View.transform.localRotation.ToString("R") + rig.View.fieldOfView.ToString("R")
                 + rig.View.nearClipPlane.ToString("R") + rig.View.farClipPlane.ToString("R") : result;

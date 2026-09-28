@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c2c9aed371b85949beef82413028264, type: 3}
+  m_Name: PlayerToolsPreset
+  m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerToolsPreset
+  RootPath: Player Camera/PF_PlayerArmTest
+  Tools:
+  - Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    MoveVisual: 1
+    Path: PF_PlayerArmTest_Visual/Tool_A
+    PassivePose:
+      Position: {x: 0, y: 0.69, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+  - Tool: {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
+    MoveVisual: 1
+    Path: PF_PlayerArmTest_Visual/Tool_B
+    PassivePose:
+      Position: {x: 0, y: 0.69, z: 0}
+      Rotation: {x: 87.04991, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+  - Tool: {fileID: 11400000, guid: 07cdba6c534bc36429a324061e639905, type: 2}
+    MoveVisual: 1
+    Path: PF_PlayerArmTest_Visual/Tool_C
+    PassivePose:
+      Position: {x: 0, y: 0.69, z: 0}
+      Rotation: {x: 309.4, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+  InitialTool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+  Layout: 1
+  ActivePose:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 90, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  Slots:
+  - Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 90, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  - Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  - Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: -50, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  SlotMotion: 0
+  Pivot: {x: 0, y: 0, z: 0}
+  Axis: {x: 0, y: 0, z: 1}
+  Clockwise: 1
+  SwitchDuration: 0.3

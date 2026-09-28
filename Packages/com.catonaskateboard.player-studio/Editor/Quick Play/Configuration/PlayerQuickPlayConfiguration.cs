@@ -30,10 +30,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             try
             {
                 PlayerPresetDraftCopy.Apply(batch.Find(state.Selection.Master), candidate);
-                PlayerMasterPreset master = PlayerConfigurationCopy.Copy(candidate, folder, false);
+                PlayerMasterPreset master = PlayerConfigurationCopy.Copy(candidate, folder);
                 using SerializedObject source = new SerializedObject(candidate);
                 using SerializedObject copy = new SerializedObject(master);
-                foreach (string slot in new[] { "bodyPreset", "inputPreset", "locomotionPreset", "visualPreset", "cameraPreset", "toolsPreset" })
+                foreach (string slot in new[] { "bodyPreset", "inputPreset", "locomotionPreset", "cameraPreset", "toolsPreset" })
                 {
                     // A draft on a replaced slot remains pending but is not used by the proposed test configuration.
                     ScriptableObject original = source.FindProperty(slot).objectReferenceValue as ScriptableObject;
@@ -43,8 +43,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     PlayerPresetDraftCopy.Apply(batch.Find(original), destination);
                     AssetDatabase.SaveAssetIfDirty(destination);
                 }
-                if (master.InputPreset != null)
-                    PlayerConfigurationCopy.CopyActions(master.InputPreset, folder);
                 AssetDatabase.SaveAssetIfDirty(master);
                 return master;
             }

@@ -120,6 +120,20 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 }
         }
 
+        /// <summary>Shows a model selection only when facing or first-person hiding needs it.</summary>
+        /// <param name="data">Current Camera preset draft.</param>
+        /// <returns>True when the camera uses a model child.</returns>
+        internal static bool UsesModel(SerializedObject data)
+        {
+            // Read the proposal so visibility updates before Apply.
+            if (data == null)
+                return false;
+            SerializedProperty settings = data.FindProperty("settings");
+            return settings.FindPropertyRelative("modelFacing").enumValueIndex != (int)PlayerModelFacing.Authored
+                || settings.FindPropertyRelative("mode").enumValueIndex == (int)PlayerCameraMode.FirstPerson
+                && settings.FindPropertyRelative("hideVisualInFirstPerson").boolValue;
+        }
+
         /// <summary>Draws a field with its serialized tooltip and a consistent layout.</summary>
         /// <param name="settings">Parent settings property.</param>
         /// <param name="name">Serialized child field name.</param>

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Globalization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,47 +8,21 @@ using UnityEngine.SceneManagement;
 
 namespace CatOnASkateboard.MenuStudio.Editor
 {
-    /// <summary>Builds a project-owned action asset and reuses an existing EventSystem safely.</summary>
+    /// <summary>Connects user-owned input actions and reuses an existing EventSystem safely.</summary>
     internal static class MenuInputFactory
     {
         #region Methods
         #region Creation
-        /// <summary>Creates explicit input references for a generated menu.</summary>
-        /// <param name="host">New menu host.</param>
-        /// <param name="directory">Existing project folder receiving the action asset.</param>
-        /// <returns>The generated input asset path.</returns>
-        internal static string Configure(MenuHost host, string directory)
+        /// <summary>Connects a generated menu to existing project actions without creating another input asset.</summary>
+        /// <param name="host">New menu host whose preset may override individual actions.</param>
+        internal static void Configure(MenuHost host)
         {
-            // Each generated setup gets its own asset so changing a preset cannot overwrite existing input.
-            InputActionAsset asset = ScriptableObject.CreateInstance<InputActionAsset>();
-            InputActionMap ui = asset.AddActionMap("UI");
-            InputAction move = ui.AddAction("Move", InputActionType.PassThrough, expectedControlLayout: "Vector2");
-            move.AddCompositeBinding("2DVector").With("Up", "<Keyboard>/upArrow").With("Down", "<Keyboard>/downArrow")
-                .With("Left", "<Keyboard>/leftArrow").With("Right", "<Keyboard>/rightArrow");
-            move.AddCompositeBinding("2DVector").With("Up", "<Keyboard>/w").With("Down", "<Keyboard>/s")
-                .With("Left", "<Keyboard>/a").With("Right", "<Keyboard>/d");
-            move.AddBinding("<Gamepad>/leftStick", processors: "stickDeadzone(min=" + host.Preset.Navigation.Deadzone.ToString(CultureInfo.InvariantCulture) + ",max=1)");
-            move.AddBinding("<Gamepad>/dpad");
-            AddButton(ui, "Submit", "<Keyboard>/enter", "<Gamepad>/buttonSouth");
-            AddButton(ui, "Cancel", "<Keyboard>/escape", "<Gamepad>/buttonEast");
-            ui.AddAction("Point", InputActionType.PassThrough, "<Pointer>/position", expectedControlLayout: "Vector2");
-            ui.AddAction("Click", InputActionType.PassThrough, "<Pointer>/press", expectedControlLayout: "Button");
-            ui.AddAction("Scroll", InputActionType.PassThrough, "<Mouse>/scroll", expectedControlLayout: "Vector2");
-            InputActionMap menu = asset.AddActionMap("Menu");
-            AddButton(menu, "Pause", "<Keyboard>/escape", "<Gamepad>/start");
-            AddButton(menu, "PreviousTab", "<Keyboard>/q", "<Gamepad>/leftShoulder");
-            AddButton(menu, "NextTab", "<Keyboard>/e", "<Gamepad>/rightShoulder");
-            string path = AssetDatabase.GenerateUniqueAssetPath(directory + "/MenuInput.asset");
-            AssetDatabase.CreateAsset(asset, path);
+            // Project actions and their bindings remain entirely owned by the user.
+            InputActionAsset asset = InputSystem.actions;
             Dictionary<string, InputActionReference> references = new Dictionary<string, InputActionReference>();
-            foreach (InputAction action in asset)
-            {
-                InputActionReference reference = InputActionReference.Create(action);
-                reference.name = action.actionMap.name + "/" + action.name;
-                AssetDatabase.AddObjectToAsset(reference, asset);
-                references.Add(action.name, reference);
-            }
-
+            foreach (string role in new[] { "UI/Move", "UI/Submit", "UI/Cancel", "UI/Point", "UI/Click", "UI/Scroll",
+                "Menu/Pause", "Menu/PreviousTab", "Menu/NextTab" })
+                references.Add(role.Substring(role.IndexOf('/') + 1), FindReference(asset, role));
             MenuNavigation settings = host.Preset.Navigation;
             MenuInput input = host.gameObject.AddComponent<MenuInput>();
             input.Host = host;
@@ -59,26 +32,30 @@ namespace CatOnASkateboard.MenuStudio.Editor
             input.NextTab = settings.NextTab != null ? settings.NextTab : references["NextTab"];
             input.CreditsClose = settings.CreditsClose;
             ConfigureEventSystem(host, asset, references);
-            AssetDatabase.SaveAssets();
-            return path;
+            if (asset == null)
+                Debug.LogWarning("Assign project-wide actions in Input System settings and configure the menu's input roles.", host);
         }
 
-        /// <summary>Adds keyboard and gamepad bindings to one button action.</summary>
-        /// <param name="map">Action map receiving the control.</param>
-        /// <param name="name">Stable action name.</param>
-        /// <param name="keyboard">Keyboard control path.</param>
-        /// <param name="gamepad">Gamepad control path.</param>
-        private static void AddButton(InputActionMap map, string name, string keyboard, string gamepad)
+        /// <summary>Finds a persistent imported reference while leaving missing roles unassigned.</summary>
+        /// <param name="asset">User-selected project action asset.</param>
+        /// <param name="path">Optional conventional map and action name.</param>
+        /// <returns>The saved reference, or null until the user configures that role.</returns>
+        private static InputActionReference FindReference(InputActionAsset asset, string path)
         {
-            // Both device families resolve through the same serialized action reference.
-            InputAction action = map.AddAction(name, InputActionType.Button, keyboard);
-            action.AddBinding(gamepad);
+            // The factory never invents actions or binds devices on the user's behalf.
+            InputAction action = asset != null ? asset.FindAction(path) : null;
+            if (action == null)
+                return null;
+            foreach (Object candidate in AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GetAssetPath(asset)))
+                if (candidate is InputActionReference reference && reference.action == action)
+                    return reference;
+            return null;
         }
 
         /// <summary>Creates a scene EventSystem only when no loaded active one already exists.</summary>
         /// <param name="host">Generated menu and destination scene.</param>
-        /// <param name="asset">Generated UI action asset.</param>
-        /// <param name="references">Generated action references.</param>
+        /// <param name="asset">User-selected project action asset.</param>
+        /// <param name="references">Existing action references.</param>
         private static void ConfigureEventSystem(MenuHost host, InputActionAsset asset, Dictionary<string, InputActionReference> references)
         {
             // Existing project navigation is intentionally preserved and reported by the creation window.

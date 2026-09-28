@@ -61,12 +61,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     return false;
                 Add(locomotion);
             }
-            if (state.Visual.HasChanges)
-            {
-                if (!state.Visual.TryPrepareApply(state.Selection.Master, out SerializedObject visual, out warning))
-                    return false;
-                Add(visual);
-            }
             if (!state.Input.TryPrepare(state.Selection.Master != null ? state.Selection.Master.InputPreset : null,
                     out SerializedObject input, out warning))
                 return false;
@@ -146,7 +140,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             {
                 PlayerPresetDraftCopy.Apply(Find(master), candidate);
                 using SerializedObject slots = new SerializedObject(candidate);
-                foreach (string slot in new[] { "bodyPreset", "inputPreset", "locomotionPreset", "visualPreset", "cameraPreset", "toolsPreset" })
+                foreach (string slot in new[] { "bodyPreset", "inputPreset", "locomotionPreset", "cameraPreset", "toolsPreset" })
                 {
                     SerializedProperty property = slots.FindProperty(slot);
                     if (!(property.objectReferenceValue is ScriptableObject source) || Find(source) == null)

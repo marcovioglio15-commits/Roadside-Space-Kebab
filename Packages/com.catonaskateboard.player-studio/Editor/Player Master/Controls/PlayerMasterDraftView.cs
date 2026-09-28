@@ -12,7 +12,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private static readonly GUIContent inputLabel = new GUIContent("Input Slot", "Optional Input mapping. Apply confirms the reference; action bindings stay in the assigned Input Actions asset.");
         private static readonly GUIContent locomotionLabel = new GUIContent("Locomotion Slot", "Optional movement preset. Confirm its reference before editing its numbers.");
 
-        private static readonly GUIContent visualLabel = new GUIContent("Visual Slot", "Optional visual preset. Apply confirms this reference without changing the preset's source or offsets.");
 
         #endregion
 
@@ -31,7 +30,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             PlayerBodyPreset body = PlayerPresetPicker.Draw(bodyLabel, session.BodyPreset);
             PlayerInputPreset input = PlayerPresetPicker.Draw(inputLabel, session.InputPreset);
             PlayerLocomotionPreset locomotion = PlayerPresetPicker.Draw(locomotionLabel, session.LocomotionPreset);
-            PlayerVisualPreset visual = PlayerPresetPicker.Draw(visualLabel, session.VisualPreset);
             PlayerCameraPreset camera = PlayerPresetPicker.Draw(new GUIContent("Camera Slot", "Optional view and follow configuration."), session.CameraPreset);
             PlayerToolsPreset tools = PlayerPresetPicker.Draw(new GUIContent("Tools Slot", "Optional manual tools and visual switching configuration."), session.ToolsPreset);
             if (!EditorGUI.EndChangeCheck())
@@ -39,7 +37,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
             // Choosing references edits the window state, never the master's serialized slots.
             Undo.RecordObject(undoTarget, "Edit Preset Assignments");
-            session.SetDraft(body, input, locomotion, visual, camera, tools);
+            session.SetDraft(body, input, locomotion, camera, tools);
             return true;
         }
 

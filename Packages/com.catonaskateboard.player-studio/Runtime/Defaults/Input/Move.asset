@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
-  m_Name: Move
+  m_Name: Player/Move
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
-  m_Asset: {fileID: -944628639613478452, guid: c6412b74d26e6ee4faad31bcdc815903, type: 3}
-  m_ActionId: 77516a2f-fed4-4075-974b-9ea3d7363cfa
+  m_Asset: {fileID: -944628639613478452, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  m_ActionId: e4c3e0c9-702d-4e8f-8daa-4fd529df7e54

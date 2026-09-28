@@ -29,9 +29,9 @@ namespace CatOnASkateboard.PlayerStudio
         [SerializeField]
         private Transform target;
 
-        [Tooltip("Optional managed model used for visual yaw and first-person visibility.")]
+        [Tooltip("Optional child selected for model facing and first-person visibility.")]
         [SerializeField]
-        private PlayerVisualBinding visual;
+        private Transform model;
 
         [Tooltip("Optional motor supplying achieved movement for model facing.")]
         [SerializeField]
@@ -46,6 +46,7 @@ namespace CatOnASkateboard.PlayerStudio
         private readonly PlayerCameraVisibility visibility = new PlayerCameraVisibility();
         private PlayerCameraSettings settings;
         private Quaternion authoredModelRotation;
+        private Transform capturedModel;
         private float initialHeading;
         private Vector2 angles;
         private PlayerCameraLookState look;
@@ -64,6 +65,10 @@ namespace CatOnASkateboard.PlayerStudio
         #endregion
 
         #region Properties
+
+        /// <summary>The selected hierarchy child used for model presentation.</summary>
+        public Transform Model => model;
+
 
         /// <summary>Player that owns this camera configuration.</summary>
         public PlayerHost Host => host;
@@ -110,6 +115,7 @@ namespace CatOnASkateboard.PlayerStudio
             commands.Dispose();
             visibility.Dispose();
             RestoreCursor();
+            RestoreModel();
         }
 
         /// <summary>Draws an optional centered pointer only while this rig owns active capture.</summary>
@@ -260,11 +266,15 @@ namespace CatOnASkateboard.PlayerStudio
             initialHeading = host.transform.eulerAngles.y;
             angles = settings.InitialAngles;
             look.Reset(angles);
-            if (visual != null && visual.VisualRoot != null && host.MasterPreset.VisualPreset != null
-                && host.MasterPreset.VisualPreset.TryGetSettings(out PlayerVisualSettings modelSettings, out _))
-                authoredModelRotation = modelSettings.Rotation * visual.BaseMatrix.rotation;
+            if (capturedModel != model || settings.ModelFacing == PlayerModelFacing.Authored)
+                RestoreModel();
+            if (model != null && capturedModel == null && settings.ModelFacing != PlayerModelFacing.Authored)
+            {
+                capturedModel = model;
+                authoredModelRotation = Quaternion.Inverse(host.transform.rotation) * model.rotation;
+            }
             if (settings.Mode == PlayerCameraMode.FirstPerson && settings.HideVisualInFirstPerson)
-                visibility.Connect(view, visual != null ? visual.VisualRoot : null);
+                visibility.Connect(view, model);
             if (inputFocused && settings.Mode != PlayerCameraMode.Fixed && settings.LookEnabled && settings.LockCursor)
                 SetCursor(true);
             initialized = true;
@@ -283,8 +293,13 @@ namespace CatOnASkateboard.PlayerStudio
                 warning = "Connect this root's Player Host, its master and an existing camera.";
             else if (host.transform.IsChildOf(view.transform) || (target != null && target.IsChildOf(view.transform)))
                 warning = "The camera must not contain the player or the focus target in its hierarchy.";
-            else if (visual != null && visual.Host != host)
-                warning = "Camera visual binding must belong to the same player.";
+            else if (model != null && host.MasterPreset.CameraPreset != null
+                && host.MasterPreset.CameraPreset.TryGetSettings(out PlayerCameraSettings configuration, out _)
+                && (configuration.ModelFacing != PlayerModelFacing.Authored
+                    || configuration.Mode == PlayerCameraMode.FirstPerson && configuration.HideVisualInFirstPerson)
+                && (model == transform || !model.IsChildOf(transform)
+                || view.transform.IsChildOf(model)))
+                warning = "Select a player child that does not contain its camera for model presentation.";
             return warning.Length == 0;
         }
 
@@ -346,18 +361,27 @@ namespace CatOnASkateboard.PlayerStudio
                 SetCursor(true);
         }
 
+        /// <summary>Restores the authored facing before the next activation captures its correction.</summary>
+        private void RestoreModel()
+        {
+            // The optional model remains an authored child; runtime facing must not accumulate between sessions.
+            if (capturedModel != null && host != null)
+                capturedModel.rotation = host.transform.rotation * authoredModelRotation;
+            capturedModel = null;
+        }
+
         /// <summary>Turns the model independently of collider orientation, using a cached authored correction.</summary>
         private void UpdateVisualFacing()
         {
             // No model search is performed during camera updates.
-            if (visual == null || visual.VisualRoot == null || settings.ModelFacing == PlayerModelFacing.Authored)
+            if (model == null || settings.ModelFacing == PlayerModelFacing.Authored)
                 return;
             Vector3 forward = settings.ModelFacing == PlayerModelFacing.Camera ? Heading * Vector3.forward
                 : motor != null ? motor.ActualVelocity : Vector3.zero;
             forward.y = 0f;
             if (forward.sqrMagnitude <= 0.000001f)
                 return;
-            visual.VisualRoot.rotation = Quaternion.RotateTowards(visual.VisualRoot.rotation,
+            model.rotation = Quaternion.RotateTowards(model.rotation,
                 Quaternion.LookRotation(forward, Vector3.up) * authoredModelRotation, settings.TurnSpeed * Time.deltaTime);
         }
 

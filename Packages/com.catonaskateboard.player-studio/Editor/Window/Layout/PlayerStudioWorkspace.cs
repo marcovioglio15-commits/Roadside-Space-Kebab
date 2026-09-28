@@ -44,12 +44,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="useSelected">Selects the Hierarchy player without adding a full-width button.</param>
         /// <param name="createDefault">Creates a complete default player at a chosen prefab destination.</param>
         /// <param name="quickPlay">Tests current drafts in the dedicated test scene, or stops the active test.</param>
+        /// <param name="synchronize">Stages the saved presets for scene synchronization.</param>
         /// <param name="showModules">Saved visibility of the module pane.</param>
         /// <param name="showPreview">Saved visibility of the scene pane.</param>
         /// <param name="drawGame">Draws the actual Quick Play camera in a separate input surface.</param>
         public PlayerStudioWorkspace(VisualElement root, Action drawControls, Action drawTransform, Action apply, Action discard,
             Action togglePreview, Action framePlayer, Action editTransform, Action toggleModules, Action placement,
-            Action defaults, Action useSelected, Action createDefault, Action quickPlay, bool showModules, bool showPreview, Action drawGame)
+            Action defaults, Action useSelected, Action createDefault, Action quickPlay, Action synchronize, bool showModules, bool showPreview, Action drawGame)
         {
             // SceneView creates this native IMGUI viewport before our workspace is built.
             viewport = root.Q<IMGUIContainer>();
@@ -73,6 +74,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             playerMenu.menu.AppendAction("Create Default Player…", _ => createDefault());
             playerMenu.menu.AppendAction("Use Selected Player", _ => useSelected());
             playerMenu.menu.AppendAction("Load Default Configuration", _ => defaults());
+            playerMenu.menu.AppendAction("Synchronize/Saved Presets to Scene", _ => synchronize());
             toolbar.Add(playerMenu);
             root.Add(toolbar);
 

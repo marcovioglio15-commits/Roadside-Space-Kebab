@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7c5086676de3074eb3e8f672595535e, type: 3}
   m_Name: Drop Preset Test
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DropPreset
+  ToolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   Settings:
     OverrideBody: 1
     Mass: 1

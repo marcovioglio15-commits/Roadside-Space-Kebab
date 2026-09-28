@@ -19,12 +19,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [Tooltip("Movement, gravity and jump proposal.")]
         public PlayerLocomotionEditSession Locomotion = new PlayerLocomotionEditSession();
 
-        [Tooltip("Visual source and offset proposal.")]
-        public PlayerVisualEditSession Visual = new PlayerVisualEditSession();
-
-        [Tooltip("Selected visual hierarchy proposal and conflict baseline.")]
-        public PlayerVisualSceneSession VisualScene = new PlayerVisualSceneSession();
-
         [Tooltip("Input role references edited in an isolated draft.")]
         public PlayerModuleEditSession Input = new PlayerModuleEditSession();
 
@@ -33,9 +27,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         [Tooltip("Manual tool definitions and visual slots edited in an isolated draft.")]
         public PlayerModuleEditSession Tools = new PlayerModuleEditSession();
-
-        [Tooltip("Animation recording state retained by the existing scene preview.")]
-        public PlayerToolRecording Recording = new PlayerToolRecording();
 
         [Tooltip("Proposed camera and target references.")]
         public PlayerCameraSceneSession CameraScene = new PlayerCameraSceneSession();
@@ -69,8 +60,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         #region Properties
 
         /// <summary>All editable domains share selection guards, Apply and Discard.</summary>
-        public bool HasChanges => Selection.HasChanges(Body) || Locomotion.HasChanges || Visual.HasChanges
-            || VisualScene.HasChanges || Transform.HasChanges || Input.HasChanges || Camera.HasChanges || CameraScene.HasChanges || Tools.HasChanges;
+        public bool HasChanges => Selection.HasChanges(Body) || Locomotion.HasChanges
+            || Transform.HasChanges || Input.HasChanges || Camera.HasChanges || CameraScene.HasChanges || Tools.HasChanges;
 
         #endregion
     }

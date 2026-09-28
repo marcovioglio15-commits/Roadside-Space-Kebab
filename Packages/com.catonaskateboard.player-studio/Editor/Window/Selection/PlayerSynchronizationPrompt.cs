@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.PlayerStudio.Editor
 {
-    /// <summary>Schedules one preset-to-scene comparison after the workspace has recovered its player and drafts.</summary>
+    /// <summary>Offers synchronization directions after the workspace has recovered its player and drafts.</summary>
     internal sealed class PlayerSynchronizationPrompt : IDisposable
     {
         #region State
@@ -49,20 +49,33 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             scheduled = false;
         }
 
-        /// <summary>Offers confirmation while preserving a declined proposal for Apply, Discard and Undo.</summary>
+        /// <summary>Stages saved preset values through the explicit Player menu action.</summary>
+        internal void StagePresets()
+        {
+            PlayerSceneSynchronization.TryStage(state(), owner, out string warning);
+            report(warning);
+        }
+
+
+
+        /// <summary>Offers both synchronization directions without changing anything when cancelled.</summary>
         private void Check()
         {
             scheduled = false;
-            if (owner == null || EditorApplication.isPlayingOrWillChangePlaymode)
+            if (owner == null || EditorApplication.isPlayingOrWillChangePlaymode || Application.isBatchMode)
                 return;
-            bool proposed = PlayerSceneSynchronization.TryStage(state(), owner, out string differences, out string warning);
+            bool differs = PlayerSceneSynchronization.TryCompare(state(), out string differences, out string warning);
             report(warning);
-            if (!proposed || Application.isBatchMode)
+            if (!differs)
                 return;
             if (EditorUtility.DisplayDialog("Synchronize Player", "The scene differs from the saved presets: " + differences
-                + ".\n\nReapply the preset values to the player and its prefab now? Keeping the proposal pending leaves the scene unchanged until Apply.",
-                "Synchronize", "Keep Pending"))
-                apply();
+                + ". Apply Saved Presets updates the configured components and the player prefab.", "Apply Saved Presets", "Cancel"))
+            {
+                if (PlayerSceneSynchronization.TryStage(state(), owner, out warning))
+                    apply();
+                else
+                    report(warning);
+            }
         }
 
         #endregion

@@ -6,20 +6,19 @@ using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.PlayerStudio.Editor
 {
-    /// <summary>Compares preset-owned scene values once when opening a player and stages their reapplication.</summary>
+    /// <summary>Compares scene values and stages either saved configuration to the selected player.</summary>
     internal static class PlayerSceneSynchronization
     {
         #region Methods
 
         #region Proposal
 
-        /// <summary>Stages all differing modules without changing a preset, component or prefab.</summary>
+        /// <summary>Lists differing modules without creating pending edits or changing the scene.</summary>
         /// <param name="state">Clean workspace whose selected player supplies the comparison context.</param>
-        /// <param name="owner">Window that owns the proposal's Undo record.</param>
         /// <param name="differences">Receives the names of the modules requiring confirmation.</param>
         /// <param name="warning">Receives invalid preset data or an unsupported player context.</param>
-        /// <returns>True when a synchronization proposal was created.</returns>
-        internal static bool TryStage(PlayerStudioState state, Object owner, out string differences, out string warning)
+        /// <returns>True when the scene differs from its saved presets.</returns>
+        internal static bool TryCompare(PlayerStudioState state, out string differences, out string warning)
         {
             // Opening another view never replaces work that was already pending.
             differences = warning = string.Empty;
@@ -28,7 +27,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 || host.MasterPreset == null || host.MasterPreset != state.Selection.Master)
                 return false;
             if (!PlayerCreationUtility.TryValidate(host.MasterPreset, out InputActionAsset actions, out warning)
-                || !PlayerVisualPrefabUtility.TryGetPath(host, out string path, out warning))
+                || !PlayerPrefabUtility.TryGetPath(host, out string path, out warning))
                 return false;
 
             List<string> changed = new List<string>();
@@ -38,8 +37,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 changed.Add("Input");
             if (!MovementMatches(host))
                 changed.Add("Locomotion");
-            if (!VisualMatches(host))
-                changed.Add("Visual");
             if (!CameraMatches(host))
                 changed.Add("Camera");
             if (path.Length == 0 || HasManagedOverrides(host))
@@ -47,16 +44,32 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (changed.Count == 0)
                 return false;
 
-            // These requests reuse the same validated Apply path as ordinary preset and Transform edits.
-            Undo.RecordObject(owner, "Stage Player Synchronization");
-            state.VisualScene.Refresh(host);
-            state.VisualScene.SetDraft(host.MasterPreset.VisualPreset != null, state.VisualScene.Existing);
-            state.VisualScene.RequestSynchronization();
-            state.CameraScene.Refresh(host);
-            state.CameraScene.RequestSynchronization();
             differences = string.Join(", ", changed);
             return true;
         }
+
+        /// <summary>Proposes reapplying saved presets after the synchronization direction is chosen.</summary>
+        /// <param name="state">Clean workspace whose scene player receives the proposal.</param>
+        /// <param name="owner">Window recorded for draft Undo.</param>
+        /// <param name="warning">Receives invalid data or a pending-session warning.</param>
+        /// <returns>True when the saved configuration is ready for the shared Apply action.</returns>
+        internal static bool TryStage(PlayerStudioState state, Object owner, out string warning)
+        {
+            // Comparison is read-only; opening or cancelling the prompt must not create drafts.
+            if (!TryCompare(state, out _, out warning))
+            {
+                if (state.HasChanges)
+                    warning = "Apply or discard the current session before synchronizing saved presets.";
+                return false;
+            }
+            Undo.RecordObject(owner, "Stage Player Synchronization");
+            state.Transform.Open(state.PreviewHost);
+            state.CameraScene.Refresh(state.PreviewHost);
+            state.CameraScene.RequestSynchronization();
+            return true;
+        }
+
+
 
         #endregion
 
@@ -77,7 +90,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         /// <summary>Checks action ownership, the initial map and the bridge references without inspecting hard-coded action names.</summary>
         /// <param name="host">Selected scene player.</param>
-        /// <param name="actions">Validated dedicated asset, or null for an unassigned Input slot.</param>
+        /// <param name="actions">Validated selected asset, or null for an unassigned Input slot.</param>
         /// <returns>True when Input components match the saved configuration.</returns>
         private static bool InputMatches(PlayerHost host, InputActionAsset actions)
         {
@@ -106,33 +119,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             return motor != null && motor.enabled && ReferencesMatch(motor, ("host", host), ("input", host.GetComponent<PlayerInputBridge>()));
         }
 
-        /// <summary>Compares model identity and its full composed local pose, including authored scale.</summary>
-        /// <param name="host">Selected scene player.</param>
-        /// <returns>True when no visual creation, removal or pose correction is needed.</returns>
-        private static bool VisualMatches(PlayerHost host)
-        {
-            PlayerVisualBinding binding = host.GetComponent<PlayerVisualBinding>();
-            PlayerVisualPreset preset = host.MasterPreset.VisualPreset;
-            if (preset == null)
-                return binding == null;
-            preset.TryGetSettings(out PlayerVisualSettings settings, out _);
-            if (binding == null)
-                return settings.Prefab == null;
-            if (binding.Host != host || binding.VisualRoot == null || binding.Model == null
-                || binding.SourcePrefab != settings.Prefab || binding.VisualRoot.parent != host.transform)
-                return false;
-            Matrix4x4 expected = Matrix4x4.TRS(settings.Position, settings.Rotation, Vector3.one * settings.Scale) * binding.BaseMatrix;
-            Matrix4x4 actual = Matrix4x4.TRS(binding.VisualRoot.localPosition, binding.VisualRoot.localRotation, binding.VisualRoot.localScale);
-            // Matrix comparison includes position, rotation and non-unit authored model scale.
-            for (int index = 0; index < 16; index++)
-                if (Mathf.Abs(expected[index] - actual[index]) > 0.0001f)
-                    return false;
-            if (binding.OwnsContainer && settings.Prefab != null)
-                return Near(binding.Model.transform.localPosition, settings.Prefab.transform.localPosition)
-                    && Quaternion.Angle(binding.Model.transform.localRotation, settings.Prefab.transform.localRotation) < 0.01f
-                    && Near(binding.Model.transform.localScale, settings.Prefab.transform.localScale);
-            return true;
-        }
+
 
         /// <summary>Checks lens, pose, activation and the rig's references against the saved Camera preset.</summary>
         /// <param name="host">Selected scene player.</param>
@@ -144,7 +131,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 return rig == null || !rig.enabled && (rig.View == null || !rig.View.enabled);
             if (rig == null || !rig.enabled || rig.View == null || !rig.View.enabled || rig.View.orthographic
                 || !ReferencesMatch(rig, ("host", host), ("input", host.GetComponent<PlayerInput>()),
-                    ("visual", host.GetComponent<PlayerVisualBinding>()), ("motor", host.GetComponent<PlayerCharacterControllerMotor>())))
+                    ("motor", host.GetComponent<PlayerCharacterControllerMotor>())))
                 return false;
             host.MasterPreset.CameraPreset.TryGetSettings(out PlayerCameraSettings settings, out _);
             Vector3 focus = (rig.Target != null ? rig.Target : host.transform).TransformPoint(settings.TargetOffset);
@@ -204,7 +191,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             PlayerCameraRig rig = host.GetComponent<PlayerCameraRig>();
             return component.gameObject == host.gameObject && (component is PlayerHost || component is CharacterController
                 || component is PlayerInput || component is PlayerInputBridge || component is PlayerCharacterControllerMotor
-                || component is PlayerVisualBinding || component is PlayerCameraRig)
+                || component is PlayerCameraRig)
                 || rig != null && rig.View != null && component.gameObject == rig.View.gameObject;
         }
 

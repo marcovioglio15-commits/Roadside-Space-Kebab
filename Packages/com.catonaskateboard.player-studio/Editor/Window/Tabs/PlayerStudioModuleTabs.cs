@@ -13,15 +13,11 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [Header("Tabs")]
         [Tooltip("Open module tabs; closing one does not discard its values.")]
         [SerializeField]
-        private int openMask = 63;
+        private int openMask = 31;
 
-        [Tooltip("Currently displayed module: Body, Locomotion, Visual, Input, Camera or Tools.")]
+        [Tooltip("Currently displayed module: Body, Locomotion, Input, Camera or Tools.")]
         [SerializeField]
         private int active;
-
-        [Tooltip("Visual section and handle preferences retained independently of its draft.")]
-        [SerializeField]
-        private PlayerVisualDraftView visualView = new PlayerVisualDraftView();
 
         [Tooltip("Collapsed subsections retained when tabs or the window are closed.")]
         [SerializeField]
@@ -37,7 +33,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             new GUIContent("Body", "Edit collision dimensions."),
             new GUIContent("Locomotion", "Edit movement, gravity and jump values."),
-            new GUIContent("Visual", "Edit model source, offsets and the scene binding."),
             new GUIContent("Input", "Select compatible actions by map and action name."),
             new GUIContent("Camera", "Configure the view, follow and movement orientation."),
             new GUIContent("Tools", "Configure manual tools, switching and visual slots.")
@@ -48,6 +43,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         #region Methods
 
         #region Visibility
+
+        /// <summary>Identifies the visible module before giving its controls ownership of preview handles.</summary>
+        /// <param name="index">Module index in the fixed tab order.</param>
+        /// <returns>True when this module is open and currently selected.</returns>
+        internal bool IsActive(int index)
+        {
+            return active == index && IsOpen(index);
+        }
 
         /// <summary>Reports whether a tab remains open without inspecting any preset values.</summary>
         /// <param name="index">Module index in the fixed tab order.</param>
@@ -124,10 +127,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             {
                 0 => state.Body.Source,
                 1 => state.Locomotion.Source,
-                2 => state.Visual.Source,
-                3 => state.Input.Source,
-                4 => state.Camera.Source,
-                5 => state.Tools.Source,
+                2 => state.Input.Source,
+                3 => state.Camera.Source,
+                4 => state.Tools.Source,
                 _ => null
             };
             if (source != null)
@@ -145,17 +147,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                             return PlayerBodyDraftView.Draw(state.Body, owner);
                     case 1 when state.Locomotion.Source != null || state.Locomotion.HasChanges:
                         return PlayerLocomotionDraftView.Draw(state.Locomotion, owner, sections);
-                    case 2:
-                        return visualView.Draw(state.Visual, state.VisualScene, owner);
-                    case 3 when state.Input.Source != null || state.Input.HasChanges:
+                    case 2 when state.Input.Source != null || state.Input.HasChanges:
                         return DrawModule(state.Input, owner, false);
-                    case 5 when state.Tools.Source != null || state.Tools.HasChanges:
+                    case 4 when state.Tools.Source != null || state.Tools.HasChanges:
                         return PlayerToolsControls.Draw(state, owner);
-                    case 4 when state.Camera.Source != null || state.Camera.HasChanges:
+                    case 3 when state.Camera.Source != null || state.Camera.HasChanges:
                         bool changed = DrawModule(state.Camera, owner, true);
                         if (sections.Draw("Camera.Binding", "Scene Binding"))
                             using (new EditorGUI.IndentLevelScope())
-                                changed |= state.CameraScene.Draw(owner);
+                                changed |= state.CameraScene.Draw(owner, PlayerCameraControls.UsesModel(state.Camera.GetEditor()));
                         return changed;
                     default:
                         EditorGUILayout.LabelField("Assign and apply this module's preset to edit it.", EditorStyles.wordWrappedLabel);
@@ -186,7 +186,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     using (new EditorGUI.IndentLevelScope())
                         PlayerPresetField.DrawAction(serialized, "jumpAction");
                 if (sections.Draw("Input.Tools", "Use Tool"))
-                    PlayerToolsControls.DrawInput(serialized);
+                    using (new EditorGUI.IndentLevelScope())
+                        PlayerToolsControls.DrawInput(serialized);
                 if (sections.Draw("Input.Camera", "Camera"))
                     using (new EditorGUI.IndentLevelScope())
                     {

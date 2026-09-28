@@ -92,6 +92,7 @@ GameObject:
   - component: {fileID: -223255509274549693}
   - component: {fileID: -4224281006891219117}
   - component: {fileID: 1082582575293119777}
+  - component: {fileID: 4226661555200800207}
   m_Layer: 6
   m_Name: PF_Test_BurgerBun
   m_TagString: HoverGrabTest
@@ -178,9 +179,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
   interactionName: First Person Hover
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -196,6 +197,39 @@ MonoBehaviour:
   label: {fileID: 459704337668838561}
   preset: {fileID: 11400000, guid: 6e20b92e59afa4d4aa7ccb3480766605, type: 2}
   drawGizmos: 1
+  configuration:
+    settings:
+      targetMode: 0
+      playerDistance: 3
+      centerRadius: 0.08
+      queryInterval: 0.05
+      obstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967291
+      anchorOffset: {x: 0, y: 0, z: 0}
+      worldOffset: {x: 0, y: 0.25, z: 0}
+      screenOffset: {x: 0, y: 35}
+      appearance: 1
+      duration: 0.18
+      startScale: 0.2
+    style:
+      content: Burger Bun
+      font: {fileID: 0}
+      fontSize: 24
+      fontStyle: 0
+      textColor: {r: 1, g: 1, b: 1, a: 1}
+      alignment: 4
+      richText: 1
+      horizontalOverflow: 0
+      verticalOverflow: 1
+      size: {x: 280, y: 64}
+      textSizeOffset: {x: -24, y: -12}
+      textOffset: {x: 0, y: 0}
+      sortingOrder: 20
+      showBackground: 1
+      backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
+      backgroundSprite: {fileID: 0}
+      backgroundType: 0
 --- !u!114 &5794248098843545310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,9 +243,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectGrab
   interactionName: Grab
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -262,9 +296,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDrop
   interactionName: Drop
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -306,9 +340,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectThrow
   interactionName: Throw
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -644,3 +678,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a829493c66c08ef46836574868dbb655, type: 3}
   m_PrefabInstance: {fileID: 5498311910069865581}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4226661555200800207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4593334166877187736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  flags:
+  - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}

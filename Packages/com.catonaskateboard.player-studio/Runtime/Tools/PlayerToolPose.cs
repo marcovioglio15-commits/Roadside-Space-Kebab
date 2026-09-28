@@ -30,7 +30,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         #region Sampling
 
-        /// <summary>Captures a child before a transition or an editor recording.</summary>
+        /// <summary>Captures a child before a transition.</summary>
         /// <param name="target">Transform whose local values are captured.</param>
         /// <returns>An independent value snapshot.</returns>
         public static PlayerToolPose Read(Transform target)
@@ -55,7 +55,7 @@ namespace CatOnASkateboard.PlayerStudio
         /// <returns>The sampled local pose.</returns>
         public static PlayerToolPose Interpolate(PlayerToolPose from, PlayerToolPose to, float amount)
         {
-            // Euler interpolation retains explicitly recorded multi-turn motion.
+            // Euler interpolation retains authored multi-turn motion.
             return new PlayerToolPose
             {
                 Position = Vector3.LerpUnclamped(from.Position, to.Position, amount),

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
-  m_Name: Jump
+  m_Name: Player/Jump
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
-  m_Asset: {fileID: -944628639613478452, guid: 9187905137d0d5d48b753d1747e40044, type: 3}
+  m_Asset: {fileID: -944628639613478452, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   m_ActionId: e9df8c74-16fd-4192-bf50-2c8c9ee6afd6

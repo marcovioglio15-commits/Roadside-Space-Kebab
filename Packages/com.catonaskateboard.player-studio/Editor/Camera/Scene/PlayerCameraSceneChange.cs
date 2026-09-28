@@ -24,6 +24,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             public readonly PlayerHost Host;
             public readonly Camera View;
             public readonly Transform Target;
+            public readonly Transform Model;
             public readonly PlayerCameraSettings Settings;
             public readonly bool Enabled;
 
@@ -33,14 +34,16 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             /// <param name="host">Player receiving the setup.</param>
             /// <param name="view">Existing camera or null for a new child.</param>
             /// <param name="target">Optional focus anchor.</param>
+            /// <param name="model">Optional child used for facing and visibility.</param>
             /// <param name="settings">Validated configuration snapshot.</param>
             /// <param name="enabled">Whether the master retains its camera module.</param>
-            public Operation(PlayerHost host, Camera view, Transform target, PlayerCameraSettings settings, bool enabled)
+            public Operation(PlayerHost host, Camera view, Transform target, Transform model, PlayerCameraSettings settings, bool enabled)
             {
                 // Immutable operation data cannot drift while preset values are being confirmed.
                 Host = host;
                 View = view;
                 Target = target;
+                Model = model;
                 Settings = settings;
                 Enabled = enabled;
             }
@@ -57,11 +60,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>Finds loaded players affected by a Camera preset, a slot change or an explicit scene setup.</summary>
         /// <param name="preset">Pending preset properties, or null for scene-only changes.</param>
         /// <param name="session">Selected camera setup proposal.</param>
-        /// <param name="visual">Visual setup whose changed binding must be reconnected after Apply.</param>
         /// <param name="change">Receives the validated plan.</param>
         /// <param name="warning">Receives the first incompatible scene reference.</param>
         /// <returns>True when camera writes can safely join Apply.</returns>
-        public static bool TryPrepare(PlayerPresetBatch preset, PlayerCameraSceneSession session, PlayerVisualSceneSession visual,
+        public static bool TryPrepare(PlayerPresetBatch preset, PlayerCameraSceneSession session,
             out PlayerCameraSceneChange change, out string warning)
         {
             // Discovery happens once per confirmation, never on each Editor repaint.
@@ -69,25 +71,18 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             warning = string.Empty;
             bool sceneDraft = session != null && session.HasChanges;
             if (sceneDraft && (!session.TryValidate(out warning)
-                || !change.TryAdd(session.Host, session.View, session.Target, preset, out warning)))
+                || !change.TryAdd(session.Host, session.View, session.Target, session.Model, preset, out warning)))
                 return false;
-            if (!sceneDraft && visual != null && visual.HasChanges && visual.Host != null)
-            {
-                PlayerCameraRig rig = visual.Host.GetComponent<PlayerCameraRig>();
-                if (rig != null && !change.TryAdd(visual.Host, rig.View, rig.Target, preset, out warning))
-                    return false;
-            }
             foreach (PlayerHost host in Object.FindObjectsByType<PlayerHost>(FindObjectsInactive.Include))
             {
                 if (host.MasterPreset == null || EditorUtility.IsPersistent(host) || !host.gameObject.scene.IsValid()
                     || EditorSceneManager.IsPreviewScene(host.gameObject.scene) || (sceneDraft && host == session.Host))
                     continue;
                 PlayerCameraRig rig = host.GetComponent<PlayerCameraRig>();
-                bool affected = preset.Affects(host.MasterPreset, "cameraPreset", host.MasterPreset.CameraPreset)
-                    || rig != null && preset.Affects(host.MasterPreset, "visualPreset", host.MasterPreset.VisualPreset);
+                bool affected = preset.Affects(host.MasterPreset, "cameraPreset", host.MasterPreset.CameraPreset);
                 if (!affected)
                     continue;
-                if (!change.TryAdd(host, rig != null ? rig.View : null, rig != null ? rig.Target : null, preset, out warning))
+                if (!change.TryAdd(host, rig != null ? rig.View : null, rig != null ? rig.Target : null, rig != null ? rig.Model : null, preset, out warning))
                     return false;
             }
             return true;
@@ -97,10 +92,11 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="host">Player whose camera will be configured.</param>
         /// <param name="view">Optional existing camera.</param>
         /// <param name="target">Optional focus anchor.</param>
+        /// <param name="model">Optional child used for facing and visibility.</param>
         /// <param name="preset">Pending asset included in the same Apply.</param>
         /// <param name="warning">Receives an incompatible reference or setting.</param>
         /// <returns>True when the operation was prepared or no Camera slot is assigned.</returns>
-        private bool TryAdd(PlayerHost host, Camera view, Transform target, PlayerPresetBatch preset, out string warning)
+        private bool TryAdd(PlayerHost host, Camera view, Transform target, Transform model, PlayerPresetBatch preset, out string warning)
         {
             // The camera must never move the player root, an asset transform or a target below itself.
             warning = string.Empty;
@@ -120,7 +116,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             PlayerCameraPreset source = preset.Slot(host.MasterPreset, "cameraPreset", host.MasterPreset.CameraPreset);
             if (source == null)
             {
-                operations.Add(new Operation(host, view, target, default, false));
+                operations.Add(new Operation(host, view, target, model, default, false));
                 return true;
             }
             PlayerCameraSettings settings;
@@ -131,7 +127,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 return false;
             if (!settings.TryValidate(out warning))
                 return false;
-            operations.Add(new Operation(host, view, target, settings, true));
+            if ((settings.ModelFacing != PlayerModelFacing.Authored
+                || settings.Mode == PlayerCameraMode.FirstPerson && settings.HideVisualInFirstPerson) && model != null && (model == host.transform || !model.IsChildOf(host.transform)
+                || view != null && view.transform.IsChildOf(model)))
+            {
+                warning = "Select a player child that does not contain its camera for model presentation.";
+                return false;
+            }
+            operations.Add(new Operation(host, view, target, model, settings, true));
             return true;
         }
 
@@ -172,7 +175,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     serialized.FindProperty("view").objectReferenceValue = view;
                     serialized.FindProperty("target").objectReferenceValue = operation.Target;
                     serialized.FindProperty("input").objectReferenceValue = operation.Host.GetComponent<PlayerInput>();
-                    serialized.FindProperty("visual").objectReferenceValue = operation.Host.GetComponent<PlayerVisualBinding>();
+                    serialized.FindProperty("model").objectReferenceValue = operation.Model;
                     serialized.FindProperty("motor").objectReferenceValue = operation.Host.GetComponent<PlayerCharacterControllerMotor>();
                     serialized.ApplyModifiedProperties();
                 }

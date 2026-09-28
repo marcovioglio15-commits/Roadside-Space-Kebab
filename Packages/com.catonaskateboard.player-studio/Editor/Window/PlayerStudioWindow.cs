@@ -29,7 +29,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private PlayerSynchronizationPrompt synchronization;
         private PlayerWorkspaceStore.Snapshot beforePlay;
         private bool shutdownSaved;
-        private PlayerVisualPreview visualPreview;
         private PlayerQuickPlayView quickPlayView;
         private PlayerPreviewNavigation navigation;
         private string operationWarning = string.Empty;
@@ -66,16 +65,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             window.synchronization?.Schedule();
         }
 
-        /// <summary>Opens a scene player's Visual tab without abandoning another unfinished proposal.</summary>
-        /// <param name="host">Scene player requested by its binding Inspector.</param>
-        internal static void OpenVisual(PlayerHost host)
-        {
-            // The existing selection guard reports pending work instead of replacing it.
-            PlayerStudioWindow window = GetWindow<PlayerStudioWindow>("Player Studio");
-            window.TryUsePlayer(host);
-            window.state.Modules.SetOpen(2, true);
-            window.Repaint();
-        }
+
 
         /// <summary>Initializes Unity's native viewport before restoring our session and subscriptions.</summary>
         public override void OnEnable()
@@ -107,9 +97,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             EditorApplication.playModeStateChanged += HandlePlayModeChanged;
             EditorApplication.projectChanged += RefreshSession;
             SceneView.duringSceneGui += DrawSceneDraft;
-            SceneView.duringSceneGui += DrawVisualPreview;
             EditorApplication.hierarchyChanged += HandleHierarchyChanged;
-            visualPreview = new PlayerVisualPreview();
             quickPlayView = new PlayerQuickPlayView(this);
         }
 
@@ -119,7 +107,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // UI construction occurs only in the Editor, once per window UI lifetime.
             workspace = new PlayerStudioWorkspace(rootVisualElement, DrawControls, DrawTransformControls, ApplyDraft, DiscardChanges,
                 TogglePreview, FramePlayer, EditTransform, ToggleModules, TogglePlacement, LoadDefaults, UseSelectedPlayer,
-                CreateDefaultPlayer, ToggleQuickPlay,
+                CreateDefaultPlayer, ToggleQuickPlay, () => synchronization?.StagePresets(),
                 state.ModulesOpen, state.PreviewOpen, () => quickPlayView?.Draw());
             recovery?.RestoreLayout(workspace);
             navigation?.Dispose();
@@ -139,16 +127,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             EditorApplication.playModeStateChanged -= HandlePlayModeChanged;
             EditorApplication.projectChanged -= RefreshSession;
             SceneView.duringSceneGui -= DrawSceneDraft;
-            SceneView.duringSceneGui -= DrawVisualPreview;
             EditorApplication.hierarchyChanged -= HandleHierarchyChanged;
-            visualPreview?.Dispose();
             quickPlayView?.Dispose();
             navigation?.Dispose();
             quickPlayView = null;
             state.Input.Dispose();
             state.Camera.Dispose();
             state.Tools.Dispose();
-            visualPreview = null;
             workspace = null;
             base.OnDisable();
         }
@@ -215,10 +200,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Closing this panel only changes presentation; pending pose values remain in the session.
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
             {
-                if (state.TransformView.Draw(state.Transform, state.Visual, state.VisualScene, this, out string warning))
+                if (state.TransformView.Draw(state.Transform, this))
                     HandleDraftChanged();
-                if (warning.Length > 0)
-                    operationWarning = warning;
             }
         }
 
@@ -227,7 +210,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Validation is event-driven and stays outside the navigation repaint loop.
             PlayerStudioStatus.Update(state, workspace, recovery?.IsBlocked ?? false,
-                operationWarning, visualPreview != null ? visualPreview.Warning : string.Empty);
+                operationWarning);
         }
 
         #endregion
@@ -342,10 +325,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (!state.PreviewOpen)
                 return;
 
-            if (!state.Recording.Enabled && state.TransformView.Pick(state.PreviewHost, state.VisualScene, state.Visual.Draft, state.Transform, visualPreview))
+            if (state.TransformView.Pick(state.PreviewHost, state.Transform))
                 Repaint();
-            if (state.Recording.Enabled ? state.Recording.DrawHandles(state, this)
-                : state.TransformView.DrawHandles(state.Transform, state.Visual, state.VisualScene, this))
+            if (state.TransformView.DrawHandles(state.Transform, this))
                 HandleDraftChanged();
         }
 
@@ -375,8 +357,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             Vector3 worldScale = state.Transform.WorldMatrix.lossyScale;
             float extent = Mathf.Max(Mathf.Abs(worldScale.x), Mathf.Abs(worldScale.y), Mathf.Abs(worldScale.z));
             Bounds bounds = new Bounds(state.Transform.WorldMatrix.MultiplyPoint3x4(settings.Center), Vector3.one * settings.Height * extent);
-            if (visualPreview != null && visualPreview.TryGetBounds(state.VisualScene, state.Visual.Draft, state.Transform.WorldMatrix, out Bounds visualBounds))
-                bounds.Encapsulate(visualBounds);
+            foreach (Renderer renderer in state.PreviewHost.GetComponentsInChildren<Renderer>(true))
+                if (renderer.enabled && renderer.gameObject.activeInHierarchy)
+                    bounds.Encapsulate(renderer.bounds);
             Frame(bounds, true);
             Repaint();
         }
@@ -402,17 +385,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 PlayerBodyWireGizmo.Draw(state.Transform.WorldMatrix, settings, hasDraft ? draftColor : appliedColor);
         }
 
-        /// <summary>Draws cached proposed meshes in the embedded viewport after its real scene.</summary>
-        /// <param name="view">Native scene view currently preparing to render.</param>
-        private void DrawVisualPreview(SceneView view)
-        {
-            // The applied model stays visible; only this camera receives the amber proposal.
-            if (view == this && state.PreviewOpen && !EditorApplication.isPlayingOrWillChangePlaymode
-                && Event.current.type == EventType.Repaint && state.VisualScene.Host != null
-                && (state.Visual.HasChanges || state.VisualScene.HasChanges || state.Transform.HasChanges || state.Recording.Enabled)
-                && state.Transform.TryValidateNumbers(out _))
-                visualPreview?.Draw(state.VisualScene, state.Visual.Draft, state.Transform.WorldMatrix, state.Recording);
-        }
+
 
         /// <summary>Checks that the chosen instance belongs to the current asset route.</summary>
         /// <returns>True when candidate geometry can be drawn at this player's position.</returns>
@@ -441,7 +414,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         }
 
         /// <summary>Updates pending presentation without changing assets or scene components.</summary>
-        private void HandleDraftChanged()
+        internal void HandleDraftChanged()
         {
             // Draft edits repaint the outline, not the CharacterController.
             operationWarning = string.Empty;
@@ -463,7 +436,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
 
             // All prepared properties join the same validated save boundary.
-            if (!PlayerPresetSaveUtility.TrySaveBatch(changes, state.Transform, state.VisualScene, state.CameraScene, out operationWarning))
+            if (!PlayerPresetSaveUtility.TrySaveBatch(changes, state.Transform, state.CameraScene, out operationWarning))
             {
                 UpdateActions();
                 return;
@@ -500,16 +473,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // All module and scene sessions leave the shared confirmation boundary together.
             state.Selection.Discard(state.Body, out operationWarning);
             state.Locomotion.Discard();
-            state.Visual.Discard();
-            state.VisualScene.Discard();
             state.Input.Discard();
             state.Camera.Discard();
             state.Tools.Discard();
             state.CameraScene.Discard();
             RefreshModules();
             state.Transform.Discard();
-            visualPreview?.Invalidate();
-            state.Recording.Invalidate();
             Undo.ClearUndo(this);
         }
 
@@ -550,8 +519,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     state.Transform.Open(state.PreviewHost);
             }
 
-            visualPreview?.Invalidate();
-            state.Recording.Invalidate();
             hasUnsavedChanges = false;
             UpdateActions();
             Repaint();
@@ -562,15 +529,11 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Asset and scene proposals share a context but keep separate ownership and conflicts.
             state.Locomotion.Refresh(state.Selection.Master);
-            state.Visual.Refresh(state.Selection.Master);
             state.Input.Refresh(state.Selection.Master != null ? state.Selection.Master.InputPreset : null);
             state.Camera.Refresh(state.Selection.Master != null ? state.Selection.Master.CameraPreset : null);
             state.Tools.Refresh(state.Selection.Master != null ? state.Selection.Master.ToolsPreset : null);
             if (!state.Camera.HasChanges && !state.Selection.MasterSession.HasChanges)
                 state.CameraScene.Refresh(state.Selection.Mode == PlayerStudioSourceMode.Master && state.PreviewHost != null
-                    && state.PreviewHost.MasterPreset == state.Selection.Master ? state.PreviewHost : null);
-            if (!state.Visual.HasChanges && !state.Selection.MasterSession.HasChanges)
-                state.VisualScene.Refresh(state.Selection.Mode == PlayerStudioSourceMode.Master && state.PreviewHost != null
                     && state.PreviewHost.MasterPreset == state.Selection.Master ? state.PreviewHost : null);
         }
 
@@ -598,9 +561,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             {
                 SaveWorkspace();
                 beforePlay = PlayerWorkspaceStore.Capture(state, this);
-                state.VisualScene.CaptureSceneReferences();
                 state.Transform.CaptureSceneReferences();
-                visualPreview?.Dispose();
             }
             else if (transition == PlayModeStateChange.EnteredEditMode)
             {
@@ -608,7 +569,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     state = PlayerWorkspaceStore.Restore(beforePlay, out operationWarning);
                 else
                     recovery?.Load(this, ref state);
-                state.VisualScene.RestoreSceneReferences();
                 state.Transform.RestoreSceneReferences();
                 state.PreviewHost = state.Transform.Source;
             }

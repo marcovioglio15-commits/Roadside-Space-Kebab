@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -50,7 +51,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         #region Lifecycle
 
-        /// <summary>Initializes after the existing visual binding and PlayerInput have completed Awake.</summary>
+        /// <summary>Initializes after PlayerInput have completed startup.</summary>
         private void Start()
         {
             // Resolve authored modules once, without creating runtime components or visuals.
@@ -140,8 +141,8 @@ namespace CatOnASkateboard.PlayerStudio
                 Debug.LogWarning(warning, this);
                 return;
             }
-            PlayerVisualBinding visual = GetComponent<PlayerVisualBinding>();
-            Transform model = visual != null && visual.Model != null ? visual.Model.transform : null;
+            Transform model = PlayerHierarchy.Resolve(transform, configuration.RootPath);
+            HashSet<Transform> moved = new HashSet<Transform>();
             targets = new Transform[configuration.Tools.Length];
             transitions = new PlayerToolSlotTransition[targets.Length];
             entrances = new PlayerToolAnimationRun[targets.Length];
@@ -151,23 +152,26 @@ namespace CatOnASkateboard.PlayerStudio
             for (int index = 0; index < targets.Length; index++)
             {
                 PlayerToolEntry entry = configuration.Tools[index];
-                targets[index] = entry.MoveVisual ? PlayerToolAnimationRun.Resolve(model, entry.Path) : null;
+                targets[index] = entry.MoveVisual ? PlayerHierarchy.Resolve(model, entry.Path) : null;
                 entrances[index] = new PlayerToolAnimationRun(entry.Tool.SwitchIn, model);
                 exits[index] = new PlayerToolAnimationRun(entry.Tool.SwitchOut, model);
-                if (entry.MoveVisual && targets[index] == null || !entrances[index].IsBound() || !exits[index].IsBound()
+                if (entry.MoveVisual && (targets[index] == null || targets[index] == transform)
+                    || !entrances[index].CollectTargets(moved, transform) || !exits[index].CollectTargets(moved, transform)
                     || configuration.Layout == PlayerToolLayout.Cyclic && targets[index] != null
                     && commonParent != null && targets[index].parent != commonParent)
                 {
-                    Debug.LogWarning("Tools need existing visual paths; cyclic visual children must share a parent.", this);
+                    Debug.LogWarning("Select existing tool children; cyclic slots need a common parent. The player root cannot be animated.", this);
                     return;
                 }
                 if (targets[index] != null)
                 {
+                    moved.Add(targets[index]);
                     commonParent = targets[index].parent;
                     hasSlots = true;
                 }
             }
-            modelChildren = model != null ? model.GetComponentsInChildren<Transform>(true) : Array.Empty<Transform>();
+            modelChildren = new Transform[moved.Count];
+            moved.CopyTo(modelChildren);
             original = new PlayerToolPose[modelChildren.Length];
             for (int index = 0; index < modelChildren.Length; index++)
                 original[index] = PlayerToolPose.Read(modelChildren[index]);

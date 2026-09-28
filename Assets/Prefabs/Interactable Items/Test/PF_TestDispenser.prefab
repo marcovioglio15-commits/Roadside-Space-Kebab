@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4248488884802301241}
   - component: {fileID: 1571920681258394874}
   - component: {fileID: 5438683417763415203}
+  - component: {fileID: 573242413944535872}
   m_Layer: 0
   m_Name: PF_TestDispenser
   m_TagString: Untagged
@@ -140,9 +141,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
   interactionName: Dispenser
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -185,9 +186,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContainer
   interactionName: Container
-  tagChange:
+  flagChange:
     Enabled: 0
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -211,11 +212,25 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
-    AllowedTags:
-    - HoverGrabTest
+    AllowedFlags:
+    - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
     Unlimited: 1
     Capacity: 10
     KeepVisible: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
     Spacing: {x: 0, y: 0.2, z: 0}
+--- !u!114 &573242413944535872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714663089715580423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  flags:
+  - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ModifyByContact Preset
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ContactModificationPreset
   Settings:
-    Tag: Untagged
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     ContactDuration: 1
     ContactTolerance: 0.02
     QueryInterval: 0.02

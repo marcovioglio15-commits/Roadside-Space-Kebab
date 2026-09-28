@@ -8035,10 +8035,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.MenuStudio.Runtime::CatOnASkateboard.MenuStudio.MenuInput
   Host: {fileID: 929879004907155742}
-  Pause: {fileID: -5550602042727835848, guid: ef8ccdc4c946c0b45a3ea2867b4cb742, type: 2}
-  Cancel: {fileID: 5232847957354171022, guid: ef8ccdc4c946c0b45a3ea2867b4cb742, type: 2}
-  PreviousTab: {fileID: -3697361809342859138, guid: ef8ccdc4c946c0b45a3ea2867b4cb742, type: 2}
-  NextTab: {fileID: -8305524655250662496, guid: ef8ccdc4c946c0b45a3ea2867b4cb742, type: 2}
+  Pause: {fileID: -9189422184425944451, guid: 555956dca2c71774c9ae3793f85fc02b, type: 2}
+  Cancel: {fileID: 5302569535910796963, guid: 555956dca2c71774c9ae3793f85fc02b, type: 2}
+  PreviousTab: {fileID: -1306782529263278776, guid: 555956dca2c71774c9ae3793f85fc02b, type: 2}
+  NextTab: {fileID: 3304585530405942168, guid: 555956dca2c71774c9ae3793f85fc02b, type: 2}
   CreditsClose: {fileID: 0}
 --- !u!1 &9090951355068410444
 GameObject:

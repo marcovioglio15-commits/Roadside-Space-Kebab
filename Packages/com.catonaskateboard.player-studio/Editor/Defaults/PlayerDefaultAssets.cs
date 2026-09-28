@@ -87,35 +87,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Reuse each asset independently; no personalized preset receives default values again.
             EnsureFolder(folder);
             EnsureFolder(folder + "/Presets");
-            EnsureFolder(folder + "/Input");
-            EnsureFolder(folder + "/Visual");
             EnsureFolder(folder + "/Player");
-            InputActionAsset actions = CreateActions(folder + "/Input/PlayerControls.inputactions");
             PlayerBodyPreset body = Preset<PlayerBodyPreset>(folder, "Body", null);
-            PlayerLocomotionPreset movement = Preset<PlayerLocomotionPreset>(folder, "Locomotion", value =>
-            {
-                using SerializedObject serialized = new SerializedObject(value);
-                serialized.FindProperty("useJump").boolValue = true;
-                serialized.ApplyModifiedPropertiesWithoutUndo();
-            });
-            GameObject capsule = CreateCapsule(folder + "/Visual");
-            PlayerVisualPreset visual = Preset<PlayerVisualPreset>(folder, "Visual",
-                value => PlayerCreationUtility.SetReferences(value, ("prefab", capsule)));
-            PlayerInputPreset input = Preset<PlayerInputPreset>(folder, "Input", value =>
-            {
-                // Names select only authored default content; runtime always resolves the stored action IDs.
-                PlayerCreationUtility.SetReferences(value,
-                    ("movementAction", CreateReference(actions, "Move", folder)),
-                    ("jumpAction", CreateReference(actions, "Jump", folder)),
-                    ("lookDeltaAction", CreateReference(actions, "LookDelta", folder)),
-                    ("lookRateAction", CreateReference(actions, "LookRate", folder)),
-                    ("cursorToggleAction", CreateReference(actions, "Cursor", folder)), ("tools.UseTool", CreateReference(actions, "UseTool", folder)));
-            });
-            PlayerCameraPreset camera = Preset<PlayerCameraPreset>(folder, "Camera", null);
+            Preset<PlayerLocomotionPreset>(folder, "Locomotion", null);
+            Preset<PlayerInputPreset>(folder, "Input", null);
+            Preset<PlayerCameraPreset>(folder, "Camera", null);
             PlayerToolsPreset tools = Preset<PlayerToolsPreset>(folder, "Tools", null);
+            // Input, locomotion and camera are assigned after the user selects their action roles.
             PlayerMasterPreset master = Preset<PlayerMasterPreset>(folder, "Master",
-                value => PlayerCreationUtility.SetReferences(value, ("bodyPreset", body), ("locomotionPreset", movement),
-                    ("visualPreset", visual), ("inputPreset", input), ("cameraPreset", camera), ("toolsPreset", tools)));
+                value => PlayerCreationUtility.SetReferences(value, ("bodyPreset", body), ("toolsPreset", tools)));
             string prefabPath = folder + "/Player/Player.prefab";
             if (!File.Exists(prefabPath))
             {
@@ -173,99 +153,11 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             return created;
         }
 
-        /// <summary>Creates an editable dedicated action asset with ordinary keyboard, mouse and gamepad bindings.</summary>
-        /// <param name="path">Destination input asset path.</param>
-        /// <returns>The imported asset, independent of project-wide actions.</returns>
-        private static InputActionAsset CreateActions(string path)
-        {
-            // Bindings are initial asset content; no runtime script assumes these action or control names.
-            if (!File.Exists(path))
-            {
-                InputActionAsset asset = ScriptableObject.CreateInstance<InputActionAsset>();
-                try
-                {
-                    InputActionMap map = asset.AddActionMap("Player");
-                    InputAction move = map.AddAction("Move", InputActionType.Value, expectedControlLayout: "Vector2");
-                    move.AddCompositeBinding("2DVector").With("Up", "<Keyboard>/w").With("Down", "<Keyboard>/s")
-                        .With("Left", "<Keyboard>/a").With("Right", "<Keyboard>/d");
-                    move.AddBinding("<Gamepad>/leftStick");
-                    InputAction jump = map.AddAction("Jump", InputActionType.Button, "<Keyboard>/space");
-                    jump.AddBinding("<Gamepad>/buttonSouth");
-                    map.AddAction("LookDelta", InputActionType.PassThrough, "<Mouse>/delta", expectedControlLayout: "Vector2");
-                    map.AddAction("LookRate", InputActionType.Value, "<Gamepad>/rightStick", expectedControlLayout: "Vector2");
-                    map.AddAction("Cursor", InputActionType.Button, "<Keyboard>/escape");
-                    InputAction useTool = map.AddAction("UseTool", InputActionType.Button, "<Keyboard>/tab");
-                    useTool.AddBinding("<Gamepad>/dpad/right");
-                    File.WriteAllText(path, asset.ToJson());
-                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
-                }
-                finally
-                {
-                    UnityEngine.Object.DestroyImmediate(asset);
-                }
-            }
-            InputActionAsset result = AssetDatabase.LoadAssetAtPath<InputActionAsset>(path);
-            return result != null ? result : throw new IOException("Cannot load input asset " + path);
-        }
 
-        /// <summary>Persists an action reference separately so preset fields retain its GUID identity.</summary>
-        /// <param name="asset">Dedicated default actions.</param>
-        /// <param name="name">Initial role name in the authored defaults.</param>
-        /// <param name="folder">Default collection root.</param>
-        /// <returns>Existing or newly created action reference.</returns>
-        private static InputActionReference CreateReference(InputActionAsset asset, string name, string folder)
-        {
-            // A personalized reference is reused even if its target action was renamed.
-            string path = folder + "/Input/" + name + ".asset";
-            InputActionReference reference = AssetDatabase.LoadAssetAtPath<InputActionReference>(path);
-            if (reference != null)
-                return reference;
-            if (File.Exists(path))
-                throw new IOException("An incompatible reference exists at " + path);
-            reference = InputActionReference.Create(asset.FindAction(name, true));
-            AssetDatabase.CreateAsset(reference, path);
-            return reference;
-        }
 
-        /// <summary>Creates a renderer-only capsule prefab and URP material when they are absent.</summary>
-        /// <param name="folder">Visual content folder.</param>
-        /// <returns>The default capsule prefab.</returns>
-        private static GameObject CreateCapsule(string folder)
-        {
-            // Existing geometry and materials are never changed by bootstrap.
-            string path = folder + "/Capsule.prefab";
-            GameObject existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-            if (existing != null)
-                return existing;
-            if (File.Exists(path))
-                throw new IOException("An incompatible prefab exists at " + path);
-            string materialPath = folder + "/Capsule.mat";
-            Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
-            if (material == null)
-            {
-                Shader shader = Shader.Find("Universal Render Pipeline/Lit");
-                if (shader == null || File.Exists(materialPath))
-                    throw new IOException("A URP Lit shader and a writable capsule material path are required.");
-                material = new Material(shader) { color = new Color(0.15f, 0.6f, 0.8f) };
-                AssetDatabase.CreateAsset(material, materialPath);
-            }
-            Scene scene = EditorSceneManager.NewPreviewScene();
-            try
-            {
-                GameObject capsule = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                SceneManager.MoveGameObjectToScene(capsule, scene);
-                UnityEngine.Object.DestroyImmediate(capsule.GetComponent<Collider>());
-                capsule.name = "Capsule";
-                capsule.transform.localPosition = new Vector3(0f, 0.9f, 0f);
-                capsule.transform.localScale = new Vector3(0.7f, 0.9f, 0.7f);
-                capsule.GetComponent<MeshRenderer>().sharedMaterial = material;
-                return PrefabUtility.SaveAsPrefabAsset(capsule, path);
-            }
-            finally
-            {
-                EditorSceneManager.ClosePreviewScene(scene);
-            }
-        }
+
+
+
 
         /// <summary>Creates only the missing directory segments through the Asset Database.</summary>
         /// <param name="path">Project-relative package content path.</param>

@@ -21,7 +21,7 @@ namespace CatOnASkateboard.PlayerStudio
         public PlayerTool Tool;
         [Tooltip("Move a visual child between slots when switching tools. Tools without models can leave this disabled.")]
         public bool MoveVisual;
-        [Tooltip("Path relative to the visual model. Empty selects the model root.")]
+        [Tooltip("Target selected below Hierarchy Root. Empty selects that root when it is a player child.")]
         public string Path = string.Empty;
         [Tooltip("Parking pose used by this tool in Independent layout.")]
         public PlayerToolPose PassivePose = PlayerToolPose.Identity;
@@ -34,6 +34,10 @@ namespace CatOnASkateboard.PlayerStudio
     public sealed class PlayerToolsPreset : ScriptableObject
     {
         #region Fields
+
+        [Header("Hierarchy")]
+        [Tooltip("Selected hierarchy root relative to the player. Tool targets and animation tracks are resolved below it. Empty uses the player hierarchy.")]
+        public string RootPath = string.Empty;
 
         [Header("Tools")]
         [Tooltip("Tools in cycling order. Each identity may appear only once.")]
@@ -106,6 +110,7 @@ namespace CatOnASkateboard.PlayerStudio
             bool moving = false;
             foreach (PlayerToolEntry entry in Tools)
             {
+                warning = "Assign unique tools, valid names and distinct visual paths with valid passive poses.";
                 if (entry == null || entry.Tool == null || !identities.Add(entry.Tool) || string.IsNullOrWhiteSpace(entry.Tool.DisplayName)
                     || entry.MoveVisual && (entry.Path == null || !paths.Add(entry.Path) || !entry.PassivePose.IsValid()))
                     return false;
@@ -119,6 +124,7 @@ namespace CatOnASkateboard.PlayerStudio
                 warning = "The initial tool must belong to this Tools preset.";
                 return false;
             }
+            warning = "Choose a supported layout, a valid active pose and a finite non-negative switch duration.";
             if (moving && (!float.IsFinite(SwitchDuration) || SwitchDuration < 0f
                 || Layout is not (PlayerToolLayout.Independent or PlayerToolLayout.Cyclic)
                 || Layout == PlayerToolLayout.Independent && !ActivePose.IsValid()))
