@@ -5,7 +5,7 @@
 			<value>vo_hellfury</value>
 		</property>
 		<property name="outputFormat">
-			<value>0</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{807a3375-aba1-4037-ab2a-aa58c7cb3e88}</destination>
@@ -28,6 +28,9 @@
 		<relationship name="timeline">
 			<destination>{0ceac232-5258-4162-99a5-279b2506feb9}</destination>
 		</relationship>
+		<relationship name="parameters">
+			<destination>{2e58dbe4-1e6c-4e71-8e26-c90eb4bd213c}</destination>
+		</relationship>
 		<relationship name="banks">
 			<destination>{879e4c69-6ef2-4e78-aae6-600f83204827}</destination>
 		</relationship>
@@ -38,6 +41,9 @@
 		</relationship>
 	</object>
 	<object class="MasterTrack" id="{bc514ecf-4b90-440a-9bb4-73dcc7386281}">
+		<relationship name="modules">
+			<destination>{26ea4083-19cb-48cd-a89a-a9a0f464770d}</destination>
+		</relationship>
 		<relationship name="mixerGroup">
 			<destination>{4b7ed27f-2146-44bd-8714-83a414b8f194}</destination>
 		</relationship>
@@ -60,6 +66,11 @@
 			<value>false</value>
 		</property>
 	</object>
+	<object class="ActionSheet" id="{2e58dbe4-1e6c-4e71-8e26-c90eb4bd213c}">
+		<relationship name="modules">
+			<destination>{26ea4083-19cb-48cd-a89a-a9a0f464770d}</destination>
+		</relationship>
+	</object>
 	<object class="EventMixerMaster" id="{4b7ed27f-2146-44bd-8714-83a414b8f194}">
 		<relationship name="effectChain">
 			<destination>{1af7e94d-d553-40e3-ac4e-3a4500d57d66}</destination>
@@ -69,6 +80,11 @@
 		</relationship>
 		<relationship name="mixer">
 			<destination>{1f65332b-2ec0-4022-98fb-150df82f0bc2}</destination>
+		</relationship>
+	</object>
+	<object class="MultiSound" id="{26ea4083-19cb-48cd-a89a-a9a0f464770d}">
+		<relationship name="sounds">
+			<destination>{308688c8-6b64-4a88-afe6-9302d4d2455e}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusEffectChain" id="{2da9d81a-4490-413d-ba22-4e21d1b7fe5a}">
@@ -83,6 +99,49 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{10caeb7a-a215-4a59-96de-a8cfc50ae54f}" />
+	<object class="MultiSound" id="{308688c8-6b64-4a88-afe6-9302d4d2455e}">
+		<property name="playlistMode">
+			<value>1</value>
+		</property>
+		<relationship name="sounds">
+			<destination>{09a911ac-8909-423f-8aea-d2d4a437891e}</destination>
+			<destination>{313831df-9424-44f4-9092-45eff476f8b4}</destination>
+			<destination>{399b44d8-cc00-40e1-90e7-089f68931339}</destination>
+			<destination>{ab4ee5a0-438d-46f3-a74e-52cbe0c829d0}</destination>
+			<destination>{5f3f8f26-6a6f-499a-b84f-7da759535a2e}</destination>
+			<destination>{d9fa2ead-e2fc-4ec4-a799-d86d9480285c}</destination>
+		</relationship>
+	</object>
 	<object class="MixerBusFader" id="{cba7977d-d960-4ad4-99cf-cff79eaeb960}" />
 	<object class="MixerBusFader" id="{e042c413-18bb-4aac-84a7-5ef87c4f31df}" />
+	<object class="SingleSound" id="{09a911ac-8909-423f-8aea-d2d4a437891e}">
+		<relationship name="audioFile">
+			<destination>{f470021f-ff7a-4e97-9720-8e3898d658be}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{313831df-9424-44f4-9092-45eff476f8b4}">
+		<relationship name="audioFile">
+			<destination>{82caf603-218d-434a-bd49-4c03e13c711f}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{399b44d8-cc00-40e1-90e7-089f68931339}">
+		<relationship name="audioFile">
+			<destination>{7a48e532-f840-449d-aab3-ebf2f09711d0}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{ab4ee5a0-438d-46f3-a74e-52cbe0c829d0}">
+		<relationship name="audioFile">
+			<destination>{44e912d8-acf9-4fd5-b7d2-fcf3eb6f1e7e}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{5f3f8f26-6a6f-499a-b84f-7da759535a2e}">
+		<relationship name="audioFile">
+			<destination>{43b52517-4a07-4403-bdcb-37076d012738}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{d9fa2ead-e2fc-4ec4-a799-d86d9480285c}">
+		<relationship name="audioFile">
+			<destination>{1734b930-741d-465c-a0f1-c1483ce19212}</destination>
+		</relationship>
+	</object>
 </objects>
