@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{80ce85cb-58c8-4ca6-92b1-a668af50a65e}">
+		<property name="assetPath">
+			<value>wrapping.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>24</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>1.1759999999999999</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{359d9595-c1bc-4cbe-a8a4-1c0bf4b7f9a7}</destination>
+		</relationship>
+	</object>
+</objects>

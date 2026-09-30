@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{b611c595-d8a7-4589-bdd6-484af8fbad2e}">
+		<property name="assetPath">
+			<value>frying.wav</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>32.042666666666669</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{359d9595-c1bc-4cbe-a8a4-1c0bf4b7f9a7}</destination>
+		</relationship>
+	</object>
+</objects>

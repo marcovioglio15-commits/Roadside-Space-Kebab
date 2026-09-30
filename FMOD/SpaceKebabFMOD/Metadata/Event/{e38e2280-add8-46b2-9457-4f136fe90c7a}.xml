@@ -5,7 +5,7 @@
 			<value>vo_fishy</value>
 		</property>
 		<property name="outputFormat">
-			<value>0</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{807a3375-aba1-4037-ab2a-aa58c7cb3e88}</destination>
@@ -28,6 +28,9 @@
 		<relationship name="timeline">
 			<destination>{7cd01ade-bf12-43c7-aca6-5a0a861cb904}</destination>
 		</relationship>
+		<relationship name="parameters">
+			<destination>{0609f9af-459c-4e0d-a29a-7a967929a2cb}</destination>
+		</relationship>
 		<relationship name="banks">
 			<destination>{879e4c69-6ef2-4e78-aae6-600f83204827}</destination>
 		</relationship>
@@ -38,6 +41,9 @@
 		</relationship>
 	</object>
 	<object class="MasterTrack" id="{4b1dfacb-5e58-44db-a357-ab9a0d5605ed}">
+		<relationship name="modules">
+			<destination>{c975a1b7-9404-48ff-8f3f-d80d6b70e3b3}</destination>
+		</relationship>
 		<relationship name="mixerGroup">
 			<destination>{9f46bc58-fbb4-4dfa-98b0-a416f76b6022}</destination>
 		</relationship>
@@ -60,6 +66,11 @@
 			<value>false</value>
 		</property>
 	</object>
+	<object class="ActionSheet" id="{0609f9af-459c-4e0d-a29a-7a967929a2cb}">
+		<relationship name="modules">
+			<destination>{c975a1b7-9404-48ff-8f3f-d80d6b70e3b3}</destination>
+		</relationship>
+	</object>
 	<object class="EventMixerMaster" id="{9f46bc58-fbb4-4dfa-98b0-a416f76b6022}">
 		<relationship name="effectChain">
 			<destination>{362bd081-8558-4d7c-9b4b-f84853bd312e}</destination>
@@ -69,6 +80,11 @@
 		</relationship>
 		<relationship name="mixer">
 			<destination>{da891d29-3eec-4f37-9ba0-85fb981df835}</destination>
+		</relationship>
+	</object>
+	<object class="MultiSound" id="{c975a1b7-9404-48ff-8f3f-d80d6b70e3b3}">
+		<relationship name="sounds">
+			<destination>{a07ac00b-d56a-4b5d-b718-9ddabe33d1e6}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusEffectChain" id="{36f60d1b-77fd-4077-80d3-d4b7bfb5ee5b}">
@@ -83,6 +99,49 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{69f8aced-f9ec-412f-9301-a5a2b5a0c5b8}" />
+	<object class="MultiSound" id="{a07ac00b-d56a-4b5d-b718-9ddabe33d1e6}">
+		<property name="playlistMode">
+			<value>1</value>
+		</property>
+		<relationship name="sounds">
+			<destination>{c46380a1-13f8-4484-84e5-78c4740e97f8}</destination>
+			<destination>{e04456e5-addd-4b0f-912f-c979ee54d621}</destination>
+			<destination>{547798e3-7ff2-4bb3-b8e7-e0ef29996902}</destination>
+			<destination>{dd1c7809-e5ee-44e7-bdc7-e1e405158071}</destination>
+			<destination>{372521d5-82c1-4ecc-91a9-3a1f49a4718b}</destination>
+			<destination>{21c9ae82-1072-440b-8555-22da7b148d85}</destination>
+		</relationship>
+	</object>
 	<object class="MixerBusFader" id="{895ab0a5-51d5-4929-8690-c420c409aa72}" />
 	<object class="MixerBusFader" id="{bb57bc2a-8bdd-4832-9f1d-092ef301e731}" />
+	<object class="SingleSound" id="{c46380a1-13f8-4484-84e5-78c4740e97f8}">
+		<relationship name="audioFile">
+			<destination>{f470021f-ff7a-4e97-9720-8e3898d658be}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{e04456e5-addd-4b0f-912f-c979ee54d621}">
+		<relationship name="audioFile">
+			<destination>{82caf603-218d-434a-bd49-4c03e13c711f}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{547798e3-7ff2-4bb3-b8e7-e0ef29996902}">
+		<relationship name="audioFile">
+			<destination>{7a48e532-f840-449d-aab3-ebf2f09711d0}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{dd1c7809-e5ee-44e7-bdc7-e1e405158071}">
+		<relationship name="audioFile">
+			<destination>{44e912d8-acf9-4fd5-b7d2-fcf3eb6f1e7e}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{372521d5-82c1-4ecc-91a9-3a1f49a4718b}">
+		<relationship name="audioFile">
+			<destination>{43b52517-4a07-4403-bdcb-37076d012738}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{21c9ae82-1072-440b-8555-22da7b148d85}">
+		<relationship name="audioFile">
+			<destination>{1734b930-741d-465c-a0f1-c1483ce19212}</destination>
+		</relationship>
+	</object>
 </objects>

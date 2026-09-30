@@ -121,6 +121,12 @@
 		<property name="start">
 			<value>2</value>
 		</property>
+		<property name="pitch">
+			<value>-2.60000014</value>
+		</property>
+		<relationship name="sounds">
+			<destination>{71ea5e71-7d42-4002-bd85-8e44e0859f7a}</destination>
+		</relationship>
 	</object>
 	<object class="MultiSound" id="{7944ed1c-a319-48f0-b538-ca7337e19c31}">
 		<property name="start">
@@ -137,7 +143,11 @@
 			<destination>{0bb33db3-51df-4ca4-888a-27e2b23c8ab7}</destination>
 		</relationship>
 	</object>
-	<object class="MultiSound" id="{04bab918-5769-47d9-9803-5779bf4a4b97}" />
+	<object class="MultiSound" id="{04bab918-5769-47d9-9803-5779bf4a4b97}">
+		<relationship name="sounds">
+			<destination>{ae5fdb4e-b5e9-4a0b-9555-89e749b5595b}</destination>
+		</relationship>
+	</object>
 	<object class="EventMixerGroup" id="{fd3dfbb0-786f-4b12-85b2-0ba136afc960}">
 		<property name="name">
 			<value>FOOD</value>
@@ -184,6 +194,14 @@
 	</object>
 	<object class="MixerBusPanner" id="{fd0b9f6f-9a7e-4d54-8853-ab4a9bfbf46b}" />
 	<object class="MixerBusFader" id="{88c543b1-2c9c-45ce-9169-beb121fd87e4}" />
+	<object class="SingleSound" id="{71ea5e71-7d42-4002-bd85-8e44e0859f7a}">
+		<property name="startOffset">
+			<value>37.5</value>
+		</property>
+		<relationship name="audioFile">
+			<destination>{ed0f11c9-269f-4c8c-8d98-e997f139c5f3}</destination>
+		</relationship>
+	</object>
 	<object class="SingleSound" id="{f99c7b00-a65f-4464-9f66-21bb7721102d}">
 		<relationship name="audioFile">
 			<destination>{750b9fb1-f443-4e43-9a8d-f99afe803a49}</destination>
@@ -192,6 +210,11 @@
 	<object class="SingleSound" id="{0bb33db3-51df-4ca4-888a-27e2b23c8ab7}">
 		<relationship name="audioFile">
 			<destination>{9c368c3e-8fa7-4a12-9134-a8143419a6ab}</destination>
+		</relationship>
+	</object>
+	<object class="SingleSound" id="{ae5fdb4e-b5e9-4a0b-9555-89e749b5595b}">
+		<relationship name="audioFile">
+			<destination>{ed0f11c9-269f-4c8c-8d98-e997f139c5f3}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusEffectChain" id="{1da95195-2385-475b-bcfc-78b67b6b8f92}">
