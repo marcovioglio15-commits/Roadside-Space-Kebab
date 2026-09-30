@@ -62,7 +62,11 @@
 			<destination>{17719153-f2c4-4a4e-81b8-a08a0e58c69e}</destination>
 		</relationship>
 	</object>
-	<object class="EventAutomatableProperties" id="{854f206b-5e40-4e07-8fad-c61fe27ccd0b}" />
+	<object class="EventAutomatableProperties" id="{854f206b-5e40-4e07-8fad-c61fe27ccd0b}">
+		<property name="maximumDistance">
+			<value>7.20000029</value>
+		</property>
+	</object>
 	<object class="MarkerTrack" id="{cd539335-23e2-486c-9c4f-ad65fe660b5b}" />
 	<object class="GroupTrack" id="{80d3f298-b990-4794-98a7-b3d332c7fd34}">
 		<relationship name="modules">
@@ -253,6 +257,7 @@
 	<object class="MixerBusEffectChain" id="{c1f9b280-9b71-4c6d-83ad-5d6547921bc6}">
 		<relationship name="effects">
 			<destination>{7fb13eb8-dc28-4afd-a415-40094eba827e}</destination>
+			<destination>{bea46885-a38e-48db-8713-935c4cd34ba5}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{19cb14f0-b505-4efd-9942-0778d4af2a6d}" />
@@ -306,6 +311,11 @@
 	</object>
 	<object class="MixerBusPanner" id="{8351a475-db87-43a3-9483-6aeb438066ad}" />
 	<object class="MixerBusFader" id="{7fb13eb8-dc28-4afd-a415-40094eba827e}" />
+	<object class="ObjectSpatialiserEffect" id="{bea46885-a38e-48db-8713-935c4cd34ba5}">
+		<property name="distanceRolloffType">
+			<value>2</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{f11a7711-eb41-4877-8102-3b78fe6a10d5}" />
 	<object class="AutomationCurve" id="{e649be74-985a-4720-8d3f-211e453174ce}">
 		<relationship name="parameter">
@@ -335,7 +345,7 @@
 		</relationship>
 		<relationship name="automationPoints">
 			<destination>{0f619be2-ed84-49b3-b63c-51be520d6db0}</destination>
-			<destination>{3f8a763d-f4d7-410e-96ed-35c9c2349229}</destination>
+			<destination>{76cb30f9-e74e-4626-a37a-f09c4a35fd29}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{d02fce3a-a481-460a-8aa8-590d7ce67de4}" />
@@ -410,12 +420,12 @@
 			<value>1</value>
 		</property>
 	</object>
-	<object class="AutomationPoint" id="{3f8a763d-f4d7-410e-96ed-35c9c2349229}">
+	<object class="AutomationPoint" id="{76cb30f9-e74e-4626-a37a-f09c4a35fd29}">
 		<property name="position">
 			<value>3</value>
 		</property>
 		<property name="value">
-			<value>10</value>
+			<value>-4</value>
 		</property>
 	</object>
 </objects>
