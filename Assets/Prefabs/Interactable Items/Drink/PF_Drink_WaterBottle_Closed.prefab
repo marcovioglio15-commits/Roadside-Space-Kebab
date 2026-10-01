@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: -7135031244868547612}
   - component: {fileID: -3582026367845979599}
   - component: {fileID: 1951258988951912284}
+  - component: {fileID: 3585783198264507268}
   m_Layer: 6
   m_Name: PF_Drink_WaterBottle_Closed
   m_TagString: Untagged
@@ -348,6 +349,69 @@ MonoBehaviour:
       backgroundSprite: {fileID: 0}
       backgroundType: 0
   drawGizmos: 1
+--- !u!114 &3585783198264507268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494145750488431442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a68a7c4e18344f0bfc3dc31f84eb5f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectSlice
+  interactionName: Slice
+  toolRequirement:
+    Mode: 2
+    Tool: {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 4916453b18944954890fae4c95d78d77, type: 2}
+  drawGizmos: 1
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 55
+      DrawGizmos: 1
+    Priority: 99
+    Contact:
+      Enabled: 0
+      Flags:
+      - {fileID: 11400000, guid: 502cd1abface4603a56e2231e33003ff, type: 2}
+      Match: 0
+      Tolerance: 0.1
+      IncludeTriggers: 1
+    Interval: 0.15
+    Steps:
+    - Name: Slice 1
+      Consume: 1
+      Meshes: []
+      Materials: []
+      Spawns:
+      - Prefab: {fileID: 3211498181490116140, guid: 78551beb0bb414247b3f6fc42c20f155, type: 3}
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+  action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!1 &4627893161434961247
 GameObject:
   m_ObjectHideFlags: 0

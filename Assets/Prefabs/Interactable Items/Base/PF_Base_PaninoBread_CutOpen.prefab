@@ -156,7 +156,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Burger
+  m_Text: Bread
 --- !u!1 &2615674392044304233
 GameObject:
   m_ObjectHideFlags: 0
@@ -485,7 +485,7 @@ MonoBehaviour:
       duration: 0.18
       startScale: 0.2
     style:
-      content: Burger
+      content: Bread
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0
