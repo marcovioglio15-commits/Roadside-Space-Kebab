@@ -20,6 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly System.Random random;
         private GameObject instance;
         private ObjectInteraction completion;
+        private ObjectDialogue arrivalDialogue;
         private SpawnFlowStep step;
         private SpawnFlowMotion motion;
         private SuspendedItemState suspended;
@@ -190,15 +191,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     {
                         phase = Phase.Waiting;
                         suspended.Restore();
+                        arrivalDialogue?.RequestArrival(step.NewCustomerSound);
                     }
                     break;
                 case Phase.Waiting:
                     if (!signaled)
                         return;
-                    suspended = new SuspendedItemState(instance);
+                    suspended = new SuspendedItemState(instance, true);
                     suspended.Suspend();
                     motion.Begin(step.WalkOut);
-                    instance.SetActive(true);
+                    suspended.Reveal();
                     phase = Phase.Departure;
                     break;
                 case Phase.Departure:
@@ -226,17 +228,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             completion = generated[index];
+            // Match the independent arrival component before any activation callback can run.
+            if (step.ArrivalDialogueEnabled)
+            {
+                index = Array.IndexOf(original, step.ArrivalDialogue);
+                arrivalDialogue = index >= 0 && index < generated.Length ? generated[index] as ObjectDialogue : null;
+                arrivalDialogue?.ConfigureArrival();
+            }
             motion = new SpawnFlowMotion(instance.transform);
             if (step.WalkIn.Enabled)
             {
-                suspended = new SuspendedItemState(instance);
+                suspended = new SuspendedItemState(instance, true);
                 suspended.Suspend();
                 motion.Begin(step.WalkIn);
                 phase = Phase.Arrival;
             }
             else
                 phase = Phase.Waiting;
-            instance.SetActive(true);
+            if (suspended != null)
+                suspended.Reveal();
+            else
+                instance.SetActive(true);
+            if (!step.WalkIn.Enabled)
+                arrivalDialogue?.RequestArrival(step.NewCustomerSound);
         }
 
         /// <summary>Records only the selected component's successful completion on the current clone.</summary>
@@ -313,6 +327,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             instance = null;
             completion = null;
+            arrivalDialogue = null;
             suspended = null;
             motion = null;
         }

@@ -50,7 +50,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             for (int index = 0; index < animation.Keyframes.Length; index++)
             {
                 SpawnFlowKeyframe frame = animation.Keyframes[index];
-                Vector3 point = origin + orientation * frame.Pose.Position;
+                Vector3 point = animation.Space == SpawnFlowSpace.World ? frame.Pose.Position : origin + orientation * frame.Pose.Position;
                 Handles.DrawDottedLine(previous, point, 4f);
                 Handles.SphereHandleCap(0, point, Quaternion.identity, size, EventType.Repaint);
                 Handles.Label(point + Vector3.up * size, (index + 1) + " · " + frame.Duration.ToString("0.##") + " s");

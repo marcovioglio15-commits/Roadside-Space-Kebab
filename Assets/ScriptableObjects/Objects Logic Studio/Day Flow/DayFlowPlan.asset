@@ -23,13 +23,17 @@ MonoBehaviour:
     Steps:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
-      Completion: {fileID: 5254269728490429368, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Completion: {fileID: 1048780206782002216, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      ArrivalDialogueEnabled: 1
+      ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 90, z: 0}
       WalkIn:
         Enabled: 1
+        Space: 1
         Keyframes:
         - Pose:
             Position: {x: 3, y: 0.99, z: -5.073}
@@ -40,6 +44,7 @@ MonoBehaviour:
           Direction: 1
       WalkOut:
         Enabled: 1
+        Space: 1
         Keyframes:
         - Pose:
             Position: {x: 6, y: 0.99, z: -5.073}
@@ -58,13 +63,17 @@ MonoBehaviour:
     Steps:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
-      Completion: {fileID: 5254269728490429368, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Completion: {fileID: 1048780206782002216, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      ArrivalDialogueEnabled: 1
+      ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: -1.053, y: 0.99, z: -5.073}
       Rotation: {x: 0, y: 0, z: 0}
       WalkIn:
         Enabled: 1
+        Space: 1
         Keyframes:
         - Pose:
             Position: {x: 3, y: 0.99, z: -5.073}
@@ -75,6 +84,7 @@ MonoBehaviour:
           Direction: 1
       WalkOut:
         Enabled: 1
+        Space: 1
         Keyframes:
         - Pose:
             Position: {x: 6, y: 0.99, z: -5.073}

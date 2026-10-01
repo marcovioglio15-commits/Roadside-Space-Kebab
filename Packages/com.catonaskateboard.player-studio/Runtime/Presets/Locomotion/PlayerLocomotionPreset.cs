@@ -55,6 +55,10 @@ namespace CatOnASkateboard.PlayerStudio
         [SerializeField]
         private float coyoteTime = 0.1f;
 
+        [Header("Audio")]
+        [Tooltip("Grounded footsteps, surface layers and body-impact sounds.")]
+        public PlayerAudioSettings Audio = new PlayerAudioSettings();
+
         #endregion
 
         #region Methods
@@ -85,6 +89,8 @@ namespace CatOnASkateboard.PlayerStudio
         {
             // Leave the original numbers available for an explicit correction.
             if (!TryGetSettings(out _, out string warning))
+                Debug.LogWarning(warning, this);
+            if (Audio != null && !Audio.TryValidate(out warning))
                 Debug.LogWarning(warning, this);
         }
 

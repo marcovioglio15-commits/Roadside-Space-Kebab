@@ -1,5 +1,8 @@
 {
   "name": "CatOnASkateboard.PlayerStudio.Runtime",
   "rootNamespace": "CatOnASkateboard.PlayerStudio",
-  "references": ["Unity.InputSystem"]
+  "references": [
+    "Unity.InputSystem",
+    "CatOnASkateboard.AudioStudio.Runtime"
+  ]
 }

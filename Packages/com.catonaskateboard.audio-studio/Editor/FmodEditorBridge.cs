@@ -142,7 +142,8 @@ namespace CatOnASkateboard.AudioStudio.Editor
                             Minimum = Convert.ToSingle(Read(parameter.GetType(), parameter, "Min")),
                             Maximum = Convert.ToSingle(Read(parameter.GetType(), parameter, "Max")),
                             Default = Convert.ToSingle(Read(parameter.GetType(), parameter, "Default")),
-                            Global = Read(parameter.GetType(), parameter, "IsGlobal") is bool global && global
+                            Global = Read(parameter.GetType(), parameter, "IsGlobal") is bool global && global,
+                            Labels = Read(parameter.GetType(), parameter, "Labels") as string[] ?? Array.Empty<string>()
                         });
                 result.Add(entry);
             }
@@ -162,18 +163,51 @@ namespace CatOnASkateboard.AudioStudio.Editor
         {
             // Only release the audition owned by this workspace, never other FMOD browser previews.
             Stop();
-            if (!Available || entry.Source == null)
+            if (!Available || entry == null)
                 return "Preview needs the official FMOD integration and built banks for this event.";
             try
             {
+                // Refresh the descriptor at audition time; a catalog may predate a bank rebuild.
+                object source = Invoke(managerType, "EventFromPath", entry.Path);
+                if (source == null)
+                    return "Build and refresh the banks containing " + entry.Path + " before previewing it.";
                 Invoke(utilitiesType, "LoadPreviewBanks");
-                preview = Invoke(utilitiesType, "PreviewEvent", entry.Source, parameters, volume, 0f);
+                preview = Invoke(utilitiesType, "PreviewEvent", source, parameters, volume, 0f);
+                if (preview == null || !(preview.GetType().GetMethod("isValid").Invoke(preview, null) is true))
+                {
+                    Stop();
+                    return "FMOD could not create the preview voice. Refresh its banks and check the Console.";
+                }
+                // 3D events require orthogonal forward/up vectors, even for an audition at the listener.
+                MethodInfo placement = preview.GetType().GetMethod("set3DAttributes");
+                object pose = Activator.CreateInstance(placement.GetParameters()[0].ParameterType);
+                SetAxis(pose, "forward", "z");
+                SetAxis(pose, "up", "y");
+                object result = placement.Invoke(preview, new[] { pose });
+                if (result.ToString() != "OK")
+                {
+                    Stop();
+                    return "Preview placement failed: " + result;
+                }
                 return "Previewing " + entry.Path;
             }
             catch (Exception exception)
             {
                 return "Preview: " + exception.GetBaseException().Message;
             }
+        }
+
+        /// <summary>Sets a unit axis on an SDK pose using its supported public value fields.</summary>
+        /// <param name="pose">Editor-only native attributes value.</param>
+        /// <param name="direction">Forward or up member.</param>
+        /// <param name="axis">Unit vector component.</param>
+        private static void SetAxis(object pose, string direction, string axis)
+        {
+            // Boxed structs must be assigned back after editing their public vector field.
+            FieldInfo field = pose.GetType().GetField(direction);
+            object vector = field.GetValue(pose);
+            vector.GetType().GetField(axis).SetValue(vector, 1f);
+            field.SetValue(pose, vector);
         }
 
         /// <summary>Stops and releases only the current Audio Studio audition.</summary>

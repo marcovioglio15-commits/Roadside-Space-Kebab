@@ -86,6 +86,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (sections.Draw("Item Value", "Configure recipe and consumption units represented by one object."))
                 using (new EditorGUI.IndentLevelScope())
                     Field(grab, "Units");
+            if (sections.Draw("Item Audio", "Pickup and collision sounds after the first grab."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(grab, "PickupSound");
+                    SerializedProperty audio = grab.FindPropertyRelative("CollisionAudio");
+                    Field(audio, "Enabled");
+                    if (audio.FindPropertyRelative("Enabled").boolValue)
+                    {
+                        Field(audio, "MinimumSpeed");
+                        Field(audio, "Cooldown");
+                    }
+                }
             if (!sections.Draw("Carry", "Configure the held pose, pickup transition, world collisions and hover visibility."))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
@@ -160,6 +172,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Field(trajectory, "Yaw");
             Field(trajectory, "Elevation");
             Field(trajectory, "Spin");
+            Field(trajectory, "Sound");
         }
 
         /// <summary>Uses native tooltips and full vector controls for one serialized setting.</summary>

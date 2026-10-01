@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
+    /// <summary>Chooses offsets in the spawn frame or absolute scene coordinates.</summary>
+    public enum SpawnFlowSpace { Relative, World }
+
     /// <summary>Owns one prefab's placement, interaction completion and arrival/departure keyframes.</summary>
     [Serializable]
     public sealed class SpawnFlowStep
@@ -17,6 +20,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public GameObject Prefab;
         [Tooltip("Interaction on this prefab whose successful completion starts departure. Dialogue must finish its final page; interruption does not count.")]
         public ObjectInteraction Completion;
+        [Tooltip("Request a separate dialogue after arrival, without a start action, distance or sight requirement.")]
+        public bool ArrivalDialogueEnabled;
+        [Tooltip("Dialogue component on this prefab to request once after walk-in. Its advance action still controls pages.")]
+        public ObjectDialogue ArrivalDialogue;
+        [Tooltip("Play the configured new-customer sound when the arrival dialogue actually opens.")]
+        public bool NewCustomerSound;
         [Tooltip("Relative chance used only by Weighted Random selection.")]
         public float Weight = 1f;
         [Tooltip("Scaled seconds to wait before creating this step's instance.")]
@@ -49,6 +58,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (Transform branch = Completion.transform; branch != null; branch = branch.parent)
                 if (!branch.gameObject.activeSelf)
                     return false;
+            // Automatic arrival dialogue still belongs to the same generated prefab instance.
+            if (ArrivalDialogueEnabled && (ArrivalDialogue == null || !ArrivalDialogue.enabled
+                || !ArrivalDialogue.transform.IsChildOf(Prefab.transform)))
+            {
+                warning = "Choose an enabled arrival dialogue on the selected prefab.";
+                return false;
+            }
             warning = "Use finite placement, a nonnegative delay and a nonnegative selection weight.";
             if (!InteractionValues.Finite(Position) || !InteractionValues.Finite(Rotation)
                 || !SpawnFlowPlan.Duration(Delay) || !SpawnFlowPlan.Duration(Weight))
@@ -70,6 +86,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Walk Path")]
         [Tooltip("Run these keyframes while the object's interactions and physics are suspended.")]
         public bool Enabled;
+        [Tooltip("World uses exact scene positions and rotations. Relative uses offsets rotated by the spawn orientation and scale multipliers.")]
+        public SpawnFlowSpace Space;
         [Tooltip("Ordered destinations. Each Duration is travel time from the preceding pose, after its Delay. A zero-duration first frame sets an explicit starting pose.")]
         public SpawnFlowKeyframe[] Keyframes = Array.Empty<SpawnFlowKeyframe>();
 
@@ -88,7 +106,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!Enabled)
                 return true;
             warning = "Enabled walk paths need keyframes with finite poses, positive scale and nonnegative timing.";
-            if (Keyframes == null || Keyframes.Length == 0)
+            if (Keyframes == null || Keyframes.Length == 0 || Space is not (SpawnFlowSpace.Relative or SpawnFlowSpace.World))
                 return false;
             foreach (SpawnFlowKeyframe frame in Keyframes)
                 if (frame == null || !frame.Pose.IsValid() || !SpawnFlowPlan.Duration(frame.Duration)
@@ -109,7 +127,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Keyframe")]
-        [Tooltip("Position and Euler rotation relative to the spawn origin; scale multiplies the prefab's original scale.")]
+        [Tooltip("Destination in the path's selected coordinate space. World scale is absolute; Relative scale multiplies the prefab scale.")]
         public PlayerToolPose Pose = PlayerToolPose.Identity;
         [Tooltip("Scaled seconds held at the previous pose before movement starts.")]
         public float Delay;

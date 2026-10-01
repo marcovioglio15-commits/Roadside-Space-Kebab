@@ -8,6 +8,7 @@
     "com.catonaskateboard.studio-input": "0.1.0",
     "com.unity.inputsystem": "1.20.0",
     "com.catonaskateboard.studio-identity": "0.1.0",
-    "com.catonaskateboard.studio-colors": "1.0.0"
+    "com.catonaskateboard.studio-colors": "1.0.0",
+    "com.catonaskateboard.audio-studio": "1.0.0"
   }
 }

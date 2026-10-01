@@ -106,7 +106,7 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 4182828039336747428, guid: cb83fdee05565914083f160286ab031a, type: 3}
-    Trigger: 0
+    Trigger: 2
     ContactDuration: 0.5
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005

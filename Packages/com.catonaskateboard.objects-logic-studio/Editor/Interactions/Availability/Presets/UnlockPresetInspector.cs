@@ -31,10 +31,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SerializedProperty conditions = settings.FindPropertyRelative("Conditions");
             SerializedProperty sources = rule.FindPropertyRelative("Sources");
             if (conditions.arraySize > 1)
-                HoverControls.Field(settings, "RequireAll");
+                UnlockInteractionControls.ConditionLogic(settings.FindPropertyRelative("RequireAll"));
             for (int index = 0; index < conditions.arraySize; index++)
             {
                 SerializedProperty condition = conditions.GetArrayElementAtIndex(index);
+                HoverControls.Field(condition, "Count");
                 if ((UnlockTrigger)condition.FindPropertyRelative("Trigger").enumValueIndex == UnlockTrigger.Interaction)
                 {
                     if (index < sources.arraySize)

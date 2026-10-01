@@ -36,6 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 ContactModificationPreset contact => contact.Settings.TryValidate(out warning),
                 DialoguePreset dialogue => dialogue.Settings.TryValidate(out warning),
+                AmbientPreset ambient => ambient.Settings.TryValidate(out warning),
                 SlicePreset slice => slice.Settings.TryValidate(out warning),
                 OutlinePreset outline => outline.Settings.TryValidate(out warning),
                 SpawnManagementPreset spawn => spawn.Settings.TryValidate(out warning),

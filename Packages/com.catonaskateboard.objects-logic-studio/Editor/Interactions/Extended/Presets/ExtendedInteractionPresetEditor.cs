@@ -23,7 +23,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Preset edits affect future imports; already imported item snapshots stay independent.
             serializedObject.Update();
             InteractionToolControls.Draw(serializedObject.FindProperty("ToolRequirement"));
-            if (target is SlicePreset)
+            if (target is AmbientPreset)
+                AmbientControls.Draw(serializedObject.FindProperty("Settings"));
+            else if (target is SlicePreset)
                 SliceControls.Draw(serializedObject.FindProperty("Settings"), sections);
             else if (target is SpawnManagementPreset)
                 SpawnManagementControls.Draw(serializedObject.FindProperty("Settings"), sections);

@@ -12,7 +12,9 @@
     "Unity.RenderPipelines.Universal.Runtime",
     "CatOnASkateboard.StudioIdentity.Runtime",
     "CatOnASkateboard.StudioIdentity.Editor",
-    "CatOnASkateboard.StudioColors.Editor"
+    "CatOnASkateboard.StudioColors.Editor",
+    "CatOnASkateboard.AudioStudio.Runtime",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [
     "Editor"

@@ -134,6 +134,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             string settings = Kind switch
             {
+                ExtendedInteractionKind.MakeOrder => JsonUtility.ToJson(Draft.Orders.Resolve(feature.gameObject)),
+                ExtendedInteractionKind.PlayAmbient => JsonUtility.ToJson(Draft.Ambient),
                 ExtendedInteractionKind.Slice => JsonUtility.ToJson(Draft.Slice),
                 ExtendedInteractionKind.SpawnManagement => JsonUtility.ToJson(SpawnSourceAuthoring.Resolve(Draft.SpawnManagement)),
                 ExtendedInteractionKind.AssemblyStation => JsonUtility.ToJson(Draft.AssemblyStation),

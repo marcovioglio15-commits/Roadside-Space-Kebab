@@ -64,6 +64,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.RecordObject(state, "Import interaction preset");
             switch (state.Extended.Preset)
             {
+                case AmbientPreset ambient:
+                    state.Extended.Draft.Ambient = ObjectWorkspace.Copy(ambient.Settings);
+                    break;
                 case SlicePreset slice:
                     state.Extended.Draft.Slice = ObjectWorkspace.Copy(slice.Settings);
                     break;
@@ -99,6 +102,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ExtendedInteractionPreset preset = (ExtendedInteractionPreset)ScriptableObject.CreateInstance(PresetType(state.Extended.Kind));
             switch (preset)
             {
+                case AmbientPreset ambient:
+                    ambient.Settings = ObjectWorkspace.Copy(state.Extended.Draft.Ambient);
+                    break;
                 case SlicePreset slice:
                     slice.Settings = ObjectWorkspace.Copy(state.Extended.Draft.Slice);
                     break;
@@ -141,6 +147,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Availability rules use separate mapping controls; product data remains on its prefab.
             return kind switch
             {
+                ExtendedInteractionKind.PlayAmbient => typeof(AmbientPreset),
                 ExtendedInteractionKind.Slice => typeof(SlicePreset),
                 ExtendedInteractionKind.ModifyByContact => typeof(ContactModificationPreset),
                 ExtendedInteractionKind.Outline => typeof(OutlinePreset),

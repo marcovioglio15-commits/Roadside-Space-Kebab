@@ -41,7 +41,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             path = animation;
             index = 0;
             elapsed = 0f;
-            from = new PlayerToolPose
+            from = path.Space == SpawnFlowSpace.World ? new PlayerToolPose
+            {
+                Position = target.position,
+                Rotation = target.eulerAngles,
+                Scale = target.localScale
+            } : new PlayerToolPose
             {
                 Position = Quaternion.Inverse(orientation) * (target.position - origin),
                 Rotation = (Quaternion.Inverse(orientation) * target.rotation).eulerAngles,
@@ -66,9 +71,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
                 float amount = frame.Duration > 0f ? Mathf.Clamp01((elapsed - frame.Delay) / frame.Duration) : 1f;
                 float eased = Mathf.SmoothStep(0f, 1f, amount);
-                target.SetPositionAndRotation(origin + orientation * Vector3.Lerp(from.Position, frame.Pose.Position, eased),
-                    orientation * TransformRotation.Sample(from.Rotation, frame.Pose.Rotation, eased, frame.Direction));
-                target.localScale = Vector3.Scale(scale, Vector3.Lerp(from.Scale, frame.Pose.Scale, eased));
+                Vector3 position = Vector3.Lerp(from.Position, frame.Pose.Position, eased);
+                Quaternion rotation = TransformRotation.Sample(from.Rotation, frame.Pose.Rotation, eased, frame.Direction);
+                Vector3 size = Vector3.Lerp(from.Scale, frame.Pose.Scale, eased);
+                bool world = path.Space == SpawnFlowSpace.World;
+                target.SetPositionAndRotation(world ? position : origin + orientation * position, world ? rotation : orientation * rotation);
+                target.localScale = world ? size : Vector3.Scale(scale, size);
                 if (amount < 1f)
                     return false;
                 from = frame.Pose;

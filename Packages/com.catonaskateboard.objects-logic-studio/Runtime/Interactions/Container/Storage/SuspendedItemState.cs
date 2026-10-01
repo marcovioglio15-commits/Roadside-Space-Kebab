@@ -8,8 +8,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly ObjectInteraction[] interactions;
+        private readonly bool preserveOrders;
         private readonly bool[] interactionStates;
-        private readonly bool[][] unlockProgress;
+        private readonly int[][] unlockProgress;
         private readonly bool[] applied;
         private readonly bool[] appliedLocks;
         private readonly ObjectDialogue.StoredProgress?[] dialogueProgress;
@@ -35,16 +36,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Captures an item after its carry overrides have been released.</summary>
         /// <param name="root">Item root, including any assembled ingredient hierarchy.</param>
-        internal SuspendedItemState(GameObject root)
+        /// <param name="preserveOrders">Keep order-board ownership during spawn paths, including brief root deactivation.</param>
+        internal SuspendedItemState(GameObject root, bool preserveOrders = false)
         {
             // Allocation occurs once per deposit, never while a stored item waits.
             Root = root;
+            this.preserveOrders = preserveOrders;
             interactions = root.GetComponentsInChildren<ObjectInteraction>(true);
             items = root.GetComponentsInChildren<ObjectItem>(true);
             bodies = root.GetComponentsInChildren<Rigidbody>(true);
             colliders = root.GetComponentsInChildren<Collider>(true);
             interactionStates = new bool[interactions.Length];
-            unlockProgress = new bool[interactions.Length][];
+            unlockProgress = new int[interactions.Length][];
             applied = new bool[interactions.Length];
             appliedLocks = new bool[interactions.Length];
             dialogueProgress = new ObjectDialogue.StoredProgress?[interactions.Length];
@@ -79,9 +82,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Suspend()
         {
             // Disable collision and logic even for visible items, so storage cannot trigger contact consumption.
+            if (preserveOrders)
+                foreach (ObjectInteraction interaction in interactions)
+                    if (interaction is ObjectMakeOrder order)
+                        order.HoldPresentation(true);
             Root.SetActive(false);
             foreach (ObjectInteraction interaction in interactions)
-                if (interaction != null)
+                if (interaction != null && (!preserveOrders || interaction is not ObjectMakeOrder))
                     interaction.enabled = false;
             foreach (ObjectItem item in items)
                 if (item != null)
@@ -100,10 +107,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
         }
 
+        /// <summary>Shows a suspended walk-path object and ends the brief presentation-deactivation guard.</summary>
+        internal void Reveal()
+        {
+            // Later external deactivation is a real despawn and must free order-board slots immediately.
+            Root.SetActive(true);
+            if (preserveOrders)
+                foreach (ObjectInteraction interaction in interactions)
+                    if (interaction is ObjectMakeOrder order)
+                        order.HoldPresentation(false);
+        }
+
         /// <summary>Restores original component states and retained interaction progress before normal updates resume.</summary>
         internal void Restore()
         {
             // Restore while inactive so activation callbacks observe a complete physical hierarchy.
+            if (preserveOrders)
+                foreach (ObjectInteraction interaction in interactions)
+                    if (interaction is ObjectMakeOrder order)
+                        order.HoldPresentation(true);
             Root.SetActive(false);
             for (int index = 0; index < bodies.Length; index++)
                 if (bodies[index] != null)
@@ -121,6 +143,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int index = 0; index < interactions.Length; index++)
                 switch (interactions[index])
                 {
+                    case ObjectMakeOrder order when preserveOrders:
+                        order.HoldPresentation(false);
+                        break;
                     case ObjectInteractionUnlock rule:
                         rule.RestoreStoredProgress(unlockProgress[index], applied[index], appliedLocks[index]);
                         break;

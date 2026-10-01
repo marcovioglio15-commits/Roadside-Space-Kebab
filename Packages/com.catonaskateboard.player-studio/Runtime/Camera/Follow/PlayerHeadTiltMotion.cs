@@ -25,7 +25,8 @@ namespace CatOnASkateboard.PlayerStudio
         /// <param name="deltaTime">Elapsed render time in seconds.</param>
         /// <param name="position">Base camera position receiving the displacement.</param>
         /// <param name="rotation">Base camera rotation receiving lateral roll.</param>
-        internal void Apply(PlayerHeadTiltSettings settings, Vector3 velocity, bool grounded, float deltaTime,
+        /// <returns>True when the phase crosses a footstep trough.</returns>
+        internal bool Apply(PlayerHeadTiltSettings settings, Vector3 velocity, bool grounded, float deltaTime,
             ref Vector3 position, ref Quaternion rotation)
         {
             // Pitch never turns forward motion into a lateral step or a vertical movement request.
@@ -36,8 +37,10 @@ namespace CatOnASkateboard.PlayerStudio
             float side = speed > 0.001f ? Vector3.Dot(heading * Vector3.right, velocity) / speed : 0f;
             bool irregular = settings.Irregular && (settings.AmplitudeVariation > 0f || settings.CadenceVariation > 0f);
             float noise = irregular ? Mathf.PerlinNoise((settings.Seed & 65535) * 0.031f, variation) * 2f - 1f : 0f;
-            phase = Mathf.Repeat(phase + speed * deltaTime / settings.StrideLength * Mathf.PI * 2f
-                * (irregular ? 1f + noise * settings.CadenceVariation : 1f), Mathf.PI * 2f);
+            float nextPhase = phase + speed * deltaTime / settings.StrideLength * Mathf.PI * 2f
+                * (irregular ? 1f + noise * settings.CadenceVariation : 1f);
+            bool step = Mathf.Floor((nextPhase + Mathf.PI * 0.25f) / Mathf.PI) > Mathf.Floor((phase + Mathf.PI * 0.25f) / Mathf.PI);
+            phase = Mathf.Repeat(nextPhase, Mathf.PI * 2f);
             if (irregular)
                 variation = Mathf.Repeat(variation + speed * deltaTime / settings.StrideLength * settings.VariationRate, 4096f);
 
@@ -51,6 +54,7 @@ namespace CatOnASkateboard.PlayerStudio
                 ? -side * strength * (settings.Lean + settings.RollAmplitude * Mathf.Sin(phase)) : 0f, response);
             position += heading * offset;
             rotation *= Quaternion.Euler(0f, 0f, roll);
+            return step;
         }
 
         #endregion

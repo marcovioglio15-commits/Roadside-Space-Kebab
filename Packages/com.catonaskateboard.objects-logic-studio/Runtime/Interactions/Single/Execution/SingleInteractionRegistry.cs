@@ -41,7 +41,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Revision++;
             foreach (ObjectSingleInteraction item in Object.FindObjectsByType<ObjectSingleInteraction>())
                 if (item.isActiveAndEnabled)
+                {
+                    if (item is ObjectGrab grab)
+                        grab.ResetAudio();
                     Register(item);
+                }
         }
 
         /// <summary>Makes an enabled feature available to the observer.</summary>

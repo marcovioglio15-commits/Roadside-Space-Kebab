@@ -51,14 +51,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if ((useGravity || useJump) && sections.Draw("Locomotion.Jump", "Jump"))
                 using (new EditorGUI.IndentLevelScope())
                     PlayerJumpControls.Draw(useGravity, ref useJump, ref height, ref bufferTime, ref coyoteTime);
-            if (!EditorGUI.EndChangeCheck())
-                return false;
-
-            Undo.RecordObject(owner, "Edit Locomotion Draft");
-            session.SetDraft(speed, acceleration, deceleration);
-            session.SetGravityDraft(useGravity, gravityAcceleration, terminalSpeed, groundSpeed);
-            session.SetJumpDraft(useJump, height, bufferTime, coyoteTime);
-            return true;
+            bool changed = EditorGUI.EndChangeCheck();
+            if (changed)
+            {
+                Undo.RecordObject(owner, "Edit Locomotion Draft");
+                session.SetDraft(speed, acceleration, deceleration);
+                session.SetGravityDraft(useGravity, gravityAcceleration, terminalSpeed, groundSpeed);
+                session.SetJumpDraft(useJump, height, bufferTime, coyoteTime);
+            }
+            return PlayerAudioControls.Draw(owner, sections, session.HeadTilt) || changed;
         }
 
         #endregion

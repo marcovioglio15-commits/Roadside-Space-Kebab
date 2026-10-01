@@ -119,6 +119,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(step, "Name");
                     TransferInteractionControls.Prefab(step.FindPropertyRelative("Prefab"));
                     Completion(step);
+                    HoverControls.Field(step, "ArrivalDialogueEnabled", "Walk-in Dialogue");
+                    if (step.FindPropertyRelative("ArrivalDialogueEnabled").boolValue)
+                    {
+                        Completion(step, "ArrivalDialogue", "Dialogue", true);
+                        HoverControls.Field(step, "NewCustomerSound", "Arrival Sound");
+                    }
                     if (weighted)
                         HoverControls.Field(step, "Weight");
                     HoverControls.Field(step, "Delay");
@@ -134,6 +140,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 added.FindPropertyRelative("Name").stringValue = "Spawn " + steps.arraySize;
                 added.FindPropertyRelative("Prefab").objectReferenceValue = null;
                 added.FindPropertyRelative("Completion").objectReferenceValue = null;
+                added.FindPropertyRelative("ArrivalDialogueEnabled").boolValue = false;
+                added.FindPropertyRelative("ArrivalDialogue").objectReferenceValue = null;
+                added.FindPropertyRelative("NewCustomerSound").boolValue = false;
                 added.FindPropertyRelative("Weight").floatValue = 1f;
                 added.FindPropertyRelative("Delay").floatValue = 0f;
                 added.FindPropertyRelative("Position").vector3Value = Vector3.zero;
@@ -141,6 +150,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 foreach (string name in new[] { "WalkIn", "WalkOut" })
                 {
                     added.FindPropertyRelative(name + ".Enabled").boolValue = false;
+                    added.FindPropertyRelative(name + ".Space").enumValueIndex = (int)SpawnFlowSpace.World;
                     added.FindPropertyRelative(name + ".Keyframes").arraySize = 0;
                 }
                 added.isExpanded = true;
@@ -149,20 +159,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Selects an existing interaction by component identity within the chosen prefab.</summary>
         /// <param name="step">Spawn row receiving the exact completion source.</param>
-        private static void Completion(SerializedProperty step)
+        /// <param name="field">Serialized component link.</param>
+        /// <param name="title">Selector caption.</param>
+        /// <param name="dialogueOnly">Restrict the menu to dialogue components.</param>
+        private static void Completion(SerializedProperty step, string field = "Completion", string title = "Complete On", bool dialogueOnly = false)
         {
             // Build the menu only on demand; normal repaints allocate no hierarchy catalog.
             GameObject prefab = step.FindPropertyRelative("Prefab").objectReferenceValue as GameObject;
-            SerializedProperty property = step.FindPropertyRelative("Completion");
+            SerializedProperty property = step.FindPropertyRelative(field);
             ObjectInteraction current = property.objectReferenceValue as ObjectInteraction;
             Rect rect = EditorGUILayout.GetControlRect();
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("Complete On", property.tooltip));
+            rect = EditorGUI.PrefixLabel(rect, new GUIContent(title, property.tooltip));
             if (!GUI.Button(rect, current != null ? current.InteractionName + " (" + current.GetType().Name + ")" : "Select Interaction", EditorStyles.popup))
                 return;
             GenericMenu menu = new GenericMenu();
             if (prefab != null)
                 foreach (ObjectInteraction source in prefab.GetComponentsInChildren<ObjectInteraction>(true))
-                    if (source is not ObjectSpawnManager)
+                    if (source is not ObjectSpawnManager && (!dialogueOnly || source is ObjectDialogue))
                     {
                         ObjectInteraction selected = source;
                         string path = property.propertyPath;
@@ -181,7 +194,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             menu.DropDown(rect);
         }
 
-        /// <summary>Edits explicit relative keyframes with independent delays and rotation directions.</summary>
+        /// <summary>Edits explicit transform keyframes with independent delays and rotation directions.</summary>
         /// <param name="animation">Walk-in or walk-out path.</param>
         /// <param name="label">Section label.</param>
         private static void Animation(SerializedProperty animation, string label)
@@ -192,6 +205,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!enabled.boolValue)
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            HoverControls.Field(animation, "Space", "Key Space");
             SerializedProperty frames = animation.FindPropertyRelative("Keyframes");
             for (int index = 0; index < frames.arraySize; index++)
             {

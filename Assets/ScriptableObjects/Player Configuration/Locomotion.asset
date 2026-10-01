@@ -23,3 +23,29 @@ MonoBehaviour:
   jumpHeight: 1.5
   jumpBufferTime: 0.1
   coyoteTime: 0.1
+  Audio:
+    Footsteps: 1
+    Interval: 0.45
+    MinimumSpeed: 0.15
+    DefaultSurface: 0
+    Surfaces:
+    - Layers:
+        serializedVersion: 2
+        m_Bits: 256
+      Surface: 0
+    - Layers:
+        serializedVersion: 2
+        m_Bits: 512
+      Surface: 1
+    - Layers:
+        serializedVersion: 2
+        m_Bits: 1024
+      Surface: 2
+    - Layers:
+        serializedVersion: 2
+        m_Bits: 2048
+      Surface: 3
+    Collision:
+      Enabled: 1
+      MinimumSpeed: 3
+      Cooldown: 0.25

@@ -33,5 +33,257 @@ MonoBehaviour:
     SfxVolume: 1
     MusicVolume: 1
   MusicCrossfadeSeconds: 1.5
-  Music: []
-  Events: []
+  Music:
+  - Context: Gameplay
+    Enabled: 1
+    EventPath: event:/MUS/mus_radio
+    EventGuid: '{8249f50a-625c-4be4-b7a7-406891480d82}'
+    Bank: MUS
+    Volume: 1
+    AutoStart: 1
+    RestartWhenPathChanges: 1
+    StopWhenDisabled: 1
+  Events:
+  - Key: sfx_footstep
+    DisplayName: sfx_footstep
+    Description: 
+    EventPath: event:/SFX/PLAYER/sfx_footstep
+    EventGuid: '{5ab6acfe-ad70-4bb1-8555-d35566be8cfc}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_throw
+    DisplayName: sfx_throw
+    Description: 
+    EventPath: event:/SFX/PLAYER/sfx_throw
+    EventGuid: '{37572bd1-e6a2-45e4-897c-1c8bcfb198fd}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_pickup
+    DisplayName: sfx_pickup
+    Description: 
+    EventPath: event:/SFX/PLAYER/sfx_pickup
+    EventGuid: '{367715f3-6a6a-45d2-9ece-d1585cde9aec}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_playercollision
+    DisplayName: sfx_playercollision
+    Description: 
+    EventPath: event:/SFX/PLAYER/sfx_playercollision
+    EventGuid: '{7f16a07d-ca5f-4652-ace7-cfe6a566e8be}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_ingredientslice
+    DisplayName: sfx_ingredientslice
+    Description: 
+    EventPath: event:/SFX/PLAYER/sfx_ingredientslice
+    EventGuid: '{3aea555a-569b-44b9-bb02-0ea3e7ce45c4}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_orderOK
+    DisplayName: sfx_orderOK
+    Description: 
+    EventPath: event:/SFX/sfx_orderOK
+    EventGuid: '{0e14f88d-db0c-4c95-85b4-e6013f4fef51}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_orderNO
+    DisplayName: sfx_orderNO
+    Description: 
+    EventPath: event:/SFX/sfx_orderNO
+    EventGuid: '{357cfc3a-ce40-45f9-a9d1-43eae1a61a8e}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: vo_hellfury
+    DisplayName: vo_hellfury
+    Description: 
+    EventPath: event:/VO/vo_hellfury
+    EventGuid: '{0d58ff4e-18c8-450f-bd9e-a5842212a9a6}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: vo_mothman
+    DisplayName: vo_mothman
+    Description: 
+    EventPath: event:/VO/vo_mothman
+    EventGuid: '{39e6ef60-511d-464c-a8dc-cc87d550dcb5}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: vo_fishy
+    DisplayName: vo_fishy
+    Description: 
+    EventPath: event:/VO/vo_fishy
+    EventGuid: '{e38e2280-add8-46b2-9457-4f136fe90c7a}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_ingredientcollision
+    DisplayName: sfx_ingredientcollision
+    Description: 
+    EventPath: event:/SFX/ITEMS/sfx_ingredientcollision
+    EventGuid: '{8fa84ce5-2511-429e-b33b-589a0ec9e4ba}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: amb_neonsign
+    DisplayName: amb_neonsign
+    Description: 
+    EventPath: event:/SFX/AMB/amb_neonsign
+    EventGuid: '{877960ec-1139-4e63-892d-b6b62839f171}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: amb_traffic
+    DisplayName: amb_traffic
+    Description: 
+    EventPath: event:/SFX/AMB/amb_traffic
+    EventGuid: '{00135130-0838-4b26-a0f4-d2b55c541360}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_newcustomer
+    DisplayName: sfx_newcustomer
+    Description: 
+    EventPath: event:/SFX/sfx_newcostumer
+    EventGuid: '{2b713b2c-e162-410d-be0c-e88c149c0da6}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: mus_radio
+    DisplayName: mus_radio
+    Description: 
+    EventPath: event:/MUS/mus_radio
+    EventGuid: '{8249f50a-625c-4be4-b7a7-406891480d82}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 1
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters:
+    - Name: Channels
+      Value: 1
+      Global: 0

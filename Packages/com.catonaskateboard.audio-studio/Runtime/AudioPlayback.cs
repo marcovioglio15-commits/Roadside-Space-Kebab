@@ -10,7 +10,7 @@ namespace CatOnASkateboard.AudioStudio
     {
         #region Fields
         [Header("Playback")]
-        [Tooltip("Enable playback in a future project adapter.")]
+        [Tooltip("Enable playback through the scene audio adapter.")]
         public bool Enabled = true;
         [Tooltip("Global event volume multiplier.")]
         public float MasterVolume = 1f;

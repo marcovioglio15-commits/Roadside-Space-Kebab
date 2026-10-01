@@ -1,3 +1,4 @@
+using CatOnASkateboard.AudioStudio;
 using System;
 using UnityEngine;
 
@@ -60,6 +61,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Keep existing hover labels eligible for their normal detection while the object is carried.")]
         public bool ShowHover = true;
 
+        [Header("Audio")]
+        [Tooltip("Play the pickup cue when this object acquires the carry slot.")]
+        public bool PickupSound = true;
+        [Tooltip("Collision sound thresholds after the first grab and subsequent release. Requires Drop or Throw.")]
+        public ImpactAudioSettings CollisionAudio = new ImpactAudioSettings();
+
         #endregion
 
         #region Methods
@@ -73,6 +80,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Check only settings used by the selected modes.
             warning = string.Empty;
+            if (CollisionAudio == null || !CollisionAudio.IsValid())
+            {
+                warning = "Collision audio needs finite nonnegative thresholds.";
+                return false;
+            }
             if (Units <= 0)
                 warning = "Grab Units must be a positive whole number.";
             else if (!InteractionValues.Positive(Distance) || !SolidHitOnly && !InteractionValues.Finite(TargetOffset)

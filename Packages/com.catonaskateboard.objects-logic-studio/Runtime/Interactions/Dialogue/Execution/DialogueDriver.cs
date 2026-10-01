@@ -82,8 +82,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (dialogue == null || !dialogue.Ready)
                     continue;
                 InteractionButton advance = input.Bind(dialogue.AdvanceAction);
-                InteractionButton start = dialogue.Settings.Trigger == DialogueTrigger.InputAction ? input.Bind(dialogue.StartAction) : null;
-                if (advance == null || dialogue.Settings.Trigger == DialogueTrigger.InputAction && start == null)
+                InteractionButton start = !dialogue.ArrivalOnly && dialogue.Settings.Trigger == DialogueTrigger.InputAction ? input.Bind(dialogue.StartAction) : null;
+                if (advance == null || !dialogue.ArrivalOnly && dialogue.Settings.Trigger == DialogueTrigger.InputAction && start == null)
                 {
                     Debug.LogWarning("Dialogue needs its Button actions in the Observer player's active PlayerInput asset.", dialogue);
                     continue;
@@ -134,7 +134,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Observe all ranges even while another dialogue is speaking, so completed entries rearm on departure.
             foreach (KeyValuePair<ObjectDialogue, Buttons> pair in bindings)
                 if (pair.Key != null && pair.Key.CanStart(player) && active == null && pair.Value.Advance.Enabled
-                    && (pair.Key.Settings.Trigger != DialogueTrigger.InputAction || pair.Value.Start.Pending)
+                    && (pair.Key.ArrivalOnly || pair.Key.Settings.Trigger != DialogueTrigger.InputAction || pair.Value.Start.Pending)
                     && (selected == null || pair.Key.Settings.Priority > selected.Settings.Priority
                         || pair.Key.Settings.Priority == selected.Settings.Priority
                         && EntityId.ToULong(pair.Key.GetEntityId()) < EntityId.ToULong(selected.GetEntityId()))
@@ -156,7 +156,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (selected.IsSpeaking)
                 {
                     active = selected;
-                    consumed = selected.Settings.Trigger == DialogueTrigger.InputAction ? selected.StartAction : null;
+                    consumed = !selected.ArrivalOnly && selected.Settings.Trigger == DialogueTrigger.InputAction ? selected.StartAction : null;
                 }
             }
             input.ClearSignals();

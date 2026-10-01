@@ -28,6 +28,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(settings, "Priority");
                     FlagContactControls.Draw(settings.FindPropertyRelative("Contact"));
                 }
+            if (sections.Draw("Slice Audio", "Sound and Ingredient parameter for each successful cut."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    HoverControls.Field(settings, "Sound");
+                    if (settings.FindPropertyRelative("Sound").boolValue)
+                        HoverControls.Field(settings, "Ingredient");
+                }
             if (!sections.Draw("Slice Sequence", "Each performed press commits the next step. The last step completes this interaction."))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();

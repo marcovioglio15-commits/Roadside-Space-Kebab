@@ -1,3 +1,4 @@
+using CatOnASkateboard.AudioStudio;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -167,6 +168,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             try
             {
                 run.Commit(transform);
+                if (settings.Sound)
+                    StudioAudio.Play("sfx_ingredientslice", transform, "Ingredient", settings.Ingredient.ToString());
                 CompletedSteps++;
                 nextPress = Time.time + settings.Interval;
                 if (CompletedSteps == 1)

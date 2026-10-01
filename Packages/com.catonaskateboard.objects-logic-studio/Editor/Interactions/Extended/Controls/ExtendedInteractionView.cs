@@ -111,7 +111,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return feature == category || (category switch
             {
                 ExtendedInteractionKind.Dialogue => feature == ExtendedInteractionKind.Slice,
-                ExtendedInteractionKind.ModifyByContact => feature == ExtendedInteractionKind.Outline,
+                ExtendedInteractionKind.ModifyByContact => feature is ExtendedInteractionKind.Outline or ExtendedInteractionKind.PlayAmbient or ExtendedInteractionKind.MakeOrder,
                 ExtendedInteractionKind.AssemblyStation => feature == ExtendedInteractionKind.AssemblyProduct,
                 _ => false
             });
@@ -129,7 +129,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 if (!InCategory(kind, category))
                     continue;
-                GUIContent label = new GUIContent(kind == ExtendedInteractionKind.Unlock ? "Availability Rule" : ObjectNames.NicifyVariableName(kind.ToString()),
+                GUIContent label = new GUIContent(kind == ExtendedInteractionKind.Unlock ? "Availability Rule" : kind == ExtendedInteractionKind.MakeOrder ? "Make an Order" : ObjectNames.NicifyVariableName(kind.ToString()),
                     "Add this interaction to the selected prefab object.");
                 if (!CanAdd(kind))
                     menu.AddDisabledItem(label);
@@ -149,6 +149,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             switch (kind)
             {
+                case ExtendedInteractionKind.MakeOrder:
+                    if (target.GetComponent<ObjectMakeOrder>() != null)
+                        return false;
+                    foreach (ObjectContactModifier candidate in target.GetComponents<ObjectContactModifier>())
+                        if (OrderSettings.Eligible(candidate, target))
+                            return true;
+                    return false;
                 case ExtendedInteractionKind.Outline:
                     return target.GetComponent<ObjectOutline>() == null;
                 case ExtendedInteractionKind.AssemblyProduct:
@@ -188,7 +195,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Preset import changes only configuration; local input and HUD references stay with the prefab.
             if (feature is ObjectInteractionUnlock)
                 UnlockPresetView.DrawRule(state, target);
-            else if (feature is not ObjectAssemblyProduct)
+            else if (feature is not (ObjectAssemblyProduct or ObjectMakeOrder))
                 ExtendedInteractionPresetView.Draw(state);
             if (ExtendedInteractionControls.Draw(data, state) || validated != feature || GUI.changed)
             {

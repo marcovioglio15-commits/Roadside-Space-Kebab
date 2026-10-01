@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
+    /// <summary>Matches the Ingredient labels authored in FMOD.</summary>
+    public enum SliceIngredient { Bread, Crunchy, Full }
+
     /// <summary>Places one independent prefab when its slice step succeeds.</summary>
     [Serializable]
     public sealed class SliceSpawn
@@ -57,6 +60,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Interval = 0.15f;
         [Tooltip("Ordered slice steps. Started is emitted on the first step and Completed after the final step. Finished sequences cannot run again on this instance.")]
         public SliceStep[] Steps = Array.Empty<SliceStep>();
+
+        [Header("Slice Audio")]
+        [Tooltip("Play the slice cue for each successfully committed cut.")]
+        public bool Sound = true;
+        [Tooltip("Ingredient parameter label supplied to the slice event.")]
+        public SliceIngredient Ingredient = SliceIngredient.Full;
 
         #endregion
 

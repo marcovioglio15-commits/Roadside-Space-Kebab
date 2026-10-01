@@ -61,6 +61,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.ModifyByContact => session.Draft.Contact.TryValidate(out warning),
                 ExtendedInteractionKind.Dialogue => session.Draft.Dialogue.TryValidate(out warning),
+                ExtendedInteractionKind.PlayAmbient => session.Draft.Ambient.TryValidate(out warning),
                 ExtendedInteractionKind.Slice => session.Draft.Slice.TryValidate(out warning),
                 ExtendedInteractionKind.Outline => session.Draft.Outline.TryValidate(out warning),
                 ExtendedInteractionKind.SpawnManagement => session.Draft.SpawnManagement.TryValidate(out warning),
@@ -130,6 +131,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.ModifyByContact => JsonUtility.ToJson(session.Draft.Contact),
                 ExtendedInteractionKind.Dialogue => JsonUtility.ToJson(session.Draft.Dialogue),
+                ExtendedInteractionKind.PlayAmbient => JsonUtility.ToJson(session.Draft.Ambient),
                 ExtendedInteractionKind.Slice => JsonUtility.ToJson(session.Draft.Slice),
                 ExtendedInteractionKind.Outline => JsonUtility.ToJson(session.Draft.Outline),
                 ExtendedInteractionKind.SpawnManagement => JsonUtility.ToJson(SpawnSourceAuthoring.Resolve(session.Draft.SpawnManagement)),

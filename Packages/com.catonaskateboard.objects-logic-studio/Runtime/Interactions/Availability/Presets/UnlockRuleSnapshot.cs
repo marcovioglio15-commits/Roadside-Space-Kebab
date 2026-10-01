@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Identifies transferable interaction kinds without serializing references to another prefab instance.</summary>
-    public enum InteractionTemplateKind { Hover, Grab, Drop, Throw, Dispenser, Container, Dialogue, Slice, Contact, Outline, Spawn, AssemblyStation, AssemblyProduct }
+    public enum InteractionTemplateKind { Hover, Grab, Drop, Throw, Dispenser, Container, Dialogue, Slice, Contact, Outline, Spawn, AssemblyStation, AssemblyProduct, Ambient, MakeOrder, TriggerAnimation, Eject }
 
     /// <summary>Describes an existing interaction for explicit remapping when a rule preset is imported.</summary>
     [Serializable]
@@ -73,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int index = 0; index < Settings.Conditions.Length; index++)
             {
                 InteractionUnlockCondition condition = Settings.Conditions[index];
-                if (condition == null)
+                if (condition == null || condition.Count < 1)
                     return false;
                 switch (condition.Trigger)
                 {

@@ -1,3 +1,4 @@
+using CatOnASkateboard.AudioStudio;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -55,6 +56,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Grab.Body.AddForce(trajectory.Direction(view.rotation) * trajectory.Strength,
                 trajectory.Mode == ThrowStrengthMode.Impulse ? ForceMode.Impulse : ForceMode.VelocityChange);
             Grab.Body.angularVelocity = view.rotation * trajectory.Spin;
+            if (trajectory.Sound)
+                StudioAudio.Play("sfx_throw", transform);
         }
 
         #endregion

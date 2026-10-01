@@ -65,6 +65,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool retained;
         private bool awaitingSight;
         private DialogueHud hud;
+        private bool arrivalOnly;
+        private bool arrivalPending;
+        private bool arrivalCue;
+        private readonly DialogueAudioRun audio = new DialogueAudioRun();
         internal readonly DialogueSightGeometry SightGeometry = new DialogueSightGeometry();
 
         #endregion
@@ -81,6 +85,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool IsSpeaking { get; private set; }
         /// <summary>Whether the latest activation validation passed.</summary>
         internal bool Ready { get; private set; }
+        /// <summary>Whether Day Flow exclusively requests this clone dialogue.</summary>
+        internal bool ArrivalOnly => arrivalOnly;
         /// <summary>Identifies this multiple-interaction feature.</summary>
         public override ExtendedInteractionKind Kind => ExtendedInteractionKind.Dialogue;
 
@@ -120,6 +126,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             entry = consumptionRevision = startedRevision = -1;
             line = nextEntry = 0;
             eligible.Clear();
+            audio.Stop();
             SightGeometry.Bind(transform);
             Ready = TryValidate(out string warning);
             if (!Ready)
@@ -152,7 +159,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (GetComponent<ObjectItem>() == null || configuration == null || !configuration.TryValidate(out warning))
                 return false;
             if (advance == null || advance.action is not { type: InputActionType.Button }
-                || configuration.Trigger == DialogueTrigger.InputAction && (start == null || start.action is not { type: InputActionType.Button }))
+                || !arrivalOnly && configuration.Trigger == DialogueTrigger.InputAction && (start == null || start.action is not { type: InputActionType.Button }))
                 warning = "Assign an advance Button action and, for input activation, a start Button action.";
             return warning.Length == 0;
         }
@@ -167,8 +174,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanStart(Transform player)
         {
             // Conditions are recomputed only when receipts change, while distance remains responsive each frame.
-            if (!Ready || !Available(InteractionChannels.Dialogue) || Item == null)
+            if (!Ready || !Available(InteractionChannels.Dialogue) || Item == null
+                || settings.Trigger == DialogueTrigger.SpawnArrival && !arrivalOnly)
                 return false;
+            RefreshEntries();
+            if (arrivalOnly)
+                return arrivalPending && !IsSpeaking && eligible.Count > 0;
             float distance = (transform.position - player.position).sqrMagnitude;
             if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
                 armed = true;
@@ -184,7 +195,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // No controller, cursor or movement state is changed when range is lost.
             return Available(InteractionChannels.Dialogue) && hud != null && hud.Ready
-                && (transform.position - player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance;
+                && (arrivalOnly || (transform.position - player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance);
         }
 
         /// <summary>Rebuilds the compact entry catalog only after consumption history changes.</summary>
@@ -209,7 +220,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanPresent(HoverObserver observer, DialogueVisibility visibility, bool continuing)
         {
             // After sight interrupts a running page, wait for visibility before applying its resume/restart policy.
-            if (continuing ? !settings.HideWhenSightLost : !settings.RequireSightToStart && !awaitingSight)
+            if (arrivalOnly || (continuing ? !settings.HideWhenSightLost : !settings.RequireSightToStart && !awaitingSight))
                 return true;
             bool visible = visibility.HasSight(observer, this);
             if (visible || continuing)
@@ -224,12 +235,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanAdvance(HoverObserver observer, DialogueVisibility visibility)
         {
             // Blocking an advance does not interrupt presentation or change its retained page.
-            return !settings.RequireSightToContinue || visibility.HasSight(observer, this);
+            return arrivalOnly || !settings.RequireSightToContinue || visibility.HasSight(observer, this);
         }
 
         #endregion
 
         #region Flow
+
+        /// <summary>Reserves this clone dialogue for the flow's automatic arrival request before activation.</summary>
+        internal void ConfigureArrival()
+        {
+            // Only the selected clone bypasses its ordinary trigger and visibility settings.
+            arrivalOnly = true;
+        }
+
+        /// <summary>Queues arrival presentation until the shared dialogue HUD becomes available.</summary>
+        /// <param name="playCue">Whether opening the HUD should announce the new customer.</param>
+        internal void RequestArrival(bool playCue)
+        {
+            // The observer retains ownership of page input and arbitration.
+            arrivalPending = true;
+            arrivalCue = playCue;
+        }
+
+        /// <summary>Schedules voice phrases only while this interaction owns presentation.</summary>
+        private void Update()
+        {
+            // Pausing freezes intervals and the backend pauses active voices.
+            if (IsSpeaking && Time.timeScale > 0f)
+                audio.Tick(settings.Audio, transform);
+        }
 
         /// <summary>Interrupts presentation and captures progress before temporary inventory deactivation.</summary>
         /// <returns>The page and selection state to restore after retrieval.</returns>
@@ -276,6 +311,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             armed = false;
             startedRevision = Item.ConsumptionRevision;
             IsSpeaking = true;
+            arrivalPending = false;
+            audio.Begin(settings.Audio, transform, arrivalCue);
+            arrivalCue = false;
             hud.Show(settings.Entries[entry].Lines[line]);
             if (!resumed)
                 Signal(InteractionMoment.Started);
@@ -338,6 +376,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 retained = false;
                 entry = -1;
                 line = 0;
+                audio.Finish(settings.Audio, transform);
                 Signal(InteractionMoment.Completed);
             }
         }
@@ -351,6 +390,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (hud != null)
                 hud.Hide();
             IsSpeaking = false;
+            audio.Stop();
+            arrivalPending = arrivalOnly;
             armed = true;
             retained = settings.Interruption != DialogueInterruption.SelectNext;
             if (settings.Interruption != DialogueInterruption.Resume)

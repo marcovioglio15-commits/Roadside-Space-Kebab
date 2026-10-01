@@ -28,6 +28,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public InputActionReference Action;
         [Tooltip("Maximum player distance in metres for this condition Button. Interaction-event conditions have no range requirement.")]
         public float Distance = 3f;
+        [Tooltip("Number of matching events or performed inputs needed for this condition during one rule cycle.")]
+        public int Count = 1;
 
         #endregion
     }
@@ -80,8 +82,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else
                 foreach (InteractionUnlockCondition condition in Conditions)
                 {
-                    if (condition == null || condition.Trigger is not (UnlockTrigger.Interaction or UnlockTrigger.InputAction))
-                        warning = "Choose a supported condition.";
+                    if (condition == null || condition.Count < 1 || condition.Trigger is not (UnlockTrigger.Interaction or UnlockTrigger.InputAction))
+                        warning = "Choose a supported condition with a count of at least one.";
                     else
                         switch (condition.Trigger)
                         {

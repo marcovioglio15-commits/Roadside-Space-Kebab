@@ -16,6 +16,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Methods
 
+        /// <summary>Displays the existing any/all policy as an explicit logical operator.</summary>
+        /// <param name="property">Saved RequireAll flag.</param>
+        internal static void ConditionLogic(SerializedProperty property)
+        {
+            // Existing rule semantics remain unchanged when the caption becomes AND/OR.
+            property.boolValue = EditorGUILayout.Popup(new GUIContent("Logic", property.tooltip), property.boolValue ? 0 : 1,
+                new[] { "AND · all conditions", "OR · any condition" }) == 0;
+        }
+
+
         #region Catalog
 
         /// <summary>Rebuilds the named component catalog only after hierarchy or workspace refresh.</summary>
@@ -58,7 +68,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SerializedProperty conditions = settings.FindPropertyRelative("Conditions");
             SerializedProperty sources = draft.FindPropertyRelative("SourceIds");
             if (conditions.arraySize > 1)
-                HoverControls.Field(settings, "RequireAll");
+                ConditionLogic(settings.FindPropertyRelative("RequireAll"));
             // Every condition owns its source or dedicated Button independently.
             for (int index = 0; index < conditions.arraySize; index++)
             {
@@ -76,6 +86,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         }
                     }
                     HoverControls.Field(condition, "Trigger");
+                    HoverControls.Field(condition, "Count");
                     switch ((UnlockTrigger)condition.FindPropertyRelative("Trigger").enumValueIndex)
                     {
                         case UnlockTrigger.Interaction:
@@ -105,6 +116,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 added.FindPropertyRelative("Moment").enumValueIndex = (int)InteractionMoment.Completed;
                 added.FindPropertyRelative("Action").objectReferenceValue = null;
                 added.FindPropertyRelative("Distance").floatValue = 3f;
+                added.FindPropertyRelative("Count").intValue = 1;
                 sources.GetArrayElementAtIndex(sources.arraySize - 1).longValue = 0;
             }
         }

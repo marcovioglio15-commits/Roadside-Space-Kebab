@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Determines what requests a dialogue after range and consumption conditions pass.</summary>
-    public enum DialogueTrigger { Proximity, InputAction, Consumption }
+    public enum DialogueTrigger { Proximity, InputAction, Consumption, SpawnArrival }
     /// <summary>Chooses among dialogue entries whose flag requirements are satisfied.</summary>
     public enum DialogueSelection { Sequence, Random, WeightedRandom }
     /// <summary>Controls the next entry after a dialogue is interrupted by range or availability.</summary>
@@ -76,7 +76,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Activation")]
-        [Tooltip("Start by proximity, by a performed input action, or after new consumption receipts satisfy an entry. All modes require the player to be in range.")]
+        [Tooltip("Start by proximity, by a performed input action, or after new consumption receipts satisfy an entry. Spawn Arrival waits for a Day Flow walk-in request and ignores range and sight.")]
         public DialogueTrigger Trigger;
         [Tooltip("Maximum player-root distance in metres for starting or resuming a dialogue.")]
         public float Distance = 3f;
@@ -104,6 +104,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool ReplayOnReturn = true;
         [Tooltip("Available dialogue sequences and their independent flag conditions.")]
         public DialogueEntry[] Entries = { new DialogueEntry() };
+        [Header("Audio")]
+        [Tooltip("Optional voice phrases and final-page result sound.")]
+        public DialogueAudioSettings Audio = new DialogueAudioSettings();
 
         #endregion
 
@@ -118,11 +121,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Range hysteresis avoids restarting at the same boundary that just interrupted the HUD.
             warning = string.Empty;
-            if (!InteractionValues.Positive(Distance) || !InteractionValues.Positive(ExitDistance) || ExitDistance < Distance)
+            if (Audio == null || !Audio.IsValid())
+                warning = "Choose supported dialogue sounds and a positive voice interval.";
+            else if (!InteractionValues.Positive(Distance) || !InteractionValues.Positive(ExitDistance) || ExitDistance < Distance)
                 warning = "Dialogue needs positive finite distances; Exit Distance must be at least Distance.";
             else if ((RequireSightToStart || RequireSightToContinue || HideWhenSightLost) && !InteractionValues.Finite(SightOffset))
                 warning = "Dialogue Sight Offset must be finite.";
-            else if (Trigger is not (DialogueTrigger.Proximity or DialogueTrigger.InputAction or DialogueTrigger.Consumption)
+            else if (Trigger is not (DialogueTrigger.Proximity or DialogueTrigger.InputAction or DialogueTrigger.Consumption or DialogueTrigger.SpawnArrival)
                 || Selection is not (DialogueSelection.Sequence or DialogueSelection.Random or DialogueSelection.WeightedRandom)
                 || Interruption is not (DialogueInterruption.Resume or DialogueInterruption.Restart or DialogueInterruption.SelectNext))
                 warning = "Choose supported dialogue trigger, selection and interruption modes.";

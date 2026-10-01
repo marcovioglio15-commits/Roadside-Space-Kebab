@@ -149,6 +149,11 @@ namespace CatOnASkateboard.AudioStudio.Editor
                         previewParameters.Clear();
                         foreach (FmodCatalogParameter parameter in entry.Parameters)
                             previewParameters[parameter.Name] = parameter.Default;
+                        AudioBinding configured = Preset.Events.Find(binding => binding.EventPath == entry.Path);
+                        if (configured != null)
+                            foreach (AudioParameter parameter in configured.Parameters)
+                                if (previewParameters.ContainsKey(parameter.Name))
+                                    previewParameters[parameter.Name] = parameter.Value;
                     }
             EditorGUILayout.EndScrollView();
             if (selected == null)
@@ -173,7 +178,13 @@ namespace CatOnASkateboard.AudioStudio.Editor
             }
             DrawAssignments(data);
             foreach (FmodCatalogParameter parameter in selected.Parameters)
-                previewParameters[parameter.Name] = EditorGUILayout.Slider(new GUIContent(parameter.Name, parameter.Global ? "Global preview parameter." : "Event preview parameter."), previewParameters[parameter.Name], parameter.Minimum, parameter.Maximum);
+                if (parameter.Labels.Length > 0)
+                    previewParameters[parameter.Name] = parameter.Minimum + EditorGUILayout.Popup(new GUIContent(parameter.Name,
+                        "Authored FMOD parameter label used by the next preview."),
+                        Mathf.RoundToInt(previewParameters[parameter.Name] - parameter.Minimum), parameter.Labels);
+                else
+                    previewParameters[parameter.Name] = EditorGUILayout.Slider(new GUIContent(parameter.Name,
+                        parameter.Global ? "Global preview parameter." : "Event preview parameter."), previewParameters[parameter.Name], parameter.Minimum, parameter.Maximum);
             previewVolume = EditorGUILayout.Slider(new GUIContent("Preview volume", "Volume of editor auditions only."), previewVolume, 0f, 1f);
             using (new EditorGUILayout.HorizontalScope())
             {

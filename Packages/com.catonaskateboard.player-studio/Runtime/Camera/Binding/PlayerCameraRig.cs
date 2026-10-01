@@ -74,6 +74,9 @@ namespace CatOnASkateboard.PlayerStudio
         public PlayerHost Host => host;
         /// <summary>Existing camera configured by Editor Apply and followed during Play.</summary>
         public Camera View => view;
+        /// <summary>Whether this camera currently supplies grounded footstep cadence.</summary>
+        public bool HeadTiltActive => initialized && isActiveAndEnabled && view != null && view.isActiveAndEnabled
+            && settings.Mode == PlayerCameraMode.FirstPerson && settings.HeadTilt.Enabled;
         /// <summary>Optional focus anchor; null means the host transform.</summary>
         public Transform Target => target;
         /// <summary>The movement frame captured at activation.</summary>
@@ -207,9 +210,9 @@ namespace CatOnASkateboard.PlayerStudio
             // Collision uses the real player focus; smoothing never lengthens an obstructed camera arm.
             if (settings.Mode == PlayerCameraMode.ThirdPerson && settings.AvoidObstacles)
                 position = obstacles.Resolve(host, settings, focus, position, Time.deltaTime);
-            if (settings.Mode == PlayerCameraMode.FirstPerson && settings.HeadTilt.Enabled)
-                headTilt.Apply(settings.HeadTilt, motor != null && motor.isActiveAndEnabled ? motor.ActualVelocity : Vector3.zero,
-                    motor != null && motor.isActiveAndEnabled && motor.IsGrounded, Time.deltaTime, ref position, ref rotation);
+            if (HeadTiltActive && headTilt.Apply(settings.HeadTilt, motor != null && motor.isActiveAndEnabled ? motor.ActualVelocity : Vector3.zero,
+                    motor != null && motor.isActiveAndEnabled && motor.IsGrounded, Time.deltaTime, ref position, ref rotation))
+                motor?.PlayFootstep();
             view.transform.SetPositionAndRotation(position, rotation);
         }
 

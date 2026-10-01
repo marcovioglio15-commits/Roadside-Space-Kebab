@@ -1,3 +1,4 @@
+using CatOnASkateboard.AudioStudio;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,6 +43,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Transform pickupSource;
         private bool firstFollow;
         private bool pickupCompleted;
+        private bool grabbedOnce;
+        private float nextImpact;
+        private ObjectDrop drop;
+        private ObjectThrow throwing;
 
         #endregion
 
@@ -77,11 +82,39 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Lifecycle
 
+        /// <summary>Clears pickup arming when entering a new Play session with scene reload disabled.</summary>
+        internal void ResetAudio()
+        {
+            // Inventory suspension within a session preserves first-grab history.
+            grabbedOnce = false;
+            nextImpact = 0f;
+        }
+
+        /// <summary>Plays physical impacts only after pickup has armed the item and it is released.</summary>
+        /// <param name="collision">Contact manifold supplied by Unity physics.</param>
+        private void OnCollisionEnter(Collision collision)
+        {
+            // Held, consumed and stored items never emit ingredient impact sounds.
+            if (!grabbedOnce || IsHeld || Item != null && (Item.IsConsumed || Item.IsReserved)
+                || drop == null && throwing == null || !settings.CollisionAudio.Enabled || Time.time < nextImpact)
+                return;
+            float speed = 0f;
+            for (int index = 0; index < collision.contactCount; index++)
+                speed = Mathf.Max(speed, Mathf.Abs(Vector3.Dot(collision.relativeVelocity, collision.GetContact(index).normal)));
+            if (speed < settings.CollisionAudio.MinimumSpeed)
+                return;
+            nextImpact = Time.time + settings.CollisionAudio.Cooldown;
+            StudioAudio.Play("sfx_ingredientcollision", transform);
+        }
+
+
         /// <summary>Caches the authored body, colliders and hover labels at activation.</summary>
         protected override void OnEnable()
         {
             // Compound colliders belonging to another rigidbody must never inherit these overrides.
             body = GetComponent<Rigidbody>();
+            drop = GetComponent<ObjectDrop>();
+            throwing = GetComponent<ObjectThrow>();
             CacheGeometry();
             hovers = GetComponentsInChildren<ObjectHover>(true);
             base.OnEnable();
@@ -261,6 +294,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             body.constraints = RigidbodyConstraints.None;
             body.interpolation = RigidbodyInterpolation.None;
             IsHeld = true;
+            grabbedOnce = true;
+            if (settings.PickupSound)
+                StudioAudio.Play("sfx_pickup", transform);
             if (TryGetComponent(out ObjectAssemblyProduct product))
                 product.ReleaseTable();
             SetHoverSuppression(!settings.ShowHover);

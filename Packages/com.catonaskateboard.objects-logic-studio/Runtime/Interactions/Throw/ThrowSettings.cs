@@ -24,6 +24,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Initial angular velocity in radians per second around camera right, up and forward axes.")]
         public Vector3 Spin;
 
+        [Header("Audio")]
+        [Tooltip("Play the throw cue after this action releases and launches the object.")]
+        public bool Sound = true;
+
         #endregion
 
         #region Methods

@@ -28,6 +28,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public DialogueSettings Dialogue = new DialogueSettings();
         [Tooltip("Detached Slice targeting and ordered appearance/output steps.")]
         public SliceSettings Slice = new SliceSettings();
+        [Tooltip("Detached ambient event and listening radius.")]
+        public AmbientSettings Ambient = new AmbientSettings();
+        [Tooltip("Selected consuming components and order text retained across prefab stages.")]
+        public OrderDraft Orders = new OrderDraft();
         [Tooltip("Detached outline shader settings.")]
         public OutlineSettings Outline = new OutlineSettings();
         [Tooltip("Existing target and unlock conditions retained by stable prefab identity.")]
@@ -73,6 +77,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             draft.DrawGizmos = feature.DrawGizmos;
             switch (feature)
             {
+                case ObjectMakeOrder orders:
+                    draft.Orders = OrderDraft.Capture(orders.Settings);
+                    break;
+                case ObjectAmbient ambient:
+                    draft.Ambient = ObjectWorkspace.Copy(ambient.Settings);
+                    break;
                 case ObjectSlice slice:
                     draft.Slice = ObjectWorkspace.Copy(slice.Settings);
                     draft.StartAction = slice.Action;
@@ -134,6 +144,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             return feature switch
             {
+                ObjectMakeOrder orders => Orders.Resolve(orders.gameObject).TryValidate(orders.gameObject, out warning),
+                ObjectAmbient => Ambient.TryValidate(out warning),
                 ObjectSlice slice => slice.TryValidate(Slice, StartAction, out warning),
                 ObjectSpawnManager => SpawnSourceAuthoring.Validate(SpawnManagement, out warning),
                 ObjectAssemblyStation station => station.TryValidate(AssemblyStation, StartAction, out warning),

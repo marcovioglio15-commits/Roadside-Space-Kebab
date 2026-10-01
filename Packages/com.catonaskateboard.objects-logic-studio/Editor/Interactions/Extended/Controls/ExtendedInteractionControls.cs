@@ -28,6 +28,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
             switch (state.Extended.Kind)
             {
+                case ExtendedInteractionKind.MakeOrder:
+                    OrderControls.Draw(draft.FindPropertyRelative("Orders"), state.Target.Resolve());
+                    break;
+                case ExtendedInteractionKind.PlayAmbient:
+                    AmbientControls.Draw(draft.FindPropertyRelative("Ambient"));
+                    break;
                 case ExtendedInteractionKind.Slice:
                     SliceControls.Draw(draft.FindPropertyRelative("Slice"), state.Sections);
                     StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Slice", Button);
@@ -226,11 +232,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "Trigger");
-                    Field(settings, "Distance");
-                    Field(settings, "ExitDistance");
+                    if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival)
+                    {
+                        Field(settings, "Distance");
+                        Field(settings, "ExitDistance");
+                    }
                     Field(settings, "Priority");
                 }
-            if (sections.Draw("Dialogue Visibility", "Configure startup, page advancement and hiding independently."))
+            if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival
+                && sections.Draw("Dialogue Visibility", "Configure startup, page advancement and hiding independently."))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "RequireSightToStart");
@@ -249,7 +259,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     Field(settings, "Selection");
                     Field(settings, "Interruption");
-                    Field(settings, "ReplayOnReturn");
+                    if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival)
+                        Field(settings, "ReplayOnReturn");
+                }
+            if (sections.Draw("Dialogue Audio", "Optional character phrases and final-page result sound."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    SerializedProperty audio = settings.FindPropertyRelative("Audio");
+                    Field(audio, "Voice");
+                    if (audio.FindPropertyRelative("Voice").enumValueIndex != 0)
+                        Field(audio, "Interval");
+                    Field(audio, "Completion");
                 }
             if (!sections.Draw("Dialogue Entries", "Each entry contains ordered pages and optional consumption requirements."))
                 return;

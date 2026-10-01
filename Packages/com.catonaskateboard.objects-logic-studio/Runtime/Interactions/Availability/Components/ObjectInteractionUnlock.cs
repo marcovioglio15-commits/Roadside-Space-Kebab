@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private ObjectInteraction lockedTarget;
         private ObjectInteraction replacementTarget;
-        private bool[] satisfied;
+        private int[] counts;
         private InteractionButton[] buttons;
         private bool ready;
         private bool applying;
@@ -82,7 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning(warning, this);
                 return;
             }
-            satisfied = new bool[settings.Conditions.Length];
+            counts = new int[settings.Conditions.Length];
             buttons = new InteractionButton[settings.Conditions.Length];
         }
 
@@ -131,24 +131,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return settings != null && settings.TryValidate(transform.root, out warning);
         }
 
-        /// <summary>Captures satisfied conditions before inventory temporarily disables this component.</summary>
+        /// <summary>Captures accumulated condition counts before inventory temporarily disables this component.</summary>
         /// <returns>A detached progress snapshot, or null for an uninitialized rule.</returns>
-        internal bool[] CaptureStoredProgress()
+        internal int[] CaptureStoredProgress()
         {
             // Storage preserves progress without changing the normal reset-on-enable authoring policy.
-            return satisfied != null ? (bool[])satisfied.Clone() : null;
+            return counts != null ? (int[])counts.Clone() : null;
         }
 
         /// <summary>Restores inventory-retained conditions after the original rule has reactivated.</summary>
         /// <param name="conditions">Progress captured before storage.</param>
         /// <param name="applied">Whether this rule had already committed its availability operation.</param>
         /// <param name="locked">Whether its applied lock was still present before suspension.</param>
-        internal void RestoreStoredProgress(bool[] conditions, bool applied, bool locked)
+        internal void RestoreStoredProgress(int[] conditions, bool applied, bool locked)
         {
             // Restoration never publishes another unlock completion or changes other rules' ownership.
-            if (!ready || conditions == null || satisfied.Length != conditions.Length)
+            if (!ready || conditions == null || counts.Length != conditions.Length)
                 return;
-            System.Array.Copy(conditions, satisfied, conditions.Length);
+            System.Array.Copy(conditions, counts, conditions.Length);
             IsApplied = applied;
             ApplyLocks();
             if (locked && lockedTarget != null)
@@ -175,11 +175,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!ready || applying || IsApplied && !settings.Repeat || !Available(InteractionChannels.None))
                 return;
             for (int index = 0; index < buttons.Length; index++)
-                if (!satisfied[index] && buttons[index] is { Pending: true }
+                if (counts[index] < settings.Conditions[index].Count && buttons[index] is { Pending: true }
                     && (settings.Target.transform.position - player.position).sqrMagnitude
                     <= settings.Conditions[index].Distance * settings.Conditions[index].Distance)
                 {
-                    satisfied[index] = true;
+                    counts[index]++;
                     InteractionUnlockRegistry.Consume(settings.Conditions[index].Action);
                 }
             TryApply();
@@ -193,10 +193,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // No name matching occurs at runtime; duplicate and renamed cards keep their identity.
             if (!ready || applying || IsApplied && !settings.Repeat || !Available(InteractionChannels.None))
                 return;
-            for (int index = 0; index < satisfied.Length; index++)
-                if (settings.Conditions[index].Trigger == UnlockTrigger.Interaction
+            for (int index = 0; index < counts.Length; index++)
+                if (counts[index] < settings.Conditions[index].Count && settings.Conditions[index].Trigger == UnlockTrigger.Interaction
                     && settings.Conditions[index].Source == source && settings.Conditions[index].Moment == moment)
-                    satisfied[index] = true;
+                    counts[index]++;
             TryApply();
         }
 
@@ -205,8 +205,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A target with multiple rules becomes usable only after every owning rule releases it.
             bool any = false;
-            foreach (bool condition in satisfied)
+            for (int index = 0; index < counts.Length; index++)
             {
+                bool condition = counts[index] >= settings.Conditions[index].Count;
                 if (settings.RequireAll && !condition)
                     return;
                 any |= condition;
@@ -219,7 +220,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (replacementTarget != null)
                 replacementTarget.SetRuleLocked(this, false);
             if (settings.Repeat)
-                System.Array.Clear(satisfied, 0, satisfied.Length);
+                System.Array.Clear(counts, 0, counts.Length);
             applying = true;
             try
             {

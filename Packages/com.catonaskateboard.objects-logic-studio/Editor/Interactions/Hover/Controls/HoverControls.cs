@@ -119,11 +119,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Draws a scalar with its authored tooltip and without Header spacing inside a dropdown.</summary>
         /// <param name="parent">Owning serialized block.</param>
         /// <param name="name">Serialized field name.</param>
-        internal static void Field(SerializedProperty parent, string name)
+        /// <param name="caption">Optional compact field caption.</param>
+        internal static void Field(SerializedProperty parent, string name, string caption = null)
         {
             // Native property fields remain available for asset references and layer masks.
             SerializedProperty property = parent.FindPropertyRelative(name);
-            GUIContent label = new GUIContent(Label(property), property.tooltip);
+            GUIContent label = new GUIContent(caption ?? Label(property), property.tooltip);
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Boolean:

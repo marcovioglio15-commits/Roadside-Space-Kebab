@@ -161,6 +161,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
         internal float Maximum;
         internal float Default;
         internal bool Global;
+        internal string[] Labels = Array.Empty<string>();
         #endregion
     }
 }

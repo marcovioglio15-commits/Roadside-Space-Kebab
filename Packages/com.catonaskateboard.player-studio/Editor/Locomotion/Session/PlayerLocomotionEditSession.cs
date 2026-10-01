@@ -107,6 +107,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [SerializeField]
         private float coyoteTime;
 
+        [Header("Audio Draft")]
+        [Tooltip("Detached footstep and collision proposal.")]
+        [SerializeField]
+        private PlayerAudioSettings audio = new PlayerAudioSettings();
+        [Tooltip("Audio snapshot last read from the preset for external-edit detection.")]
+        [SerializeField]
+        private string originalAudio = JsonUtility.ToJson(new PlayerAudioSettings());
+        private bool headTilt;
+
         #endregion
 
         #region Properties
@@ -148,7 +157,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         public float CoyoteTime => coyoteTime;
 
         /// <summary>Detects pending values even after the source reference is lost.</summary>
-        public bool HasChanges => !speed.Equals(originalSpeed) || !acceleration.Equals(originalAcceleration)
+        public bool HeadTilt => headTilt;
+
+        /// <summary>Detects audio changes alongside movement proposals.</summary>
+        public bool HasChanges => JsonUtility.ToJson(audio) != originalAudio || !speed.Equals(originalSpeed) || !acceleration.Equals(originalAcceleration)
             || !deceleration.Equals(originalDeceleration)
             || !useGravity.Equals(originalUseGravity)
             || !gravityAcceleration.Equals(originalGravityAcceleration)
@@ -173,6 +185,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (HasChanges)
                 return;
 
+            headTilt = master != null && master.CameraPreset != null && master.CameraPreset.TryGetSettings(out PlayerCameraSettings camera, out _)
+                && camera.Mode == PlayerCameraMode.FirstPerson && camera.HeadTilt.Enabled;
             source = master != null ? master.LocomotionPreset : null;
             Discard();
         }
@@ -223,6 +237,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         public bool TryValidate(out string warning)
         {
             // The immutable settings type owns the rules for both editing and runtime initialization.
+            if (!audio.TryValidate(out warning))
+                return false;
             return PlayerGravitySettings.TryCreate(useGravity, gravityAcceleration, terminalSpeed, groundSpeed,
                 out PlayerGravitySettings gravity, out warning)
                 && PlayerJumpSettings.TryCreate(useJump, jumpHeight, jumpBufferTime, coyoteTime, gravity,
@@ -257,6 +273,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 originalGravityAcceleration = originalTerminalSpeed = originalGroundSpeed = 0f;
             }
 
+            originalAudio = JsonUtility.ToJson(source != null ? source.Audio : new PlayerAudioSettings());
+            audio = JsonUtility.FromJson<PlayerAudioSettings>(originalAudio);
             SetDraft(originalSpeed, originalAcceleration, originalDeceleration);
             SetGravityDraft(originalUseGravity, originalGravityAcceleration, originalTerminalSpeed, originalGroundSpeed);
             SetJumpDraft(originalUseJump, originalJumpHeight, originalJumpBufferTime, originalCoyoteTime);
@@ -288,7 +306,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
             // Compare every edited property immediately before preparing the candidate.
             SerializedObject serialized = new SerializedObject(source);
-            if (!serialized.FindProperty("speed").floatValue.Equals(originalSpeed)
+            if (JsonUtility.ToJson(source.Audio) != originalAudio
+                || !serialized.FindProperty("speed").floatValue.Equals(originalSpeed)
                 || !serialized.FindProperty("acceleration").floatValue.Equals(originalAcceleration)
                 || !serialized.FindProperty("deceleration").floatValue.Equals(originalDeceleration)
                 || !serialized.FindProperty("useGravity").boolValue.Equals(originalUseGravity)
@@ -306,6 +325,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
 
             changes = serialized;
+            changes.FindProperty("Audio").boxedValue = JsonUtility.FromJson<PlayerAudioSettings>(JsonUtility.ToJson(audio));
             changes.FindProperty("speed").floatValue = speed;
             changes.FindProperty("acceleration").floatValue = acceleration;
             changes.FindProperty("deceleration").floatValue = deceleration;
