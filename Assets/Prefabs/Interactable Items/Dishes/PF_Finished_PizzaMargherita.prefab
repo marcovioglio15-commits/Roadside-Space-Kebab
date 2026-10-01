@@ -172,6 +172,7 @@ GameObject:
   - component: {fileID: 6291863003508957925}
   - component: {fileID: -7524546340151767831}
   - component: {fileID: 2180616153765746934}
+  - component: {fileID: 313421414926010583}
   m_Layer: 6
   m_Name: PF_Finished_PizzaMargherita
   m_TagString: Untagged
@@ -307,6 +308,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -327,6 +329,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &6291863003508957925
 MonoBehaviour:
@@ -432,6 +439,7 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
 --- !u!114 &2180616153765746934
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,15 +481,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
     style:
       content: Pizza Margherita
       font: {fileID: 0}
@@ -501,6 +516,92 @@ MonoBehaviour:
       backgroundSprite: {fileID: 0}
       backgroundType: 0
   drawGizmos: 1
+--- !u!114 &313421414926010583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3748823794255209065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b3f1b34465481291b768662cedce04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyProduct
+  interactionName: Assembly Pizza Margherita
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Ingredients:
+    - Flags:
+      - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: a0e42af0629e8484fa131faa689723bf, type: 2}
+      Count: 1
+      Optional: 0
+    Magnets:
+    - Name: Magnet 1
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+      Order: 1
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 3176775191320682383, guid: df2a34812f3fced4c94972c3861e05a5, type: 3}
+    - Name: Magnet 2
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: a0e42af0629e8484fa131faa689723bf, type: 2}
+      Order: 2
+      Position: {x: 0, y: 0.011163271, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 4357755812359040115, guid: b337591f6f4024a40a7b3024484e4fc8, type: 3}
+    InteractionRules:
+    - Target: {fileID: 4060919288793665968}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    - Target: {fileID: 6291863003508957925}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    - Target: {fileID: -7524546340151767831}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    CompletedAppearance:
+      Meshes: []
+      Materials: []
+    HideIngredients: 1
 --- !u!1 &9096285007244077299
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,13 +736,30 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -5754084199372789682, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6480718798285180254}
   m_SourcePrefab: {fileID: 100100000, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
 --- !u!4 &5994002071574155790 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
   m_PrefabInstance: {fileID: 6099070564039620069}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6369542933444708532 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
+  m_PrefabInstance: {fileID: 6099070564039620069}
+  m_PrefabAsset: {fileID: 0}
+--- !u!33 &6480718798285180254
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6369542933444708532}
+  m_Mesh: {fileID: 0}

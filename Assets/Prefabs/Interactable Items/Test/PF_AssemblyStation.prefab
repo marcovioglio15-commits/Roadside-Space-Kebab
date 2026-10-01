@@ -304,21 +304,21 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
+  settingsPreset: {fileID: 11400000, guid: c45be141bdfc377408c0dc37af3c24b5, type: 2}
   drawGizmos: 1
   settings:
-    ProductPrefab: {fileID: 3500573369959323781, guid: 1ce0407b79e592b458738e6cb31546c4, type: 3}
+    ProductPrefab: {fileID: 3748823794255209065, guid: c684292326866854fb5205e178ec9fbe, type: 3}
     Trigger: 2
     ContactDuration: 0.5
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
-    IncludeTriggers: 1
+    IncludeTriggers: 0
     Distance: 3
     RequireSight: 1
     Obstacles:
       serializedVersion: 2
       m_Bits: 4294967295
-    OutputPosition: {x: 0, y: 0.5, z: 0}
+    OutputPosition: {x: 0, y: 0.05, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
     AcceptReturnedProduct: 1
   action: {fileID: 0}
