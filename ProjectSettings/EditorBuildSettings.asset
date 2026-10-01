@@ -12,10 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_Blockout_LogicTest.unity
     guid: ecdb3f95b4526cb458f0cd1c105ef9ca
   - enabled: 1
-    path: Assets/Scenes/Test/Programming/UI/SCN_PauseMenu.unity
+    path: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_PauseMenu.unity
     guid: e7eb9732224d9834d954a394baf1b51b
-  - enabled: 1
-    path: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_PlayerStudioMovement.unity
-    guid: 66feab5d8bda5be45aba1ce79d501712
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}

@@ -35,7 +35,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
         #region Methods
         #region Window
         /// <summary>Opens the standalone Menu Studio workspace.</summary>
-        [MenuItem("Tools/Menu Studio")]
+        //[MenuItem("Tools/Menu Studio")]
         public static void Open()
         {
             // Menu presets and scenes are selected explicitly in the compact workspace.

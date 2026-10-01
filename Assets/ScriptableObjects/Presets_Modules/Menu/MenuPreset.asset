@@ -16,15 +16,12 @@ MonoBehaviour:
   PauseTitle: PAUSED
   GameplayScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_Blockout_LogicTest.unity
   MainMenuScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_MainMenu.unity
-  PauseScene: Assets/Scenes/Test/Programming/UI/SCN_PauseMenu.unity
+  PauseScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_PauseMenu.unity
   IncludeSettings: 1
   IncludeCredits: 1
   IncludeRestart: 1
   ConfirmQuit: 1
-  Credits: 'Credits
-
-
-    Your team here'
+  Credits: Credits
   ControlsText: 'Move: WASD / Left stick
 
     Look: Mouse / Right stick

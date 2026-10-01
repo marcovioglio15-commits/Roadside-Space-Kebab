@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b77670925e4c3e4fa61bf42efd92efd, type: 3}
+  m_Name: DayFlowPlan
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.SpawnFlowPlan
+  Days:
+  - Name: Day 1
+    Scene: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_Blockout_LogicTest.unity
+    RandomCount: 1
+    Count: 1
+    Minimum: 5
+    Maximum: 10
+    Selection: 1
+    Steps:
+    - Name: Spawn 1
+      Prefab: {fileID: 3097014450015891093, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Completion: {fileID: 5254269728490429368, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 0.99, z: -5.073}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 0.99, z: -5.073}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+  - Name: Day 2
+    Scene: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_Blockout_LogicTest.unity
+    RandomCount: 0
+    Count: 3
+    Minimum: 1
+    Maximum: 3
+    Selection: 1
+    Steps:
+    - Name: Spawn 1
+      Prefab: {fileID: 3097014450015891093, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Completion: {fileID: 5254269728490429368, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Weight: 1
+      Delay: 0
+      Position: {x: -1.053, y: 0.99, z: -5.073}
+      Rotation: {x: 0, y: 0, z: 0}
+      WalkIn:
+        Enabled: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 0.99, z: -5.073}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 0.99, z: -5.073}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+  Loop: 1
+  MainMenu: 
+  PauseScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_PauseMenu.unity
+  FadeOut: 0.5
+  BlackDelay: 0.2
+  FadeIn: 0.5
+  FixedSeed: 0
+  Seed: 1

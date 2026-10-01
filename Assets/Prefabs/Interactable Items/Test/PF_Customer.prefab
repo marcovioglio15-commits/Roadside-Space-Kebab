@@ -1,5 +1,117 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2640551324973694607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3902746370405300848}
+  - component: {fileID: 8944489232215373468}
+  - component: {fileID: 7740591780502162513}
+  - component: {fileID: 8204411704168140872}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3902746370405300848
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2640551324973694607}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.13713002, y: 0.33161008, z: 0.671}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8835111422629543820}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8944489232215373468
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2640551324973694607}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &7740591780502162513
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2640551324973694607}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &8204411704168140872
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2640551324973694607}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3097014450015891093
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,7 +152,8 @@ Transform:
   m_LocalPosition: {x: 3.0723, y: 1.02182, z: -5.097}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3902746370405300848}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3757105704402398700
@@ -125,9 +238,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
   interactionName: Dialogue Test
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -181,9 +299,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
   interactionName: Modify by contact
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -210,6 +333,8 @@ MonoBehaviour:
     CompleteAfterSeparation: 0
     ResumeAfterInterruption: 0
     RepeatAfterSeparation: 0
+    WhileContact: 0
+    RevertDelay: 0.25
     Self:
       Tint: 0
       Multiplier: {r: 1, g: 1, b: 1, a: 1}
@@ -228,6 +353,7 @@ MonoBehaviour:
       Consume: 1
     ChangeContactFlag: 0
     ContactFlag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    ContactFlagOperation: 0
     BlockSelf: 1
     BlockOther: 1
 --- !u!114 &4771604094856511517
@@ -243,9 +369,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
   interactionName: Dialogue Test Consumption
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -344,9 +475,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
   interactionName: Dialogue Test Post Consumption
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -409,9 +545,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
   interactionName: Availability Rule
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -427,6 +568,8 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Operation: 2
+    InitiallyLocked: 1
+    Repeat: 0
     Target: {fileID: 4488316828472950241}
     Replacement: {fileID: 5254269728490429368}
     RequireAll: 1
@@ -449,9 +592,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
   interactionName: Availability Rule
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -467,6 +615,8 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Operation: 1
+    InitiallyLocked: 1
+    Repeat: 0
     Target: {fileID: 4771604094856511517}
     Replacement: {fileID: 0}
     RequireAll: 1
@@ -486,7 +636,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   flags:
   - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
