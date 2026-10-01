@@ -110,6 +110,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Release only locks owned by this assembly component if the object itself survives.
             destroying = true;
+            foreach (ObjectAssemblyPart part in parts)
+                if (part != null)
+                    part.SetGeometryHidden(false);
             if (features == null)
                 return;
             foreach (ObjectInteraction feature in features)
@@ -149,6 +152,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (initializationSession == session)
                 return;
             initializationSession = session;
+            foreach (ObjectAssemblyPart part in parts)
+                if (part != null)
+                    part.SetGeometryHidden(false);
             if (completedAppearanceApplied)
                 completedAppearance?.Restore();
             completedAppearance = null;
@@ -399,6 +405,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     completedAppearance.Restore();
                 completedAppearanceApplied = IsComplete;
             }
+            // Optional ingredients inserted after completion also inherit the final presentation immediately.
+            foreach (ObjectAssemblyPart part in parts)
+                part.SetGeometryHidden(IsComplete && settings.ReplacesIngredients);
             foreach (ObjectInteraction feature in features)
             {
                 if (feature == null || feature == this || feature is ObjectInteractionUnlock)

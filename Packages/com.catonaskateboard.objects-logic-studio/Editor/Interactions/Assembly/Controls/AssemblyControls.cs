@@ -85,7 +85,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUI.IndentLevelScope())
                     DrawMagnets(settings.FindPropertyRelative("Magnets"));
             RefreshIngredients(settings.FindPropertyRelative("Ingredients"));
-            ItemAppearanceControls.Draw(settings.FindPropertyRelative("CompletedAppearance"));
+            SerializedProperty completed = settings.FindPropertyRelative("CompletedAppearance");
+            ItemAppearanceControls.Draw(completed);
+            if (completed.isExpanded && completed.FindPropertyRelative("Meshes").arraySize > 0)
+                using (new EditorGUI.IndentLevelScope())
+                    HoverControls.Field(settings, "HideIngredients");
             if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly."))
                 using (new EditorGUI.IndentLevelScope())
                     DrawRules(settings.FindPropertyRelative("InteractionRules"), draft.FindPropertyRelative("TargetIds"), state);

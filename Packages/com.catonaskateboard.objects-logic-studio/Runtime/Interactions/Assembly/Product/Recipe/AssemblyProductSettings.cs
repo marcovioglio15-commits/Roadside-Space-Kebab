@@ -81,6 +81,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public AssemblyInteractionRule[] InteractionRules = Array.Empty<AssemblyInteractionRule>();
         [Tooltip("Mesh and material changes on the product's existing hierarchy when the recipe completes. Losing completion restores its previous appearance.")]
         public ItemAppearanceSettings CompletedAppearance = new ItemAppearanceSettings();
+        [Tooltip("Hide the inserted ingredients' meshes while a completed mesh replacement is active. Geometry returns when the recipe becomes incomplete or an ingredient detaches; collisions and VFX stay active.")]
+        public bool HideIngredients = true;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Whether completed product meshes replace the assembled ingredients' visible geometry.</summary>
+        public bool ReplacesIngredients => HideIngredients && CompletedAppearance?.Meshes is { Length: > 0 };
 
         #endregion
     }
