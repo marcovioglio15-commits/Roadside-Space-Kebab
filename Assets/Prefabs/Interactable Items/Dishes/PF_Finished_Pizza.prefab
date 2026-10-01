@@ -566,7 +566,7 @@ MonoBehaviour:
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
-      Order: 0
+      Order: 1
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
@@ -578,7 +578,7 @@ MonoBehaviour:
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
-      Order: 1
+      Order: 2
       Position: {x: 0, y: 0.031446874, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
