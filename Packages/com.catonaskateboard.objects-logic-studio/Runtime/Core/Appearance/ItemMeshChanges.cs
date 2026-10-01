@@ -79,30 +79,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int index = 0; index < replacements.Length; index++)
             {
                 ContactMeshReplacement replacement = replacements[index];
-                Transform branch = replacement != null ? Resolve(item.transform, replacement.Path) : null;
-                if (!CanBind(item, branch, replacement))
-                {
-                    warning = "A mesh replacement path is missing, ambiguous, or lacks its requested mesh component.";
+                if (!ItemAppearanceBindings.TryMesh(item, replacement, out Transform branch, out warning))
                     return false;
-                }
                 bindings[index] = new MeshBinding(branch, replacement);
             }
             changes = new ItemMeshChanges(item, bindings);
             warning = string.Empty;
             return true;
-        }
-
-        /// <summary>Checks existing mesh components without allocating a reversible operation.</summary>
-        /// <param name="item">Item owning the affected branch.</param>
-        /// <param name="branch">Resolved target transform.</param>
-        /// <param name="replacement">Requested mesh and collider policy.</param>
-        /// <returns>True when the replacement can bind to existing owned components.</returns>
-        internal static bool CanBind(ObjectItem item, Transform branch, ContactMeshReplacement replacement)
-        {
-            // Eligibility queries need no snapshots of original geometry or materials.
-            return item != null && branch != null && replacement != null && replacement.Mesh != null && item.Owns(branch)
-                && (branch.GetComponent<MeshFilter>() != null || branch.GetComponent<SkinnedMeshRenderer>() != null)
-                && (!replacement.UpdateCollider || branch.GetComponent<MeshCollider>() != null);
         }
 
         /// <summary>Resolves a reusable named route only when each segment identifies exactly one child.</summary>

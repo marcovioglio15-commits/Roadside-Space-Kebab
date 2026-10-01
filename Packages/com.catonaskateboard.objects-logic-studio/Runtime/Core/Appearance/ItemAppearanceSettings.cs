@@ -58,18 +58,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when every requested mesh and renderer belongs to this item.</returns>
         public bool CanBind(ObjectItem item)
         {
+            // Eligibility and editor validation resolve the same hierarchy without appearance snapshots.
+            return TryValidateBindings(item, out _);
+        }
+
+        /// <summary>Checks selected branches before Apply or recipe activation and identifies missing components.</summary>
+        /// <param name="item">Item whose existing hierarchy must receive the replacements.</param>
+        /// <param name="warning">Receives the first invalid target and the component it requires.</param>
+        /// <returns>True when every replacement can bind without creating runtime components.</returns>
+        public bool TryValidateBindings(ObjectItem item, out string warning)
+        {
             // Data validation precedes this lightweight eligibility check.
+            warning = "Appearance replacements require an Object Item and complete replacement lists.";
             if (item == null || Meshes == null || Materials == null)
                 return false;
             foreach (ContactMeshReplacement replacement in Meshes)
-                if (replacement == null || !ItemMeshChanges.CanBind(item, ItemMeshChanges.Resolve(item.transform, replacement.Path), replacement))
+                if (!ItemAppearanceBindings.TryMesh(item, replacement, out _, out warning))
                     return false;
             foreach (ItemMaterialReplacement replacement in Materials)
-            {
-                Transform branch = replacement != null ? ItemMeshChanges.Resolve(item.transform, replacement.Path) : null;
-                if (branch == null || !item.Owns(branch) || !branch.TryGetComponent(out Renderer _))
+                if (!ItemAppearanceBindings.TryRenderer(item, replacement, out _, out warning))
                     return false;
-            }
+            warning = string.Empty;
             return true;
         }
 

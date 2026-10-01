@@ -50,9 +50,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool TryValidate(out string warning)
         {
             // Local action and staging bindings are validated by the table component separately.
-            warning = "Choose a product prefab with an enabled Assembly Product component.";
-            if (ProductPrefab == null || ProductPrefab.scene.IsValid()
-                || !ProductPrefab.TryGetComponent(out ObjectAssemblyProduct product) || !product.enabled)
+            warning = "Choose an Assembly Product prefab.";
+            if (ProductPrefab == null)
+                return false;
+            warning = $"'{ProductPrefab.name}' must reference a prefab asset, not a scene instance.";
+            if (ProductPrefab.scene.IsValid())
+                return false;
+            warning = $"'{ProductPrefab.name}' needs an enabled Assembly Product component on its root. Configure its recipe in Object Assemble.";
+            if (!ProductPrefab.TryGetComponent(out ObjectAssemblyProduct product) || !product.enabled)
                 return false;
             if (!product.TryValidate(out warning))
                 return false;

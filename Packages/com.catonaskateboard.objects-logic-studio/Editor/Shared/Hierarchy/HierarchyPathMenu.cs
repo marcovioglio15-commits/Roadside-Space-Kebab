@@ -60,6 +60,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             string label = string.IsNullOrEmpty(property.stringValue) ? all ? "All Renderers" : "Root" : property.stringValue;
             if (property.stringValue == ".")
                 label = "Root";
+            // An empty route must not appear valid when the prefab root has no matching component.
+            if (source != null && !all && !transforms)
+            {
+                Transform target = string.IsNullOrEmpty(property.stringValue) || property.stringValue == "."
+                    ? source.transform : source.transform.Find(property.stringValue);
+                if (target == null)
+                    label += " (missing)";
+                else if (mesh ? target.GetComponent<MeshFilter>() == null && target.GetComponent<SkinnedMeshRenderer>() == null
+                    : target.GetComponent<Renderer>() == null)
+                    label += mesh ? " (no mesh component)" : " (no renderer)";
+            }
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
             EditorGUILayout.PrefixLabel(new GUIContent(transforms ? "Transform" : mesh ? "Mesh Target" : "Renderer Target", property.tooltip));
             using (new EditorGUI.DisabledScope(source == null))
