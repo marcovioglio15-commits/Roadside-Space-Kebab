@@ -599,7 +599,10 @@ MonoBehaviour:
       MinimumIngredients: 1
       Ingredients: []
     CompletedAppearance:
-      Meshes: []
+      Meshes:
+      - Path: SM_Finished_PizzaMargherita
+        Mesh: {fileID: 2528236585992998278, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
+        UpdateCollider: 0
       Materials: []
     HideIngredients: 1
 --- !u!1 &9096285007244077299
