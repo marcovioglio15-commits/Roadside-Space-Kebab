@@ -43,11 +43,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Captures shared geometry when the prefab, guide assignments or source assets change.</summary>
         /// <param name="product">Current product prefab contents.</param>
         /// <param name="settings">Detached recipe layout with optional guide prefabs.</param>
-        internal void Refresh(GameObject product, AssemblyProductSettings settings)
+        /// <param name="completed">Whether to show the completed appearance instead of ingredient placement.</param>
+        internal void Refresh(GameObject product, AssemblyProductSettings settings, bool completed)
         {
             // Draw shared meshes directly; execute-always components and source cameras never run.
             entries.Clear();
-            Add(product, -1, false, settings.CompletedAppearance);
+            Add(product, -1, false, completed ? settings.CompletedAppearance : null);
+            if (completed && settings.ReplacesIngredients)
+                return;
             for (int index = 0; index < settings.Magnets.Length; index++)
                 if (settings.Magnets[index].PreviewPrefab != null)
                     Add(settings.Magnets[index].PreviewPrefab, index, true, settings.Magnets[index].Appearance);

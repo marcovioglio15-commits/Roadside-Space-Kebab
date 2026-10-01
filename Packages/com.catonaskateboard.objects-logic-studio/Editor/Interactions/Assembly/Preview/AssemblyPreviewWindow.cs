@@ -19,6 +19,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Move, rotate, scale or hand tool mode.")]
         [SerializeField]
         private int mode;
+        [Tooltip("Show the completed product appearance instead of ingredient placement guides.")]
+        [SerializeField]
+        private bool completed;
         [Tooltip("Orbit angles retained when the preview reloads.")]
         [SerializeField]
         private Vector2 orbit = new Vector2(25f, 145f);
@@ -146,7 +149,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             AssemblyProductSettings settings = state.Extended.Draft.AssemblyProduct.Settings;
             if (dirty || cachedRoot != root)
             {
-                geometry.Refresh(root, settings);
+                geometry.Refresh(root, settings, completed);
                 cachedRoot = root;
                 dirty = false;
             }
@@ -160,6 +163,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 mode = GUILayout.Toolbar(mode, modes, EditorStyles.toolbarButton, GUILayout.Width(240f));
                 if (GUILayout.Button(new GUIContent("Frame All", "Fit the product and all guide prefabs in the viewport."), EditorStyles.toolbarButton, GUILayout.Width(80f)))
                     Frame(settings);
+                EditorGUI.BeginChangeCheck();
+                completed = GUILayout.Toggle(completed, new GUIContent("Completed", "Show the final mesh and ingredient visibility after the recipe completes."),
+                    EditorStyles.toolbarButton, GUILayout.Width(80f));
+                if (EditorGUI.EndChangeCheck())
+                    Refresh();
                 GUILayout.FlexibleSpace();
                 GUILayout.Label(new GUIContent("RMB + WASD/QE · Alt + drag · F", "RMB: look and fly with WASD/QE; Shift: faster; wheel while flying: speed. Alt+LMB: orbit; MMB: pan; Alt+RMB or wheel: zoom. F: frame selected; Q/W/E/R: hand/move/rotate/scale."), EditorStyles.miniLabel);
             }

@@ -25,6 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private string originalName;
         private bool attached;
         private ItemAppearanceChanges appearance;
+        private AssemblyPartVisibility visibility;
         private readonly Dictionary<Collider, Collider> shapes = new Dictionary<Collider, Collider>();
 
         #endregion
@@ -139,10 +140,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return attached && source != null && shapes.TryGetValue(source, out Collider proxy) ? proxy : null;
         }
 
+        /// <summary>Suppresses ingredient geometry when its product displays a replacement mesh.</summary>
+        /// <param name="hidden">Whether completion currently replaces this ingredient's visuals.</param>
+        internal void SetGeometryHidden(bool hidden)
+        {
+            // Recipes without completed mesh replacements allocate no renderer visibility cache.
+            if (hidden)
+                visibility ??= new AssemblyPartVisibility(transform);
+            visibility?.SetHidden(hidden);
+        }
+
         /// <summary>Updates the surviving product when an ingredient is explicitly destroyed.</summary>
         private void OnDestroy()
         {
             // A destroyed product ignores callbacks from its own children.
+            SetGeometryHidden(false);
             if (!attached)
                 return;
             attached = false;
@@ -159,6 +171,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             RemoveGeometry();
             product.Remove(this);
             product = null;
+            SetGeometryHidden(false);
             appearance.Restore();
             appearance = null;
             transform.localScale = originalScale;
