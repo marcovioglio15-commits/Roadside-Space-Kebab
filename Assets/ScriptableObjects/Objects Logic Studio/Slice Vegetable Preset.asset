@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06d0cde110444068911453f2539b2bc7, type: 3}
+  m_Name: Slice Vegetable Preset
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.SlicePreset
+  ToolRequirement:
+    Mode: 2
+    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    Tools: []
+  Settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 55
+      DrawGizmos: 1
+    Priority: 99
+    Contact:
+      Enabled: 0
+      Flags:
+      - {fileID: 11400000, guid: 502cd1abface4603a56e2231e33003ff, type: 2}
+      Match: 0
+      Tolerance: 0.1
+      IncludeTriggers: 1
+    Interval: 0.15
+    Steps:
+    - Name: Slice 1
+      Consume: 1
+      Meshes: []
+      Materials: []
+      Spawns:
+      - Prefab: {fileID: 4593334166877187736, guid: f4e42104d5f929b4faeaee372fcc8a1e, type: 3}
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+      - Prefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+      - Prefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+      - Prefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
