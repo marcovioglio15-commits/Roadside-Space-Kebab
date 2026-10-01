@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CheeseSlice
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
   DisplayName: CheeseSlice
-  Group: Ingredient
+  Group: Ingredients
   Description: 
