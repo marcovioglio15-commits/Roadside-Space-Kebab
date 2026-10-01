@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c50280941a4743a48c31f044cd0f3062, type: 3}
-  m_Name: AssemblyStation Preset Test
+  m_Name: AssemblyStation Pizza Preset
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.AssemblyStationPreset
   ToolRequirement:
     Mode: 0
     Tool: {fileID: 0}
     Tools: []
   Settings:
-    ProductPrefab: {fileID: 4182828039336747428, guid: cb83fdee05565914083f160286ab031a, type: 3}
+    ProductPrefab: {fileID: 3176775191320682383, guid: df2a34812f3fced4c94972c3861e05a5, type: 3}
     Trigger: 2
     ContactDuration: 0.5
     ContactQueryInterval: 0.02
@@ -27,7 +27,7 @@ MonoBehaviour:
     RequireSight: 1
     Obstacles:
       serializedVersion: 2
-      m_Bits: 55
-    OutputPosition: {x: 0, y: 0.1, z: 0}
+      m_Bits: 4294967295
+    OutputPosition: {x: 0, y: 0.05, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
     AcceptReturnedProduct: 1
