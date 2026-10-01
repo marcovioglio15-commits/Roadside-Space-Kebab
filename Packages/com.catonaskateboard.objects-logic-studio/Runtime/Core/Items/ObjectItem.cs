@@ -92,13 +92,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when this item owns the branch directly or through an attached ingredient.</returns>
         internal bool Owns(Transform branch)
         {
-            // Disabled ingredient items retain their receipts while their product owns visual effects.
+            // Prefab assets and staged products must retain ownership before their hierarchy is activated.
             if (branch.GetComponentInParent<InteractionVfxInstance>(true) != null)
                 return false;
-            ObjectItem nearest = branch.GetComponentInParent<ObjectItem>();
+            ObjectItem nearest = branch.GetComponentInParent<ObjectItem>(true);
             if (nearest == this)
                 return true;
-            ObjectAssemblyPart part = branch.GetComponentInParent<ObjectAssemblyPart>();
+            ObjectAssemblyPart part = branch.GetComponentInParent<ObjectAssemblyPart>(true);
             return part != null && part.Product != null && part.Product.Item == this;
         }
 

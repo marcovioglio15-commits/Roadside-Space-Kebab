@@ -79,8 +79,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Add compatible magnets or quantity capacity for all mandatory ingredients and numbered slots.";
                 return false;
             }
-            return settings.CompletedAppearance != null && settings.CompletedAppearance.TryValidate(out warning)
-                && ValidateRules(owner, settings, quantities, total, out warning);
+            // Final appearance belongs to this prefab, so invalid targets must fail before Apply or spawning.
+            if (settings.CompletedAppearance == null)
+            {
+                warning = "Configure the completed appearance lists.";
+                return false;
+            }
+            if (!settings.CompletedAppearance.TryValidate(out warning)
+                || !settings.CompletedAppearance.TryValidateBindings(owner.GetComponent<ObjectItem>(), out warning))
+            {
+                warning = "Completed Appearance: " + warning;
+                return false;
+            }
+            return ValidateRules(owner, settings, quantities, total, out warning);
         }
 
         #endregion

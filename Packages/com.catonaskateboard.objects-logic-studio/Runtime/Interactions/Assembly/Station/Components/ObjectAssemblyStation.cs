@@ -27,6 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectAssemblyProduct current;
         private AssemblyContactRun contact;
         private bool contactReady;
+        private string lastWarning;
 
         #endregion
 
@@ -67,9 +68,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.Trigger != AssemblyStationTrigger.InputAction)
             {
                 contactReady = TryValidate(out string warning);
-                if (!contactReady)
-                    Debug.LogWarning(warning, this);
-                else
+                if (!contactReady && lastWarning != warning)
+                    Debug.LogWarning($"Assembly Station '{InteractionName}' on '{name}': {warning}", this);
+                lastWarning = contactReady ? string.Empty : warning;
+                if (contactReady)
                 {
                     contact ??= new AssemblyContactRun();
                     contact.Bind(this);
@@ -84,6 +86,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             AssemblyInteractionRegistry.Unregister(this);
             contact?.Reset();
             contactReady = false;
+            lastWarning = string.Empty;
         }
 
         #endregion

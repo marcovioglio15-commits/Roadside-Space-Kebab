@@ -769,15 +769,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.2
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
     style:
       content: Hi, I'm being hovered.
       font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
@@ -835,6 +842,7 @@ MonoBehaviour:
     Target:
       Distance: 3
       Mode: 0
+      SolidHitOnly: 0
       CenterRadius: 0.15
       Offset: {x: 0, y: 0, z: 0}
       ObstacleMask:
@@ -847,6 +855,7 @@ MonoBehaviour:
     Stock: 1
     PickupDuration: 0.35
     OutputRotation: {x: 0, y: 0, z: 0}
+    FillSteps: []
 --- !u!114 &3005331026009365597
 MonoBehaviour:
   m_ObjectHideFlags: 0

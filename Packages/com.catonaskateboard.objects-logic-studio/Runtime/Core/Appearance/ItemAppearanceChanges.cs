@@ -64,14 +64,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             Renderer[] targets = new Renderer[materials.Length];
             for (int index = 0; index < targets.Length; index++)
-            {
-                Transform branch = ItemMeshChanges.Resolve(item.transform, materials[index].Path);
-                if (branch == null || !item.Owns(branch) || !branch.TryGetComponent(out targets[index]))
-                {
-                    warning = "A material target is missing, ambiguous, or has no owned Renderer.";
+                if (!ItemAppearanceBindings.TryRenderer(item, materials[index], out targets[index], out warning))
                     return false;
-                }
-            }
             changes = new ItemAppearanceChanges(meshes, targets, materials);
             return true;
         }
