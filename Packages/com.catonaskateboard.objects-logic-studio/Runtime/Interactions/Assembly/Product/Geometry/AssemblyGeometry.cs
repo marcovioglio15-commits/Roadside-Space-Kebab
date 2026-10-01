@@ -25,7 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Dictionary<Transform, Transform> paths = new Dictionary<Transform, Transform> { { ingredient, root.transform } };
             foreach (Collider source in colliders)
             {
-                if (source == null || !source.enabled)
+                if (source == null || !source.enabled || !ActiveWithin(source.transform, ingredient))
                     continue;
                 Transform target = Resolve(source.transform, paths);
                 Collider shape = source switch
@@ -48,6 +48,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 shapes.Add(source, shape);
             }
             return root;
+        }
+
+        /// <summary>Tests branch activation while allowing a product to be prepared under inactive staging.</summary>
+        /// <param name="branch">Collider branch inside the ingredient.</param>
+        /// <param name="root">Root whose external activation is intentionally ignored.</param>
+        /// <returns>True when every descendant branch is locally active.</returns>
+        internal static bool ActiveWithin(Transform branch, Transform root)
+        {
+            // Inactive nested proxy groups must never become live collision shapes in a new recipe.
+            while (branch != null && branch != root)
+            {
+                if (!branch.gameObject.activeSelf)
+                    return false;
+                branch = branch.parent;
+            }
+            return branch == root;
         }
 
         /// <summary>Creates only the transform paths needed by an ingredient's colliders.</summary>

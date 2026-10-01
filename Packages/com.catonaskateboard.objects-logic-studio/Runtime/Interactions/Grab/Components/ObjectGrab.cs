@@ -208,7 +208,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 bool solid = false;
                 foreach (Collider collider in target.GetComponentsInChildren<Collider>(true))
                 {
-                    if (!collider.enabled || collider.isTrigger)
+                    if (!collider.enabled || collider.isTrigger || !AssemblyGeometry.ActiveWithin(collider.transform, target.transform))
                         continue;
                     if (collider is not (BoxCollider or SphereCollider or CapsuleCollider or MeshCollider { convex: true, sharedMesh: not null }))
                     {
@@ -217,7 +217,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     }
                     solid |= collider.GetComponentInParent<Rigidbody>(true) == rigidbody;
                 }
-                if (warning.Length == 0 && !solid && (Application.isPlaying || target.GetComponent<ObjectAssemblyProduct>() == null))
+                if (warning.Length == 0 && !solid)
                     warning = "Add at least one enabled solid 3D collider before using Grab.";
             }
             return warning.Length == 0;
@@ -236,7 +236,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     continue;
                 bool suspended = candidate.isKinematic && !candidate.detectCollisions;
                 bool assembly = candidate.TryGetComponent(out ObjectAssemblyPart part)
-                    && part.Product != null && part.Product.gameObject == target;
+                    && part.Product != null && part.Product.transform.IsChildOf(target.transform)
+                    && candidate.transform.IsChildOf(part.Product.transform);
                 ObjectContainer container = candidate.transform.parent.GetComponentInParent<ObjectContainer>(true);
                 bool stored = container != null && container.transform.IsChildOf(target.transform) && container.OwnsStoredBody(candidate);
                 if (!suspended || !assembly && !stored)

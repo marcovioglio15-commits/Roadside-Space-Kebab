@@ -24,6 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector3 originalScale;
         private string originalName;
         private bool attached;
+        private bool physicsSuppressed;
         private ItemAppearanceChanges appearance;
         private AssemblyPartVisibility visibility;
         private readonly Dictionary<Collider, Collider> shapes = new Dictionary<Collider, Collider>();
@@ -59,6 +60,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Capture state after ending carry, so later detachment restores the ingredient's own body policy.
             grab.Cancel();
+            if (grab.TryGetComponent(out ObjectAssemblyProduct ingredient))
+                ingredient.ReleaseTable();
             appearance = changes;
             appearance.Commit();
             product = owner;
@@ -101,10 +104,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             body.collisionDetectionMode = CollisionDetectionMode.Discrete;
             body.isKinematic = true;
+            body.useGravity = false;
             body.detectCollisions = false;
             body.interpolation = RigidbodyInterpolation.None;
-            geometry.SetActive(true);
+            physicsSuppressed = false;
             attached = true;
+            RefreshPhysics();
         }
 
         /// <summary>Restores standalone behavior when an external operation removes this ingredient from its product.</summary>
@@ -127,8 +132,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void OnEnable()
         {
             // No shapes are recreated on activation.
-            if (geometry != null && attached)
-                geometry.SetActive(true);
+            RefreshPhysics();
+        }
+
+        /// <summary>Removes ingredient proxy collisions while the final product uses its authored colliders.</summary>
+        /// <param name="suppressed">Whether the owning recipe is complete.</param>
+        internal void SetPhysicsSuppressed(bool suppressed)
+        {
+            // Originals and their bodies stay dormant for the entire attachment; only proxies serve partial recipes.
+            if (physicsSuppressed != suppressed)
+            {
+                physicsSuppressed = suppressed;
+                foreach (Collider shape in shapes.Values)
+                    if (shape != null)
+                        shape.enabled = !suppressed;
+            }
+            RefreshPhysics();
+        }
+
+        /// <summary>Restores pooling visibility without reactivating completed ingredient collision branches.</summary>
+        private void RefreshPhysics()
+        {
+            // Parent activation and component activation share the same completion policy.
+            if (geometry != null)
+                geometry.SetActive(attached && !physicsSuppressed && isActiveAndEnabled && product != null && product.enabled);
         }
 
         /// <summary>Finds the product-owned counterpart of an original ingredient collider.</summary>

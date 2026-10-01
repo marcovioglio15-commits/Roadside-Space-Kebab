@@ -40,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>World-space pose at which a product begins or returns.</summary>
         public Vector3 OutputPosition => transform.TransformPoint(settings.OutputPosition);
         /// <summary>Product still waiting on this table; pickup releases the table immediately.</summary>
-        public ObjectAssemblyProduct CurrentProduct => current != null && current.gameObject.activeInHierarchy
+        public ObjectAssemblyProduct CurrentProduct => current != null && current.isActiveAndEnabled
             && !current.Item.IsCarried && !current.Item.IsConsumed ? current : null;
         /// <summary>Identifies the table card in Object Assemble.</summary>
         public override ExtendedInteractionKind Kind => ExtendedInteractionKind.AssemblyStation;
@@ -172,9 +172,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!Available(InteractionChannels.Assembly) || Item == null || Item.IsReserved || held == null || !held.isActiveAndEnabled || requireHeld && !held.IsHeld)
                 return false;
             current = CurrentProduct;
-            if (held.TryGetComponent(out ObjectAssemblyProduct returning))
-                return requireHeld && current == null && settings.AcceptReturnedProduct && returning.SourcePrefab == settings.ProductPrefab
-                    && !returning.Item.IsReserved && !returning.Item.IsBlocked(InteractionChannels.Assembly);
+            if (CanReturn(held, requireHeld, out _))
+                return true;
             ObjectAssemblyProduct target = current != null ? current : settings.ProductPrefab.GetComponent<ObjectAssemblyProduct>();
             return target.CanAccept(held, out _, requireHeld);
         }
@@ -188,7 +187,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // A failed recipe or slot check leaves the carry slot and existing product untouched.
             if (!CanAccept(held, requireHeld))
                 return false;
-            if (held.TryGetComponent(out ObjectAssemblyProduct returning))
+            if (CanReturn(held, requireHeld, out ObjectAssemblyProduct returning))
             {
                 held.Cancel();
                 current = returning;
@@ -220,6 +219,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!complete && current.IsComplete)
                 Signal(InteractionMoment.Completed);
             return true;
+        }
+
+        /// <summary>Separates returning this table's own product from supplying another recipe's ingredient.</summary>
+        /// <param name="held">Candidate root interaction.</param>
+        /// <param name="requireHeld">Only an explicit carry command can return an existing product.</param>
+        /// <param name="product">Receives the matching product when return is allowed.</param>
+        /// <returns>True when the table should retain the existing product instead of using it as an ingredient.</returns>
+        private bool CanReturn(ObjectGrab held, bool requireHeld, out ObjectAssemblyProduct product)
+        {
+            // Completed products with other source prefabs continue through normal flag and magnet matching.
+            product = null;
+            return requireHeld && current == null && settings.AcceptReturnedProduct && held.TryGetComponent(out product)
+                && product.isActiveAndEnabled && product.SourcePrefab == settings.ProductPrefab && !product.Item.IsConsumed
+                && !product.Item.IsReserved && !product.Item.IsBlocked(InteractionChannels.Assembly);
         }
 
         /// <summary>Sets a stable world-space output pose without parenting the product to table physics.</summary>

@@ -537,9 +537,9 @@ MonoBehaviour:
     Tools: []
   flagChange:
     Enabled: 1
-    Flag: {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
+    Flag: {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     Operation: 0
-    Moment: 0
+    Moment: 1
   visualEffect:
     Enabled: 0
     Prefab: {fileID: 0}

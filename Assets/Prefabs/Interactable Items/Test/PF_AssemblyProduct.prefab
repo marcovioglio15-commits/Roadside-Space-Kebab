@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2326014492238964528}
   - component: {fileID: 6084086214577113263}
   - component: {fileID: 1374417912557854080}
+  - component: {fileID: 5781779231488785972}
   m_Layer: 0
   m_Name: PF_AssemblyProduct
   m_TagString: Untagged
@@ -334,3 +335,24 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   flags:
   - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+--- !u!65 &5781779231488785972
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4182828039336747428}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.971581, y: 0.5000001, z: 0.5}
+  m_Center: {x: -0.31079054, y: 0.50000006, z: 0.052991092}

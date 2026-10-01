@@ -211,17 +211,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             magnet = -1;
             flag = null;
             if (!enabled || IsLocked || !ToolAllowed || Item == null || Item.IsConsumed || Item.IsReserved || Item.IsCarried
-                || Item.IsBlocked(InteractionChannels.Assembly) || grab == null || !grab.isActiveAndEnabled || requireHeld && !grab.IsHeld
-                || grab.Identity == null || grab.GetComponent<ObjectAssemblyProduct>() != null || grab.transform.IsChildOf(transform)
-                || !ValidateRecipe() || !ObjectGrab.ValidateBody(grab.gameObject, out _)
-                || grab.GetComponentsInChildren<Joint>(true).Length > 0)
+                || Item.IsBlocked(InteractionChannels.Assembly) || !AssemblyIngredientValidation.Allows(this, grab, requireHeld)
+                || !ValidateRecipe())
                 return false;
-            foreach (ObjectItem ingredient in grab.GetComponentsInChildren<ObjectItem>(true))
-                if (ingredient.IsConsumed || ingredient.IsReserved || ingredient.IsBlocked(InteractionChannels.Assembly))
-                    return false;
-            foreach (Collider collider in grab.GetComponentsInChildren<Collider>(true))
-                if (collider.enabled && collider is not (BoxCollider or SphereCollider or CapsuleCollider or MeshCollider { convex: true, sharedMesh: not null }))
-                    return false;
             // Prefer specific slots; recipe order breaks ties for generic slots deterministically.
             for (int pass = 0; pass < 2; pass++)
                 for (int index = 0; index < settings.Magnets.Length; index++)
@@ -307,8 +299,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             counts.TryGetValue(part.IngredientFlag, out int count);
             counts[part.IngredientFlag] = count + part.Units;
             IngredientUnits += part.Units;
-            RefreshGeometry();
             RefreshLocks();
+            RefreshGeometry();
             pendingStart |= first;
             pendingCompletion |= !complete && IsComplete;
             if (gameObject.activeInHierarchy)
@@ -345,8 +337,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (ObjectInteraction feature in features)
                 if (feature is ObjectOutline outline)
                     outline.RemovePart(part);
-            RefreshGeometry();
             RefreshLocks();
+            RefreshGeometry();
         }
 
         /// <summary>Reads a recipe count without exposing mutable progress.</summary>
@@ -361,7 +353,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Updates body mass and geometry caches only when the composition changes.</summary>
         private void RefreshGeometry()
         {
-            // Original ingredient rigidbodies are dormant; product-owned proxy colliders supply the compound body.
+            // Ingredient mass remains part of the root body after its temporary collision shapes are retired.
             float mass = baseMass;
             foreach (ObjectAssemblyPart part in parts)
                 mass += part.Mass;
@@ -407,7 +399,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             // Optional ingredients inserted after completion also inherit the final presentation immediately.
             foreach (ObjectAssemblyPart part in parts)
+            {
                 part.SetGeometryHidden(IsComplete && settings.ReplacesIngredients);
+                part.SetPhysicsSuppressed(IsComplete);
+            }
             foreach (ObjectInteraction feature in features)
             {
                 if (feature == null || feature == this || feature is ObjectInteractionUnlock)
