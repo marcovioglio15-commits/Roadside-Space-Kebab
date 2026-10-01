@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5380535108366121443}
   - component: {fileID: 1182668963011632132}
-  m_Layer: 0
+  - component: {fileID: 7180350878683577996}
+  m_Layer: 6
   m_Name: PF_Ingredient_SauceYogurt_Bottle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +61,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &7180350878683577996
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2509107118136717471}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.06290968
+  m_Height: 0.37032673
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.1820663, z: 0.0006573051}
 --- !u!1001 &256224587640638692
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111,6 +135,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2f12fd6b85efd594ca6dae4f4ec7ebf6, type: 3}
       propertyPath: m_Name
       value: SM_Ingredient_SauceYogurt_Bottle
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2f12fd6b85efd594ca6dae4f4ec7ebf6, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

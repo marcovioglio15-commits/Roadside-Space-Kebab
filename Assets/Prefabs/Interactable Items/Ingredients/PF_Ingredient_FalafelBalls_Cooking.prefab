@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2034241471173846784}
   - component: {fileID: 8376224206330073851}
-  m_Layer: 0
+  - component: {fileID: 5963766372190037482}
+  m_Layer: 6
   m_Name: PF_Ingredient_FalafelBalls_Cooking
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +61,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &5963766372190037482
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7576674769820030107}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.2541146, y: 0.0734849, z: 0.47032315}
+  m_Center: {x: 0.00082944334, y: 0.03445892, z: -0.0020792484}
 --- !u!1001 &1564929664916069911
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111,6 +133,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 633bd66bbec6d8b4d8058d305d556b47, type: 3}
       propertyPath: m_Name
       value: SM_Ingredient_FalafelBalls_Cooking
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 633bd66bbec6d8b4d8058d305d556b47, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7883820791717114183}
   - component: {fileID: 8350502607335985809}
-  m_Layer: 0
+  - component: {fileID: 4466845106997731536}
+  m_Layer: 6
   m_Name: PF_Ingredient_Onion_Whole
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +61,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &4466845106997731536
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3484734030430255404}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.1704104, y: 0.13534789, z: 0.16733874}
+  m_Center: {x: 0.0005918108, y: 0.06550061, z: -0.0015282556}
 --- !u!1001 &3671556684174705408
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111,6 +133,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 856690348b1fb104b980bfca50803cfb, type: 3}
       propertyPath: m_Name
       value: SM_Ingredient_Onion_Whole
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 856690348b1fb104b980bfca50803cfb, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

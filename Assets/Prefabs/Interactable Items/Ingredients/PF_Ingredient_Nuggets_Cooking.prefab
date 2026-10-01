@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2691583420686927551}
   - component: {fileID: 2285587403240480454}
-  m_Layer: 0
+  - component: {fileID: 2839540965484835737}
+  m_Layer: 6
   m_Name: PF_Ingredient_Nuggets_Cooking
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +61,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &2839540965484835737
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4872291968861290408}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.2541146, y: 0.04173156, z: 0.41126925}
+  m_Center: {x: 0.00082944334, y: 0.01858225, z: -0.001941748}
 --- !u!1001 &9209267428188611053
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111,6 +133,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: d110e98f75a3f88418fc4149a8a47396, type: 3}
       propertyPath: m_Name
       value: SM_Ingredient_Nuggets_Cooking
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d110e98f75a3f88418fc4149a8a47396, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

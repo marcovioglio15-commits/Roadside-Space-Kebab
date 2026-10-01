@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4676210112173892041}
   - component: {fileID: -5907079748419669718}
   - component: {fileID: 1348625618464516427}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PF_Base_PaninoBread_UncutClosed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,6 +133,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2823a3db7a9274f45bfbe5126a140b17, type: 3}
       propertyPath: m_Name
       value: SM_Base_PaninoBread_UncutClosed
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2823a3db7a9274f45bfbe5126a140b17, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

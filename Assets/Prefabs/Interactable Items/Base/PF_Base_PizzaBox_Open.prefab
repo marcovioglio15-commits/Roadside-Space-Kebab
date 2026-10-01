@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6762525786067770511}
   - component: {fileID: -6292513629382139630}
   - component: {fileID: 4084668357150717334}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PF_Base_PizzaBox_Open
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,6 +133,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
       propertyPath: m_Name
       value: SM_Base_PizzaBox_Open
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

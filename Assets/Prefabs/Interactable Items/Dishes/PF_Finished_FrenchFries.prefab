@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 8425204793366830635}
   - component: {fileID: -8898366845800521741}
-  m_Layer: 0
+  - component: {fileID: 6153221417727427619}
+  m_Layer: 6
   m_Name: PF_Finished_FrenchFries
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +61,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &6153221417727427619
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224706048140884364}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.2, y: 0.2, z: 0.2}
+  m_Center: {x: 0, y: 0.1, z: 0}
 --- !u!1001 &3467505606020357493
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111,6 +133,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3c6bfb167b413b549b6fd77d0ff2efba, type: 3}
       propertyPath: m_Name
       value: SM_Finished_FrenchFries
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3c6bfb167b413b549b6fd77d0ff2efba, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

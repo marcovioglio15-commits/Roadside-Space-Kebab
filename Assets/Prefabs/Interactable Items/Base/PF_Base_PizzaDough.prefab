@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5775207508657234930}
   - component: {fileID: 4907730719137518617}
   - component: {fileID: 8617591487790029805}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PF_Base_PizzaDough
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,6 +133,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
       propertyPath: m_Name
       value: SM_Base_PizzaDough
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

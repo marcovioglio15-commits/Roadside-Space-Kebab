@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7690305011897225697}
   - component: {fileID: 1870395006741314917}
-  m_Layer: 0
+  - component: {fileID: -1622074814032730178}
+  m_Layer: 6
   m_Name: PF_Finished_WrapKebab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +61,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &-1622074814032730178
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3500573369959323781}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.1
+  m_Height: 0.46
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &5801212475085543947
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -82,27 +106,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -3.7493994e-33
+      value: 4.329774e-17
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -6.123234e-17
+      value: -4.3297866e-17
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0.70710784
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 6.123234e-17
+      value: 0.70710576
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -180
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -111,6 +135,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_Name
       value: SM_Finished_WrapKebab
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

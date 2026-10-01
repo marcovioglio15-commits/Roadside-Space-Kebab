@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2015006034865527870}
   - component: {fileID: 7625412776220584716}
-  m_Layer: 0
+  - component: {fileID: 45960053217542048}
+  m_Layer: 6
   m_Name: PF_Drink_BeerBottle_Open
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +61,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &45960053217542048
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2577462939994801892}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.07
+  m_Height: 0.38
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.18, z: 0}
 --- !u!1001 &8962541383851763533
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111,6 +135,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 0b7b26fc3e78d5e488499e99aed887fc, type: 3}
       propertyPath: m_Name
       value: SM_Drink_BeerBottle_Open
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0b7b26fc3e78d5e488499e99aed887fc, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

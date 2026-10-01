@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6312979612856465176}
   - component: {fileID: 5357025113123972147}
-  m_Layer: 0
+  - component: {fileID: 6869853616155017797}
+  m_Layer: 6
   m_Name: PF_Ingredient_SauceKetchup_Bottle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,6 +61,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &6869853616155017797
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8117234458026244839}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.06290968
+  m_Height: 0.37032673
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.1820663, z: 0.0006573051}
 --- !u!1001 &1502680152316509858
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111,6 +135,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 00088c0611b4f1946882c9debf093fa7, type: 3}
       propertyPath: m_Name
       value: SM_Ingredient_SauceKetchup_Bottle
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 00088c0611b4f1946882c9debf093fa7, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
