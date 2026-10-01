@@ -603,7 +603,7 @@ Transform:
   m_GameObject: {fileID: 9202498891951487179}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.44, y: 1.276, z: -1.37}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -741,9 +741,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
   interactionName: First Person Hover
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -758,7 +763,6 @@ MonoBehaviour:
   anchor: {fileID: 0}
   label: {fileID: 4450186185276258677}
   preset: {fileID: 11400000, guid: 1682b5c0ab264eddb14c8b91d5ccb881, type: 2}
-  drawGizmos: 1
   configuration:
     settings:
       targetMode: 0
@@ -792,6 +796,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  drawGizmos: 1
 --- !u!114 &6213792910319298494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -805,9 +810,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
   interactionName: Dispenser
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -850,9 +860,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
   interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -871,6 +886,7 @@ MonoBehaviour:
     Color: {r: 0.8207547, g: 0.80139726, b: 0.80139726, a: 1}
     Intensity: 5
     EdgeAngle: 30
+    HoverOnly: 0
   renderers:
   - {fileID: 8881516529544936468}
 --- !u!114 &1448255713819930455
@@ -883,7 +899,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   flags:
   - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
