@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2076607803781630238}
   - component: {fileID: 6544544449097397199}
   - component: {fileID: 8683877465849084663}
-  - component: {fileID: 7803563063700851627}
+  - component: {fileID: 7674884789034087477}
   m_Layer: 0
   m_Name: PF_AssemblyStation
   m_TagString: Untagged
@@ -42,7 +42,7 @@ Transform:
   - {fileID: 2391484352427523858}
   - {fileID: 3902492065998624986}
   - {fileID: 4748412538439301442}
-  - {fileID: 8078284058245692407}
+  - {fileID: 6346928117622790933}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &3464830694783968524
@@ -272,7 +272,7 @@ MonoBehaviour:
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 4748412538439301442}
---- !u!114 &7803563063700851627
+--- !u!114 &7674884789034087477
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -304,26 +304,26 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: c45be141bdfc377408c0dc37af3c24b5, type: 2}
+  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    ProductPrefab: {fileID: 3748823794255209065, guid: c684292326866854fb5205e178ec9fbe, type: 3}
+    ProductPrefab: {fileID: 3500573369959323781, guid: 1ce0407b79e592b458738e6cb31546c4, type: 3}
     Trigger: 2
     ContactDuration: 0.5
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
-    IncludeTriggers: 0
+    IncludeTriggers: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
       serializedVersion: 2
       m_Bits: 4294967295
-    OutputPosition: {x: 0, y: 0.05, z: 0}
+    OutputPosition: {x: 0, y: 0.5, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
     AcceptReturnedProduct: 1
   action: {fileID: 0}
-  staging: {fileID: 8078284058245692407}
---- !u!1 &1392666734803603010
+  staging: {fileID: 6346928117622790933}
+--- !u!1 &3360010866173008966
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -331,7 +331,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8078284058245692407}
+  - component: {fileID: 6346928117622790933}
   m_Layer: 0
   m_Name: Assembly Staging
   m_TagString: Untagged
@@ -339,13 +339,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &8078284058245692407
+--- !u!4 &6346928117622790933
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1392666734803603010}
+  m_GameObject: {fileID: 3360010866173008966}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}

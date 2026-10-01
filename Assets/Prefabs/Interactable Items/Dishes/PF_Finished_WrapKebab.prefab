@@ -93,6 +93,7 @@ GameObject:
   - component: {fileID: -4377101331111047039}
   - component: {fileID: 3966705488560917104}
   - component: {fileID: 5367851085139979882}
+  - component: {fileID: 1754369885519753882}
   m_Layer: 6
   m_Name: PF_Finished_WrapKebab
   m_TagString: Untagged
@@ -230,6 +231,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -250,6 +252,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &-4377101331111047039
 MonoBehaviour:
@@ -355,6 +362,7 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
 --- !u!114 &5367851085139979882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,15 +404,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
     style:
       content: Kebab
       font: {fileID: 0}
@@ -424,6 +439,140 @@ MonoBehaviour:
       backgroundSprite: {fileID: 0}
       backgroundType: 0
   drawGizmos: 1
+--- !u!114 &1754369885519753882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3500573369959323781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b3f1b34465481291b768662cedce04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyProduct
+  interactionName: Assembly Product
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Ingredients:
+    - Flags:
+      - {fileID: 11400000, guid: e42db53ae9a09274b85d6ad91916ca84, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: c69745f27196e29439f70f5d1d5c1ea1, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      Count: 1
+      Optional: 0
+    Magnets:
+    - Name: Magnet 1
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: e42db53ae9a09274b85d6ad91916ca84, type: 2}
+      Order: 1
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 2415388357218636138, guid: af4c3470368f2464e9369c03fb2f257c, type: 3}
+    - Name: Magnet 2
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: c69745f27196e29439f70f5d1d5c1ea1, type: 2}
+      Order: 2
+      Position: {x: 0, y: 0.005, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 3974403703203748344, guid: 536ae3a8429f3e447bb8cd6f50472260, type: 3}
+    - Name: Magnet 3
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      Order: 3
+      Position: {x: 0, y: 0.015, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
+    - Name: Magnet 4
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      Order: 4
+      Position: {x: 0, y: 0.01, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1.5, y: 1, z: 1.5}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 5936169737003267211, guid: 139947defc322cd48bd4a20ba12d216d, type: 3}
+    - Name: Magnet 5
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      Order: 5
+      Position: {x: 0, y: 0.02, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 2891034634997325463, guid: 750a7a35b9d541f4b805396137f7c6b6, type: 3}
+    InteractionRules:
+    - Target: {fileID: -6992635712506474423}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    - Target: {fileID: -4377101331111047039}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    - Target: {fileID: 3966705488560917104}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    CompletedAppearance:
+      Meshes: []
+      Materials: []
+    HideIngredients: 1
 --- !u!1 &6473174347206530466
 GameObject:
   m_ObjectHideFlags: 0
@@ -628,6 +777,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5754084199372789682, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
       propertyPath: m_Name
