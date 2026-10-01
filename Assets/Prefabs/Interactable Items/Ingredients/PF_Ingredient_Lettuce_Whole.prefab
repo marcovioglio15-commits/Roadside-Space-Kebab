@@ -251,6 +251,7 @@ GameObject:
   - component: {fileID: 3493836189622071991}
   - component: {fileID: 3944654813433322829}
   - component: {fileID: 5987195386809859929}
+  - component: {fileID: 8834736741460893502}
   m_Layer: 6
   m_Name: PF_Ingredient_Lettuce_Whole
   m_TagString: Untagged
@@ -390,15 +391,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
     style:
       content: Lettuce
       font: {fileID: 0}
@@ -455,6 +463,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -475,6 +484,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &3493836189622071991
 MonoBehaviour:
@@ -514,6 +528,7 @@ MonoBehaviour:
     Target:
       Distance: 3
       Mode: 0
+      SolidHitOnly: 0
       CenterRadius: 0.15
       Offset: {x: 0, y: 0, z: 0}
       ObstacleMask:
@@ -547,6 +562,8 @@ MonoBehaviour:
       - Prefab: {fileID: 5936169737003267211, guid: 139947defc322cd48bd4a20ba12d216d, type: 3}
         Position: {x: 0, y: 0.1, z: 0}
         Rotation: {x: 0, y: 0, z: 0}
+    Sound: 1
+    Ingredient: 2
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!114 &3944654813433322829
 MonoBehaviour:
@@ -652,6 +669,49 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
+--- !u!114 &8834736741460893502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6191959766604075906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: a7567f77c3095ae4193cae8fb5439c19, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 16
+    Color: {r: 0.8207547, g: 0.80139726, b: 0.80139726, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 5282017039685377823}
 --- !u!1001 &6813078871704028059
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -713,6 +773,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ae6176a0ee6d6a4a901098abc5fe111, type: 3}
+--- !u!23 &5282017039685377823 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 3ae6176a0ee6d6a4a901098abc5fe111, type: 3}
+  m_PrefabInstance: {fileID: 6813078871704028059}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6414905289494897776 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3ae6176a0ee6d6a4a901098abc5fe111, type: 3}

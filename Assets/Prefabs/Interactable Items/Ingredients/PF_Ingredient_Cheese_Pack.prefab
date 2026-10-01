@@ -317,15 +317,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967291
+        m_Bits: 4294967227
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
     style:
       content: 'Cheese Pack
 
@@ -384,6 +391,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -404,6 +412,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &702052543352322469
 MonoBehaviour:
@@ -509,6 +522,7 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
 --- !u!114 &998761705617332601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -547,6 +561,7 @@ MonoBehaviour:
     Target:
       Distance: 3
       Mode: 0
+      SolidHitOnly: 0
       CenterRadius: 0.15
       Offset: {x: 0, y: 0, z: 0}
       ObstacleMask:
@@ -574,6 +589,8 @@ MonoBehaviour:
       - Prefab: {fileID: 4357755812359040115, guid: b337591f6f4024a40a7b3024484e4fc8, type: 3}
         Position: {x: 0, y: 0.1, z: 0}
         Rotation: {x: 0, y: 0, z: 0}
+    Sound: 1
+    Ingredient: 2
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!114 &5116323520887726527
 MonoBehaviour:
@@ -614,7 +631,7 @@ MonoBehaviour:
     Color: {r: 0.8207547, g: 0.80139726, b: 0.80139726, a: 1}
     Intensity: 5
     EdgeAngle: 30
-    HoverOnly: 0
+    HoverOnly: 1
   renderers:
   - {fileID: 2980412890255196527}
 --- !u!1 &7075871541189158568

@@ -172,6 +172,7 @@ GameObject:
   - component: {fileID: -5692657518627925397}
   - component: {fileID: 6150668356305103613}
   - component: {fileID: 6980752106515514817}
+  - component: {fileID: 6508360064938661714}
   m_Layer: 6
   m_Name: PF_Finished_Pizza
   m_TagString: Untagged
@@ -192,7 +193,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1266037435741541142}
   - {fileID: 7622626112488474149}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -307,6 +307,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -327,6 +328,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &-5692657518627925397
 MonoBehaviour:
@@ -432,6 +438,7 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
 --- !u!114 &6980752106515514817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,15 +480,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
     style:
       content: Pizza Rossa
       font: {fileID: 0}
@@ -501,6 +515,94 @@ MonoBehaviour:
       backgroundSprite: {fileID: 0}
       backgroundType: 0
   drawGizmos: 1
+--- !u!114 &6508360064938661714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3176775191320682383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b3f1b34465481291b768662cedce04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyProduct
+  interactionName: Assembly Product
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 1
+    Flag: {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
+    Operation: 0
+    Moment: 0
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Ingredients:
+    - Flags:
+      - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      Count: 1
+      Optional: 0
+    Magnets:
+    - Name: Magnet 1
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
+      Order: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 13743455491562369, guid: 5bb456d407eb39946a0e5e5cfaf267c1, type: 3}
+    - Name: Magnet 2
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      Order: 1
+      Position: {x: 0, y: 0.031446874, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
+    InteractionRules:
+    - Target: {fileID: 9123578632224009876}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    - Target: {fileID: -5692657518627925397}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    - Target: {fileID: 6150668356305103613}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    CompletedAppearance:
+      Meshes:
+      - Path: 
+        Mesh: {fileID: 2233014724806348769, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
+        UpdateCollider: 0
+      Materials: []
 --- !u!1 &4169196207671211607
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,69 +681,3 @@ MonoBehaviour:
   panel: {fileID: 7010771828525999080}
   text: {fileID: 8019865520979150432}
   background: {fileID: 3076497354236401750}
---- !u!1001 &1592980325221659901
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 7025359255021423171}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -3.7493994e-33
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -6.123234e-17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 6.123234e-17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_Name
-      value: SM_Finished_Pizza
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-      propertyPath: m_Layer
-      value: 6
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
---- !u!4 &1266037435741541142 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
-  m_PrefabInstance: {fileID: 1592980325221659901}
-  m_PrefabAsset: {fileID: 0}

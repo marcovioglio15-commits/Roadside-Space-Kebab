@@ -12,8 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 000bafe59a8948c9905a4fdcafdf1f4f, type: 3}
   m_Name: Outline Preset Test
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.OutlinePreset
+  ToolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   Settings:
     Thickness: 1
     Color: {r: 0.8207547, g: 0.80139726, b: 0.80139726, a: 1}
     Intensity: 5
     EdgeAngle: 30
+    HoverOnly: 1
