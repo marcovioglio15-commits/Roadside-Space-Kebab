@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -45,12 +46,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 set ? typeof(UnlockRuleSetPreset) : typeof(UnlockRulePreset), false);
             if (selected != previous)
                 Select(state, selected, set);
-            using (new EditorGUILayout.HorizontalScope())
+            using (new StudioButton.RowScope())
             {
                 try
                 {
                     using (new EditorGUI.DisabledScope(selected == null || owner == null || set && state.HasChanges))
-                        if (GUILayout.Button(new GUIContent("Import", set ? "Replace and save all local rules with Undo. Apply or Discard pending edits first."
+                        if (StudioButton.Draw(new GUIContent("Import", set ? "Replace and save all local rules with Undo. Apply or Discard pending edits first."
                             : "Remap this preset onto the destination and copy it into the pending card.")))
                         {
                             if (set)
@@ -60,10 +61,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             return set;
                         }
                     using (new EditorGUI.DisabledScope(selected == null || owner == null))
-                        if (GUILayout.Button(new GUIContent("Update", "Write the current rule configuration to the selected preset.")))
+                        if (StudioButton.Draw(new GUIContent("Update", "Write the current rule configuration to the selected preset.")))
                             Update(state, owner, selected, set);
                     using (new EditorGUI.DisabledScope(owner == null))
-                        if (GUILayout.Button(new GUIContent("Export", "Save the current rule configuration in a new reusable preset.")))
+                        if (StudioButton.Draw(new GUIContent("Export", "Save the current rule configuration in a new reusable preset.")))
                             Export(state, owner, set);
                 }
                 catch (Exception exception)

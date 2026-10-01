@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         #region Lifecycle
 
         /// <summary>Opens the shared flag catalog independently of any gameplay object.</summary>
-        [MenuItem("Tools/Studio Identity/Object Flags")]
+        [MenuItem("Tools/Object Flags")]
         private static void Open()
         {
             // Project flags remain available even when no prefab or interaction is selected.
@@ -38,9 +39,9 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             search = EditorGUILayout.TextField(new GUIContent("Filter", "Search flag names and groups."), search);
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button(new GUIContent("+ Create Flag", "Add a new named flag to the shared project catalog.")))
+                if (StudioButton.Draw(new GUIContent("+ Create Flag", "Add a new named flag to the shared project catalog.")))
                     ObjectFlagCreateWindow.Open(flag => Selection.activeObject = flag, search);
-                if (GUILayout.Button(new GUIContent("Create Missing Flags from Unity Tags", "Import every project tag that has no same-named definition. Repeating this action creates no duplicates.")))
+                if (StudioButton.Draw(new GUIContent("Import Unity Tags", "Create a flag for every project tag that has no same-named definition. Repeating this action creates no duplicates.")))
                     status = ObjectFlagCatalog.ImportProjectTags() + " flags created.";
             }
             if (status.Length > 0)

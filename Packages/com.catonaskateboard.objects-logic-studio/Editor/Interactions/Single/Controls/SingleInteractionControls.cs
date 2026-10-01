@@ -27,6 +27,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             StudioInputActionMenu.Draw(data, "Single.Draft.Action", "ObjectsLogicStudio.Button", Button);
             switch (state.Single.Kind)
             {
+                case SingleInteractionKind.TriggerAnimation:
+                    CommandInteractionControls.Animation(draft.FindPropertyRelative("TriggerAnimation"), state.Sections);
+                    break;
+                case SingleInteractionKind.Eject:
+                    CommandInteractionControls.Eject(draft.FindPropertyRelative("Eject"), state.Sections);
+                    break;
                 case SingleInteractionKind.Dispenser:
                     TransferInteractionControls.Dispenser(draft.FindPropertyRelative("Dispenser"), state.Sections);
                     break;
@@ -74,9 +80,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     Field(grab, "Distance");
                     Field(grab, "TargetMode");
-                    if (grab.FindPropertyRelative("TargetMode").enumValueIndex == (int)HoverTargetMode.ViewCenter)
-                        Field(grab, "CenterRadius");
-                    Field(grab, "TargetOffset");
+                    TransferInteractionControls.Aim(grab, "TargetMode", "TargetOffset");
                     Field(grab, "ObstacleMask");
                 }
             if (sections.Draw("Item Value", "Configure recipe and consumption units represented by one object."))

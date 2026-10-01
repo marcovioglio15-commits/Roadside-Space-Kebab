@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -28,10 +29,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 session.PresetBaseline = InteractionPresetWrites.Capture(selected);
                 state.Persist();
             }
-            using (new EditorGUILayout.HorizontalScope())
+            using (new StudioButton.RowScope())
             {
                 using (new EditorGUI.DisabledScope(session.Preset == null))
-                    if (GUILayout.Button(new GUIContent("Import", "Copy this preset's settings into the draft with Undo. Apply saves the result to this prefab.")))
+                    if (StudioButton.Draw(new GUIContent("Import", "Copy this preset's settings into the draft with Undo. Apply saves the result to this prefab.")))
                     {
                         if (TryImport(state, out string warning))
                             GUI.changed = true;
@@ -39,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             Debug.LogWarning(warning, session.Preset);
                     }
                 using (new EditorGUI.DisabledScope(session.Preset == null))
-                    if (GUILayout.Button(new GUIContent("Update", "Write the current settings to the selected preset. Apply saves the object independently.")))
+                    if (StudioButton.Draw(new GUIContent("Update", "Write the current settings to the selected preset. Apply saves the object independently.")))
                         try
                         {
                             InteractionPresetWrites.UpdateSingle(state);
@@ -48,7 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         {
                             Debug.LogWarning(exception.Message, session.Preset);
                         }
-                if (GUILayout.Button(new GUIContent("Export", "Save the current draft settings as a new preset asset. Existing presets and other items are unchanged.")))
+                if (StudioButton.Draw(new GUIContent("Export", "Save the current draft settings as a new preset asset. Existing presets and other items are unchanged.")))
                     Export(state);
             }
         }
@@ -73,6 +74,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 case DispenserPreset dispenser:
                     state.Single.Draft.Dispenser = ObjectWorkspace.Copy(dispenser.Settings);
+                    break;
+                case TriggerAnimationPreset triggeranimation:
+                    state.Single.Draft.TriggerAnimation = ObjectWorkspace.Copy(triggeranimation.Settings);
+                    break;
+                case EjectPreset eject:
+                    state.Single.Draft.Eject = ObjectWorkspace.Copy(eject.Settings);
                     break;
                 case ContainerPreset container:
                     state.Single.Draft.Container = ObjectWorkspace.Copy(container.Settings);
@@ -105,6 +112,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 case DispenserPreset dispenser:
                     dispenser.Settings = ObjectWorkspace.Copy(session.Draft.Dispenser);
+                    break;
+                case TriggerAnimationPreset triggeranimation:
+                    triggeranimation.Settings = ObjectWorkspace.Copy(session.Draft.TriggerAnimation);
+                    break;
+                case EjectPreset eject:
+                    eject.Settings = ObjectWorkspace.Copy(session.Draft.Eject);
                     break;
                 case ContainerPreset container:
                     container.Settings = ObjectWorkspace.Copy(session.Draft.Container);
@@ -168,6 +181,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Throw => typeof(ThrowPreset),
                 SingleInteractionKind.Dispenser => typeof(DispenserPreset),
                 SingleInteractionKind.Container => typeof(ContainerPreset),
+                SingleInteractionKind.Eject => typeof(EjectPreset),
+                SingleInteractionKind.TriggerAnimation => typeof(TriggerAnimationPreset),
                 _ => throw new ArgumentOutOfRangeException(nameof(kind))
             };
         }

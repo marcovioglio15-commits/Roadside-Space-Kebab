@@ -58,6 +58,8 @@ namespace CatOnASkateboard.PlayerStudio
         public Vector3 Axis = Vector3.forward;
         [Tooltip("Follow negative angles around the axis. Disable to follow positive angles.")]
         public bool Clockwise = true;
+        [Tooltip("Rotation between direct slots and independent parked poses. Clockwise follows negative angles around each changed local axis.")]
+        public TransformRotationDirection SlotRotation = TransformRotationDirection.Shortest;
         [Tooltip("Seconds used to interpolate slot changes. Zero applies slots immediately.")]
         public float SwitchDuration = 0.3f;
 
@@ -126,7 +128,7 @@ namespace CatOnASkateboard.PlayerStudio
             }
             warning = "Choose a supported layout, a valid active pose and a finite non-negative switch duration.";
             if (moving && (!float.IsFinite(SwitchDuration) || SwitchDuration < 0f
-                || Layout is not (PlayerToolLayout.Independent or PlayerToolLayout.Cyclic)
+                || !TransformRotation.IsValid(SlotRotation) || Layout is not (PlayerToolLayout.Independent or PlayerToolLayout.Cyclic)
                 || Layout == PlayerToolLayout.Independent && !ActivePose.IsValid()))
                 return false;
             if (moving && Layout == PlayerToolLayout.Cyclic)

@@ -62,7 +62,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
             foreach (GameObject sceneRoot in host.gameObject.scene.GetRootGameObjects())
                 if (sceneRoot.GetComponentInChildren<EventSystem>(true) != null)
                     return;
-            GameObject root = new GameObject("Menu EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+            GameObject root = new GameObject("Menu EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule), typeof(MenuEventSystemScope));
             SceneManager.MoveGameObjectToScene(root, host.gameObject.scene);
             Undo.RegisterCreatedObjectUndo(root, "Create menu EventSystem");
             EventSystem system = root.GetComponent<EventSystem>();

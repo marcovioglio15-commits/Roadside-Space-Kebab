@@ -2,6 +2,7 @@
   "name": "CatOnASkateboard.ObjectsLogicStudio.Runtime",
   "rootNamespace": "CatOnASkateboard.ObjectsLogicStudio",
   "references": [
+    "CatOnASkateboard.MenuStudio.Runtime",
     "CatOnASkateboard.PlayerStudio.Runtime",
     "UnityEngine.UI",
     "Unity.InputSystem",

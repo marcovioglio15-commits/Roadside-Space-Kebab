@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 172cc92e5181476408fe0e234c123a2f, type: 3}
   m_Name: MenuPreset
   m_EditorClassIdentifier: CatOnASkateboard.MenuStudio.Runtime::CatOnASkateboard.MenuStudio.MenuPreset
-  Title: GAME TITLE
+  Title: ROADSIDE SPACE KEBAB
   PauseTitle: PAUSED
-  GameplayScene: Assets/Scenes/SCN_PlayerStudioMovement.unity
-  MainMenuScene: Assets/Scenes/SCN_MainMenu.unity
+  GameplayScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_Blockout_LogicTest.unity
+  MainMenuScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_MainMenu.unity
+  PauseScene: Assets/Scenes/Test/Programming/UI/SCN_PauseMenu.unity
   IncludeSettings: 1
   IncludeCredits: 1
   IncludeRestart: 1
@@ -226,12 +227,12 @@ MonoBehaviour:
     Enabled: 1
     WrapButtons: 1
     FollowPointer: 1
-    Move: {fileID: 0}
-    Submit: {fileID: 0}
-    Cancel: {fileID: 0}
-    Pause: {fileID: 0}
-    PreviousTab: {fileID: 0}
-    NextTab: {fileID: 0}
+    Move: {fileID: 3235706272184940096, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+    Submit: {fileID: -6644198666085264704, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+    Cancel: {fileID: 5302569535910796963, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+    Pause: {fileID: -9189422184425944451, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+    PreviousTab: {fileID: -1306782529263278776, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+    NextTab: {fileID: 3304585530405942168, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
     CreditsClose: {fileID: 0}
     WrapTabs: 1
     RepeatDelay: 0.32

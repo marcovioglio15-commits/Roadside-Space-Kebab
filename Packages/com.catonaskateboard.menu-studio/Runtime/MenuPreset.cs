@@ -19,6 +19,8 @@ namespace CatOnASkateboard.MenuStudio
         public string GameplayScene = "";
         [Tooltip("Full scene asset path loaded by Main Menu.")]
         public string MainMenuScene = "";
+        [Tooltip("Optional saved pause menu scene loaded additively alongside gameplay by Menu Scene Overlay or Day Flow.")]
+        public string PauseScene = "";
         [Tooltip("Generate a settings overlay.")]
         public bool IncludeSettings = true;
         [Tooltip("Generate a credits overlay for the main menu.")]

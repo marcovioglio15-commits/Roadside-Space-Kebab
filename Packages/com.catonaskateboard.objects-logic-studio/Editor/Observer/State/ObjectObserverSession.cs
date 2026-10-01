@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using CatOnASkateboard.StudioIdentity;
 using System;
@@ -192,7 +193,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 DialogueHud hud = observer != null ? observer.DialogueHud : null;
                 using (new EditorGUI.DisabledScope(true))
                     EditorGUILayout.ObjectField(new GUIContent("Dialogue HUD", "One overlay shared by all object dialogues for this observer."), hud, typeof(DialogueHud), true);
-                if (!GUILayout.Button(new GUIContent(hud != null ? "Select Dialogue HUD" : "Create Shared Dialogue HUD",
+                if (!StudioButton.Draw(new GUIContent(hud != null ? "Select Dialogue HUD" : "Create Shared Dialogue HUD",
                     "Edit the shared panel and text in its authored hierarchy; no UI is created during gameplay.")))
                     return;
                 if (hud != null)

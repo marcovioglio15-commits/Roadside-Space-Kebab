@@ -1,4 +1,3 @@
-using CatOnASkateboard.StudioIdentity;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -36,23 +35,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Queries
 
-        /// <summary>Collects matching item roots once, regardless of the number of touching colliders.</summary>
+        /// <summary>Collects physical item contacts before the modifier evaluates identity eligibility.</summary>
         /// <param name="item">Owner excluded from results.</param>
-        /// <param name="settings">Flag, distance tolerance and trigger policy.</param>
+        /// <param name="settings">Distance tolerance and trigger policy.</param>
         /// <param name="contacts">Reusable destination cleared before the query.</param>
         internal void Query(ObjectItem item, ContactModificationSettings settings, HashSet<ObjectItem> contacts)
         {
-            // Passive modifiers and assembly stations share the same exact contact implementation.
-            Query(item, settings.ContactTolerance, settings.IncludeTriggers, settings.Flag, contacts);
+            // Keep a retained counterpart detectable after a completed effect changes its identity.
+            Query(item, settings.ContactTolerance, settings.IncludeTriggers, contacts);
         }
 
-        /// <summary>Collects owned contact roots using optional flag filtering in the item's physics scene.</summary>
+        /// <summary>Collects physical item roots in the owner's physics scene for caller-specific filtering.</summary>
         /// <param name="item">Owner excluded from the results.</param>
         /// <param name="tolerance">Allowed surface separation.</param>
         /// <param name="includeTriggers">Whether trigger surfaces participate.</param>
-        /// <param name="flag">Optional required flag; null accepts recipe filtering by the caller.</param>
         /// <param name="contacts">Reusable result set.</param>
-        internal void Query(ObjectItem item, float tolerance, bool includeTriggers, ObjectFlag flag, HashSet<ObjectItem> contacts)
+        internal void Query(ObjectItem item, float tolerance, bool includeTriggers, HashSet<ObjectItem> contacts)
         {
             // Multiple passive features share one scripted-transform synchronization per render frame.
             contacts.Clear();
@@ -79,7 +77,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     Collider other = buffer[index];
                     if (!Usable(other, includeTriggers) || other.GetComponentInParent<ObjectItem>() is not ObjectItem candidate
                         || candidate == item || !candidate.isActiveAndEnabled || candidate.IsConsumed || contacts.Contains(candidate)
-                        || flag != null && (candidate.Identity == null || !candidate.Identity.Has(flag)) || Physics.GetIgnoreLayerCollision(collider.gameObject.layer, other.gameObject.layer)
+                        || Physics.GetIgnoreLayerCollision(collider.gameObject.layer, other.gameObject.layer)
                         || Physics.GetIgnoreCollision(collider, other))
                         continue;
                     if (Touches(collider, other, tolerance))

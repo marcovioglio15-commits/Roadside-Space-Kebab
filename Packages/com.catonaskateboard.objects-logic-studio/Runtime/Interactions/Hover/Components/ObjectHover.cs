@@ -38,8 +38,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool ready;
         private float nextQuery;
         private bool hovered;
+        private bool detected;
+        private bool eligible;
         private bool carrySuppressed;
         private HoverSettings settings;
+        private Rigidbody body;
+        private ObjectGrab grab;
+        private Vector3 previousPosition;
+        private float previousTime;
+        private float lastDetected;
+        private float speed;
+        private bool moving;
 
         #endregion
 
@@ -58,8 +67,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public HoverLabel Label => label;
         /// <summary>Current world point used for range and view-center tests.</summary>
         public Vector3 WorldAnchor => (anchor != null ? anchor : transform).TransformPoint(Settings.AnchorOffset);
-        /// <summary>Whether the latest query passed every eligibility check.</summary>
+        /// <summary>Whether this interaction owns an active hover after selection and availability checks.</summary>
         public bool IsHovered => hovered;
+        /// <summary>Latest detection result, distinguishing a visible candidate from release-delay grace.</summary>
+        internal bool Detected => detected;
         /// <summary>Whether editor debug geometry is requested.</summary>
         public bool DrawGizmos => drawGizmos;
 
@@ -95,6 +106,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Discovery and warnings happen at activation or an explicit refresh, never per frame.
             Hide();
             colliders = GetComponentsInChildren<Collider>(true);
+            body = GetComponentInParent<Rigidbody>();
+            grab = GetComponentInParent<ObjectGrab>();
+            previousPosition = transform.position;
+            previousTime = Time.time;
+            speed = 0f;
+            moving = false;
+            carrySuppressed = grab != null && grab.IsHeld && !grab.Settings.ShowHover;
             ready = TryValidate(out string warning);
             if (ready)
             {
@@ -138,35 +156,79 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Evaluation
 
-        /// <summary>Runs throttled detection and updates only a currently visible label.</summary>
+        /// <summary>Queries eligibility without emitting events before the registry chooses a centre target.</summary>
         /// <param name="observer">Shared observer supplying camera, player and reusable query buffers.</param>
         /// <param name="time">Current unscaled time.</param>
-        internal void Tick(HoverObserver observer, float time)
+        /// <returns>True for a detected candidate or the previous winner within its release delay.</returns>
+        internal bool Evaluate(HoverObserver observer, float time)
         {
             // Deleted UI or invalid initialization leaves the component dormant until Refresh.
-            if (!ready || carrySuppressed || !Available(InteractionChannels.Hover) || label == null || !label.isActiveAndEnabled)
+            if (!ready || label == null || !label.isActiveAndEnabled)
+            {
+                Hide();
+                return false;
+            }
+            UpdateMotion();
+            bool suspended = carrySuppressed || settings.SuspendCarried && grab != null && grab.IsHeld
+                || moving || !Available(InteractionChannels.Hover);
+            if (suspended)
+            {
+                detected = false;
+                nextQuery = 0f;
+            }
+            else if (time >= nextQuery)
+            {
+                nextQuery = time + settings.QueryInterval;
+                detected = observer.Evaluate(this, colliders);
+                if (detected)
+                    lastDetected = time;
+            }
+            eligible = !suspended && (detected || hovered && time - lastDetected < settings.ReleaseDelay);
+            return eligible;
+        }
+
+        /// <summary>Commits selection and updates entry or exit animation after competing hovers are resolved.</summary>
+        /// <param name="observer">Observer supplying the final camera pose.</param>
+        /// <param name="time">Shared unscaled presentation time.</param>
+        /// <param name="selected">Whether this candidate may activate after centre arbitration.</param>
+        internal void Present(HoverObserver observer, float time, bool selected)
+        {
+            // Callbacks on another selected interaction may have removed this component's UI or availability.
+            if (!isActiveAndEnabled || !ready || label == null || !label.isActiveAndEnabled)
             {
                 Hide();
                 return;
             }
-            if (time >= nextQuery)
+            bool previous = hovered;
+            hovered = selected && eligible && Available(InteractionChannels.Hover);
+            if (hovered && !previous)
             {
-                nextQuery = time + settings.QueryInterval;
-                bool previous = hovered;
-                hovered = observer.Evaluate(this, colliders);
-                if (hovered && !previous)
-                {
-                    Signal(InteractionMoment.Started);
-                    Signal(InteractionMoment.Completed);
-                }
-                if (!hovered)
-                    label.Hide();
+                Signal(InteractionMoment.Started);
+                Signal(InteractionMoment.Completed);
             }
             // A rule may lock or replace this hover synchronously from its own start event.
+            if (this == null || !isActiveAndEnabled || label == null || !label.isActiveAndEnabled)
+                return;
             if (!Available(InteractionChannels.Hover))
-                Hide();
-            else if (hovered)
-                label.Present(observer.View, WorldAnchor, settings, time);
+                hovered = false;
+            label.Present(observer.View, WorldAnchor, settings, time, hovered);
+        }
+
+        /// <summary>Tracks physics or authored motion with hysteresis around the configured suspension speed.</summary>
+        private void UpdateMotion()
+        {
+            // Dynamic bodies provide continuous velocity between physics ticks; scripted motion uses the live transform.
+            if (!settings.SuspendMoving)
+                return;
+            float elapsed = Time.time - previousTime;
+            if (elapsed <= 0f)
+                return;
+            float measured = body != null && !body.isKinematic ? body.linearVelocity.magnitude
+                : Vector3.Distance(transform.position, previousPosition) / elapsed;
+            previousPosition = transform.position;
+            previousTime = Time.time;
+            speed = Mathf.Lerp(speed, measured, 1f - Mathf.Exp(-elapsed / 0.04f));
+            moving = speed > settings.SpeedThreshold * (moving ? 0.85f : 1f);
         }
 
         /// <summary>Clears stale detection whenever the observing camera or player becomes unavailable.</summary>
@@ -174,6 +236,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Reset the query deadline so reacquisition does not wait for an old interval.
             hovered = false;
+            detected = false;
+            eligible = false;
             nextQuery = 0f;
             if (label != null)
                 label.Hide();
@@ -184,8 +248,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void SetCarrySuppressed(bool suppressed)
         {
             // Releasing suppression schedules fresh detection rather than reusing a stale hovered result.
+            if (carrySuppressed == suppressed)
+                return;
             carrySuppressed = suppressed;
-            Hide();
+            nextQuery = 0f;
         }
 
         #endregion

@@ -3,5 +3,8 @@
   "version": "0.1.0",
   "displayName": "Studio Identity",
   "description": "Editable object flags, stable identities and searchable authoring controls shared by Studio packages.",
-  "unity": "6000.6"
+  "unity": "6000.6",
+  "dependencies": {
+    "com.catonaskateboard.studio-colors": "1.0.0"
+  }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 namespace CatOnASkateboard.StudioIdentity
 {
     /// <summary>Defines one extensible enum value whose asset identity survives display-name and group changes.</summary>
-    [CreateAssetMenu(fileName = "Object Flag", menuName = "Studio Identity/Object Flag")]
+    [CreateAssetMenu(fileName = "Object Flag", menuName = "Object Flag")]
     public sealed class ObjectFlag : ScriptableObject
     {
         #region Fields

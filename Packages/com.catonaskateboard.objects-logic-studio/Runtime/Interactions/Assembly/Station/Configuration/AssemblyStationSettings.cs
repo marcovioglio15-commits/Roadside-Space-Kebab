@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Chooses a player command or sustained ingredient contact.</summary>
-    public enum AssemblyStationTrigger { InputAction, IngredientContact }
+    public enum AssemblyStationTrigger { InputAction, IngredientContact, ImmediateContact }
 
     /// <summary>Connects an assembly table to one already configured product prefab.</summary>
     [Serializable]
@@ -15,7 +15,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Assembly Table")]
         [Tooltip("Existing product prefab containing Assembly Product, its recipe and its configured interactions.")]
         public GameObject ProductPrefab;
-        [Tooltip("Input Action inserts a held ingredient. Ingredient Contact inserts a matching ingredient after continuous collider contact.")]
+        [Tooltip("Input Action inserts a held ingredient. Ingredient Contact waits for sustained contact. Immediate Contact inserts a compatible recipe ingredient on the first contact query, without player input.")]
         public AssemblyStationTrigger Trigger;
         [Tooltip("Seconds of uninterrupted ingredient contact required before insertion.")]
         public float ContactDuration = 0.5f;
@@ -57,10 +57,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!product.TryValidate(out warning))
                 return false;
             warning = "Choose a trigger with positive range or contact timing, non-negative contact tolerance and finite output pose.";
-            if (Trigger is not (AssemblyStationTrigger.InputAction or AssemblyStationTrigger.IngredientContact)
+            if (Trigger is not (AssemblyStationTrigger.InputAction or AssemblyStationTrigger.IngredientContact or AssemblyStationTrigger.ImmediateContact)
                 || Trigger == AssemblyStationTrigger.InputAction && !InteractionValues.Positive(Distance)
-                || Trigger == AssemblyStationTrigger.IngredientContact && (!InteractionValues.Positive(ContactDuration)
-                    || !InteractionValues.Positive(ContactQueryInterval) || !float.IsFinite(ContactTolerance) || ContactTolerance < 0f)
+                || Trigger == AssemblyStationTrigger.IngredientContact && !InteractionValues.Positive(ContactDuration)
+                || Trigger != AssemblyStationTrigger.InputAction && (!InteractionValues.Positive(ContactQueryInterval)
+                    || !float.IsFinite(ContactTolerance) || ContactTolerance < 0f)
                 || !InteractionValues.Finite(OutputPosition)
                 || !InteractionValues.Finite(OutputRotation))
                 return false;

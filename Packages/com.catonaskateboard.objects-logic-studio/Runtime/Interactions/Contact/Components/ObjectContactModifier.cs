@@ -20,6 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly ContactDetection detection = new ContactDetection();
+        private readonly ContactIdentityRun identityRun = new ContactIdentityRun();
         private readonly HashSet<ObjectItem> contacts = new HashSet<ObjectItem>();
         private readonly HashSet<ObjectItem> completed = new HashSet<ObjectItem>();
         private readonly HashSet<ObjectItem> failed = new HashSet<ObjectItem>();
@@ -34,6 +35,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool paused;
         private bool ready;
         private bool running;
+        private bool retained;
+        private float revertAt = -1f;
         private string lastWarning = string.Empty;
 
         #endregion
@@ -43,14 +46,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Modification duration, excluding the contact dwell before a successful start.</summary>
         internal override float VfxDuration => settings.Duration;
         /// <summary>Whether the effect still belongs to a running or retained transition.</summary>
-        internal override bool VfxRunning => running || paused;
+        internal override bool VfxRunning => running || paused || identityRun.IsRunning;
         /// <summary>Whether automatic effect timing must pause with the contact transition.</summary>
         internal override bool VfxPaused => paused;
 
         /// <summary>Reusable settings edited by the passive-interaction card.</summary>
         public ContactModificationSettings Settings => settings;
         /// <summary>Whether effects currently own both participants.</summary>
-        public bool IsModifying => running;
+        public bool IsModifying => running || identityRun.IsRunning;
         /// <summary>Whether an interrupted transition retains its appearance and counterpart.</summary>
         public bool IsPaused => paused;
         /// <summary>Identifies the passive feature in the workspace.</summary>
@@ -118,21 +121,39 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (Time.timeScale <= 0f)
                 return;
+            if (settings.IdentityOnly)
+            {
+                // Flag-only zones track every contacted item and release reservations when each change completes.
+                if (Time.time >= nextQuery)
+                {
+                    nextQuery = Time.time + settings.QueryInterval;
+                    detection.Query(Item, settings, contacts);
+                    identityRun.Tick(this, contacts);
+                }
+                return;
+            }
             // Locked effects skip contact queries but still release a lost counterpart or interrupt their active transition.
-            if (!IsLocked && ToolAllowed && Time.time >= nextQuery)
+            if ((!IsLocked && ToolAllowed || settings.WhileContact && (running || retained)) && Time.time >= nextQuery)
             {
                 nextQuery = Time.time + settings.QueryInterval;
                 detection.Query(Item, settings, contacts);
                 UpdateContacts();
             }
-            if ((running || paused) && (other == null || !other.IsOwnedBy(this) || !Item.IsOwnedBy(this)))
+            if ((running || paused || retained) && (other == null || !other.IsOwnedBy(this) || !Item.IsOwnedBy(this)))
             {
                 Cancel();
                 return;
             }
+            if (settings.WhileContact && (running || retained))
+            {
+                UpdateRetention();
+                if (retained || !running || IsLocked || !ToolAllowed || !Eligible(other))
+                    return;
+            }
             if (!running)
                 return;
-            if (IsLocked || !ToolAllowed || !Eligible(other) || !settings.CompleteAfterSeparation && !contacts.Contains(other))
+            if (!settings.WhileContact && (IsLocked || !ToolAllowed || !Eligible(other)
+                || !settings.CompleteAfterSeparation && !contacts.Contains(other)))
             {
                 Interrupt();
                 return;
@@ -205,7 +226,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Compound colliders share one timer; leaving contact removes their accumulated dwell time.
             departed.Clear();
             foreach (ObjectItem candidate in entered.Keys)
-                if (candidate == null || !contacts.Contains(candidate) || !Eligible(candidate))
+                if (candidate == null || !contacts.Contains(candidate) || !Eligible(candidate) || !Matches(candidate))
                     departed.Add(candidate);
             foreach (ObjectItem candidate in departed)
             {
@@ -218,11 +239,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float distance = float.PositiveInfinity;
             foreach (ObjectItem candidate in contacts)
             {
-                if (!Eligible(candidate))
+                if (!Eligible(candidate) || !Matches(candidate))
                     continue;
                 if (!entered.TryGetValue(candidate, out float time))
                     entered.Add(candidate, time = Time.time);
-                if (running || paused && candidate != other || !Eligible(candidate)
+                if (running || retained || paused && candidate != other
                     || !Available(InteractionChannels.Passive) || candidate.IsBlocked(InteractionChannels.Passive)
                     || completed.Contains(candidate) || failed.Contains(candidate) || Time.time - time < settings.ContactDuration)
                     continue;
@@ -252,10 +273,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Checks both independently configured carry conditions before starting or continuing effects.</summary>
         /// <param name="candidate">Other participant in this contact pair.</param>
         /// <returns>True when neither participant violates its carry policy.</returns>
-        private bool Eligible(ObjectItem candidate)
+        internal bool Eligible(ObjectItem candidate)
         {
             // Cached grab state avoids hierarchy searches in contact polling.
             return (settings.AllowCarriedSelf || !Item.IsCarried) && (settings.AllowCarriedOther || !candidate.IsCarried);
+        }
+
+        /// <summary>Retains physical contact after this modifier changes its counterpart's identity.</summary>
+        /// <param name="candidate">Contacted item being evaluated.</param>
+        /// <returns>True for an accepted alternative or this modifier's retained counterpart.</returns>
+        private bool Matches(ObjectItem candidate)
+        {
+            // A completion-time flag replacement must not itself simulate separation.
+            return retained && candidate == other || candidate.Identity != null && candidate.Identity.Matches(settings.Flags);
         }
 
         /// <summary>Reserves both items and prepares all effects before the first visible change.</summary>
@@ -281,6 +311,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             other = candidate;
+            revertAt = -1f;
             Item.Acquire(this, settings.BlockSelf);
             candidate.Acquire(this, settings.BlockOther);
             started = Time.time;
@@ -325,23 +356,60 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else if (settings.Other.Consume)
                 Item.Consume(other, this);
             // Receipts describe what was consumed; completion listeners observe the counterpart's final flag.
-            if (settings.ChangeContactFlag && other != null
-                && !InteractionFlagChange.TryApplyFlag(other.gameObject, settings.ContactFlag, out string warning, settings.ContactFlagOperation))
-                Report(warning);
-            Release();
+            if (settings.ChangeContactFlag && other != null)
+            {
+                if (settings.WhileContact)
+                    other.Identity.SetTemporary(this, settings.ContactFlag, settings.ContactFlagOperation);
+                else if (!InteractionFlagChange.TryApplyFlag(other.gameObject, settings.ContactFlag, out string warning, settings.ContactFlagOperation))
+                    Report(warning);
+            }
+            if (settings.WhileContact)
+            {
+                // Keep visual ownership but release interaction restrictions so either item may move away.
+                retained = true;
+                Item.Acquire(this, InteractionChannels.None);
+                other.Acquire(this, InteractionChannels.None);
+            }
+            else
+                Release();
             Signal(InteractionMoment.Completed);
+        }
+
+        /// <summary>Restores an active or completed temporary change after uninterrupted separation.</summary>
+        private void UpdateRetention()
+        {
+            // Physical contact remains authoritative even if completion changed the counterpart's flags.
+            if (contacts.Contains(other) && Eligible(other) && !IsLocked && ToolAllowed)
+            {
+                revertAt = -1f;
+                return;
+            }
+            if (revertAt < 0f)
+                revertAt = Time.time + settings.RevertDelay;
+            if (Time.time >= revertAt)
+                Cancel();
         }
 
         /// <summary>Reverses only unfinished visual effects and restarts continuous contact timing.</summary>
         private void Cancel()
         {
-            // Preserve completed modifications and consumption receipts when this component is disabled later.
-            if (!running && !paused)
+            // Independent identity contacts may be active even when no visual transition owns the item.
+            identityRun.Clear(this);
+            // Permanent completions no longer own a snapshot; temporary completions restore theirs here.
+            if (!running && !paused && !retained)
                 return;
             running = false;
             paused = false;
+            retained = false;
             selfEffect.Cancel();
             otherEffect.Cancel();
+            if (other != null)
+            {
+                completed.Remove(other);
+                other.Identity.RemoveTemporary(this);
+            }
+            if (Item != null)
+                Item.Identity.RemoveTemporary(this);
             Release();
             entered.Clear();
         }
@@ -355,7 +423,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (other != null)
                 other.Release(this);
             other = null;
+            revertAt = -1f;
             selfEffect = otherEffect = null;
+        }
+
+        /// <summary>Keeps the owner's identity changes reversible for the lifetime of a contact effect.</summary>
+        /// <param name="moment">Successful start or completion being published.</param>
+        protected override void ApplyIdentityChange(InteractionMoment moment)
+        {
+            // A temporary contact never overwrites permanent membership or another zone's pending operation.
+            if (!settings.WhileContact)
+                base.ApplyIdentityChange(moment);
+            else if (FlagChange.Enabled && FlagChange.Moment == moment && Item != null)
+                Item.Identity.SetTemporary(this, FlagChange.Flag, FlagChange.Operation);
         }
 
         /// <summary>Reports a changed configuration failure without repeating it every contact query.</summary>

@@ -33,6 +33,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private bool shown;
         private float appearedAt;
+        private float previousTime;
+        private bool requested;
+        private Vector3 trackedAnchor;
+        private float amount;
+        private float scale;
+        private float fromAmount;
+        private float fromScale;
 
         #endregion
 
@@ -76,44 +83,76 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Assign only at the visible-to-hidden transition or initialization.
             shown = false;
+            requested = false;
             if (canvas != null && canvas.enabled)
                 canvas.enabled = false;
         }
 
-        /// <summary>Tracks an eligible object and advances its optional entry animation.</summary>
+        /// <summary>Projects current object motion every frame and reverses entry or exit without restarting from the anchor.</summary>
         /// <param name="view">Observer camera used for pixel projection and target display.</param>
         /// <param name="anchor">Detection anchor in world space.</param>
         /// <param name="settings">Validated placement and animation settings.</param>
         /// <param name="time">Current unscaled time shared by all interactions.</param>
-        internal void Present(Camera view, Vector3 anchor, HoverSettings settings, float time)
+        /// <param name="visible">Whether detection currently requests a visible label.</param>
+        internal void Present(Camera view, Vector3 anchor, HoverSettings settings, float time, bool visible = true)
         {
+            // Invisible labels do no projection work; optional exits retain their existing canvas.
+            if (!shown && !visible)
+                return;
+            if (!visible && !settings.PopIn)
+            {
+                Hide();
+                return;
+            }
+            if (!shown)
+            {
+                amount = 0f;
+                scale = settings.Appearance == HoverAppearance.PopUp ? settings.StartScale : 1f;
+                trackedAnchor = anchor;
+                previousTime = time;
+                shown = true;
+                requested = false;
+                canvas.targetDisplay = view.targetDisplay;
+                canvas.enabled = true;
+            }
+            if (requested != visible)
+            {
+                requested = visible;
+                appearedAt = time;
+                fromAmount = amount;
+                fromScale = scale;
+            }
+            float duration = visible ? settings.Appearance == HoverAppearance.Instant ? 0f : settings.Duration : settings.ExitDuration;
+            float progress = duration > 0f ? Mathf.Clamp01((time - appearedAt) / duration) : 1f;
+            float eased = Mathf.SmoothStep(0f, 1f, progress);
+            amount = Mathf.Lerp(fromAmount, visible ? 1f : 0f, eased);
+            scale = Mathf.Lerp(fromScale, visible ? 1f : 0f, eased);
+            if (!visible && progress >= 1f)
+            {
+                Hide();
+                return;
+            }
+
+            // Smooth world motion only; fresh camera projection avoids lag when the player turns.
+            trackedAnchor = Vector3.Lerp(trackedAnchor, anchor, settings.FollowSmoothing > 0f
+                ? 1f - Mathf.Exp(-(time - previousTime) / settings.FollowSmoothing) : 1f);
+            previousTime = time;
             // A label offset behind the camera must never create a mirrored overlay.
-            Vector3 origin = view.WorldToScreenPoint(anchor);
-            Vector3 destination = view.WorldToScreenPoint(anchor + settings.WorldOffset);
+            Vector3 origin = view.WorldToScreenPoint(trackedAnchor);
+            Vector3 destination = view.WorldToScreenPoint(trackedAnchor + settings.WorldOffset);
             if (origin.z < view.nearClipPlane || destination.z < view.nearClipPlane)
             {
                 Hide();
                 return;
             }
 
-            // Starting an entry animation is separate from its per-frame movement.
-            if (!shown)
-            {
-                appearedAt = time;
-                shown = true;
-                canvas.targetDisplay = view.targetDisplay;
-                canvas.enabled = true;
-            }
-            float progress = settings.Appearance == HoverAppearance.Instant ? 1f : Mathf.Clamp01((time - appearedAt) / settings.Duration);
-            float eased = 1f - Mathf.Pow(1f - progress, 3f);
             float pixelScale = view.pixelHeight / 1080f;
-            Vector2 screenPoint = Vector2.Lerp(origin, (Vector2)destination + settings.ScreenOffset * pixelScale, eased);
+            Vector2 screenPoint = Vector2.Lerp(origin, (Vector2)destination + settings.ScreenOffset * pixelScale, amount);
 
             // Convert actual screen pixels to the existing canvas, including partial camera viewports.
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle((RectTransform)canvas.transform, screenPoint, null, out Vector3 position))
                 panel.position = position;
-            panel.localScale = Vector3.one * (settings.Appearance == HoverAppearance.Instant
-                ? pixelScale : Mathf.Lerp(settings.StartScale, 1f, eased) * pixelScale);
+            panel.localScale = Vector3.one * (scale * pixelScale);
         }
 
         #endregion

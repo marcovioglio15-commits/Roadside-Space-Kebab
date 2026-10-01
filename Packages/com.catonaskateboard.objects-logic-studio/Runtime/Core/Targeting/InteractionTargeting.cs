@@ -25,16 +25,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="mode">Centre targeting or an exact unlocked cursor hit.</param>
         /// <param name="radius">Centre radius as a fraction of viewport height.</param>
         /// <param name="mask">Solid layers obstructing selection.</param>
+        /// <param name="solidHitOnly">Require an exact solid surface hit instead of trigger hits or nearby anchors.</param>
         /// <param name="score">Receives the selected surface's squared distance from the player.</param>
         /// <returns>True when at least one owned surface or authored anchor is reachable and visible.</returns>
         internal bool Eligible(HoverObserver observer, Transform root, Collider[] colliders, Vector3 anchor,
-            float distance, HoverTargetMode mode, float radius, int mask, out float score)
+            float distance, HoverTargetMode mode, float radius, int mask, bool solidHitOnly, out float score)
         {
             // Target geometry may have moved since the last physics step or assembly insertion.
             Camera view = observer.View;
             Rect viewport = view.pixelRect;
             score = float.PositiveInfinity;
             Vector2 pixel = viewport.center;
+            if (solidHitOnly)
+                radius = float.PositiveInfinity;
             if (mode == HoverTargetMode.Cursor)
             {
                 if (Mouse.current == null || Cursor.lockState == CursorLockMode.Locked || view.targetDisplay != 0)
@@ -44,10 +47,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
             }
             if (colliders != null && HoverPhysics.TryCursorHit(view.ScreenPointToRay(pixel), colliders, view.cullingMask,
-                Vector3.Distance(view.transform.position, observer.Player.position) + distance, out Vector3 hit)
+                Vector3.Distance(view.transform.position, observer.Player.position) + distance, out Vector3 hit, solidHitOnly)
                 && Visible(observer, root, hit, distance, radius, mask, out score))
                 return true;
-            if (mode != HoverTargetMode.ViewCenter)
+            // Exact solid targeting cannot fall back to a nearby pivot or collider centre.
+            if (solidHitOnly || mode != HoverTargetMode.ViewCenter)
                 return false;
             if ((view.cullingMask & (1 << root.gameObject.layer)) != 0
                 && Visible(observer, root, anchor, distance, radius, mask, out score))

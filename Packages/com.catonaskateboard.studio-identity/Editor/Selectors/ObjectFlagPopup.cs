@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -80,7 +81,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             group = EditorGUILayout.Popup(new GUIContent("Group", "Show definitions from one catalog group."), group, groups);
             if (multiple)
                 selectedOnly = EditorGUILayout.Toggle(new GUIContent("Selected Only", "Show only flags included in this field."), selectedOnly);
-            if (GUILayout.Button(new GUIContent("Clear Selection", "Remove this field's selected flags."), EditorStyles.miniButton))
+            if (StudioButton.Draw(new GUIContent("Clear Selection", "Remove this field's selected flags."), EditorStyles.miniButton))
             {
                 ObjectFlagSelector.Assign(owner, path, null, false);
                 selected.Clear();
@@ -108,12 +109,12 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                     editorWindow.Close();
             }
             EditorGUILayout.EndScrollView();
-            if (GUILayout.Button(new GUIContent("+ Create Object Flag", "Define a new custom flag and assign it to this field.")))
+            if (StudioButton.Draw(new GUIContent("+ Create Object Flag", "Define a new custom flag and assign it to this field.")))
             {
                 ObjectFlagSelector.Create(owner, path, current, search);
                 editorWindow.Close();
             }
-            if (GUILayout.Button(new GUIContent("Create Missing Flags from Unity Tags", "Create one definition for each project tag without a same-named flag. Existing flags are preserved.")))
+            if (StudioButton.Draw(new GUIContent("Create Missing Flags from Unity Tags", "Create one definition for each project tag without a same-named flag. Existing flags are preserved.")))
             {
                 ObjectFlagCatalog.ImportProjectTags();
                 RefreshGroups();

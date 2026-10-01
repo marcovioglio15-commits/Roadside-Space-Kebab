@@ -52,14 +52,18 @@ namespace CatOnASkateboard.PlayerStudio
         /// <param name="from">Previous key.</param>
         /// <param name="to">Next key.</param>
         /// <param name="amount">Normalized interpolation weight.</param>
+        /// <param name="direction">Rotation policy; the default preserves existing authored Euler turns.</param>
         /// <returns>The sampled local pose.</returns>
-        public static PlayerToolPose Interpolate(PlayerToolPose from, PlayerToolPose to, float amount)
+        public static PlayerToolPose Interpolate(PlayerToolPose from, PlayerToolPose to, float amount,
+            TransformRotationDirection direction = TransformRotationDirection.AsAuthored)
         {
             // Euler interpolation retains authored multi-turn motion.
             return new PlayerToolPose
             {
                 Position = Vector3.LerpUnclamped(from.Position, to.Position, amount),
-                Rotation = Vector3.LerpUnclamped(from.Rotation, to.Rotation, amount),
+                Rotation = direction == TransformRotationDirection.Shortest
+                    ? TransformRotation.Sample(from.Rotation, to.Rotation, amount, direction).eulerAngles
+                    : from.Rotation + TransformRotation.Delta(from.Rotation, to.Rotation, direction) * amount,
                 Scale = Vector3.LerpUnclamped(from.Scale, to.Scale, amount)
             };
         }

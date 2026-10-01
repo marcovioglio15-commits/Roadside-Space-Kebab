@@ -24,6 +24,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly Dictionary<ObjectFlag, int> counts = new Dictionary<ObjectFlag, int>();
         private readonly List<ObjectAssemblyPart> parts = new List<ObjectAssemblyPart>();
+        private readonly AssemblyCapacity capacity = new AssemblyCapacity();
+        private bool recipeValidated;
         private ObjectInteraction[] features;
         private bool[] occupied;
         private Rigidbody body;
@@ -152,6 +154,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             completedAppearance = null;
             completedAppearanceApplied = false;
             initialized = destroying = pendingStart = pendingCompletion = IsComplete = false;
+            recipeValidated = false;
             counts.Clear();
             IngredientUnits = 0;
             parts.Clear();
@@ -204,7 +207,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!enabled || IsLocked || !ToolAllowed || Item == null || Item.IsConsumed || Item.IsReserved || Item.IsCarried
                 || Item.IsBlocked(InteractionChannels.Assembly) || grab == null || !grab.isActiveAndEnabled || requireHeld && !grab.IsHeld
                 || grab.Identity == null || grab.GetComponent<ObjectAssemblyProduct>() != null || grab.transform.IsChildOf(transform)
-                || !TryValidate(out string warning) || !ObjectGrab.ValidateBody(grab.gameObject, out warning)
+                || !ValidateRecipe() || !ObjectGrab.ValidateBody(grab.gameObject, out _)
                 || grab.GetComponentsInChildren<Joint>(true).Length > 0)
                 return false;
             foreach (ObjectItem ingredient in grab.GetComponentsInChildren<ObjectItem>(true))
@@ -221,14 +224,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (initialized && occupied[index] || slot.AnyIngredient != (pass == 1))
                         continue;
                     foreach (AssemblyIngredient ingredient in settings.Ingredients)
-                        if ((slot.AnyIngredient || slot.Flag == ingredient.Flag) && grab.Identity.Has(ingredient.Flag)
-                            && grab.Units > 0 && grab.Units <= ingredient.Count - Count(ingredient.Flag)
-                            && CanUseMagnet(index, grab, ingredient.Flag))
-                        {
-                            magnet = index;
-                            flag = ingredient.Flag;
-                            return true;
-                        }
+                        if (grab.Units > 0 && grab.Units <= ingredient.Count - AssemblyCapacity.Count(counts, ingredient.Flags))
+                            foreach (ObjectFlag alternative in ingredient.Flags)
+                                if ((slot.AnyIngredient || System.Array.IndexOf(slot.Flags, alternative) >= 0)
+                                    && grab.Identity.Has(alternative) && CanUseMagnet(index, grab, alternative))
+                                {
+                                    magnet = index;
+                                    flag = alternative;
+                                    return true;
+                                }
                 }
             return false;
         }
@@ -242,37 +246,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Appearance validation happens before carry or recipe ownership changes.
             return AssemblySlotOrder.Allows(settings.Magnets, initialized ? occupied : null, index, parts.Count + 1)
-                && AssemblySlotOrder.HasCapacity(settings, counts, initialized ? occupied : null, index, flag, grab.Units)
-                && CanFinishAfterInsertion(index, flag, grab.Units)
+                && capacity.CanFit(settings, counts, initialized ? occupied : null, index, flag, grab.Units)
                 && (!settings.Magnets[index].Appearance.HasChanges
                     || settings.Magnets[index].Appearance.CanBind(grab.Item));
         }
 
-        /// <summary>Preserves at least one compatible slot for each mandatory flag still needing units.</summary>
-        /// <param name="selected">Magnet occupied by the proposed physical ingredient.</param>
-        /// <param name="flag">Incoming ingredient flag.</param>
-        /// <param name="units">Units supplied by this insertion.</param>
-        /// <returns>True when remaining mandatory units can still receive physical ingredients.</returns>
-        private bool CanFinishAfterInsertion(int selected, ObjectFlag flag, int units)
+        /// <summary>Validates the fixed recipe once before runtime contact polling begins.</summary>
+        /// <returns>True when the current session has a usable recipe and product root.</returns>
+        private bool ValidateRecipe()
         {
-            // Unknown future item values need only one slot per unfinished flag; never assume one unit per object.
-            int generic = 0;
-            int required = 0;
-            for (int index = 0; index < settings.Magnets.Length; index++)
-                if (index != selected && (!initialized || !occupied[index]) && settings.Magnets[index].AnyIngredient)
-                    generic++;
-            foreach (AssemblyIngredient ingredient in settings.Ingredients)
-            {
-                if (ingredient.Optional || Count(ingredient.Flag) + (ingredient.Flag == flag ? units : 0) >= ingredient.Count)
-                    continue;
-                bool specific = false;
-                for (int index = 0; index < settings.Magnets.Length && !specific; index++)
-                    specific = index != selected && (!initialized || !occupied[index])
-                        && !settings.Magnets[index].AnyIngredient && settings.Magnets[index].Flag == ingredient.Flag;
-                if (!specific)
-                    required++;
-            }
-            return required <= generic;
+            // Failed configuration remains retryable; successful checks need no recurring layout allocations.
+            if (!Application.isPlaying)
+                return TryValidate(out _);
+            return recipeValidated || (recipeValidated = TryValidate(out _));
         }
 
         #endregion
@@ -400,7 +386,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             IsComplete = parts.Count > 0;
             foreach (AssemblyIngredient ingredient in settings.Ingredients)
-                if (!ingredient.Optional && Count(ingredient.Flag) < ingredient.Count)
+                if (!ingredient.Optional && AssemblyCapacity.Count(counts, ingredient.Flags) < ingredient.Count)
                     IsComplete = false;
             for (int index = 0; index < settings.Magnets.Length; index++)
                 if (settings.Magnets[index].Order > 0 && !occupied[index])
@@ -423,7 +409,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     {
                         available = rule.RequireComplete ? IsComplete : IngredientUnits >= rule.MinimumIngredients;
                         foreach (ItemFlagRequirement requirement in rule.Ingredients)
-                            available &= Count(requirement.Flag) >= requirement.Count;
+                            available &= AssemblyCapacity.Count(counts, requirement.Flags) >= requirement.Count;
                         break;
                     }
                 feature.SetLocked(this, !available);

@@ -182,7 +182,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="text">Visible action name.</param>
         /// <param name="tooltip">Explains the action's write or discard scope.</param>
         /// <param name="clicked">Action invoked by a deliberate click.</param>
-        /// <returns>A button with equal width to the other session action.</returns>
+        /// <returns>A session action sharing the full footer width equally with the other action.</returns>
         private static Button CreateAction(string text, string tooltip, Action clicked)
         {
             // UI Toolkit lays out both buttons even when no source has been selected yet.

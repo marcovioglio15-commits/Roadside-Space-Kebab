@@ -112,16 +112,19 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Ingredients:
-    - Flag: {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
+    - Flags:
+      - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
       Count: 1
       Optional: 0
-    - Flag: {fileID: 11400000, guid: d3074bb85b754906b57c3c98cde17a97, type: 2}
+    - Flags:
+      - {fileID: 11400000, guid: d3074bb85b754906b57c3c98cde17a97, type: 2}
       Count: 1
       Optional: 0
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 1
-      Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+      Flags:
+      - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
       Order: 0
       Position: {x: -0.546581, y: 0.5, z: 0.052991092}
       Rotation: {x: 0, y: 0, z: 0}
@@ -132,7 +135,8 @@ MonoBehaviour:
       PreviewPrefab: {fileID: 9017165495754910650, guid: eb773dd05cd83df4aa5ef91eb4a1abac, type: 3}
     - Name: Magnet 2
       AnyIngredient: 1
-      Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+      Flags:
+      - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
       Order: 0
       Position: {x: 0, y: 0.5, z: 0}
       Rotation: {x: 0, y: 0, z: 0}

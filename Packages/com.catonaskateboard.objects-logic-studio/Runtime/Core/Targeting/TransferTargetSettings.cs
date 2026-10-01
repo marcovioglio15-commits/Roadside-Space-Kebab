@@ -14,6 +14,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Distance = 3f;
         [Tooltip("Select an object near the view centre or under the unlocked cursor.")]
         public HoverTargetMode Mode;
+        [Tooltip("Require the view-centre or cursor ray to hit a non-trigger collider on this object. Trigger volumes and nearby anchors cannot activate it; triggers in front of a solid hit are ignored.")]
+        public bool SolidHitOnly;
         [Tooltip("Allowed screen distance from view centre as a fraction of viewport height.")]
         public float CenterRadius = 0.15f;
         [Tooltip("Local selection point; visible owned collider centres are also eligible.")]
@@ -36,9 +38,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Centre tolerance has no effect on exact cursor selection.
             warning = string.Empty;
-            if (!InteractionValues.Positive(Distance) || !InteractionValues.Finite(Offset)
+            if (!InteractionValues.Positive(Distance) || !SolidHitOnly && !InteractionValues.Finite(Offset)
                 || Mode is not (HoverTargetMode.ViewCenter or HoverTargetMode.Cursor)
-                || Mode == HoverTargetMode.ViewCenter && (!InteractionValues.Positive(CenterRadius) || CenterRadius > 1f))
+                || !SolidHitOnly && Mode == HoverTargetMode.ViewCenter && (!InteractionValues.Positive(CenterRadius) || CenterRadius > 1f))
                 warning = "Use a positive finite distance, finite offset and centre radius in (0, 1].";
             return warning.Length == 0;
         }

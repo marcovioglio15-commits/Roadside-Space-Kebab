@@ -21,6 +21,8 @@ namespace CatOnASkateboard.PlayerStudio
         private readonly float startHeight;
         private readonly float endHeight;
         private readonly bool circular;
+        private readonly TransformRotationDirection direction;
+        private readonly Vector3 rotationDelta;
 
         #endregion
 
@@ -39,6 +41,8 @@ namespace CatOnASkateboard.PlayerStudio
             to = destination;
             startRotation = Quaternion.Euler(initial.Rotation);
             endRotation = Quaternion.Euler(destination.Rotation);
+            direction = settings.SlotRotation;
+            rotationDelta = TransformRotation.Delta(initial.Rotation, destination.Rotation, direction);
             circular = settings.Layout == PlayerToolLayout.Cyclic && settings.SlotMotion == PlayerToolSlotMotion.AroundPivot;
             pivot = settings.Pivot;
             axis = settings.Axis.normalized;
@@ -64,7 +68,8 @@ namespace CatOnASkateboard.PlayerStudio
         {
             // Exact endpoints prevent accumulated drift over repeated wheel cycles.
             Vector3 position = Vector3.Lerp(from.Position, to.Position, amount);
-            Quaternion rotation = Quaternion.Slerp(startRotation, endRotation, amount);
+            Quaternion rotation = direction == TransformRotationDirection.Shortest || amount >= 1f
+                ? Quaternion.Slerp(startRotation, endRotation, amount) : Quaternion.Euler(from.Rotation + rotationDelta * amount);
             if (circular && startRadius > 0.001f && amount < 1f)
             {
                 Quaternion turn = Quaternion.AngleAxis(angle * amount, axis);

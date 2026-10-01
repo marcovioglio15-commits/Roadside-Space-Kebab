@@ -11,7 +11,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         /// <summary>Disables competing scene cameras and listeners in the same creation Undo group.</summary>
         /// <param name="player">New player whose view remains active.</param>
-        /// <param name="scene">Only scene affected by this explicit placement option.</param>
+        /// <param name="scene">Scene affected by this explicit placement option.</param>
         internal static void Activate(GameObject player, Scene scene)
         {
             // Other loaded scenes and cameras inside the new player remain untouched.

@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -50,7 +51,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             if (warning.Length > 0)
                 EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
             using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(flagName)))
-                if (GUILayout.Button(new GUIContent("Create Flag", "Save this definition and assign it to the field that opened this form.")))
+                if (StudioButton.Draw(new GUIContent("Create Flag", "Save this definition and assign it to the field that opened this form.")))
                     try
                     {
                         ObjectFlag flag = ObjectFlagCatalog.Create(flagName, group, description);

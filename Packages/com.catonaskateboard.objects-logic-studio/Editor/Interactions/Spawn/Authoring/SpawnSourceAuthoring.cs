@@ -27,6 +27,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Source references always point to saved prefab components, never temporary stage objects.
             if (!settings.TryValidate(out warning))
                 return false;
+            if (settings.Mode == SpawnManagementMode.DayFlow)
+                return true;
             if (!AssetDatabase.IsOpenForEdit(settings.SourcePrefab))
                 warning = "The source prefab is not writable; its completion links cannot be prepared.";
             foreach (SpawnCondition condition in settings.Conditions)
@@ -42,6 +44,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Identities are metadata, not editable names; renaming a source interaction cannot break its link.
             SpawnManagementSettings result = ObjectWorkspace.Copy(settings);
+            if (settings.Mode == SpawnManagementMode.DayFlow)
+                return result;
             string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(result.SourcePrefab));
             foreach (SpawnCondition condition in result.Conditions)
                 condition.SourceId = guid + ":" + ObjectWorkspaceTarget.FileId(condition.Source);
@@ -56,6 +60,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Applied rule containing resolved prefab component identities.</param>
         internal void Prepare(SpawnManagementSettings settings)
         {
+            // Day flow resolves the exact component on its inactive clone and needs no source metadata writes.
+            if (settings.Mode == SpawnManagementMode.DayFlow)
+                return;
             // An already open source stage receives edits directly so its later save cannot erase this binding.
             PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
             foreach (SpawnCondition condition in settings.Conditions)

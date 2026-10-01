@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -59,7 +60,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.Update();
             }
             using (new EditorGUI.DisabledScope(state.HasChanges || target == null || EditorUtility.IsPersistent(target)))
-                if (GUILayout.Button(new GUIContent("+ Add Interaction", "Choose an available interaction in this category."), EditorStyles.miniButton))
+                if (StudioButton.Draw(new GUIContent("+ Add Interaction", "Choose an available interaction in this category."), EditorStyles.miniButton))
                     ShowAddMenu(state, kind);
             for (int index = 0; index < features.Length; index++)
             {
@@ -195,25 +196,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 state.Extended.Draft.TryValidate(feature, out warning);
             }
             if (feature is ObjectAssemblyProduct product
-                && GUILayout.Button(new GUIContent("Open Assembly Preview", "Orbit the product and place its magnets with transform handles and ingredient prefab guides.")))
+                && StudioButton.Draw(new GUIContent("Open Assembly Preview", "Orbit the product and place its magnets with transform handles and ingredient prefab guides.")))
                 AssemblyPreviewWindow.Open(state, product);
             if (feature is ObjectAssemblyStation station)
                 using (new EditorGUI.DisabledScope(state.HasChanges))
-                    if (GUILayout.Button(new GUIContent("Rebuild Staging", "Restore the inactive prefab child used to prepare new products before activation.")))
+                    if (StudioButton.Draw(new GUIContent("Rebuild Staging", "Restore the inactive prefab child used to prepare new products before activation.")))
                     {
                         AssemblyAuthoring.Prepare(station);
                         ObjectAuthoringSave.Save(target);
                         Refresh(target);
                     }
             if (feature is ObjectDialogue
-                && GUILayout.Button(new GUIContent("Configure Shared Dialogue HUD", "Open Scene Observer to edit the overlay used by every dialogue.")))
+                && StudioButton.Draw(new GUIContent("Configure Shared Dialogue HUD", "Open Scene Observer to edit the overlay used by every dialogue.")))
             {
                 state.Category = ObjectInteractionCategory.SceneObserver;
                 state.Persist();
             }
             if (feature is ObjectOutline outline)
                 using (new EditorGUI.DisabledScope(state.HasChanges))
-                    if (GUILayout.Button(new GUIContent("Collect Outline Renderers", "Collect original renderers after changing this prefab hierarchy.")))
+                    if (StudioButton.Draw(new GUIContent("Collect Outline Renderers", "Collect original renderers after changing this prefab hierarchy.")))
                     {
                         OutlineAuthoring.Rebuild(outline);
                         ObjectAuthoringSave.Save(target);

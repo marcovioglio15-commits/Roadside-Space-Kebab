@@ -19,7 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Invalid authored values are left untouched and never reach Handles calculations.
             if (!grab.DrawGizmos || grab.Settings == null || !grab.Settings.TryValidate(out _))
                 return;
-            Vector3 anchor = grab.WorldTarget;
+            Vector3 anchor = grab.Settings.SolidHitOnly ? grab.transform.position : grab.WorldTarget;
             float size = HandleUtility.GetHandleSize(anchor) * 0.05f;
             using (new Handles.DrawingScope(grab.IsHeld ? new Color(0.3f, 1f, 0.55f) : new Color(1f, 0.7f, 0.2f)))
             {

@@ -37,6 +37,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Grab => session.Draft.Grab.TryValidate(out warning),
                 SingleInteractionKind.Dispenser => session.Draft.Dispenser.TryValidate(out warning),
                 SingleInteractionKind.Container => session.Draft.Container.TryValidate(out warning),
+                SingleInteractionKind.Eject => session.Draft.Eject.TryValidate(out warning),
+                SingleInteractionKind.TriggerAnimation => session.Draft.TriggerAnimation.TryValidate(out warning),
                 SingleInteractionKind.Drop => session.Draft.Release.TryValidate(out warning),
                 SingleInteractionKind.Throw => session.Draft.Release.TryValidate(out warning) && session.Draft.Throw.TryValidate(out warning),
                 _ => false
@@ -102,6 +104,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Grab => JsonUtility.ToJson(session.Draft.Grab),
                 SingleInteractionKind.Dispenser => JsonUtility.ToJson(session.Draft.Dispenser),
                 SingleInteractionKind.Container => JsonUtility.ToJson(session.Draft.Container),
+                SingleInteractionKind.Eject => JsonUtility.ToJson(session.Draft.Eject),
+                SingleInteractionKind.TriggerAnimation => JsonUtility.ToJson(session.Draft.TriggerAnimation),
                 _ => JsonUtility.ToJson(session.Draft.Release)
             };
             string payload = "{\"Settings\":" + settings + (session.Kind == SingleInteractionKind.Throw

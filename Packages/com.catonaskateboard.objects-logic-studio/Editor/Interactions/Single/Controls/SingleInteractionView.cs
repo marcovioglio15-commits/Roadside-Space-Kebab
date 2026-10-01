@@ -141,11 +141,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Throw => Undo.AddComponent<ObjectThrow>(target),
                 SingleInteractionKind.Dispenser => Undo.AddComponent<ObjectDispenser>(target),
                 SingleInteractionKind.Container => Undo.AddComponent<ObjectContainer>(target),
+                SingleInteractionKind.Eject => Undo.AddComponent<ObjectEject>(target),
+                SingleInteractionKind.TriggerAnimation => Undo.AddComponent<ObjectTriggerAnimation>(target),
                 _ => throw new ArgumentOutOfRangeException(nameof(kind))
             };
             using (SerializedObject serialized = new SerializedObject(feature))
             {
-                serialized.FindProperty("interactionName").stringValue = kind.ToString();
+                serialized.FindProperty("interactionName").stringValue = ObjectNames.NicifyVariableName(kind.ToString());
                 serialized.ApplyModifiedProperties();
             }
             ObjectAuthoringSave.Save(target);

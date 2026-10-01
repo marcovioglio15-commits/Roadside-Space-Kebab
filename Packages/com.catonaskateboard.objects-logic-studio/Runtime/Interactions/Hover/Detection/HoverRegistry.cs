@@ -9,6 +9,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private static readonly List<ObjectHover> interactions = new List<ObjectHover>();
+        private static readonly List<ObjectHover> frame = new List<ObjectHover>();
 
         #endregion
 
@@ -22,6 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // With scene reload disabled, OnEnable is not a reliable reset boundary.
             interactions.Clear();
+            frame.Clear();
             foreach (HoverObserver observer in Object.FindObjectsByType<HoverObserver>())
                 observer.RefreshContext();
             foreach (ObjectHover interaction in Object.FindObjectsByType<ObjectHover>())
@@ -57,13 +59,59 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="observer">Owner of the current first-person view.</param>
         internal static void Tick(HoverObserver observer)
         {
-            // Reverse traversal also tolerates Unity objects destroyed during scene unloading.
+            // Snapshot membership so hover events may enable or remove other interactions safely.
             float time = Time.unscaledTime;
+            frame.Clear();
             for (int index = interactions.Count - 1; index >= 0; index--)
                 if (interactions[index] == null)
                     interactions.RemoveAt(index);
                 else
-                    interactions[index].Tick(observer, time);
+                    frame.Add(interactions[index]);
+
+            // Compare live screen positions; expensive visibility queries keep each hover's own interval.
+            ObjectHover selected = null;
+            float score = float.PositiveInfinity;
+            foreach (ObjectHover interaction in frame)
+                if (interaction.Evaluate(observer, time) && interaction.Settings.TargetMode == HoverTargetMode.ViewCenter)
+                {
+                    float candidate = ((Vector2)observer.View.WorldToScreenPoint(interaction.WorldAnchor)
+                        - observer.View.pixelRect.center).sqrMagnitude;
+                    if (Closer(interaction, selected, candidate, score))
+                    {
+                        selected = interaction;
+                        score = candidate;
+                    }
+                }
+
+            // Release the previous winner before the new one emits events; Pop In may finish independently.
+            foreach (ObjectHover interaction in frame)
+                if (interaction != null && interaction.Settings != null && interaction.Settings.TargetMode == HoverTargetMode.ViewCenter
+                    && interaction != selected)
+                    interaction.Present(observer, time, false);
+            foreach (ObjectHover interaction in frame)
+                if (interaction != null && interaction.Settings != null
+                    && (interaction == selected || interaction.Settings.TargetMode != HoverTargetMode.ViewCenter))
+                    interaction.Present(observer, time, true);
+        }
+
+        /// <summary>Chooses the closest screen anchor without allowing grace or equal-score ties to cause flicker.</summary>
+        /// <param name="candidate">Eligible centre-targeted hover.</param>
+        /// <param name="selected">Best candidate so far.</param>
+        /// <param name="score">Candidate squared pixel distance from viewport centre.</param>
+        /// <param name="best">Previously selected squared pixel distance.</param>
+        /// <returns>True when this candidate should own the centre hover.</returns>
+        private static bool Closer(ObjectHover candidate, ObjectHover selected, float score, float best)
+        {
+            // A real detection takes precedence over an old winner retained only by its release delay.
+            if (selected == null)
+                return true;
+            if (candidate.Detected != selected.Detected)
+                return candidate.Detected;
+            if (score != best)
+                return score < best;
+            if (candidate.IsHovered != selected.IsHovered)
+                return candidate.IsHovered;
+            return EntityId.ToULong(candidate.GetEntityId()) < EntityId.ToULong(selected.GetEntityId());
         }
 
         /// <summary>Clears visible labels when observation stops or its context is missing.</summary>

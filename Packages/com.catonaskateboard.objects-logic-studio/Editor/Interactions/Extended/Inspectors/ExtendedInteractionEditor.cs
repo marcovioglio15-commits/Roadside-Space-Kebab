@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorGUILayout.LabelField(ObjectNames.NicifyVariableName(feature.Kind.ToString()), EditorStyles.miniLabel);
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
                 || !ObjectAuthoringSave.TryValidate(feature.gameObject, out _)))
-                if (GUILayout.Button(new GUIContent("Open Objects Logic Studio", "Select this exact component in the tool; use Open to enter its prefab workspace.")))
+                if (StudioButton.Draw(new GUIContent("Open Objects Logic Studio", "Select this exact component in the tool; use Open to enter its prefab workspace.")))
                     ObjectsLogicStudioWindow.Open(feature);
             if (Application.isPlaying)
                 EditorGUILayout.LabelField(feature switch

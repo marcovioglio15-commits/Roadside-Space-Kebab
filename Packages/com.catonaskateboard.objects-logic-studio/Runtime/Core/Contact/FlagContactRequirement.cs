@@ -75,29 +75,65 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Queries run only for a requested interaction, after scripted transforms have settled.
             if (!settings.Enabled)
                 return true;
+            return Query(item, owned, settings.Tolerance, settings.IncludeTriggers, null, settings);
+        }
+
+        /// <summary>Collects each touching collider for commands that must operate on every matching physical body.</summary>
+        /// <param name="item">Owner excluded from contacts.</param>
+        /// <param name="owned">Cached owner colliders.</param>
+        /// <param name="tolerance">Maximum allowed surface separation.</param>
+        /// <param name="includeTriggers">Whether trigger geometry participates.</param>
+        /// <param name="contacts">Reusable destination receiving distinct colliders.</param>
+        /// <returns>True when the complete query fit its buffer; false cancels an incomplete result.</returns>
+        internal bool Collect(ObjectItem item, Collider[] owned, float tolerance, bool includeTriggers, HashSet<Collider> contacts)
+        {
+            // Shared geometry checks keep Eject and contact-gated Slice consistent.
+            contacts.Clear();
+            return Query(item, owned, tolerance, includeTriggers, contacts, null);
+        }
+
+        /// <summary>Runs one exact contact implementation for first-match checks and complete collections.</summary>
+        /// <param name="item">Excluded interaction owner.</param>
+        /// <param name="owned">Cached collider hierarchy.</param>
+        /// <param name="tolerance">Permitted surface gap.</param>
+        /// <param name="includeTriggers">Trigger participation policy.</param>
+        /// <param name="contacts">Collection destination, or null for a first-match query.</param>
+        /// <param name="filter">Optional flag filter for first-match queries.</param>
+        /// <returns>Whether collection succeeded, or a requested first match was found.</returns>
+        private bool Query(ObjectItem item, Collider[] owned, float tolerance, bool includeTriggers,
+            HashSet<Collider> contacts, FlagContactRequirement filter)
+        {
+            // Full buffers fail closed, preventing an arbitrary subset of touching objects from being ejected.
             Physics.SyncTransforms();
             foreach (Collider collider in owned)
             {
-                if (!ContactDetection.Usable(collider, settings.IncludeTriggers) || !item.Owns(collider.transform))
+                if (!ContactDetection.Usable(collider, includeTriggers) || !item.Owns(collider.transform))
                     continue;
                 Bounds bounds = collider.bounds;
                 int count = item.gameObject.scene.GetPhysicsScene().OverlapSphere(bounds.center,
-                    bounds.extents.magnitude + settings.Tolerance, buffer, ~0,
-                    settings.IncludeTriggers ? QueryTriggerInteraction.Collide : QueryTriggerInteraction.Ignore);
+                    bounds.extents.magnitude + tolerance, buffer, ~0,
+                    includeTriggers ? QueryTriggerInteraction.Collide : QueryTriggerInteraction.Ignore);
                 if (count == buffer.Length)
+                {
+                    contacts?.Clear();
                     return false;
+                }
                 for (int index = 0; index < count; index++)
                 {
                     Collider other = buffer[index];
-                    if (!ContactDetection.Usable(other, settings.IncludeTriggers) || item.Owns(other.transform)
+                    if (!ContactDetection.Usable(other, includeTriggers) || item.Owns(other.transform)
                         || Physics.GetIgnoreLayerCollision(collider.gameObject.layer, other.gameObject.layer)
-                        || Physics.GetIgnoreCollision(collider, other) || !Matches(other.transform, settings.Flags, settings.Match))
+                        || Physics.GetIgnoreCollision(collider, other)
+                        || filter != null && !Matches(other.transform, filter.Flags, filter.Match))
                         continue;
-                    if (ContactDetection.Touches(collider, other, settings.Tolerance))
+                    if (!ContactDetection.Touches(collider, other, tolerance))
+                        continue;
+                    if (contacts == null)
                         return true;
+                    contacts.Add(other);
                 }
             }
-            return false;
+            return contacts != null;
         }
 
         /// <summary>Checks the collider and its parents so flagged table roots can own compound surfaces.</summary>
@@ -105,7 +141,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="flags">Accepted project flags.</param>
         /// <param name="match">Any or all selected flags.</param>
         /// <returns>True when ancestors satisfy the selected flags.</returns>
-        private static bool Matches(Transform branch, ObjectFlag[] flags, ObjectFlagMatch match)
+        internal static bool Matches(Transform branch, ObjectFlag[] flags, ObjectFlagMatch match)
         {
             // Each flag may belong to the collider itself or an owning parent.
             foreach (ObjectFlag flag in flags)

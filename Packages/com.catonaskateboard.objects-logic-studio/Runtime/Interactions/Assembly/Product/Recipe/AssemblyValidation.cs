@@ -27,20 +27,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             long total = 0;
             foreach (AssemblyIngredient ingredient in settings.Ingredients)
             {
-                if (!ValidFlag( ingredient, out warning))
+                if (ingredient == null || !ingredient.TryValidate(out warning))
                     return false;
-                if (!quantities.TryAdd(ingredient.Flag, ingredient.Count))
-                {
-                    warning = "Use each recipe flag once and set its quantity on that row.";
-                    return false;
-                }
+                foreach (ObjectFlag flag in ingredient.Flags)
+                    if (!quantities.TryAdd(flag, ingredient.Count))
+                    {
+                        warning = "Use each flag in only one recipe row; alternatives on a row share its quantity.";
+                        return false;
+                    }
                 total += ingredient.Count;
             }
-            int generic = 0;
-            HashSet<ObjectFlag> specific = new HashSet<ObjectFlag>();
             HashSet<string> names = new HashSet<string>();
             HashSet<int> orders = new HashSet<int>();
-            Dictionary<ObjectFlag, int> required = new Dictionary<ObjectFlag, int>();
             foreach (Transform child in owner.transform)
                 if (!child.TryGetComponent(out ObjectAssemblyPart part) || part.Product == null || part.Product.gameObject != owner)
                     names.Add(child.name);
@@ -64,54 +62,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
                 if (magnet.Appearance == null || !magnet.Appearance.TryValidate(out warning))
                     return false;
-                if (magnet.AnyIngredient)
-                    generic++;
-                else if (magnet.Flag == null || !quantities.ContainsKey(magnet.Flag))
+                if (!magnet.AnyIngredient)
                 {
-                    warning = "Choose a recipe ingredient flag for each specific magnet.";
-                    return false;
-                }
-                else
-                {
-                    specific.Add(magnet.Flag);
-                    if (magnet.Order > 0)
-                    {
-                        required.TryGetValue(magnet.Flag, out int count);
-                        if (count >= quantities[magnet.Flag])
+                    if (!ObjectFlagRules.TryValidate(magnet.Flags, false, out warning))
+                        return false;
+                    foreach (ObjectFlag flag in magnet.Flags)
+                        if (!quantities.ContainsKey(flag))
                         {
-                            warning = "Numbered magnets need at least one recipe unit each for their required flag.";
+                            warning = "Choose recipe flags for each restricted magnet.";
                             return false;
                         }
-                        required[magnet.Flag] = count + 1;
-                    }
                 }
             }
-            // One physical ingredient can supply multiple units; require a compatible slot for each flag.
-            // Additional unit-one ingredients still need additional physical magnets at insertion.
-            int remaining = 0;
-            foreach (ObjectFlag flag in quantities.Keys)
-                if (!specific.Contains(flag))
-                    remaining++;
-            if (remaining > generic)
+            if (!new AssemblyCapacity().CanFit(settings, null))
             {
-                warning = "The recipe needs more compatible magnets. Add generic slots or slots for its missing flags.";
+                warning = "Add compatible magnets or quantity capacity for all mandatory ingredients and numbered slots.";
                 return false;
             }
             return settings.CompletedAppearance != null && settings.CompletedAppearance.TryValidate(out warning)
-                && ValidateRules(owner, settings.InteractionRules, quantities, total, out warning);
-        }
-
-        /// <summary>Checks that a flag requirement uses a defined project flag and positive integer quantity.</summary>
-        /// <param name="requirement">Proposed flag and quantity.</param>
-        /// <param name="warning">Receives an invalid quantity or undefined flag.</param>
-        /// <returns>True when the requirement is usable.</returns>
-        private static bool ValidFlag(ItemFlagRequirement requirement, out string warning)
-        {
-            // A flag asset remains the same recipe key after renaming.
-            warning = "Choose a flag asset and a positive whole-number quantity.";
-            if (requirement == null || requirement.Flag == null || requirement.Count <= 0)
-                return false;
-            return requirement.Flag.TryValidate(out warning);
+                && ValidateRules(owner, settings, quantities, total, out warning);
         }
 
         #endregion
@@ -120,18 +89,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Rejects ambiguous targets and ingredient thresholds that the recipe cannot satisfy.</summary>
         /// <param name="owner">Root of the assembled product.</param>
-        /// <param name="rules">Per-feature ingredient requirements.</param>
+        /// <param name="settings">Recipe and per-feature ingredient requirements.</param>
         /// <param name="quantities">Maximum recipe quantity for each distinct flag.</param>
         /// <param name="total">Maximum allowed ingredient count.</param>
         /// <param name="warning">Receives a missing target or impossible threshold.</param>
         /// <returns>True when every rule has a unique existing target and attainable requirements.</returns>
-        private static bool ValidateRules(GameObject owner, AssemblyInteractionRule[] rules, Dictionary<ObjectFlag, int> quantities,
+        private static bool ValidateRules(GameObject owner, AssemblyProductSettings settings, Dictionary<ObjectFlag, int> quantities,
             long total, out string warning)
         {
             // A feature has one assembly rule; independent Unlock Interactions may add their own restrictions.
             warning = string.Empty;
             HashSet<ObjectInteraction> targets = new HashSet<ObjectInteraction>();
-            foreach (AssemblyInteractionRule rule in rules)
+            foreach (AssemblyInteractionRule rule in settings.InteractionRules)
             {
                 if (rule == null || rule.Target == null || !rule.Target.transform.IsChildOf(owner.transform)
                     || rule.Target is ObjectInteractionUnlock or ObjectAssemblyProduct || !targets.Add(rule.Target))
@@ -140,12 +109,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     warning = "Choose a positive minimum ingredient count that fits this recipe.";
                 else
                     foreach (ItemFlagRequirement requirement in rule.Ingredients)
-                        if (!ValidFlag( requirement, out warning)
-                            || !quantities.TryGetValue(requirement.Flag, out int count) || requirement.Count > count)
+                    {
+                        if (requirement == null || !requirement.TryValidate(out warning))
+                            return false;
+                        foreach (ObjectFlag flag in requirement.Flags)
+                            if (!quantities.ContainsKey(flag))
+                            {
+                                warning = "Product interaction conditions must use recipe flags.";
+                                return false;
+                            }
+                        long capacity = 0;
+                        foreach (AssemblyIngredient ingredient in settings.Ingredients)
+                            foreach (ObjectFlag flag in requirement.Flags)
+                                if (System.Array.IndexOf(ingredient.Flags, flag) >= 0)
+                                {
+                                    capacity += ingredient.Count;
+                                    break;
+                                }
+                        if (requirement.Count > capacity)
                         {
-                            warning = "Product interaction requirements must use recipe flags and attainable positive quantities.";
-                            break;
+                            warning = "The required quantity exceeds the matching recipe capacity.";
+                            return false;
                         }
+                    }
                 if (warning.Length > 0)
                     return false;
             }

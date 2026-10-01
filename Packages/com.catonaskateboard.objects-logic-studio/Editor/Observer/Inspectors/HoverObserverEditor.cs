@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -26,9 +27,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             serializedObject.ApplyModifiedProperties();
             HoverObserver observer = (HoverObserver)target;
             if (!Application.isPlaying && !EditorUtility.IsPersistent(observer) && observer.DialogueHud == null
-                && GUILayout.Button(new GUIContent("Create Shared Dialogue HUD", "Create one overlay for all dialogues before Play.")))
+                && StudioButton.Draw(new GUIContent("Create Shared Dialogue HUD", "Create one overlay for all dialogues before Play.")))
                 DialogueAuthoring.CreateHud(observer);
-            if (Application.isPlaying && GUILayout.Button(new GUIContent("Refresh Context", "Reacquire the camera and flagged player after an explicit binding change.")))
+            if (Application.isPlaying && StudioButton.Draw(new GUIContent("Refresh Context", "Reacquire the camera and flagged player after an explicit binding change.")))
                 observer.RefreshContext();
             if (observer.Warning.Length > 0)
                 EditorGUILayout.HelpBox(observer.Warning, MessageType.Warning);

@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using CatOnASkateboard.StudioIdentity;
 using System;
@@ -12,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region State
 
         private static readonly InteractionChoiceCatalog choices = new InteractionChoiceCatalog();
-        private static ObjectFlag[] ingredientFlags = Array.Empty<ObjectFlag>();
+        private static readonly System.Collections.Generic.HashSet<ObjectFlag> ingredientFlags = new System.Collections.Generic.HashSet<ObjectFlag>();
 
         #endregion
 
@@ -55,7 +56,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             else
             {
-                HoverControls.Field(settings, "ContactDuration");
+                if (settings.FindPropertyRelative("Trigger").enumValueIndex == (int)AssemblyStationTrigger.IngredientContact)
+                    HoverControls.Field(settings, "ContactDuration");
                 HoverControls.Field(settings, "ContactQueryInterval");
                 HoverControls.Field(settings, "ContactTolerance");
                 HoverControls.Field(settings, "IncludeTriggers");
@@ -114,13 +116,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             DrawMagnet(magnet);
                 }
             }
-            if (GUILayout.Button(new GUIContent("+ Add Magnet", "Add one empty generic ingredient slot.")))
+            if (StudioButton.Draw(new GUIContent("+ Add Magnet", "Add one empty generic ingredient slot.")))
             {
                 magnets.arraySize++;
                 SerializedProperty magnet = magnets.GetArrayElementAtIndex(magnets.arraySize - 1);
                 magnet.FindPropertyRelative("Name").stringValue = "Magnet " + magnets.arraySize;
                 magnet.FindPropertyRelative("AnyIngredient").boolValue = true;
-                magnet.FindPropertyRelative("Flag").objectReferenceValue = null;
+                magnet.FindPropertyRelative("Flags").arraySize = 0;
                 magnet.FindPropertyRelative("Position").vector3Value = Vector3.zero;
                 magnet.FindPropertyRelative("Rotation").vector3Value = Vector3.zero;
                 magnet.FindPropertyRelative("Scale").vector3Value = Vector3.one;
@@ -141,7 +143,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(magnet, "AnyIngredient");
             HoverControls.Field(magnet, "Order");
             if (!magnet.FindPropertyRelative("AnyIngredient").boolValue)
-                ExtendedInteractionControls.Flag(magnet.FindPropertyRelative("Flag"));
+                ObjectFlagSelector.Draw(magnet.FindPropertyRelative("Flags"));
             HoverControls.Field(magnet, "Position");
             HoverControls.Field(magnet, "Rotation");
             HoverControls.Field(magnet, "Scale");
@@ -180,7 +182,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     FlagRequirementControls.Draw(rule.FindPropertyRelative("Ingredients"), "+ Require Recipe Ingredient", false, DrawIngredient);
                 }
             }
-            if (GUILayout.Button(new GUIContent("+ Configure Interaction", "Choose an interaction already configured on this product.")))
+            if (StudioButton.Draw(new GUIContent("+ Configure Interaction", "Choose an interaction already configured on this product.")))
             {
                 GenericMenu menu = new GenericMenu();
                 long productId = state.Extended.ComponentId;
@@ -219,15 +221,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="recipe">Current recipe rows.</param>
         private static void RefreshIngredients(SerializedProperty recipe)
         {
-            // Rebuild only when membership changes; quantities and display names do not affect this cache.
-            bool changed = recipe.arraySize != ingredientFlags.Length;
-            for (int index = 0; !changed && index < ingredientFlags.Length; index++)
-                changed = ingredientFlags[index] != recipe.GetArrayElementAtIndex(index).FindPropertyRelative("Flag").objectReferenceValue as ObjectFlag;
-            if (!changed)
-                return;
-            ingredientFlags = new ObjectFlag[recipe.arraySize];
-            for (int index = 0; index < recipe.arraySize; index++)
-                ingredientFlags[index] = recipe.GetArrayElementAtIndex(index).FindPropertyRelative("Flag").objectReferenceValue as ObjectFlag;
+            // Recipe rows can accept alternatives; flatten their membership for the condition selector.
+            ingredientFlags.Clear();
+            for (int row = 0; row < recipe.arraySize; row++)
+            {
+                SerializedProperty flags = recipe.GetArrayElementAtIndex(row).FindPropertyRelative("Flags");
+                for (int index = 0; index < flags.arraySize; index++)
+                    if (flags.GetArrayElementAtIndex(index).objectReferenceValue is ObjectFlag flag)
+                        ingredientFlags.Add(flag);
+            }
         }
 
         /// <summary>Edits an ingredient condition and reports choices missing from the recipe.</summary>
@@ -236,8 +238,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Keep the common searchable catalog; indicate selections absent from this recipe.
             ObjectFlagSelector.Draw(flag, new GUIContent("Recipe Ingredient", flag.tooltip));
-            if (flag.objectReferenceValue != null && Array.IndexOf(ingredientFlags, flag.objectReferenceValue) < 0)
-                EditorGUILayout.LabelField("This flag is not in the recipe.", EditorStyles.miniLabel);
+            for (int index = 0; index < flag.arraySize; index++)
+                if (flag.GetArrayElementAtIndex(index).objectReferenceValue is ObjectFlag selected && !ingredientFlags.Contains(selected))
+                {
+                    EditorGUILayout.LabelField("A selected flag is not in the recipe.", EditorStyles.miniLabel);
+                    break;
+                }
         }
 
         #endregion

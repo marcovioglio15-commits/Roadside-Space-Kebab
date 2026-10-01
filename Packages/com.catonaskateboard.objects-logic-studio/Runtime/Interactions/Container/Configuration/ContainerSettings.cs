@@ -22,6 +22,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool Unlimited = true;
         [Tooltip("Maximum number of stored instances when unlimited storage is disabled.")]
         public int Capacity = 10;
+        [Tooltip("Accept only spaces available in this object's finite Dispenser. Prefab supply starts full; stored-only supply starts empty. Deposited originals become available to that Dispenser.")]
+        public bool LimitToDispenserSpace;
         [Tooltip("Keep stored objects visible. Their physics and interactions remain suspended until dispensed.")]
         public bool KeepVisible;
         [Tooltip("Local position of the first stored object.")]
@@ -30,6 +32,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Vector3 Rotation;
         [Tooltip("Local offset between successive occupied storage slots.")]
         public Vector3 Spacing = new Vector3(0f, 0.2f, 0f);
+        [Header("Fill Steps")]
+        [Tooltip("Appearance selected by actual stored count. Highest reached count wins; Dispenser steps take precedence if both target the same mesh or renderer.")]
+        public InventoryFillStep[] FillSteps = Array.Empty<InventoryFillStep>();
 
         #endregion
 
@@ -47,6 +52,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (Target == null || !Target.TryValidate(out warning))
                 return false;
             if (!ObjectFlagRules.TryValidate(AllowedFlags, false, out warning))
+                return false;
+            if (!InventoryFillStep.TryValidate(FillSteps, out warning))
                 return false;
             if (Match is not (ObjectFlagMatch.Any or ObjectFlagMatch.All))
                 warning = "Choose Any or All for the accepted flags.";

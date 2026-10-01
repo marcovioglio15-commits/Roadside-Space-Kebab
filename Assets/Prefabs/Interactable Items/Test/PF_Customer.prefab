@@ -198,7 +198,8 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Flag: {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
+    Flags:
+    - {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
     ContactDuration: 1
     ContactTolerance: 0.02
     QueryInterval: 0.02
@@ -277,7 +278,8 @@ MonoBehaviour:
     - Name: Dialogue
       Weight: 1
       RequiredFlags:
-      - Flag: {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
+      - Flags:
+        - {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
         Count: 2
       RequireAll: 1
       Lines:

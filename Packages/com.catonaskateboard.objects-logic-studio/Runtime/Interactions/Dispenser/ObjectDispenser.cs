@@ -6,7 +6,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Starts carrying a new prefab or an original item recovered from this object's Container.</summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Object Dispenser")]
-    public sealed class ObjectDispenser : ObjectTransferInteraction
+    public sealed class ObjectDispenser : ObjectInventoryInteraction
     {
         #region Serialized Fields
 
@@ -19,7 +19,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region State
 
-        private ObjectContainer container;
         private int dispensed;
         private bool transferring;
 
@@ -31,6 +30,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public DispenserSettings Settings => settings;
         /// <summary>Successful withdrawals from finite prefab stock during this instance's lifetime.</summary>
         public int DispensedCount => dispensed;
+        /// <summary>Actual recoverable instances plus unused prefab stock; minus one represents unbounded prefab supply.</summary>
+        public int RemainingCount => !settings.UseContainer && settings.Unlimited ? -1
+            : (settings.UseContainer ? 0 : Mathf.Max(0, settings.Stock - dispensed))
+                + (UsesStored && Container != null ? Container.StoredCount : 0);
+        /// <summary>Whether originals are supplied from a linked Container before creating a prefab.</summary>
+        private bool UsesStored => settings.UseContainer || Container != null && Container.Settings.LimitToDispenserSpace;
         /// <summary>Identifies this single interaction card.</summary>
         public override SingleInteractionKind Kind => SingleInteractionKind.Dispenser;
         /// <summary>Range and aiming configuration.</summary>
@@ -52,18 +57,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 dispenser.dispensed = 0;
                 dispenser.transferring = false;
             }
-        }
-
-        #endregion
-
-        #region Lifecycle
-
-        /// <summary>Caches the optional inventory dependency at activation.</summary>
-        protected override void OnEnable()
-        {
-            // Re-enabling a pooled instance preserves its stock and inventory.
-            container = GetComponent<ObjectContainer>();
-            base.OnEnable();
         }
 
         #endregion
@@ -91,6 +84,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (configuration.UseContainer && GetComponent<ObjectContainer>() == null)
                 warning = "Add Container to this same object before linking its stored items.";
+            else if (configuration.Unlimited && GetComponent<ObjectContainer>() is ObjectContainer container
+                && container.Settings.LimitToDispenserSpace)
+                warning = "This Container limits storage to Dispenser spaces. Keep finite Stock or remove that link first.";
+            else if ((configuration.UseContainer || !configuration.Unlimited) && !InventoryFillStep.CanBind(configuration.FillSteps, Item, out warning))
+                return false;
             return warning.Length == 0;
         }
 
@@ -104,7 +102,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Empty linked storage remains unavailable until a deposit succeeds.
             return !transferring && Available(InteractionChannels.Transfer) && !Item.IsReserved
-                && (settings.UseContainer ? container != null && container.HasStoredItem() : settings.Unlimited || dispensed < settings.Stock);
+                && (UsesStored && Container != null && Container.HasStoredItem()
+                    || !settings.UseContainer && (settings.Unlimited || dispensed < settings.Stock));
+        }
+
+        /// <summary>Checks unoccupied spaces without treating a previously returned object as a second free slot.</summary>
+        /// <param name="stored">Actual originals already retained by the Container.</param>
+        /// <returns>True when the finite supply has a vacancy for another deposit.</returns>
+        internal bool HasStorageSpace(int stored)
+        {
+            // Stored-only supply begins empty; finite prefab supply frees one space per successful withdrawal.
+            return !transferring && !settings.Unlimited && stored < (settings.UseContainer ? settings.Stock : dispensed);
         }
 
         /// <summary>Commits stock only after an item has acquired the observer's empty carry slot.</summary>
@@ -122,13 +130,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 Vector3 position = transform.position;
                 Quaternion rotation = transform.rotation * Quaternion.Euler(settings.OutputRotation);
-                if (settings.UseContainer)
+                if (UsesStored && Container != null && Container.HasStoredItem())
                 {
-                    if (!container.TryTake(observer, position, rotation, out grab, transform, settings.PickupDuration))
+                    if (!Container.TryTake(observer, position, rotation, out grab, transform, settings.PickupDuration))
                         return false;
                 }
                 else
                 {
+                    if (settings.UseContainer)
+                        return false;
                     GameObject created = Instantiate(settings.Prefab, position, rotation);
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
                     ObjectGrab candidate = created.GetComponent<ObjectGrab>();
@@ -141,6 +151,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     grab = candidate;
                     dispensed++;
                 }
+                RefreshFill();
                 Signal(InteractionMoment.Started);
                 Signal(InteractionMoment.Completed);
                 return true;

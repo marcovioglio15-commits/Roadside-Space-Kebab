@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,9 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     SerializedProperty target = settings.FindPropertyRelative("Target");
                     HoverControls.Field(target, "Distance");
                     HoverControls.Field(target, "Mode");
-                    if (target.FindPropertyRelative("Mode").enumValueIndex == (int)HoverTargetMode.ViewCenter)
-                        HoverControls.Field(target, "CenterRadius");
-                    HoverControls.Field(target, "Offset");
+                    TransferInteractionControls.Aim(target, "Mode", "Offset");
                     HoverControls.Field(target, "ObstacleMask");
                     HoverControls.Field(settings, "Priority");
                     FlagContactControls.Draw(settings.FindPropertyRelative("Contact"));
@@ -58,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 }
             }
-            if (GUILayout.Button(new GUIContent("+ Add Slice Step", "Append an independent cut to the end of this sequence.")))
+            if (StudioButton.Draw(new GUIContent("+ Add Slice Step", "Append an independent cut to the end of this sequence.")))
             {
                 steps.arraySize++;
                 SerializedProperty added = steps.GetArrayElementAtIndex(steps.arraySize - 1);
@@ -119,7 +118,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(spawn, "Position");
                 HoverControls.Field(spawn, "Rotation");
             }
-            if (!GUILayout.Button(new GUIContent("+ Add Prefab Output", "Generate another prefab at this cut's local output pose.")))
+            if (!StudioButton.Draw(new GUIContent("+ Add Prefab Output", "Generate another prefab at this cut's local output pose.")))
                 return;
             spawns.arraySize++;
             SerializedProperty added = spawns.GetArrayElementAtIndex(spawns.arraySize - 1);

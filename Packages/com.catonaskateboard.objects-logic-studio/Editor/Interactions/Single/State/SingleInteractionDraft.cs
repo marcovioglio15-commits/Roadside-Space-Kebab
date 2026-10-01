@@ -31,6 +31,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public DispenserSettings Dispenser = new DispenserSettings();
         [Tooltip("Accepted flags, capacity and retained item appearance.")]
         public ContainerSettings Container = new ContainerSettings();
+        [Tooltip("Two local transform endpoints with configurable rotation directions.")]
+        public TriggerAnimationSettings TriggerAnimation = new TriggerAnimationSettings();
+        [Tooltip("Contact policy, flag-specific impulses and optional ejected-object lifetime.")]
+        public EjectSettings Eject = new EjectSettings();
 
         [Tooltip("Independent optional start effect retained on this exact interaction, including its own prefab and timing.")]
         public InteractionVfxSettings VisualEffect = new InteractionVfxSettings();
@@ -62,19 +66,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             draft.Name = feature.InteractionName;
             draft.Enabled = feature.enabled;
             draft.Action = feature.Action;
-            if (feature is ObjectDispenser dispenser)
-                draft.Dispenser = ObjectWorkspace.Copy(dispenser.Settings);
-            if (feature is ObjectContainer container)
-                draft.Container = ObjectWorkspace.Copy(container.Settings);
-            if (feature is ObjectGrab grab)
+            switch (feature)
             {
-                draft.Grab = ObjectWorkspace.Copy(grab.Settings);
-                draft.DrawGizmos = grab.DrawGizmos;
+                case ObjectTriggerAnimation animation:
+                    draft.TriggerAnimation = ObjectWorkspace.Copy(animation.Settings);
+                    break;
+                case ObjectEject eject:
+                    draft.Eject = ObjectWorkspace.Copy(eject.Settings);
+                    break;
+                case ObjectDispenser dispenser:
+                    draft.Dispenser = ObjectWorkspace.Copy(dispenser.Settings);
+                    break;
+                case ObjectContainer container:
+                    draft.Container = ObjectWorkspace.Copy(container.Settings);
+                    break;
+                case ObjectGrab grab:
+                    draft.Grab = ObjectWorkspace.Copy(grab.Settings);
+                    draft.DrawGizmos = grab.DrawGizmos;
+                    break;
+                case ObjectRelease release:
+                    draft.Release = ObjectWorkspace.Copy(release.PhysicsSettings);
+                    if (release is ObjectThrow launch)
+                        draft.Throw = ObjectWorkspace.Copy(launch.Trajectory);
+                    break;
             }
-            if (feature is ObjectRelease release)
-                draft.Release = ObjectWorkspace.Copy(release.PhysicsSettings);
-            if (feature is ObjectThrow launch)
-                draft.Throw = ObjectWorkspace.Copy(launch.Trajectory);
             return draft;
         }
 
@@ -88,7 +103,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal float VfxDuration(SingleInteractionKind kind)
         {
             // Unused feature payloads never determine the selected card's timing.
-            return kind == SingleInteractionKind.Grab && Grab != null && !Grab.Instant ? Grab.TransitionDuration : 0f;
+            return kind switch
+            {
+                SingleInteractionKind.Grab when Grab != null && !Grab.Instant => Grab.TransitionDuration,
+                SingleInteractionKind.TriggerAnimation when TriggerAnimation != null => TriggerAnimation.Duration,
+                _ => 0f
+            };
         }
 
         /// <summary>Validates the proposal against the existing object without editing its components.</summary>
@@ -114,14 +134,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 || !FlagChange.TryValidate(feature.gameObject, out warning))
                 return false;
             if (Action == null || Action.action == null || Action.action.type != InputActionType.Button)
+            {
                 warning = "Choose a Button action from the player's Input Actions asset.";
-            else if (feature is ObjectGrab)
-                return Grab != null && Grab.TryValidate(out warning) && ObjectGrab.ValidateBody(feature.gameObject, out warning);
-            else if (feature is ObjectDispenser dispenser)
-                return dispenser.TryValidate(Dispenser, out warning);
-            else if (feature is ObjectContainer container)
-                return container.TryValidate(Container, out warning);
-            else if (feature.GetComponent<ObjectGrab>() is not ObjectGrab owner || !owner.enabled)
+                return false;
+            }
+            switch (feature)
+            {
+                case ObjectGrab:
+                    return Grab != null && Grab.TryValidate(out warning) && ObjectGrab.ValidateBody(feature.gameObject, out warning);
+                case ObjectTriggerAnimation animation:
+                    return animation.TryValidate(TriggerAnimation, out warning);
+                case ObjectEject eject:
+                    return eject.TryValidate(Eject, out warning);
+                case ObjectDispenser dispenser:
+                    return dispenser.TryValidate(Dispenser, out warning);
+                case ObjectContainer container:
+                    return container.TryValidate(Container, out warning);
+            }
+            if (feature.GetComponent<ObjectGrab>() is not ObjectGrab owner || !owner.enabled)
                 warning = "Drop and Throw require an enabled Grab on the same object.";
             else if (Release == null || !Release.TryValidate(out warning))
                 return false;

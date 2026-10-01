@@ -199,10 +199,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Signal(InteractionMoment moment)
         {
             // Cancellations and interrupted transitions never emit completion.
-            flagChange?.Apply(Item != null ? Item.gameObject : gameObject, moment);
+            ApplyIdentityChange(moment);
             if (moment == InteractionMoment.Started)
                 StartEffect();
             Signaled?.Invoke(this, moment);
+        }
+
+        /// <summary>Applies this interaction's identity change at a successful lifecycle boundary.</summary>
+        /// <param name="moment">Successful start or completion.</param>
+        protected virtual void ApplyIdentityChange(InteractionMoment moment)
+        {
+            // Reversible interactions can retain a temporary identity layer instead of a permanent write.
+            flagChange?.Apply(Item != null ? Item.gameObject : gameObject, moment);
         }
 
         /// <summary>Validates once and starts this component's own optional visual effect.</summary>

@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
                 || !ObjectAuthoringSave.TryValidate(hover.gameObject, out _)))
-                if (GUILayout.Button(new GUIContent("Open Objects Logic Studio", "Edit this interaction in a persistent Apply/Discard session.")))
+                if (StudioButton.Draw(new GUIContent("Open Objects Logic Studio", "Edit this interaction in a persistent Apply/Discard session.")))
                     ObjectsLogicStudioWindow.Open(hover);
             if (!hover.TryValidate(out string warning))
                 EditorGUILayout.HelpBox(warning, MessageType.Warning);

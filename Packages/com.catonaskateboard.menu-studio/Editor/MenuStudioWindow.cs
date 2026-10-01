@@ -21,7 +21,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
         [Tooltip("Main or pause menu structure to create.")]
         [SerializeField]
         private MenuKind kind;
-        [Tooltip("Project folder receiving generated input assets.")]
+        [Tooltip("Project folder used for saved menu assets. Input actions remain in the existing project asset.")]
         [SerializeField]
         private string assetDirectory = "Assets/Studio/Menu";
         #endregion
@@ -35,7 +35,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
         #region Methods
         #region Window
         /// <summary>Opens the standalone Menu Studio workspace.</summary>
-        //[MenuItem("Tools/Menu Studio")]
+        [MenuItem("Tools/Menu Studio")]
         public static void Open()
         {
             // Menu presets and scenes are selected explicitly in the compact workspace.
@@ -59,6 +59,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
                 case 3:
                     StudioFields.Draw(data, "PauseTitle", "IncludeRestart");
                     DrawScene(data.FindProperty("MainMenuScene"), "Main menu scene");
+                    DrawScene(data.FindProperty("PauseScene"), "Pause overlay scene");
                     DrawProfile(data.FindProperty("PauseButtons"));
                     break;
                 case 4: DrawSettings(data); break;
@@ -90,10 +91,13 @@ namespace CatOnASkateboard.MenuStudio.Editor
             StudioFields.Draw(data, "ConfirmQuit", "IncludeSettings", "IncludeCredits");
             destination = (SceneAsset)EditorGUILayout.ObjectField(new GUIContent("Scene", "Empty uses the active scene; another scene opens additively without replacing current scenes."), destination, typeof(SceneAsset), false);
             kind = (MenuKind)EditorGUILayout.EnumPopup(new GUIContent("Menu", "Choose Main or Pause structure."), kind);
-            assetDirectory = EditorGUILayout.TextField(new GUIContent("Generated assets", "Existing or new folder under Assets for project-owned input assets."), assetDirectory);
+            assetDirectory = EditorGUILayout.TextField(new GUIContent("Asset Folder", "Existing or new folder under Assets for saved menu assets."), assetDirectory);
             using (new EditorGUI.DisabledScope(Pending || Source == null))
                 if (StudioFields.Button("Create in scene", "Create a new root with Undo. Existing menus are not overwritten and the scene is not saved automatically."))
                     CreateMenu();
+            using (new EditorGUI.DisabledScope(Pending || Source == null || string.IsNullOrWhiteSpace(Preset.PauseScene)))
+                if (StudioFields.Button("Connect Pause Scene", "Add an overlay loader to the selected gameplay scene. Uses the saved preset; existing scene content is retained."))
+                    ConnectPause();
             MenuHost selected = Selection.activeGameObject != null ? Selection.activeGameObject.GetComponent<MenuHost>() : null;
             using (new EditorGUI.DisabledScope(selected == null))
                 if (StudioFields.Button("Save selected menu as prefab", "Save the selected MenuHost hierarchy as a reusable prefab, keeping its project asset references."))
@@ -127,9 +131,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
                         AssetDatabase.CreateFolder(folder, segments[index]);
                     folder += "/" + segments[index];
                 }
-                Scene scene = destination == null ? SceneManager.GetActiveScene() : SceneManager.GetSceneByPath(AssetDatabase.GetAssetPath(destination));
-                if (destination != null && !scene.isLoaded)
-                    scene = EditorSceneManager.OpenScene(AssetDatabase.GetAssetPath(destination), OpenSceneMode.Additive);
+                Scene scene = ResolveDestination();
                 Undo.IncrementCurrentGroup();
                 int group = Undo.GetCurrentGroup();
                 MenuHost host = MenuSceneFactory.Create((MenuPreset)Source, kind, scene, folder);
@@ -141,6 +143,40 @@ namespace CatOnASkateboard.MenuStudio.Editor
             {
                 SetStatus(exception.GetBaseException().Message);
             }
+        }
+
+        /// <summary>Gets the selected scene without replacing other loaded or unsaved scenes.</summary>
+        /// <returns>The loaded authoring destination.</returns>
+        private Scene ResolveDestination()
+        {
+            // Both menu generation and pause-loader authoring share additive scene handling.
+            if (destination == null)
+                return SceneManager.GetActiveScene();
+            string path = AssetDatabase.GetAssetPath(destination);
+            Scene scene = SceneManager.GetSceneByPath(path);
+            return scene.isLoaded ? scene : EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+        }
+
+        /// <summary>Links the saved pause scene once without duplicating existing gameplay loaders.</summary>
+        private void ConnectPause()
+        {
+            // Repeated authoring updates the existing loader in the chosen destination only.
+            Scene scene = ResolveDestination();
+            MenuSceneOverlay overlay = null;
+            foreach (GameObject candidate in scene.GetRootGameObjects())
+                if (candidate.TryGetComponent(out overlay))
+                    break;
+            if (overlay == null)
+            {
+                GameObject root = new GameObject("Pause Menu Scene");
+                SceneManager.MoveGameObjectToScene(root, scene);
+                Undo.RegisterCreatedObjectUndo(root, "Connect pause scene");
+                overlay = Undo.AddComponent<MenuSceneOverlay>(root);
+            }
+            Undo.RecordObject(overlay, "Connect pause scene");
+            overlay.Preset = (MenuPreset)Source;
+            EditorSceneManager.MarkSceneDirty(scene);
+            SetStatus("Pause loader connected. Save the gameplay scene.");
         }
 
         /// <summary>Edits a runtime scene path through a validated SceneAsset selector.</summary>
@@ -279,7 +315,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
         private void DrawSceneWarnings()
         {
             // Empty scene paths are valid while building a reusable menu template.
-            foreach (string path in new[] { Preset.GameplayScene, Preset.MainMenuScene })
+            foreach (string path in new[] { Preset.GameplayScene, Preset.MainMenuScene, Preset.PauseScene })
                 if (string.IsNullOrEmpty(path))
                     EditorGUILayout.LabelField("A scene command is unassigned. Set destinations in Main and Pause before using those commands.", EditorStyles.wordWrappedMiniLabel);
                 else if (!Array.Exists(EditorBuildSettings.scenes, scene => scene.enabled && scene.path == path))

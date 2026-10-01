@@ -23,12 +23,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     HoverControls.Field(settings, "UseContainer");
                     if (!settings.FindPropertyRelative("UseContainer").boolValue)
-                    {
                         Prefab(settings.FindPropertyRelative("Prefab"));
-                        HoverControls.Field(settings, "Unlimited");
-                        if (!settings.FindPropertyRelative("Unlimited").boolValue)
-                            HoverControls.Field(settings, "Stock");
-                    }
+                    HoverControls.Field(settings, "Unlimited");
+                    if (!settings.FindPropertyRelative("Unlimited").boolValue)
+                        HoverControls.Field(settings, "Stock");
                 }
             if (sections.Draw("Dispenser Output", "Animate from the dispenser pivot to the item carry pose while ignoring the dispenser colliders."))
                 using (new EditorGUI.IndentLevelScope())
@@ -36,6 +34,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(settings, "PickupDuration");
                     HoverControls.Field(settings, "OutputRotation");
                 }
+            if (settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue)
+                InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Dispenser Fill");
         }
 
         /// <summary>Draws a real allowed-flag list and optional visible storage arrangement.</summary>
@@ -45,9 +45,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Hidden inventory retains the same instance; only presentation controls become irrelevant.
             Target(settings.FindPropertyRelative("Target"), sections);
-            if (!sections.Draw("Container Storage", "Store carried objects with matching flags. Recovery requires a linked Dispenser."))
-                return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            if (sections.Draw("Container Storage", "Store carried objects with matching flags. Recovery requires a linked Dispenser."))
+                using (new EditorGUI.IndentLevelScope())
+                    Storage(settings);
+            InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Container Fill");
+        }
+
+        /// <summary>Draws deposit constraints and the optional display of retained originals.</summary>
+        /// <param name="settings">Container settings being edited.</param>
+        private static void Storage(SerializedProperty settings)
+        {
+            // Linked capacity is independent of the Container's own maximum count.
             SerializedProperty flags = settings.FindPropertyRelative("AllowedFlags");
             ObjectFlagSelector.Draw(flags);
             if (flags.arraySize > 1)
@@ -55,6 +63,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(settings, "Unlimited");
             if (!settings.FindPropertyRelative("Unlimited").boolValue)
                 HoverControls.Field(settings, "Capacity");
+            HoverControls.Field(settings, "LimitToDispenserSpace");
             HoverControls.Field(settings, "KeepVisible");
             if (settings.FindPropertyRelative("KeepVisible").boolValue)
             {
@@ -67,19 +76,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Edits common transfer targeting while preserving independent input bindings.</summary>
         /// <param name="target">Serialized targeting configuration.</param>
         /// <param name="sections">Persistent foldout state.</param>
-        private static void Target(SerializedProperty target, ObjectStudioSections sections)
+        internal static void Target(SerializedProperty target, ObjectStudioSections sections)
         {
             // Exact cursor mode does not use a screen-centre tolerance.
-            if (!sections.Draw("Transfer Targeting", "Configure reach, aim and solid obstruction layers."))
+            if (!sections.Draw("Action Targeting", "Configure reach, aim and solid obstruction layers."))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             HoverControls.Field(target, "Distance");
             HoverControls.Field(target, "Mode");
-            if (target.FindPropertyRelative("Mode").enumValueIndex == (int)HoverTargetMode.ViewCenter)
-                HoverControls.Field(target, "CenterRadius");
-            HoverControls.Field(target, "Offset");
+            Aim(target, "Mode", "Offset");
             HoverControls.Field(target, "ObstacleMask");
             HoverControls.Field(target, "DrawGizmos");
+        }
+
+        /// <summary>Shares exact-hit controls across action, Grab and Slice targeting.</summary>
+        /// <param name="target">Serialized targeting settings.</param>
+        /// <param name="mode">Name of the selected aiming mode field.</param>
+        /// <param name="offset">Name of the optional anchor offset field.</param>
+        internal static void Aim(SerializedProperty target, string mode, string offset)
+        {
+            // Solid hits use the actual ray intersection, so centre tolerance and anchor offsets are unused.
+            HoverControls.Field(target, "SolidHitOnly");
+            if (target.FindPropertyRelative("SolidHitOnly").boolValue)
+                return;
+            if (target.FindPropertyRelative(mode).enumValueIndex == (int)HoverTargetMode.ViewCenter)
+                HoverControls.Field(target, "CenterRadius");
+            HoverControls.Field(target, offset);
         }
 
         /// <summary>Allows only prefab assets in a serialized GameObject field.</summary>

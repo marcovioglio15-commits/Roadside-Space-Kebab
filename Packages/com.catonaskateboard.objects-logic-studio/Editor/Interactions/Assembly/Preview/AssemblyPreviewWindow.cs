@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -200,7 +201,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             EditorGUILayout.Space(8f);
             using (new EditorGUI.DisabledScope(!state.HasChanges))
-                if (GUILayout.Button(new GUIContent("Apply Layout", "Validate and save the retained workspace changes directly to this prefab.")))
+                if (StudioButton.Draw(new GUIContent("Apply Layout", "Validate and save the retained workspace changes directly to this prefab.")))
                 {
                     ObjectWorkspaceSession.Apply(state, out status);
                     Refresh();

@@ -145,7 +145,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!pending)
                 return;
             Physics.SyncTransforms();
-            if (!Slice(observer))
+            if (!Command(observer) && !Slice(observer))
                 if (held != null)
                     Release(observer);
                 else
@@ -169,7 +169,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 TransferTargetSettings target = candidate.Settings.Target;
                 if (targeting.Eligible(observer, candidate.transform, candidate.Colliders, candidate.transform.TransformPoint(target.Offset),
                     target.Distance, target.Mode, target.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : target.CenterRadius,
-                    target.ObstacleMask, out float score)
+                    target.ObstacleMask, target.SolidHitOnly, out float score)
                     && (selected == null || candidate.Settings.Priority > selected.Settings.Priority
                         || candidate.Settings.Priority == selected.Settings.Priority && Nearer(candidate, selected, score, distance)))
                 {
@@ -178,6 +178,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
             }
             return selected != null && selected.Advance();
+        }
+
+        /// <summary>Routes one visible transform or eject action without requiring an empty carry slot.</summary>
+        /// <param name="observer">Current camera and player supplying reach and aim.</param>
+        /// <returns>True when a targeted command performed a successful operation.</returns>
+        private bool Command(HoverObserver observer)
+        {
+            // A shared press selects one nearest command before carry or inventory actions consume it.
+            ObjectCommandInteraction selected = null;
+            float distance = float.PositiveInfinity;
+            foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
+                if (pair.Value.Pending && pair.Key is ObjectCommandInteraction candidate && candidate.CanExecute()
+                    && !candidate.transform.IsChildOf(observer.Player) && Eligible(observer, candidate, out float score)
+                    && Nearer(candidate, selected, score, distance))
+                {
+                    selected = candidate;
+                    distance = score;
+                }
+            return selected != null && selected.Execute();
         }
 
         /// <summary>Chooses the highest-priority eligible release without grabbing again in the same event.</summary>
@@ -270,13 +289,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="target">Inventory interaction responding to an input event.</param>
         /// <param name="score">Receives squared player distance.</param>
         /// <returns>True when the target is reachable and unobstructed.</returns>
-        private bool Eligible(HoverObserver observer, ObjectTransferInteraction target, out float score)
+        private bool Eligible(HoverObserver observer, ObjectTargetedInteraction target, out float score)
         {
             // Transfer interactions have their own range and aim settings, independent of Grab.
             TransferTargetSettings settings = target.Target;
             return targeting.Eligible(observer, target.transform, target.Colliders, target.transform.TransformPoint(settings.Offset),
                 settings.Distance, settings.Mode, settings.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
-                settings.ObstacleMask, out score);
+                settings.ObstacleMask, settings.SolidHitOnly, out score);
         }
 
         /// <summary>Applies independent Grab targeting even when the object has no Hover feature.</summary>
@@ -289,7 +308,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Test actual compound geometry as well as the authored pivot.
             GrabSettings settings = target.Settings;
             return targeting.Eligible(observer, target.transform, target.Colliders, target.WorldTarget, settings.Distance,
-                settings.TargetMode, settings.TargetMode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius, settings.ObstacleMask, out score);
+                settings.TargetMode, settings.TargetMode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
+                settings.ObstacleMask, settings.SolidHitOnly, out score);
         }
 
         #endregion

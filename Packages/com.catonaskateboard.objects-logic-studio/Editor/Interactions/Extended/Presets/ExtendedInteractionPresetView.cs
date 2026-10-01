@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,13 +25,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 state.Extended.PresetBaseline = InteractionPresetWrites.Capture(selected);
                 state.Persist();
             }
-            using (new EditorGUILayout.HorizontalScope())
+            using (new StudioButton.RowScope())
             {
                 using (new EditorGUI.DisabledScope(selected == null))
-                    if (GUILayout.Button(new GUIContent("Import", "Copy the selected preset into this card's pending settings.")))
+                    if (StudioButton.Draw(new GUIContent("Import", "Copy the selected preset into this card's pending settings.")))
                         Import(state);
                 using (new EditorGUI.DisabledScope(selected == null))
-                    if (GUILayout.Button(new GUIContent("Update", "Write this card's current settings to the selected preset. Apply saves the object independently.")))
+                    if (StudioButton.Draw(new GUIContent("Update", "Write this card's current settings to the selected preset. Apply saves the object independently.")))
                         try
                         {
                             InteractionPresetWrites.UpdateExtended(state);
@@ -39,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         {
                             Debug.LogWarning(exception.Message, selected);
                         }
-                if (GUILayout.Button(new GUIContent("Export", "Save this card's settings as a new typed preset.")))
+                if (StudioButton.Draw(new GUIContent("Export", "Save this card's settings as a new typed preset.")))
                     Export(state);
             }
         }

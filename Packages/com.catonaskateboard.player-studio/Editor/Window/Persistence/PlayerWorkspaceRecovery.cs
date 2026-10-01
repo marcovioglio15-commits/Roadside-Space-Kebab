@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -82,9 +83,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (!IsBlocked)
                 return false;
             EditorGUILayout.HelpBox(warning, MessageType.Warning);
-            if (GUILayout.Button(new GUIContent("Retry Workspace Recovery", "Resolve the saved references after loading their scenes or restoring missing assets.")))
+            if (StudioButton.Draw(new GUIContent("Retry Workspace Recovery", "Resolve the saved references after loading their scenes or restoring missing assets.")))
                 Load(window, ref state);
-            if (GUILayout.Button(new GUIContent("Discard Saved Workspace", "Abandon the saved proposal without modifying any preset or scene.")))
+            if (StudioButton.Draw(new GUIContent("Discard Saved Workspace", "Abandon the saved proposal without modifying any preset or scene.")))
             {
                 warning = string.Empty;
                 retained = null;

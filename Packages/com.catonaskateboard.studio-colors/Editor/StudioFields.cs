@@ -43,7 +43,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static bool Button(string label, string tooltip)
         {
             // GUIContent makes otherwise hidden editor behavior discoverable on hover.
-            return GUILayout.Button(new GUIContent(label, tooltip));
+            return StudioButton.Draw(new GUIContent(label, tooltip));
         }
         #endregion
         #endregion

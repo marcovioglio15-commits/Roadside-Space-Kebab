@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Defines the allowed quantity of one ingredient flag in an assembly recipe.</summary>
+    /// <summary>Defines a shared quantity for a group of alternative ingredient flags.</summary>
     [Serializable]
     public sealed class AssemblyIngredient : ItemFlagRequirement
     {
@@ -27,8 +27,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Magnet";
         [Tooltip("Accept any ingredient allowed by the recipe. Specific flag slots take priority over generic slots.")]
         public bool AnyIngredient = true;
-        [Tooltip("Ingredient flag accepted by this specific slot.")]
-        public ObjectFlag Flag;
+        [Tooltip("Alternative recipe flags accepted by this slot. Any selected flag qualifies an ingredient.")]
+        public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Required physical insertion number, starting at 1. Zero leaves this magnet unordered. Numbered magnets are required for completion.")]
         public int Order;
         [Tooltip("Ingredient root position relative to the product root.")]
@@ -73,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Recipe")]
-        [Tooltip("Distinct ingredient flags and quantities. Mandatory entries must be filled; optional entries can be omitted.")]
+        [Tooltip("Groups of alternative ingredient flags sharing one quantity per row. A flag belongs to only one row. Mandatory rows must be filled; optional rows can be omitted.")]
         public AssemblyIngredient[] Ingredients = Array.Empty<AssemblyIngredient>();
         [Tooltip("Placement slots in product-local space. Each physical object occupies one slot regardless of its Grab units; provide enough slots for the intended ingredient prefabs.")]
         public AssemblyMagnet[] Magnets = Array.Empty<AssemblyMagnet>();

@@ -147,8 +147,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             JsonUtility.FromJsonOverwrite("{\"settings\":" + settings + ",\"flagChange\":" + JsonUtility.ToJson(Draft.FlagChange)
                 + ",\"visualEffect\":" + JsonUtility.ToJson(Draft.VisualEffect)
                 + ",\"toolRequirement\":" + JsonUtility.ToJson(Draft.ToolRequirement) + "}", feature);
-            if (feature is ObjectSpawnManager manager && Draft.SpawnManagement.Animation.Enabled)
-                InteractionStagingAuthoring.Prepare(manager, "Spawn Staging");
+            if (feature is ObjectSpawnManager manager)
+            {
+                if (Draft.SpawnManagement.Mode == SpawnManagementMode.DayFlow || Draft.SpawnManagement.Animation.Enabled)
+                    InteractionStagingAuthoring.Prepare(manager, "Spawn Staging");
+                if (Draft.SpawnManagement.Mode == SpawnManagementMode.DayFlow)
+                    SpawnFlowAuthoring.Prepare(manager);
+            }
             if (feature is ObjectOutline outline)
                 OutlineAuthoring.Rebuild(outline);
             EditorUtility.SetDirty(feature);

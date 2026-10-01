@@ -35,19 +35,27 @@ namespace CatOnASkateboard.AudioStudio.Editor
             // Reflection is editor-only; the package has no runtime backend or SDK source copy.
             if (!Available)
                 return "Install the official FMOD for Unity integration to connect banks and preview audio.";
-            if (connection.UseStudioProject && !File.Exists(ResolvePath(connection.ProjectPath))
-                || !connection.UseStudioProject && !Directory.Exists(ResolvePath(connection.BankPath)))
-                return "Select an existing Studio project or bank directory first.";
             try
             {
+                string projectPath = connection.UseStudioProject ? ResolvePath(connection.ProjectPath) : string.Empty;
+                if (connection.UseStudioProject && (!File.Exists(projectPath)
+                    || !string.Equals(Path.GetExtension(projectPath), ".fspro", StringComparison.OrdinalIgnoreCase)))
+                    return "Select an existing .fspro Studio project first.";
+                // Project mode follows FMOD's own Build folder; the bank field is hidden in this mode.
+                string bankPath = connection.UseStudioProject
+                    ? Path.Combine(Path.GetDirectoryName(projectPath), (string)Read(utilitiesType, null, "BuildFolder"))
+                    : ResolvePath(connection.BankPath);
+                if (!Directory.Exists(bankPath))
+                    return "The bank directory does not exist. Build the banks in FMOD Studio or select an existing bank directory.";
+
                 UnityEngine.Object settings = Read(settingsType, null, "Instance") as UnityEngine.Object;
                 if (settings == null)
                     return "FMOD settings could not be opened.";
                 Undo.RecordObject(settings, "Connect Audio Studio to FMOD");
                 Write(settings, "HasSourceProject", connection.UseStudioProject);
-                Write(settings, "SourceProjectPath", ResolvePath(connection.ProjectPath));
-                Write(settings, "SourceBankPath", ResolvePath(connection.BankPath));
-                Write(settings, "HasPlatforms", connection.BanksHavePlatforms);
+                Write(settings, "SourceProjectPath", PortablePath(projectPath));
+                Write(settings, "SourceBankPath", PortablePath(bankPath));
+                Write(settings, "HasPlatforms", connection.UseStudioProject || connection.BanksHavePlatforms);
                 Write(settings, "AutomaticEventLoading", connection.AutomaticBankLoading);
                 EditorUtility.SetDirty(settings);
                 AssetDatabase.SaveAssetIfDirty(settings);
@@ -66,7 +74,19 @@ namespace CatOnASkateboard.AudioStudio.Editor
         internal static string ResolvePath(string path)
         {
             // Empty optional fields stay empty instead of resolving to the project directory.
-            return string.IsNullOrWhiteSpace(path) ? string.Empty : Path.GetFullPath(path);
+            return string.IsNullOrWhiteSpace(path) ? string.Empty
+                : Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Application.dataPath), path));
+        }
+
+        /// <summary>Keeps sources inside the Unity project portable across checkouts.</summary>
+        /// <param name="path">Resolved source path, or empty for an unused source.</param>
+        /// <returns>Project-relative path when possible, otherwise the absolute path.</returns>
+        private static string PortablePath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return string.Empty;
+            string relative = FileUtil.GetProjectRelativePath(path.Replace('\\', '/'));
+            return string.IsNullOrEmpty(relative) ? path.Replace('\\', '/') : relative;
         }
 
         /// <summary>Requests a bank refresh without changing any connection settings.</summary>

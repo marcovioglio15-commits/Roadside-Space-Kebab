@@ -16,8 +16,8 @@ MonoBehaviour:
   Version: 1.0.0
   Connection:
     UseStudioProject: 1
-    ProjectPath: 
-    BankPath: 
+    ProjectPath: FMOD/SpaceKebabFMOD/SpaceKebabFMOD.fspro
+    BankPath: FMOD/SpaceKebabFMOD/Build
     BanksHavePlatforms: 1
     AutomaticBankLoading: 1
   Playback:

@@ -121,7 +121,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores the pre-transition appearance when continuous contact is interrupted.</summary>
         internal void Cancel()
         {
-            // Mesh changes have not committed yet, so cancellation only restores property blocks.
+            // The same snapshot restores unfinished transitions and completed temporary effects.
+            meshes.Restore();
             foreach (TintBinding tint in tints)
                 if (tint.Renderer != null)
                     tint.Renderer.SetPropertyBlock(tint.Original.isEmpty ? null : tint.Original, tint.Slot);

@@ -24,14 +24,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="cameraMask">Layers actually rendered by the observing camera.</param>
         /// <param name="distance">Camera-to-player distance plus the permitted player range.</param>
         /// <param name="point">Receives the nearest hit position.</param>
+        /// <param name="solidOnly">Ignore trigger colliders when an action requires a physical surface hit.</param>
         /// <returns>True when an enabled owned collider was hit.</returns>
-        internal static bool TryCursorHit(Ray ray, Collider[] colliders, int cameraMask, float distance, out Vector3 point)
+        internal static bool TryCursorHit(Ray ray, Collider[] colliders, int cameraMask, float distance, out Vector3 point, bool solidOnly = false)
         {
             // Collider.Raycast includes target triggers without making unrelated triggers obstruct sight.
             point = default;
             bool found = false;
             foreach (Collider collider in colliders)
-                if (collider != null && collider.enabled && collider.gameObject.activeInHierarchy
+                if (collider != null && collider.enabled && (!solidOnly || !collider.isTrigger) && collider.gameObject.activeInHierarchy
                     && (cameraMask & (1 << collider.gameObject.layer)) != 0
                     && collider.Raycast(ray, out RaycastHit hit, distance))
                 {

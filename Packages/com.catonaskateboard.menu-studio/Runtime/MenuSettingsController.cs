@@ -209,7 +209,7 @@ namespace CatOnASkateboard.MenuStudio
             if (FrameRateLabel != null)
                 FrameRateLabel.text = "Frame rate: " + (draft.FrameRate < 0 ? "Platform default" : draft.FrameRate.ToString());
             if (FrameRateRow != null)
-                FrameRateRow.SetActive(!draft.VSync);
+                FrameRateRow.SetActive(!(Host.Preset.Settings.VSync ? draft.VSync : QualitySettings.vSyncCount > 0));
             RefreshNavigation();
         }
 
@@ -239,7 +239,7 @@ namespace CatOnASkateboard.MenuStudio
                 return;
             if (options.VSync)
                 QualitySettings.vSyncCount = values.VSync ? 1 : 0;
-            if (options.FrameRate && !values.VSync)
+            if (options.FrameRate && QualitySettings.vSyncCount == 0)
                 Application.targetFrameRate = values.FrameRate;
             if (options.Resolution || options.Fullscreen)
                 Screen.SetResolution(options.Resolution ? values.Width : Screen.width, options.Resolution ? values.Height : Screen.height,

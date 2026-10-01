@@ -24,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Serialized Fields
 
         [Header("Detection")]
-        [Tooltip("View Center tests the anchor's screen distance. Cursor requires a ray hit on this object's colliders.")]
+        [Tooltip("View Center activates only the eligible hover nearest the viewport centre. Cursor requires a ray hit on this object's colliders.")]
         [SerializeField]
         private HoverTargetMode targetMode;
 
@@ -39,6 +39,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Seconds between detection queries. Zero evaluates every frame; label motion still updates every visible frame.")]
         [SerializeField]
         private float queryInterval = 0.05f;
+
+        [Tooltip("Seconds an acquired target may briefly miss detection before hover ends. Reduces flicker on moving edges.")]
+        [SerializeField]
+        private float releaseDelay = 0.08f;
+
+        [Header("Suspension")]
+        [Tooltip("Suspend this hover while its item is carried, including when Grab otherwise allows hover.")]
+        [SerializeField]
+        private bool suspendCarried;
+
+        [Tooltip("Suspend hover while the object's world speed exceeds the configured threshold.")]
+        [SerializeField]
+        private bool suspendMoving;
+
+        [Tooltip("World speed in metres per second that suspends hover. It resumes below 85% of this speed to avoid boundary flicker.")]
+        [SerializeField]
+        private float speedThreshold = 0.5f;
 
         [Tooltip("Solid collider layers that block visibility. Include walls and other interactive objects; triggers never block sight.")]
         [SerializeField]
@@ -57,6 +74,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private Vector2 screenOffset = new Vector2(0f, 35f);
 
+        [Tooltip("Seconds of world-anchor smoothing for uneven physics motion. Zero follows the transform exactly; camera projection still updates every frame.")]
+        [SerializeField]
+        private float followSmoothing = 0.035f;
+
         [Header("Appearance")]
         [Tooltip("Instant displays the label at its final position. Pop Up moves and grows it from the object anchor.")]
         [SerializeField]
@@ -70,6 +91,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private float startScale = 0.2f;
 
+        [Tooltip("Return and shrink the label into the object when hover ends. Re-entering hover reverses from the current visible pose.")]
+        [SerializeField]
+        private bool popIn;
+
+        [Tooltip("Exit animation duration in unscaled seconds.")]
+        [SerializeField]
+        private float exitDuration = 0.16f;
+
         #endregion
 
         #region Properties
@@ -82,6 +111,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float CenterRadius => centerRadius;
         /// <summary>Minimum time between visibility queries.</summary>
         public float QueryInterval => queryInterval;
+        /// <summary>Grace interval for brief targeting misses.</summary>
+        public float ReleaseDelay => releaseDelay;
+        /// <summary>Whether carrying suppresses this label independently of Grab settings.</summary>
+        public bool SuspendCarried => suspendCarried;
+        /// <summary>Whether movement speed suppresses this label.</summary>
+        public bool SuspendMoving => suspendMoving;
+        /// <summary>Speed above which detection is suspended.</summary>
+        public float SpeedThreshold => speedThreshold;
+        /// <summary>Time constant used to smooth world-anchor motion.</summary>
+        public float FollowSmoothing => followSmoothing;
+        /// <summary>Whether an exit keeps rendering while returning to the object.</summary>
+        public bool PopIn => popIn;
+        /// <summary>Exit length in unscaled seconds.</summary>
+        public float ExitDuration => exitDuration;
         /// <summary>Layers included in obstruction queries.</summary>
         public int ObstacleMask => obstacleMask;
         /// <summary>Local displacement of the detection anchor.</summary>
@@ -125,6 +168,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             appearance = source.appearance;
             duration = source.duration;
             startScale = source.startScale;
+            releaseDelay = source.releaseDelay;
+            suspendCarried = source.suspendCarried;
+            suspendMoving = source.suspendMoving;
+            speedThreshold = source.speedThreshold;
+            followSmoothing = source.followSmoothing;
+            popIn = source.popIn;
+            exitDuration = source.exitDuration;
         }
 
         #endregion
@@ -144,6 +194,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Player Distance must be greater than zero and at most 100000 world units.";
             else if (!float.IsFinite(queryInterval) || queryInterval < 0f)
                 warning = "Query Interval must be a finite, non-negative number.";
+            else if (!float.IsFinite(releaseDelay) || releaseDelay < 0f || !float.IsFinite(followSmoothing) || followSmoothing < 0f)
+                warning = "Release Delay and Follow Smoothing must be finite and non-negative.";
+            else if (suspendMoving && !InteractionValues.Positive(speedThreshold))
+                warning = "Speed Threshold must be positive and finite.";
+            else if (popIn && !InteractionValues.Positive(exitDuration))
+                warning = "Exit Duration must be positive and finite.";
             else if (targetMode == HoverTargetMode.ViewCenter && (!float.IsFinite(centerRadius) || centerRadius < 0f || centerRadius > 1f))
                 warning = "Center Radius must be between zero and one.";
             else if (obstacleMask.value == 0)

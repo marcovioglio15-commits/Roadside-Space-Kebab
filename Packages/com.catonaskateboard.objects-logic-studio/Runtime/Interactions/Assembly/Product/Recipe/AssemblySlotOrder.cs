@@ -1,6 +1,3 @@
-using CatOnASkateboard.StudioIdentity;
-using System.Collections.Generic;
-
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Reserves numbered magnets while allowing unnumbered insertions between required positions.</summary>
@@ -26,49 +23,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     && (required < 0 || magnets[candidate].Order < magnets[required].Order))
                     required = candidate;
             return required >= 0 ? required == index : magnets[index].Order == 0;
-        }
-
-        /// <summary>Protects quantity capacity needed by every still-empty numbered magnet.</summary>
-        /// <param name="settings">Recipe and numbered magnets.</param>
-        /// <param name="counts">Units already supplied for each recipe flag.</param>
-        /// <param name="occupied">Current occupancy, or null before initialization.</param>
-        /// <param name="selected">Candidate magnet receiving this insertion.</param>
-        /// <param name="flag">Incoming ingredient flag.</param>
-        /// <param name="units">Incoming logical units.</param>
-        /// <returns>True when future numbered slots still have sufficient recipe quantity.</returns>
-        internal static bool HasCapacity(AssemblyProductSettings settings, IReadOnlyDictionary<ObjectFlag, int> counts,
-            bool[] occupied, int selected, ObjectFlag flag, int units)
-        {
-            // A multi-unit ingredient cannot exhaust units reserved for a later required slot.
-            long available = 0;
-            int generic = 0;
-            long remainingUnits = 0;
-            int inserted = 1;
-            int lastRequired = 0;
-            foreach (AssemblyIngredient ingredient in settings.Ingredients)
-            {
-                counts.TryGetValue(ingredient.Flag, out int count);
-                int remaining = ingredient.Count - count - (ingredient.Flag == flag ? units : 0);
-                remainingUnits += remaining;
-                int required = 0;
-                for (int index = 0; index < settings.Magnets.Length; index++)
-                    if (index != selected && (occupied == null || !occupied[index]) && settings.Magnets[index].Order > 0
-                        && !settings.Magnets[index].AnyIngredient && settings.Magnets[index].Flag == ingredient.Flag)
-                        required++;
-                if (required > remaining)
-                    return false;
-                available += remaining - required;
-            }
-            for (int index = 0; index < settings.Magnets.Length; index++)
-            {
-                if (occupied != null && occupied[index])
-                    inserted++;
-                lastRequired = System.Math.Max(lastRequired, settings.Magnets[index].Order);
-                if (index != selected && (occupied == null || !occupied[index]) && settings.Magnets[index].Order > 0
-                    && settings.Magnets[index].AnyIngredient)
-                    generic++;
-            }
-            return available >= generic && remainingUnits >= lastRequired - inserted;
         }
 
         #endregion

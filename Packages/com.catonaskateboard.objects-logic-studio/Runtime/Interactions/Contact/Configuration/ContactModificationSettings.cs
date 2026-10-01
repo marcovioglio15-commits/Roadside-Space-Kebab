@@ -46,6 +46,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
 
+        #region Properties
+
+        /// <summary>Whether this participant needs exclusive appearance ownership.</summary>
+        public bool HasAppearance => Tint || Meshes != null && Meshes.Length > 0;
+
+        #endregion
+
         #region Methods
 
         #region Validation
@@ -84,8 +91,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Contact")]
-        [Tooltip("Project flag required on the other Object Item root.")]
-        public ObjectFlag Flag;
+        [Tooltip("Accept contact with an item bearing any of these identity flags.")]
+        public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Uninterrupted contact time in seconds before effects begin.")]
         public float ContactDuration = 1f;
         [Tooltip("Maximum separation counted as contact, in metres. Include the carry collision padding when held objects should activate this interaction.")]
@@ -107,6 +114,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool ResumeAfterInterruption;
         [Tooltip("Allow this pair to run again after a completed interaction and a subsequent separation.")]
         public bool RepeatAfterSeparation;
+        [Tooltip("Restore active or completed effects after contact ends and Revert Delay expires. This mode replaces interruption/repeat settings and does not support consumption.")]
+        public bool WhileContact;
+        [Tooltip("Scaled seconds after separation before restoring both participants. Contact returning during this delay cancels the pending restoration.")]
+        public float RevertDelay = 0.25f;
         [Tooltip("Effects applied to the item owning this interaction.")]
         public ContactEffects Self = new ContactEffects();
         [Tooltip("Effects applied to the matching item in contact.")]
@@ -126,6 +137,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
 
+        #region Properties
+
+        /// <summary>Whether independent contacts can run without exclusive appearance snapshots.</summary>
+        public bool IdentityOnly => WhileContact && Self != null && Other != null && !Self.HasAppearance && !Other.HasAppearance;
+
+        #endregion
+
         #region Methods
 
         #region Validation
@@ -137,7 +155,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Both items cannot disappear because the surviving item owns the consumption receipt.
             warning = string.Empty;
-            if (Flag == null || !InteractionValues.Finite(ContactDuration) || ContactDuration < 0f
+            if (!ObjectFlagRules.TryValidate(Flags, false, out warning))
+                return false;
+            if (!InteractionValues.Finite(ContactDuration) || ContactDuration < 0f
                 || !InteractionValues.Positive(ContactTolerance) || !InteractionValues.Positive(QueryInterval)
                 || !InteractionValues.Finite(Duration) || Duration < 0f)
                 warning = "Choose a flag, non-negative finite durations, and positive finite contact tolerance and query interval.";
@@ -147,6 +167,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             else if (Self.Consume && Other.Consume)
                 warning = "Consume only one participant so the other can retain its receipt.";
+            else if (WhileContact && (Self.Consume || Other.Consume || !float.IsFinite(RevertDelay) || RevertDelay < 0f))
+                warning = "While Contact requires reversible effects without consumption and a finite non-negative Revert Delay.";
             else if (!ValidChannels(BlockSelf) || !ValidChannels(BlockOther))
                 warning = "Choose supported interaction families for temporary restrictions.";
             else if (ChangeContactFlag && (!ObjectFlagRules.IsValidOperation(ContactFlagOperation)
@@ -165,7 +187,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Enum flag controls may serialize Everything as all bits set, including unused bits.
             return channels == (InteractionChannels)(-1) || (channels & ~(InteractionChannels.Grab | InteractionChannels.Release
                 | InteractionChannels.Hover | InteractionChannels.Dialogue | InteractionChannels.Passive
-                | InteractionChannels.Assembly | InteractionChannels.Transfer | InteractionChannels.Spawn | InteractionChannels.Slice)) == 0;
+                | InteractionChannels.Assembly | InteractionChannels.Transfer | InteractionChannels.Spawn | InteractionChannels.Slice
+                | InteractionChannels.Animation | InteractionChannels.Eject)) == 0;
         }
 
         #endregion

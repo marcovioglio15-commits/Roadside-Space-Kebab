@@ -17,6 +17,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Distance = 3f;
         [Tooltip("Choose proximity to the view centre or an exact cursor hit on the object's colliders.")]
         public HoverTargetMode TargetMode;
+        [Tooltip("Require the view-centre or cursor ray to hit a non-trigger collider on this object. Trigger volumes and nearby anchors cannot activate it; triggers in front of a solid hit are ignored.")]
+        public bool SolidHitOnly;
         [Tooltip("Allowed distance from view centre as a fraction of viewport height.")]
         public float CenterRadius = 0.15f;
         [Tooltip("Local point used for grab range and view-centre targeting.")]
@@ -73,13 +75,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = string.Empty;
             if (Units <= 0)
                 warning = "Grab Units must be a positive whole number.";
-            else if (!InteractionValues.Positive(Distance) || !InteractionValues.Finite(TargetOffset)
+            else if (!InteractionValues.Positive(Distance) || !SolidHitOnly && !InteractionValues.Finite(TargetOffset)
                 || !InteractionValues.Finite(Offset) || !InteractionValues.Finite(Rotation))
                 warning = "Grab needs a positive finite distance and finite position/rotation values.";
             else if (TargetMode is not (HoverTargetMode.ViewCenter or HoverTargetMode.Cursor)
                 || Space is not (CarrySpace.Camera or CarrySpace.Player))
                 warning = "Choose a supported grab target mode and carry space.";
-            else if (TargetMode == HoverTargetMode.ViewCenter && (!InteractionValues.Positive(CenterRadius) || CenterRadius > 1f))
+            else if (!SolidHitOnly && TargetMode == HoverTargetMode.ViewCenter && (!InteractionValues.Positive(CenterRadius) || CenterRadius > 1f))
                 warning = "Grab Center Radius must be greater than zero and at most one.";
             else if (!Instant && !InteractionValues.Positive(TransitionDuration))
                 warning = "Grab Transition Duration must be positive and finite.";

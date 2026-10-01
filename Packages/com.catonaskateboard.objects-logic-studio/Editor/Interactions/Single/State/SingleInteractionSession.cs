@@ -58,6 +58,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Throw => target.GetComponent<ObjectThrow>(),
                 SingleInteractionKind.Dispenser => target.GetComponent<ObjectDispenser>(),
                 SingleInteractionKind.Container => target.GetComponent<ObjectContainer>(),
+                SingleInteractionKind.Eject => target.GetComponent<ObjectEject>(),
+                SingleInteractionKind.TriggerAnimation => target.GetComponent<ObjectTriggerAnimation>(),
                 _ => null
             };
         }
@@ -122,6 +124,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SingleInteractionKind.Grab => "\"settings\":" + JsonUtility.ToJson(Draft.Grab),
                 SingleInteractionKind.Dispenser => "\"settings\":" + JsonUtility.ToJson(Draft.Dispenser),
                 SingleInteractionKind.Container => "\"settings\":" + JsonUtility.ToJson(Draft.Container),
+                SingleInteractionKind.Eject => "\"settings\":" + JsonUtility.ToJson(Draft.Eject),
+                SingleInteractionKind.TriggerAnimation => "\"settings\":" + JsonUtility.ToJson(Draft.TriggerAnimation),
                 _ => "\"physics\":" + JsonUtility.ToJson(Draft.Release)
             };
             if (Kind == SingleInteractionKind.Throw)

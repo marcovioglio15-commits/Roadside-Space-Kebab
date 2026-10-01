@@ -72,14 +72,14 @@ namespace CatOnASkateboard.MenuStudio
         public void Execute(MenuCommand command)
         {
             // Ignore duplicate scene requests while an asynchronous transition is underway.
-            if (transitioning || Preset == null)
+            if (transitioning || MenuSceneTransition.IsBusy || Preset == null)
                 return;
             CommandRequested.Invoke(command);
             switch (command)
             {
                 case MenuCommand.Play: LoadScene(Preset.GameplayScene); break;
                 case MenuCommand.Resume: SetVisible(false); break;
-                case MenuCommand.Restart: LoadScene(gameObject.scene.path); break;
+                case MenuCommand.Restart: LoadScene(SceneManager.GetActiveScene().path); break;
                 case MenuCommand.MainMenu: LoadScene(Preset.MainMenuScene); break;
                 case MenuCommand.Settings:
                     if (Settings != null)
@@ -104,7 +104,7 @@ namespace CatOnASkateboard.MenuStudio
         public void TogglePause()
         {
             // Escape can be shared by Pause and Cancel without opening and closing in one frame.
-            if (Kind != MenuKind.Pause || lastNavigationFrame == Time.frameCount)
+            if (Kind != MenuKind.Pause || MenuSceneTransition.IsBusy || lastNavigationFrame == Time.frameCount)
                 return;
             lastNavigationFrame = Time.frameCount;
             if (visible && current != MenuPageKind.Home)
@@ -117,7 +117,7 @@ namespace CatOnASkateboard.MenuStudio
         public void Back()
         {
             // Main menus remain visible when Cancel is pressed on their home page.
-            if (!visible || lastNavigationFrame == Time.frameCount)
+            if (!visible || MenuSceneTransition.IsBusy || lastNavigationFrame == Time.frameCount)
                 return;
             lastNavigationFrame = Time.frameCount;
             if (current != MenuPageKind.Home)

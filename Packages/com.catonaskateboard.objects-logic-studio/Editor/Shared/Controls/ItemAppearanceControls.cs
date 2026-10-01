@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -54,7 +55,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (mesh)
                     HoverControls.Field(entry, "UpdateCollider");
             }
-            if (!GUILayout.Button(new GUIContent(mesh ? "+ Add Mesh Replacement" : "+ Add Material Replacement", "Add one replacement on an existing hierarchy component.")))
+            if (!StudioButton.Draw(new GUIContent(mesh ? "+ Add Mesh Replacement" : "+ Add Material Replacement", "Add one replacement on an existing hierarchy component.")))
                 return;
             array.arraySize++;
             SerializedProperty added = array.GetArrayElementAtIndex(array.arraySize - 1);

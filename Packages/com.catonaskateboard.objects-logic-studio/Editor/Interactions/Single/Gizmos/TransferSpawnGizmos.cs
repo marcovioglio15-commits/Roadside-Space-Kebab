@@ -14,13 +14,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="feature">Selected inventory interaction.</param>
         /// <param name="type">Unity selection flags.</param>
         [DrawGizmo(GizmoType.Selected | GizmoType.Active)]
-        private static void Transfer(ObjectTransferInteraction feature, GizmoType type)
+        private static void Transfer(ObjectTargetedInteraction feature, GizmoType type)
         {
             // Finite validation keeps invalid authored values out of Handles calculations.
             if (feature.Target == null || !feature.Target.DrawGizmos || !feature.Target.TryValidate(out _))
                 return;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.3f, 0.85f, 1f));
-            Vector3 target = feature.transform.TransformPoint(feature.Target.Offset);
+            Vector3 target = feature.Target.SolidHitOnly ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
             Handles.DrawWireDisc(target, Vector3.up, feature.Target.Distance);
             Handles.Label(target, feature.Kind + " · " + feature.Target.Distance.ToString("0.##") + " m");
             switch (feature)
@@ -44,7 +44,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Spawn(ObjectSpawnManager feature, GizmoType type)
         {
             // Output radius is measured in world metres and does not inherit parent scale.
-            if (!feature.DrawGizmos || feature.Settings == null || !feature.Settings.TryValidate(out _))
+            if (!feature.DrawGizmos || feature.Settings == null || feature.Settings.Mode != SpawnManagementMode.CompletionRules || !feature.Settings.TryValidate(out _))
                 return;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.5f, 1f, 0.45f));
             Pose(feature.transform, feature.Settings.Position, feature.Settings.Rotation, "Spawn output");

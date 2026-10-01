@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
+using CatOnASkateboard.MenuStudio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Creates prefab draws from committed interaction completions, keeping source instances independent.</summary>
+    /// <summary>Runs sequential day flow or independent prefab draws from committed interaction completions.</summary>
     [AddComponentMenu("Objects Logic Studio/Spawn Management")]
     public sealed class ObjectSpawnManager : ObjectExtendedInteraction
     {
         #region Serialized Fields
 
         [Header("Spawn Management")]
-        [Tooltip("Source prefab conditions, per-instance cycles and randomized output prefabs.")]
+        [Tooltip("Day-flow plan or independent completion conditions and randomized output prefabs.")]
         [SerializeField]
         private SpawnManagementSettings settings = new SpawnManagementSettings();
 
@@ -20,6 +21,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         [HideInInspector]
         private Transform staging;
+
+        [Tooltip("Preauthored black overlay prepared by Apply for persistent day transitions.")]
+        [SerializeField]
+        [HideInInspector]
+        private MenuSceneTransition transition;
 
         #endregion
 
@@ -35,13 +41,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int animating;
         private int observedSession = -1;
         private static int session;
+        private SpawnFlowRun flow;
 
         #endregion
 
         #region Properties
 
         /// <summary>Arrival duration available to this rule's automatic start effect.</summary>
-        internal override float VfxDuration => settings.Animation.Enabled ? settings.Animation.Duration : 0f;
+        internal override float VfxDuration => settings.Mode == SpawnManagementMode.CompletionRules && settings.Animation.Enabled ? settings.Animation.Duration : 0f;
         /// <summary>Whether any generated batch is still completing its arrival animation.</summary>
         internal override bool VfxRunning => animating > 0;
 
@@ -51,6 +58,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public override ExtendedInteractionKind Kind => ExtendedInteractionKind.SpawnManagement;
         /// <summary>Number of queued source instances awaiting delay, availability or live capacity.</summary>
         public int PendingCount => pending.Count;
+        /// <summary>Current one-based day, or zero when no day flow is running.</summary>
+        public int CurrentDay => flow?.Day ?? 0;
+        /// <summary>Visitors completed during the current day.</summary>
+        public int CompletedSpawns => flow?.Completed ?? 0;
+        /// <summary>Spawn budget selected at the beginning of this day.</summary>
+        public int PlannedSpawns => flow?.Total ?? 0;
 
         #endregion
 
@@ -81,8 +94,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Disabled rules miss completions deliberately; their already queued work resumes on reactivation.
             Signaled -= Observe;
+            if (flow != null && observedSession == session)
+                return;
             if (observedSession != session)
             {
+                flow?.Stop();
+                flow = null;
                 observedSession = session;
                 progress.Clear();
                 pending.Clear();
@@ -96,6 +113,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning(warning, this);
                 return;
             }
+            if (settings.Mode == SpawnManagementMode.DayFlow)
+            {
+                if (Application.isPlaying)
+                {
+                    flow = new SpawnFlowRun(this, staging, transition);
+                    ready = flow.Begin();
+                }
+                return;
+            }
             used = new bool[settings.Choices.Length];
             Signaled += Observe;
         }
@@ -105,6 +131,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Re-enabling cannot duplicate an already consumed condition cycle.
             Signaled -= Observe;
+            flow?.Stop();
+            flow = null;
         }
 
         #endregion
@@ -120,6 +148,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Spawn Management settings are missing.";
             if (settings == null || !settings.TryValidate(out warning))
                 return false;
+            if (settings.Mode == SpawnManagementMode.DayFlow)
+            {
+                warning = "Day Flow needs a dedicated, unparented manager root. Apply it in Objects Logic Studio to prepare staging and the black overlay.";
+                if (transform.parent != null || staging == null || staging == transform || !staging.IsChildOf(transform)
+                    || staging.gameObject.activeSelf || transition == null || transition.Overlay == null)
+                    return false;
+                if (Application.isPlaying)
+                {
+                    foreach (SpawnFlowDay day in settings.Flow.Days)
+                        if (!Application.CanStreamedLevelBeLoaded(day.Scene))
+                        {
+                            warning = "Enable the day scene in Build Settings: " + day.Scene;
+                            return false;
+                        }
+                    if (!settings.Flow.Loop && !Application.CanStreamedLevelBeLoaded(settings.Flow.MainMenu))
+                    {
+                        warning = "Enable the final Main Menu scene in Build Settings.";
+                        return false;
+                    }
+                }
+                warning = string.Empty;
+                return true;
+            }
             if (settings.Animation.Enabled && (staging == null || staging == transform || !staging.IsChildOf(transform) || staging.gameObject.activeSelf))
             {
                 warning = "Apply this spawn rule in Objects Logic Studio to prepare its inactive animation staging child.";
@@ -188,6 +239,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Processes ready draws outside the source interaction's callback stack.</summary>
         private void Update()
         {
+            // Day flow owns its visitor and progresses only through explicit lifecycle states.
+            if (flow != null)
+            {
+                flow.Tick();
+                return;
+            }
             // Delaying execution prevents recursive spawn chains and respects pause and independent interaction locks.
             if (!ready || pending.Count == 0 || Time.timeScale <= 0f || !Available(InteractionChannels.Spawn))
                 return;

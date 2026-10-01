@@ -244,7 +244,8 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Flag: {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
+    Flags:
+    - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
     ContactDuration: 0.2
     ContactTolerance: 0.02
     QueryInterval: 0.02

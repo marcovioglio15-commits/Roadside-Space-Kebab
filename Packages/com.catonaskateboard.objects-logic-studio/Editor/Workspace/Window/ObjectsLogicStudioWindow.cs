@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -393,7 +394,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             EditorGUILayout.ObjectField(new GUIContent("Prefab Object", "Selected root or child inside the prefab workspace."), currentObject, typeof(GameObject), true);
                         ObjectIdentityControls.Draw(currentObject, state.HasChanges);
                         using (new EditorGUI.DisabledScope(state.HasChanges))
-                            if (currentObject.GetComponent<ObjectItem>() == null && GUILayout.Button(new GUIContent("Prepare Contact Item",
+                            if (currentObject.GetComponent<ObjectItem>() == null && StudioButton.Draw(new GUIContent("Prepare Contact Item",
                                 "Add shared item state so this prefab can be a flagged contact participant and retain consumption receipts.")))
                             {
                                 ExtendedInteractionAuthoring.Prepare(currentObject);
@@ -520,7 +521,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     status = "Choose an anchor inside the selected object's hierarchy.";
             }
             using (new EditorGUI.DisabledScope(EditorUtility.IsPersistent(hover)))
-                if (hover.Label == null && GUILayout.Button(new GUIContent("Create Hover UI", "Author missing label objects in the prefab workspace or a loaded scene.")))
+                if (hover.Label == null && StudioButton.Draw(new GUIContent("Create Hover UI", "Author missing label objects in the prefab workspace or a loaded scene.")))
                 {
                     HoverAuthoring.CreateLabel(hover);
                     ObjectAuthoringSave.Save(hover.gameObject);

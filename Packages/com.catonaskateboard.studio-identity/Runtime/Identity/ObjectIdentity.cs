@@ -21,6 +21,9 @@ namespace CatOnASkateboard.StudioIdentity
         #region State
 
         private readonly HashSet<ObjectFlag> current = new HashSet<ObjectFlag>();
+        private readonly HashSet<ObjectFlag> effective = new HashSet<ObjectFlag>();
+        private readonly List<(UnityEngine.Object Owner, ObjectFlag Flag, ObjectFlagOperation Operation)> temporary
+            = new List<(UnityEngine.Object, ObjectFlag, ObjectFlagOperation)>();
         private int initializationSession = -1;
         private static int session;
 
@@ -37,7 +40,7 @@ namespace CatOnASkateboard.StudioIdentity
             {
                 // The set is initialized on demand for inactive staging objects.
                 Initialize();
-                return current;
+                return temporary.Count > 0 ? effective : current;
             }
         }
 
@@ -66,8 +69,10 @@ namespace CatOnASkateboard.StudioIdentity
         /// <summary>Removes the identity from active-player discovery while preserving its membership.</summary>
         private void OnDisable()
         {
-            // Inactive ingredients can still retain their flags while owned by a product.
+            // Permanent membership survives pooling; temporary contact membership ends with activation.
             ObjectIdentityRegistry.Unregister(this);
+            temporary.Clear();
+            effective.Clear();
         }
 
         /// <summary>Invalidates retained membership before scene callbacks start a new Play session.</summary>
@@ -86,6 +91,8 @@ namespace CatOnASkateboard.StudioIdentity
                 return;
             initializationSession = session;
             current.Clear();
+            temporary.Clear();
+            effective.Clear();
             if (flags != null)
                 foreach (ObjectFlag flag in flags)
                     if (flag != null)
@@ -107,7 +114,7 @@ namespace CatOnASkateboard.StudioIdentity
             if (!Application.isPlaying)
                 return flags != null && Array.IndexOf(flags, flag) >= 0;
             Initialize();
-            return current.Contains(flag);
+            return temporary.Count > 0 ? effective.Contains(flag) : current.Contains(flag);
         }
 
         /// <summary>Checks a combination of flags using the requested any/all rule.</summary>
@@ -152,32 +159,90 @@ namespace CatOnASkateboard.StudioIdentity
         public bool Change(ObjectFlag flag, ObjectFlagOperation operation)
         {
             // Authored defaults are preserved; changing a runtime identity never edits an asset or prefab.
-            if (!Application.isPlaying || operation != ObjectFlagOperation.Clear && flag == null)
+            if (!Application.isPlaying || !ObjectFlagRules.IsValidOperation(operation) || operation != ObjectFlagOperation.Clear && flag == null)
                 return false;
             Initialize();
+            Apply(current, flag, operation);
+            RefreshTemporary();
+            return true;
+        }
+
+        /// <summary>Applies one owner's temporary membership change without overwriting permanent flags.</summary>
+        /// <param name="owner">Interaction responsible for removing this change.</param>
+        /// <param name="flag">Flag used by the operation; unused by Clear.</param>
+        /// <param name="operation">Temporary membership operation.</param>
+        /// <returns>True when the operation was accepted.</returns>
+        public bool SetTemporary(UnityEngine.Object owner, ObjectFlag flag, ObjectFlagOperation operation)
+        {
+            // Separate owners compose in activation order; replacing an existing entry preserves its priority.
+            if (!Application.isPlaying || owner == null || !ObjectFlagRules.IsValidOperation(operation)
+                || operation != ObjectFlagOperation.Clear && flag == null)
+                return false;
+            Initialize();
+            for (int index = 0; index < temporary.Count; index++)
+                if (temporary[index].Owner == owner)
+                {
+                    temporary[index] = (owner, flag, operation);
+                    RefreshTemporary();
+                    return true;
+                }
+            temporary.Add((owner, flag, operation));
+            RefreshTemporary();
+            return true;
+        }
+
+        /// <summary>Removes only the specified owner's temporary membership operation.</summary>
+        /// <param name="owner">Interaction ending its contact or being disabled.</param>
+        public void RemoveTemporary(UnityEngine.Object owner)
+        {
+            // Remaining contact zones and permanent changes continue to define the visible membership.
+            Initialize();
+            for (int index = temporary.Count - 1; index >= 0; index--)
+                if (temporary[index].Owner == owner)
+                    temporary.RemoveAt(index);
+            RefreshTemporary();
+        }
+
+        /// <summary>Rebuilds effective membership only when a permanent or temporary operation changes.</summary>
+        private void RefreshTemporary()
+        {
+            // Ordinary membership queries read the cached set without allocations or owner searches.
+            if (temporary.Count == 0)
+                return;
+            effective.Clear();
+            effective.UnionWith(current);
+            foreach ((UnityEngine.Object Owner, ObjectFlag Flag, ObjectFlagOperation Operation) entry in temporary)
+                if (entry.Owner != null)
+                    Apply(effective, entry.Flag, entry.Operation);
+        }
+
+        /// <summary>Applies a validated operation to either base or temporary membership.</summary>
+        /// <param name="membership">Destination set.</param>
+        /// <param name="flag">Selected flag.</param>
+        /// <param name="operation">Validated operation.</param>
+        private static void Apply(HashSet<ObjectFlag> membership, ObjectFlag flag, ObjectFlagOperation operation)
+        {
+            // One implementation keeps permanent and temporary operations consistent.
             switch (operation)
             {
                 case ObjectFlagOperation.Replace:
-                    current.Clear();
-                    current.Add(flag);
+                    membership.Clear();
+                    membership.Add(flag);
                     break;
                 case ObjectFlagOperation.Add:
-                    current.Add(flag);
+                    membership.Add(flag);
                     break;
                 case ObjectFlagOperation.Remove:
-                    current.Remove(flag);
+                    membership.Remove(flag);
                     break;
                 case ObjectFlagOperation.Toggle:
-                    if (!current.Remove(flag))
-                        current.Add(flag);
+                    if (!membership.Remove(flag))
+                        membership.Add(flag);
                     break;
                 case ObjectFlagOperation.Clear:
-                    current.Clear();
+                    membership.Clear();
                     break;
-                default:
-                    return false;
             }
-            return true;
         }
 
         #endregion

@@ -39,7 +39,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public AssemblyProductDraft AssemblyProduct = new AssemblyProductDraft();
 
         [Tooltip("Independent source-instance completion progress and randomized prefab outputs.")]
-        public SpawnManagementSettings SpawnManagement = new SpawnManagementSettings();
+        public SpawnManagementSettings SpawnManagement = new SpawnManagementSettings { Mode = SpawnManagementMode.DayFlow };
 
         [Tooltip("Independent optional start effect retained on this exact interaction, including its own prefab and timing.")]
         public InteractionVfxSettings VisualEffect = new InteractionVfxSettings();
@@ -114,7 +114,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return kind switch
             {
                 ExtendedInteractionKind.ModifyByContact => Contact != null ? Contact.Duration : 0f,
-                ExtendedInteractionKind.SpawnManagement => SpawnManagement?.Animation is { Enabled: true } ? SpawnManagement.Animation.Duration : 0f,
+                ExtendedInteractionKind.SpawnManagement => SpawnManagement is { Mode: SpawnManagementMode.CompletionRules, Animation: { Enabled: true } } ? SpawnManagement.Animation.Duration : 0f,
                 _ => 0f
             };
         }

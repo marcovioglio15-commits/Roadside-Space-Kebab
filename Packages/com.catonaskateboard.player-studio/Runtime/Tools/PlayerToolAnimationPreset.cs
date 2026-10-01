@@ -15,6 +15,8 @@ namespace CatOnASkateboard.PlayerStudio
         public float Time;
         [Tooltip("Local pose reached at this time.")]
         public PlayerToolPose Pose = PlayerToolPose.Identity;
+        [Tooltip("Travel into this key. Clockwise uses negative angles around changed local axes; Counter Clockwise uses positive angles. Authored full turns are retained.")]
+        public TransformRotationDirection RotationDirection;
 
         #endregion
     }
@@ -50,7 +52,7 @@ namespace CatOnASkateboard.PlayerStudio
                 if (key == null || !float.IsFinite(key.Time) || !key.Pose.IsValid())
                     return initial;
                 if (time < key.Time)
-                    return PlayerToolPose.Interpolate(initial, key.Pose, Mathf.SmoothStep(0f, 1f, (time - previous) / (key.Time - previous)));
+                    return PlayerToolPose.Interpolate(initial, key.Pose, Mathf.SmoothStep(0f, 1f, (time - previous) / (key.Time - previous)), key.RotationDirection);
                 previous = key.Time;
                 initial = key.Pose;
             }
@@ -69,9 +71,9 @@ namespace CatOnASkateboard.PlayerStudio
         #region Fields
 
         [Header("Animation")]
-        [Tooltip("Total duration in seconds; all recorded keys must fit inside this duration.")]
+        [Tooltip("Total duration in seconds; all keys must fit inside this duration.")]
         public float Duration = 0.3f;
-        [Tooltip("Independent child transform tracks recorded in the Player Studio preview.")]
+        [Tooltip("Independent transform tracks bound through the hierarchy selector.")]
         public PlayerToolTrack[] Tracks = Array.Empty<PlayerToolTrack>();
 
         #endregion
@@ -106,7 +108,7 @@ namespace CatOnASkateboard.PlayerStudio
                 foreach (PlayerToolKey key in track.Keys)
                 {
                     if (key == null || !float.IsFinite(key.Time) || key.Time < 0f || key.Time <= previous
-                        || key.Time > Duration || !key.Pose.IsValid())
+                        || key.Time > Duration || !key.Pose.IsValid() || !TransformRotation.IsValid(key.RotationDirection))
                         return false;
                     previous = key.Time;
                 }

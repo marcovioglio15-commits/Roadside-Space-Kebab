@@ -31,7 +31,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if ((HoverTargetMode)settings.FindPropertyRelative("targetMode").enumValueIndex == HoverTargetMode.ViewCenter)
                         Field(settings, "centerRadius");
                     Field(settings, "queryInterval");
+                    Field(settings, "releaseDelay");
                     Field(settings, "obstacleMask");
+                }
+            if (sections.Draw("Suspension", "Temporarily hide this hover while carried or moving."))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Field(settings, "suspendCarried");
+                    Field(settings, "suspendMoving");
+                    if (settings.FindPropertyRelative("suspendMoving").boolValue)
+                        Field(settings, "speedThreshold");
                 }
             if (sections.Draw("Placement", "Offset the detection anchor and final label."))
                 using (new EditorGUI.IndentLevelScope())
@@ -39,6 +48,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "anchorOffset");
                     Field(settings, "worldOffset");
                     Field(settings, "screenOffset");
+                    Field(settings, "followSmoothing");
                 }
             if (sections.Draw("Appearance", "Choose instant appearance or an animated pop-up."))
                 using (new EditorGUI.IndentLevelScope())
@@ -49,6 +59,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(settings, "duration");
                         Field(settings, "startScale");
                     }
+                    Field(settings, "popIn");
+                    if (settings.FindPropertyRelative("popIn").boolValue)
+                        Field(settings, "exitDuration");
                 }
             DrawStyle(configuration.FindPropertyRelative("style"), sections);
         }
@@ -151,7 +164,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Existing serialized names and preset compatibility remain independent of presentation.
             return property.name switch
             {
+                "WhileContact" => "While in Contact",
+                "AutoReturnDuration" => "Return Duration",
+                "AutoReturnRotation" => "Return Rotation",
                 "AcceptReturnedProduct" => "Accept Returns",
+                "LimitToDispenserSpace" => "Dispenser Spaces",
+                "ForwardRotation" => "Rotation to B",
+                "ReturnRotation" => "Rotation to A",
                 "CompleteAfterSeparation" => "Finish on Separation",
                 "ContactFlagOperation" => "Flag Operation",
                 "ContactQueryInterval" => "Contact Interval",

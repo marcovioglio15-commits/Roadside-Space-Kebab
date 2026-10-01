@@ -25,8 +25,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Handles.DrawWireDisc(station.OutputPosition, Vector3.up, station.Settings.Distance);
                 float size = HandleUtility.GetHandleSize(station.OutputPosition) * 0.2f;
                 Handles.ArrowHandleCap(0, station.OutputPosition, station.transform.rotation * Quaternion.Euler(station.Settings.OutputRotation), size, EventType.Repaint);
-                Handles.Label(station.OutputPosition, station.Settings.Trigger == AssemblyStationTrigger.IngredientContact
-                    ? "Assembly · contact " + station.Settings.ContactDuration.ToString("0.##") + " s" : "Assembly output");
+                Handles.Label(station.OutputPosition, station.Settings.Trigger switch
+                {
+                    AssemblyStationTrigger.IngredientContact => "Assembly · contact " + station.Settings.ContactDuration.ToString("0.##") + " s",
+                    AssemblyStationTrigger.ImmediateContact => "Assembly · immediate contact",
+                    _ => "Assembly output"
+                });
             }
         }
 
@@ -45,7 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     {
                         Handles.DrawWireDisc(magnet.Position, Quaternion.Euler(magnet.Rotation) * Vector3.up, 0.04f);
                         Handles.Label(magnet.Position, magnet.Name + (magnet.Order > 0 ? " · #" + magnet.Order : string.Empty)
-                            + (magnet.AnyIngredient ? " · Any recipe ingredient" : " · " + magnet.Flag));
+                            + (magnet.AnyIngredient ? " · Any recipe ingredient" : " · " + magnet.Flags.Length + " accepted flags"));
                     }
         }
 

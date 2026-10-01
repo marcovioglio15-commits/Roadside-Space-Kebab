@@ -122,7 +122,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (sections.Draw("Passive Contact", "Require continuous contact with another flagged Object Item."))
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    Flag(settings.FindPropertyRelative("Flag"));
+                    ObjectFlagSelector.Draw(settings.FindPropertyRelative("Flags"));
                     Field(settings, "ContactDuration");
                     Field(settings, "ContactTolerance");
                     Field(settings, "QueryInterval");
@@ -138,7 +138,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "Duration");
-                    if (settings.FindPropertyRelative("Duration").floatValue > 0f)
+                    Field(settings, "WhileContact");
+                    if (settings.FindPropertyRelative("WhileContact").boolValue)
+                        Field(settings, "RevertDelay");
+                    if (!settings.FindPropertyRelative("WhileContact").boolValue && settings.FindPropertyRelative("Duration").floatValue > 0f)
                     {
                         Field(settings, "CompleteAfterSeparation");
                         if (!settings.FindPropertyRelative("CompleteAfterSeparation").boolValue
@@ -146,16 +149,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             || !settings.FindPropertyRelative("AllowCarriedOther").boolValue)
                             Field(settings, "ResumeAfterInterruption");
                     }
-                    if (!settings.FindPropertyRelative("Self.Consume").boolValue && !settings.FindPropertyRelative("Other.Consume").boolValue)
+                    if (!settings.FindPropertyRelative("WhileContact").boolValue
+                        && !settings.FindPropertyRelative("Self.Consume").boolValue && !settings.FindPropertyRelative("Other.Consume").boolValue)
                         Field(settings, "RepeatAfterSeparation");
                 }
             if (sections.Draw("Self Effects", "Modify the item owning this component."))
                 using (new EditorGUI.IndentLevelScope())
-                    DrawEffects(settings.FindPropertyRelative("Self"), false);
+                    DrawEffects(settings.FindPropertyRelative("Self"), false, !settings.FindPropertyRelative("WhileContact").boolValue);
             if (sections.Draw("Contact Item Effects", "Modify the other item using paths relative to its root."))
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    DrawEffects(settings.FindPropertyRelative("Other"), true);
+                    DrawEffects(settings.FindPropertyRelative("Other"), true, !settings.FindPropertyRelative("WhileContact").boolValue);
                     Field(settings, "ChangeContactFlag");
                     if (settings.FindPropertyRelative("ChangeContactFlag").boolValue)
                     {
@@ -175,7 +179,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Shows only controls used by the participant's enabled effects.</summary>
         /// <param name="effects">Serialized participant effect configuration.</param>
         /// <param name="other">Whether a sample counterpart prefab must supply the hierarchy.</param>
-        private static void DrawEffects(SerializedProperty effects, bool other)
+        /// <param name="consumption">Whether irreversible consumption is supported by the selected mode.</param>
+        private static void DrawEffects(SerializedProperty effects, bool other, bool consumption)
         {
             // Discrete effects commit only after the configured duration.
             GameObject source = HierarchyPathMenu.Source(effects, other);
@@ -188,7 +193,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Field(effects, "MaterialSlot");
             }
             ItemAppearanceControls.DrawList(effects.FindPropertyRelative("Meshes"), source, true);
-            Field(effects, "Consume");
+            if (consumption || effects.FindPropertyRelative("Consume").boolValue)
+                Field(effects, "Consume");
         }
 
         /// <summary>Displays existing carry eligibility as an explicit exclusion without changing saved defaults.</summary>

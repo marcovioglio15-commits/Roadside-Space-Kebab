@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Drawing
 
         /// <summary>Edits concrete flag rows with explicit add/remove controls and optional recipe flags.</summary>
-        /// <param name="requirements">Serialized array containing Flag and Count on each element.</param>
+        /// <param name="requirements">Serialized array containing Flags and Count on each element.</param>
         /// <param name="addLabel">Context-specific add button label.</param>
         /// <param name="optional">Expose the recipe ingredient's Optional flag.</param>
         /// <param name="drawFlag">Optional recipe-specific selector; absent uses the project flag catalog.</param>
@@ -27,9 +28,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         if (drawFlag != null)
-                            drawFlag(requirement.FindPropertyRelative("Flag"));
+                            drawFlag(requirement.FindPropertyRelative("Flags"));
                         else
-                            ExtendedInteractionControls.Flag(requirement.FindPropertyRelative("Flag"));
+                            ExtendedInteractionControls.Flag(requirement.FindPropertyRelative("Flags"));
                         if (GUILayout.Button(new GUIContent("−", "Remove this flag requirement."), GUILayout.Width(28f)))
                         {
                             requirements.DeleteArrayElementAtIndex(index);
@@ -44,11 +45,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         EditorGUILayout.LabelField("Quantity must be a positive whole number.", EditorStyles.miniLabel);
                 }
             }
-            if (GUILayout.Button(new GUIContent(addLabel, "Add a project flag with a positive whole-number quantity.")))
+            if (StudioButton.Draw(new GUIContent(addLabel, "Add alternative project flags sharing one positive whole-number quantity.")))
             {
                 requirements.arraySize++;
                 SerializedProperty added = requirements.GetArrayElementAtIndex(requirements.arraySize - 1);
-                added.FindPropertyRelative("Flag").objectReferenceValue = null;
+                added.FindPropertyRelative("Flags").arraySize = 0;
                 added.FindPropertyRelative("Count").intValue = 1;
                 if (optional)
                     added.FindPropertyRelative("Optional").boolValue = false;

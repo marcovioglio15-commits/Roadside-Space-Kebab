@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -74,7 +75,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
             using (new EditorGUI.DisabledScope(master == null))
             {
-                if (!GUILayout.Button(placeLabel))
+                if (!StudioButton.Draw(placeLabel))
                     return false;
 
                 TryPlace(master, out createdHost, out warning);
@@ -95,7 +96,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         #region Creation
 
-        /// <summary>Creates an upright native player in the requested scene without saving it or changing other scenes.</summary>
+        /// <summary>Creates a native player in the requested scene without saving it or changing other scenes.</summary>
         /// <param name="master">Persistent master with a valid applied Body.</param>
         /// <param name="createdHost">Receives the configured scene component on success.</param>
         /// <param name="warning">Receives invalid input or a native binding incompatibility.</param>

@@ -7,7 +7,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Deposits carried instances by flag and exposes recovery only through a linked Dispenser.</summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Object Container")]
-    public sealed class ObjectContainer : ObjectTransferInteraction
+    public sealed class ObjectContainer : ObjectInventoryInteraction
     {
         #region Serialized Fields
 
@@ -75,7 +75,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Asset references remain valid after display names change.
             warning = "Container settings are missing.";
-            return configuration != null && configuration.TryValidate(out warning);
+            if (configuration == null || !configuration.TryValidate(out warning)
+                || !InventoryFillStep.CanBind(configuration.FillSteps, Item, out warning))
+                return false;
+            if (configuration.LimitToDispenserSpace && (GetComponent<ObjectDispenser>() is not ObjectDispenser dispenser
+                || dispenser.Settings.Unlimited || dispenser.Settings.Stock <= 0))
+                warning = "Limit to Dispenser Space requires a finite Dispenser on this object with positive Stock.";
+            return warning.Length == 0;
         }
 
         #endregion
@@ -104,6 +110,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (transferring || !Available(InteractionChannels.Transfer) || Item.IsReserved || grab == null || !grab.IsHeld
                 || transform.IsChildOf(grab.transform) || grab.transform.IsChildOf(transform)
                 || !settings.Unlimited && stored.Count >= settings.Capacity
+                || settings.LimitToDispenserSpace && (Dispenser == null || !Dispenser.HasStorageSpace(stored.Count))
                 || grab.Identity == null || !grab.Identity.Matches(settings.AllowedFlags, settings.Match))
                 return false;
             foreach (ObjectItem item in grab.GetComponentsInChildren<ObjectItem>(true))
@@ -127,6 +134,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 StoredObject entry = new StoredObject(grab);
                 entry.Suspend(this, stored.Count);
                 stored.Add(entry);
+                RefreshFill();
                 Signal(InteractionMoment.Started);
                 Signal(InteractionMoment.Completed);
                 return true;
@@ -170,6 +178,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     grab = entry.Grab;
                     stored.RemoveAt(stored.Count - 1);
+                    RefreshFill();
                     return true;
                 }
                 entry.Suspend(this, stored.Count - 1);
@@ -185,9 +194,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Prune()
         {
             // Destruction outside this system cannot permanently occupy a limited storage slot.
+            bool changed = false;
             for (int index = stored.Count - 1; index >= 0; index--)
                 if (stored[index].Grab == null)
+                {
                     stored.RemoveAt(index);
+                    changed = true;
+                }
+            if (changed)
+                RefreshFill();
         }
 
         #endregion

@@ -28,6 +28,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case GrabPreset:
                     SingleInteractionControls.DrawGrab(serializedObject.FindProperty("Settings"), sections);
                     break;
+                case TriggerAnimationPreset:
+                    CommandInteractionControls.Animation(serializedObject.FindProperty("Settings"), sections);
+                    break;
+                case EjectPreset:
+                    CommandInteractionControls.Eject(serializedObject.FindProperty("Settings"), sections);
+                    break;
                 case DispenserPreset:
                     TransferInteractionControls.Dispenser(serializedObject.FindProperty("Settings"), sections);
                     break;

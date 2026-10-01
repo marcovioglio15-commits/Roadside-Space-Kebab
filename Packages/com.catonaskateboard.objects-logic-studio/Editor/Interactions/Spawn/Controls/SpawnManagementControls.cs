@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -68,6 +69,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained section visibility.</param>
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
+            // Day plans have their own focused editor while completion rules retain their independent settings.
+            HoverControls.Field(settings, "Mode");
+            if (settings.FindPropertyRelative("Mode").enumValueIndex == (int)SpawnManagementMode.DayFlow)
+            {
+                SpawnFlowPlanEditor.Link(settings.FindPropertyRelative("Flow"));
+                return;
+            }
             // Each rule observes one source prefab; multiple rules can observe different prefabs independently.
             if (sections.Draw("Spawn Conditions", "Each instance of the linked prefab must meet its own completion quantities."))
                 using (new EditorGUI.IndentLevelScope())
@@ -159,7 +167,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (source.objectReferenceValue != null && Array.IndexOf(sources, source.objectReferenceValue as ObjectInteraction) < 0)
                         EditorGUILayout.LabelField("Choose an interaction from the current source prefab.", EditorStyles.miniLabel);
                 }
-            if (GUILayout.Button(new GUIContent("+ Add Completion Condition", "Require an existing interaction to complete on the same source instance.")))
+            if (StudioButton.Draw(new GUIContent("+ Add Completion Condition", "Require an existing interaction to complete on the same source instance.")))
             {
                 conditions.arraySize++;
                 SerializedProperty added = conditions.GetArrayElementAtIndex(conditions.arraySize - 1);
@@ -191,7 +199,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (weighted)
                         HoverControls.Field(row, "Weight");
                 }
-            if (GUILayout.Button(new GUIContent("+ Add Output Prefab", "Add another eligible prefab to this rule's output choices.")))
+            if (StudioButton.Draw(new GUIContent("+ Add Output Prefab", "Add another eligible prefab to this rule's output choices.")))
             {
                 choices.arraySize++;
                 SerializedProperty added = choices.GetArrayElementAtIndex(choices.arraySize - 1);

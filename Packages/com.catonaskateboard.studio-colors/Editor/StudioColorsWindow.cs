@@ -73,7 +73,7 @@ namespace CatOnASkateboard.StudioColors.Editor
                 {
                     if (GUILayout.Button(new GUIContent("Apply", "Color all selected folders.")))
                         ApplySelection(true);
-                    if (GUILayout.Button(new GUIContent("No color", "Block inherited color for these folders.")))
+                    if (StudioButton.Draw(new GUIContent("No color", "Block inherited color for these folders.")))
                         ApplySelection(false);
                 }
 
@@ -101,13 +101,13 @@ namespace CatOnASkateboard.StudioColors.Editor
             if (element.OverrideBackground)
                 element.Background = EditorGUILayout.ColorField(new GUIContent("Background", "Color for the control's background."), element.Background);
             using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(elementKey)))
-                if (GUILayout.Button(new GUIContent("Apply tool colors", "Save and refresh this key in every registered tool.")))
+                if (StudioButton.Draw(new GUIContent("Apply tool colors", "Save and refresh this key in every registered tool.")))
                 {
                     element.Key = elementKey;
                     ColorSettings.instance.SetElement(JsonUtility.FromJson<ElementRule>(JsonUtility.ToJson(element)));
                 }
             foreach (ElementRule rule in ColorSettings.instance.Elements)
-                if (GUILayout.Button(new GUIContent(rule.Key, "Edit this saved tool color.")))
+                if (StudioButton.Draw(new GUIContent(rule.Key, "Edit this saved tool color.")))
                     EditElement(rule.Key);
             EditorGUILayout.EndScrollView();
         }

@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using CatOnASkateboard.StudioInput.Editor;
 using UnityEditor;
@@ -60,9 +61,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     continue;
                 using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                 EditorGUILayout.PropertyField(entry.FindPropertyRelative("Tool"));
-                if (tool == null && GUILayout.Button(new GUIContent("Create Tool", "Save a tool identity with a custom name and optional switch animations.")))
+                if (tool == null && StudioButton.Draw(new GUIContent("Create Tool", "Save a tool identity with a custom name and optional switch animations.")))
                     entry.FindPropertyRelative("Tool").objectReferenceValue = PlayerToolsAuthoring.Create<PlayerTool>("Player Tool");
-                if (tool != null && GUILayout.Button(new GUIContent("Edit Tool Asset", "Select the tool to edit its name and switch-in/switch-out animations.")))
+                if (tool != null && StudioButton.Draw(new GUIContent("Edit Tool Asset", "Select the tool to edit its name and switch-in/switch-out animations.")))
                     Selection.activeObject = tool;
                 EditorGUILayout.PropertyField(entry.FindPropertyRelative("MoveVisual"), new GUIContent("Use Slots", entry.FindPropertyRelative("MoveVisual").tooltip));
                 if (!entry.FindPropertyRelative("MoveVisual").boolValue)
@@ -72,7 +73,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 EditorGUILayout.PropertyField(entry.FindPropertyRelative("PassivePose"), new GUIContent("Parked Pose", entry.FindPropertyRelative("PassivePose").tooltip), true);
                 Transform target = PlayerHierarchy.Resolve(root, entry.FindPropertyRelative("Path").stringValue);
                 using (new EditorGUI.DisabledScope(target == null || target == player))
-                    if (GUILayout.Button(new GUIContent("Read Parked Pose", "Use this target's current local position, rotation and scale as its parked pose.")))
+                    if (StudioButton.Draw(new GUIContent("Read Parked Pose", "Use this target's current local position, rotation and scale as its parked pose.")))
                         entry.FindPropertyRelative("PassivePose").boxedValue = PlayerToolPose.Read(target);
             }
             if (!moving)
@@ -92,7 +93,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             else
                 EditorGUILayout.PropertyField(data.FindProperty("ActivePose"), true);
             if (!cyclic)
+            {
+                EditorGUILayout.PropertyField(data.FindProperty("SlotRotation"));
                 return;
+            }
             EditorGUILayout.PropertyField(data.FindProperty("SlotMotion"));
             if (data.FindProperty("SlotMotion").enumValueIndex == (int)PlayerToolSlotMotion.AroundPivot)
             {
@@ -100,6 +104,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 EditorGUILayout.PropertyField(data.FindProperty("Axis"));
                 EditorGUILayout.PropertyField(data.FindProperty("Clockwise"));
             }
+            else
+                EditorGUILayout.PropertyField(data.FindProperty("SlotRotation"));
         }
 
         /// <summary>Initializes newly added entries with usable scale instead of Unity's zeroed struct values.</summary>

@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -55,7 +56,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                 return;
             UnityEditor.Editor.CreateCachedEditor(flag, null, ref inspector);
             inspector.OnInspectorGUI();
-            if (GUILayout.Button(new GUIContent("Save", "Save this definition without changing its identity.")))
+            if (StudioButton.Draw(new GUIContent("Save", "Save this definition without changing its identity.")))
                 AssetDatabase.SaveAssetIfDirty(flag);
         }
 

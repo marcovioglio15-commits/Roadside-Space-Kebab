@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioInput.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -94,7 +95,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 }
             }
-            if (GUILayout.Button(new GUIContent("+ Add Condition", "Add an interaction event or a dedicated player input condition.")))
+            if (StudioButton.Draw(new GUIContent("+ Add Condition", "Add an interaction event or a dedicated player input condition.")))
             {
                 conditions.arraySize++;
                 sources.arraySize = conditions.arraySize;

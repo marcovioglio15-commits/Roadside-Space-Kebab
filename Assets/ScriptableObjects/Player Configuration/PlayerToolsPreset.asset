@@ -55,4 +55,5 @@ MonoBehaviour:
   Pivot: {x: 0, y: 0, z: 0}
   Axis: {x: 0, y: 0, z: 1}
   Clockwise: 1
+  SlotRotation: 3
   SwitchDuration: 0.3

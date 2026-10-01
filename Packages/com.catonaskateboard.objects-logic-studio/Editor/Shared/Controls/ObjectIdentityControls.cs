@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity;
 using UnityEditor;
 using UnityEngine;
@@ -19,16 +20,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Membership belongs to the object, independently of any interaction preset.
             ObjectIdentity identity = target.GetComponent<ObjectIdentity>();
             using (new EditorGUI.DisabledScope(pending && identity == null))
-                if (GUILayout.Button(new GUIContent(identity != null ? "Edit Object Flags" : "Add Object Identity",
-                    "Open this object's flags in the Inspector. Use its searchable selector to combine, create or import flags.")))
+                if (StudioButton.Draw(new GUIContent(identity != null ? "Edit Object Flags" : "Add Object Identity",
+                    "Edit this object's identity flags in a dedicated window with search, creation and catalog access.")))
                 {
                     if (identity == null)
                     {
                         identity = Undo.AddComponent<ObjectIdentity>(target);
                         ObjectAuthoringSave.Save(target);
                     }
-                    Selection.activeObject = identity;
-                    EditorGUIUtility.PingObject(identity);
+                    ObjectIdentityWindow.Open(identity);
                 }
         }
 

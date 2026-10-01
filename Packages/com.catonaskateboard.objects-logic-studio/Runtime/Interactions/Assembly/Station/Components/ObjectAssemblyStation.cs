@@ -64,7 +64,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Reusing the detector also discards any elapsed dwell from the previous session.
             contact?.Reset();
             contactReady = false;
-            if (settings.Trigger == AssemblyStationTrigger.IngredientContact)
+            if (settings.Trigger != AssemblyStationTrigger.InputAction)
             {
                 contactReady = TryValidate(out string warning);
                 if (!contactReady)
@@ -94,7 +94,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void FixedUpdate()
         {
             // Input stations do no contact queries or geometry work.
-            if (contactReady && settings.Trigger == AssemblyStationTrigger.IngredientContact)
+            if (contactReady && settings.Trigger != AssemblyStationTrigger.InputAction)
                 contact.Tick(this, Time.time);
         }
 
@@ -126,7 +126,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (configuration.Trigger == AssemblyStationTrigger.InputAction
                 && (command == null || command.action == null || command.action.type != InputActionType.Button))
                 return false;
-            if (configuration.Trigger == AssemblyStationTrigger.IngredientContact)
+            if (configuration.Trigger != AssemblyStationTrigger.InputAction)
             {
                 warning = "Contact assembly requires an Object Item and an enabled primitive or convex collider.";
                 bool hasShape = false;

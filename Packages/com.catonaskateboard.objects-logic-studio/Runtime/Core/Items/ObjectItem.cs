@@ -7,7 +7,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Interaction families that a running modification can temporarily suspend.</summary>
     [Flags]
-    public enum InteractionChannels { None = 0, Grab = 1, Release = 2, Hover = 4, Dialogue = 8, Passive = 16, Assembly = 32, Transfer = 64, Spawn = 128, Slice = 256 }
+    public enum InteractionChannels { None = 0, Grab = 1, Release = 2, Hover = 4, Dialogue = 8, Passive = 16, Assembly = 32, Transfer = 64, Spawn = 128, Slice = 256, Animation = 512, Eject = 1024 }
 
     /// <summary>Owns runtime consumption receipts and independent temporary locks for one object.</summary>
     [DisallowMultipleComponent]
@@ -18,6 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly Dictionary<ObjectFlag, int> consumedFlags = new Dictionary<ObjectFlag, int>();
+        private readonly List<(ObjectFlag[] Flags, int Units)> receipts = new List<(ObjectFlag[], int)>();
         private readonly Dictionary<UnityEngine.Object, InteractionChannels> locks = new Dictionary<UnityEngine.Object, InteractionChannels>();
         private InteractionChannels blocked;
         private UnityEngine.Object reservation;
@@ -66,6 +67,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 item.blocked = InteractionChannels.None;
                 item.reservation = null;
                 item.consumedFlags.Clear();
+                item.receipts.Clear();
                 item.ConsumptionRevision++;
                 item.IsConsumed = false;
                 item.grab = item.GetComponent<ObjectGrab>();
@@ -184,6 +186,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 consumedFlags.TryGetValue(flag, out int count);
                 consumedFlags[flag] = count + units;
             }
+            receipts.Add((new List<ObjectFlag>(victim.Identity.ActiveFlags).ToArray(), units));
             ConsumptionRevision++;
             victim.IsConsumed = true;
             victim.gameObject.SetActive(false);
@@ -211,6 +214,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return flag != null && consumedFlags.TryGetValue(flag, out int count) ? count : 0;
         }
 
+        /// <summary>Counts receipts matching any accepted flag without counting a multi-flag victim twice.</summary>
+        /// <param name="flags">Alternative flags accepted by a dialogue condition.</param>
+        /// <returns>Total consumed units matching at least one selected flag.</returns>
+        public long CountConsumed(ObjectFlag[] flags)
+        {
+            // Snapshots retain the victim's membership at consumption, even if later changes remove those flags.
+            long count = 0;
+            if (flags == null)
+                return count;
+            foreach ((ObjectFlag[] Flags, int Units) receipt in receipts)
+                foreach (ObjectFlag flag in flags)
+                    if (Array.IndexOf(receipt.Flags, flag) >= 0)
+                    {
+                        count += receipt.Units;
+                        break;
+                    }
+            return count;
+        }
+
         /// <summary>Clears receipts and consumed status before explicitly reusing an inactive pooled item.</summary>
         public void ResetConsumption()
         {
@@ -221,6 +243,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             consumedFlags.Clear();
+            receipts.Clear();
             IsConsumed = false;
             ConsumptionRevision++;
         }

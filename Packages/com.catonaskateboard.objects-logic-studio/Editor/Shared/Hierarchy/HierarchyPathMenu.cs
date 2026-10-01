@@ -53,17 +53,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="source">Existing hierarchy supplying component choices.</param>
         /// <param name="mesh">Whether to list mesh components instead of all renderers.</param>
         /// <param name="all">Whether an empty route means all renderers.</param>
-        internal static void Draw(SerializedProperty property, GameObject source, bool mesh, bool all = false)
+        /// <param name="transforms">Whether to offer all transforms instead of filtering by render components.</param>
+        internal static void Draw(SerializedProperty property, GameObject source, bool mesh, bool all = false, bool transforms = false)
         {
             // Missing imported routes remain visible until explicitly rebound on the destination hierarchy.
             string label = string.IsNullOrEmpty(property.stringValue) ? all ? "All Renderers" : "Root" : property.stringValue;
             if (property.stringValue == ".")
                 label = "Root";
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
-            EditorGUILayout.PrefixLabel(new GUIContent(mesh ? "Mesh Target" : "Renderer Target", property.tooltip));
+            EditorGUILayout.PrefixLabel(new GUIContent(transforms ? "Transform" : mesh ? "Mesh Target" : "Renderer Target", property.tooltip));
             using (new EditorGUI.DisabledScope(source == null))
                 if (GUILayout.Button(new GUIContent(label, source == null ? "Choose a hierarchy source first." : property.tooltip), EditorStyles.popup))
-                    Show(property, source, mesh, all);
+                    Show(property, source, mesh, all, transforms);
         }
 
         /// <summary>Builds component choices only when the user opens the menu.</summary>
@@ -71,7 +72,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="source">Existing prefab hierarchy.</param>
         /// <param name="mesh">Whether to require a mesh component.</param>
         /// <param name="all">Whether to offer all renderers independently of the root renderer.</param>
-        private static void Show(SerializedProperty property, GameObject source, bool mesh, bool all)
+        /// <param name="transforms">Whether transforms without renderers are also selectable.</param>
+        private static void Show(SerializedProperty property, GameObject source, bool mesh, bool all, bool transforms)
         {
             // Duplicate sibling names are rejected rather than silently resolving another branch.
             GenericMenu menu = new GenericMenu();
@@ -90,8 +92,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 menu.AddItem(new GUIContent("All Renderers"), selected.Length == 0, () => Assign(owner, field, string.Empty));
             foreach (Transform branch in branches)
             {
-                if (mesh ? branch.GetComponent<MeshFilter>() == null && branch.GetComponent<SkinnedMeshRenderer>() == null
-                    : branch.GetComponent<Renderer>() == null)
+                if (!transforms && (mesh ? branch.GetComponent<MeshFilter>() == null && branch.GetComponent<SkinnedMeshRenderer>() == null
+                    : branch.GetComponent<Renderer>() == null))
                     continue;
                 string path = AnimationUtility.CalculateTransformPath(branch, source.transform);
                 GUIContent label = new GUIContent(path.Length == 0 ? "Root" : "Hierarchy/" + path);

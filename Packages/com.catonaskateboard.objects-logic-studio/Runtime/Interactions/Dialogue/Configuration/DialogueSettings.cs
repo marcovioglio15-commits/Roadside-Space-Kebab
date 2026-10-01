@@ -59,7 +59,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (RequiredFlags.Length == 0)
                 return true;
             foreach (ItemFlagRequirement requirement in RequiredFlags)
-                if ((item.CountConsumed(requirement.Flag) >= requirement.Count) != RequireAll)
+                if ((item.CountConsumed(requirement.Flags) >= requirement.Count) != RequireAll)
                     return !RequireAll;
             return RequireAll;
         }
@@ -143,7 +143,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (Trigger == DialogueTrigger.Consumption && entry.RequiredFlags.Length == 0)
                         warning = "Consumption-triggered entries need at least one consumed-flag requirement.";
                     foreach (ItemFlagRequirement requirement in entry.RequiredFlags)
-                        if (requirement == null || requirement.Flag == null || requirement.Count <= 0)
+                        if (requirement == null || !requirement.TryValidate(out _))
                             warning = "Each consumed-flag requirement needs a project flag and a positive count.";
                     foreach (DialogueLine line in entry.Lines)
                         if (line == null || string.IsNullOrWhiteSpace(line.Text))

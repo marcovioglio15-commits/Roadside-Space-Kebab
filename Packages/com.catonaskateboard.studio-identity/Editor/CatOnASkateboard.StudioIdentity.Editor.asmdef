@@ -1,6 +1,11 @@
 {
   "name": "CatOnASkateboard.StudioIdentity.Editor",
   "rootNamespace": "CatOnASkateboard.StudioIdentity.Editor",
-  "references": ["CatOnASkateboard.StudioIdentity.Runtime"],
-  "includePlatforms": ["Editor"]
+  "references": [
+    "CatOnASkateboard.StudioIdentity.Runtime",
+    "CatOnASkateboard.StudioColors.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
 }

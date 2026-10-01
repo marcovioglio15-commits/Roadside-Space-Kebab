@@ -32,6 +32,7 @@ namespace CatOnASkateboard.MenuStudio
             // The first owner captures state; later overlays cannot overwrite that baseline.
             if (!owners.Add(owner))
                 return;
+            MenuGameplayGate.Acquire(owner);
             if (owners.Count == 1)
             {
                 previousLock = Cursor.lockState;
@@ -53,6 +54,7 @@ namespace CatOnASkateboard.MenuStudio
             // Disabling a paused host or unloading its scene must never leave time frozen.
             if (paused.Remove(owner) && paused.Count == 0)
                 Time.timeScale = previousScale;
+            MenuGameplayGate.Release(owner);
             if (!owners.Remove(owner) || owners.Count > 0)
                 return;
             Cursor.lockState = previousLock;

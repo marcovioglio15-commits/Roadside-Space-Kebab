@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("action"));
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
                 || !ObjectAuthoringSave.TryValidate(feature.gameObject, out _)))
-                if (GUILayout.Button(new GUIContent("Open Objects Logic Studio", "Edit this feature's binding and settings with Apply and Discard.")))
+                if (StudioButton.Draw(new GUIContent("Open Objects Logic Studio", "Edit this feature's binding and settings with Apply and Discard.")))
                     ObjectsLogicStudioWindow.Open(feature);
             if (!feature.TryValidate(out string warning))
                 EditorGUILayout.HelpBox(warning, MessageType.Warning);

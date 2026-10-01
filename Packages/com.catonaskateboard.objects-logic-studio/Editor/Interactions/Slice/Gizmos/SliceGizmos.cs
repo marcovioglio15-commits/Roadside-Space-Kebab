@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!slice.DrawGizmos || slice.Settings?.Target == null || !slice.Settings.TryValidate(out _))
                 return;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.35f, 0.85f, 1f, 0.7f));
-            Vector3 point = slice.transform.TransformPoint(slice.Settings.Target.Offset);
+            Vector3 point = slice.Settings.Target.SolidHitOnly ? slice.transform.position : slice.transform.TransformPoint(slice.Settings.Target.Offset);
             Handles.DrawWireDisc(point, Vector3.up, slice.Settings.Target.Distance);
             int index = Application.isPlaying ? slice.CompletedSteps : 0;
             if (index >= slice.Settings.Steps.Length)

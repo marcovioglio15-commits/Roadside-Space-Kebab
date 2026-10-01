@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,16 +25,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 state.SourceBaseline = InteractionPresetWrites.Capture(selected);
                 state.Persist();
             }
-            using (new EditorGUILayout.HorizontalScope())
+            using (new StudioButton.RowScope())
             {
                 using (new EditorGUI.DisabledScope(state.Source == null))
                 {
-                    if (GUILayout.Button(new GUIContent("Import", "Copy the selected snapshot into this object's pending settings.")))
+                    if (StudioButton.Draw(new GUIContent("Import", "Copy the selected snapshot into this object's pending settings.")))
                         Import(state);
-                    if (GUILayout.Button(new GUIContent("Update", "Overwrite the selected preset with this draft, retaining other objects' local settings.")))
+                    if (StudioButton.Draw(new GUIContent("Update", "Overwrite the selected preset with this draft, retaining other objects' local settings.")))
                         Update(state);
                 }
-                if (GUILayout.Button(new GUIContent("Export", "Save the current Hover draft as a new reusable preset.")))
+                if (StudioButton.Draw(new GUIContent("Export", "Save the current Hover draft as a new reusable preset.")))
                     Export(state);
             }
         }

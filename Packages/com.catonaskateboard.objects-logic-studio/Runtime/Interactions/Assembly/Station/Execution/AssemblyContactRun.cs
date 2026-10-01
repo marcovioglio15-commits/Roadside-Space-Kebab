@@ -58,7 +58,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             AssemblyStationSettings settings = station.Settings;
             nextQuery = time + settings.ContactQueryInterval;
-            detection.Query(station.Item, settings.ContactTolerance, settings.IncludeTriggers, null, contacts);
+            detection.Query(station.Item, settings.ContactTolerance, settings.IncludeTriggers, contacts);
             removed.Clear();
             foreach (ObjectItem item in started.Keys)
                 if (item == null || !contacts.Contains(item))
@@ -79,7 +79,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     began = time;
                     started.Add(item, began);
                 }
-                if (time - began < settings.ContactDuration || began > earliest)
+                if (settings.Trigger == AssemblyStationTrigger.IngredientContact && time - began < settings.ContactDuration || began > earliest)
                     continue;
                 if (began == earliest && selected != null
                     && EntityId.ToULong(ingredient.GetEntityId()) > EntityId.ToULong(selected.GetEntityId()))

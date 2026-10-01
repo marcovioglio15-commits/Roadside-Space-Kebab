@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: ModifyByContact Consume
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ContactModificationPreset
   Settings:
-    Flag: {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
+    Flags:
+    - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
     ContactDuration: 1
     ContactTolerance: 0.02
     QueryInterval: 0.02

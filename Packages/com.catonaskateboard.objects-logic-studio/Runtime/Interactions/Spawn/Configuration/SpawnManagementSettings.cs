@@ -3,11 +3,20 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
+    /// <summary>Selects independent completion-driven spawning or the persistent day sequence.</summary>
+    public enum SpawnManagementMode { CompletionRules, DayFlow }
+
     /// <summary>Configures completion conditions, per-instance repetition and randomized prefab output.</summary>
     [Serializable]
     public sealed class SpawnManagementSettings
     {
         #region Fields
+
+        [Header("Flow")]
+        [Tooltip("Completion Rules reacts to external instances. Day Flow owns sequential visitors, days and scene transitions.")]
+        public SpawnManagementMode Mode;
+        [Tooltip("Shared day sequence used by Day Flow. Place its manager on a dedicated, unparented scene root.")]
+        public SpawnFlowPlan Flow;
 
         [Header("Completion Conditions")]
         [Tooltip("Prefab whose instances are observed. Each instance owns separate completion counts.")]
@@ -68,6 +77,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Prefab-local source references remain stable even when interaction names are changed.
             warning = string.Empty;
+            if (Mode == SpawnManagementMode.DayFlow)
+            {
+                warning = "Assign a Day Flow Plan.";
+                return Flow != null && Flow.TryValidate(out warning);
+            }
+            if (Mode != SpawnManagementMode.CompletionRules)
+            {
+                warning = "Choose a supported Spawn Management mode.";
+                return false;
+            }
             if (!Prefab(SourcePrefab) || Conditions == null || Conditions.Length == 0)
                 warning = "Choose a source prefab and add at least one existing interaction condition.";
             else if (Repeat && CyclesPerInstance <= 0 || Draws <= 0 || Selection is not (SpawnSelection.WeightedRandom or SpawnSelection.UniformRandom or SpawnSelection.Sequence))

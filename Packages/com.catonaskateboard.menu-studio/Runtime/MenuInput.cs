@@ -84,7 +84,7 @@ namespace CatOnASkateboard.MenuStudio
         private void Handle(InputAction.CallbackContext context)
         {
             // A shared Pause/Cancel action uses the host's same-frame guard.
-            if (Host == null || Host.Preset == null || !Host.Preset.Navigation.Enabled)
+            if (Host == null || Host.Preset == null || MenuSceneTransition.IsBusy || !Host.Preset.Navigation.Enabled)
                 return;
             if (Pause != null && context.action == Pause.action)
                 Host.TogglePause();
