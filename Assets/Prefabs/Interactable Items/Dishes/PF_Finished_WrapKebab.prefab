@@ -570,8 +570,14 @@ MonoBehaviour:
       MinimumIngredients: 1
       Ingredients: []
     CompletedAppearance:
-      Meshes: []
-      Materials: []
+      Meshes:
+      - Path: SM_Finished_WrapKebab
+        Mesh: {fileID: 7300422150075294253, guid: 449c9bc3b0ec7924baa918089b61ece1, type: 3}
+        UpdateCollider: 0
+      Materials:
+      - Path: SM_Finished_WrapKebab
+        Materials:
+        - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
     HideIngredients: 1
 --- !u!1 &6473174347206530466
 GameObject:
