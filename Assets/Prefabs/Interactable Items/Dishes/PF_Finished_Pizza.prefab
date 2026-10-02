@@ -602,7 +602,7 @@ MonoBehaviour:
       Ingredients: []
     CompletedAppearance:
       Meshes:
-      - Path: 
+      - Path: SM_Finished_Pizza
         Mesh: {fileID: 2233014724806348769, guid: 9745f72932edfd0439b7800d452ecd10, type: 3}
         UpdateCollider: 0
       Materials: []

@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 3925398906064348706}
   - component: {fileID: 7202886261825108978}
   m_Layer: 6
-  m_Name: PF_Finished_Panino
+  m_Name: PF_Finished_PaninoKebab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -332,7 +332,7 @@ MonoBehaviour:
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967291
+        m_Bits: 4294967227
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
