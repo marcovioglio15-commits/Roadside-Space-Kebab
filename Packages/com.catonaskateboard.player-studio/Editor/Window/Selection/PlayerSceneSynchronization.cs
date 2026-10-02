@@ -172,27 +172,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private static bool HasManagedOverrides(PlayerHost host)
         {
             foreach (AddedComponent added in PrefabUtility.GetAddedComponents(host.gameObject))
-                if (IsManaged(added.instanceComponent, host))
+                if (PlayerPrefabProperties.HasOverrides(added.instanceComponent, host))
                     return true;
             foreach (ObjectOverride changed in PrefabUtility.GetObjectOverrides(host.gameObject, false))
-                if (changed.instanceObject is Component component && IsManaged(component, host))
+                if (changed.instanceObject is Component component && PlayerPrefabProperties.HasOverrides(component, host))
                     return true;
             return false;
-        }
-
-        /// <summary>Identifies only components controlled by Player Studio on this root or its camera.</summary>
-        /// <param name="component">Potential overridden component.</param>
-        /// <param name="host">Player defining the owned hierarchy.</param>
-        /// <returns>True for a managed component; the root placement Transform is excluded.</returns>
-        private static bool IsManaged(Component component, PlayerHost host)
-        {
-            if (component == null)
-                return false;
-            PlayerCameraRig rig = host.GetComponent<PlayerCameraRig>();
-            return component.gameObject == host.gameObject && (component is PlayerHost || component is CharacterController
-                || component is PlayerInput || component is PlayerInputBridge || component is PlayerCharacterControllerMotor
-                || component is PlayerCameraRig)
-                || rig != null && rig.View != null && component.gameObject == rig.View.gameObject;
         }
 
         #endregion

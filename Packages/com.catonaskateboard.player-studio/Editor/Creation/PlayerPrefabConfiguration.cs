@@ -128,8 +128,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 return;
             }
 
-            // Apply dependencies first so serialized references resolve to their prefab counterparts.
+            // Capture every configured component before the first write propagates the prefab to this instance.
             PlayerCameraRig rig = host.GetComponent<PlayerCameraRig>();
+            foreach (Component component in host.GetComponents<Component>())
+                PlayerPrefabProperties.Record(component, host);
+            if (rig != null && rig.View != null)
+                foreach (Component component in rig.View.GetComponents<Component>())
+                    PlayerPrefabProperties.Record(component, host);
+
+            // Apply dependencies first so serialized references resolve to their prefab counterparts.
             if (rig != null && rig.Model != null)
                 PlayerPrefabUtility.ApplyChild(rig.Model.gameObject, path);
             if (rig != null && rig.Target != null)
@@ -137,37 +144,22 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (rig != null && rig.View != null)
             {
                 PlayerPrefabUtility.ApplyChild(rig.View.gameObject, path);
-                // The camera child is fully owned by Player Studio, including its URP data component.
+                // Save camera pose and lens without applying observers, audio scripts or rendering overrides.
                 foreach (Component component in rig.View.GetComponents<Component>())
-                    ApplyComponent(component, path);
+                    PlayerPrefabProperties.Apply(component, host, path);
             }
             foreach (Component component in host.GetComponents<Component>())
                 if (component is PlayerInput || component is PlayerInputBridge || component is PlayerCharacterControllerMotor
                     || component is PlayerCameraRig || component is PlayerTools || component is CharacterController)
                     if (PrefabUtility.GetCorrespondingObjectFromSourceAtPath(component, path) == null)
                         PrefabUtility.ApplyAddedComponent(component, path, InteractionMode.UserAction);
-            ApplyComponent(host.BodyController, path);
-            ApplyComponent(host.GetComponent<PlayerInput>(), path);
-            ApplyComponent(host.GetComponent<PlayerInputBridge>(), path);
-            ApplyComponent(host.GetComponent<PlayerTools>(), path);
-            ApplyComponent(host.GetComponent<PlayerCharacterControllerMotor>(), path);
-            ApplyComponent(rig, path);
-            ApplyComponent(host, path);
-        }
-
-        /// <summary>Applies only one owned component, preserving other components and root placement overrides.</summary>
-        /// <param name="component">Managed component, or null when its module is absent.</param>
-        /// <param name="path">Owning player prefab, never a nested visual prefab.</param>
-        private static void ApplyComponent(Component component, string path)
-        {
-            // Camera Transform is owned; the player root Transform intentionally remains scene placement.
-            if (component == null)
-                return;
-            PrefabUtility.RecordPrefabInstancePropertyModifications(component);
-            if (PrefabUtility.GetCorrespondingObjectFromSourceAtPath(component, path) == null)
-                PrefabUtility.ApplyAddedComponent(component, path, InteractionMode.UserAction);
-            else
-                PrefabUtility.ApplyObjectOverride(component, path, InteractionMode.UserAction);
+            PlayerPrefabProperties.Apply(host.BodyController, host, path);
+            PlayerPrefabProperties.Apply(host.GetComponent<PlayerInput>(), host, path);
+            PlayerPrefabProperties.Apply(host.GetComponent<PlayerInputBridge>(), host, path);
+            PlayerPrefabProperties.Apply(host.GetComponent<PlayerTools>(), host, path);
+            PlayerPrefabProperties.Apply(host.GetComponent<PlayerCharacterControllerMotor>(), host, path);
+            PlayerPrefabProperties.Apply(rig, host, path);
+            PlayerPrefabProperties.Apply(host, host, path);
         }
 
         #endregion

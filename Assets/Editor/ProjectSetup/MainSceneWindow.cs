@@ -20,11 +20,11 @@ namespace RoadsideSpaceKebab.Editor
         #region Window
 
         /// <summary>Opens the central gameplay scene and audio setup controls.</summary>
-        [MenuItem("Tools/Roadside Space Kebab/Main Scene & Audio")]
+        [MenuItem("Tools/Main Scene & Audio Validate")]
         public static void Open()
         {
             // This project window does not add project-specific dependencies to reusable packages.
-            GetWindow<MainSceneWindow>("Main Scene & Audio").Show();
+            GetWindow<MainSceneWindow>("Main Scene & Audio Validate").Show();
         }
 
         /// <summary>Starts from the same menu preset used by the built Main Menu.</summary>
