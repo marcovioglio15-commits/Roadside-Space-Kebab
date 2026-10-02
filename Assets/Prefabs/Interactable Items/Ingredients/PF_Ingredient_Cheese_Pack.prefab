@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 702052543352322469}
   - component: {fileID: 6125662994363023009}
   - component: {fileID: 998761705617332601}
-  - component: {fileID: 5116323520887726527}
+  - component: {fileID: 4698496195298647205}
   m_Layer: 6
   m_Name: PF_Ingredient_Cheese_Pack
   m_TagString: HoverGrabTest
@@ -592,7 +592,7 @@ MonoBehaviour:
     Sound: 1
     Ingredient: 2
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
---- !u!114 &5116323520887726527
+--- !u!114 &4698496195298647205
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -624,11 +624,11 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: a7567f77c3095ae4193cae8fb5439c19, type: 2}
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
   drawGizmos: 1
   settings:
-    Thickness: 1
-    Color: {r: 0.8207547, g: 0.80139726, b: 0.80139726, a: 1}
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
     Intensity: 5
     EdgeAngle: 30
     HoverOnly: 1

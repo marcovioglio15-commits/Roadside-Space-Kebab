@@ -173,6 +173,7 @@ GameObject:
   - component: {fileID: -7524546340151767831}
   - component: {fileID: 2180616153765746934}
   - component: {fileID: 313421414926010583}
+  - component: {fileID: 6654021113453119442}
   m_Layer: 6
   m_Name: PF_Finished_PizzaMargherita
   m_TagString: Untagged
@@ -487,7 +488,7 @@ MonoBehaviour:
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967291
+        m_Bits: 4294967227
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -605,6 +606,48 @@ MonoBehaviour:
         UpdateCollider: 0
       Materials: []
     HideIngredients: 1
+--- !u!114 &6654021113453119442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3748823794255209065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 4856523054974364001}
 --- !u!1 &9096285007244077299
 GameObject:
   m_ObjectHideFlags: 0
@@ -748,6 +791,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6480718798285180254}
   m_SourcePrefab: {fileID: 100100000, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
+--- !u!23 &4856523054974364001 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
+  m_PrefabInstance: {fileID: 6099070564039620069}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5994002071574155790 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}

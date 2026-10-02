@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: -1897559306165011813}
   - component: {fileID: 3668129019503711395}
   - component: {fileID: 2380673162319761128}
+  - component: {fileID: 6354227486815829116}
   m_Layer: 6
   m_Name: PF_Drink_BeerBottle_Closed
   m_TagString: Untagged
@@ -412,7 +413,7 @@ MonoBehaviour:
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967291
+        m_Bits: 4294967227
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -507,6 +508,48 @@ MonoBehaviour:
     Sound: 1
     Ingredient: 2
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+--- !u!114 &6354227486815829116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2807803861718283967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 1275067550027039341}
 --- !u!1 &4057142638138118717
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,5 +769,10 @@ PrefabInstance:
 --- !u!4 &142672572782393602 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: aee8e072d4de5ef479ba2f23272acb57, type: 3}
+  m_PrefabInstance: {fileID: 463983528357388009}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &1275067550027039341 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: aee8e072d4de5ef479ba2f23272acb57, type: 3}
   m_PrefabInstance: {fileID: 463983528357388009}
   m_PrefabAsset: {fileID: 0}

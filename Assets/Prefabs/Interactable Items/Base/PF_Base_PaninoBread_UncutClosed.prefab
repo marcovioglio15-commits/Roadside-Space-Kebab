@@ -169,6 +169,7 @@ GameObject:
   - component: {fileID: 7966207177916234237}
   - component: {fileID: 2918399538152505287}
   - component: {fileID: 1332642922883041813}
+  - component: {fileID: 2718778180934229708}
   m_Layer: 6
   m_Name: PF_Base_PaninoBread_UncutClosed
   m_TagString: Untagged
@@ -411,6 +412,48 @@ MonoBehaviour:
     Sound: 1
     Ingredient: 2
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+--- !u!114 &2718778180934229708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8544101319874731497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 7215794423399974919}
 --- !u!1 &8633502895990417894
 GameObject:
   m_ObjectHideFlags: 0
@@ -553,6 +596,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2823a3db7a9274f45bfbe5126a140b17, type: 3}
+--- !u!23 &7215794423399974919 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 2823a3db7a9274f45bfbe5126a140b17, type: 3}
+  m_PrefabInstance: {fileID: 8350293205591430275}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8388106110508200808 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2823a3db7a9274f45bfbe5126a140b17, type: 3}

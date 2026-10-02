@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 1097780511911198070}
   - component: {fileID: 9078639743984971572}
   - component: {fileID: 313607941425171536}
+  - component: {fileID: 3596156668242509674}
   m_Layer: 6
   m_Name: PF_Finished_PaninoFalafel
   m_TagString: Untagged
@@ -410,7 +411,7 @@ MonoBehaviour:
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967291
+        m_Bits: 4294967227
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -579,6 +580,48 @@ MonoBehaviour:
         Materials:
         - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
     HideIngredients: 1
+--- !u!114 &3596156668242509674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6185445663845738765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 5727826766446514201}
 --- !u!1 &7488552449112281918
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,6 +842,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f60007d43c5281243a3d1727c9228e2f, type: 3}
+--- !u!23 &5727826766446514201 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: f60007d43c5281243a3d1727c9228e2f, type: 3}
+  m_PrefabInstance: {fileID: 6394198571669146781}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6860803867317840758 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f60007d43c5281243a3d1727c9228e2f, type: 3}

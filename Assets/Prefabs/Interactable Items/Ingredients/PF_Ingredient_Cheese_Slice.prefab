@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 6489756238173887046}
   - component: {fileID: 4632372336793643292}
   - component: {fileID: 3313577183043265812}
-  - component: {fileID: 3645747838241800091}
+  - component: {fileID: 8052298775256982700}
   m_Layer: 6
   m_Name: PF_Ingredient_Cheese_Slice
   m_TagString: Untagged
@@ -235,15 +235,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967291
+        m_Bits: 4294967227
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
     style:
       content: Cheese
       font: {fileID: 0}
@@ -300,6 +307,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -320,6 +328,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &4632372336793643292
 MonoBehaviour:
@@ -425,7 +438,8 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
---- !u!114 &3645747838241800091
+    Sound: 1
+--- !u!114 &8052298775256982700
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -457,14 +471,14 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: a7567f77c3095ae4193cae8fb5439c19, type: 2}
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
   drawGizmos: 1
   settings:
-    Thickness: 1
-    Color: {r: 0.8207547, g: 0.80139726, b: 0.80139726, a: 1}
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
     Intensity: 5
     EdgeAngle: 30
-    HoverOnly: 0
+    HoverOnly: 1
   renderers:
   - {fileID: 4274644348561374629}
 --- !u!1 &6689548626028436159

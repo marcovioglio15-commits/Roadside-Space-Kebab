@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 7543009960944469859}
   - component: {fileID: 8660738907484017592}
   - component: {fileID: 3925398906064348706}
+  - component: {fileID: 4911326527916986151}
   m_Layer: 6
   m_Name: PF_Finished_PaninoKebab
   m_TagString: Untagged
@@ -360,6 +361,48 @@ MonoBehaviour:
       backgroundSprite: {fileID: 0}
       backgroundType: 0
   drawGizmos: 1
+--- !u!114 &4911326527916986151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2305683179381614155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 5810867436002175667}
 --- !u!1 &3146031304833970957
 GameObject:
   m_ObjectHideFlags: 0
@@ -657,5 +700,10 @@ PrefabInstance:
 --- !u!4 &4679088253990900188 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e978ed14c0395c548bc2714cb7f3182e, type: 3}
+  m_PrefabInstance: {fileID: 5144743019289376311}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5810867436002175667 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: e978ed14c0395c548bc2714cb7f3182e, type: 3}
   m_PrefabInstance: {fileID: 5144743019289376311}
   m_PrefabAsset: {fileID: 0}

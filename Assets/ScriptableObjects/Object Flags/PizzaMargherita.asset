@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: PizzaMargherita
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
   DisplayName: PizzaMargherita
-  Group: 
+  Group: Ingredient
   Description: 
