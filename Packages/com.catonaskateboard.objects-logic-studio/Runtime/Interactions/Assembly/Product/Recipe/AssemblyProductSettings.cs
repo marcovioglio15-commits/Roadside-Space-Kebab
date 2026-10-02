@@ -75,13 +75,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Recipe")]
         [Tooltip("Groups of alternative ingredient flags sharing one quantity per row. A flag belongs to only one row. Mandatory rows must be filled; optional rows can be omitted.")]
         public AssemblyIngredient[] Ingredients = Array.Empty<AssemblyIngredient>();
-        [Tooltip("Placement slots in product-local space. Each physical object occupies one slot regardless of its Grab units; provide enough slots for the intended ingredient prefabs.")]
+        [Tooltip("Placement slots in product-local space. Each object occupies one slot regardless of its Grab units. On completion, only colliders authored on the product prefab remain active.")]
         public AssemblyMagnet[] Magnets = Array.Empty<AssemblyMagnet>();
         [Tooltip("Existing product interactions with custom availability requirements. Unlisted interactions wait for recipe completion.")]
         public AssemblyInteractionRule[] InteractionRules = Array.Empty<AssemblyInteractionRule>();
         [Tooltip("Mesh and material changes on the product's existing hierarchy when the recipe completes. Losing completion restores its previous appearance.")]
         public ItemAppearanceSettings CompletedAppearance = new ItemAppearanceSettings();
-        [Tooltip("Hide the inserted ingredients' meshes while a completed mesh replacement is active. Geometry returns when the recipe becomes incomplete or an ingredient detaches; collisions and VFX stay active.")]
+        [Tooltip("Hide ingredient meshes while a completed mesh replacement is active. They return when the recipe becomes incomplete or an ingredient detaches. Product colliders and ingredient VFX remain active.")]
         public bool HideIngredients = true;
 
         #endregion

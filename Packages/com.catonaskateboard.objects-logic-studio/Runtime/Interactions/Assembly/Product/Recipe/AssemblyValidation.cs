@@ -23,6 +23,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (owner == null || settings == null || settings.Ingredients == null || settings.Ingredients.Length == 0
                 || settings.Magnets == null || settings.Magnets.Length == 0 || settings.InteractionRules == null)
                 return false;
+            // Completed recipes retire ingredient colliders, so carry geometry must exist on the product itself.
+            if (owner.TryGetComponent(out ObjectGrab _) && !ObjectGrab.ValidateBody(owner, out warning))
+            {
+                warning = "Product Physics: " + warning;
+                return false;
+            }
             Dictionary<ObjectFlag, int> quantities = new Dictionary<ObjectFlag, int>();
             long total = 0;
             foreach (AssemblyIngredient ingredient in settings.Ingredients)

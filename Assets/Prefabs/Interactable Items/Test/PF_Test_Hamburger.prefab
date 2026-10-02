@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 6084086214577113263}
   - component: {fileID: 3078138421203572724}
   - component: {fileID: 392655467241966721}
+  - component: {fileID: 3856206238075889047}
   m_Layer: 0
   m_Name: PF_Test_Hamburger
   m_TagString: Untagged
@@ -676,3 +677,24 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Burger
+--- !u!65 &3856206238075889047
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4182828039336747428}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.21378556, y: 0.12117137, z: 0.20000002}
+  m_Center: {x: -0.0068927854, y: 0.040515706, z: 0}
