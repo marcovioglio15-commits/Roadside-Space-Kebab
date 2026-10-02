@@ -118,11 +118,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                     HoverControls.Field(step, "Name");
                     TransferInteractionControls.Prefab(step.FindPropertyRelative("Prefab"));
-                    Completion(step);
+                    Completions(step);
                     HoverControls.Field(step, "ArrivalDialogueEnabled", "Walk-in Dialogue");
                     if (step.FindPropertyRelative("ArrivalDialogueEnabled").boolValue)
                     {
-                        Completion(step, "ArrivalDialogue", "Dialogue", true);
+                        Completion(step, step.FindPropertyRelative("ArrivalDialogue"), "Dialogue", true);
                         HoverControls.Field(step, "NewCustomerSound", "Arrival Sound");
                     }
                     if (weighted)
@@ -139,7 +139,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty added = steps.GetArrayElementAtIndex(steps.arraySize - 1);
                 added.FindPropertyRelative("Name").stringValue = "Spawn " + steps.arraySize;
                 added.FindPropertyRelative("Prefab").objectReferenceValue = null;
-                added.FindPropertyRelative("Completion").objectReferenceValue = null;
+                added.FindPropertyRelative("Completions").arraySize = 0;
+                added.FindPropertyRelative("RequireAll").boolValue = true;
                 added.FindPropertyRelative("ArrivalDialogueEnabled").boolValue = false;
                 added.FindPropertyRelative("ArrivalDialogue").objectReferenceValue = null;
                 added.FindPropertyRelative("NewCustomerSound").boolValue = false;
@@ -157,16 +158,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
         }
 
+        /// <summary>Edits the distinct interactions that finish this visitor's step.</summary>
+        /// <param name="step">Spawn template containing completion sources.</param>
+        private static void Completions(SerializedProperty step)
+        {
+            // A single selection retains the same departure behavior as an ordinary completion event.
+            SerializedProperty sources = step.FindPropertyRelative("Completions");
+            if (sources.arraySize > 1)
+                UnlockInteractionControls.ConditionLogic(step.FindPropertyRelative("RequireAll"));
+            for (int index = 0; index < sources.arraySize; index++)
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    Completion(step, sources.GetArrayElementAtIndex(index), "Complete On " + (index + 1));
+                    if (GUILayout.Button(new GUIContent("−", "Remove this completion requirement."), GUILayout.Width(24f)))
+                    {
+                        sources.GetArrayElementAtIndex(index).objectReferenceValue = null;
+                        sources.DeleteArrayElementAtIndex(index);
+                        break;
+                    }
+                }
+            if (StudioButton.Draw(new GUIContent("+ Completion", "Select another interaction whose final completion can finish this visit.")))
+            {
+                sources.arraySize++;
+                sources.GetArrayElementAtIndex(sources.arraySize - 1).objectReferenceValue = null;
+            }
+        }
+
         /// <summary>Selects an existing interaction by component identity within the chosen prefab.</summary>
         /// <param name="step">Spawn row receiving the exact completion source.</param>
-        /// <param name="field">Serialized component link.</param>
+        /// <param name="property">Serialized component link.</param>
         /// <param name="title">Selector caption.</param>
         /// <param name="dialogueOnly">Restrict the menu to dialogue components.</param>
-        private static void Completion(SerializedProperty step, string field = "Completion", string title = "Complete On", bool dialogueOnly = false)
+        private static void Completion(SerializedProperty step, SerializedProperty property, string title, bool dialogueOnly = false)
         {
             // Build the menu only on demand; normal repaints allocate no hierarchy catalog.
             GameObject prefab = step.FindPropertyRelative("Prefab").objectReferenceValue as GameObject;
-            SerializedProperty property = step.FindPropertyRelative(field);
             ObjectInteraction current = property.objectReferenceValue as ObjectInteraction;
             Rect rect = EditorGUILayout.GetControlRect();
             rect = EditorGUI.PrefixLabel(rect, new GUIContent(title, property.tooltip));

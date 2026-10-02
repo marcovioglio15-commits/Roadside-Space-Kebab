@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.SpawnFlowPlan
   Days:
   - Name: Day 1
-    Scene: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_Blockout_LogicTest.unity
+    Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_RecipeTesting.unity
     RandomCount: 1
     Count: 1
     Minimum: 5
@@ -23,7 +23,10 @@ MonoBehaviour:
     Steps:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
-      Completion: {fileID: 1048780206782002216, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      - {fileID: 5254269728490429368, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      RequireAll: 0
       ArrivalDialogueEnabled: 1
       ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
       NewCustomerSound: 1
@@ -54,7 +57,7 @@ MonoBehaviour:
           Duration: 1
           Direction: 1
   - Name: Day 2
-    Scene: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_Blockout_LogicTest.unity
+    Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_RecipeTesting.unity
     RandomCount: 0
     Count: 3
     Minimum: 1
@@ -63,7 +66,10 @@ MonoBehaviour:
     Steps:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
-      Completion: {fileID: 1048780206782002216, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      - {fileID: 5254269728490429368, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      RequireAll: 0
       ArrivalDialogueEnabled: 1
       ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
       NewCustomerSound: 1

@@ -109,6 +109,11 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                     editorWindow.Close();
             }
             EditorGUILayout.EndScrollView();
+            if (StudioButton.Draw(new GUIContent("Manage Flags", "Edit or delete definitions in the shared flag catalog.")))
+            {
+                ObjectFlagCatalogWindow.Open();
+                editorWindow.Close();
+            }
             if (StudioButton.Draw(new GUIContent("+ Create Object Flag", "Define a new custom flag and assign it to this field.")))
             {
                 ObjectFlagSelector.Create(owner, path, current, search);

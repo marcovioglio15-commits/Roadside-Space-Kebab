@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -38,6 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool retained;
         private float revertAt = -1f;
         private string lastWarning = string.Empty;
+        private ObjectFlag[] consumedFlags = Array.Empty<ObjectFlag>();
 
         #endregion
 
@@ -325,6 +328,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Completion
 
+        /// <summary>Matches only the victim of the completion currently being published.</summary>
+        /// <param name="flags">Alternative identity flags allowed by an availability condition.</param>
+        /// <returns>True when this successful consumption included any requested flag.</returns>
+        internal bool ConsumedAny(ObjectFlag[] flags)
+        {
+            // Cumulative receipts and later identity changes cannot satisfy this event's filter.
+            foreach (ObjectFlag flag in flags)
+                if (flag != null && Array.IndexOf(consumedFlags, flag) >= 0)
+                    return true;
+            return false;
+        }
+
         /// <summary>Retains a pair's current transition or rolls it back according to the interruption policy.</summary>
         private void Interrupt()
         {
@@ -351,10 +366,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!settings.Self.Consume && !settings.Other.Consume)
                 completed.Add(other);
             running = false;
+            ObjectFlag[] receipt = Array.Empty<ObjectFlag>();
             if (settings.Self.Consume)
-                other.Consume(Item, this);
+                other.Consume(Item, this, out receipt);
             else if (settings.Other.Consume)
-                Item.Consume(other, this);
+                Item.Consume(other, this, out receipt);
             // Receipts describe what was consumed; completion listeners observe the counterpart's final flag.
             if (settings.ChangeContactFlag && other != null)
             {
@@ -372,7 +388,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             else
                 Release();
-            Signal(InteractionMoment.Completed);
+            // Expose this receipt only during the exact completion event, including self-consumption.
+            consumedFlags = receipt;
+            try
+            {
+                Signal(InteractionMoment.Completed);
+            }
+            finally
+            {
+                consumedFlags = Array.Empty<ObjectFlag>();
+            }
         }
 
         /// <summary>Restores an active or completed temporary change after uninterrupted separation.</summary>

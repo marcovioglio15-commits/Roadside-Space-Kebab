@@ -61,9 +61,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Vector3 origin = feature.Target.SolidHitOnly ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
             float size = HandleUtility.GetHandleSize(origin) * 0.7f;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(1f, 0.65f, 0.2f));
-            for (int index = 0; index < feature.Settings.Rules.Length; index++)
+            for (int index = 0; index < (feature.Settings.SelfEject ? 1 : feature.Settings.Rules.Length); index++)
             {
-                EjectRule rule = feature.Settings.Rules[index];
+                EjectRule rule = feature.Settings.SelfEject ? feature.Settings.SelfImpulse : feature.Settings.Rules[index];
                 Vector3 impulse = rule.Space == Space.Self ? feature.transform.rotation * rule.Impulse : rule.Impulse;
                 Vector3 end = origin + impulse.normalized * size;
                 Handles.DrawLine(origin, end);

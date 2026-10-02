@@ -22,7 +22,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Window
 
         /// <summary>Opens board configuration independently of a locked Inspector or prefab stage.</summary>
-        [MenuItem("Tools/Objects Logic Studio/Order Board")]
         internal static void Open()
         {
             // Opening an editor does not modify scene objects.

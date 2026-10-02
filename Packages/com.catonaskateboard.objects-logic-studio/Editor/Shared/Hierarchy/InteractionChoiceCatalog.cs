@@ -22,6 +22,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Catalog
 
+        /// <summary>Resolves a selected stable identity against the already cached hierarchy.</summary>
+        /// <param name="identity">Saved component file identity.</param>
+        /// <returns>The existing interaction, or null if it was removed.</returns>
+        internal ObjectInteraction Resolve(long identity)
+        {
+            // Conditional controls reuse the catalog instead of searching the hierarchy on every repaint.
+            int index = Array.IndexOf(identities, identity);
+            return index >= 0 ? features[index] : null;
+        }
+
         /// <summary>Caches names and stable prefab IDs at hierarchy refresh boundaries.</summary>
         /// <param name="root">Prefab branch containing selectable interactions.</param>
         /// <param name="product">Exclude product configuration itself when selecting ingredient-gated features.</param>

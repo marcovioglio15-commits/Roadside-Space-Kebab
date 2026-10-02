@@ -265,7 +265,7 @@ Transform:
   m_GameObject: {fileID: 7191164700220224227}
   serializedVersion: 2
   m_LocalRotation: {x: 0.1305262, y: -0, z: -0, w: 0.9914449}
-  m_LocalPosition: {x: 0, y: 1.6, z: 0}
+  m_LocalPosition: {x: 0, y: 1.6000001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -314,7 +314,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 8400000, guid: 787eb66a50326bc468ce484ae45cf173, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -523,6 +523,7 @@ GameObject:
   - component: {fileID: 6146813732017797570}
   - component: {fileID: 3920058800087996398}
   - component: {fileID: 2884604792394426986}
+  - component: {fileID: 7904935437359823284}
   m_Layer: 0
   m_Name: PF_Player
   m_TagString: Player
@@ -689,6 +690,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flags:
   - {fileID: 11400000, guid: 281d8342d7ff4b9c8c600666d1bf4d00, type: 2}
+--- !u!114 &7904935437359823284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7919666368900942333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9521bddbe6374d1aa5d8ed0ce08a1814, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoadsideSpaceKebab.Audio.GameplayAudio
+  preset: {fileID: 11400000, guid: fa213195c9cfa734a848a2f18b7f6e1e, type: 2}
+  music: mus_radio
 --- !u!1001 &4942952950983230775
 PrefabInstance:
   m_ObjectHideFlags: 0

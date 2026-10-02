@@ -1,4 +1,5 @@
 using System;
+using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -74,6 +75,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 InteractionUnlockCondition condition = Settings.Conditions[index];
                 if (condition == null || condition.Count < 1)
+                    return false;
+                if (condition.FilterConsumed && (condition.Trigger != UnlockTrigger.Interaction || condition.Moment != InteractionMoment.Completed
+                    || Sources[index] == null || Sources[index].Kind != InteractionTemplateKind.Contact
+                    || !ObjectFlagRules.TryValidate(condition.ConsumedFlags, false, out warning)))
                     return false;
                 switch (condition.Trigger)
                 {

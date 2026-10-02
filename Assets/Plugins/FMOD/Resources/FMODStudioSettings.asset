@@ -464,7 +464,7 @@ MonoBehaviour:
   HasSourceProject: 1
   HasPlatforms: 1
   sourceProjectPath: FMOD/SpaceKebabFMOD/SpaceKebabFMOD.fspro
-  sourceBankPath: FMOD/SpaceKebabFMOD/Build
+  sourceBankPath: Assets/FMODbanks
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1

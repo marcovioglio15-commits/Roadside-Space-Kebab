@@ -18,7 +18,6 @@ namespace CatOnASkateboard.StudioColors.Editor
         #region Methods
         #region Opening
         /// <summary>Opens the project color workspace.</summary>
-        [MenuItem("Tools/Studio Colors")]
         public static void Open()
         {
             // Selection remains in the Project window for multi-folder operations.

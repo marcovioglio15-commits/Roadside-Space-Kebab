@@ -19,7 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly MenuSceneTransition transition;
         private readonly System.Random random;
         private GameObject instance;
-        private ObjectInteraction completion;
+        private readonly SpawnFlowCompletion completion = new SpawnFlowCompletion();
         private ObjectDialogue arrivalDialogue;
         private SpawnFlowStep step;
         private SpawnFlowMotion motion;
@@ -221,17 +221,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             instance.transform.SetPositionAndRotation(owner.transform.TransformPoint(step.Position), owner.transform.rotation * Quaternion.Euler(step.Rotation));
             ObjectInteraction[] original = step.Prefab.GetComponentsInChildren<ObjectInteraction>(true);
             ObjectInteraction[] generated = instance.GetComponentsInChildren<ObjectInteraction>(true);
-            int index = Array.IndexOf(original, step.Completion);
-            if (index < 0 || index >= generated.Length)
+            if (!completion.Bind(step, original, generated))
             {
                 Fail("The selected completion interaction no longer belongs to the spawned prefab. Select it again in the day plan.");
                 return;
             }
-            completion = generated[index];
             // Match the independent arrival component before any activation callback can run.
             if (step.ArrivalDialogueEnabled)
             {
-                index = Array.IndexOf(original, step.ArrivalDialogue);
+                int index = Array.IndexOf(original, step.ArrivalDialogue);
                 arrivalDialogue = index >= 0 && index < generated.Length ? generated[index] as ObjectDialogue : null;
                 arrivalDialogue?.ConfigureArrival();
             }
@@ -259,8 +257,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
             // Dialogue starts, page advances, interruptions and completions from other clones do not advance the day.
-            if (phase == Phase.Waiting && source == completion && moment == InteractionMoment.Completed)
-                signaled = true;
+            if (phase == Phase.Waiting && moment == InteractionMoment.Completed)
+                signaled |= completion.Observe(source);
         }
 
         /// <summary>Despawns a departed visitor and advances the day only after its final step.</summary>
@@ -326,7 +324,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Object.Destroy(instance);
             }
             instance = null;
-            completion = null;
+            completion.Clear();
             arrivalDialogue = null;
             suspended = null;
             motion = null;
