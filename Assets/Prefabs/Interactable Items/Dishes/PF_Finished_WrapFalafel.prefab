@@ -250,6 +250,7 @@ GameObject:
   - component: {fileID: -537830999663927592}
   - component: {fileID: 3950836888395484947}
   - component: {fileID: 1214343198905960401}
+  - component: {fileID: 6928960631079084286}
   m_Layer: 6
   m_Name: PF_Finished_WrapFalafel
   m_TagString: Untagged
@@ -387,6 +388,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -407,6 +409,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &-537830999663927592
 MonoBehaviour:
@@ -512,6 +519,7 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
 --- !u!114 &1214343198905960401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -553,15 +561,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
     style:
       content: Falafel Wrap
       font: {fileID: 0}
@@ -581,6 +596,146 @@ MonoBehaviour:
       backgroundSprite: {fileID: 0}
       backgroundType: 0
   drawGizmos: 1
+--- !u!114 &6928960631079084286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7089714603075415954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b3f1b34465481291b768662cedce04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyProduct
+  interactionName: Assembly Product
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Ingredients:
+    - Flags:
+      - {fileID: 11400000, guid: e42db53ae9a09274b85d6ad91916ca84, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: fcf35914e2cc9284880bc93ea1746227, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      Count: 1
+      Optional: 0
+    Magnets:
+    - Name: Magnet 1
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: e42db53ae9a09274b85d6ad91916ca84, type: 2}
+      Order: 1
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 2415388357218636138, guid: af4c3470368f2464e9369c03fb2f257c, type: 3}
+    - Name: Magnet 2
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: fcf35914e2cc9284880bc93ea1746227, type: 2}
+      Order: 2
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 8331006917502743928, guid: b686d2134be718c49817c4ebdac86ca8, type: 3}
+    - Name: Magnet 3
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      Order: 3
+      Position: {x: 0, y: 0.02, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
+    - Name: Magnet 4
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      Order: 4
+      Position: {x: 0, y: 0.01, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1.5, y: 1, z: 1.5}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 5936169737003267211, guid: 139947defc322cd48bd4a20ba12d216d, type: 3}
+    - Name: Magnet 5
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      Order: 5
+      Position: {x: 0, y: 0.025, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 2891034634997325463, guid: 750a7a35b9d541f4b805396137f7c6b6, type: 3}
+    InteractionRules:
+    - Target: {fileID: 6856799073750927014}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    - Target: {fileID: -537830999663927592}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    - Target: {fileID: 3950836888395484947}
+      RequireComplete: 1
+      MinimumIngredients: 1
+      Ingredients: []
+    CompletedAppearance:
+      Meshes:
+      - Path: SM_Finished_WrapFalafel
+        Mesh: {fileID: -3504686817410387113, guid: b36df8e41405a164a99f4fd9866102f2, type: 3}
+        UpdateCollider: 0
+      Materials:
+      - Path: SM_Finished_WrapFalafel
+        Materials:
+        - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
+    HideIngredients: 1
 --- !u!1001 &4395763880822093935
 PrefabInstance:
   m_ObjectHideFlags: 0
