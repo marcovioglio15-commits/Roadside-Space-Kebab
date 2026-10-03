@@ -17,10 +17,10 @@ MonoBehaviour:
     Tool: {fileID: 0}
     Tools: []
   Settings:
-    Trigger: 0
-    Distance: 3
-    ExitDistance: 4
-    Priority: 0
+    Trigger: 2
+    Distance: 15
+    ExitDistance: 20
+    Priority: 1
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -34,68 +34,84 @@ MonoBehaviour:
     Entries:
     - Name: Shadowblade Order Correct 1
       Weight: 1
-      RequiredFlags: []
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Ahh, manna from Pandemonium itself.
     - Name: Shadowblade Order Correct 2
       Weight: 1
-      RequiredFlags: []
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: 'Heh, not bad for a mortal.
-
-'
+        Text: Heh, not bad for a mortal.
     - Name: Shadowblade Order Correct 3
       Weight: 1
-      RequiredFlags: []
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Your skills impress me, chef.
     - Name: Shadowblade Order Correct 4
       Weight: 1
-      RequiredFlags: []
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: 'The Elder Gods are pleased.
-
-'
+        Text: The Elder Gods are pleased.
     - Name: Shadowblade Order Correct 5
       Weight: 1
-      RequiredFlags: []
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: 'This will do.
-
-'
+        Text: This will do.
     - Name: Shadowblade Order Correct 6
       Weight: 1
-      RequiredFlags: []
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: "My demons\u2026 pleased\u2026\n"
+        Text: "My demons\u2026 pleased\u2026"
     - Name: Shadowblade Order Correct 7
       Weight: 1
-      RequiredFlags: []
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: "\u2026I\u2019ll be back.\n"
-    - Name: Shadowblade Order Correct 7
+        Text: "\u2026I\u2019ll be back."
+    - Name: Shadowblade Order Correct 8
       Weight: 1
-      RequiredFlags: []
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: 'Hmph.
-
-'
+        Text: Hmph.
     Audio:
       Voice: 1
       Interval: 1

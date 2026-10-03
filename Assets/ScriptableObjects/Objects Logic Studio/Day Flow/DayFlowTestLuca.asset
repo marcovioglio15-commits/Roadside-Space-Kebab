@@ -23,7 +23,8 @@ MonoBehaviour:
     Steps:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
-      Completion: {fileID: 1048780206782002216, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      Completions: []
+      RequireAll: 1
       ArrivalDialogueEnabled: 1
       ArrivalDialogue: {fileID: 0}
       NewCustomerSound: 0

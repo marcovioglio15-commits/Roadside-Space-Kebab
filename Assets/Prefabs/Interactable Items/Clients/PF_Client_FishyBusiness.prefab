@@ -104,8 +104,8 @@ Transform:
   m_GameObject: {fileID: 2640551324973694607}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.009, y: 0.33161008, z: 0.464}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.3}
+  m_LocalPosition: {x: -0.009, y: 0.451, z: 0.464}
+  m_LocalScale: {x: 0.3896995, y: 0.19010489, z: 0.16190177}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8835111422629543820}
@@ -207,7 +207,6 @@ GameObject:
   - component: {fileID: 962167144239944056}
   - component: {fileID: 1048780206782002216}
   - component: {fileID: 4817618802008152814}
-  - component: {fileID: 8995142133869339014}
   - component: {fileID: 6388289395759616639}
   - component: {fileID: 4783263057593612631}
   m_Layer: 0
@@ -315,7 +314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: Shadowblade Order
+  interactionName: FishyBushiness Order
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -353,43 +352,29 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Random Intro 1
+    - Name: Fishy Business Random Intro 1
       Weight: 1
       RequiredFlags: []
       RequireAll: 1
       Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The darkness inside me yearns for a feast, mortal.
-    - Name: Shadowblade Random Intro 2
+      - Speaker: Fishy Business
+        Text: "Sir, I\u2019m here to eat, and I am to eat FAST. I\u2019ve got plenty of AMERICAN DOLLARS."
+    - Name: Fishy Business Random Intro 2
       Weight: 1
       RequiredFlags: []
       RequireAll: 1
       Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Deliver me some nutrients.
-    - Name: Shadowblade Random Intro 3
+      - Speaker: Fishy Business
+        Text: My time is MONEY. Hustle up and get my order!
+    - Name: Fishy Business Random Intro 3
       Weight: 1
       RequiredFlags: []
       RequireAll: 1
       Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "I\u2019m Shadowblade. Shadowblade Hellfury."
-    - Name: Shadowblade Random Intro 4
-      Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: My knife? To cut your Kebab? No chance.
-    - Name: Shadowblade Random Intro 5
-      Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Food. Now.
+      - Speaker: Fishy Business
+        Text: Get me something to eat, PRONTO!
     Audio:
-      Voice: 1
+      Voice: 3
       Interval: 0.1
       Completion: 0
   startAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
@@ -406,7 +391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Order Pizza Margherita
+  interactionName: Order 1
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -430,11 +415,8 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Flags:
-    - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
-    - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
     - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
     - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-    - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
     - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
     - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
@@ -445,6 +427,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
     - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+    - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
     ContactDuration: 0
     ContactTolerance: 0.02
     QueryInterval: 0.02
@@ -513,7 +496,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: Shadowblade Delivery Wrong
+  interactionName: FishyBusiness Delivery Wrong
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -551,7 +534,7 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Order Wrong 1
+    - Name: Fishy Business Order Wrong 1
       Weight: 1
       RequiredFlags:
       - Flags:
@@ -563,111 +546,16 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
         - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
         - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
         - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
         - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Ugh, toxins for my delicate system.
-    - Name: Shadowblade Order Wrong 2
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
-        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are not pleased.
-    - Name: Shadowblade Order Wrong 3
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
-        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Pathetic.
-    - Name: Shadowblade Order Wrong 4
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
-        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Get out of my sight, slowpoke!
-    - Name: Shadowblade Order Wrong 5
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
-        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: I knew you were a FAKER.
+      - Speaker: Fishy Business
+        Text: "Hey, CHUM, guess what? You\u2019ve got the WRONG order."
     Audio:
-      Voice: 1
+      Voice: 3
       Interval: 1
       Completion: 2
   startAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
@@ -698,7 +586,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: 'Shadowblade Delivery Correct '
+  interactionName: 'FishyBusiness Delivery Correct '
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -736,88 +624,36 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Order Correct 1
+    - Name: Fishy Business Order Correct 1
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Ahh, manna from Pandemonium itself.
-    - Name: Shadowblade Order Correct 2
+      - Speaker: Fishy Business
+        Text: 'Congratulations PAL, you just cost me 15 TRILLION dollars!
+
+'
+    - Name: Fishy Business Order Correct 2
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
         Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Heh, not bad for a mortal.
-    - Name: Shadowblade Order Correct 3
-      Weight: 1
-      RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Your skills impress me, chef.
-    - Name: Shadowblade Order Correct 4
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are pleased.
-    - Name: Shadowblade Order Correct 5
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: This will do.
-    - Name: Shadowblade Order Correct 6
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "My demons\u2026 pleased\u2026"
-    - Name: Shadowblade Order Correct 7
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "\u2026I\u2019ll be back."
-    - Name: Shadowblade Order Correct 8
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Hmph.
+      - Speaker: Fishy Business
+        Text: "Don\u2019t expect a tip from me ahhahahahahhahahahahahahhahahahahahahhahahahhahahahahahahhahahahahhahaha.\n"
     Audio:
-      Voice: 1
+      Voice: 3
       Interval: 1
       Completion: 1
   startAction: {fileID: 0}
@@ -860,72 +696,7 @@ MonoBehaviour:
     Board: Orders
     Entries:
     - Source: {fileID: 1741706001150086087}
-      Text: Pizza Margherita
-    - Source: {fileID: 1741706001150086087}
-      Text: Soda
---- !u!114 &8995142133869339014
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3097014450015891093}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b627afa401c8cda4cb9718ee06e4e338, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectEject
-  interactionName: Eject
-  toolRequirement:
-    Mode: 2
-    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 0}
-  action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
-  settings:
-    Target:
-      Distance: 3
-      Mode: 0
-      SolidHitOnly: 0
-      CenterRadius: 0.15
-      Offset: {x: 0, y: 0, z: 0}
-      ObstacleMask:
-        serializedVersion: 2
-        m_Bits: 4294967295
-      DrawGizmos: 1
-    SelfEject: 1
-    SelfImpulse:
-      Flags: []
-      Match: 0
-      Impulse: {x: 0, y: 500, z: -10000}
-      Space: 0
-    IncludeTriggers: 0
-    Tolerance: 0.005
-    ReleaseKinematic: 1
-    Mode: 0
-    Rules: []
-    IgnoreCollisions: 0
-    IgnoredLayers:
-      serializedVersion: 2
-      m_Bits: 0
-    IgnoreDuration: 0.5
-    Despawn: 1
-    DespawnDelay: 5
+      Text: Kebab Wrap
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0
