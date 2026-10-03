@@ -63,7 +63,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Publish();
         }
 
-        /// <summary>Queues one ticket for each selected consuming action.</summary>
+        /// <summary>Queues one ticket per order row, including rows sharing a consuming action.</summary>
         private void Publish()
         {
             // Day Flow presentation is allowed during walk paths while gameplay physics is suspended.
@@ -118,19 +118,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
         #region Completion
 
-        /// <summary>Crosses out only orders whose exact consuming action has completed.</summary>
+        /// <summary>Crosses out the first unfinished order matching this exact consuming action.</summary>
         /// <param name="source">Interaction publishing a lifecycle event.</param>
         /// <param name="moment">Successful start or completion boundary.</param>
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
-            // Completing an order preserves slot ownership and does not reorder waiting customers.
+            // One consumption fulfils one row; completed and waiting rows retain their queue positions.
             if (!registered || moment != InteractionMoment.Completed)
                 return;
             bool changed = false;
             bool complete = true;
             foreach (OrderTicket ticket in tickets)
             {
-                if (!ticket.Completed && ticket.Entry.Source == source)
+                if (!changed && !ticket.Completed && ticket.Entry.Source == source)
                 {
                     ticket.Completed = true;
                     ticket.Board?.Draw(ticket);

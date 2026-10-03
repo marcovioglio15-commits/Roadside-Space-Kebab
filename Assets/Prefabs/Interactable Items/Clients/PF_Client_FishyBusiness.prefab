@@ -861,6 +861,8 @@ MonoBehaviour:
     Entries:
     - Source: {fileID: 1741706001150086087}
       Text: Pizza Margherita
+    - Source: {fileID: 1741706001150086087}
+      Text: Soda
 --- !u!114 &8995142133869339014
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -10,7 +9,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region Fields
 
-        [Tooltip("Modify By Contact on this same object whose successful consumption completes the order.")]
+        [Tooltip("Modify By Contact on this same object. Each completion fulfils its first unfinished order in the list; several orders may share this source.")]
         public ObjectContactModifier Source;
         [Tooltip("Order text shown until the object despawns. Completion adds strikethrough without freeing its slot.")]
         [TextArea(2, 5)]
@@ -28,7 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Orders")]
         [Tooltip("ID of the scene Order Board receiving this object's entries. Multiple customers use the same ID.")]
         public string Board = "Orders";
-        [Tooltip("Selected consuming contact interactions and their independent board text, in queue order.")]
+        [Tooltip("Independent orders in queue order. Reuse a consuming interaction for multiple rows; each consumption completes only its first unfinished row.")]
         public OrderEntry[] Entries = Array.Empty<OrderEntry>();
 
         #endregion
@@ -36,19 +35,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Methods
         #region Validation
 
-        /// <summary>Checks exact component references so duplicate names cannot complete the wrong order.</summary>
+        /// <summary>Checks each order independently, allowing several rows to share the same consuming action.</summary>
         /// <param name="owner">Object owning this order interaction.</param>
         /// <param name="warning">Receives an incomplete row or missing consuming interaction.</param>
-        /// <returns>True when every selected row is eligible and unique.</returns>
+        /// <returns>True when every row has an eligible local source and nonempty text.</returns>
         public bool TryValidate(GameObject owner, out string warning)
         {
             // Empty or removed sources stay visible instead of being replaced by similarly named interactions.
             warning = "Select at least one enabled Modify By Contact with Consume on this object, a board ID and nonempty order text.";
             if (string.IsNullOrWhiteSpace(Board) || Entries == null || Entries.Length == 0)
                 return false;
-            HashSet<ObjectContactModifier> sources = new HashSet<ObjectContactModifier>();
             foreach (OrderEntry entry in Entries)
-                if (entry == null || !Eligible(entry.Source, owner) || string.IsNullOrWhiteSpace(entry.Text) || !sources.Add(entry.Source))
+                if (entry == null || !Eligible(entry.Source, owner) || string.IsNullOrWhiteSpace(entry.Text))
                     return false;
             warning = string.Empty;
             return true;

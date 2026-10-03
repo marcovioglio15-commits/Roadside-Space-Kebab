@@ -40,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Source(sources.GetArrayElementAtIndex(index), owner);
                     HoverControls.Field(entry, "Text");
                 }
-            if (StudioButton.Draw(new GUIContent("+ Add Order", "Associate another consuming contact action with one text slot.")))
+            if (StudioButton.Draw(new GUIContent("+ Add Order", "Add an independent order and text slot. Its consuming action may also be used by other orders.")))
             {
                 entries.arraySize++;
                 sources.arraySize = entries.arraySize;
@@ -62,7 +62,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             foreach (ObjectContactModifier candidate in candidates)
                 if (ObjectWorkspaceTarget.FileId(candidate) == property.longValue)
                     label = candidate.InteractionName;
-            Rect rect = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), new GUIContent("Consume Action", "A Modify By Contact with Consume enabled on this object."));
+            Rect rect = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), new GUIContent("Consume Action", "A Modify By Contact with Consume on this object. Each completion fulfils its first unfinished order in the list."));
             if (!GUI.Button(rect, label, EditorStyles.popup))
                 return;
             GenericMenu menu = new GenericMenu();
