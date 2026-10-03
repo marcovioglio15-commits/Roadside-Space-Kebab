@@ -20,9 +20,8 @@ namespace CatOnASkateboard.StudioIdentity.Editor
 
         #region Lifecycle
 
-        /// <summary>Opens the shared flag catalog independently of any gameplay object.</summary>
-        [MenuItem("Tools/Object Flags")]
-        private static void Open()
+        /// <summary>Opens catalog management from a flag selector without changing its selection.</summary>
+        internal static void Open()
         {
             // Project flags remain available even when no prefab or interaction is selected.
             GetWindow<ObjectFlagCatalogWindow>("Object Flags").Show();

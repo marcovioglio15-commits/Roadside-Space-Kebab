@@ -17,7 +17,7 @@ MonoBehaviour:
   Connection:
     UseStudioProject: 1
     ProjectPath: FMOD/SpaceKebabFMOD/SpaceKebabFMOD.fspro
-    BankPath: FMOD/SpaceKebabFMOD/Build
+    BankPath: Assets/FMODbanks
     BanksHavePlatforms: 1
     AutomaticBankLoading: 1
   Playback:
@@ -285,5 +285,5 @@ MonoBehaviour:
     WindowSeconds: 0.25
     Parameters:
     - Name: Channels
-      Value: 1
+      Value: 3
       Global: 0

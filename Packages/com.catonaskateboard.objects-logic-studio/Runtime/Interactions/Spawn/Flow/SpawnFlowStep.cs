@@ -18,8 +18,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Spawn";
         [Tooltip("Active prefab root created for this step.")]
         public GameObject Prefab;
-        [Tooltip("Interaction on this prefab whose successful completion starts departure. Dialogue must finish its final page; interruption does not count.")]
-        public ObjectInteraction Completion;
+        [Tooltip("Interactions on this prefab that can complete the visit. A dialogue counts only after its final page; interruption does not count.")]
+        public ObjectInteraction[] Completions = Array.Empty<ObjectInteraction>();
+        [Tooltip("Wait for every selected interaction to complete. Disable to depart after any one completes.")]
+        public bool RequireAll = true;
         [Tooltip("Request a separate dialogue after arrival, without a start action, distance or sight requirement.")]
         public bool ArrivalDialogueEnabled;
         [Tooltip("Dialogue component on this prefab to request once after walk-in. Its advance action still controls pages.")]
@@ -51,13 +53,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A direct component reference distinguishes multiple dialogues on the same object.
             warning = "Select an active prefab with positive scale and an enabled completion interaction belonging to it.";
-            if (!SpawnManagementSettings.Prefab(Prefab) || !Prefab.activeSelf || Completion == null
-                || !PlayerToolPose.Read(Prefab.transform).IsValid()
-                || !Completion.enabled || !Completion.transform.IsChildOf(Prefab.transform) || Completion is ObjectSpawnManager)
+            if (!SpawnManagementSettings.Prefab(Prefab) || !Prefab.activeSelf || !PlayerToolPose.Read(Prefab.transform).IsValid()
+                || Completions == null || Completions.Length == 0)
                 return false;
-            for (Transform branch = Completion.transform; branch != null; branch = branch.parent)
-                if (!branch.gameObject.activeSelf)
+            for (int index = 0; index < Completions.Length; index++)
+            {
+                ObjectInteraction completion = Completions[index];
+                if (completion == null || !completion.enabled || !completion.transform.IsChildOf(Prefab.transform)
+                    || completion is ObjectSpawnManager || Array.IndexOf(Completions, completion) != index)
                     return false;
+                for (Transform branch = completion.transform; branch != null; branch = branch.parent)
+                    if (!branch.gameObject.activeSelf)
+                        return false;
+            }
             // Automatic arrival dialogue still belongs to the same generated prefab instance.
             if (ArrivalDialogueEnabled && (ArrivalDialogue == null || !ArrivalDialogue.enabled
                 || !ArrivalDialogue.transform.IsChildOf(Prefab.transform)))

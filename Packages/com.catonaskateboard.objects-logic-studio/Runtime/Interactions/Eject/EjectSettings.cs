@@ -35,6 +35,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Targeting")]
         [Tooltip("Player reach, aim and visibility required to press this object's eject action.")]
         public TransferTargetSettings Target = new TransferTargetSettings();
+        [Header("Ejection")]
+        [Tooltip("Apply one impulse to this object's own Rigidbody instead of searching for flagged contacts.")]
+        public bool SelfEject;
+        [Tooltip("Single impulse for Self Eject. Flags are unused in this mode.")]
+        public EjectRule SelfImpulse = new EjectRule();
         [Header("Contact")]
         [Tooltip("Include trigger colliders on the ejector and contacted objects.")]
         public bool IncludeTriggers;
@@ -75,16 +80,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (Target == null || !Target.TryValidate(out warning))
                 return false;
             warning = "Use a finite non-negative contact tolerance, a supported force mode and at least one impulse rule.";
-            if (!float.IsFinite(Tolerance) || Tolerance < 0f || Rules == null || Rules.Length == 0
-                || Mode is not (EjectForceMode.Impulse or EjectForceMode.VelocityChange))
+            if (Mode is not (EjectForceMode.Impulse or EjectForceMode.VelocityChange)
+                || !SelfEject && (!float.IsFinite(Tolerance) || Tolerance < 0f || Rules == null || Rules.Length == 0))
                 return false;
-            foreach (EjectRule rule in Rules)
+            for (int index = 0; index < (SelfEject ? 1 : Rules.Length); index++)
             {
+                EjectRule rule = SelfEject ? SelfImpulse : Rules[index];
                 warning = "Each Eject rule needs flags, a finite non-zero impulse, Any or All matching, and Self or World space.";
                 if (rule == null || !InteractionValues.Finite(rule.Impulse) || rule.Impulse.sqrMagnitude <= 0f
                     || rule.Space is not (Space.Self or Space.World) || rule.Match is not (ObjectFlagMatch.Any or ObjectFlagMatch.All))
                     return false;
-                if (!ObjectFlagRules.TryValidate(rule.Flags, false, out warning))
+                if (!SelfEject && !ObjectFlagRules.TryValidate(rule.Flags, false, out warning))
                     return false;
             }
             warning = IgnoreCollisions && (IgnoredLayers.value == 0 || !InteractionValues.Positive(IgnoreDuration))

@@ -9,8 +9,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_MainMenu.unity
     guid: bb672b0f45115714388d6f9613e6b8f9
   - enabled: 1
-    path: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_Blockout_LogicTest.unity
-    guid: ecdb3f95b4526cb458f0cd1c105ef9ca
+    path: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_RecipeTesting.unity
+    guid: 24e7f92781f8abb41868c235790300bd
   - enabled: 1
     path: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_PauseMenu.unity
     guid: e7eb9732224d9834d954a394baf1b51b

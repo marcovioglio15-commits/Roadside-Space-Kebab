@@ -1,4 +1,5 @@
 using System;
+using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -30,6 +31,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Distance = 3f;
         [Tooltip("Number of matching events or performed inputs needed for this condition during one rule cycle.")]
         public int Count = 1;
+        [Tooltip("Count only successful consumption of an item bearing one of the selected flags. Available for completed Modify By Contact events with Consume enabled.")]
+        public bool FilterConsumed;
+        [Tooltip("Alternative flags of the item actually consumed by this completion. One matching flag is enough; the item counts as one event.")]
+        public ObjectFlag[] ConsumedFlags = Array.Empty<ObjectFlag>();
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Whether the selected source can produce a consumed-item completion receipt.</summary>
+        public bool SupportsConsumption => Trigger == UnlockTrigger.Interaction && Moment == InteractionMoment.Completed
+            && Source is ObjectContactModifier contact && (contact.Settings.Self.Consume || contact.Settings.Other.Consume);
 
         #endregion
     }
@@ -93,9 +106,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                                     || Operation == InteractionAvailabilityChange.Replace && condition.Source == Replacement
                                     || condition.Moment is not (InteractionMoment.Started or InteractionMoment.Completed))
                                     warning = "Choose a valid event from an existing interaction that this rule does not initially lock.";
+                                else if (condition.FilterConsumed && (!condition.SupportsConsumption
+                                    || !ObjectFlagRules.TryValidate(condition.ConsumedFlags, false, out warning)))
+                                    warning = "Consumed Flags requires a completed Modify By Contact with Consume and at least one valid flag.";
                                 break;
                             case UnlockTrigger.InputAction:
-                                if (condition.Action == null || condition.Action.action is not { type: InputActionType.Button }
+                                if (condition.FilterConsumed || condition.Action == null || condition.Action.action is not { type: InputActionType.Button }
                                     || !InteractionValues.Positive(condition.Distance))
                                     warning = "Assign a Button action and a positive finite activation distance.";
                                 break;

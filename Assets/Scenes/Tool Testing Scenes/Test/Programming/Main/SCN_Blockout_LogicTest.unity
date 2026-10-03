@@ -4697,7 +4697,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1324811164}
-  - component: {fileID: 1324811163}
   m_Layer: 0
   m_Name: Radio
   m_TagString: Untagged
@@ -4705,20 +4704,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &1324811163
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1324811162}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9521bddbe6374d1aa5d8ed0ce08a1814, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RoadsideSpaceKebab.Audio.GameplayAudio
-  preset: {fileID: 11400000, guid: fa213195c9cfa734a848a2f18b7f6e1e, type: 2}
-  music: mus_radio
 --- !u!4 &1324811164
 Transform:
   m_ObjectHideFlags: 0

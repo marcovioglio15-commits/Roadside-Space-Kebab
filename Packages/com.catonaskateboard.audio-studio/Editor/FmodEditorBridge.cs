@@ -41,9 +41,9 @@ namespace CatOnASkateboard.AudioStudio.Editor
                 if (connection.UseStudioProject && (!File.Exists(projectPath)
                     || !string.Equals(Path.GetExtension(projectPath), ".fspro", StringComparison.OrdinalIgnoreCase)))
                     return "Select an existing .fspro Studio project first.";
-                // Project mode follows FMOD's own Build folder; the bank field is hidden in this mode.
+                // Follow the authored export folder so preview cannot silently load stale banks.
                 string bankPath = connection.UseStudioProject
-                    ? Path.Combine(Path.GetDirectoryName(projectPath), (string)Read(utilitiesType, null, "BuildFolder"))
+                    ? FmodBankPaths.FromProject(projectPath)
                     : ResolvePath(connection.BankPath);
                 if (!Directory.Exists(bankPath))
                     return "The bank directory does not exist. Build the banks in FMOD Studio or select an existing bank directory.";
@@ -56,7 +56,8 @@ namespace CatOnASkateboard.AudioStudio.Editor
                 Write(settings, "SourceProjectPath", PortablePath(projectPath));
                 Write(settings, "SourceBankPath", PortablePath(bankPath));
                 Write(settings, "HasPlatforms", connection.UseStudioProject || connection.BanksHavePlatforms);
-                Write(settings, "AutomaticEventLoading", connection.AutomaticBankLoading);
+                Write(settings, "BankLoadType", Enum.Parse(Read(settingsType, settings, "BankLoadType").GetType(),
+                    connection.AutomaticBankLoading ? "All" : "None"));
                 EditorUtility.SetDirty(settings);
                 AssetDatabase.SaveAssetIfDirty(settings);
                 Invoke(managerType, "RefreshBanks");

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Applies one configured impulse to every eligible touching body after a player input action.</summary>
+    /// <summary>Applies one impulse to this object's body or eligible touching bodies after a player input action.</summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Eject Interaction")]
     public sealed class ObjectEject : ObjectCommandInteraction
@@ -53,13 +53,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Validates an imported snapshot against the ejector's actual collider hierarchy.</summary>
         /// <param name="configuration">Settings being applied.</param>
         /// <param name="warning">Receives unusable rules or missing owned geometry.</param>
-        /// <returns>True when at least one supported collider can collect contacts.</returns>
+        /// <returns>True when the object has the body or contact geometry required by its mode.</returns>
         public bool TryValidate(EjectSettings configuration, out string warning)
         {
             // Static and kinematic ejectors are supported because detection does not depend on collision callbacks.
             warning = "Configure Eject settings first.";
             if (configuration == null || !configuration.TryValidate(out warning))
                 return false;
+            if (configuration.SelfEject)
+                return ObjectGrab.ValidateBody(gameObject, out warning);
             if (Item != null)
                 foreach (Collider shape in GetComponentsInChildren<Collider>(true))
                     if (Item.Owns(shape.transform) && ContactDetection.Usable(shape, configuration.IncludeTriggers))
@@ -85,17 +87,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal override bool Execute()
         {
             // Complete collection precedes mutation; a saturated buffer never yields a partial ejection.
-            if (!CanExecute() || !query.Collect(Item, Colliders, settings.Tolerance, settings.IncludeTriggers, contacts))
+            if (!CanExecute() || !settings.SelfEject && !query.Collect(Item, Colliders, settings.Tolerance, settings.IncludeTriggers, contacts))
                 return false;
             executing = true;
             ejected.Clear();
             try
             {
                 // Rule order is authoritative even when different child colliders carry different flags.
-                foreach (EjectRule rule in settings.Rules)
-                    foreach (Collider contact in contacts)
-                        if (contact != null && FlagContactQuery.Matches(contact.transform, rule.Flags, rule.Match))
-                            Eject(contact.attachedRigidbody, rule);
+                if (settings.SelfEject)
+                    Eject(GetComponent<Rigidbody>(), settings.SelfImpulse);
+                else
+                    foreach (EjectRule rule in settings.Rules)
+                        foreach (Collider contact in contacts)
+                            if (contact != null && FlagContactQuery.Matches(contact.transform, rule.Flags, rule.Match))
+                                Eject(contact.attachedRigidbody, rule);
                 if (ejected.Count == 0)
                     return false;
                 Signal(InteractionMoment.Started);
@@ -116,7 +121,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Eject(Rigidbody body, EjectRule rule)
         {
             // Suspended ingredients, stored objects and in-progress modifications retain their ownership.
-            if (body == null || ejected.Contains(body) || body.transform.IsChildOf(transform) || transform.IsChildOf(body.transform)
+            if (body == null || ejected.Contains(body) || body.gameObject.isStatic
+                || !settings.SelfEject && (body.transform.IsChildOf(transform) || transform.IsChildOf(body.transform))
                 || !settings.ReleaseKinematic && body.isKinematic)
                 return;
             ObjectItem item = body.GetComponentInParent<ObjectItem>();
@@ -133,6 +139,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             body.WakeUp();
             if (settings.IgnoreCollisions)
                 EjectCollisionGrace.Apply(body, settings.IgnoredLayers, settings.IgnoreDuration);
+            // Both force modes are single physics impulses; no Update loop reapplies the force.
             body.AddForce(rule.Space == Space.Self ? transform.rotation * rule.Impulse : rule.Impulse,
                 settings.Mode == EjectForceMode.Impulse ? ForceMode.Impulse : ForceMode.VelocityChange);
             ejected.Add(body);

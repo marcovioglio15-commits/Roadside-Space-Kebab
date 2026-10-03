@@ -41,6 +41,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (index < sources.arraySize)
                         Mapping("Condition " + (index + 1), sources.GetArrayElementAtIndex(index));
                     HoverControls.Field(condition, "Moment");
+                    if (index < sources.arraySize && sources.GetArrayElementAtIndex(index).FindPropertyRelative("Kind").enumValueIndex
+                        == (int)InteractionTemplateKind.Contact)
+                        UnlockInteractionControls.Consumption(condition);
                 }
                 else
                 {

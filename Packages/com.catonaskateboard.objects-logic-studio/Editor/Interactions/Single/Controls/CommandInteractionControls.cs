@@ -70,15 +70,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Only input-time contact queries use these settings; no passive scans are introduced.
             TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
-            if (sections.Draw("Eject Contact", "Affect touching physical objects with matching identity flags."))
+            HoverControls.Field(settings, "SelfEject", "Self Eject");
+            bool self = settings.FindPropertyRelative("SelfEject").boolValue;
+            if (sections.Draw("Ejection", "Apply one physical impulse per successful activation."))
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    HoverControls.Field(settings, "IncludeTriggers");
-                    HoverControls.Field(settings, "Tolerance");
+                    if (!self)
+                    {
+                        HoverControls.Field(settings, "IncludeTriggers");
+                        HoverControls.Field(settings, "Tolerance");
+                    }
                     HoverControls.Field(settings, "ReleaseKinematic");
                     HoverControls.Field(settings, "Mode");
+                    if (self)
+                    {
+                        HoverControls.Field(settings.FindPropertyRelative("SelfImpulse"), "Impulse");
+                        HoverControls.Field(settings.FindPropertyRelative("SelfImpulse"), "Space");
+                    }
                 }
-            if (sections.Draw("Eject Impulses", "Rules run in list order. Each body receives the first matching impulse only."))
+            if (!self && sections.Draw("Eject Impulses", "Rules run in list order. Each body receives the first matching impulse only."))
                 using (new EditorGUI.IndentLevelScope())
                     Rules(settings.FindPropertyRelative("Rules"));
             if (sections.Draw("Eject Collisions", "Temporarily ignore selected collision layers on ejected bodies."))

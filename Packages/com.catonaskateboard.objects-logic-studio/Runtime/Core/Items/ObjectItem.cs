@@ -160,10 +160,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Records one reserved victim before deactivating its complete item root.</summary>
         /// <param name="victim">Other participant that disappears.</param>
         /// <param name="owner">Modification holding both participants.</param>
+        /// <param name="flags">Receives this victim's flags at consumption time, or an empty array on failure.</param>
         /// <returns>True only for the first successful consumption of this victim.</returns>
-        internal bool Consume(ObjectItem victim, UnityEngine.Object owner)
+        internal bool Consume(ObjectItem victim, UnityEngine.Object owner, out ObjectFlag[] flags)
         {
             // Mark before callbacks can re-enter another interaction; the survivor keeps the receipt.
+            flags = Array.Empty<ObjectFlag>();
             if (victim == null || victim == this || IsConsumed || victim.IsConsumed
                 || reservation != owner || victim.reservation != owner)
                 return false;
@@ -186,7 +188,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 consumedFlags.TryGetValue(flag, out int count);
                 consumedFlags[flag] = count + units;
             }
-            receipts.Add((new List<ObjectFlag>(victim.Identity.ActiveFlags).ToArray(), units));
+            flags = new List<ObjectFlag>(victim.Identity.ActiveFlags).ToArray();
+            receipts.Add((flags, units));
             ConsumptionRevision++;
             victim.IsConsumed = true;
             victim.gameObject.SetActive(false);

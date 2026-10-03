@@ -1,5 +1,6 @@
 using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioInput.Editor;
+using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Existing rule semantics remain unchanged when the caption becomes AND/OR.
             property.boolValue = EditorGUILayout.Popup(new GUIContent("Logic", property.tooltip), property.boolValue ? 0 : 1,
-                new[] { "AND · all conditions", "OR · any condition" }) == 0;
+                new[] { "AND - all conditions", "OR - any condition" }) == 0;
         }
 
 
@@ -97,11 +98,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                                 _ => 0
                             });
                             HoverControls.Field(condition, "Moment");
+                            ObjectInteraction source = choices.Resolve(sources.GetArrayElementAtIndex(index).longValue);
+                            if (source is ObjectContactModifier contact && (contact.Settings.Self.Consume || contact.Settings.Other.Consume))
+                                Consumption(condition);
+                            else if (condition.FindPropertyRelative("FilterConsumed").boolValue)
+                                HoverControls.Field(condition, "FilterConsumed", "Consumed Filter");
                             break;
                         case UnlockTrigger.InputAction:
                             StudioInputActionMenu.Draw(draft.serializedObject, condition.FindPropertyRelative("Action").propertyPath,
                                 "ObjectsLogicStudio.Unlock." + index, ExtendedInteractionControls.Button);
                             HoverControls.Field(condition, "Distance");
+                            if (condition.FindPropertyRelative("FilterConsumed").boolValue)
+                                HoverControls.Field(condition, "FilterConsumed", "Consumed Filter");
                             break;
                     }
                 }
@@ -117,8 +125,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 added.FindPropertyRelative("Action").objectReferenceValue = null;
                 added.FindPropertyRelative("Distance").floatValue = 3f;
                 added.FindPropertyRelative("Count").intValue = 1;
+                added.FindPropertyRelative("FilterConsumed").boolValue = false;
+                added.FindPropertyRelative("ConsumedFlags").arraySize = 0;
                 sources.GetArrayElementAtIndex(sources.arraySize - 1).longValue = 0;
             }
+        }
+
+        /// <summary>Shows the consumed-item alternatives only for completed consumption conditions.</summary>
+        /// <param name="condition">Serialized event condition.</param>
+        internal static void Consumption(SerializedProperty condition)
+        {
+            // Preserve inactive values for correction when the source or event moment changes.
+            if (condition.FindPropertyRelative("Moment").enumValueIndex != (int)InteractionMoment.Completed
+                && !condition.FindPropertyRelative("FilterConsumed").boolValue)
+                return;
+            HoverControls.Field(condition, "FilterConsumed", "Consumed Filter");
+            if (condition.FindPropertyRelative("FilterConsumed").boolValue)
+                ObjectFlagSelector.Draw(condition.FindPropertyRelative("ConsumedFlags"), new GUIContent("Consumed Flags", "Accept any selected flag on the item consumed by this completion."));
         }
 
         #endregion

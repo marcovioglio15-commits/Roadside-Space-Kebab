@@ -195,7 +195,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             for (int index = 0; index < counts.Length; index++)
                 if (counts[index] < settings.Conditions[index].Count && settings.Conditions[index].Trigger == UnlockTrigger.Interaction
-                    && settings.Conditions[index].Source == source && settings.Conditions[index].Moment == moment)
+                    && settings.Conditions[index].Source == source && settings.Conditions[index].Moment == moment
+                    && (!settings.Conditions[index].FilterConsumed
+                        || source is ObjectContactModifier contact && contact.ConsumedAny(settings.Conditions[index].ConsumedFlags)))
                     counts[index]++;
             TryApply();
         }
