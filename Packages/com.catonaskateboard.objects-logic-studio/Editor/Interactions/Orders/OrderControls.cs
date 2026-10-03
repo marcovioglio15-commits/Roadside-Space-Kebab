@@ -1,4 +1,5 @@
 using CatOnASkateboard.StudioColors.Editor;
+using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,6 +40,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                     Source(sources.GetArrayElementAtIndex(index), owner);
                     HoverControls.Field(entry, "Text");
+                    HoverControls.Field(entry, "FilterConsumed", "Filter Flags");
+                    if (entry.FindPropertyRelative("FilterConsumed").boolValue)
+                        using (new EditorGUI.IndentLevelScope())
+                            ObjectFlagSelector.Draw(entry.FindPropertyRelative("ConsumedFlags"),
+                                new GUIContent("Consumed Flags", "Complete this order when the consumed item had any selected flag. Earlier nonmatching orders remain open."));
                 }
             if (StudioButton.Draw(new GUIContent("+ Add Order", "Add an independent order and text slot. Its consuming action may also be used by other orders.")))
             {
@@ -47,6 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty added = entries.GetArrayElementAtIndex(entries.arraySize - 1);
                 added.FindPropertyRelative("Source").objectReferenceValue = null;
                 added.FindPropertyRelative("Text").stringValue = "Order";
+                added.FindPropertyRelative("FilterConsumed").boolValue = false;
+                added.FindPropertyRelative("ConsumedFlags").arraySize = 0;
                 sources.GetArrayElementAtIndex(sources.arraySize - 1).longValue = 0;
             }
         }
@@ -62,7 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             foreach (ObjectContactModifier candidate in candidates)
                 if (ObjectWorkspaceTarget.FileId(candidate) == property.longValue)
                     label = candidate.InteractionName;
-            Rect rect = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), new GUIContent("Consume Action", "A Modify By Contact with Consume on this object. Each completion fulfils its first unfinished order in the list."));
+            Rect rect = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), new GUIContent("Consume Action", "A Modify By Contact with Consume on this object. Each consumption fulfils its first matching unfinished order in the list."));
             if (!GUI.Button(rect, label, EditorStyles.popup))
                 return;
             GenericMenu menu = new GenericMenu();

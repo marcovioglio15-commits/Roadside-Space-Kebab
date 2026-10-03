@@ -118,7 +118,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
         #region Completion
 
-        /// <summary>Crosses out the first unfinished order matching this exact consuming action.</summary>
+        /// <summary>Crosses out the first unfinished order matching the exact action and current consumption receipt.</summary>
         /// <param name="source">Interaction publishing a lifecycle event.</param>
         /// <param name="moment">Successful start or completion boundary.</param>
         private void Observe(ObjectInteraction source, InteractionMoment moment)
@@ -130,7 +130,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             bool complete = true;
             foreach (OrderTicket ticket in tickets)
             {
-                if (!changed && !ticket.Completed && ticket.Entry.Source == source)
+                if (!changed && !ticket.Completed && ticket.Entry.Source == source
+                    && (!ticket.Entry.FilterConsumed || ticket.Entry.Source.ConsumedAny(ticket.Entry.ConsumedFlags)))
                 {
                     ticket.Completed = true;
                     ticket.Board?.Draw(ticket);

@@ -330,7 +330,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Completion
 
         /// <summary>Matches only the victim of the completion currently being published.</summary>
-        /// <param name="flags">Alternative identity flags allowed by an availability condition.</param>
+        /// <param name="flags">Alternative identity flags required by an order or availability condition.</param>
         /// <returns>True when this successful consumption included any requested flag.</returns>
         internal bool ConsumedAny(ObjectFlag[] flags)
         {
