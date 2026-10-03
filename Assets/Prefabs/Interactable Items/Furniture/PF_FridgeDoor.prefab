@@ -1,0 +1,265 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3770076412675370250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1638523482159598714}
+  - component: {fileID: 8983370223308316355}
+  - component: {fileID: 1292654135048857350}
+  - component: {fileID: 6307985189071836768}
+  - component: {fileID: 6475915941170381610}
+  m_Layer: 0
+  m_Name: PF_FridgeDoor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1638523482159598714
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3770076412675370250}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5107849216674815913}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8983370223308316355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3770076412675370250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
+  flags:
+  - {fileID: 11400000, guid: 3144801e2815bca4fa3d4e28c5520161, type: 2}
+--- !u!114 &1292654135048857350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3770076412675370250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
+--- !u!114 &6307985189071836768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3770076412675370250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 6244686255925699782}
+--- !u!114 &6475915941170381610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3770076412675370250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2490eeb3a3184da48aeeee959452e3df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectTriggerAnimation
+  interactionName: Trigger Animation
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    Path: SM_Fridge_Door
+    StateA:
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+    StateB:
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 120, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+    StartAtB: 0
+    Duration: 0.35
+    ForwardRotation: 1
+    ReturnRotation: 1
+    AutoReturn: 0
+    ReturnDelay: 1
+    AutoReturnDuration: 0.35
+    AutoReturnRotation: 1
+--- !u!1001 &4713017773215037506
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1638523482159598714}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      propertyPath: m_Name
+      value: SM_Fridge_Door
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3215565201860814532}
+  m_SourcePrefab: {fileID: 100100000, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+--- !u!4 &5107849216674815913 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+  m_PrefabInstance: {fileID: 4713017773215037506}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5596119874441610515 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+  m_PrefabInstance: {fileID: 4713017773215037506}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &3215565201860814532
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5596119874441610515}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 3065210070202115760, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+--- !u!23 &6244686255925699782 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 56b333623d145004abf4791e0e5a0647, type: 3}
+  m_PrefabInstance: {fileID: 4713017773215037506}
+  m_PrefabAsset: {fileID: 0}
