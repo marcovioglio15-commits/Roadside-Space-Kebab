@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f0c50a8b333bde45afdc8487649a534, type: 3}
+  m_Name: Unlock Rule Order Wrong
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.UnlockRulePreset
+  ToolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  Rule:
+    Name: Shadowblade Order to Delivery Wrong
+    Enabled: 1
+    Settings:
+      Operation: 2
+      InitiallyLocked: 1
+      Repeat: 0
+      Target: {fileID: 0}
+      Replacement: {fileID: 0}
+      RequireAll: 1
+      Conditions:
+      - Trigger: 0
+        Source: {fileID: 0}
+        Moment: 1
+        Action: {fileID: 0}
+        Distance: 3
+        Count: 1
+        FilterConsumed: 1
+        ConsumedFlags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        - {fileID: 11400000, guid: 46b88f7f4eb6ab34788a0b44b2c8ac91, type: 2}
+        - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
+    Target:
+      Assigned: 1
+      Path: 
+      Kind: 6
+      Name: Shadowblade Order
+      Occurrence: 0
+    Replacement:
+      Assigned: 1
+      Path: 
+      Kind: 6
+      Name: Shadowblade Delivery Wrong
+      Occurrence: 1
+    Sources:
+    - Assigned: 1
+      Path: 
+      Kind: 8
+      Name: Modify by contact
+      Occurrence: 0
+    ToolRequirement:
+      Mode: 0
+      Tool: {fileID: 0}
+      Tools: []

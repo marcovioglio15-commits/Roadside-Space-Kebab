@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: customer
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
   DisplayName: customer
-  Group: customer
+  Group: Customer
   Description: 

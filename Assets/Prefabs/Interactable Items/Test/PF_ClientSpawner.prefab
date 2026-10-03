@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 7667976349241050314}
   - component: {fileID: 8798008648663988149}
   m_Layer: 0
-  m_Name: PF_ClientSpwaner
+  m_Name: PF_ClientSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
