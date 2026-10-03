@@ -290,7 +290,7 @@ MonoBehaviour:
     Tool: {fileID: 0}
     Tools: []
   flagChange:
-    Enabled: 1
+    Enabled: 0
     Flag: {fileID: 11400000, guid: a8e9408c19d8cda438450b8cedc4406d, type: 2}
     Operation: 0
     Moment: 0
@@ -314,7 +314,7 @@ MonoBehaviour:
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 3959
     Units: 1
     Space: 0
     Offset: {x: 0, y: -0.02, z: 0.7}

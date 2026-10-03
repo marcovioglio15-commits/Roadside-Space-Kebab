@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 2583656532494501698}
   - component: {fileID: 6363317141538871987}
   m_Layer: 6
-  m_Name: PF_Finished_Pizza
+  m_Name: PF_Finished_PizzaRossa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -316,7 +316,7 @@ MonoBehaviour:
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 3959
     Units: 1
     Space: 0
     Offset: {x: 0, y: -0.02, z: 0.7}

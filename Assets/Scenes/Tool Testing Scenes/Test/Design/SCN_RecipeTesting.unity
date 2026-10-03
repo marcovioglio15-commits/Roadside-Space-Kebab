@@ -6326,7 +6326,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 379141897293873495, guid: 1c899248eb07de84cad0ffffa75dd893, type: 3}
       propertyPath: m_Name
-      value: GameObject
+      value: PF_AssemblyStation
       objectReference: {fileID: 0}
     - target: {fileID: 1757242934722147787, guid: 1c899248eb07de84cad0ffffa75dd893, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6366,6 +6366,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1757242934722147787, guid: 1c899248eb07de84cad0ffffa75dd893, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3464830694783968524, guid: 1c899248eb07de84cad0ffffa75dd893, type: 3}
+      propertyPath: m_Size.x
+      value: 0.7831063
+      objectReference: {fileID: 0}
+    - target: {fileID: 3464830694783968524, guid: 1c899248eb07de84cad0ffffa75dd893, type: 3}
+      propertyPath: m_Center.x
+      value: 0.0008816719
+      objectReference: {fileID: 0}
+    - target: {fileID: 3464830694783968524, guid: 1c899248eb07de84cad0ffffa75dd893, type: 3}
+      propertyPath: m_IsTrigger
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
