@@ -552,9 +552,10 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    WaitForNextIngredient: 0
     Ingredients:
     - Flags:
-      - {fileID: 11400000, guid: a8e9408c19d8cda438450b8cedc4406d, type: 2}
+      - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
       Count: 1
       Optional: 0
     - Flags:
@@ -573,7 +574,7 @@ MonoBehaviour:
     - Name: Magnet 1
       AnyIngredient: 0
       Flags:
-      - {fileID: 11400000, guid: a8e9408c19d8cda438450b8cedc4406d, type: 2}
+      - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
       Order: 1
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}

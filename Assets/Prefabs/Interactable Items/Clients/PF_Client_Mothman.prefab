@@ -1,0 +1,1208 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2308060718626455298
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2078415249031647057}
+  - component: {fileID: 2978666569137211505}
+  - component: {fileID: 6438139907706139039}
+  m_Layer: 5
+  m_Name: Label
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2078415249031647057
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2308060718626455298}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3362611254298223261}
+  m_Father: {fileID: 1361676163233640779}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 280, y: 64}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &2978666569137211505
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2308060718626455298}
+  m_CullTransparentMesh: 1
+--- !u!114 &6438139907706139039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2308060718626455298}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!1 &2640551324973694607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3902746370405300848}
+  - component: {fileID: 8944489232215373468}
+  - component: {fileID: 7740591780502162513}
+  - component: {fileID: 8204411704168140872}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3902746370405300848
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2640551324973694607}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.009, y: 0.33161008, z: 0.464}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.3}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8835111422629543820}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8944489232215373468
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2640551324973694607}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &7740591780502162513
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2640551324973694607}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: afa9fdd052d44ee4fa9dfdb65ed73a5b, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &8204411704168140872
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2640551324973694607}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &3097014450015891093
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8835111422629543820}
+  - component: {fileID: 3757105704402398700}
+  - component: {fileID: 8107996118899902976}
+  - component: {fileID: 5896082320163606573}
+  - component: {fileID: 4488316828472950241}
+  - component: {fileID: 1741706001150086087}
+  - component: {fileID: 3151776499264896803}
+  - component: {fileID: 5254269728490429368}
+  - component: {fileID: 962167144239944056}
+  - component: {fileID: 1048780206782002216}
+  - component: {fileID: 4817618802008152814}
+  - component: {fileID: 8995142133869339014}
+  - component: {fileID: 6388289395759616639}
+  - component: {fileID: 4783263057593612631}
+  m_Layer: 0
+  m_Name: PF_Client_Mothman
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8835111422629543820
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.0723, y: 1.02182, z: -5.097}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3902746370405300848}
+  - {fileID: 1361676163233640779}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &3757105704402398700
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &8107996118899902976
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 8f538d34a5f4d604d92855661debc98d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5896082320163606573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
+--- !u!114 &4488316828472950241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
+  interactionName: Shadowblade Order
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Trigger: 1
+    Distance: 3
+    ExitDistance: 4
+    Priority: 0
+    RequireSightToStart: 1
+    RequireSightToContinue: 0
+    HideWhenSightLost: 0
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    SightOffset: {x: 0, y: 0, z: 0}
+    Selection: 1
+    Interruption: 0
+    ReplayOnReturn: 1
+    Entries:
+    - Name: Shadowblade Random Intro 1
+      Weight: 1
+      RequiredFlags: []
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: The darkness inside me yearns for a feast, mortal.
+    - Name: Shadowblade Random Intro 2
+      Weight: 1
+      RequiredFlags: []
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Deliver me some nutrients.
+    - Name: Shadowblade Random Intro 3
+      Weight: 1
+      RequiredFlags: []
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: "I\u2019m Shadowblade. Shadowblade Hellfury."
+    - Name: Shadowblade Random Intro 4
+      Weight: 1
+      RequiredFlags: []
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: My knife? To cut your Kebab? No chance.
+    - Name: Shadowblade Random Intro 5
+      Weight: 1
+      RequiredFlags: []
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Food. Now.
+    Audio:
+      Voice: 1
+      Interval: 0.1
+      Completion: 0
+  startAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  advanceAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+--- !u!114 &1741706001150086087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
+  interactionName: Order Pizza Margherita
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Flags:
+    - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
+    - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
+    - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+    - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+    - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+    - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+    - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+    - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+    - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+    - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+    - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+    - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+    - {fileID: 0}
+    - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+    - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+    ContactDuration: 0
+    ContactTolerance: 0.02
+    QueryInterval: 0.02
+    IncludeTriggers: 1
+    AllowCarriedSelf: 1
+    AllowCarriedOther: 0
+    Duration: 0
+    CompleteAfterSeparation: 0
+    ResumeAfterInterruption: 0
+    RepeatAfterSeparation: 0
+    WhileContact: 0
+    RevertDelay: 0.25
+    Self:
+      Tint: 0
+      Multiplier: {r: 1, g: 1, b: 1, a: 1}
+      ColorProperty: _BaseColor
+      RendererPath: 
+      MaterialSlot: -1
+      Meshes: []
+      Consume: 0
+    Other:
+      Tint: 0
+      Multiplier: {r: 0, g: 0, b: 0, a: 1}
+      ColorProperty: _BaseColor
+      RendererPath: 
+      MaterialSlot: -1
+      Meshes: []
+      Consume: 1
+    ChangeContactFlag: 0
+    ContactFlag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    ContactFlagOperation: 0
+    BlockSelf: 1
+    BlockOther: 1
+--- !u!136 &3151776499264896803
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5254269728490429368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
+  interactionName: Shadowblade Delivery Wrong
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Trigger: 2
+    Distance: 15
+    ExitDistance: 20
+    Priority: 1
+    RequireSightToStart: 1
+    RequireSightToContinue: 0
+    HideWhenSightLost: 0
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    SightOffset: {x: 0, y: 0, z: 0}
+    Selection: 1
+    Interruption: 0
+    ReplayOnReturn: 1
+    Entries:
+    - Name: Shadowblade Order Wrong 1
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 0}
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Ugh, toxins for my delicate system.
+    - Name: Shadowblade Order Wrong 2
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 0}
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: The Elder Gods are not pleased.
+    - Name: Shadowblade Order Wrong 3
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 0}
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Pathetic.
+    - Name: Shadowblade Order Wrong 4
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 0}
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Get out of my sight, slowpoke!
+    - Name: Shadowblade Order Wrong 5
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 0}
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        - {fileID: 11400000, guid: f6c85275598d3e14e9f9d9b4ccbc0b03, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 0ee3eaa1b55dd8a4fb6267118ba2916c, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: I knew you were a FAKER.
+    Audio:
+      Voice: 1
+      Interval: 1
+      Completion: 2
+  startAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  advanceAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+--- !u!114 &962167144239944056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flags:
+  - {fileID: 11400000, guid: a8d2f6a0e2ede7c4081920761f976521, type: 2}
+--- !u!114 &1048780206782002216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
+  interactionName: 'Shadowblade Delivery Correct '
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 2334ce1700f4c4744af4bcc44439e0c6, type: 2}
+  drawGizmos: 1
+  settings:
+    Trigger: 2
+    Distance: 15
+    ExitDistance: 20
+    Priority: 1
+    RequireSightToStart: 1
+    RequireSightToContinue: 0
+    HideWhenSightLost: 0
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    SightOffset: {x: 0, y: 0, z: 0}
+    Selection: 0
+    Interruption: 0
+    ReplayOnReturn: 1
+    Entries:
+    - Name: Shadowblade Order Correct 1
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Ahh, manna from Pandemonium itself.
+    - Name: Shadowblade Order Correct 2
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Heh, not bad for a mortal.
+    - Name: Shadowblade Order Correct 3
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Your skills impress me, chef.
+    - Name: Shadowblade Order Correct 4
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: The Elder Gods are pleased.
+    - Name: Shadowblade Order Correct 5
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: This will do.
+    - Name: Shadowblade Order Correct 6
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: "My demons\u2026 pleased\u2026"
+    - Name: Shadowblade Order Correct 7
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: "\u2026I\u2019ll be back."
+    - Name: Shadowblade Order Correct 8
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Hmph.
+    Audio:
+      Voice: 1
+      Interval: 1
+      Completion: 1
+  startAction: {fileID: 0}
+  advanceAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+--- !u!114 &4817618802008152814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ca51f46e77464d9b66d85a2e26af54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectMakeOrder
+  interactionName: Make an Order
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Board: Orders
+    Entries:
+    - Source: {fileID: 1741706001150086087}
+      Text: Pizza Margherita
+--- !u!114 &8995142133869339014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b627afa401c8cda4cb9718ee06e4e338, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectEject
+  interactionName: Eject
+  toolRequirement:
+    Mode: 2
+    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    SelfEject: 1
+    SelfImpulse:
+      Flags: []
+      Match: 0
+      Impulse: {x: 0, y: 500, z: -10000}
+      Space: 0
+    IncludeTriggers: 0
+    Tolerance: 0.005
+    ReleaseKinematic: 1
+    Mode: 0
+    Rules: []
+    IgnoreCollisions: 0
+    IgnoredLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    IgnoreDuration: 0.5
+    Despawn: 1
+    DespawnDelay: 5
+--- !u!114 &6388289395759616639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
+  drawGizmos: 1
+  settings:
+    Thickness: 8
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 8107996118899902976}
+  - {fileID: 7740591780502162513}
+--- !u!114 &4783263057593612631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 938429a5d51206345b01b27c9fb3a6a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
+  interactionName: First Person Hover
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  anchor: {fileID: 0}
+  label: {fileID: 4283565405258863622}
+  preset: {fileID: 0}
+  configuration:
+    settings:
+      targetMode: 0
+      playerDistance: 3
+      centerRadius: 0.25
+      queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
+      obstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967227
+      anchorOffset: {x: 0, y: 0, z: 0}
+      worldOffset: {x: 0, y: 0.7, z: 0}
+      screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
+      appearance: 1
+      duration: 0.18
+      startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
+    style:
+      content: 
+      font: {fileID: 0}
+      fontSize: 24
+      fontStyle: 0
+      textColor: {r: 1, g: 1, b: 1, a: 1}
+      alignment: 4
+      richText: 0
+      horizontalOverflow: 0
+      verticalOverflow: 0
+      size: {x: 280, y: 64}
+      textSizeOffset: {x: -24, y: -12}
+      textOffset: {x: 0, y: 0}
+      sortingOrder: 20
+      showBackground: 0
+      backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
+      backgroundSprite: {fileID: 0}
+      backgroundType: 0
+  drawGizmos: 1
+--- !u!1 &4472445664153572561
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3362611254298223261}
+  - component: {fileID: 434009380198731702}
+  - component: {fileID: 3067464545194947781}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3362611254298223261
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4472445664153572561}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2078415249031647057}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -24, y: -12}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &434009380198731702
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4472445664153572561}
+  m_CullTransparentMesh: 1
+--- !u!114 &3067464545194947781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4472445664153572561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 24
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 0
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 
+--- !u!1 &6006107217739750512
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1361676163233640779}
+  - component: {fileID: 1457088878824536694}
+  - component: {fileID: 4283565405258863622}
+  m_Layer: 5
+  m_Name: Hover UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1361676163233640779
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6006107217739750512}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2078415249031647057}
+  m_Father: {fileID: 8835111422629543820}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
+--- !u!223 &1457088878824536694
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6006107217739750512}
+  m_Enabled: 0
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 20
+  m_TargetDisplay: 0
+--- !u!114 &4283565405258863622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6006107217739750512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cbbf2a3dbb554a4ebe92c9bb904862c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.HoverLabel
+  canvas: {fileID: 1457088878824536694}
+  panel: {fileID: 2078415249031647057}
+  text: {fileID: 3067464545194947781}
+  background: {fileID: 6438139907706139039}

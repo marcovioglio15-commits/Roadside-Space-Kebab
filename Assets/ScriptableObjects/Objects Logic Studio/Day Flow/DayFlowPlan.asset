@@ -15,8 +15,8 @@ MonoBehaviour:
   Days:
   - Name: Day 1
     Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_RecipeTesting.unity
-    RandomCount: 1
-    Count: 1
+    RandomCount: 0
+    Count: 3
     Minimum: 5
     Maximum: 10
     Selection: 1
@@ -24,8 +24,8 @@ MonoBehaviour:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
       Completions:
-      - {fileID: 1024598874194639592, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
-      - {fileID: 2534361684040139323, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      - {fileID: 5254269728490429368, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      - {fileID: 1048780206782002216, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
@@ -67,8 +67,8 @@ MonoBehaviour:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
       Completions:
-      - {fileID: 1024598874194639592, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
-      - {fileID: 2534361684040139323, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      - {fileID: 5254269728490429368, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      - {fileID: 1048780206782002216, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}

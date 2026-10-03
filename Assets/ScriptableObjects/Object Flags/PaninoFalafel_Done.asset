@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a7aff9b64574755a8a5d30eb51ffc49, type: 3}
   m_Name: PaninoFalafel_Done
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
-  DisplayName: PaninoFalafel_Done
+  DisplayName: PaninoFalafel
   Group: Dish
   Description: 
