@@ -102,6 +102,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             detection.Bind(Item);
             nextQuery = 0f;
+            lastWarning = string.Empty;
         }
 
         /// <summary>Restores unfinished appearance and releases restrictions on the surviving participant.</summary>
@@ -471,7 +472,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (lastWarning == warning)
                 return;
             lastWarning = warning;
-            Debug.LogWarning(warning, this);
+            Debug.LogWarning($"Modify by Contact '{InteractionName}' on '{name}': {warning}", this);
         }
 
         #endregion

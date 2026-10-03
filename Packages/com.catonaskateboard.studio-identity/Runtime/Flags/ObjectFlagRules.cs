@@ -32,15 +32,32 @@ namespace CatOnASkateboard.StudioIdentity
         public static bool TryValidate(IReadOnlyList<ObjectFlag> flags, bool allowEmpty, out string warning)
         {
             // Validation runs at authoring and activation boundaries, never inside each match.
-            warning = "Select distinct, assigned object flags.";
-            if (flags == null || !allowEmpty && flags.Count == 0)
+            warning = "The object flag selection is missing.";
+            if (flags == null)
                 return false;
+            warning = "Select at least one object flag.";
+            if (!allowEmpty && flags.Count == 0)
+                return false;
+            // Identify the exact entry without removing or replacing authored references.
             HashSet<ObjectFlag> unique = new HashSet<ObjectFlag>();
-            foreach (ObjectFlag flag in flags)
+            for (int index = 0; index < flags.Count; index++)
             {
-                warning = "Select distinct, assigned object flags.";
-                if (flag == null || !unique.Add(flag) || !flag.TryValidate(out warning))
+                ObjectFlag flag = flags[index];
+                if (flag == null)
+                {
+                    warning = $"Object flag entry {index + 1} is unassigned or references a deleted asset.";
                     return false;
+                }
+                if (!unique.Add(flag))
+                {
+                    warning = $"Object flag '{flag.DisplayName}' is selected more than once (entry {index + 1}).";
+                    return false;
+                }
+                if (!flag.TryValidate(out warning))
+                {
+                    warning = $"Object flag entry {index + 1}: {warning}";
+                    return false;
+                }
             }
             warning = string.Empty;
             return true;

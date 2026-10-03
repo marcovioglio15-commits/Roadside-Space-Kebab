@@ -20,6 +20,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         private string[] groups;
         private int group;
         private bool selectedOnly;
+        private bool missing;
         private Vector2 scroll;
 
         #endregion
@@ -38,7 +39,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             owner = target;
             path = propertyPath;
             current = isCurrent;
-            selected = ObjectFlagSelector.Read(owner, path, out multiple);
+            selected = ObjectFlagSelector.Read(owner, path, out multiple, out missing);
             RefreshGroups();
         }
 
@@ -85,8 +86,14 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             {
                 ObjectFlagSelector.Assign(owner, path, null, false);
                 selected.Clear();
+                missing = false;
                 if (!multiple)
                     editorWindow.Close();
+            }
+            if (missing && StudioButton.Draw(new GUIContent("Remove Missing Flags", "Remove unassigned or deleted references from this selection. Assigned flags are preserved."), EditorStyles.miniButton))
+            {
+                ObjectFlagSelector.RemoveMissing(owner, path);
+                missing = false;
             }
             scroll = EditorGUILayout.BeginScrollView(scroll);
             foreach (ObjectFlag flag in ObjectFlagCatalog.Flags)

@@ -136,8 +136,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else
             {
                 double totalWeight = 0d;
-                foreach (DialogueEntry entry in Entries)
+                for (int entryIndex = 0; entryIndex < Entries.Length; entryIndex++)
                 {
+                    DialogueEntry entry = Entries[entryIndex];
                     if (entry == null || entry.RequiredFlags == null || entry.Lines == null || entry.Lines.Length == 0)
                     {
                         warning = "Each dialogue entry needs conditions and at least one explicit text page.";
@@ -147,9 +148,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         warning = "Dialogue weights must be finite and non-negative.";
                     if (Trigger == DialogueTrigger.Consumption && entry.RequiredFlags.Length == 0)
                         warning = "Consumption-triggered entries need at least one consumed-flag requirement.";
-                    foreach (ItemFlagRequirement requirement in entry.RequiredFlags)
-                        if (requirement == null || !requirement.TryValidate(out _))
-                            warning = "Each consumed-flag requirement needs a project flag and a positive count.";
+                    if (warning.Length > 0)
+                        break;
+                    // Preserve the exact flag or quantity failure and identify its authored requirement.
+                    for (int requirementIndex = 0; requirementIndex < entry.RequiredFlags.Length; requirementIndex++)
+                    {
+                        ItemFlagRequirement requirement = entry.RequiredFlags[requirementIndex];
+                        warning = "Assign a consumed-flag requirement or remove its unused entry.";
+                        if (requirement != null && requirement.TryValidate(out warning))
+                            continue;
+                        warning = $"Dialogue entry {entryIndex + 1} ('{entry.Name}'), consumed requirement {requirementIndex + 1}: {warning}";
+                        return false;
+                    }
                     foreach (DialogueLine line in entry.Lines)
                         if (line == null || string.IsNullOrWhiteSpace(line.Text))
                             warning = "Write text for every dialogue page or remove the unused page.";

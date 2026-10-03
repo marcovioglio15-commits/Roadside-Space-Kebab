@@ -108,12 +108,14 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         /// <param name="owner">Object containing the field.</param>
         /// <param name="path">Serialized flag or array path.</param>
         /// <param name="multiple">Receives whether the field permits a combination.</param>
+        /// <param name="missing">Receives whether an array includes unassigned or deleted references.</param>
         /// <returns>The current selection, or an empty list for a removed field.</returns>
-        internal static HashSet<ObjectFlag> Read(UnityEngine.Object owner, string path, out bool multiple)
+        internal static HashSet<ObjectFlag> Read(UnityEngine.Object owner, string path, out bool multiple, out bool missing)
         {
             // Fresh wrappers permit menus to outlive inspector layout passes safely.
             HashSet<ObjectFlag> selected = new HashSet<ObjectFlag>();
             multiple = false;
+            missing = false;
             if (owner == null)
                 return selected;
             using SerializedObject data = new SerializedObject(owner);
@@ -126,10 +128,36 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                 {
                     if (property.GetArrayElementAtIndex(index).objectReferenceValue is ObjectFlag flag)
                         selected.Add(flag);
+                    else
+                        missing = true;
                 }
             else if (property.objectReferenceValue is ObjectFlag flag)
                 selected.Add(flag);
             return selected;
+        }
+
+        /// <summary>Removes broken array entries on explicit request while preserving assigned flags and Undo.</summary>
+        /// <param name="owner">Object containing the selection.</param>
+        /// <param name="path">Serialized flag array path.</param>
+        internal static void RemoveMissing(UnityEngine.Object owner, string path)
+        {
+            // Resolve the current field so a delayed popup never writes through a stale property.
+            if (owner == null)
+                return;
+            using SerializedObject data = new SerializedObject(owner);
+            SerializedProperty property = data.FindProperty(path);
+            if (property == null || !property.isArray)
+                return;
+
+            // Clear the stored reference before deleting, including references to deleted assets.
+            for (int index = property.arraySize - 1; index >= 0; index--)
+                if (property.GetArrayElementAtIndex(index).objectReferenceValue == null)
+                {
+                    property.GetArrayElementAtIndex(index).objectReferenceValue = null;
+                    property.DeleteArrayElementAtIndex(index);
+                }
+            if (data.ApplyModifiedProperties())
+                SelectionChanged?.Invoke(owner);
         }
 
         /// <summary>Applies a popup choice with native Undo to an existing serialized field.</summary>

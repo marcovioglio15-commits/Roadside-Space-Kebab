@@ -130,7 +130,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             SightGeometry.Bind(transform);
             Ready = TryValidate(out string warning);
             if (!Ready)
-                Debug.LogWarning(warning, this);
+                Debug.LogWarning($"Dialogue '{InteractionName}' on '{name}': {warning}", this);
         }
 
         #endregion

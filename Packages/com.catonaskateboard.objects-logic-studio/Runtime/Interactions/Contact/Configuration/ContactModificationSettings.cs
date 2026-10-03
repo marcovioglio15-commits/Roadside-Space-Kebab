@@ -156,7 +156,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Both items cannot disappear because the surviving item owns the consumption receipt.
             warning = string.Empty;
             if (!ObjectFlagRules.TryValidate(Flags, false, out warning))
+            {
+                warning = "Contact Flags: " + warning;
                 return false;
+            }
             if (!InteractionValues.Finite(ContactDuration) || ContactDuration < 0f
                 || !InteractionValues.Positive(ContactTolerance) || !InteractionValues.Positive(QueryInterval)
                 || !InteractionValues.Finite(Duration) || Duration < 0f)

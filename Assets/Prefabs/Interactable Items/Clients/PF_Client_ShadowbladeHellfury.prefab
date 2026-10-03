@@ -207,7 +207,6 @@ GameObject:
   - component: {fileID: 962167144239944056}
   - component: {fileID: 1048780206782002216}
   - component: {fileID: 4817618802008152814}
-  - component: {fileID: 8995142133869339014}
   - component: {fileID: 6388289395759616639}
   - component: {fileID: 4783263057593612631}
   m_Layer: 0
@@ -443,7 +442,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
     - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
     - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-    - {fileID: 0}
     - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
     - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
     ContactDuration: 0
@@ -558,7 +556,6 @@ MonoBehaviour:
       - Flags:
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
         - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 0}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -582,7 +579,6 @@ MonoBehaviour:
       - Flags:
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
         - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 0}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -606,7 +602,6 @@ MonoBehaviour:
       - Flags:
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
         - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 0}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -630,7 +625,6 @@ MonoBehaviour:
       - Flags:
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
         - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 0}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -654,7 +648,6 @@ MonoBehaviour:
       - Flags:
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
         - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 0}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -867,69 +860,6 @@ MonoBehaviour:
     Entries:
     - Source: {fileID: 1741706001150086087}
       Text: Pizza Margherita
---- !u!114 &8995142133869339014
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3097014450015891093}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b627afa401c8cda4cb9718ee06e4e338, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectEject
-  interactionName: Eject
-  toolRequirement:
-    Mode: 2
-    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 0}
-  action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
-  settings:
-    Target:
-      Distance: 3
-      Mode: 0
-      SolidHitOnly: 0
-      CenterRadius: 0.15
-      Offset: {x: 0, y: 0, z: 0}
-      ObstacleMask:
-        serializedVersion: 2
-        m_Bits: 4294967295
-      DrawGizmos: 1
-    SelfEject: 1
-    SelfImpulse:
-      Flags: []
-      Match: 0
-      Impulse: {x: 0, y: 500, z: -10000}
-      Space: 0
-    IncludeTriggers: 0
-    Tolerance: 0.005
-    ReleaseKinematic: 1
-    Mode: 0
-    Rules: []
-    IgnoreCollisions: 0
-    IgnoredLayers:
-      serializedVersion: 2
-      m_Bits: 0
-    IgnoreDuration: 0.5
-    Despawn: 1
-    DespawnDelay: 5
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

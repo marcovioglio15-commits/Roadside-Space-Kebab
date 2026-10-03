@@ -45,7 +45,6 @@ MonoBehaviour:
         - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
         - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 46b88f7f4eb6ab34788a0b44b2c8ac91, type: 2}
         - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
     Target:
       Assigned: 1
