@@ -9,9 +9,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly ContactDetection detection = new ContactDetection();
-        private readonly AssemblyIngredientDock dock = new AssemblyIngredientDock();
+        private readonly AssemblyRecipeProposal proposal = new AssemblyRecipeProposal();
+        private ObjectAssemblyStation owner;
         private readonly HashSet<ObjectItem> contacts = new HashSet<ObjectItem>();
-        private readonly HashSet<ObjectItem> withdrawn = new HashSet<ObjectItem>();
         private readonly Dictionary<ObjectItem, float> started = new Dictionary<ObjectItem, float>();
         private readonly List<ObjectItem> removed = new List<ObjectItem>();
         private readonly List<ObjectGrab> candidates = new List<ObjectGrab>();
@@ -29,17 +29,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Bind(ObjectAssemblyStation station)
         {
             // Disabled/re-enabled stations never inherit elapsed time from a previous contact.
-            detection.Bind(station.Item);
             Reset();
+            owner = station;
+            detection.Bind(station.Item);
         }
 
         /// <summary>Forgets contacts when the interaction is unavailable or disabled.</summary>
         internal void Reset()
         {
             // Reusable collections keep their capacity between interactions.
-            dock.Release();
+            owner?.Pending.Release();
             contacts.Clear();
-            withdrawn.Clear();
             started.Clear();
             removed.Clear();
             candidates.Clear();
@@ -51,7 +51,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Evaluation
 
-        /// <summary>Commits one contact transfer, including both ingredients of a deferred recipe start.</summary>
+        /// <summary>Resolves shared recipe prefixes before committing a contact assembly.</summary>
         /// <param name="station">Station whose recipe and tool restrictions must still be satisfied.</param>
         /// <param name="time">Scaled time supplied by the station physics update.</param>
         internal void Tick(ObjectAssemblyStation station, float time)
@@ -67,33 +67,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             AssemblyStationSettings settings = station.Settings;
             nextQuery = time + settings.ContactQueryInterval;
             detection.Query(station.Item, settings.ContactTolerance, settings.IncludeTriggers, contacts);
-            RefreshDock(station);
+            station.Pending.Refresh(contacts);
+            candidates.Clear();
+            AssemblyInteractionRegistry.CollectPending(station, candidates);
+            foreach (ObjectGrab ingredient in candidates)
+                contacts.Add(ingredient.Item);
             removed.Clear();
             foreach (ObjectItem item in started.Keys)
                 if (item == null || !contacts.Contains(item))
                     removed.Add(item);
             foreach (ObjectItem item in removed)
                 started.Remove(item);
-            // Deferred products retain their own interactions while displaying their future magnet placement.
+            // Share visual contacts while preserving each recipe's own duration and flag requirements.
             candidates.Clear();
             ready.Clear();
-            bool waiting = false;
             foreach (ObjectItem item in contacts)
-            {
-                if (withdrawn.Contains(item))
-                    continue;
-                if (item != null && item.TryGetComponent(out ObjectGrab ingredient))
-                {
+                if (item != null && !AssemblyInteractionRegistry.IsWithdrawn(station, item)
+                    && item.TryGetComponent(out ObjectGrab ingredient))
                     candidates.Add(ingredient);
-                    waiting |= station.WaitsForIngredient(ingredient);
-                }
                 else
                     started.Remove(item);
-            }
             foreach (ObjectGrab ingredient in candidates)
             {
                 ObjectItem item = ingredient.Item;
-                if (!station.CanTrackContact(ingredient, waiting))
+                if (!(station.CurrentProduct == null ? station.CanPreview(ingredient) : station.CanAccept(ingredient, false)))
                 {
                     started.Remove(item);
                     continue;
@@ -104,72 +101,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     started.Add(item, began);
                 }
                 if (settings.Trigger != AssemblyStationTrigger.IngredientContact || time - began >= settings.ContactDuration)
-                    ready.Add(ingredient);
-            }
-            ObjectGrab selected = null;
-            ObjectGrab companion = null;
-            ObjectGrab awaiting = null;
-            foreach (ObjectGrab ingredient in ready)
-            {
-                if (!Precedes(ingredient, selected) || waiting && !station.CanAccept(ingredient, false))
-                    continue;
-                bool requiresCompanion = station.WaitsForIngredient(ingredient);
-                ObjectGrab next = requiresCompanion ? FindCompanion(station, ingredient) : null;
-                if (requiresCompanion && next == null)
                 {
-                    if (Precedes(ingredient, awaiting))
-                        awaiting = ingredient;
-                    continue;
+                    int index = 0;
+                    while (index < ready.Count && !Precedes(ingredient, ready[index]))
+                        index++;
+                    ready.Insert(index, ingredient);
                 }
-                selected = ingredient;
-                companion = next;
             }
-            // Recheck ownership on commit so another station cannot consume the same ingredient twice.
-            if (selected != null && station.Execute(selected, false, companion))
+            if (ready.Count == 0)
+                return;
+            if (station.CurrentProduct != null)
             {
-                started.Remove(selected.Item);
-                if (companion != null)
-                    started.Remove(companion.Item);
-                dock.Release();
+                // Once chosen, a product continues through its own existing ingredient and slot rules.
+                foreach (ObjectGrab ingredient in ready)
+                    if (station.Execute(ingredient, false))
+                    {
+                        started.Remove(ingredient.Item);
+                        break;
+                    }
+                return;
             }
-            else if (awaiting != null)
-                dock.Snap(station, awaiting);
-        }
-
-        /// <summary>Retains a visual magnet contact and lets externally moved ingredients leave without snapping back.</summary>
-        /// <param name="station">Station that owns this contact run.</param>
-        private void RefreshDock(ObjectAssemblyStation station)
-        {
-            // A released preview can become eligible again after physically leaving the contact surface.
-            ObjectItem released = dock.Refresh(station);
-            if (released != null)
-                withdrawn.Add(released);
-            removed.Clear();
-            foreach (ObjectItem item in withdrawn)
-                if (item == null || !contacts.Contains(item))
-                    removed.Add(item);
-            foreach (ObjectItem item in removed)
-            {
-                withdrawn.Remove(item);
-                started.Remove(item);
-            }
-            // Magnets may intentionally place the ingredient above or outside the trigger volume.
-            if (dock.Ingredient != null)
-                contacts.Add(dock.Ingredient.Item);
-        }
-
-        /// <summary>Chooses the earliest ready companion that satisfies the recipe after the deferred first ingredient.</summary>
-        /// <param name="station">Empty station receiving the pair.</param>
-        /// <param name="first">Completed product still independently usable.</param>
-        /// <returns>A compatible distinct ingredient, or null while the product must remain free.</returns>
-        private ObjectGrab FindCompanion(ObjectAssemblyStation station, ObjectGrab first)
-        {
-            // Only ready contacts participate, so each object must satisfy its own sustained-contact duration.
-            ObjectGrab selected = null;
-            foreach (ObjectGrab candidate in ready)
-                if (candidate != first && Precedes(candidate, selected) && station.CanBeginWith(first, candidate))
-                    selected = candidate;
-            return selected;
+            proposal.Build(station, ready);
+            if (proposal.Ingredients.Count == 0)
+                return;
+            // One transaction attaches the whole discriminating prefix, including shared snapped ingredients.
+            if (station.ExecuteSequence(proposal.Ingredients))
+                foreach (ObjectGrab ingredient in proposal.Ingredients)
+                    started.Remove(ingredient.Item);
+            else
+                station.Pending.Show(station, proposal.Ingredients);
         }
 
         /// <summary>Keeps selection stable across unordered physics query results.</summary>
