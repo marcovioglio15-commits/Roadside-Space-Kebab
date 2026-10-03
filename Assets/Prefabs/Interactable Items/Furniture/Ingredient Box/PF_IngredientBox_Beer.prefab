@@ -197,9 +197,7 @@ MonoBehaviour:
       popIn: 0
       exitDuration: 0.16
     style:
-      content: 'Beer Box
-
-'
+      content: Beer Box
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0
@@ -440,9 +438,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'Beer Box
-
-'
+  m_Text: Beer Box
 --- !u!1 &8970675220741352576
 GameObject:
   m_ObjectHideFlags: 0
