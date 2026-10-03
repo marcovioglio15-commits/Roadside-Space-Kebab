@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb77a7acc92d8a3499466f2e47d3dc52, type: 3}
+  m_Name: Eject Character Preset
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.EjectPreset
+  ToolRequirement:
+    Mode: 2
+    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    Tools: []
+  Settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    SelfEject: 1
+    SelfImpulse:
+      Flags: []
+      Match: 0
+      Impulse: {x: 0, y: 500, z: -10000}
+      Space: 0
+    IncludeTriggers: 0
+    Tolerance: 0.005
+    ReleaseKinematic: 1
+    Mode: 0
+    Rules: []
+    IgnoreCollisions: 0
+    IgnoredLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    IgnoreDuration: 0.5
+    Despawn: 1
+    DespawnDelay: 5
