@@ -87,7 +87,6 @@ GameObject:
   - component: {fileID: 3902746370405300848}
   - component: {fileID: 8944489232215373468}
   - component: {fileID: 7740591780502162513}
-  - component: {fileID: 8204411704168140872}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -167,27 +166,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8204411704168140872
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2640551324973694607}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3097014450015891093
 GameObject:
   m_ObjectHideFlags: 0
@@ -697,6 +675,14 @@ MonoBehaviour:
     Entries:
     - Source: {fileID: 1741706001150086087}
       Text: Kebab Wrap
+      FilterConsumed: 1
+      ConsumedFlags:
+      - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+    - Source: {fileID: 1741706001150086087}
+      Text: Soda
+      FilterConsumed: 1
+      ConsumedFlags:
+      - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

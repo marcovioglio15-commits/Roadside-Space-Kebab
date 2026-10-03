@@ -68,7 +68,42 @@ MonoBehaviour:
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
-      Rotation: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 0.99, z: -5.073}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 0.99, z: -5.073}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 3
+      Prefab: {fileID: 3097014450015891093, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      - {fileID: 1048780206782002216, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 0
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
       WalkIn:
         Enabled: 1
         Space: 1
@@ -139,6 +174,41 @@ MonoBehaviour:
       Completions:
       - {fileID: 5254269728490429368, guid: 429619ea9c3662e4ab526627b9af45c5, type: 3}
       - {fileID: 1048780206782002216, guid: 429619ea9c3662e4ab526627b9af45c5, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 0
+      Weight: 1
+      Delay: 0
+      Position: {x: -1.053, y: 0.99, z: -5.073}
+      Rotation: {x: 0, y: 0, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 0.99, z: -5.073}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 0.99, z: -5.073}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 3
+      Prefab: {fileID: 3097014450015891093, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      - {fileID: 1048780206782002216, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
