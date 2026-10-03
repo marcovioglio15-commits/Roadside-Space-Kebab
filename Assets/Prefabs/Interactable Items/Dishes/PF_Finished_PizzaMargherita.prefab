@@ -552,6 +552,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    WaitForNextIngredient: 1
     Ingredients:
     - Flags:
       - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}

@@ -267,6 +267,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (source != null && !InteractionValues.Positive(duration))
                 return false;
+            // Restore visual magnet overrides before capturing the body's carry policy and scaled geometry.
+            if (TryGetComponent(out ObjectAssemblyProduct product))
+                product.ReleaseTable();
             sourceCollisions.Restore(true);
             pickupSource = source;
             pickupDuration = source != null ? duration : settings.Instant ? 0f : settings.TransitionDuration;
@@ -298,8 +301,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             grabbedOnce = true;
             if (settings.PickupSound)
                 StudioAudio.Play("sfx_pickup", transform);
-            if (TryGetComponent(out ObjectAssemblyProduct product))
-                product.ReleaseTable();
             SetHoverSuppression(!settings.ShowHover);
             Signal(InteractionMoment.Started);
             if (pickupDuration <= 0f)

@@ -73,6 +73,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Recipe")]
+        [Tooltip("Snap this completed product to the next recipe's magnet while keeping its interactions usable. Another compatible ingredient starts assembly; Grab releases the snap. Explicit input insertion remains immediate.")]
+        public bool WaitForNextIngredient;
         [Tooltip("Groups of alternative ingredient flags sharing one quantity per row. A flag belongs to only one row. Mandatory rows must be filled; optional rows can be omitted.")]
         public AssemblyIngredient[] Ingredients = Array.Empty<AssemblyIngredient>();
         [Tooltip("Placement slots in product-local space. Each object occupies one slot regardless of its Grab units. On completion, only colliders authored on the product prefab remain active.")]

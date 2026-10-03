@@ -24,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly Dictionary<ObjectFlag, int> counts = new Dictionary<ObjectFlag, int>();
         private readonly List<ObjectAssemblyPart> parts = new List<ObjectAssemblyPart>();
-        private readonly AssemblyCapacity capacity = new AssemblyCapacity();
+        private readonly AssemblyIngredientSelection selection = new AssemblyIngredientSelection();
         private bool recipeValidated;
         private ObjectInteraction[] features;
         private bool[] occupied;
@@ -50,6 +50,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public GameObject SourcePrefab { get; internal set; }
         /// <summary>Table currently retaining this product, cleared at the pickup boundary.</summary>
         internal ObjectAssemblyStation Table { get; set; }
+        /// <summary>Optional visual magnet preview that leaves this completed product independently usable.</summary>
+        internal AssemblyIngredientDock Dock { get; set; }
         /// <summary>Number of actual ingredient roots currently attached to the product.</summary>
         public int IngredientCount => parts.Count;
         /// <summary>Total logical units supplied by the attached physical ingredients.</summary>
@@ -89,6 +91,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // The table normally publishes immediately after activation; scene-authored products use this boundary.
             PublishPending();
+        }
+
+        /// <summary>Releases temporary magnet placement before pooling or transferring ingredient ownership.</summary>
+        private void OnDisable()
+        {
+            // Completed recipe progress remains intact when the product is reenabled.
+            Dock?.Release();
         }
 
         /// <summary>Reapplies assembly-owned locks once when entering Play with scene reload disabled.</summary>
@@ -152,6 +161,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (initializationSession == session)
                 return;
             initializationSession = session;
+            Dock?.Release();
             foreach (ObjectAssemblyPart part in parts)
                 if (part != null)
                     part.SetGeometryHidden(false);
@@ -206,47 +216,54 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when a compatible insertion is available.</returns>
         private bool TrySelectIngredient(ObjectGrab grab, out int magnet, out ObjectFlag flag, bool requireHeld)
         {
-            // A reserved product or ingredient must finish its visual transaction before changing ownership.
-            RefreshSession();
+            // Single insertion and deferred starts use the same selection rules.
             magnet = -1;
             flag = null;
-            if (!enabled || IsLocked || !ToolAllowed || Item == null || Item.IsConsumed || Item.IsReserved || Item.IsCarried
-                || Item.IsBlocked(InteractionChannels.Assembly) || !AssemblyIngredientValidation.Allows(this, grab, requireHeld)
-                || !ValidateRecipe())
-                return false;
-            // Prefer specific slots; recipe order breaks ties for generic slots deterministically.
-            for (int pass = 0; pass < 2; pass++)
-                for (int index = 0; index < settings.Magnets.Length; index++)
-                {
-                    AssemblyMagnet slot = settings.Magnets[index];
-                    if (initialized && occupied[index] || slot.AnyIngredient != (pass == 1))
-                        continue;
-                    foreach (AssemblyIngredient ingredient in settings.Ingredients)
-                        if (grab.Units > 0 && grab.Units <= ingredient.Count - AssemblyCapacity.Count(counts, ingredient.Flags))
-                            foreach (ObjectFlag alternative in ingredient.Flags)
-                                if ((slot.AnyIngredient || System.Array.IndexOf(slot.Flags, alternative) >= 0)
-                                    && grab.Identity.Has(alternative) && CanUseMagnet(index, grab, alternative))
-                                {
-                                    magnet = index;
-                                    flag = alternative;
-                                    return true;
-                                }
-                }
-            return false;
+            return CanReceive(grab, requireHeld) && selection.TrySelect(settings, counts, initialized ? occupied : null,
+                parts.Count + 1, grab, out magnet, out flag);
         }
 
-        /// <summary>Checks slot order, remaining capacity and the incoming ingredient's appearance bindings.</summary>
-        /// <param name="index">Proposed unoccupied magnet.</param>
-        /// <param name="grab">Ingredient proposed for insertion.</param>
-        /// <param name="flag">Ingredient's current recipe flag.</param>
-        /// <returns>True when the complete slot transaction can be prepared.</returns>
-        private bool CanUseMagnet(int index, ObjectGrab grab, ObjectFlag flag)
+        /// <summary>Checks shared ownership and recipe requirements before considering an ingredient's magnet.</summary>
+        /// <param name="grab">Incoming ingredient.</param>
+        /// <param name="requireHeld">Whether insertion requires the player's carry slot.</param>
+        /// <returns>True when recipe selection can proceed without bypassing an existing transaction.</returns>
+        private bool CanReceive(ObjectGrab grab, bool requireHeld)
         {
-            // Appearance validation happens before carry or recipe ownership changes.
-            return AssemblySlotOrder.Allows(settings.Magnets, initialized ? occupied : null, index, parts.Count + 1)
-                && capacity.CanFit(settings, counts, initialized ? occupied : null, index, flag, grab.Units)
-                && (!settings.Magnets[index].Appearance.HasChanges
-                    || settings.Magnets[index].Appearance.CanBind(grab.Item));
+            // Refresh retained session state before reading composition or ingredient eligibility.
+            RefreshSession();
+            return enabled && !IsLocked && ToolAllowed && Item != null && !Item.IsConsumed && !Item.IsReserved && !Item.IsCarried
+                && !Item.IsBlocked(InteractionChannels.Assembly) && AssemblyIngredientValidation.Allows(this, grab, requireHeld)
+                && ValidateRecipe();
+        }
+
+        /// <summary>Tracks a later ordered ingredient while a completed product waits for a companion.</summary>
+        /// <param name="grab">Contact candidate for an empty recipe.</param>
+        /// <returns>True when ownership and recipe membership allow the candidate to wait.</returns>
+        internal bool CanConsider(ObjectGrab grab)
+        {
+            // A populated product continues through ordinary insertion checks.
+            return CanReceive(grab, false) && parts.Count == 0 && AssemblyIngredientSelection.Matches(settings, grab);
+        }
+
+        /// <summary>Checks a two-object start without spawning a product or locking either ingredient.</summary>
+        /// <param name="first">Completed product waiting at the station.</param>
+        /// <param name="second">New compatible ingredient.</param>
+        /// <returns>True when both ingredients can occupy the first two magnets in recipe order.</returns>
+        internal bool CanAcceptPair(ObjectGrab first, ObjectGrab second)
+        {
+            // Distinct roots prevent one physical ingredient from filling two slots.
+            return PairAllowed(first, second) && selection.TrySelectPair(settings, first, second, out _, out _, out _, out _);
+        }
+
+        /// <summary>Validates both independent roots before an empty recipe starts with two ingredients.</summary>
+        /// <param name="first">First physical ingredient.</param>
+        /// <param name="second">Additional physical ingredient.</param>
+        /// <returns>True when neither ingredient overlaps the other's ownership hierarchy.</returns>
+        private bool PairAllowed(ObjectGrab first, ObjectGrab second)
+        {
+            // Candidate eligibility includes consumption, reservations and existing assembly ownership.
+            return first != second && CanReceive(first, false) && CanReceive(second, false) && parts.Count == 0
+                && !first.transform.IsChildOf(second.transform) && !second.transform.IsChildOf(first.transform);
         }
 
         /// <summary>Validates the fixed recipe once before runtime contact polling begins.</summary>
@@ -267,6 +284,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void ReleaseTable()
         {
             // A later ingredient starts a new product unless this one is explicitly returned.
+            Dock?.Release();
             if (Table != null)
                 Table.Release(this);
             Table = null;
@@ -285,6 +303,40 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!initialized || !ItemAppearanceChanges.TryPrepare(grab.Item, settings.Magnets[magnet].Appearance,
                 out ItemAppearanceChanges appearance, out _))
                 return false;
+            AttachIngredient(grab, magnet, flag, appearance);
+            return true;
+        }
+
+        /// <summary>Commits both prepared ingredients before the station activates its new product.</summary>
+        /// <param name="first">Completed product that has remained independently usable.</param>
+        /// <param name="second">Companion that starts the next recipe.</param>
+        /// <returns>True when both objects were validated and attached to the inactive product.</returns>
+        internal bool AcceptPair(ObjectGrab first, ObjectGrab second)
+        {
+            // Prepare both appearances before any carry, physics or interaction state is changed.
+            if (gameObject.activeInHierarchy || !PairAllowed(first, second)
+                || !selection.TrySelectPair(settings, first, second, out int firstMagnet, out ObjectFlag firstFlag,
+                    out int secondMagnet, out ObjectFlag secondFlag))
+                return false;
+            Initialize();
+            if (!initialized || !ItemAppearanceChanges.TryPrepare(first.Item, settings.Magnets[firstMagnet].Appearance,
+                    out ItemAppearanceChanges firstAppearance, out _)
+                || !ItemAppearanceChanges.TryPrepare(second.Item, settings.Magnets[secondMagnet].Appearance,
+                    out ItemAppearanceChanges secondAppearance, out _))
+                return false;
+            AttachIngredient(first, firstMagnet, firstFlag, firstAppearance);
+            AttachIngredient(second, secondMagnet, secondFlag, secondAppearance);
+            return true;
+        }
+
+        /// <summary>Attaches a validated ingredient and refreshes the product's physical and interaction state.</summary>
+        /// <param name="grab">Ingredient whose transfer has passed validation.</param>
+        /// <param name="magnet">Reserved recipe slot.</param>
+        /// <param name="flag">Single recipe category counted for this insertion.</param>
+        /// <param name="appearance">Prepared ingredient appearance transaction.</param>
+        private void AttachIngredient(ObjectGrab grab, int magnet, ObjectFlag flag, ItemAppearanceChanges appearance)
+        {
+            // Deferred pairs remain inactive until both insertions have completed.
             bool first = parts.Count == 0;
             bool complete = IsComplete;
             ObjectAssemblyPart part = grab.GetComponent<ObjectAssemblyPart>();
@@ -305,7 +357,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             pendingCompletion |= !complete && IsComplete;
             if (gameObject.activeInHierarchy)
                 PublishPending();
-            return true;
         }
 
         /// <summary>Emits committed ingredient events after the complete product hierarchy has become active.</summary>

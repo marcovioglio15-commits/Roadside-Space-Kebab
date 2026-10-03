@@ -39,6 +39,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public InputActionReference Action => action;
         /// <summary>World-space pose at which a product begins or returns.</summary>
         public Vector3 OutputPosition => transform.TransformPoint(settings.OutputPosition);
+        /// <summary>Root scale inherited by a product instantiated under the authored staging transform.</summary>
+        internal Vector3 OutputScale => (staging.localToWorldMatrix * settings.ProductPrefab.transform.localToWorldMatrix).lossyScale;
         /// <summary>Product still waiting on this table; pickup releases the table immediately.</summary>
         public ObjectAssemblyProduct CurrentProduct => current != null && current.isActiveAndEnabled
             && !current.Item.IsCarried && !current.Item.IsConsumed ? current : null;
@@ -169,7 +171,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanAccept(ObjectGrab held, bool requireHeld = true)
         {
             // Availability includes independent Unlock Interactions and temporary contact restrictions.
-            if (!Available(InteractionChannels.Assembly) || Item == null || Item.IsReserved || held == null || !held.isActiveAndEnabled || requireHeld && !held.IsHeld)
+            if (!Available(InteractionChannels.Assembly) || Item == null || Item.IsReserved || held == null || !held.isActiveAndEnabled
+                || requireHeld && !held.IsHeld || !requireHeld && !AssemblyIngredientDock.Allows(this, held))
                 return false;
             current = CurrentProduct;
             if (CanReturn(held, requireHeld, out _))
@@ -178,14 +181,51 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return target.CanAccept(held, out _, requireHeld);
         }
 
+        /// <summary>Checks whether automatic insertion must wait for another ingredient to start this empty station.</summary>
+        /// <param name="ingredient">Contact candidate that may be a completed product.</param>
+        /// <returns>True when the candidate requests deferred insertion into a new recipe.</returns>
+        internal bool WaitsForIngredient(ObjectGrab ingredient)
+        {
+            // An assembly already in progress has received the new ingredient that releases this restriction.
+            return CurrentProduct == null && ingredient != null && ingredient.TryGetComponent(out ObjectAssemblyProduct product)
+                && product.IsComplete && product.Settings.WaitForNextIngredient;
+        }
+
+        /// <summary>Tracks contact eligibility while allowing later ordered ingredients to wait beside a completed product.</summary>
+        /// <param name="ingredient">Contact candidate.</param>
+        /// <param name="waiting">Whether a completed product is waiting to start the recipe.</param>
+        /// <returns>True when contact duration may accumulate for this candidate.</returns>
+        internal bool CanTrackContact(ObjectGrab ingredient, bool waiting)
+        {
+            // Ordinary stations retain their existing slot and order checks.
+            return AssemblyIngredientDock.Allows(this, ingredient) && (waiting && CurrentProduct == null
+                ? settings.ProductPrefab.GetComponent<ObjectAssemblyProduct>().CanConsider(ingredient)
+                : CanAccept(ingredient, false));
+        }
+
+        /// <summary>Preflights a complete two-object start without changing either ingredient.</summary>
+        /// <param name="first">Completed product waiting at this empty station.</param>
+        /// <param name="second">Companion ready to enter the next slot.</param>
+        /// <returns>True when the station and both ordered insertions are available.</returns>
+        internal bool CanBeginWith(ObjectGrab first, ObjectGrab second)
+        {
+            // Current ownership is rechecked at commit because several stations can share one contact surface.
+            return WaitsForIngredient(first) && Available(InteractionChannels.Assembly) && Item != null && !Item.IsReserved
+                && AssemblyIngredientDock.Allows(this, first) && AssemblyIngredientDock.Allows(this, second)
+                && settings.ProductPrefab.GetComponent<ObjectAssemblyProduct>().CanAcceptPair(first, second);
+        }
+
         /// <summary>Returns a carried product or inserts one ingredient into the table's current product.</summary>
         /// <param name="held">Actual object occupying the observer's carry slot.</param>
         /// <param name="requireHeld">True for input insertion; false for physical contact insertion.</param>
+        /// <param name="companion">Second contact ingredient required to start with a deferred completed product.</param>
         /// <returns>True when the command performed one successful transfer.</returns>
-        internal bool Execute(ObjectGrab held, bool requireHeld = true)
+        internal bool Execute(ObjectGrab held, bool requireHeld = true, ObjectGrab companion = null)
         {
             // A failed recipe or slot check leaves the carry slot and existing product untouched.
-            if (!CanAccept(held, requireHeld))
+            if (!CanAccept(held, requireHeld)
+                || companion != null && (requireHeld || !CanBeginWith(held, companion))
+                || !requireHeld && companion == null && WaitsForIngredient(held))
                 return false;
             if (CanReturn(held, requireHeld, out ObjectAssemblyProduct returning))
             {
@@ -206,10 +246,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Place(current);
             }
             bool complete = current.IsComplete;
-            if (!current.Accept(held, requireHeld))
+            if (!(companion != null ? current.AcceptPair(held, companion) : current.Accept(held, requireHeld)))
             {
                 if (spawned)
+                {
                     Destroy(current.gameObject);
+                    current = null;
+                }
                 return false;
             }
             if (spawned)

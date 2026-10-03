@@ -92,7 +92,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(settings, "HideIngredients");
             if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly."))
                 using (new EditorGUI.IndentLevelScope())
+                {
+                    if (state.Target.Resolve().GetComponent<ObjectGrab>() != null)
+                        HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
                     DrawRules(settings.FindPropertyRelative("InteractionRules"), draft.FindPropertyRelative("TargetIds"), state);
+                }
         }
 
         /// <summary>Edits named generic or flag-specific slots without exposing raw array sizes.</summary>

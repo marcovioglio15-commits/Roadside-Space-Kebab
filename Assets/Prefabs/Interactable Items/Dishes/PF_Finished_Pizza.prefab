@@ -292,7 +292,7 @@ MonoBehaviour:
     Tool: {fileID: 0}
     Tools: []
   flagChange:
-    Enabled: 1
+    Enabled: 0
     Flag: {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     Operation: 0
     Moment: 0
@@ -537,7 +537,7 @@ MonoBehaviour:
     Tool: {fileID: 0}
     Tools: []
   flagChange:
-    Enabled: 1
+    Enabled: 0
     Flag: {fileID: 11400000, guid: 46b88f7f4eb6ab34788a0b44b2c8ac91, type: 2}
     Operation: 0
     Moment: 1
@@ -554,6 +554,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    WaitForNextIngredient: 1
     Ingredients:
     - Flags:
       - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
