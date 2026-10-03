@@ -15,7 +15,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Assembly Table")]
         [Tooltip("Existing product prefab containing Assembly Product, its recipe and its configured interactions.")]
         public GameObject ProductPrefab;
-        [Tooltip("Input Action inserts a held ingredient. Ingredient Contact waits for sustained contact. Immediate Contact inserts a compatible recipe ingredient on the first contact query, without player input.")]
+        [Tooltip("Insert by input, sustained contact or immediate contact. Recipes sharing a first ingredient on the same object keep it snapped and usable until later ingredients distinguish the recipe. Different input bindings select their recipes explicitly.")]
         public AssemblyStationTrigger Trigger;
         [Tooltip("Seconds of uninterrupted ingredient contact required before insertion.")]
         public float ContactDuration = 0.5f;

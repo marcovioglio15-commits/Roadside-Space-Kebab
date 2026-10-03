@@ -76,6 +76,72 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
 
+        #region Recipe Alternatives
+
+        /// <summary>Shares pending placements across recipes driven by the same table interaction mode.</summary>
+        /// <param name="station">Station collecting candidate ingredients.</param>
+        /// <param name="ingredients">Reusable destination receiving distinct pending objects.</param>
+        internal static void CollectPending(ObjectAssemblyStation station, List<ObjectGrab> ingredients)
+        {
+            // Only registered sibling components participate; different physical tables stay independent.
+            foreach (ObjectAssemblyStation other in items)
+                if (SharesChoices(station, other))
+                    other.Pending.Collect(ingredients);
+        }
+
+        /// <summary>Preserves a manual withdrawal for every competing contact recipe on the same table.</summary>
+        /// <param name="station">Station evaluating a physical contact.</param>
+        /// <param name="item">Object moved by a different interaction.</param>
+        /// <returns>True while a sibling preview is waiting for the object to leave contact.</returns>
+        internal static bool IsWithdrawn(ObjectAssemblyStation station, ObjectItem item)
+        {
+            // An alternative recipe must not immediately undo a movement that released another preview.
+            foreach (ObjectAssemblyStation other in items)
+                if (SharesChoices(station, other) && other.Pending.IsWithdrawn(item))
+                    return true;
+            return false;
+        }
+
+        /// <summary>Checks whether a proposed prefix still belongs to more than one available recipe.</summary>
+        /// <param name="station">Station proposing a new product.</param>
+        /// <param name="ingredients">Ordered physical prefix being evaluated.</param>
+        /// <param name="complete">Whether this prefix already completes the proposing recipe.</param>
+        /// <returns>True while another available recipe keeps this choice unresolved or takes priority.</returns>
+        internal static bool IsAmbiguous(ObjectAssemblyStation station, IReadOnlyList<ObjectGrab> ingredients, bool complete)
+        {
+            // A completed shorter recipe wins over an unfinished extension; identical completed recipes use stable identity.
+            foreach (ObjectAssemblyStation other in items)
+            {
+                if (other == station || !SharesChoices(station, other) || !other.CanPlan
+                    || !other.Template.CanAcceptSequence(ingredients, out bool otherComplete))
+                    continue;
+                if (station.Settings.ProductPrefab == other.Settings.ProductPrefab || complete && otherComplete)
+                {
+                    if (EntityId.ToULong(other.GetEntityId()) < EntityId.ToULong(station.GetEntityId()))
+                        return true;
+                }
+                else if (!complete)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>Groups automatic recipes and shared input commands without merging distinct explicit commands.</summary>
+        /// <param name="first">Proposing station.</param>
+        /// <param name="second">Potential alternative on the same GameObject.</param>
+        /// <returns>True when both stations represent alternatives for the same player action or contact surface.</returns>
+        private static bool SharesChoices(ObjectAssemblyStation first, ObjectAssemblyStation second)
+        {
+            // Different input bindings explicitly select a recipe and therefore need no ingredient arbitration.
+            return second != null && second.isActiveAndEnabled && first.gameObject == second.gameObject
+                && (first.Settings.Trigger != AssemblyStationTrigger.InputAction && second.Settings.Trigger != AssemblyStationTrigger.InputAction
+                    || first.Settings.Trigger == AssemblyStationTrigger.InputAction && second.Settings.Trigger == AssemblyStationTrigger.InputAction
+                        && first.Action != null && second.Action != null && first.Action.action != null && second.Action.action != null
+                        && first.Action.action.id == second.Action.action.id);
+        }
+
+        #endregion
+
         #region Input
 
         /// <summary>Dispatches at most one valid transfer from the player's actual carry slot.</summary>

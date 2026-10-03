@@ -7,7 +7,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region State
 
-        private ObjectAssemblyProduct product;
         private Rigidbody body;
         private CarryBodyState originalBody;
         private Transform parent;
@@ -30,16 +29,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Eligibility
 
-        /// <summary>Prevents automatic contact from stealing a held product or another station's preview.</summary>
+        /// <summary>Shares a visual preview between recipes on one table without allowing remote stations to claim it.</summary>
         /// <param name="station">Station considering contact insertion.</param>
         /// <param name="ingredient">Physical object proposed for this recipe.</param>
         /// <returns>True when the ingredient is free for this station's automatic contact handling.</returns>
         internal static bool Allows(ObjectAssemblyStation station, ObjectGrab ingredient)
         {
-            // Ordinary ingredients keep their existing contact behavior, including insertion while carried.
-            return ingredient != null && (!ingredient.TryGetComponent(out ObjectAssemblyProduct product)
-                || (product.Dock == null || product.Dock.Station == station)
-                    && (!product.Settings.WaitForNextIngredient || !ingredient.IsHeld));
+            // A preview chooses only its visible pose, never which recipe will eventually consume the ingredient.
+            return ingredient != null && (ingredient.Dock == null || ingredient.Dock.Station != null
+                    && ingredient.Dock.Station.gameObject == station.gameObject)
+                && (!ingredient.IsHeld || ingredient.Dock == null
+                    && (!ingredient.TryGetComponent(out ObjectAssemblyProduct product) || !product.Settings.WaitForNextIngredient));
         }
 
         /// <summary>Ends a preview when another interaction moves the object or its eligibility changes.</summary>
@@ -53,9 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Release();
                 return null;
             }
-            if (product != null && product.isActiveAndEnabled && product.Dock == this && body != null && body.isKinematic
-                && Ingredient.transform.parent == parent && AtPose() && station.WaitsForIngredient(Ingredient)
-                && station.CanAccept(Ingredient, false))
+            if (station != null && Ingredient.Dock == this && body != null && body.isKinematic
+                && Ingredient.transform.parent == parent && AtPose() && station.CanPreview(Ingredient))
                 return null;
             ObjectItem withdrawn = Ingredient.Item;
             Release();
@@ -80,21 +79,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Snaps one eligible waiting product to the exact pose and scale it will have after insertion.</summary>
         /// <param name="station">Empty station whose next recipe provides the magnet.</param>
-        /// <param name="ingredient">Completed product still retaining all of its own interactions.</param>
-        internal void Snap(ObjectAssemblyStation station, ObjectGrab ingredient)
+        /// <param name="ingredient">Independent ingredient retaining its own interactions.</param>
+        /// <param name="index">Validated slot in the proposed recipe.</param>
+        internal void Snap(ObjectAssemblyStation station, ObjectGrab ingredient, int index)
         {
             // No product prefab, assembly part, collision proxy or reservation is created for a preview.
-            if (Ingredient != null || !station.WaitsForIngredient(ingredient) || !Allows(station, ingredient)
-                || !station.CanAccept(ingredient, false))
+            if (Ingredient != null || ingredient.Dock != null || ingredient.IsHeld || !station.CanPreview(ingredient))
                 return;
-            ObjectAssemblyProduct template = station.Settings.ProductPrefab.GetComponent<ObjectAssemblyProduct>();
-            if (!template.CanAccept(ingredient, out int index, false))
-                return;
-            AssemblyMagnet magnet = template.Settings.Magnets[index];
+            AssemblyMagnet magnet = station.Template.Settings.Magnets[index];
             Station = station;
             Ingredient = ingredient;
-            product = ingredient.GetComponent<ObjectAssemblyProduct>();
-            product.Dock = this;
+            ingredient.Dock = this;
             body = ingredient.Body;
             originalBody = new CarryBodyState(body);
             parent = ingredient.transform.parent;
@@ -124,8 +119,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Release()
         {
             // Clear ownership first so reentrant component callbacks cannot release the same preview twice.
-            if (product != null && product.Dock == this)
-                product.Dock = null;
+            if (Ingredient != null && Ingredient.Dock == this)
+                Ingredient.Dock = null;
             if (Ingredient != null)
             {
                 if ((Ingredient.transform.localScale - snappedScale).sqrMagnitude < 0.000001f)
@@ -136,7 +131,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             Ingredient = null;
             Station = null;
-            product = null;
             body = null;
             parent = null;
         }

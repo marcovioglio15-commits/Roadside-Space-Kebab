@@ -75,6 +75,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Vector3 WorldTarget => transform.TransformPoint(settings.TargetOffset);
         /// <summary>Cached solid and trigger colliders owned by this body.</summary>
         internal Collider[] Colliders => colliders;
+        /// <summary>Temporary magnet placement shared by undecided recipes on one assembly table.</summary>
+        internal AssemblyIngredientDock Dock { get; set; }
 
         #endregion
 
@@ -140,6 +142,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Disabling a carried component must not leave a kinematic or collision-free object behind.
             Cancel();
+            Dock?.Release();
             collisions.Restore(true);
             sourceCollisions.Restore(true);
             RestoreSurface(null);
@@ -267,6 +270,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (source != null && !InteractionValues.Positive(duration))
                 return false;
+            Dock?.Release();
             // Restore visual magnet overrides before capturing the body's carry policy and scaled geometry.
             if (TryGetComponent(out ObjectAssemblyProduct product))
                 product.ReleaseTable();

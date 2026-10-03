@@ -4,7 +4,7 @@ using CatOnASkateboard.StudioIdentity;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Shares deterministic magnet selection between ordinary insertion and deferred two-ingredient starts.</summary>
+    /// <summary>Shares deterministic magnet selection between insertion and competing recipe proposals.</summary>
     internal sealed class AssemblyIngredientSelection
     {
         #region State
@@ -76,31 +76,64 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return false;
         }
 
-        /// <summary>Prepares an empty recipe's first two insertions while leaving both physical objects usable.</summary>
-        /// <param name="settings">Validated destination recipe.</param>
-        /// <param name="first">Completed product waiting to become the first ingredient.</param>
-        /// <param name="second">Additional ingredient that starts the new assembly.</param>
-        /// <param name="firstMagnet">Receives the first insertion slot.</param>
-        /// <param name="firstFlag">Receives the first ingredient's recipe category.</param>
-        /// <param name="secondMagnet">Receives the second insertion slot.</param>
-        /// <param name="secondFlag">Receives the second ingredient's recipe category.</param>
-        /// <returns>True when both distinct objects fit consecutively, including mandatory magnet order.</returns>
-        internal bool TrySelectPair(AssemblyProductSettings settings, ObjectGrab first, ObjectGrab second,
-            out int firstMagnet, out ObjectFlag firstFlag, out int secondMagnet, out ObjectFlag secondFlag)
+        /// <summary>Clears scratch progress before evaluating a possible recipe without creating a product.</summary>
+        /// <param name="settings">Validated recipe whose slots will be simulated.</param>
+        internal void Begin(AssemblyProductSettings settings)
         {
-            // Scratch progress never changes the prefab's counts or allocates a temporary product.
-            secondMagnet = -1;
-            secondFlag = null;
-            if (!TrySelect(settings, null, null, 1, first, out firstMagnet, out firstFlag))
-                return false;
+            // Reuse buffers across contact queries and competing recipe checks.
             proposedCounts.Clear();
-            proposedCounts.Add(firstFlag, first.Units);
             if (proposedSlots == null || proposedSlots.Length != settings.Magnets.Length)
                 proposedSlots = new bool[settings.Magnets.Length];
             else
                 Array.Clear(proposedSlots, 0, proposedSlots.Length);
-            proposedSlots[firstMagnet] = true;
-            return TrySelect(settings, proposedCounts, proposedSlots, 2, second, out secondMagnet, out secondFlag);
+        }
+
+        /// <summary>Appends an eligible ingredient to scratch progress without taking ownership.</summary>
+        /// <param name="settings">Recipe being simulated.</param>
+        /// <param name="grab">Next independent ingredient.</param>
+        /// <param name="insertion">One-based proposed insertion number.</param>
+        /// <param name="magnet">Receives the chosen magnet.</param>
+        /// <param name="flag">Receives the counted recipe flag.</param>
+        /// <returns>True when the ingredient fits after every previously proposed insertion.</returns>
+        internal bool Append(AssemblyProductSettings settings, ObjectGrab grab, int insertion, out int magnet, out ObjectFlag flag)
+        {
+            // A rejected candidate leaves scratch progress unchanged for the next alternative.
+            if (!TrySelect(settings, proposedCounts, proposedSlots, insertion, grab, out magnet, out flag))
+                return false;
+            proposedSlots[magnet] = true;
+            proposedCounts.TryGetValue(flag, out int count);
+            proposedCounts[flag] = count + grab.Units;
+            return true;
+        }
+
+        /// <summary>Checks whether proposed ingredients finish the recipe instead of only matching a shared prefix.</summary>
+        /// <param name="settings">Recipe whose required quantities and ordered slots are checked.</param>
+        /// <returns>True when every mandatory requirement is satisfied.</returns>
+        internal bool Completes(AssemblyProductSettings settings)
+        {
+            // Scratch and live products share the same mandatory quantity and ordered-slot rules.
+            return Completes(settings, proposedCounts, proposedSlots, proposedCounts.Count > 0);
+        }
+
+        /// <summary>Evaluates completion for either proposed or actually attached ingredients.</summary>
+        /// <param name="settings">Validated recipe.</param>
+        /// <param name="counts">Logical units per recipe flag.</param>
+        /// <param name="occupied">Occupied physical magnet slots.</param>
+        /// <param name="hasIngredients">Whether at least one physical ingredient has been supplied.</param>
+        /// <returns>True when every mandatory requirement is satisfied by a nonempty composition.</returns>
+        internal static bool Completes(AssemblyProductSettings settings, IReadOnlyDictionary<ObjectFlag, int> counts,
+            bool[] occupied, bool hasIngredients)
+        {
+            // Optional rows may remain empty; numbered slots still require their physical ingredient.
+            if (!hasIngredients)
+                return false;
+            foreach (AssemblyIngredient ingredient in settings.Ingredients)
+                if (!ingredient.Optional && AssemblyCapacity.Count(counts, ingredient.Flags) < ingredient.Count)
+                    return false;
+            for (int index = 0; index < settings.Magnets.Length; index++)
+                if (settings.Magnets[index].Order > 0 && !occupied[index])
+                    return false;
+            return true;
         }
 
         #endregion

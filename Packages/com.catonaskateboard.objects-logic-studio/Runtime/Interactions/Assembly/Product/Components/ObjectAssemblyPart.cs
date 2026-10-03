@@ -60,6 +60,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Capture state after ending carry, so later detachment restores the ingredient's own body policy.
             grab.Cancel();
+            grab.Dock?.Release();
             if (grab.TryGetComponent(out ObjectAssemblyProduct ingredient))
                 ingredient.ReleaseTable();
             appearance = changes;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -24,6 +25,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region State
 
+        private readonly AssemblyRecipeProposal inputProposal = new AssemblyRecipeProposal();
+        private readonly List<ObjectGrab> proposed = new List<ObjectGrab>();
         private ObjectAssemblyProduct current;
         private AssemblyContactRun contact;
         private bool contactReady;
@@ -35,6 +38,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Reusable table configuration.</summary>
         public AssemblyStationSettings Settings => settings;
+        /// <summary>Product definition used to compare empty recipes on this table.</summary>
+        internal ObjectAssemblyProduct Template => settings.ProductPrefab != null ? settings.ProductPrefab.GetComponent<ObjectAssemblyProduct>() : null;
+        /// <summary>Shared visual placements that have not yet committed to a recipe.</summary>
+        internal AssemblyPendingIngredients Pending { get; } = new AssemblyPendingIngredients();
+        /// <summary>Whether this configured empty station can take part in choosing a new recipe.</summary>
+        internal bool CanPlan => CurrentProduct == null && Available(InteractionChannels.Assembly) && Item != null && !Item.IsReserved
+            && Template != null && (settings.Trigger == AssemblyStationTrigger.InputAction ? TryValidate(out _) : contactReady);
         /// <summary>Player command used to insert a carried ingredient.</summary>
         public InputActionReference Action => action;
         /// <summary>World-space pose at which a product begins or returns.</summary>
@@ -66,6 +76,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Reusing the detector also discards any elapsed dwell from the previous session.
             contact?.Reset();
+            Pending.Release();
             contactReady = false;
             if (settings.Trigger != AssemblyStationTrigger.InputAction)
             {
@@ -87,6 +98,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // A table never destroys a completed or partially built product when disabled.
             AssemblyInteractionRegistry.Unregister(this);
             contact?.Reset();
+            Pending.Release();
             contactReady = false;
             lastWarning = string.Empty;
         }
@@ -171,14 +183,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanAccept(ObjectGrab held, bool requireHeld = true)
         {
             // Availability includes independent Unlock Interactions and temporary contact restrictions.
-            if (!Available(InteractionChannels.Assembly) || Item == null || Item.IsReserved || held == null || !held.isActiveAndEnabled
+            if (!Available(InteractionChannels.Assembly) || Item == null || Item.IsReserved || Template == null || held == null || !held.isActiveAndEnabled
                 || requireHeld && !held.IsHeld || !requireHeld && !AssemblyIngredientDock.Allows(this, held))
                 return false;
             current = CurrentProduct;
             if (CanReturn(held, requireHeld, out _))
                 return true;
-            ObjectAssemblyProduct target = current != null ? current : settings.ProductPrefab.GetComponent<ObjectAssemblyProduct>();
-            return target.CanAccept(held, out _, requireHeld);
+            if (current != null || !requireHeld)
+                return (current != null ? current : Template).CanAccept(held, out _, requireHeld);
+            // Shared input actions retain explicitly placed ingredients until a later command distinguishes a recipe.
+            proposed.Clear();
+            AssemblyInteractionRegistry.CollectPending(this, proposed);
+            if (!proposed.Contains(held))
+                proposed.Add(held);
+            inputProposal.Build(this, proposed, true);
+            for (int index = 0; index < inputProposal.Ingredients.Count; index++)
+                if (inputProposal.Ingredients[index] == held)
+                    return true;
+            return false;
         }
 
         /// <summary>Checks whether automatic insertion must wait for another ingredient to start this empty station.</summary>
@@ -191,41 +213,40 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && product.IsComplete && product.Settings.WaitForNextIngredient;
         }
 
-        /// <summary>Tracks contact eligibility while allowing later ordered ingredients to wait beside a completed product.</summary>
-        /// <param name="ingredient">Contact candidate.</param>
-        /// <param name="waiting">Whether a completed product is waiting to start the recipe.</param>
-        /// <returns>True when contact duration may accumulate for this candidate.</returns>
-        internal bool CanTrackContact(ObjectGrab ingredient, bool waiting)
+        /// <summary>Checks whether an independent ingredient can participate in this empty table's proposals.</summary>
+        /// <param name="ingredient">Physical ingredient or shared preview.</param>
+        /// <returns>True while station, ingredient and recipe eligibility remain available.</returns>
+        internal bool CanPreview(ObjectGrab ingredient)
         {
-            // Ordinary stations retain their existing slot and order checks.
-            return AssemblyIngredientDock.Allows(this, ingredient) && (waiting && CurrentProduct == null
-                ? settings.ProductPrefab.GetComponent<ObjectAssemblyProduct>().CanConsider(ingredient)
-                : CanAccept(ingredient, false));
+            // Pending ingredients are never reserved and keep their own interaction locks unchanged.
+            return CanPlan
+                && AssemblyIngredientDock.Allows(this, ingredient) && Template.CanConsider(ingredient);
         }
 
-        /// <summary>Preflights a complete two-object start without changing either ingredient.</summary>
-        /// <param name="first">Completed product waiting at this empty station.</param>
-        /// <param name="second">Companion ready to enter the next slot.</param>
-        /// <returns>True when the station and both ordered insertions are available.</returns>
-        internal bool CanBeginWith(ObjectGrab first, ObjectGrab second)
+        /// <summary>Determines whether a complete proposal can select this recipe now.</summary>
+        /// <param name="ingredients">Ordered ingredients available for a new assembly.</param>
+        /// <param name="requireHeld">Whether an explicit input command supplied the final ingredient.</param>
+        /// <returns>True when the proposal resolves competing recipes and any deferred product requirement.</returns>
+        internal bool CanStart(IReadOnlyList<ObjectGrab> ingredients, bool requireHeld = false)
         {
-            // Current ownership is rechecked at commit because several stations can share one contact surface.
-            return WaitsForIngredient(first) && Available(InteractionChannels.Assembly) && Item != null && !Item.IsReserved
-                && AssemblyIngredientDock.Allows(this, first) && AssemblyIngredientDock.Allows(this, second)
-                && settings.ProductPrefab.GetComponent<ObjectAssemblyProduct>().CanAcceptPair(first, second);
+            // Contact previews wait for a companion; an explicit command keeps its original insertion behavior.
+            if (ingredients.Count == 0 || !CanPlan || !requireHeld && ingredients.Count == 1 && WaitsForIngredient(ingredients[0]))
+                return false;
+            foreach (ObjectGrab ingredient in ingredients)
+                if (!requireHeld && !AssemblyIngredientDock.Allows(this, ingredient))
+                    return false;
+            return Template.CanAcceptSequence(ingredients, out bool complete)
+                && !AssemblyInteractionRegistry.IsAmbiguous(this, ingredients, complete);
         }
 
-        /// <summary>Returns a carried product or inserts one ingredient into the table's current product.</summary>
-        /// <param name="held">Actual object occupying the observer's carry slot.</param>
+        /// <summary>Returns a carried product, stages an ambiguous input, or inserts an unambiguous ingredient.</summary>
+        /// <param name="held">Ingredient supplied by the player or by physical contact.</param>
         /// <param name="requireHeld">True for input insertion; false for physical contact insertion.</param>
-        /// <param name="companion">Second contact ingredient required to start with a deferred completed product.</param>
-        /// <returns>True when the command performed one successful transfer.</returns>
-        internal bool Execute(ObjectGrab held, bool requireHeld = true, ObjectGrab companion = null)
+        /// <returns>True when the command performed a transfer or an explicit provisional placement.</returns>
+        internal bool Execute(ObjectGrab held, bool requireHeld = true)
         {
-            // A failed recipe or slot check leaves the carry slot and existing product untouched.
-            if (!CanAccept(held, requireHeld)
-                || companion != null && (requireHeld || !CanBeginWith(held, companion))
-                || !requireHeld && companion == null && WaitsForIngredient(held))
+            // A failed proposal leaves the carry slot and existing product untouched.
+            if (!CanAccept(held, requireHeld))
                 return false;
             if (CanReturn(held, requireHeld, out ObjectAssemblyProduct returning))
             {
@@ -234,6 +255,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Place(current);
                 return true;
             }
+            if (current != null)
+                return Commit(held, requireHeld, null);
+            if (!requireHeld)
+            {
+                proposed.Clear();
+                proposed.Add(held);
+                return ExecuteSequence(proposed);
+            }
+            if (CanStart(inputProposal.Ingredients, true))
+                return Commit(null, false, inputProposal.Ingredients);
+            // The input placed the shared prefix, but no station or product start event is emitted yet.
+            held.Cancel();
+            if (held.TryGetComponent(out ObjectAssemblyProduct product))
+                product.ReleaseTable();
+            Pending.Show(this, inputProposal.Ingredients);
+            return true;
+        }
+
+        /// <summary>Commits contact ingredients only after their combined sequence identifies a recipe.</summary>
+        /// <param name="ingredients">Ordered ready contacts, including shared snapped ingredients.</param>
+        /// <returns>True when a new product took ownership of the entire proposal.</returns>
+        internal bool ExecuteSequence(IReadOnlyList<ObjectGrab> ingredients)
+        {
+            // Recheck at the commit boundary: another station may have accepted these objects in the same frame.
+            return CanStart(ingredients) && Commit(null, false, ingredients);
+        }
+
+        /// <summary>Creates and activates one product only after every prepared ingredient can transfer.</summary>
+        /// <param name="ingredient">Single ingredient for an existing product, or null for a new sequence.</param>
+        /// <param name="requireHeld">Whether the single insertion must still be carried.</param>
+        /// <param name="sequence">Complete starting proposal, or null when continuing a product.</param>
+        /// <returns>True when committed insertion succeeded.</returns>
+        private bool Commit(ObjectGrab ingredient, bool requireHeld, IReadOnlyList<ObjectGrab> sequence)
+        {
+            // Inactive staging prevents premature locks and callbacks before all starting ingredients exist.
             bool spawned = current == null;
             if (spawned)
             {
@@ -246,7 +302,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Place(current);
             }
             bool complete = current.IsComplete;
-            if (!(companion != null ? current.AcceptPair(held, companion) : current.Accept(held, requireHeld)))
+            if (!(sequence != null ? current.AcceptSequence(sequence) : current.Accept(ingredient, requireHeld)))
             {
                 if (spawned)
                 {
@@ -255,6 +311,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
                 return false;
             }
+            Pending.Release();
             if (spawned)
                 current.gameObject.SetActive(true);
             current.PublishPending();
