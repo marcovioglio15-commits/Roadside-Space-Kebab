@@ -475,6 +475,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    WaitForNextIngredient: 0
     Ingredients:
     - Flags:
       - {fileID: 11400000, guid: 1ac7af2c5229af545bf8eb66046023af, type: 2}
@@ -525,7 +526,7 @@ MonoBehaviour:
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
-      Order: 3
+      Order: 0
       Position: {x: 0, y: 0.1, z: 0.075}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
@@ -537,7 +538,7 @@ MonoBehaviour:
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
-      Order: 4
+      Order: 0
       Position: {x: 0, y: 0.055, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 2}
@@ -549,7 +550,7 @@ MonoBehaviour:
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      Order: 5
+      Order: 0
       Position: {x: 0, y: 0.1, z: -0.075}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
