@@ -70,7 +70,7 @@ MonoBehaviour:
       - {fileID: 1024598874194639592, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
       - {fileID: 2534361684040139323, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
       RequireAll: 0
-      ArrivalDialogueEnabled: 1
+      ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
       NewCustomerSound: 1
       Weight: 1
