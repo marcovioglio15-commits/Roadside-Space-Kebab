@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -519,7 +519,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 296590821164827702, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
       propertyPath: m_FontData.m_MaxSize
-      value: 52
+      value: 178
+      objectReference: {fileID: 0}
+    - target: {fileID: 296590821164827702, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 83
+      objectReference: {fileID: 0}
+    - target: {fileID: 296590821164827702, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
+      propertyPath: m_FontData.m_FontStyle
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 523217520377794756, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
       propertyPath: m_AnchorMax.x
@@ -539,7 +547,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3900055773363485268, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
       propertyPath: m_Text
-      value: Team
+      value: 'Cristian Roffino - Design
+
+
+        Elena ''Mikko'' Striglia - 3D Art
+
+
+        Luca Bacile - Design
+
+
+        Maja Milas - Sound
+
+
+        Marco Vioglio - Programming
+
+
+        Noemi Frulio - 2D Art
+
+'
       objectReference: {fileID: 0}
     - target: {fileID: 4205729769572956532, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
       propertyPath: m_AnchorMax.x
