@@ -188,7 +188,7 @@ GameObject:
   - component: {fileID: 6388289395759616639}
   - component: {fileID: 4783263057593612631}
   m_Layer: 0
-  m_Name: PF_Client_FishyBusiness
+  m_Name: PF_Client_FishyBusiness_2PizzaMarg+2Beer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -609,11 +609,11 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        Count: 1
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 2
       - Flags:
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        Count: 1
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        Count: 2
       RequireAll: 1
       Lines:
       - Speaker: Fishy Business
@@ -624,11 +624,11 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        Count: 1
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Count: 2
       - Flags:
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        Count: 1
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        Count: 2
       RequireAll: 1
       Lines:
       - Speaker: Fishy Business
@@ -677,15 +677,15 @@ MonoBehaviour:
     Board: Orders
     Entries:
     - Source: {fileID: 1741706001150086087}
-      Text: Kebab Wrap
+      Text: Pizza Margherita
       FilterConsumed: 1
       ConsumedFlags:
-      - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+      - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
     - Source: {fileID: 1741706001150086087}
-      Text: Soda
+      Text: Beer
       FilterConsumed: 1
       ConsumedFlags:
-      - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+      - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0
