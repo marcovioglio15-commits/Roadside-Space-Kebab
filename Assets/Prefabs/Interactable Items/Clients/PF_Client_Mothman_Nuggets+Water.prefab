@@ -210,7 +210,7 @@ GameObject:
   - component: {fileID: 6388289395759616639}
   - component: {fileID: 4783263057593612631}
   m_Layer: 0
-  m_Name: PF_Client_Mothman
+  m_Name: PF_Client_Mothman_Nuggets+Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -550,7 +550,6 @@ MonoBehaviour:
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
         - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
         - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
         - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
         - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
@@ -573,7 +572,6 @@ MonoBehaviour:
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
         - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
         - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
         - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
         - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
@@ -684,6 +682,9 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        Count: 1
+      - Flags:
         - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         Count: 1
       RequireAll: 1
@@ -695,6 +696,9 @@ MonoBehaviour:
     - Name: Mothman Order Correct 2
       Weight: 1
       RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        Count: 1
       - Flags:
         - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         Count: 1
@@ -748,9 +752,15 @@ MonoBehaviour:
     Board: Orders
     Entries:
     - Source: {fileID: 1741706001150086087}
+      Text: Nuggets
+      FilterConsumed: 1
+      ConsumedFlags:
+      - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+    - Source: {fileID: 1741706001150086087}
       Text: Water
-      FilterConsumed: 0
-      ConsumedFlags: []
+      FilterConsumed: 1
+      ConsumedFlags:
+      - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0
