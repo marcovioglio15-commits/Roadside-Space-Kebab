@@ -23,7 +23,7 @@ MonoBehaviour:
   m_OverrideGlobalSceneList: 0
   m_Scenes:
   - m_enabled: 1
-    m_path: Assets/Scenes/SCN_PlayerStudioMovement.unity
+    m_path: Assets/Scenes/Tool Testing Scenes/Test/Programming/Main/SCN_PlayerStudioMovement.unity
     m_guid: 66feab5d8bda5be45aba1ce79d501712
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []

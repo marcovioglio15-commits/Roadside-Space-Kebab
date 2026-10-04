@@ -682,7 +682,7 @@ MonoBehaviour:
       RequiredFlags:
       - Flags:
         - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        Count: 2
+        Count: 1
       - Flags:
         - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         Count: 1
@@ -697,7 +697,7 @@ MonoBehaviour:
       RequiredFlags:
       - Flags:
         - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        Count: 2
+        Count: 1
       - Flags:
         - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         Count: 1

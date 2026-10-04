@@ -610,10 +610,10 @@ MonoBehaviour:
       RequiredFlags:
       - Flags:
         - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-        Count: 2
+        Count: 1
       - Flags:
         - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        Count: 2
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Fishy Business
@@ -625,10 +625,10 @@ MonoBehaviour:
       RequiredFlags:
       - Flags:
         - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-        Count: 2
+        Count: 1
       - Flags:
         - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        Count: 2
+        Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Fishy Business
