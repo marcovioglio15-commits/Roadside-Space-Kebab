@@ -256,6 +256,8 @@ MonoBehaviour:
     CompleteAfterSeparation: 0
     ResumeAfterInterruption: 0
     RepeatAfterSeparation: 1
+    WhileContact: 0
+    RevertDelay: 0.25
     Self:
       Tint: 0
       Multiplier: {r: 0, g: 0, b: 0, a: 1}
@@ -374,15 +376,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.7
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 1
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 1
+      exitDuration: 0.16
     style:
       content: Contact Table
       font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}

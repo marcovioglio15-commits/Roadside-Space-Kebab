@@ -115,6 +115,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    WaitForNextIngredient: 0
     Ingredients:
     - Flags:
       - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
@@ -185,6 +186,7 @@ MonoBehaviour:
     CompletedAppearance:
       Meshes: []
       Materials: []
+    HideIngredients: 1
 --- !u!114 &9195871525651147916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,7 +398,7 @@ MonoBehaviour:
       centerRadius: 0.08
       queryInterval: 0.05
       releaseDelay: 0.08
-      suspendCarried: 0
+      suspendCarried: 1
       suspendMoving: 0
       speedThreshold: 0.5
       obstacleMask:
@@ -409,7 +411,7 @@ MonoBehaviour:
       appearance: 1
       duration: 0.18
       startScale: 0.2
-      popIn: 0
+      popIn: 1
       exitDuration: 0.16
     style:
       content: Burger Bun
@@ -444,6 +446,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flags:
   - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+--- !u!65 &3856206238075889047
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4182828039336747428}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.21378556, y: 0.12117137, z: 0.20000002}
+  m_Center: {x: -0.0068927854, y: 0.040515706, z: 0}
 --- !u!1 &4656305680823003017
 GameObject:
   m_ObjectHideFlags: 0
@@ -677,24 +700,3 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Burger
---- !u!65 &3856206238075889047
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4182828039336747428}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.21378556, y: 0.12117137, z: 0.20000002}
-  m_Center: {x: -0.0068927854, y: 0.040515706, z: 0}

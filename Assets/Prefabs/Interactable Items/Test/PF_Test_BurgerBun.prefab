@@ -209,15 +209,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 1
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 1
+      exitDuration: 0.16
     style:
       content: Burger Bun
       font: {fileID: 0}
@@ -274,6 +281,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -294,6 +302,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &-223255509274549693
 MonoBehaviour:
@@ -399,6 +412,7 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
 --- !u!114 &1082582575293119777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -472,6 +486,9 @@ MonoBehaviour:
       Moment: 0
       Action: {fileID: 0}
       Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
 --- !u!114 &6194369630120944784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,11 +536,17 @@ MonoBehaviour:
       Moment: 1
       Action: {fileID: 0}
       Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
     - Trigger: 0
       Source: {fileID: -4224281006891219117}
       Moment: 1
       Action: {fileID: 0}
       Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
 --- !u!1 &5623698135074143705
 GameObject:
   m_ObjectHideFlags: 0

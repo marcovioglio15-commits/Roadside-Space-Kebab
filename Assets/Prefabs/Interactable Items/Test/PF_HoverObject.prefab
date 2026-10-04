@@ -128,9 +128,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
   interactionName: First Person Hover
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
@@ -145,22 +150,28 @@ MonoBehaviour:
   anchor: {fileID: 0}
   label: {fileID: 8408381805660075422}
   preset: {fileID: 11400000, guid: 1682b5c0ab264eddb14c8b91d5ccb881, type: 2}
-  drawGizmos: 1
   configuration:
     settings:
       targetMode: 2
       playerDistance: 3
       centerRadius: 0.2
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 1
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 1
+      exitDuration: 0.16
     style:
       content: Hi, I'm being hovered.
       font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
@@ -179,6 +190,21 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  drawGizmos: 1
+--- !u!114 &2822601982632669940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023713480037723574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flags:
+  - {fileID: 11400000, guid: 2abe669abbad4e8fb36d1a1eb94d4e4a, type: 2}
 --- !u!1 &1898171772214229929
 GameObject:
   m_ObjectHideFlags: 0
@@ -412,17 +438,3 @@ MonoBehaviour:
   panel: {fileID: 343612474810450362}
   text: {fileID: 1303298557871371846}
   background: {fileID: 1914098863728941503}
---- !u!114 &2822601982632669940
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1023713480037723574}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  flags:
-  - {fileID: 11400000, guid: 2abe669abbad4e8fb36d1a1eb94d4e4a, type: 2}

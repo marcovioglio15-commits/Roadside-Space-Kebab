@@ -561,7 +561,7 @@ MonoBehaviour:
       centerRadius: 0.08
       queryInterval: 0.05
       releaseDelay: 0.08
-      suspendCarried: 0
+      suspendCarried: 1
       suspendMoving: 0
       speedThreshold: 0.5
       obstacleMask:
@@ -574,7 +574,7 @@ MonoBehaviour:
       appearance: 1
       duration: 0.18
       startScale: 0.2
-      popIn: 0
+      popIn: 1
       exitDuration: 0.16
     style:
       content: French Fries Pack

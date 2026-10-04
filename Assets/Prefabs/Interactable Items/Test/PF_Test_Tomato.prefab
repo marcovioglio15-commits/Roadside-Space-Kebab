@@ -236,15 +236,22 @@ MonoBehaviour:
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 1
+      suspendMoving: 0
+      speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
       appearance: 1
       duration: 0.18
       startScale: 0.2
+      popIn: 1
+      exitDuration: 0.16
     style:
       content: Tomato gnam gnam
       font: {fileID: 0}
@@ -314,6 +321,7 @@ MonoBehaviour:
     Target:
       Distance: 3
       Mode: 0
+      SolidHitOnly: 0
       CenterRadius: 0.15
       Offset: {x: 0, y: 0, z: 0}
       ObstacleMask:
@@ -347,6 +355,8 @@ MonoBehaviour:
       - Prefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
         Position: {x: 0, y: 0, z: 0}
         Rotation: {x: 0, y: 0, z: 0}
+    Sound: 1
+    Ingredient: 2
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!114 &384766734718519796
 MonoBehaviour:
@@ -426,6 +436,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -446,6 +457,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 1
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &5521453723754277542
 MonoBehaviour:
@@ -551,6 +567,7 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
 --- !u!1 &4566847251600692758
 GameObject:
   m_ObjectHideFlags: 0
