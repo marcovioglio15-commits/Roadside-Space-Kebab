@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.MenuStudio.Runtime::CatOnASkateboard.MenuStudio.MenuPreset
   Title: ROADSIDE SPACE KEBAB
   PauseTitle: PAUSED
-  GameplayScene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_RecipeTesting.unity
+  GameplayScene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_DaysTesting.unity
   MainMenuScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_MainMenu.unity
   PauseScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_PauseMenu.unity
   IncludeSettings: 1

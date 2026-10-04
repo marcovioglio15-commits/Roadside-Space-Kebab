@@ -617,6 +617,10 @@ MonoBehaviour:
 
 '
       - Speaker: Grandpa's Pic
+        Text: 'You can take out ingredients from their packaging with the shotgun (RED TOOL). Good old classic. '
+      - Speaker: Grandpa's Pic
+        Text: Similarly, you can shred them to pieces to use them in your dishes by shooting again at them.
+      - Speaker: Grandpa's Pic
         Text: To make a Pizza Rossa, place Pizza Dough, then Tomato Slice on it on the cutting board.
       - Speaker: Grandpa's Pic
         Text: To make a Pizza Margherita, place Pizza Rossa, then Cheese slice on it on the cutting board.
@@ -625,11 +629,11 @@ MonoBehaviour:
       - Speaker: Grandpa's Pic
         Text: To make a Falafel Wrap, place a Wrap, then Falafel Balls, and then, in any order, Tomato Slice, Lettuce Slice, and Onion Slice on the cutting board.
       - Speaker: Grandpa's Pic
-        Text: 'You can take out ingredients from their packaging with the shotgun. Good old classic. '
+        Text: 'To cook Falafel, Crab Claws, French Fries and Nuggets you must cook them in the oven first. (we are still working on the fryer!) '
       - Speaker: Grandpa's Pic
-        Text: Similarly, you can shred them to pieces to use them in your dishes by shooting again at them.
+        Text: Water and Beer needs to be popped opened with the bottle opener (BLUE TOOL) before being delivered.
       - Speaker: Grandpa's Pic
-        Text: Water and Beer needs to be popped opened with the bottle opener before being delivered.
+        Text: '(ORANGE TOOL) does not serve a purpose yet. '
       - Speaker: Grandpa's Pic
         Text: 'You can get more ingredients from the shelves or fridge. If you''re out of them, you can find more in the storage room. '
       - Speaker: Grandpa's Pic

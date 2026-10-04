@@ -351,7 +351,7 @@ MonoBehaviour:
     MaxAngularSpeed: 20
     OverrideSurface: 1
     StaticFriction: 0.5
-    DynamicFriction: 0.4
+    DynamicFriction: 1
     Bounciness: 0.2
     FrictionCombine: 0
     BounceCombine: 3

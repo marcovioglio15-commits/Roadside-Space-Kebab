@@ -188,12 +188,12 @@ MonoBehaviour:
       DrawGizmos: 1
     Path: 
     StateA:
-      Position: {x: -2.5814688, y: 1.3314686, z: 2.4499993}
-      Rotation: {x: 0, y: 0, z: 0}
+      Position: {x: -3.418533, y: 2.1685295, z: 2.4499993}
+      Rotation: {x: 0, y: 0, z: 180.00034}
       Scale: {x: 1, y: 1, z: 1}
     StateB:
-      Position: {x: -2.5814688, y: 1.3314686, z: 2.4499993}
-      Rotation: {x: -90, y: 0, z: 0}
+      Position: {x: -3.418533, y: 2.1685295, z: 2.4499993}
+      Rotation: {x: 120, y: 0, z: 180.00034}
       Scale: {x: 1, y: 1, z: 1}
     StartAtB: 0
     Duration: 0.6

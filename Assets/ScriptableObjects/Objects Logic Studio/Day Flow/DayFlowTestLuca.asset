@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.SpawnFlowPlan
   Days:
   - Name: Day 1
-    Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_RecipeTesting.unity
+    Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_DaysTesting.unity
     RandomCount: 0
     Count: 3
     Minimum: 1
