@@ -210,7 +210,7 @@ GameObject:
   - component: {fileID: 6388289395759616639}
   - component: {fileID: 4783263057593612631}
   m_Layer: 0
-  m_Name: PF_Client_ShadowbladeHellfury
+  m_Name: PF_Client_ShadowbladeHellfury_KebabPanino+Soda+FrenchFries
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -406,7 +406,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Order Pizza Margherita
+  interactionName: Order 1
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -426,14 +426,12 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
+  settingsPreset: {fileID: 11400000, guid: 40b5dcdb67837fb4ca467b86da9a6f68, type: 2}
   drawGizmos: 1
   settings:
     Flags:
-    - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
     - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
     - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-    - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
     - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
     - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
@@ -444,6 +442,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
     - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+    - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
     ContactDuration: 0
     ContactTolerance: 0.02
     QueryInterval: 0.02
@@ -555,107 +554,94 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Ugh, toxins for my delicate system.
-    - Name: Shadowblade Order Wrong 1
+    - Name: Shadowblade Order Wrong 2
       Weight: 1
       RequiredFlags:
       - Flags:
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: I knew you were a FAKER.
-    - Name: Shadowblade Order Wrong 1
+        Text: 'The Elder Gods are not pleased.
+
+'
+    - Name: Shadowblade Order Wrong 3
       Weight: 1
       RequiredFlags:
       - Flags:
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-        Count: 1
-      RequireAll: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are not pleased.
-    - Name: Shadowblade Order Wrong 1
-      Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
-        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Pathetic.
-    - Name: Shadowblade Order Wrong 1
+    - Name: Shadowblade Order Wrong 4
       Weight: 1
       RequiredFlags:
       - Flags:
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Get out of my sight, slowpoke!
+    - Name: Shadowblade Order Wrong 5
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: I knew you were a FAKER.
     Audio:
       Voice: 1
       Interval: 1
@@ -731,7 +717,16 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
@@ -741,37 +736,79 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: Heh, not bad for a mortal.
+        Text: 'Heh, not bad for a mortal.
+
+'
     - Name: Shadowblade Order Correct 3
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: Your skills impress me, chef.
+        Text: 'Your skills impress me, chef.
+
+'
     - Name: Shadowblade Order Correct 4
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
       - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are pleased.
+        Text: 'The Elder Gods are pleased.
+
+'
     - Name: Shadowblade Order Correct 5
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
@@ -781,7 +818,16 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
@@ -791,7 +837,16 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
@@ -801,7 +856,16 @@ MonoBehaviour:
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
@@ -851,7 +915,19 @@ MonoBehaviour:
     Board: Orders
     Entries:
     - Source: {fileID: 1741706001150086087}
-      Text: Pizza Margherita
+      Text: Falafel Wrap
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Source: {fileID: 1741706001150086087}
+      Text: Kebab Wrap
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Source: {fileID: 1741706001150086087}
+      Text: Fried Crab Claws
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Source: {fileID: 1741706001150086087}
+      Text: Pizza Rossa
       FilterConsumed: 0
       ConsumedFlags: []
 --- !u!114 &6388289395759616639
@@ -889,7 +965,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
   drawGizmos: 1
   settings:
-    Thickness: 1
+    Thickness: 6
     Color: {r: 1, g: 0.74509805, b: 0, a: 1}
     Intensity: 5
     EdgeAngle: 30

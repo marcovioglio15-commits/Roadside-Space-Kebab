@@ -143,7 +143,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8f538d34a5f4d604d92855661debc98d, type: 2}
+  - {fileID: 2100000, guid: afa9fdd052d44ee4fa9dfdb65ed73a5b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -210,7 +210,7 @@ GameObject:
   - component: {fileID: 6388289395759616639}
   - component: {fileID: 4783263057593612631}
   m_Layer: 0
-  m_Name: PF_Client_Mothman_Water
+  m_Name: PF_Client_ShadowbladeHellfury_KebabPizza+Beer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -266,7 +266,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8f538d34a5f4d604d92855661debc98d, type: 2}
+  - {fileID: 2100000, guid: afa9fdd052d44ee4fa9dfdb65ed73a5b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: Mothman Order
+  interactionName: Shadowblade Order
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -353,33 +353,43 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Mothman Random Intro 1
+    - Name: Shadowblade Random Intro 1
       Weight: 1
       RequiredFlags: []
       RequireAll: 1
       Lines:
-      - Speaker: Mothman
-        Text: 'I once had a dream of this place.
-
-'
-    - Name: Mothman Random Intro 2
+      - Speaker: Shadowblade Hellfury
+        Text: The darkness inside me yearns for a feast, mortal.
+    - Name: Shadowblade Random Intro 2
       Weight: 1
       RequiredFlags: []
       RequireAll: 1
       Lines:
-      - Speaker: Mothman
-        Text: 'Greetings.
-
-'
-    - Name: Mothman Random Intro 3
+      - Speaker: Shadowblade Hellfury
+        Text: Deliver me some nutrients.
+    - Name: Shadowblade Random Intro 3
       Weight: 1
       RequiredFlags: []
       RequireAll: 1
       Lines:
-      - Speaker: Mothman
-        Text: "I am pretty sure I\u2019m connected to the moon.\n"
+      - Speaker: Shadowblade Hellfury
+        Text: "I\u2019m Shadowblade. Shadowblade Hellfury."
+    - Name: Shadowblade Random Intro 4
+      Weight: 1
+      RequiredFlags: []
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: My knife? To cut your Kebab? No chance.
+    - Name: Shadowblade Random Intro 5
+      Weight: 1
+      RequiredFlags: []
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Food. Now.
     Audio:
-      Voice: 2
+      Voice: 1
       Interval: 0.1
       Completion: 0
   startAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
@@ -396,7 +406,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Order
+  interactionName: Order 1
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -421,6 +431,7 @@ MonoBehaviour:
   settings:
     Flags:
     - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+    - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
     - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
     - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
     - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -432,7 +443,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
     - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-    - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
     ContactDuration: 0
     ContactTolerance: 0.02
     QueryInterval: 0.02
@@ -501,7 +511,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: Mothman Delivery Wrong
+  interactionName: Shadowblade Delivery Wrong
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -540,12 +550,10 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Mothman Order Wrong 1
+    - Name: Shadowblade Order Wrong 1
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -553,22 +561,19 @@ MonoBehaviour:
         - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
         - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
         - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
-      - Speaker: Mothman
-        Text: 'Oh. Oh. Ohhhh. This is not correct.
-
-'
-    - Name: Mothman Order Wrong 2
+      - Speaker: Shadowblade Hellfury
+        Text: Ugh, toxins for my delicate system.
+    - Name: Shadowblade Order Wrong 2
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -576,22 +581,39 @@ MonoBehaviour:
         - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
         - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
         - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
-      - Speaker: Mothman
-        Text: 'No, no, no, no, no, no, no, no, no, no.
-
-'
-    - Name: Mothman Order Wrong 3
+      - Speaker: Shadowblade Hellfury
+        Text: I knew you were a FAKER.
+    - Name: Shadowblade Order Wrong 3
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
         - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: The Elder Gods are not pleased.
+    - Name: Shadowblade Order Wrong 4
+      Weight: 1
+      RequiredFlags:
+      - Flags:
         - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
         - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
         - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
@@ -599,18 +621,37 @@ MonoBehaviour:
         - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
         - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
         - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
         - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
-      - Speaker: Mothman
-        Text: 'This is the worst day of my life.
-
-'
+      - Speaker: Shadowblade Hellfury
+        Text: Pathetic.
+    - Name: Shadowblade Order Wrong 5
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Get out of my sight, slowpoke!
     Audio:
-      Voice: 2
+      Voice: 1
       Interval: 1
       Completion: 2
   startAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
@@ -641,7 +682,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: 'Mothman Delivery Correct '
+  interactionName: 'Shadowblade Delivery Correct '
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -680,32 +721,112 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Mothman Order Correct 1
+    - Name: Shadowblade Order Correct 1
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
-      - Speaker: Mothman
-        Text: 'Beautiful. Really.
-
-'
-    - Name: Mothman Order Correct 2
+      - Speaker: Shadowblade Hellfury
+        Text: Ahh, manna from Pandemonium itself.
+    - Name: Shadowblade Order Correct 2
       Weight: 1
       RequiredFlags:
       - Flags:
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
         Count: 1
       RequireAll: 1
       Lines:
-      - Speaker: Mothman
-        Text: 'This reminds me of the dancing Cicada.
-
-'
+      - Speaker: Shadowblade Hellfury
+        Text: Heh, not bad for a mortal.
+    - Name: Shadowblade Order Correct 3
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Your skills impress me, chef.
+    - Name: Shadowblade Order Correct 4
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: The Elder Gods are pleased.
+    - Name: Shadowblade Order Correct 5
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: This will do.
+    - Name: Shadowblade Order Correct 6
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: "My demons\u2026 pleased\u2026"
+    - Name: Shadowblade Order Correct 7
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: "\u2026I\u2019ll be back."
+    - Name: Shadowblade Order Correct 8
+      Weight: 1
+      RequiredFlags:
+      - Flags:
+        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+        Count: 1
+      - Flags:
+        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+        Count: 1
+      RequireAll: 1
+      Lines:
+      - Speaker: Shadowblade Hellfury
+        Text: Hmph.
     Audio:
-      Voice: 2
+      Voice: 1
       Interval: 1
       Completion: 1
   startAction: {fileID: 0}
@@ -748,10 +869,13 @@ MonoBehaviour:
     Board: Orders
     Entries:
     - Source: {fileID: 1741706001150086087}
-      Text: Water
-      FilterConsumed: 1
-      ConsumedFlags:
-      - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+      Text: Pizza Kebab
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Source: {fileID: 1741706001150086087}
+      Text: Beer
+      FilterConsumed: 0
+      ConsumedFlags: []
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -11518,6 +11518,10 @@ PrefabInstance:
       propertyPath: m_TargetTexture
       value: 
       objectReference: {fileID: 8400000, guid: 787eb66a50326bc468ce484ae45cf173, type: 2}
+    - target: {fileID: 5293910364743845505, guid: 8997202664fa34243a028a226dcd73ff, type: 3}
+      propertyPath: m_DefaultActionMap
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 7919666368900942333, guid: 8997202664fa34243a028a226dcd73ff, type: 3}
       propertyPath: m_Name
       value: PF_Player
