@@ -637,6 +637,8 @@ MonoBehaviour:
       - Speaker: Grandpa's Pic
         Text: 'You can get more ingredients from the shelves or fridge. If you''re out of them, you can find more in the storage room. '
       - Speaker: Grandpa's Pic
+        Text: You can discard ingredients you don't need by putting them in the Ejector on the wall.
+      - Speaker: Grandpa's Pic
         Text: That is all. You can consult me anytime.
     Audio:
       Voice: 0
