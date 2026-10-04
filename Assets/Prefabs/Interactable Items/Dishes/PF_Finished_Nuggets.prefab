@@ -607,7 +607,7 @@ MonoBehaviour:
     - Name: Magnet 1
       AnyIngredient: 1
       Flags: []
-      Order: 0
+      Order: 1
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
@@ -618,7 +618,7 @@ MonoBehaviour:
     - Name: Magnet 2
       AnyIngredient: 1
       Flags: []
-      Order: 0
+      Order: 2
       Position: {x: 0, y: 0.166942, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
