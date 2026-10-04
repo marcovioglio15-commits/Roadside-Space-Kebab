@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1757242934722147787}
   - component: {fileID: 3464830694783968524}
   - component: {fileID: 6442020716540934087}
-  - component: {fileID: 6881026261950981432}
   - component: {fileID: 2775264964013380314}
   - component: {fileID: 2076607803781630238}
   - component: {fileID: 6544544449097397199}
@@ -21,6 +20,9 @@ GameObject:
   - component: {fileID: 2236367251346473938}
   - component: {fileID: 5370390019909497021}
   - component: {fileID: 5245573820002899312}
+  - component: {fileID: 5228134902972582300}
+  - component: {fileID: 3636574319120910313}
+  - component: {fileID: 4271513465245405958}
   m_Layer: 0
   m_Name: PF_AssemblyStation
   m_TagString: Untagged
@@ -51,6 +53,9 @@ Transform:
   - {fileID: 8215382090389874618}
   - {fileID: 2920779428166167326}
   - {fileID: 4524236599516636299}
+  - {fileID: 7480781073803684815}
+  - {fileID: 6239475461044599083}
+  - {fileID: 2760922670105443173}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &3464830694783968524
@@ -86,57 +91,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
---- !u!114 &6881026261950981432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Station
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 5ac46ec16f119ee4696b9d9a5961457b, type: 2}
-  drawGizmos: 1
-  settings:
-    ProductPrefab: {fileID: 4182828039336747428, guid: cb83fdee05565914083f160286ab031a, type: 3}
-    Trigger: 2
-    ContactDuration: 0.5
-    ContactQueryInterval: 0.02
-    ContactTolerance: 0.005
-    IncludeTriggers: 1
-    Distance: 3
-    RequireSight: 1
-    Obstacles:
-      serializedVersion: 2
-      m_Bits: 55
-    OutputPosition: {x: 0, y: 0.1, z: 0}
-    OutputRotation: {x: 0, y: 0, z: 0}
-    AcceptReturnedProduct: 1
-  action: {fileID: 7328134972526443641, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
-  staging: {fileID: 292989205600492734}
 --- !u!114 &2775264964013380314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Station
+  interactionName: Assembly Pizza Rossa
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -241,7 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Station
+  interactionName: Assembly Kebab Wrap
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -292,7 +246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Station
+  interactionName: Assembly Pizza Margherita
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -343,7 +297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Station
+  interactionName: Assembly Falafel Wrap
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -394,7 +348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Station
+  interactionName: Assembly Pizza Kebab
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -445,7 +399,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Station
+  interactionName: Assembly Panino Kebab
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -496,7 +450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Station
+  interactionName: Assembly Panino Falafel
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -535,6 +489,159 @@ MonoBehaviour:
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 4524236599516636299}
+--- !u!114 &5228134902972582300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
+  interactionName: Assembly French Fries
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    ProductPrefab: {fileID: 224706048140884364, guid: 93f264b92da22d14998edcc0969a41f2, type: 3}
+    Trigger: 2
+    ContactDuration: 0.5
+    ContactQueryInterval: 0.02
+    ContactTolerance: 0.005
+    IncludeTriggers: 1
+    Distance: 3
+    RequireSight: 1
+    Obstacles:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    OutputPosition: {x: 0, y: 0.02, z: 0}
+    OutputRotation: {x: 0, y: 0, z: 0}
+    AcceptReturnedProduct: 1
+  action: {fileID: 0}
+  staging: {fileID: 7480781073803684815}
+--- !u!114 &3636574319120910313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
+  interactionName: Assembly Crab Claw
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 633a5e57a8f14874ba6bb96470b9b616, type: 2}
+  drawGizmos: 1
+  settings:
+    ProductPrefab: {fileID: 7759833384075562368, guid: 84bdd427fa97c9040b22320f5adcdc4a, type: 3}
+    Trigger: 2
+    ContactDuration: 0.5
+    ContactQueryInterval: 0.02
+    ContactTolerance: 0.005
+    IncludeTriggers: 1
+    Distance: 3
+    RequireSight: 1
+    Obstacles:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    OutputPosition: {x: 0, y: 0.02, z: 0}
+    OutputRotation: {x: 0, y: 0, z: 0}
+    AcceptReturnedProduct: 1
+  action: {fileID: 0}
+  staging: {fileID: 6239475461044599083}
+--- !u!114 &4271513465245405958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
+  interactionName: Assembly Nuggets
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 11400000, guid: 633a5e57a8f14874ba6bb96470b9b616, type: 2}
+  drawGizmos: 1
+  settings:
+    ProductPrefab: {fileID: 7371184249265839609, guid: 6045ed5dc564c16468e5ddd4a935560b, type: 3}
+    Trigger: 2
+    ContactDuration: 0.5
+    ContactQueryInterval: 0.02
+    ContactTolerance: 0.005
+    IncludeTriggers: 1
+    Distance: 3
+    RequireSight: 1
+    Obstacles:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    OutputPosition: {x: 0, y: 0.02, z: 0}
+    OutputRotation: {x: 0, y: 0, z: 0}
+    AcceptReturnedProduct: 1
+  action: {fileID: 0}
+  staging: {fileID: 2760922670105443173}
 --- !u!1 &820163158470653626
 GameObject:
   m_ObjectHideFlags: 0
@@ -589,6 +696,37 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1233407800809228376}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1757242934722147787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1294961159833118937
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6239475461044599083}
+  m_Layer: 0
+  m_Name: Assembly Staging
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &6239475461044599083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1294961159833118937}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -811,6 +949,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1757242934722147787}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4623741476879314717
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2760922670105443173}
+  m_Layer: 0
+  m_Name: Assembly Staging
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &2760922670105443173
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4623741476879314717}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1757242934722147787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5136636530615451640
 GameObject:
   m_ObjectHideFlags: 0
@@ -865,6 +1034,37 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7277327938909636851}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1757242934722147787}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8202334799682134050
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7480781073803684815}
+  m_Layer: 0
+  m_Name: Assembly Staging
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &7480781073803684815
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8202334799682134050}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}

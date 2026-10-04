@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28fd2a9b9b354771b7ea63915af5ba7c, type: 3}
+  m_Name: ModifyByContact Cook
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ContactModificationPreset
+  ToolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  Settings:
+    Flags:
+    - {fileID: 11400000, guid: f3810201d1372f14a8eb7eda092ab735, type: 2}
+    ContactDuration: 0.2
+    ContactTolerance: 0.02
+    QueryInterval: 0.02
+    IncludeTriggers: 0
+    AllowCarriedSelf: 1
+    AllowCarriedOther: 0
+    Duration: 10
+    CompleteAfterSeparation: 0
+    ResumeAfterInterruption: 0
+    RepeatAfterSeparation: 1
+    WhileContact: 0
+    RevertDelay: 0.25
+    Self:
+      Tint: 0
+      Multiplier: {r: 0, g: 0, b: 0, a: 1}
+      ColorProperty: _BaseColor
+      RendererPath: 
+      MaterialSlot: -1
+      Meshes: []
+      Consume: 0
+    Other:
+      Tint: 1
+      Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 0.3019608}
+      ColorProperty: _BaseColor
+      RendererPath: 
+      MaterialSlot: -1
+      Meshes: []
+      Consume: 0
+    ChangeContactFlag: 1
+    ContactFlag: {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    ContactFlagOperation: 0
+    BlockSelf: 1
+    BlockOther: 1

@@ -251,6 +251,7 @@ GameObject:
   - component: {fileID: -787682149558171876}
   - component: {fileID: 1078810028146786648}
   - component: {fileID: 5978522413586576434}
+  - component: {fileID: 9131791622166159450}
   m_Layer: 6
   m_Name: PF_Finished_CrabClaw
   m_TagString: Untagged
@@ -636,6 +637,82 @@ MonoBehaviour:
     HoverOnly: 1
   renderers:
   - {fileID: 7140520053148752678}
+--- !u!114 &9131791622166159450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7759833384075562368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b3f1b34465481291b768662cedce04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyProduct
+  interactionName: Assembly Product
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    WaitForNextIngredient: 0
+    Ingredients:
+    - Flags:
+      - {fileID: 11400000, guid: 2233b790a01fa404e895d36caea1b63b, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: a7939210dde959248b2f93747141a805, type: 2}
+      Count: 1
+      Optional: 0
+    Magnets:
+    - Name: Magnet 1
+      AnyIngredient: 1
+      Flags: []
+      Order: 1
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 1926761037992945242, guid: ab74849b39014cc468a4ec52d52c6e9d, type: 3}
+    - Name: Magnet 2
+      AnyIngredient: 1
+      Flags: []
+      Order: 2
+      Position: {x: 0, y: 0.166942, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+      PreviewPrefab: {fileID: 8012813332604229035, guid: 87e4fe0292d459c45935d1f543f29cdc, type: 3}
+    InteractionRules: []
+    CompletedAppearance:
+      Meshes:
+      - Path: SM_Finished_CrabClaw
+        Mesh: {fileID: -7699838354211290264, guid: c1848a9284dc8c941b7c18bfbf2a6e7f, type: 3}
+        UpdateCollider: 0
+      Materials: []
+    HideIngredients: 1
 --- !u!1001 &8419950670641006498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -683,6 +760,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: c1848a9284dc8c941b7c18bfbf2a6e7f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5754084199372789682, guid: c1848a9284dc8c941b7c18bfbf2a6e7f, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c1848a9284dc8c941b7c18bfbf2a6e7f, type: 3}
       propertyPath: m_Name
