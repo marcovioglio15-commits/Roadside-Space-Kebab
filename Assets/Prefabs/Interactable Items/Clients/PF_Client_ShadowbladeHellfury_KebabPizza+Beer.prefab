@@ -870,12 +870,14 @@ MonoBehaviour:
     Entries:
     - Source: {fileID: 1741706001150086087}
       Text: Pizza Kebab
-      FilterConsumed: 0
-      ConsumedFlags: []
+      FilterConsumed: 1
+      ConsumedFlags:
+      - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
     - Source: {fileID: 1741706001150086087}
       Text: Beer
-      FilterConsumed: 0
-      ConsumedFlags: []
+      FilterConsumed: 1
+      ConsumedFlags:
+      - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0
