@@ -851,8 +851,9 @@ MonoBehaviour:
     Entries:
     - Source: {fileID: 1741706001150086087}
       Text: Pizza Margherita
-      FilterConsumed: 0
-      ConsumedFlags: []
+      FilterConsumed: 1
+      ConsumedFlags:
+      - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

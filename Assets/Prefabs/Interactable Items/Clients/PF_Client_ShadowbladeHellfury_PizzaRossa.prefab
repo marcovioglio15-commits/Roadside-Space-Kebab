@@ -850,9 +850,10 @@ MonoBehaviour:
     Board: Orders
     Entries:
     - Source: {fileID: 1741706001150086087}
-      Text: Pizza Margherita
-      FilterConsumed: 0
-      ConsumedFlags: []
+      Text: Pizza Rossa
+      FilterConsumed: 1
+      ConsumedFlags:
+      - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0
