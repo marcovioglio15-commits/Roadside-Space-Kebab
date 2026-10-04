@@ -605,8 +605,9 @@ MonoBehaviour:
       Optional: 0
     Magnets:
     - Name: Magnet 1
-      AnyIngredient: 1
-      Flags: []
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 2233b790a01fa404e895d36caea1b63b, type: 2}
       Order: 1
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
@@ -616,8 +617,9 @@ MonoBehaviour:
         Materials: []
       PreviewPrefab: {fileID: 1926761037992945242, guid: ab74849b39014cc468a4ec52d52c6e9d, type: 3}
     - Name: Magnet 2
-      AnyIngredient: 1
-      Flags: []
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 8ea79f8ddaadf97469ae5ccc95dbb6c2, type: 2}
       Order: 2
       Position: {x: 0, y: 0.166942, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
