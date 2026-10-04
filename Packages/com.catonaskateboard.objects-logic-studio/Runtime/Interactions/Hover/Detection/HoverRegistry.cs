@@ -55,6 +55,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Dispatch
 
+        /// <summary>Reads visible hover ownership without searching an item's hierarchy during pickup selection.</summary>
+        /// <param name="target">Interaction whose eligible pickup is being compared.</param>
+        /// <returns>True when an available Hover on this item currently owns its label.</returns>
+        internal static bool IsHovered(ObjectInteraction target)
+        {
+            // Fading labels and locked interactions cannot claim pickup priority.
+            foreach (ObjectHover interaction in interactions)
+                if (interaction != null && (interaction.transform == target.transform || target.Item != null && interaction.Item == target.Item) && interaction.IsHovered
+                    && interaction.Available(InteractionChannels.Hover))
+                    return true;
+            return false;
+        }
+
         /// <summary>Evaluates the active set after the player camera has finished moving.</summary>
         /// <param name="observer">Owner of the current first-person view.</param>
         internal static void Tick(HoverObserver observer)
@@ -68,14 +81,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 else
                     frame.Add(interactions[index]);
 
+            // Keep collider raycasts aligned with transform-driven movement before the observation pass.
+            if (frame.Count > 0)
+                Physics.SyncTransforms();
+
             // Compare live screen positions; expensive visibility queries keep each hover's own interval.
             ObjectHover selected = null;
             float score = float.PositiveInfinity;
             foreach (ObjectHover interaction in frame)
-                if (interaction.Evaluate(observer, time) && interaction.Settings.TargetMode == HoverTargetMode.ViewCenter)
+                if (interaction.Evaluate(observer, time) && interaction.Settings.TargetMode != HoverDetectionMode.Cursor)
                 {
-                    float candidate = ((Vector2)observer.View.WorldToScreenPoint(interaction.WorldAnchor)
-                        - observer.View.pixelRect.center).sqrMagnitude;
+                    float candidate = interaction.Settings.TargetMode == HoverDetectionMode.CenterCollider ? 0f
+                        : ((Vector2)observer.View.WorldToScreenPoint(interaction.WorldAnchor) - observer.View.pixelRect.center).sqrMagnitude;
                     if (Closer(interaction, selected, candidate, score))
                     {
                         selected = interaction;
@@ -85,12 +102,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Release the previous winner before the new one emits events; Pop In may finish independently.
             foreach (ObjectHover interaction in frame)
-                if (interaction != null && interaction.Settings != null && interaction.Settings.TargetMode == HoverTargetMode.ViewCenter
+                if (interaction != null && interaction.Settings != null && interaction.Settings.TargetMode != HoverDetectionMode.Cursor
                     && interaction != selected)
                     interaction.Present(observer, time, false);
             foreach (ObjectHover interaction in frame)
                 if (interaction != null && interaction.Settings != null
-                    && (interaction == selected || interaction.Settings.TargetMode != HoverTargetMode.ViewCenter))
+                    && (interaction == selected || interaction.Settings.TargetMode == HoverDetectionMode.Cursor))
                     interaction.Present(observer, time, true);
         }
 
@@ -109,6 +126,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return candidate.Detected;
             if (score != best)
                 return score < best;
+            if (candidate.Settings.TargetMode == HoverDetectionMode.CenterCollider && selected.Settings.TargetMode == HoverDetectionMode.CenterCollider
+                && candidate.HitDistance != selected.HitDistance)
+                return candidate.HitDistance < selected.HitDistance;
             if (candidate.IsHovered != selected.IsHovered)
                 return candidate.IsHovered;
             return EntityId.ToULong(candidate.GetEntityId()) < EntityId.ToULong(selected.GetEntityId());

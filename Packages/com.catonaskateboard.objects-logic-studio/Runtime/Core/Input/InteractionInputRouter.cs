@@ -99,6 +99,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 button.Clear();
         }
 
+        /// <summary>Finds an already buffered action without subscribing to a new input.</summary>
+        /// <param name="reference">Authored action shared by competing interaction drivers.</param>
+        /// <returns>The existing button, or null when no interaction uses this action.</returns>
+        internal InteractionButton Find(InputActionReference reference)
+        {
+            // Stable IDs also match PlayerInput's private copy of the authored asset.
+            return reference != null && reference.action != null && buttons.TryGetValue(reference.action.id, out InteractionButton button)
+                ? button : null;
+        }
+
         /// <summary>Discards all buffered presses after one arbitration pass.</summary>
         internal void ClearSignals()
         {

@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
@@ -78,10 +79,10 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                 return;
             }
             // Filters affect only presentation and never mutate the selected flag combination.
-            search = EditorGUILayout.TextField(new GUIContent("Search", "Filter by flag name or group."), search);
-            group = EditorGUILayout.Popup(new GUIContent("Group", "Show definitions from one catalog group."), group, groups);
+            search = StudioGUI.TextField(new GUIContent("Search", "Filter by flag name or group."), search);
+            group = StudioGUI.Popup(new GUIContent("Group", "Show definitions from one catalog group."), group, groups);
             if (multiple)
-                selectedOnly = EditorGUILayout.Toggle(new GUIContent("Selected Only", "Show only flags included in this field."), selectedOnly);
+                selectedOnly = StudioGUI.Toggle(new GUIContent("Selected Only", "Show only flags included in this field."), selectedOnly);
             if (StudioButton.Draw(new GUIContent("Clear Selection", "Remove this field's selected flags."), EditorStyles.miniButton))
             {
                 ObjectFlagSelector.Assign(owner, path, null, false);

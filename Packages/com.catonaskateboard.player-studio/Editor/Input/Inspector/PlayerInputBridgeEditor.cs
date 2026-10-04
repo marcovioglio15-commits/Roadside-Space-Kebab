@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,7 +30,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // This view reads the cache; it never looks up actions or enables maps.
             PlayerInputBridge bridge = (PlayerInputBridge)target;
             using (new EditorGUI.DisabledScope(true))
-                EditorGUILayout.Vector2Field(movementLabel, bridge.Movement);
+                StudioGUI.Vector2Field(movementLabel, bridge.Movement);
 
             if (bridge.ConnectionWarning.Length > 0)
                 EditorGUILayout.HelpBox(bridge.ConnectionWarning, MessageType.Warning);

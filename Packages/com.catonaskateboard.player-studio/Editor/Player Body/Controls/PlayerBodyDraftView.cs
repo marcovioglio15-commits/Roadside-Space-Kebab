@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,8 +27,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Keep entered values intact, including invalid dimensions that need correction.
             EditorGUI.BeginChangeCheck();
-            float radius = EditorGUILayout.FloatField(radiusLabel, session.Radius);
-            float height = EditorGUILayout.FloatField(heightLabel, session.Height);
+            float radius = StudioGUI.FloatField(radiusLabel, session.Radius);
+            float height = StudioGUI.FloatField(heightLabel, session.Height);
             if (!EditorGUI.EndChangeCheck())
                 return false;
 

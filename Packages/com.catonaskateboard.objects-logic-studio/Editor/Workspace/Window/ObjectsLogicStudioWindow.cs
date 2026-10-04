@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
@@ -382,7 +383,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        GameObject requested = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Prefab", "Source prefab edited by this tool. Changing prefab asks how to handle pending changes."), state.Prefab, typeof(GameObject), false);
+                        GameObject requested = (GameObject)StudioGUI.ObjectField(new GUIContent("Prefab", "Source prefab edited by this tool. Changing prefab asks how to handle pending changes."), state.Prefab, typeof(GameObject), false);
                         if (requested != state.Prefab)
                             SelectPrefab(requested);
                         if (state.Prefab != null && GUILayout.Button(openPrefabLabel, EditorStyles.miniButton, GUILayout.Width(44f)))
@@ -391,7 +392,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (CanEdit)
                     {
                         using (new EditorGUI.DisabledScope(true))
-                            EditorGUILayout.ObjectField(new GUIContent("Prefab Object", "Selected root or child inside the prefab workspace."), currentObject, typeof(GameObject), true);
+                            StudioGUI.ObjectField(new GUIContent("Prefab Object", "Selected root or child inside the prefab workspace."), currentObject, typeof(GameObject), true);
                         ObjectIdentityControls.Draw(currentObject, state.HasChanges);
                         using (new EditorGUI.DisabledScope(state.HasChanges))
                             if (currentObject.GetComponent<ObjectItem>() == null && StudioButton.Draw(new GUIContent("Prepare Contact Item",
@@ -512,7 +513,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             SerializedProperty path = binding.FindPropertyRelative("AnchorPath");
             Transform anchor = HoverHierarchy.Resolve(hover.transform, path.stringValue);
-            Transform selected = (Transform)EditorGUILayout.ObjectField(new GUIContent("Anchor", "Optional transform inside this object's hierarchy; empty uses its root."), anchor, typeof(Transform), true);
+            Transform selected = (Transform)StudioGUI.ObjectField(new GUIContent("Anchor", "Optional transform inside this object's hierarchy; empty uses its root."), anchor, typeof(Transform), true);
             if (selected != anchor)
             {
                 if (selected == null || selected.IsChildOf(hover.transform))

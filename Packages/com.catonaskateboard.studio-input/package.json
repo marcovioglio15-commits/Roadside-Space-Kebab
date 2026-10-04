@@ -4,5 +4,8 @@
   "displayName": "Studio Input",
   "description": "Shared editor action navigation for Studio tools.",
   "unity": "6000.6",
-  "dependencies": { "com.unity.inputsystem": "1.20.0" }
+  "dependencies": {
+    "com.unity.inputsystem": "1.20.0",
+    "com.catonaskateboard.studio-colors": "1.0.0"
+  }
 }

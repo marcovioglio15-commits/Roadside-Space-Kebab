@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
@@ -35,7 +36,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         private void OnGUI()
         {
             // Search spans names and groups while asset identity remains unchanged.
-            search = EditorGUILayout.TextField(new GUIContent("Filter", "Search flag names and groups."), search);
+            search = StudioGUI.TextField(new GUIContent("Filter", "Search flag names and groups."), search);
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (StudioButton.Draw(new GUIContent("+ Create Flag", "Add a new named flag to the shared project catalog.")))

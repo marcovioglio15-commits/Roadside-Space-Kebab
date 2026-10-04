@@ -50,6 +50,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             // A small minimum width keeps the window useful when docked beside Scene view.
             minSize = new Vector2(360f, 360f);
             Undo.undoRedoPerformed += HandleUndo;
+            StudioFieldMenu.Changed += FieldChanged;
             if (draft != null)
             {
                 // HideAndDontSave includes NotEditable, which disables SerializedProperty controls.
@@ -58,11 +59,21 @@ namespace CatOnASkateboard.StudioColors.Editor
             }
         }
 
+        /// <summary>Refreshes Apply/Discard after a context-menu edit of the detached preset.</summary>
+        /// <param name="edited">Object changed by Paste.</param>
+        private void FieldChanged(UnityEngine.Object edited)
+        {
+            // Delayed menu callbacks occur outside the IMGUI change-check scope.
+            if (edited == draft)
+                RefreshActions();
+        }
+
         /// <summary>Releases callbacks without destroying a draft during script reload.</summary>
         protected virtual void OnDisable()
         {
             // Serialized draft references survive editor assembly reloads.
             Undo.undoRedoPerformed -= HandleUndo;
+            StudioFieldMenu.Changed -= FieldChanged;
             serialized?.Dispose();
             serialized = null;
         }
@@ -84,6 +95,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             toolbar.style.flexWrap = Wrap.Wrap;
             toolbar.style.height = StyleKeyword.Auto;
             selector = new ObjectField { objectType = PresetType, value = source, allowSceneObjects = false, tooltip = "Select the preset to edit." };
+            StudioFieldMenu.Attach(selector, value => value == null || PresetType.IsInstanceOfType(value) && EditorUtility.IsPersistent(value));
             selector.style.flexGrow = 1f;
             selector.style.minWidth = 160f;
             selector.RegisterValueChangedCallback(evt => SelectPreset(evt.newValue as ScriptableObject));

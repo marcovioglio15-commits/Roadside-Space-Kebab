@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -20,8 +21,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectHover hover = (ObjectHover)target;
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.ObjectField(new GUIContent("Preset", "Applied reusable hover configuration."), hover.Preset, typeof(HoverPreset), false);
-                EditorGUILayout.ObjectField(new GUIContent("Label", "Preauthored UI owned by this interaction."), hover.Label, typeof(HoverLabel), true);
+                StudioGUI.ObjectField(new GUIContent("Preset", "Applied reusable hover configuration."), hover.Preset, typeof(HoverPreset), false);
+                StudioGUI.ObjectField(new GUIContent("Label", "Preauthored UI owned by this interaction."), hover.Label, typeof(HoverLabel), true);
             }
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
                 || !ObjectAuthoringSave.TryValidate(hover.gameObject, out _)))

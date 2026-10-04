@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
@@ -61,12 +62,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             createdHost = null;
             warning = string.Empty;
 
-            sceneAsset = (SceneAsset)EditorGUILayout.ObjectField(sceneLabel, sceneAsset, typeof(SceneAsset), false);
-            playerName = EditorGUILayout.TextField(nameLabel, playerName);
-            position = EditorGUILayout.Vector3Field(positionLabel, position);
-            yaw = EditorGUILayout.FloatField(yawLabel, yaw);
+            sceneAsset = (SceneAsset)StudioGUI.ObjectField(sceneLabel, sceneAsset, typeof(SceneAsset), false);
+            playerName = StudioGUI.TextField(nameLabel, playerName);
+            position = StudioGUI.Vector3Field(positionLabel, position);
+            yaw = StudioGUI.FloatField(yawLabel, yaw);
             if (master != null && master.CameraPreset != null)
-                usePlayerView = EditorGUILayout.Toggle(new GUIContent("Use Player View",
+                usePlayerView = StudioGUI.Toggle(new GUIContent("Use Player View",
                     "Disable other active cameras and audio listeners in the destination scene with Undo."), usePlayerView);
 
             // A Body alone does not supply the master reference required by PlayerHost.

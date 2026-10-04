@@ -18,6 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int inputRevision = -1;
         private int sliceRevision = -1;
         private bool missingInputReported;
+        private bool performed;
 
         #endregion
 
@@ -121,49 +122,81 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Dispatch
 
-        /// <summary>Processes one pickup or release after the gameplay camera has finished moving.</summary>
-        /// <param name="observer">Shared camera/player context.</param>
-        /// <param name="consumed">Action already used by dialogue in this frame, if any.</param>
-        internal void Tick(HoverObserver observer, InputActionReference consumed = null)
+        /// <summary>Prepares buffered actions before dialogue chooses whether to yield its shared input.</summary>
+        /// <param name="observer">Shared camera and player context.</param>
+        internal void Prepare(HoverObserver observer)
         {
-            // Rebinding is triggered by ownership and registry changes, not by ordinary repaints or frames.
+            // Registry changes are resolved before either driver dispatches an action.
             Bind(observer);
+            performed = false;
             input.Consume(AssemblyInteractionRegistry.Consumed);
-            input.Consume(consumed);
             foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
                 input.Consume(action);
             if (held != null && !held.IsHeld)
                 held = null;
             if (!input.Usable || Time.timeScale <= 0f)
-            {
                 input.ClearSignals();
-                return;
-            }
-            bool pending = false;
-            foreach (InteractionButton button in bindings.Values)
-                pending |= button.Pending;
-            if (!pending)
-                return;
+        }
+
+        /// <summary>Gives one eligible Single the dialogue's shared press, retaining dialogue if nothing succeeds.</summary>
+        /// <param name="observer">Current aiming and carrying context.</param>
+        /// <param name="action">Dialogue start or advance action to arbitrate.</param>
+        /// <returns>True only after a Single has performed the requested action.</returns>
+        internal bool TryPrioritize(HoverObserver observer, InputActionReference action)
+        {
+            // Match only this action; a different pressed key must not suppress the dialogue.
+            InteractionButton requested = input.Find(action);
+            if (performed || !input.Usable || Time.timeScale <= 0f || requested == null || !requested.Pending)
+                return false;
             Physics.SyncTransforms();
-            if (!Command(observer) && !Slice(observer))
-                if (held != null)
-                    Release(observer);
-                else
-                    Grab(observer);
+            performed = Execute(observer, requested);
+            return performed;
+        }
+
+        /// <summary>Processes remaining input after dialogue arbitration, allowing only one Single per pass.</summary>
+        /// <param name="observer">Shared camera and player context.</param>
+        /// <param name="consumed">Action already used by dialogue in this frame, if any.</param>
+        internal void Tick(HoverObserver observer, InputActionReference consumed = null)
+        {
+            // A prioritized Single already owns this pass, including its carry-slot transition.
+            input.Consume(consumed);
+            if (!performed && input.Usable && Time.timeScale > 0f)
+            {
+                bool pending = false;
+                foreach (InteractionButton button in bindings.Values)
+                    pending |= button.Pending;
+                if (pending)
+                {
+                    Physics.SyncTransforms();
+                    Execute(observer, null);
+                }
+            }
             input.ClearSignals();
+        }
+
+        /// <summary>Uses the same selection rules for ordinary input and dialogue's optional priority handoff.</summary>
+        /// <param name="observer">Current targeting context.</param>
+        /// <param name="requested">Restrict execution to this button, or null for all pending buttons.</param>
+        /// <returns>True when an interaction successfully consumes a press.</returns>
+        private bool Execute(HoverObserver observer, InteractionButton requested)
+        {
+            // Dialogue yields only to Single interactions; ordinary dispatch retains Slice precedence over inventory operations.
+            return Command(observer, requested) || requested == null && Slice(observer, null)
+                || (held != null ? Release(observer, requested) : Grab(observer, requested));
         }
 
         /// <summary>Advances the highest-priority visible Slice before considering pickup or release.</summary>
         /// <param name="observer">Player and camera supplying reach and visibility.</param>
+        /// <param name="requested">Optional shared button restricting this arbitration pass.</param>
         /// <returns>True when one step consumed this frame's performed input.</returns>
-        private bool Slice(HoverObserver observer)
+        private bool Slice(HoverObserver observer, InteractionButton requested)
         {
             // Restrict geometry queries to performed presses on eligible unfinished sequences.
             ObjectSlice selected = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
             {
-                if (!pair.Value.Pending || pair.Key is not ObjectSlice candidate || !candidate.CanAdvance()
+                if (!pair.Value.Pending || requested != null && pair.Value != requested || pair.Key is not ObjectSlice candidate || !candidate.CanAdvance()
                     || candidate.transform.IsChildOf(observer.Player))
                     continue;
                 TransferTargetSettings target = candidate.Settings.Target;
@@ -182,14 +215,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Routes one visible transform or eject action without requiring an empty carry slot.</summary>
         /// <param name="observer">Current camera and player supplying reach and aim.</param>
+        /// <param name="requested">Optional shared button restricting this arbitration pass.</param>
         /// <returns>True when a targeted command performed a successful operation.</returns>
-        private bool Command(HoverObserver observer)
+        private bool Command(HoverObserver observer, InteractionButton requested)
         {
             // A shared press selects one nearest command before carry or inventory actions consume it.
             ObjectCommandInteraction selected = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (pair.Value.Pending && pair.Key is ObjectCommandInteraction candidate && candidate.CanExecute()
+                if (pair.Value.Pending && (requested == null || pair.Value == requested) && pair.Key is ObjectCommandInteraction candidate && candidate.CanExecute()
                     && !candidate.transform.IsChildOf(observer.Player) && Eligible(observer, candidate, out float score)
                     && Nearer(candidate, selected, score, distance))
                 {
@@ -201,13 +235,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Chooses the highest-priority eligible release without grabbing again in the same event.</summary>
         /// <param name="observer">Camera defining the release aim.</param>
-        private void Release(HoverObserver observer)
+        /// <param name="requested">Optional shared button restricting this arbitration pass.</param>
+        /// <returns>True when the operation successfully consumes the input.</returns>
+        private bool Release(HoverObserver observer, InteractionButton requested)
         {
             // A successful deposit consumes this event before a same-key Drop can release the item.
             ObjectContainer container = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (pair.Value.Pending && pair.Key is ObjectContainer candidate && candidate.CanStore(held)
+                if (pair.Value.Pending && (requested == null || pair.Value == requested) && pair.Key is ObjectContainer candidate && candidate.CanStore(held)
                     && Eligible(observer, candidate, out float score) && Nearer(candidate, container, score, distance))
                 {
                     container = candidate;
@@ -216,32 +252,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (container != null && container.Store(held))
             {
                 held = null;
-                return;
+                return true;
             }
             // Throw wins simultaneous Drop/Throw requests; using one action for Grab and Drop provides a toggle.
             ObjectRelease selected = null;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (pair.Value.Pending && pair.Key is ObjectRelease release && release.Available(InteractionChannels.Release)
+                if (pair.Value.Pending && (requested == null || pair.Value == requested) && pair.Key is ObjectRelease release && release.Available(InteractionChannels.Release)
                     && release.Grab == held && (selected == null || release.Kind == SingleInteractionKind.Throw))
                     selected = release;
             if (selected == null)
-                return;
+                return false;
             selected.Signal(InteractionMoment.Started);
             selected.Execute(observer.View.transform);
             selected.Signal(InteractionMoment.Completed);
             held = null;
+            return true;
         }
 
-        /// <summary>Selects the nearest eligible object for the performed Grab action.</summary>
+        /// <summary>Selects a hovered eligible pickup first, then resolves equal hover priority by distance.</summary>
         /// <param name="observer">Camera, player and visibility context.</param>
-        private void Grab(HoverObserver observer)
+        /// <param name="requested">Optional shared button restricting this arbitration pass.</param>
+        /// <returns>True when the operation successfully consumes the input.</returns>
+        private bool Grab(HoverObserver observer, InteractionButton requested)
         {
             // Only one eligible feature can claim the empty carry slot for this input event.
             ObjectInteraction selected = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
             {
-                if (!pair.Value.Pending || pair.Key == null || pair.Key.transform.IsChildOf(observer.Player))
+                if (!pair.Value.Pending || requested != null && pair.Value != requested || pair.Key == null || pair.Key.transform.IsChildOf(observer.Player))
                     continue;
                 float score = float.PositiveInfinity;
                 bool eligible = pair.Key switch
@@ -250,7 +289,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     ObjectDispenser dispenser => dispenser.CanTake() && Eligible(observer, dispenser, out score),
                     _ => false
                 };
-                if (eligible && Nearer(pair.Key, selected, score, distance))
+                if (eligible && PreferPickup(pair.Key, selected, score, distance))
                 {
                     selected = pair.Key;
                     distance = score;
@@ -260,11 +299,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 case ObjectGrab grab when grab.Begin(observer):
                     held = grab;
-                    break;
+                    return true;
                 case ObjectDispenser dispenser when dispenser.TryTake(observer, out ObjectGrab supplied):
                     held = supplied;
-                    break;
+                    return true;
             }
+            return false;
+        }
+
+        /// <summary>Prioritizes hovered pickups while retaining distance ordering within each group.</summary>
+        /// <param name="candidate">Eligible grab or dispenser.</param>
+        /// <param name="selected">Current best eligible pickup.</param>
+        /// <param name="score">Candidate distance score.</param>
+        /// <param name="distance">Current best distance score.</param>
+        /// <returns>True when this pickup should replace the current selection.</returns>
+        private static bool PreferPickup(ObjectInteraction candidate, ObjectInteraction selected, float score, float distance)
+        {
+            // Hover affects priority only after the candidate passed its own Grab targeting and locks.
+            if (selected == null)
+                return true;
+            bool hovered = HoverRegistry.IsHovered(candidate);
+            return hovered != HoverRegistry.IsHovered(selected) ? hovered : Nearer(candidate, selected, score, distance);
         }
 
         /// <summary>Breaks equal-distance ties consistently without depending on registry enumeration order.</summary>

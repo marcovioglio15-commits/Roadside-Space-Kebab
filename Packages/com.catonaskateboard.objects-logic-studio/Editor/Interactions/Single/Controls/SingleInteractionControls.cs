@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioInput.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -181,7 +183,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Field(SerializedProperty owner, string name)
         {
             // One field renderer keeps labels, tooltips and indentation consistent across cards.
-            EditorGUILayout.PropertyField(owner.FindPropertyRelative(name), true);
+            StudioGUI.PropertyField(owner.FindPropertyRelative(name), true);
         }
 
         #endregion

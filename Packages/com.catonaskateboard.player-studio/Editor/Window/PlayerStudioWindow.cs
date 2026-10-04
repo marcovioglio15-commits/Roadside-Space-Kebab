@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEditor.EditorTools;
@@ -151,7 +153,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             bool isPlaying = EditorApplication.isPlayingOrWillChangePlaymode;
             using (new EditorGUI.DisabledScope(isPlaying || HasPendingChanges))
             {
-                PlayerHost requestedHost = (PlayerHost)EditorGUILayout.ObjectField(playerLabel, state.PreviewHost, typeof(PlayerHost), true);
+                PlayerHost requestedHost = (PlayerHost)StudioGUI.ObjectField(playerLabel, state.PreviewHost, typeof(PlayerHost), true);
                 if (requestedHost != state.PreviewHost)
                     TryUsePlayer(requestedHost);
 

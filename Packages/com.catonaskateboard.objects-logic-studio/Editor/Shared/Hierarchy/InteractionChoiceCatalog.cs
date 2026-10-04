@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -112,7 +114,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             (long[] Identities, GUIContent[] Labels) options = Options(excluded, sameKindAs);
             int current = Array.IndexOf(options.Identities, property.longValue);
             EditorGUI.BeginChangeCheck();
-            int selected = EditorGUILayout.Popup(new GUIContent(label, property.tooltip), current >= 0 ? current : 0, options.Labels);
+            int selected = StudioGUI.Popup(StudioFieldMenu.Value(property, new GUIContent(label, property.tooltip)), current >= 0 ? current : 0, options.Labels);
             if (EditorGUI.EndChangeCheck())
                 property.longValue = options.Identities[selected];
             if (current < 0)

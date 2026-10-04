@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -154,7 +156,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Repainting never rewrites an existing value through a floating-point round trip.
             using SerializedProperty property = settings.FindPropertyRelative(name);
             EditorGUI.BeginChangeCheck();
-            Vector2 value = EditorGUILayout.Vector2Field(new GUIContent(label, tooltip),
+            Vector2 value = StudioGUI.Vector2Field(StudioFieldMenu.Value(property, new GUIContent(label, tooltip)),
                 new Vector2(property.vector2Value.x / calibration.x, property.vector2Value.y / calibration.y));
             if (EditorGUI.EndChangeCheck())
                 property.vector2Value = Vector2.Scale(value, calibration);

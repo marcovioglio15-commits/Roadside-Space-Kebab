@@ -412,13 +412,12 @@ MonoBehaviour:
   settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
   drawGizmos: 1
   settings:
-    Thickness: 8
+    Thickness: 1
     Color: {r: 1, g: 0.74509805, b: 0, a: 1}
     Intensity: 5
     EdgeAngle: 30
     HoverOnly: 1
-  renderers:
-  - {fileID: 0}
+  renderers: []
 --- !u!114 &4512469906299410155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -470,7 +469,7 @@ MonoBehaviour:
   preset: {fileID: 0}
   configuration:
     settings:
-      targetMode: 0
+      targetMode: 2
       playerDistance: 3
       centerRadius: 0.7
       queryInterval: 0.05

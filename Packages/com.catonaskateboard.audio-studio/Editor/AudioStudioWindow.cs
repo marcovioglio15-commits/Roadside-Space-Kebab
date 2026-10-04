@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -134,7 +135,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
                 SetStatus(FmodCatalog.Load(Preset.Connection, catalog));
                 FilterCatalog();
             }
-            string requested = EditorGUILayout.TextField(new GUIContent("Search", "Filter event paths and bank names."), search);
+            string requested = StudioGUI.TextField(new GUIContent("Search", "Filter event paths and bank names."), search);
             if (requested != search)
             {
                 search = requested;
@@ -179,13 +180,13 @@ namespace CatOnASkateboard.AudioStudio.Editor
             DrawAssignments(data);
             foreach (FmodCatalogParameter parameter in selected.Parameters)
                 if (parameter.Labels.Length > 0)
-                    previewParameters[parameter.Name] = parameter.Minimum + EditorGUILayout.Popup(new GUIContent(parameter.Name,
+                    previewParameters[parameter.Name] = parameter.Minimum + StudioGUI.Popup(new GUIContent(parameter.Name,
                         "Authored FMOD parameter label used by the next preview."),
                         Mathf.RoundToInt(previewParameters[parameter.Name] - parameter.Minimum), parameter.Labels);
                 else
-                    previewParameters[parameter.Name] = EditorGUILayout.Slider(new GUIContent(parameter.Name,
+                    previewParameters[parameter.Name] = StudioGUI.Slider(new GUIContent(parameter.Name,
                         parameter.Global ? "Global preview parameter." : "Event preview parameter."), previewParameters[parameter.Name], parameter.Minimum, parameter.Maximum);
-            previewVolume = EditorGUILayout.Slider(new GUIContent("Preview volume", "Volume of editor auditions only."), previewVolume, 0f, 1f);
+            previewVolume = StudioGUI.Slider(new GUIContent("Preview volume", "Volume of editor auditions only."), previewVolume, 0f, 1f);
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (StudioFields.Button("Play preview", "Audition the built event with these parameter values."))
@@ -202,7 +203,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
             // Assignments preserve volume, rate limits and other authored tuning.
             if (Preset.Events.Count > 0)
             {
-                eventIndex = EditorGUILayout.Popup(new GUIContent("Event target", "Existing event binding to update."), Mathf.Min(eventIndex, Preset.Events.Count - 1), Preset.Events.ConvertAll(binding => binding.Key).ToArray());
+                eventIndex = StudioGUI.Popup(new GUIContent("Event target", "Existing event binding to update."), Mathf.Min(eventIndex, Preset.Events.Count - 1), Preset.Events.ConvertAll(binding => binding.Key).ToArray());
                 if (StudioFields.Button("Assign event", "Replace only this binding's FMOD path and GUID."))
                 {
                     SerializedProperty binding = data.FindProperty("Events").GetArrayElementAtIndex(eventIndex);
@@ -212,7 +213,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
             }
             if (Preset.Music.Count > 0)
             {
-                musicIndex = EditorGUILayout.Popup(new GUIContent("Music target", "Existing music context to update."), Mathf.Min(musicIndex, Preset.Music.Count - 1), Preset.Music.ConvertAll(music => music.Context).ToArray());
+                musicIndex = StudioGUI.Popup(new GUIContent("Music target", "Existing music context to update."), Mathf.Min(musicIndex, Preset.Music.Count - 1), Preset.Music.ConvertAll(music => music.Context).ToArray());
                 if (StudioFields.Button("Assign music", "Set this music context's event and first assigned bank."))
                 {
                     SerializedProperty music = data.FindProperty("Music").GetArrayElementAtIndex(musicIndex);

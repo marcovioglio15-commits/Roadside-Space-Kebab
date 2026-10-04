@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -17,7 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Disabled requirements retain their previous values for later reuse.
             SerializedProperty enabled = settings.FindPropertyRelative("Enabled");
-            enabled.boolValue = EditorGUILayout.Toggle(new GUIContent("Require Contact", enabled.tooltip), enabled.boolValue);
+            enabled.boolValue = StudioGUI.Toggle(StudioFieldMenu.Value(enabled, new GUIContent("Require Contact", enabled.tooltip)), enabled.boolValue);
             if (!settings.FindPropertyRelative("Enabled").boolValue)
                 return;
             SerializedProperty flags = settings.FindPropertyRelative("Flags");

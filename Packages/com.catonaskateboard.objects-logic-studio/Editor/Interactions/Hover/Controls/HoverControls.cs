@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,7 +30,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     Field(settings, "targetMode");
                     Field(settings, "playerDistance");
-                    if ((HoverTargetMode)settings.FindPropertyRelative("targetMode").enumValueIndex == HoverTargetMode.ViewCenter)
+                    if ((HoverDetectionMode)settings.FindPropertyRelative("targetMode").enumValueIndex == HoverDetectionMode.ViewCenter)
                         Field(settings, "centerRadius");
                     Field(settings, "queryInterval");
                     Field(settings, "releaseDelay");
@@ -77,7 +79,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     SerializedProperty content = style.FindPropertyRelative("content");
                     EditorGUILayout.LabelField(new GUIContent("Content", content.tooltip));
-                    content.stringValue = EditorGUILayout.TextArea(content.stringValue, GUILayout.MinHeight(42f));
+                    content.stringValue = StudioGUI.TextArea(StudioFieldMenu.Value(content, content.stringValue), GUILayout.MinHeight(42f));
                     Field(style, "font");
                     Field(style, "fontSize");
                     Field(style, "fontStyle");
@@ -106,7 +108,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         if (style.FindPropertyRelative("backgroundSprite").objectReferenceValue != null)
                         {
                             SerializedProperty type = style.FindPropertyRelative("backgroundType");
-                            type.enumValueIndex = EditorGUILayout.Popup(new GUIContent(type.displayName, type.tooltip), type.enumValueIndex, backgroundTypes);
+                            type.enumValueIndex = StudioGUI.Popup(StudioFieldMenu.Value(type, new GUIContent(type.displayName, type.tooltip)), type.enumValueIndex, backgroundTypes);
                         }
                     }
                 }
@@ -128,31 +130,31 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Boolean:
-                    property.boolValue = EditorGUILayout.Toggle(label, property.boolValue);
+                    property.boolValue = StudioGUI.Toggle(StudioFieldMenu.Value(property, label), property.boolValue);
                     break;
                 case SerializedPropertyType.Integer:
-                    property.intValue = EditorGUILayout.IntField(label, property.intValue);
+                    property.intValue = StudioGUI.IntField(StudioFieldMenu.Value(property, label), property.intValue);
                     break;
                 case SerializedPropertyType.Float:
-                    property.floatValue = EditorGUILayout.FloatField(label, property.floatValue);
+                    property.floatValue = StudioGUI.FloatField(StudioFieldMenu.Value(property, label), property.floatValue);
                     break;
                 case SerializedPropertyType.String:
-                    property.stringValue = EditorGUILayout.TextField(label, property.stringValue);
+                    property.stringValue = StudioGUI.TextField(StudioFieldMenu.Value(property, label), property.stringValue);
                     break;
                 case SerializedPropertyType.Enum:
-                    property.enumValueIndex = EditorGUILayout.Popup(label, property.enumValueIndex, property.enumDisplayNames);
+                    property.enumValueIndex = StudioGUI.Popup(StudioFieldMenu.Value(property, label), property.enumValueIndex, property.enumDisplayNames);
                     break;
                 case SerializedPropertyType.Vector2:
-                    property.vector2Value = EditorGUILayout.Vector2Field(label, property.vector2Value);
+                    property.vector2Value = StudioGUI.Vector2Field(StudioFieldMenu.Value(property, label), property.vector2Value);
                     break;
                 case SerializedPropertyType.Vector3:
-                    property.vector3Value = EditorGUILayout.Vector3Field(label, property.vector3Value);
+                    property.vector3Value = StudioGUI.Vector3Field(StudioFieldMenu.Value(property, label), property.vector3Value);
                     break;
                 case SerializedPropertyType.Color:
-                    property.colorValue = EditorGUILayout.ColorField(label, property.colorValue);
+                    property.colorValue = StudioGUI.ColorField(StudioFieldMenu.Value(property, label), property.colorValue);
                     break;
                 default:
-                    EditorGUILayout.PropertyField(property, label, true);
+                    StudioGUI.PropertyField(property, label, true);
                     break;
             }
         }

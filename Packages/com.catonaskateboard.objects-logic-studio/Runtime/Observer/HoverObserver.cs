@@ -135,8 +135,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     dialogueHud.Prepare(this);
                 InteractionUnlockRegistry.Tick(this);
                 AssemblyInteractionRegistry.Tick(this);
-                singles.Tick(this, dialogues.Tick(this));
                 HoverRegistry.Tick(this);
+                singles.Prepare(this);
+                singles.Tick(this, dialogues.Tick(this, singles));
             }
             else if (hadContext)
             {
@@ -215,40 +216,47 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Checks range, camera viewport, mode-specific targeting and clean line of sight.</summary>
         /// <param name="target">Interaction with validated configuration.</param>
         /// <param name="colliders">Cached target collider hierarchy.</param>
+        /// <param name="hitDistance">Receives squared camera-to-target distance for centre-hit arbitration.</param>
         /// <returns>True when this object may display its label.</returns>
-        internal bool Evaluate(ObjectHover target, Collider[] colliders)
+        internal bool Evaluate(ObjectHover target, Collider[] colliders, out float hitDistance)
         {
-            // Cheap rejection precedes physics; range is measured from the identified player, not the camera.
+            // Collider modes test the actual hit surface even when the root pivot is off-screen or out of reach.
             Vector3 anchor = target.WorldAnchor;
             HoverSettings settings = target.Settings;
-            if ((anchor - player.position).sqrMagnitude > settings.PlayerDistance * settings.PlayerDistance)
-                return false;
-            Vector3 projected = resolvedView.WorldToScreenPoint(anchor);
             Rect viewport = resolvedView.pixelRect;
-            if (projected.z < resolvedView.nearClipPlane || projected.z > resolvedView.farClipPlane
-                || !viewport.Contains(projected) || (resolvedView.cullingMask & (1 << target.gameObject.layer)) == 0)
-                return false;
-
-            // Exact cursor hits and center proximity share the same final obstruction check.
+            hitDistance = float.PositiveInfinity;
             switch (settings.TargetMode)
             {
-                case HoverTargetMode.ViewCenter:
+                case HoverDetectionMode.ViewCenter:
+                    Vector3 projected = resolvedView.WorldToScreenPoint(anchor);
                     float radius = viewport.height * settings.CenterRadius;
-                    if (((Vector2)projected - viewport.center).sqrMagnitude > radius * radius)
+                    if (projected.z < resolvedView.nearClipPlane || projected.z > resolvedView.farClipPlane
+                        || !viewport.Contains(projected) || (resolvedView.cullingMask & (1 << target.gameObject.layer)) == 0
+                        || ((Vector2)projected - viewport.center).sqrMagnitude > radius * radius)
                         return false;
                     break;
-                case HoverTargetMode.Cursor:
-                    if (Mouse.current == null || Cursor.lockState == CursorLockMode.Locked || resolvedView.targetDisplay != 0)
-                        return false;
-                    Vector2 cursor = Mouse.current.position.ReadValue();
+                case HoverDetectionMode.Cursor:
+                case HoverDetectionMode.CenterCollider:
+                    Vector2 cursor = viewport.center;
+                    if (settings.TargetMode == HoverDetectionMode.Cursor)
+                    {
+                        if (Mouse.current == null || Cursor.lockState == CursorLockMode.Locked || resolvedView.targetDisplay != 0)
+                            return false;
+                        cursor = Mouse.current.position.ReadValue();
+                    }
                     if (!viewport.Contains(cursor) || !HoverPhysics.TryCursorHit(resolvedView.ScreenPointToRay(cursor), colliders,
                         resolvedView.cullingMask, Vector3.Distance(resolvedView.transform.position, player.position) + settings.PlayerDistance, out anchor))
+                        return false;
+                    float depth = resolvedView.WorldToViewportPoint(anchor).z;
+                    if (depth < resolvedView.nearClipPlane || depth > resolvedView.farClipPlane)
                         return false;
                     break;
                 default:
                     return false;
             }
-            return physics.HasSight(this, target, anchor);
+            hitDistance = (anchor - resolvedView.transform.position).sqrMagnitude;
+            return (anchor - player.position).sqrMagnitude <= settings.PlayerDistance * settings.PlayerDistance
+                && physics.HasSight(this, target, anchor);
         }
 
         #endregion

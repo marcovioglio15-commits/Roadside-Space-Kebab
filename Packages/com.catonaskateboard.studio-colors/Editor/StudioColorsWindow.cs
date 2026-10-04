@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using UnityEditor;
 using UnityEngine;
 
@@ -64,9 +65,9 @@ namespace CatOnASkateboard.StudioColors.Editor
             // The list scrolls independently of the operating system's window size.
             scroll = EditorGUILayout.BeginScrollView(scroll);
             EditorGUILayout.LabelField("Selected folders", EditorStyles.boldLabel);
-            color = EditorGUILayout.ColorField(new GUIContent("Color", "Folder icon and label tint."), color);
-            mode = (FolderColorMode)EditorGUILayout.EnumPopup(new GUIContent("Apply to", "Color the icon, text, or both."), mode);
-            inherit = EditorGUILayout.Toggle(new GUIContent("Inherit to children", "New and existing children inherit unless they have an override."), inherit);
+            color = StudioGUI.ColorField(new GUIContent("Color", "Folder icon and label tint."), color);
+            mode = (FolderColorMode)StudioGUI.EnumPopup(new GUIContent("Apply to", "Color the icon, text, or both."), mode);
+            inherit = StudioGUI.Toggle(new GUIContent("Inherit to children", "New and existing children inherit unless they have an override."), inherit);
             using (new EditorGUI.DisabledScope(!CanOpenFolders()))
                 using (new EditorGUILayout.HorizontalScope())
                 {
@@ -92,13 +93,13 @@ namespace CatOnASkateboard.StudioColors.Editor
             // Right-click any registered label or button to bring its key here.
             EditorGUILayout.Space(6f);
             EditorGUILayout.LabelField("Tool element", EditorStyles.boldLabel);
-            elementKey = EditorGUILayout.TextField(new GUIContent("Key", "Stable control key from a tool's Colors/Edit context action."), elementKey);
-            element.OverrideText = EditorGUILayout.Toggle(new GUIContent("Text override", "Use a custom text color."), element.OverrideText);
+            elementKey = StudioGUI.TextField(new GUIContent("Key", "Stable control key from a tool's Colors/Edit context action."), elementKey);
+            element.OverrideText = StudioGUI.Toggle(new GUIContent("Text override", "Use a custom text color."), element.OverrideText);
             if (element.OverrideText)
-                element.Text = EditorGUILayout.ColorField(new GUIContent("Text", "Color for this element's text."), element.Text);
-            element.OverrideBackground = EditorGUILayout.Toggle(new GUIContent("Background override", "Use a custom background color."), element.OverrideBackground);
+                element.Text = StudioGUI.ColorField(new GUIContent("Text", "Color for this element's text."), element.Text);
+            element.OverrideBackground = StudioGUI.Toggle(new GUIContent("Background override", "Use a custom background color."), element.OverrideBackground);
             if (element.OverrideBackground)
-                element.Background = EditorGUILayout.ColorField(new GUIContent("Background", "Color for the control's background."), element.Background);
+                element.Background = StudioGUI.ColorField(new GUIContent("Background", "Color for the control's background."), element.Background);
             using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(elementKey)))
                 if (StudioButton.Draw(new GUIContent("Apply tool colors", "Save and refresh this key in every registered tool.")))
                 {

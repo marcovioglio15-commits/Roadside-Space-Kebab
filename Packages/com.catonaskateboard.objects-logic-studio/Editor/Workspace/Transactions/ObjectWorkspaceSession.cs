@@ -144,9 +144,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     warning = warning.Length > 0 ? warning : "Create the dedicated hover label before Apply.";
                 else if (state.Binding.AnchorPath != "-" && HoverHierarchy.Resolve(hover.transform, state.Binding.AnchorPath) == null)
                     warning = "The proposed anchor is no longer inside the selected object.";
-                else if (state.Draft.Settings.TargetMode == HoverTargetMode.Cursor && hover.GetComponentInChildren<Collider>(true) == null
+                else if (state.Draft.Settings.TargetMode != HoverDetectionMode.ViewCenter && hover.GetComponentInChildren<Collider>(true) == null
                     && hover.GetComponent<ObjectAssemblyProduct>() == null)
-                    warning = "Cursor hover requires an existing 3D collider on the object or its children.";
+                    warning = "Collider hover requires an existing 3D collider on the object or its children.";
                 else if (EditorUtility.IsPersistent(hover) && !AssetDatabase.IsOpenForEdit(hover))
                     warning = "The selected prefab is not writable.";
             }

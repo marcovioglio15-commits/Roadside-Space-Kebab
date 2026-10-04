@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
@@ -38,7 +39,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         }
                     }
                     SerializedProperty count = requirement.FindPropertyRelative("Count");
-                    count.intValue = EditorGUILayout.IntField(new GUIContent("Quantity", count.tooltip), count.intValue);
+                    count.intValue = StudioGUI.IntField(StudioFieldMenu.Value(count, new GUIContent("Quantity", count.tooltip)), count.intValue);
                     if (optional)
                         HoverControls.Field(requirement, "Optional");
                     if (count.intValue <= 0)

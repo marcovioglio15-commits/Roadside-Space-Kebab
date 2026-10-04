@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
@@ -151,7 +152,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     {
                         int current = Array.IndexOf(sources, source.objectReferenceValue as ObjectInteraction) + 1;
                         EditorGUI.BeginChangeCheck();
-                        int selected = EditorGUILayout.Popup(new GUIContent("Interaction", source.tooltip), current, names);
+                        int selected = StudioGUI.Popup(StudioFieldMenu.Value(source, new GUIContent("Interaction", source.tooltip)), current, names);
                         if (EditorGUI.EndChangeCheck())
                         {
                             source.objectReferenceValue = selected > 0 ? sources[selected - 1] : null;

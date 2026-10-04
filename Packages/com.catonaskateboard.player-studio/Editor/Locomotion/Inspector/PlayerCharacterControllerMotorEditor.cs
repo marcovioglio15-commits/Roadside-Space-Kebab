@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,11 +37,11 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             PlayerCharacterControllerMotor motor = (PlayerCharacterControllerMotor)target;
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.Vector3Field(requestedLabel, motor.RequestedVelocity);
-                EditorGUILayout.Vector3Field(actualLabel, motor.ActualVelocity);
-                EditorGUILayout.FloatField(verticalLabel, motor.VerticalVelocity);
-                EditorGUILayout.Toggle(groundedLabel, motor.IsGrounded);
-                EditorGUILayout.EnumFlagsField(collisionLabel, motor.Collisions);
+                StudioGUI.Vector3Field(requestedLabel, motor.RequestedVelocity);
+                StudioGUI.Vector3Field(actualLabel, motor.ActualVelocity);
+                StudioGUI.FloatField(verticalLabel, motor.VerticalVelocity);
+                StudioGUI.Toggle(groundedLabel, motor.IsGrounded);
+                StudioGUI.EnumFlagsField(collisionLabel, motor.Collisions);
             }
 
             if (motor.InitializationWarning.Length > 0)

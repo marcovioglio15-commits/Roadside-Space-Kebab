@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // The component inspector does not silently bypass retained drafts.
             ObjectSingleInteraction feature = (ObjectSingleInteraction)target;
             using (new EditorGUI.DisabledScope(true))
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("action"));
+                StudioGUI.PropertyField(serializedObject.FindProperty("action"));
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
                 || !ObjectAuthoringSave.TryValidate(feature.gameObject, out _)))
                 if (StudioButton.Draw(new GUIContent("Open Objects Logic Studio", "Edit this feature's binding and settings with Apply and Discard.")))

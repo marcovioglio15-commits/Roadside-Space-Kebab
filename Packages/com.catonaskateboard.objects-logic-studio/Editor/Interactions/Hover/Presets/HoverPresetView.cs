@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(ObjectWorkspace state)
         {
             // Selecting a source does not import it or overwrite its saved configuration.
-            HoverPreset selected = (HoverPreset)EditorGUILayout.ObjectField(new GUIContent("Hover Preset",
+            HoverPreset selected = (HoverPreset)StudioGUI.ObjectField(new GUIContent("Hover Preset",
                 "Reusable snapshot. Import copies values here; Apply saves only this interaction."), state.Source, typeof(HoverPreset), false);
             if (selected != state.Source)
             {

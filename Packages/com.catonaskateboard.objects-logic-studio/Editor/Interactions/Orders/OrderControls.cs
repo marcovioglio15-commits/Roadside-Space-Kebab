@@ -70,7 +70,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             foreach (ObjectContactModifier candidate in candidates)
                 if (ObjectWorkspaceTarget.FileId(candidate) == property.longValue)
                     label = candidate.InteractionName;
-            Rect rect = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), new GUIContent("Consume Action", "A Modify By Contact with Consume on this object. Each consumption fulfils its first matching unfinished order in the list."));
+            Rect rect = EditorGUILayout.GetControlRect();
+            StudioFieldMenu.Context(rect, property);
+            rect = EditorGUI.PrefixLabel(rect, new GUIContent("Consume Action", "A Modify By Contact with Consume on this object. Each consumption fulfils its first matching unfinished order in the list."));
             if (!GUI.Button(rect, label, EditorStyles.popup))
                 return;
             GenericMenu menu = new GenericMenu();

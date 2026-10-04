@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -17,9 +19,9 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         {
             // Renaming changes presentation only; references in identities and recipes stay valid.
             serializedObject.Update();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("DisplayName"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Group"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Description"));
+            StudioGUI.PropertyField(serializedObject.FindProperty("DisplayName"));
+            StudioGUI.PropertyField(serializedObject.FindProperty("Group"));
+            StudioGUI.PropertyField(serializedObject.FindProperty("Description"));
             if (serializedObject.ApplyModifiedProperties())
                 ObjectFlagCatalog.Invalidate();
             ObjectFlag current = (ObjectFlag)target;

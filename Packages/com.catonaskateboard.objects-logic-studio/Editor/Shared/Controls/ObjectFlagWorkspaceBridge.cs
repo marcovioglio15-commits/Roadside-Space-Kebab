@@ -1,4 +1,5 @@
 using CatOnASkateboard.StudioIdentity.Editor;
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -18,6 +19,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         static ObjectFlagWorkspaceBridge()
         {
             // Ordinary scene and asset fields keep Unity's native serialization behavior.
+            StudioFieldMenu.Changed += Persist;
+            StudioFieldMenu.CollectGuards += CaptureGuard;
             ObjectFlagSelector.SelectionChanged += Persist;
             ObjectFlagSelector.CollectSelectionGuards += CaptureGuard;
         }

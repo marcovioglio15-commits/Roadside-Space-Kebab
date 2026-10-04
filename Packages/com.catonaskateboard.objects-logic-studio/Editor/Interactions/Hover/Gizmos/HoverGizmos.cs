@@ -25,13 +25,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new Handles.DrawingScope(color))
             {
                 // Three thin rings describe range without hiding the prefab mesh.
-                Handles.DrawWireDisc(anchor, Vector3.up, hover.Settings.PlayerDistance);
-                Handles.DrawWireDisc(anchor, Vector3.right, hover.Settings.PlayerDistance);
-                Handles.DrawWireDisc(anchor, Vector3.forward, hover.Settings.PlayerDistance);
+                if (hover.Settings.TargetMode == HoverDetectionMode.ViewCenter)
+                {
+                    Handles.DrawWireDisc(anchor, Vector3.up, hover.Settings.PlayerDistance);
+                    Handles.DrawWireDisc(anchor, Vector3.right, hover.Settings.PlayerDistance);
+                    Handles.DrawWireDisc(anchor, Vector3.forward, hover.Settings.PlayerDistance);
+                }
+                else
+                    foreach (Collider collider in hover.GetComponentsInChildren<Collider>())
+                        if (collider.enabled)
+                            Handles.DrawWireCube(collider.bounds.center, collider.bounds.size);
                 Handles.SphereHandleCap(0, anchor, Quaternion.identity, handleSize, EventType.Repaint);
                 Handles.DrawDottedLine(anchor, anchor + hover.Settings.WorldOffset, 4f);
                 Handles.Label(anchor + Vector3.up * handleSize, new GUIContent(hover.InteractionName + " · "
-                    + hover.Settings.PlayerDistance.ToString("0.##") + " m", "Player-to-anchor range; screen offsets are applied after projection."));
+                    + hover.Settings.PlayerDistance.ToString("0.##") + " m", "Range is measured from the player to the anchor or targeted collider surface; screen offsets affect the label only."));
             }
         }
 

@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -38,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             string key = EntityId.ToULong(property.serializedObject.targetObject.GetEntityId()) + ":" + property.propertyPath;
             sources.TryGetValue(key, out GameObject source);
-            source = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Hierarchy Source",
+            source = (GameObject)StudioGUI.ObjectField(new GUIContent("Hierarchy Source",
                 "Existing prefab used to map renderer and mesh selections. The reusable settings retain only relative routes."), source, typeof(GameObject), false);
             sources[key] = source;
             return source;
@@ -71,10 +73,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     : target.GetComponent<Renderer>() == null)
                     label += mesh ? " (no mesh component)" : " (no renderer)";
             }
-            using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
-            EditorGUILayout.PrefixLabel(new GUIContent(transforms ? "Transform" : mesh ? "Mesh Target" : "Renderer Target", property.tooltip));
+            Rect rect = EditorGUILayout.GetControlRect();
+            StudioFieldMenu.Context(rect, property);
+            rect = EditorGUI.PrefixLabel(rect, new GUIContent(transforms ? "Transform" : mesh ? "Mesh Target" : "Renderer Target", property.tooltip));
             using (new EditorGUI.DisabledScope(source == null))
-                if (GUILayout.Button(new GUIContent(label, source == null ? "Choose a hierarchy source first." : property.tooltip), EditorStyles.popup))
+                if (GUI.Button(rect, new GUIContent(label, source == null ? "Choose a hierarchy source first." : property.tooltip), EditorStyles.popup))
                     Show(property, source, mesh, all, transforms);
         }
 

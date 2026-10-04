@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
@@ -19,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Import replaces only settings; the existing action, name and enabled state remain item-owned.
             SingleInteractionSession session = state.Single;
             EditorGUI.BeginChangeCheck();
-            SingleInteractionPreset selected = (SingleInteractionPreset)EditorGUILayout.ObjectField(
+            SingleInteractionPreset selected = (SingleInteractionPreset)StudioGUI.ObjectField(
                 new GUIContent("Preset", "Reusable settings snapshot. Import copies values into this draft; Apply writes them to the prefab."),
                 session.Preset, PresetType(session.Kind), false);
             if (EditorGUI.EndChangeCheck())

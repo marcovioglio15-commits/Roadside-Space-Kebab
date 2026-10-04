@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioInput.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
@@ -22,7 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void ConditionLogic(SerializedProperty property)
         {
             // Existing rule semantics remain unchanged when the caption becomes AND/OR.
-            property.boolValue = EditorGUILayout.Popup(new GUIContent("Logic", property.tooltip), property.boolValue ? 0 : 1,
+            property.boolValue = StudioGUI.Popup(StudioFieldMenu.Value(property, new GUIContent("Logic", property.tooltip)), property.boolValue ? 0 : 1,
                 new[] { "AND - all conditions", "OR - any condition" }) == 0;
         }
 

@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -27,13 +29,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         public static void Draw(ref bool enabled, ref float acceleration, ref float terminalSpeed, ref float groundSpeed)
         {
             // One toggle introduces the section without repeating its title above a single foldout.
-            enabled = EditorGUILayout.Toggle(enabledLabel, enabled);
+            enabled = StudioGUI.Toggle(enabledLabel, enabled);
             if (!enabled)
                 return;
 
-            acceleration = EditorGUILayout.FloatField(accelerationLabel, acceleration);
-            terminalSpeed = EditorGUILayout.FloatField(terminalLabel, terminalSpeed);
-            groundSpeed = EditorGUILayout.FloatField(groundLabel, groundSpeed);
+            acceleration = StudioGUI.FloatField(accelerationLabel, acceleration);
+            terminalSpeed = StudioGUI.FloatField(terminalLabel, terminalSpeed);
+            groundSpeed = StudioGUI.FloatField(groundLabel, groundSpeed);
         }
 
         #endregion

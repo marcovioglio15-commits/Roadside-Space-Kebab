@@ -171,7 +171,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private bool DrawModule(PlayerModuleEditSession session, UnityEngine.Object owner, bool camera)
         {
             // Property fields target the temporary copy, never the saved asset.
-            SerializedObject serialized = session.GetEditor();
+            SerializedObject serialized = session.GetEditor(owner);
             if (serialized == null)
                 return false;
             EditorGUI.BeginChangeCheck();

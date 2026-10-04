@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using CatOnASkateboard.StudioIdentity;
@@ -154,7 +155,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Selecting an existing observer is navigation; a pending proposal must be resolved first.
             using (new EditorGUI.DisabledScope(HasChanges))
             {
-                HoverObserver selected = (HoverObserver)EditorGUILayout.ObjectField(new GUIContent("Observer", "Existing scene or prefab component that supplies camera and player context."), observer, typeof(HoverObserver), true);
+                HoverObserver selected = (HoverObserver)StudioGUI.ObjectField(new GUIContent("Observer", "Existing scene or prefab component that supplies camera and player context."), observer, typeof(HoverObserver), true);
                 if (selected != observer && (selected == null || EditorUtility.IsPersistent(selected) || !EditorSceneManager.IsPreviewScene(selected.gameObject.scene)))
                 {
                     observer = selected;
@@ -164,8 +165,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             }
             EditorGUI.BeginChangeCheck();
-            Camera view = (Camera)EditorGUILayout.ObjectField(new GUIContent("Camera", "Gameplay camera in the same scene or prefab as the player; no MainCamera flag is required."), camera, typeof(Camera), true);
-            GameObject root = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Player Root", "Existing player root; Apply assigns the chosen flag with Undo support."), player, typeof(GameObject), true);
+            Camera view = (Camera)StudioGUI.ObjectField(new GUIContent("Camera", "Gameplay camera in the same scene or prefab as the player; no MainCamera flag is required."), camera, typeof(Camera), true);
+            GameObject root = (GameObject)StudioGUI.ObjectField(new GUIContent("Player Root", "Existing player root; Apply assigns the chosen flag with Undo support."), player, typeof(GameObject), true);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(owner, "Edit hover observer setup");
@@ -192,7 +193,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 DialogueHud hud = observer != null ? observer.DialogueHud : null;
                 using (new EditorGUI.DisabledScope(true))
-                    EditorGUILayout.ObjectField(new GUIContent("Dialogue HUD", "One overlay shared by all object dialogues for this observer."), hud, typeof(DialogueHud), true);
+                    StudioGUI.ObjectField(new GUIContent("Dialogue HUD", "One overlay shared by all object dialogues for this observer."), hud, typeof(DialogueHud), true);
                 if (!StudioButton.Draw(new GUIContent(hud != null ? "Select Dialogue HUD" : "Create Shared Dialogue HUD",
                     "Edit the shared panel and text in its authored hierarchy; no UI is created during gameplay.")))
                     return;
@@ -228,7 +229,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ? AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(player)) : null;
             using (new EditorGUI.DisabledScope(HasChanges))
             {
-                GameObject selected = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Player Prefab",
+                GameObject selected = (GameObject)StudioGUI.ObjectField(new GUIContent("Player Prefab",
                     "Optional player prefab to configure directly. Leave empty to configure loaded scene objects."), current, typeof(GameObject), false);
                 if (selected != current && (selected == null || ObjectAuthoringSave.TryValidate(selected, out _)))
                 {
@@ -268,7 +269,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         "Camera inside the selected player prefab.");
             }
             EditorGUI.BeginChangeCheck();
-            int requested = EditorGUILayout.Popup(new GUIContent("Prefab Camera", "Existing cameras in the selected asset."), Array.IndexOf(cameraChoices, camera) + 1, cameraNames);
+            int requested = StudioGUI.Popup(new GUIContent("Prefab Camera", "Existing cameras in the selected asset."), Array.IndexOf(cameraChoices, camera) + 1, cameraNames);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(owner, "Select observer prefab camera");

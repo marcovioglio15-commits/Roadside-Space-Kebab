@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -34,7 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnGUI()
         {
             // Cached editors are rebuilt only when the selected asset changes.
-            plan = (SpawnFlowPlan)EditorGUILayout.ObjectField(new GUIContent("Plan", "Shared asset edited by this window."), plan, typeof(SpawnFlowPlan), false);
+            plan = (SpawnFlowPlan)StudioGUI.ObjectField(new GUIContent("Plan", "Shared asset edited by this window."), plan, typeof(SpawnFlowPlan), false);
             if (plan == null)
                 return;
             UnityEditor.Editor.CreateCachedEditor(plan, typeof(SpawnFlowPlanEditor), ref inspector);

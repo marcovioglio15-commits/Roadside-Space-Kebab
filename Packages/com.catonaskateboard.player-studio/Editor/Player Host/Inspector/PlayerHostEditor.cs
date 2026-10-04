@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -52,12 +54,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Keep unused binding fields hidden without clearing their saved references.
             serializedObject.Update();
-            EditorGUILayout.PropertyField(masterPreset);
-            EditorGUILayout.PropertyField(bodyBinding);
+            StudioGUI.PropertyField(masterPreset);
+            StudioGUI.PropertyField(bodyBinding);
             if (bodyBinding.intValue == (int)PlayerBodyBinding.CharacterController)
-                EditorGUILayout.PropertyField(bodyController);
+                StudioGUI.PropertyField(bodyController);
 
-            EditorGUILayout.PropertyField(drawBodyGizmo);
+            StudioGUI.PropertyField(drawBodyGizmo);
             serializedObject.ApplyModifiedProperties();
 
             // Resolve the body once for this Inspector draw and show only a necessary warning.
@@ -76,8 +78,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // These values belong to the preset, so the host cannot edit a second copy.
             using (new EditorGUI.DisabledScope(true))
             {
-                EditorGUILayout.FloatField(radiusLabel, settings.Radius);
-                EditorGUILayout.FloatField(heightLabel, settings.Height);
+                StudioGUI.FloatField(radiusLabel, settings.Radius);
+                StudioGUI.FloatField(heightLabel, settings.Height);
             }
         }
 

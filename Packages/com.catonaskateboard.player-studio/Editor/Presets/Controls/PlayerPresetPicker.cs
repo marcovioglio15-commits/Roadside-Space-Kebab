@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -20,7 +22,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Asset creation is explicit; selecting its result still uses the caller's Apply/Discard session.
             using (new EditorGUILayout.HorizontalScope())
             {
-                current = (T)EditorGUILayout.ObjectField(label, current, typeof(T), false);
+                current = (T)StudioGUI.ObjectField(label, current, typeof(T), false);
                 if (GUILayout.Button(new GUIContent("New", "Create a preset with default values and propose it for this slot."), GUILayout.Width(42f)))
                     current = Create(current, false);
                 using (new EditorGUI.DisabledScope(current == null))

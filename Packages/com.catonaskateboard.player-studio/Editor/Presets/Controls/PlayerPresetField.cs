@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,22 +30,22 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Boolean:
-                    property.boolValue = EditorGUILayout.Toggle(label, property.boolValue);
+                    property.boolValue = StudioGUI.Toggle(StudioFieldMenu.Value(property, label), property.boolValue);
                     break;
                 case SerializedPropertyType.Float:
-                    property.floatValue = EditorGUILayout.FloatField(label, property.floatValue);
+                    property.floatValue = StudioGUI.FloatField(StudioFieldMenu.Value(property, label), property.floatValue);
                     break;
                 case SerializedPropertyType.Enum:
-                    property.enumValueIndex = EditorGUILayout.Popup(label, property.enumValueIndex, property.enumDisplayNames);
+                    property.enumValueIndex = StudioGUI.Popup(StudioFieldMenu.Value(property, label), property.enumValueIndex, property.enumDisplayNames);
                     break;
                 case SerializedPropertyType.Vector2:
-                    property.vector2Value = EditorGUILayout.Vector2Field(label, property.vector2Value);
+                    property.vector2Value = StudioGUI.Vector2Field(StudioFieldMenu.Value(property, label), property.vector2Value);
                     break;
                 case SerializedPropertyType.Vector3:
-                    property.vector3Value = EditorGUILayout.Vector3Field(label, property.vector3Value);
+                    property.vector3Value = StudioGUI.Vector3Field(StudioFieldMenu.Value(property, label), property.vector3Value);
                     break;
                 default:
-                    EditorGUILayout.PropertyField(property, label, true);
+                    StudioGUI.PropertyField(property, label, true);
                     break;
             }
         }

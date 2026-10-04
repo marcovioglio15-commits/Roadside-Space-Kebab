@@ -370,7 +370,7 @@ MonoBehaviour:
   preset: {fileID: 0}
   configuration:
     settings:
-      targetMode: 0
+      targetMode: 2
       playerDistance: 3
       centerRadius: 0.7
       queryInterval: 0.05

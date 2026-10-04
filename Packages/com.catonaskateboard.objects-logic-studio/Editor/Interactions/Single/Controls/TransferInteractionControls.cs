@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -110,7 +112,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Scene instances cannot enter reusable interaction or spawn settings.
             EditorGUI.BeginChangeCheck();
-            GameObject selected = (GameObject)EditorGUILayout.ObjectField(new GUIContent(property.displayName, property.tooltip),
+            GameObject selected = (GameObject)StudioGUI.ObjectField(StudioFieldMenu.Value(property, new GUIContent(property.displayName, property.tooltip)),
                 property.objectReferenceValue, typeof(GameObject), false);
             if (EditorGUI.EndChangeCheck())
                 if (selected == null || PrefabUtility.IsPartOfPrefabAsset(selected) && selected.transform.parent == null)

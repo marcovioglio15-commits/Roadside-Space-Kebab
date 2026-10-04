@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,16 +15,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Rebuild(ObjectOutline outline)
         {
             // Nested items keep their independent interactions until explicitly joined by assembly.
-            List<Renderer> sources = new List<Renderer>();
-            ObjectItem owner = outline.GetComponent<ObjectItem>();
-            foreach (Renderer source in outline.GetComponentsInChildren<Renderer>(true))
-                if (source is MeshRenderer or SkinnedMeshRenderer && source.GetComponentInParent<ObjectItem>(true) == owner)
-                    sources.Add(source);
+            Renderer[] sources = outline.CollectRenderers();
             using (SerializedObject data = new SerializedObject(outline))
             {
                 SerializedProperty renderers = data.FindProperty("renderers");
-                renderers.arraySize = sources.Count;
-                for (int index = 0; index < sources.Count; index++)
+                renderers.arraySize = sources.Length;
+                for (int index = 0; index < sources.Length; index++)
                     renderers.GetArrayElementAtIndex(index).objectReferenceValue = sources[index];
                 data.ApplyModifiedProperties();
             }

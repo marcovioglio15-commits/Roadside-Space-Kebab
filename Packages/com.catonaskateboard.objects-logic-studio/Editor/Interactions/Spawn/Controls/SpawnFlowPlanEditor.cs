@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using System;
 using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
@@ -40,7 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Link(SerializedProperty property)
         {
             // The edit window works independently of Inspector locks or selection state.
-            EditorGUILayout.PropertyField(property, new GUIContent("Day Plan", property.tooltip));
+            StudioGUI.PropertyField(property, new GUIContent("Day Plan", property.tooltip));
             using StudioButton.RowScope row = new StudioButton.RowScope();
             if (StudioButton.Draw(new GUIContent("New", "Create a shared day plan asset.")))
             {
@@ -227,7 +228,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Disabled paths keep their saved keys without showing irrelevant pose controls.
             SerializedProperty enabled = animation.FindPropertyRelative("Enabled");
-            enabled.boolValue = EditorGUILayout.Toggle(new GUIContent(label, enabled.tooltip), enabled.boolValue);
+            enabled.boolValue = StudioGUI.Toggle(StudioFieldMenu.Value(enabled, new GUIContent(label, enabled.tooltip)), enabled.boolValue);
             if (!enabled.boolValue)
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
@@ -297,7 +298,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Runtime assemblies never need SceneAsset or editor reflection.
             SceneAsset current = AssetDatabase.LoadAssetAtPath<SceneAsset>(property.stringValue);
             EditorGUI.BeginChangeCheck();
-            SceneAsset selected = (SceneAsset)EditorGUILayout.ObjectField(new GUIContent(label, property.tooltip), current, typeof(SceneAsset), false);
+            SceneAsset selected = (SceneAsset)StudioGUI.ObjectField(StudioFieldMenu.Value(property, new GUIContent(label, property.tooltip)), current, typeof(SceneAsset), false);
             if (EditorGUI.EndChangeCheck())
                 property.stringValue = selected != null ? AssetDatabase.GetAssetPath(selected) : string.Empty;
         }
@@ -308,7 +309,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Field(SerializedObject data, string name)
         {
             // Unity handles native Undo and scalar field types on the shared asset.
-            EditorGUILayout.PropertyField(data.FindProperty(name));
+            StudioGUI.PropertyField(data.FindProperty(name));
         }
 
         /// <summary>Enables referenced scenes without replacing the project's existing build order.</summary>

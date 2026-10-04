@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -26,6 +27,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             string key = property.propertyPath;
             string current = property.stringValue;
             Rect rect = EditorGUILayout.GetControlRect();
+            StudioFieldMenu.Context(rect, property);
             using EditorGUI.PropertyScope scope = new EditorGUI.PropertyScope(rect, label, property);
             rect = EditorGUI.PrefixLabel(rect, label);
             using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(root == null);

@@ -477,7 +477,7 @@ MonoBehaviour:
   preset: {fileID: 11400000, guid: 43f220aa71cf7144cb5c32d44417af6b, type: 2}
   configuration:
     settings:
-      targetMode: 0
+      targetMode: 2
       playerDistance: 3
       centerRadius: 0.08
       queryInterval: 0.05
@@ -551,7 +551,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
   drawGizmos: 1
   settings:
-    Thickness: 8
+    Thickness: 1
     Color: {r: 1, g: 0.74509805, b: 0, a: 1}
     Intensity: 5
     EdgeAngle: 30

@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using System;
 using System.Collections.Generic;
 using CatOnASkateboard.StudioColors.Editor;
@@ -89,9 +90,9 @@ namespace CatOnASkateboard.MenuStudio.Editor
         {
             // Creation always consumes the saved preset, never an unfinished proposal.
             StudioFields.Draw(data, "ConfirmQuit", "IncludeSettings", "IncludeCredits");
-            destination = (SceneAsset)EditorGUILayout.ObjectField(new GUIContent("Scene", "Empty uses the active scene; another scene opens additively without replacing current scenes."), destination, typeof(SceneAsset), false);
-            kind = (MenuKind)EditorGUILayout.EnumPopup(new GUIContent("Menu", "Choose Main or Pause structure."), kind);
-            assetDirectory = EditorGUILayout.TextField(new GUIContent("Asset Folder", "Existing or new folder under Assets for saved menu assets."), assetDirectory);
+            destination = (SceneAsset)StudioGUI.ObjectField(new GUIContent("Scene", "Empty uses the active scene; another scene opens additively without replacing current scenes."), destination, typeof(SceneAsset), false);
+            kind = (MenuKind)StudioGUI.EnumPopup(new GUIContent("Menu", "Choose Main or Pause structure."), kind);
+            assetDirectory = StudioGUI.TextField(new GUIContent("Asset Folder", "Existing or new folder under Assets for saved menu assets."), assetDirectory);
             using (new EditorGUI.DisabledScope(Pending || Source == null))
                 if (StudioFields.Button("Create in scene", "Create a new root with Undo. Existing menus are not overwritten and the scene is not saved automatically."))
                     CreateMenu();
@@ -187,7 +188,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
             // Runtime code receives a path and never references UnityEditor.SceneAsset.
             SceneAsset current = AssetDatabase.LoadAssetAtPath<SceneAsset>(property.stringValue);
             EditorGUI.BeginChangeCheck();
-            SceneAsset requested = (SceneAsset)EditorGUILayout.ObjectField(new GUIContent(label, "Scene loaded by this command; add it to Build Settings before building."), current, typeof(SceneAsset), false);
+            SceneAsset requested = (SceneAsset)StudioGUI.ObjectField(new GUIContent(label, "Scene loaded by this command; add it to Build Settings before building."), current, typeof(SceneAsset), false);
             if (EditorGUI.EndChangeCheck())
                 property.stringValue = requested != null ? AssetDatabase.GetAssetPath(requested) : string.Empty;
         }

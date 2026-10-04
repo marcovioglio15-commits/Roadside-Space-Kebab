@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.PlayerStudio;
 using CatOnASkateboard.StudioIdentity.Editor;
@@ -53,7 +54,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Pose(SerializedProperty pose, Transform target, string label)
         {
             // Numerical fields remain available when a standalone preset has no sample hierarchy yet.
-            EditorGUILayout.PropertyField(pose, true);
+            StudioGUI.PropertyField(pose, true);
             using (new EditorGUI.DisabledScope(target == null))
                 if (StudioButton.Draw(new GUIContent(label, "Read the selected transform's current local pose into this endpoint.")))
                     pose.boxedValue = PlayerToolPose.Read(target);

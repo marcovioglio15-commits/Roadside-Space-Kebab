@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
@@ -19,11 +20,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using ObjectStudioFieldLayout layout = new ObjectStudioFieldLayout(205f);
             // The shared selector provides search, groups and new flag creation.
             serializedObject.Update();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("view"));
+            StudioGUI.PropertyField(serializedObject.FindProperty("view"));
             SerializedProperty flag = serializedObject.FindProperty("playerFlag");
             ObjectFlagSelector.Draw(flag);
             using (new EditorGUI.DisabledScope(Application.isPlaying))
-                EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogueHud"));
+                StudioGUI.PropertyField(serializedObject.FindProperty("dialogueHud"));
             serializedObject.ApplyModifiedProperties();
             HoverObserver observer = (HoverObserver)target;
             if (!Application.isPlaying && !EditorUtility.IsPersistent(observer) && observer.DialogueHud == null

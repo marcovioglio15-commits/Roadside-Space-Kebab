@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,7 +27,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Shared controls keep the asset Inspector aligned with the Tools module.
             serializedObject.Update();
-            hierarchySource = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Hierarchy Source",
+            hierarchySource = (GameObject)StudioGUI.ObjectField(new GUIContent("Hierarchy Source",
                 "Choose a player prefab or scene object to browse its children."), hierarchySource, typeof(GameObject), true);
             PlayerToolsControls.DrawSettings(serializedObject, hierarchySource != null ? hierarchySource.transform : null);
             serializedObject.ApplyModifiedProperties();

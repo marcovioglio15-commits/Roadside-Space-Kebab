@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -121,7 +123,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 host.transform, target, true, owner, value => { target = value; synchronize = true; });
             EditorGUILayout.Space();
             EditorGUI.BeginChangeCheck();
-            Camera camera = (Camera)EditorGUILayout.ObjectField(new GUIContent("Scene Camera", "Empty creates a camera child during Apply."), view, typeof(Camera), true);
+            Camera camera = (Camera)StudioGUI.ObjectField(new GUIContent("Scene Camera", "Empty creates a camera child during Apply."), view, typeof(Camera), true);
             bool changed = EditorGUI.EndChangeCheck();
             if (!changed)
                 return false;

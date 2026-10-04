@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity;
 using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
@@ -68,7 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             }
             using (new EditorGUI.DisabledScope(true))
-                EditorGUILayout.ObjectField(new GUIContent("Object", "Object receiving these identity flags."), identity.gameObject, typeof(GameObject), true);
+                StudioGUI.ObjectField(new GUIContent("Object", "Object receiving these identity flags."), identity.gameObject, typeof(GameObject), true);
             using SerializedObject data = new SerializedObject(identity);
             data.Update();
             ObjectFlagSelector.Draw(data.FindProperty("flags"));

@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,10 +26,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         public override void OnInspectorGUI()
         {
             // The hierarchy sample supplies choices; animation data keeps reusable relative targets.
-            hierarchySource = (GameObject)EditorGUILayout.ObjectField(new GUIContent("Hierarchy Source",
+            hierarchySource = (GameObject)StudioGUI.ObjectField(new GUIContent("Hierarchy Source",
                 "Use the same hierarchy root selected by the Tools preset."), hierarchySource, typeof(GameObject), true);
             serializedObject.Update();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("Duration"));
+            StudioGUI.PropertyField(serializedObject.FindProperty("Duration"));
             SerializedProperty tracks = serializedObject.FindProperty("Tracks");
             PlayerToolsControls.DrawCount(tracks, "Tracks", () => new PlayerToolTrack());
             // Each track resolves only once at runtime; no manual path field is exposed here.
@@ -44,7 +46,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 SerializedProperty keys = track.FindPropertyRelative("Keys");
                 PlayerToolsControls.DrawCount(keys, "Keys", () => new PlayerToolKey());
                 for (int key = 0; key < keys.arraySize; key++)
-                    EditorGUILayout.PropertyField(keys.GetArrayElementAtIndex(key), true);
+                    StudioGUI.PropertyField(keys.GetArrayElementAtIndex(key), true);
             }
             serializedObject.ApplyModifiedProperties();
             if (!((PlayerToolAnimationPreset)target).TryValidate(out string warning))

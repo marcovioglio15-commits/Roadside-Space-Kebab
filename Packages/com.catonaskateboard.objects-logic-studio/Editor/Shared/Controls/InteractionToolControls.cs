@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
@@ -15,10 +17,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty property)
         {
             // Field labels inherit the runtime configuration tooltips.
-            EditorGUILayout.PropertyField(property.FindPropertyRelative("Mode"), new UnityEngine.GUIContent("Player Tool", property.FindPropertyRelative("Mode").tooltip));
+            StudioGUI.PropertyField(property.FindPropertyRelative("Mode"), new UnityEngine.GUIContent("Player Tool", property.FindPropertyRelative("Mode").tooltip));
             SerializedProperty selected = Selected(property);
             if (selected != null)
-                EditorGUILayout.PropertyField(selected, true);
+                StudioGUI.PropertyField(selected, true);
         }
 
         /// <summary>Draws native inspector properties with the same mode-dependent visibility.</summary>

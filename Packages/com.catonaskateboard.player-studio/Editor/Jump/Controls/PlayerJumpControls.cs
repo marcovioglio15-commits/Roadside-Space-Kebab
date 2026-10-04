@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,13 +32,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Keep an already enabled toggle visible so a gravity mismatch can be corrected explicitly.
             if (!gravityEnabled && !enabled)
                 return;
-            enabled = EditorGUILayout.Toggle(enabledLabel, enabled);
+            enabled = StudioGUI.Toggle(enabledLabel, enabled);
             if (!enabled || !gravityEnabled)
                 return;
 
-            height = EditorGUILayout.FloatField(heightLabel, height);
-            bufferTime = EditorGUILayout.FloatField(bufferLabel, bufferTime);
-            coyoteTime = EditorGUILayout.FloatField(coyoteLabel, coyoteTime);
+            height = StudioGUI.FloatField(heightLabel, height);
+            bufferTime = StudioGUI.FloatField(bufferLabel, bufferTime);
+            coyoteTime = StudioGUI.FloatField(coyoteLabel, coyoteTime);
         }
 
         #endregion

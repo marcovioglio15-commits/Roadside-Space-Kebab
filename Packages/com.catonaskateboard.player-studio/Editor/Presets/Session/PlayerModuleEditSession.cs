@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -30,6 +31,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [NonSerialized] private ScriptableObject working;
         [NonSerialized] private SerializedObject editor;
         [NonSerialized] private string cached;
+        [NonSerialized] private UnityEngine.Object draftOwner;
 
         #endregion
 
@@ -66,10 +68,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         }
 
         /// <summary>Returns a cached Editor-only copy suitable for conditional serialized fields.</summary>
+        /// <param name="owner">Optional window whose retained draft owns Undo for delayed field edits.</param>
         /// <returns>The temporary SerializedObject, or null without a source.</returns>
-        public SerializedObject GetEditor()
+        public SerializedObject GetEditor(UnityEngine.Object owner = null)
         {
             // Rebuild only after a source type change; ordinary repaints reuse this object.
+            if (owner != null)
+                draftOwner = owner;
             if (source == null)
                 return null;
             if (working == null || working.GetType() != source.GetType())
@@ -78,6 +83,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 working = UnityEngine.Object.Instantiate(source);
                 working.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
                 editor = new SerializedObject(working);
+                StudioFieldMenu.BeforeChange += BeforePaste;
+                StudioFieldMenu.Changed += AfterPaste;
             }
             if (cached != draft)
             {
@@ -100,12 +107,36 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         public void Dispose()
         {
             // Window close and script reload must not leak hidden ScriptableObjects.
+            StudioFieldMenu.BeforeChange -= BeforePaste;
+            StudioFieldMenu.Changed -= AfterPaste;
             editor?.Dispose();
             editor = null;
             if (working != null)
                 UnityEngine.Object.DestroyImmediate(working);
             working = null;
             cached = null;
+        }
+
+        /// <summary>Records the retained window state before Paste changes its temporary module.</summary>
+        /// <param name="edited">Object targeted by the shared field menu.</param>
+        private void BeforePaste(UnityEngine.Object edited)
+        {
+            // Recording the window preserves the actual serialized session, not only its disposable inspector copy.
+            if (edited == working && draftOwner != null)
+                Undo.RecordObject(draftOwner, "Paste Player Module Field");
+        }
+
+        /// <summary>Captures a delayed Paste into the module's persistent proposal.</summary>
+        /// <param name="edited">Object changed by the shared field menu.</param>
+        private void AfterPaste(UnityEngine.Object edited)
+        {
+            // Capture keeps the next repaint from restoring the previous JSON draft over the pasted value.
+            if (edited != working)
+                return;
+            editor.Update();
+            Capture();
+            if (draftOwner != null)
+                EditorUtility.SetDirty(draftOwner);
         }
 
         #endregion

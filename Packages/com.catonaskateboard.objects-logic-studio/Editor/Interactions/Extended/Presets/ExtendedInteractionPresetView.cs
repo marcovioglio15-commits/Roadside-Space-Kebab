@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(ObjectWorkspace state)
         {
             // Export does not Apply; imported values remain a reviewable proposal on the selected prefab.
-            ExtendedInteractionPreset selected = (ExtendedInteractionPreset)EditorGUILayout.ObjectField(
+            ExtendedInteractionPreset selected = (ExtendedInteractionPreset)StudioGUI.ObjectField(
                 new GUIContent("Preset", "Import a matching settings snapshot; item name, actions and HUD bindings remain local."),
                 state.Extended.Preset, PresetType(state.Extended.Kind), false);
             if (selected != state.Extended.Preset)

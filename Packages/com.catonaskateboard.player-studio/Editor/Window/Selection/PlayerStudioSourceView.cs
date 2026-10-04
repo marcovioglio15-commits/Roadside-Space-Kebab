@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,7 +41,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // This reference is informative; selecting another target belongs to the source controls.
             using (new EditorGUI.DisabledScope(true))
-                EditorGUILayout.ObjectField(targetLabel, session.Source, typeof(PlayerBodyPreset), false);
+                StudioGUI.ObjectField(targetLabel, session.Source, typeof(PlayerBodyPreset), false);
         }
 
         #endregion

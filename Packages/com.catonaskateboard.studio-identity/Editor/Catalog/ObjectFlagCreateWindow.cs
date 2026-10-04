@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
@@ -44,9 +45,9 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         private void OnGUI()
         {
             // Creation is explicit; closing the form leaves the destination unchanged.
-            flagName = EditorGUILayout.TextField(new GUIContent("Name", "Unique name shown in every object flag selector."), flagName);
-            group = EditorGUILayout.TextField(new GUIContent("Group", "Optional category used by selector filters."), group);
-            description = EditorGUILayout.TextField(new GUIContent("Description", "Short tooltip explaining when to use this flag."), description);
+            flagName = StudioGUI.TextField(new GUIContent("Name", "Unique name shown in every object flag selector."), flagName);
+            group = StudioGUI.TextField(new GUIContent("Group", "Optional category used by selector filters."), group);
+            description = StudioGUI.TextField(new GUIContent("Description", "Short tooltip explaining when to use this flag."), description);
             GUILayout.Space(8f);
             if (warning.Length > 0)
                 EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);

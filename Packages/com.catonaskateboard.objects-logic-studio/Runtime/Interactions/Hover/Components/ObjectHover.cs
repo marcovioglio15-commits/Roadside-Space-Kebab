@@ -39,6 +39,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float nextQuery;
         private bool hovered;
         private bool detected;
+        private float hitDistance;
         private bool eligible;
         private bool carrySuppressed;
         private HoverSettings settings;
@@ -71,6 +72,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool IsHovered => hovered;
         /// <summary>Latest detection result, distinguishing a visible candidate from release-delay grace.</summary>
         internal bool Detected => detected;
+        /// <summary>Squared distance of the latest collider hit, used to choose the frontmost centre target.</summary>
+        internal float HitDistance => hitDistance;
         /// <summary>Whether editor debug geometry is requested.</summary>
         public bool DrawGizmos => drawGizmos;
 
@@ -137,9 +140,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "The hover anchor must belong to this object's prefab hierarchy.";
             else if (!configuration.TryValidate(out warning) || !label.TryValidate(transform, out warning))
                 return false;
-            else if (configuration.Settings.TargetMode == HoverTargetMode.Cursor && GetComponentInChildren<Collider>(true) == null
-                && (Application.isPlaying || GetComponent<ObjectAssemblyProduct>() == null))
-                warning = "Cursor hover requires a 3D collider on this object or one of its children.";
+            else if (configuration.Settings.TargetMode != HoverDetectionMode.ViewCenter && GetComponentInChildren<Collider>(true) == null
+                && GetComponent<ObjectAssemblyProduct>() == null)
+                warning = "Collider hover requires a 3D collider on this object or one of its children.";
 
             // Shared graphics would make independent hover modes overwrite one another.
             if (warning.Length == 0)
@@ -179,7 +182,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else if (time >= nextQuery)
             {
                 nextQuery = time + settings.QueryInterval;
-                detected = observer.Evaluate(this, colliders);
+                detected = observer.Evaluate(this, colliders, out hitDistance);
                 if (detected)
                     lastDetected = time;
             }

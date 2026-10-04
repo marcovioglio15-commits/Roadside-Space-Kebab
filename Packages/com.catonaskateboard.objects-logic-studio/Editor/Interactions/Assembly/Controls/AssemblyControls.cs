@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using CatOnASkateboard.StudioIdentity;
@@ -43,7 +44,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             SerializedProperty prefab = settings.FindPropertyRelative("ProductPrefab");
-            prefab.objectReferenceValue = EditorGUILayout.ObjectField(new GUIContent("Product Prefab", prefab.tooltip),
+            prefab.objectReferenceValue = StudioGUI.ObjectField(StudioFieldMenu.Value(prefab, new GUIContent("Product Prefab", prefab.tooltip)),
                 prefab.objectReferenceValue, typeof(GameObject), false);
             HoverControls.Field(settings, "Trigger");
             if (settings.FindPropertyRelative("Trigger").enumValueIndex == (int)AssemblyStationTrigger.InputAction)
@@ -156,7 +157,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(magnet, "Rotation");
             HoverControls.Field(magnet, "Scale");
             SerializedProperty prefab = magnet.FindPropertyRelative("PreviewPrefab");
-            prefab.objectReferenceValue = EditorGUILayout.ObjectField(new GUIContent("Preview Prefab", prefab.tooltip),
+            prefab.objectReferenceValue = StudioGUI.ObjectField(StudioFieldMenu.Value(prefab, new GUIContent("Preview Prefab", prefab.tooltip)),
                 prefab.objectReferenceValue, typeof(GameObject), false);
             ItemAppearanceControls.Draw(magnet.FindPropertyRelative("Appearance"), true, prefab.objectReferenceValue as GameObject);
         }

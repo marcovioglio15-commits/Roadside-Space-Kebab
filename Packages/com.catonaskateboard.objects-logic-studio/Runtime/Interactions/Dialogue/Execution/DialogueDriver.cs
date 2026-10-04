@@ -98,8 +98,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Advances the active dialogue or selects the highest-priority eligible request.</summary>
         /// <param name="observer">Current player and view context.</param>
-        /// <returns>The action consumed by dialogue this frame, or null for proximity-only work.</returns>
-        internal InputActionReference Tick(HoverObserver observer)
+        /// <param name="singles">Single-action driver prepared for this observation pass.</param>
+        /// <returns>The shared action consumed this frame, or null for proximity-only work.</returns>
+        internal InputActionReference Tick(HoverObserver observer, SingleInteractionDriver singles)
         {
             // The router never enables maps, changes cursor state or locks the controller.
             Bind(observer);
@@ -146,13 +147,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     consumed = active.AdvanceAction;
                     // Consume a blocked dialogue press so the same action cannot unexpectedly grab or drop an item.
-                    if (active.CanAdvance(observer, visibility))
+                    if ((!active.Settings.PreferSingleActions || !singles.TryPrioritize(observer, consumed))
+                        && active.CanAdvance(observer, visibility))
                         active.Advance();
                 }
             }
             else if (selected != null)
             {
-                selected.Begin(observer.DialogueHud);
+                InputActionReference requested = !selected.ArrivalOnly && selected.Settings.Trigger == DialogueTrigger.InputAction
+                    ? selected.StartAction : null;
+                if (requested != null && selected.Settings.PreferSingleActions && singles.TryPrioritize(observer, requested))
+                    consumed = requested;
+                else
+                    selected.Begin(observer.DialogueHud);
                 if (selected.IsSpeaking)
                 {
                     active = selected;

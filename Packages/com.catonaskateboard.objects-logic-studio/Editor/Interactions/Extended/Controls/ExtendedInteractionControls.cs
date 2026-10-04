@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using CatOnASkateboard.StudioIdentity;
 using CatOnASkateboard.StudioInput.Editor;
@@ -212,8 +214,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Invert only the control's presentation; existing prefab and preset values retain their meaning.
             SerializedProperty property = settings.FindPropertyRelative(field);
             EditorGUI.BeginChangeCheck();
-            bool excluded = EditorGUILayout.Toggle(new GUIContent(label,
-                "Do not start or continue this modification while this participant is carried. Picking it up interrupts using the configured restart or resume policy."), !property.boolValue);
+            bool excluded = StudioGUI.Toggle(StudioFieldMenu.Value(property, new GUIContent(label,
+                "Do not start or continue this modification while this participant is carried. Picking it up interrupts using the configured restart or resume policy.")), !property.boolValue);
             if (EditorGUI.EndChangeCheck())
                 property.boolValue = !excluded;
         }
@@ -238,6 +240,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(settings, "ExitDistance");
                     }
                     Field(settings, "Priority");
+                    Field(settings, "PreferSingleActions");
                 }
             if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival
                 && sections.Draw("Dialogue Visibility", "Configure startup, page advancement and hiding independently."))
@@ -275,7 +278,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
             SerializedProperty entries = settings.FindPropertyRelative("Entries");
-            EditorGUILayout.PropertyField(entries.FindPropertyRelative("Array.size"), new GUIContent("Entries", entries.tooltip));
+            StudioGUI.PropertyField(entries.FindPropertyRelative("Array.size"), new GUIContent("Entries", entries.tooltip));
             // Retain native page-list editing within each indented entry.
             for (int index = 0; index < entries.arraySize; index++)
             {
@@ -328,8 +331,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (name is "BlockSelf" or "BlockOther")
             {
                 SerializedProperty property = owner.FindPropertyRelative(name);
-                property.intValue = (int)(InteractionChannels)EditorGUILayout.EnumFlagsField(
-                    new GUIContent(property.displayName, property.tooltip), (InteractionChannels)property.intValue);
+                property.intValue = (int)(InteractionChannels)StudioGUI.EnumFlagsField(StudioFieldMenu.Value(property,
+                    new GUIContent(property.displayName, property.tooltip)), (InteractionChannels)property.intValue);
             }
             else
                 HoverControls.Field(owner, name);

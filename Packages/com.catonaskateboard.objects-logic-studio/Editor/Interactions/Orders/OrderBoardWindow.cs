@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using TMPro;
 using UnityEditor;
@@ -32,7 +33,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnGUI()
         {
             // The prefab stage cannot own a shared scene destination.
-            board = (OrderBoard)EditorGUILayout.ObjectField(new GUIContent("Board", "Shared board in the gameplay scene."), board, typeof(OrderBoard), true);
+            board = (OrderBoard)StudioGUI.ObjectField(new GUIContent("Board", "Shared board in the gameplay scene."), board, typeof(OrderBoard), true);
             if (board != null)
             {
                 UnityEditor.Editor.CreateCachedEditor(board, null, ref inspector);

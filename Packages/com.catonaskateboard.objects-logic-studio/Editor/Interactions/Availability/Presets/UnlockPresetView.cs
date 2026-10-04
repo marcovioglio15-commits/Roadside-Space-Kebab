@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
@@ -40,7 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Asset selection is independent from explicit copying in either direction.
             ScriptableObject previous = set ? state.RuleSet : state.Extended.Preset;
-            ScriptableObject selected = (ScriptableObject)EditorGUILayout.ObjectField(new GUIContent(set ? "Rule Set" : "Rule Preset",
+            ScriptableObject selected = (ScriptableObject)StudioGUI.ObjectField(new GUIContent(set ? "Rule Set" : "Rule Preset",
                 set ? "Import replaces all availability rules on this object after mapping every target and source."
                     : "Transfer this rule to compatible existing interactions on another prefab."), previous,
                 set ? typeof(UnlockRuleSetPreset) : typeof(UnlockRulePreset), false);

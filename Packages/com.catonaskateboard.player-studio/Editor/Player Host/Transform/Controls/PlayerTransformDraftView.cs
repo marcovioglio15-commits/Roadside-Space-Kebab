@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -53,15 +55,15 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Mode and axis preferences do not mark the scene or preset draft as changed.
             toolIndex = GUILayout.Toolbar(toolIndex, toolLabels);
             if (toolIndex == 0)
-                localAxes = EditorGUILayout.Toggle(axesLabel, localAxes);
+                localAxes = StudioGUI.Toggle(axesLabel, localAxes);
 
             // The compact label width leaves room for X, Y and Z in a narrow dock.
             float previousWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 65f;
             EditorGUI.BeginChangeCheck();
-            Vector3 position = EditorGUILayout.Vector3Field(positionLabel, session.Position);
-            Vector3 euler = EditorGUILayout.Vector3Field(rotationLabel, session.Euler);
-            Vector3 scale = EditorGUILayout.Vector3Field(scaleLabel, session.Scale);
+            Vector3 position = StudioGUI.Vector3Field(positionLabel, session.Position);
+            Vector3 euler = StudioGUI.Vector3Field(rotationLabel, session.Euler);
+            Vector3 scale = StudioGUI.Vector3Field(scaleLabel, session.Scale);
             EditorGUIUtility.labelWidth = previousWidth;
             if (!EditorGUI.EndChangeCheck())
                 return false;

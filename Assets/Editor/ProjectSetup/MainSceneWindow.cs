@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using System;
 using CatOnASkateboard.MenuStudio;
 using UnityEditor;
@@ -46,9 +47,9 @@ namespace RoadsideSpaceKebab.Editor
                 return;
             }
             using (new EditorGUI.DisabledScope(true))
-                EditorGUILayout.ObjectField(new GUIContent("Current Scene", "Gameplay scene currently loaded by Play in every menu."),
+                StudioGUI.ObjectField(new GUIContent("Current Scene", "Gameplay scene currently loaded by Play in every menu."),
                     AssetDatabase.LoadAssetAtPath<SceneAsset>(menu.GameplayScene), typeof(SceneAsset), false);
-            selected = (SceneAsset)EditorGUILayout.ObjectField(new GUIContent("New Scene", "Saved gameplay scene to connect to menus, day plans and Build Settings."),
+            selected = (SceneAsset)StudioGUI.ObjectField(new GUIContent("New Scene", "Saved gameplay scene to connect to menus, day plans and Build Settings."),
                 selected, typeof(SceneAsset), false);
             using (new EditorGUI.DisabledScope(selected == null || EditorApplication.isPlayingOrWillChangePlaymode))
                 if (GUILayout.Button(new GUIContent("Set Main Scene", "Update menu links, matching day scenes, player audio, pause overlay and build order."), GUILayout.Width(150f)))

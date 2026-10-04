@@ -84,6 +84,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float ExitDistance = 4f;
         [Tooltip("Higher values start first when several eligible dialogue interactions compete for the HUD.")]
         public int Priority;
+        [Tooltip("Let an eligible Single interaction use a shared start or advance action first. A successful Single consumes the press without starting or advancing this dialogue.")]
+        public bool PreferSingleActions = true;
         [Header("Visibility")]
         [Tooltip("Require some part of the object to be inside the gameplay camera frame and unobstructed when starting or resuming dialogue.")]
         public bool RequireSightToStart;

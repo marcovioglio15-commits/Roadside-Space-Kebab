@@ -101,6 +101,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // This boundary allocates binding state once, never while the effect animates.
             SetVisible(false);
+            renderers = CollectRenderers();
             hovers = GetComponents<ObjectHover>();
             ready = TryValidate(out string warning);
             if (!ready)
@@ -112,6 +113,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (OutlineRendererState[] group in assembly.Values)
                 foreach (OutlineRendererState binding in group)
                     binding.Apply(settings);
+        }
+
+        /// <summary>Collects this item's current geometry at authoring or activation boundaries.</summary>
+        /// <returns>Original owned mesh renderers, excluding nested items and temporary effects.</returns>
+        public Renderer[] CollectRenderers()
+        {
+            // Empty utility objects are valid; assembled ingredients register their geometry separately.
+            List<Renderer> sources = new List<Renderer>();
+            foreach (Renderer source in GetComponentsInChildren<Renderer>(true))
+                if (source is MeshRenderer or SkinnedMeshRenderer && source.GetComponentInParent<ObjectItem>(true) == Item
+                    && source.GetComponentInParent<InteractionVfxInstance>(true) == null)
+                    sources.Add(source);
+            return sources.ToArray();
         }
 
         /// <summary>Prepares one group of original source renderers.</summary>
@@ -158,11 +172,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when this effect can register its source geometry.</returns>
         public override bool TryValidate(out string warning)
         {
-            // Empty product prefabs receive their geometry from inserted ingredients.
-            warning = "Collect the original outline renderers in Objects Logic Studio.";
+            // Geometry may be absent on a utility object or arrive later through assembly.
+            warning = "Assign outline settings.";
             if (settings == null || !settings.TryValidate(out warning))
                 return false;
-            if (renderers == null || renderers.Length == 0 && assembly.Count == 0 && GetComponent<ObjectAssemblyProduct>() == null)
+            if (renderers == null)
             {
                 warning = "Collect the original outline renderers in Objects Logic Studio.";
                 return false;

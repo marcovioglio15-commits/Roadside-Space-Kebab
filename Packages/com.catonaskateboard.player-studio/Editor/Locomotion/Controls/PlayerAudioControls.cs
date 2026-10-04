@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -54,7 +56,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Nested layer mappings use Unity's native LayerMask selector.
             SerializedProperty property = parent.FindPropertyRelative(name);
-            EditorGUILayout.PropertyField(property, new GUIContent(label ?? property.displayName, property.tooltip), true);
+            StudioGUI.PropertyField(property, new GUIContent(label ?? property.displayName, property.tooltip), true);
         }
 
         #endregion

@@ -1,3 +1,5 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -61,7 +63,7 @@ namespace CatOnASkateboard.StudioInput.Editor
             // An incompatible stored value remains visible and unchanged until explicitly replaced.
             GUIContent label = new GUIContent(property.displayName, property.tooltip);
             EditorGUI.BeginChangeCheck();
-            int requested = EditorGUILayout.Popup(label, selected, choices.Labels);
+            int requested = StudioGUI.Popup(StudioFieldMenu.Value(property, label), selected, choices.Labels);
             if (EditorGUI.EndChangeCheck() && requested >= 0)
                 property.objectReferenceValue = choices.References[requested];
             if (selected < 0)

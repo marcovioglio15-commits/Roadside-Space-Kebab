@@ -1,3 +1,4 @@
+using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             {
                 SerializedProperty property = parent.FindPropertyRelative(name);
                 if (property != null)
-                    EditorGUILayout.PropertyField(property, true);
+                    StudioGUI.PropertyField(property, true);
             }
         }
 
@@ -32,7 +33,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             {
                 SerializedProperty property = data.FindProperty(name);
                 if (property != null)
-                    EditorGUILayout.PropertyField(property, true);
+                    StudioGUI.PropertyField(property, true);
             }
         }
 
