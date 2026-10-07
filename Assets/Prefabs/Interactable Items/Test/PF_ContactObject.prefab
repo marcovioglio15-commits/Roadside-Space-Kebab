@@ -244,41 +244,8 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Flags:
-    - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
-    ContactDuration: 0.2
-    ContactTolerance: 0.02
-    QueryInterval: 0.02
-    IncludeTriggers: 0
-    AllowCarriedSelf: 1
-    AllowCarriedOther: 0
-    Duration: 1
-    CompleteAfterSeparation: 0
-    ResumeAfterInterruption: 0
-    RepeatAfterSeparation: 1
-    WhileContact: 0
-    RevertDelay: 0.25
-    Self:
-      Tint: 0
-      Multiplier: {r: 0, g: 0, b: 0, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    Other:
-      Tint: 1
-      Multiplier: {r: 0, g: 0, b: 0, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    ChangeContactFlag: 1
-    ContactFlag: {fileID: 11400000, guid: d3074bb85b754906b57c3c98cde17a97, type: 2}
-    ContactFlagOperation: 0
-    BlockSelf: 1
-    BlockOther: 1
+    Modifications:
+    - {fileID: 11400000, guid: b2f4c37776244aabadcaf75bb8a60b3e, type: 2}
 --- !u!114 &2953059259199201431
 MonoBehaviour:
   m_ObjectHideFlags: 0

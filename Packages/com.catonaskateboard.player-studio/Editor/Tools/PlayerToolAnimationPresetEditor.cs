@@ -31,22 +31,27 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             serializedObject.Update();
             StudioGUI.PropertyField(serializedObject.FindProperty("Duration"));
             SerializedProperty tracks = serializedObject.FindProperty("Tracks");
-            PlayerToolsControls.DrawCount(tracks, "Tracks", () => new PlayerToolTrack());
+            StudioArrayGUI.Add(tracks, "Add Track", () => new PlayerToolTrack());
             // Each track resolves only once at runtime; no manual path field is exposed here.
             for (int index = 0; index < tracks.arraySize; index++)
             {
                 SerializedProperty track = tracks.GetArrayElementAtIndex(index);
-                track.isExpanded = EditorGUILayout.Foldout(track.isExpanded, new GUIContent("Track " + (index + 1),
-                    "Local transform keys for one hierarchy target."), true);
+                if (StudioArrayGUI.Header(tracks, index, new GUIContent("Track " + (index + 1), "Local transform keys for one hierarchy target.")))
+                    break;
                 if (!track.isExpanded)
                     continue;
                 using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                 PlayerHierarchyMenu.DrawPath(track.FindPropertyRelative("Path"), hierarchySource != null ? hierarchySource.transform : null,
                     new GUIContent("Target", track.FindPropertyRelative("Path").tooltip), hierarchySource != null && hierarchySource.GetComponent<PlayerHost>() == null);
                 SerializedProperty keys = track.FindPropertyRelative("Keys");
-                PlayerToolsControls.DrawCount(keys, "Keys", () => new PlayerToolKey());
+                StudioArrayGUI.Add(keys, "Add Key", () => new PlayerToolKey());
                 for (int key = 0; key < keys.arraySize; key++)
-                    StudioGUI.PropertyField(keys.GetArrayElementAtIndex(key), true);
+                {
+                    if (StudioArrayGUI.Header(keys, key, new GUIContent("Key " + (key + 1), keys.tooltip)))
+                        break;
+                    if (keys.GetArrayElementAtIndex(key).isExpanded)
+                        StudioGUI.PropertyField(keys.GetArrayElementAtIndex(key), true);
+                }
             }
             serializedObject.ApplyModifiedProperties();
             if (!((PlayerToolAnimationPreset)target).TryValidate(out string warning))

@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
+    /// <summary>Selects the counter driving dispenser appearance thresholds.</summary>
+    public enum DispenseStepCounter { Remaining, Dispensed }
+
     /// <summary>Configures either new prefab supply or recovery from this object's Container.</summary>
     [Serializable]
     public sealed class DispenserSettings
@@ -27,8 +30,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Local Euler rotation applied before the item enters the carry pose.")]
         public Vector3 OutputRotation;
         [Header("Fill Steps")]
-        [Tooltip("Appearance selected by remaining supply. It decreases on withdrawal and increases on linked deposits. Unlimited prefab supply has no fill steps.")]
+        [Tooltip("Use remaining supply or dispensed objects for appearance thresholds. Finite prefab supply uses net withdrawals, so refilling reverses its steps; other supply modes count lifetime withdrawals.")]
+        public DispenseStepCounter StepCounter;
+        [Tooltip("Appearance selected by the configured counter. Refills reverse finite-supply thresholds. Unlimited prefab supply supports the dispensed counter only.")]
         public InventoryFillStep[] FillSteps = Array.Empty<InventoryFillStep>();
+        /// <summary>Whether the selected supply counter has a meaningful finite value.</summary>
+        public bool SupportsSteps => UseContainer || !Unlimited || StepCounter == DispenseStepCounter.Dispensed;
 
         #endregion
 
@@ -45,8 +52,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Dispenser targeting is missing.";
             if (Target == null || !Target.TryValidate(out warning))
                 return false;
-            if ((UseContainer || !Unlimited) && !InventoryFillStep.TryValidate(FillSteps, out warning))
+            if (SupportsSteps && !InventoryFillStep.TryValidate(FillSteps, out warning))
                 return false;
+            if (StepCounter is not (DispenseStepCounter.Remaining or DispenseStepCounter.Dispensed))
+            {
+                warning = "Choose a supported dispense step counter.";
+                return false;
+            }
             if (!InteractionValues.Positive(PickupDuration) || !InteractionValues.Finite(OutputRotation))
                 warning = "Dispenser pickup duration must be positive and finite, with a finite output rotation.";
             else if (!Unlimited && Stock <= 0)

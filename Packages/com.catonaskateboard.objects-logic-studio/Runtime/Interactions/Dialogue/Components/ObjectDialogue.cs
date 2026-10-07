@@ -57,6 +57,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly List<int> eligible = new List<int>();
         private int consumptionRevision = -1;
+        private int orderRevision = -1;
+        private ObjectAvailableOrders orders;
         private int startedRevision = -1;
         private int entry = -1;
         private int line;
@@ -126,6 +128,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             entry = consumptionRevision = startedRevision = -1;
             line = nextEntry = 0;
             eligible.Clear();
+            orders = GetComponent<ObjectAvailableOrders>();
+            orderRevision = -1;
             audio.Stop();
             SightGeometry.Bind(transform);
             Ready = TryValidate(out string warning);
@@ -156,7 +160,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Input references identify actions; the observer binds their private runtime counterparts.
             warning = "Dialogue requires an Object Item and complete settings.";
-            if (GetComponent<ObjectItem>() == null || configuration == null || !configuration.TryValidate(out warning))
+            if (GetComponent<ObjectItem>() == null || configuration == null
+                || !configuration.TryValidate(out warning, GetComponent<ObjectAvailableOrders>()?.Settings, true))
                 return false;
             if (advance == null || advance.action is not { type: InputActionType.Button }
                 || !arrivalOnly && configuration.Trigger == DialogueTrigger.InputAction && (start == null || start.action is not { type: InputActionType.Button }))
@@ -183,7 +188,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float distance = (transform.position - player.position).sqrMagnitude;
             if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
                 armed = true;
-            RefreshEntries();
             return !IsSpeaking && distance <= settings.Distance * settings.Distance && eligible.Count > 0
                 && (armed || settings.Trigger == DialogueTrigger.Consumption && startedRevision != Item.ConsumptionRevision);
         }
@@ -202,12 +206,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void RefreshEntries()
         {
             // Zero-weight entries are excluded only in weighted mode.
-            if (consumptionRevision == Item.ConsumptionRevision)
+            if (consumptionRevision == Item.ConsumptionRevision && orderRevision == (orders != null ? orders.Revision : -1))
                 return;
             consumptionRevision = Item.ConsumptionRevision;
+            orderRevision = orders != null ? orders.Revision : -1;
             eligible.Clear();
+            if (settings.Trigger == DialogueTrigger.Consumption
+                && (!Item.HasConsumption || !settings.Consumption.Matches(Item, orders)))
+                return;
             for (int index = 0; index < settings.Entries.Length; index++)
-                if (settings.Entries[index].Matches(Item)
+                if ((settings.Trigger != DialogueTrigger.Consumption || settings.Entries[index].Consumption.Matches(Item, orders))
                     && (settings.Selection != DialogueSelection.WeightedRandom || settings.Entries[index].Weight > 0f))
                     eligible.Add(index);
         }

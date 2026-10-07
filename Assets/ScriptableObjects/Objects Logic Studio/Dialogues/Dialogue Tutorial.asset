@@ -34,8 +34,12 @@ MonoBehaviour:
     Entries:
     - Name: Tutorial 1
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Grandpa's Pic
         Text: 'Son, it is I, Grandpa.

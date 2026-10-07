@@ -64,7 +64,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             long replacement = draft.FindPropertyRelative("ReplacementId").longValue;
             if (operation == InteractionAvailabilityChange.Replace)
                 choices.Draw(draft.FindPropertyRelative("ReplacementId"), "Incoming Interaction", target, target != 0 ? target : -1);
-            if (!sections.Draw("Conditions", "Apply this availability change after existing interaction events or player commands."))
+            if (!sections.Draw("Conditions", "Apply this availability change after existing interaction events or player commands.", draft, "Settings.RequireAll", "Settings.Conditions", "SourceIds"))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
             SerializedProperty conditions = settings.FindPropertyRelative("Conditions");
@@ -100,7 +100,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             });
                             HoverControls.Field(condition, "Moment");
                             ObjectInteraction source = choices.Resolve(sources.GetArrayElementAtIndex(index).longValue);
-                            if (source is ObjectContactModifier contact && (contact.Settings.Self.Consume || contact.Settings.Other.Consume))
+                            if (source is ObjectContactModifier contact && contact.Settings.ConsumesAny)
                                 Consumption(condition);
                             else if (condition.FindPropertyRelative("FilterConsumed").boolValue)
                                 HoverControls.Field(condition, "FilterConsumed", "Consumed Filter");

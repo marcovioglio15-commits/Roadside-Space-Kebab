@@ -43,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case SingleInteractionKind.Grab:
                     DrawGrab(draft.FindPropertyRelative("Grab"), state.Sections);
-                    if (state.Sections.Draw("Grab Debug", "Draw selected-object targeting and carry guides."))
+                    if (state.Sections.Draw("Grab Debug", "Draw selected-object targeting and carry guides.", draft, "DrawGizmos"))
                         using (new EditorGUI.IndentLevelScope())
                             Field(draft, "DrawGizmos");
                     break;
@@ -77,7 +77,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void DrawGrab(SerializedProperty grab, ObjectStudioSections sections)
         {
             // Grab targeting is independent of Hover and remains available on objects without labels.
-            if (sections.Draw("Grab Detection", "Choose the object's grab range and view targeting."))
+            if (sections.Draw("Grab Detection", "Choose the object's grab range and view targeting.", grab, "Distance", "TargetMode", "SolidHitOnly", "CenterRadius", "TargetOffset", "ObstacleMask"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(grab, "Distance");
@@ -85,10 +85,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     TransferInteractionControls.Aim(grab, "TargetMode", "TargetOffset");
                     Field(grab, "ObstacleMask");
                 }
-            if (sections.Draw("Item Value", "Configure recipe and consumption units represented by one object."))
+            if (sections.Draw("Item Value", "Configure recipe and consumption units represented by one object.", grab, "Units"))
                 using (new EditorGUI.IndentLevelScope())
                     Field(grab, "Units");
-            if (sections.Draw("Item Audio", "Pickup and collision sounds after the first grab."))
+            if (sections.Draw("Item Audio", "Pickup and collision sounds after the first grab.", grab, "PickupSound", "CollisionAudio"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(grab, "PickupSound");
@@ -100,7 +100,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(audio, "Cooldown");
                     }
                 }
-            if (!sections.Draw("Carry", "Configure the held pose, pickup transition, world collisions and hover visibility."))
+            if (!sections.Draw("Carry", "Configure the held pose, pickup transition, world collisions and hover visibility.", grab, "Space", "Offset", "Rotation", "Instant", "TransitionDuration", "WorldCollisions", "FollowSpeed", "RecoveryResponse", "RotationSpeed", "CollisionPadding", "ContactRotation", "ContactAngle", "ContactResponse", "ShowHover"))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
             Field(grab, "Space");
@@ -132,7 +132,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void DrawRelease(SerializedProperty release, ObjectStudioSections sections)
         {
             // Overrides expose their coefficients only when they will actually affect a release.
-            if (sections.Draw("Release Body", "Configure mass, air resistance, gravity, constraints and continuous collision detection."))
+            if (sections.Draw("Release Body", "Configure mass, air resistance, gravity, constraints and continuous collision detection.", release, "OverrideBody", "Mass", "LinearDamping", "AngularDamping", "Gravity", "Constraints", "CollisionDetection", "MaxAngularSpeed"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(release, "OverrideBody");
@@ -147,7 +147,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(release, "MaxAngularSpeed");
                     }
                 }
-            if (!sections.Draw("Release Surface", "Configure friction and bounce against floors and other physical objects."))
+            if (!sections.Draw("Release Surface", "Configure friction and bounce against floors and other physical objects.", release, "OverrideSurface", "StaticFriction", "DynamicFriction", "Bounciness", "FrictionCombine", "BounceCombine"))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
             Field(release, "OverrideSurface");
@@ -166,7 +166,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void DrawTrajectory(SerializedProperty trajectory, ObjectStudioSections sections)
         {
             // Drop never exposes a trajectory because it releases the body from rest.
-            if (!sections.Draw("Trajectory", "Configure launch strength, direction and spin relative to the gameplay camera."))
+            if (!sections.Draw("Trajectory", "Configure launch strength, direction and spin relative to the gameplay camera.", trajectory))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
             Field(trajectory, "Mode");

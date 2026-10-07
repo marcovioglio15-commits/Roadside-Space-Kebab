@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Other tools keep Copy/Paste even when a field has no interaction mapping.
             StudioFieldMenu.Populate += Populate;
+            StudioFieldGroup.Populate += Populate;
         }
 
         /// <summary>Adds batch commands only for fields that map to an interaction component.</summary>
@@ -26,11 +27,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="property">Clicked draft, preset or component field.</param>
         private static void Populate(GenericMenu menu, SerializedProperty property)
         {
+            Populate(menu, new[] { property });
+        }
+
+        /// <summary>Adds atomic batch operations for a section or complete interaction.</summary>
+        /// <param name="menu">Context menu receiving update commands.</param>
+        /// <param name="properties">All fields represented by the clicked header.</param>
+        private static void Populate(GenericMenu menu, SerializedProperty[] properties)
+        {
             // Resolution happens only when opening the context menu, never during ordinary repaint.
-            ObjectFieldTarget target = ObjectFieldTarget.Create(property);
+            ObjectFieldTarget target = ObjectFieldTarget.Create(properties);
             if (target == null)
                 return;
-            Func<bool> guard = StudioFieldMenu.Guard(property.serializedObject.targetObject, property.propertyPath);
+            Func<bool>[] guards = Array.ConvertAll(properties, property => StudioFieldMenu.Guard(property.serializedObject.targetObject, property.propertyPath));
+            Func<bool> guard = () => Array.TrueForAll(guards, check => check());
             bool writable = GUI.enabled && !EditorApplication.isPlayingOrWillChangePlaymode;
             if (writable && target.Preset != null)
                 menu.AddItem(new GUIContent("Update Same Preset", "Copy only this field to matching interactions using the selected preset."), false,
@@ -138,23 +148,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             changed = false;
             warning = string.Empty;
             using SerializedObject data = new SerializedObject(feature);
-            SerializedProperty property = data.FindProperty(target.Path);
-            if (!target.Value.Accepts(property))
+            StudioPropertyValue[] originals = new StudioPropertyValue[target.Fields.Length];
+            uint[] hashes = new uint[target.Fields.Length];
+            for (int index = 0; index < target.Fields.Length; index++)
             {
-                warning = "The corresponding field or array row is missing or has a different type.";
-                return false;
+                SerializedProperty property = data.FindProperty(target.Fields[index].Path);
+                if (!target.Fields[index].Value.Accepts(property))
+                {
+                    warning = "The corresponding field or array row is missing or has a different type: " + target.Fields[index].Path;
+                    return false;
+                }
+                originals[index] = new StudioPropertyValue(property);
+                hashes[index] = property.contentHash;
             }
-            StudioPropertyValue original = new StudioPropertyValue(property);
-            uint before = property.contentHash;
             try
             {
                 // Trial writes are restored even when reference mapping or component validation fails.
-                target.Value.Apply(property, reference => MapReference(reference, target.Source, feature));
+                foreach (ObjectFieldTarget field in target.Fields)
+                    field.Value.Apply(data.FindProperty(field.Path), reference => MapReference(reference, target.Source, feature));
                 data.ApplyModifiedPropertiesWithoutUndo();
                 if (!Validate(feature, out warning))
                     return false;
                 data.Update();
-                changed = before != data.FindProperty(target.Path).contentHash;
+                for (int index = 0; index < target.Fields.Length; index++)
+                    changed |= hashes[index] != data.FindProperty(target.Fields[index].Path).contentHash;
             }
             catch (Exception exception)
             {
@@ -164,14 +181,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             finally
             {
                 data.Update();
-                original.Apply(data.FindProperty(target.Path));
+                for (int index = 0; index < target.Fields.Length; index++)
+                    originals[index].Apply(data.FindProperty(target.Fields[index].Path));
                 data.ApplyModifiedPropertiesWithoutUndo();
             }
             if (!changed)
                 return true;
             Undo.RecordObject(feature, "Update Interaction Field");
             data.Update();
-            target.Value.Apply(data.FindProperty(target.Path), reference => MapReference(reference, target.Source, feature));
+            foreach (ObjectFieldTarget field in target.Fields)
+                field.Value.Apply(data.FindProperty(field.Path), reference => MapReference(reference, target.Source, feature));
             data.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(feature);
             if (!EditorUtility.IsPersistent(feature))
@@ -206,7 +225,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="source">Interaction owning local source references.</param>
         /// <param name="destination">Interaction receiving the field.</param>
         /// <returns>The original external asset or an unambiguous local counterpart.</returns>
-        private static UnityEngine.Object MapReference(UnityEngine.Object reference, ObjectInteraction source, ObjectInteraction destination)
+        internal static UnityEngine.Object MapReference(UnityEngine.Object reference, ObjectInteraction source, ObjectInteraction destination)
         {
             // Asset references such as flags, meshes, materials and output prefabs retain their identity.
             Transform origin = reference switch { GameObject item => item.transform, Component component => component.transform, _ => null };

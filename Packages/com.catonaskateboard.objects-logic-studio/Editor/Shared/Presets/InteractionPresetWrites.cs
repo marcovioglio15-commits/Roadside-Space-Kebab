@@ -45,31 +45,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             };
         }
 
-        /// <summary>Validates transferable extended settings without requiring prefab-local HUD or mesh bindings.</summary>
-        /// <param name="session">Proposed extended settings and selected asset.</param>
-        /// <param name="warning">Receives invalid settings, read-only assets or conflicts.</param>
-        /// <returns>True when Update may write the selected preset.</returns>
-        internal static bool Validate(ExtendedInteractionSession session, out string warning)
-        {
-            // Availability presets use their dedicated mapping transaction before writing snapshots.
-            warning = string.Empty;
-            if (session.Preset == null)
-                return true;
-            if (!session.Draft.ToolRequirement.TryValidate(out warning) || session.Preset.Kind != session.Kind || !ValidateAsset(session.Preset, session.PresetBaseline, out warning))
-                return false;
-            return session.Kind switch
-            {
-                ExtendedInteractionKind.ModifyByContact => session.Draft.Contact.TryValidate(out warning),
-                ExtendedInteractionKind.Dialogue => session.Draft.Dialogue.TryValidate(out warning),
-                ExtendedInteractionKind.PlayAmbient => session.Draft.Ambient.TryValidate(out warning),
-                ExtendedInteractionKind.Slice => session.Draft.Slice.TryValidate(out warning),
-                ExtendedInteractionKind.Outline => session.Draft.Outline.TryValidate(out warning),
-                ExtendedInteractionKind.SpawnManagement => session.Draft.SpawnManagement.TryValidate(out warning),
-                ExtendedInteractionKind.AssemblyStation => session.Draft.AssemblyStation.TryValidate(out warning),
-                _ => false
-            };
-        }
-
         /// <summary>Protects a writable preset against changes made after its selection.</summary>
         /// <param name="preset">Asset receiving the proposed settings.</param>
         /// <param name="baseline">Asset state at selection, import or the latest successful update.</param>
@@ -125,20 +100,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ExtendedInteractionSession session = state.Extended;
             if (session.Preset == null)
                 return;
-            if (!Validate(session, out string warning))
+            string warning = "Select a preset matching the active interaction.";
+            if (session.Preset.Kind != session.Kind || !ValidateAsset(session.Preset, session.PresetBaseline, out warning))
                 throw new InvalidOperationException(warning);
-            string settings = session.Kind switch
+            ExtendedInteractionPreset snapshot = ExtendedPresetTransfer.Capture(state);
+            try
             {
-                ExtendedInteractionKind.ModifyByContact => JsonUtility.ToJson(session.Draft.Contact),
-                ExtendedInteractionKind.Dialogue => JsonUtility.ToJson(session.Draft.Dialogue),
-                ExtendedInteractionKind.PlayAmbient => JsonUtility.ToJson(session.Draft.Ambient),
-                ExtendedInteractionKind.Slice => JsonUtility.ToJson(session.Draft.Slice),
-                ExtendedInteractionKind.Outline => JsonUtility.ToJson(session.Draft.Outline),
-                ExtendedInteractionKind.SpawnManagement => JsonUtility.ToJson(SpawnSourceAuthoring.Resolve(session.Draft.SpawnManagement)),
-                ExtendedInteractionKind.AssemblyStation => JsonUtility.ToJson(session.Draft.AssemblyStation),
-                _ => throw new InvalidOperationException("This configuration has no transferable preset.")
-            };
-            Write(state, session.Preset, "{\"Settings\":" + settings + ",\"ToolRequirement\":" + JsonUtility.ToJson(session.Draft.ToolRequirement) + "}");
+                if (!snapshot.TryValidate(out warning))
+                    throw new InvalidOperationException(warning);
+                Write(state, session.Preset, JsonUtility.ToJson(snapshot));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(snapshot);
+            }
             session.PresetBaseline = Capture(session.Preset);
             state.Persist();
         }

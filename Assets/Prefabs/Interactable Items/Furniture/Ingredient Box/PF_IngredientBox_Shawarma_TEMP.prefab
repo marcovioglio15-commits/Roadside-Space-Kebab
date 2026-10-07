@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 6841947802560516959}
   - component: {fileID: 8640676104594044564}
   - component: {fileID: 5540788363025027008}
+  - component: {fileID: 746817314116535194}
   m_Layer: 0
   m_Name: PF_IngredientBox_Shawarma_TEMP
   m_TagString: Untagged
@@ -135,11 +136,33 @@ MonoBehaviour:
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 3974403703203748344, guid: 536ae3a8429f3e447bb8cd6f50472260, type: 3}
-    Unlimited: 1
-    Stock: 1
+    Unlimited: 0
+    Stock: 10
     PickupDuration: 0.35
     OutputRotation: {x: 0, y: 0, z: 0}
-    FillSteps: []
+    StepCounter: 1
+    FillSteps:
+    - Count: 2
+      Appearance:
+        Meshes:
+        - Path: SM_ShawarmaStack_1Full
+          Mesh: {fileID: -5720851812767739229, guid: f48f102d2a2217149b28cfb678745073, type: 3}
+          UpdateCollider: 0
+        Materials: []
+    - Count: 5
+      Appearance:
+        Meshes:
+        - Path: SM_ShawarmaStack_1Full
+          Mesh: {fileID: -593475255681766224, guid: 30348a1d778fef94e85d8994875f24be, type: 3}
+          UpdateCollider: 0
+        Materials: []
+    - Count: 8
+      Appearance:
+        Meshes:
+        - Path: SM_ShawarmaStack_1Full
+          Mesh: {fileID: -1834084389826122708, guid: 869515fad51fc994b93f5a04a8d0b0c1, type: 3}
+          UpdateCollider: 0
+        Materials: []
 --- !u!114 &6841947802560516959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -285,6 +308,63 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &746817314116535194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3996293612802824840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89758c4d4eb24359b9fa12c3ef130a73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContainer
+  interactionName: Container
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    AllowedFlags:
+    - {fileID: 11400000, guid: 7543dcca76d2627419ed9abf1e3b8f76, type: 2}
+    Match: 0
+    Unlimited: 0
+    Capacity: 10
+    LimitToDispenserSpace: 1
+    RefillDispenser: 1
+    KeepVisible: 0
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Spacing: {x: 0, y: 0.2, z: 0}
+    FillSteps: []
 --- !u!1 &6559834403795863480
 GameObject:
   m_ObjectHideFlags: 0
@@ -631,6 +711,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: f48f102d2a2217149b28cfb678745073, type: 3}
       propertyPath: m_Name
       value: SM_ShawarmaStack_1Full
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f48f102d2a2217149b28cfb678745073, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

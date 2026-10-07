@@ -23,10 +23,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Window
 
         /// <summary>Opens board configuration independently of a locked Inspector or prefab stage.</summary>
-        internal static void Open()
+        /// <param name="selected">Optional gameplay board selected from the prefab draft.</param>
+        internal static void Open(OrderBoard selected = null)
         {
             // Opening an editor does not modify scene objects.
-            GetWindow<OrderBoardWindow>("Order Board").Show();
+            OrderBoardWindow window = GetWindow<OrderBoardWindow>("Order Board");
+            if (selected != null)
+                window.board = selected;
+            window.Show();
         }
 
         /// <summary>Shows an existing scene board or offers explicit scene authoring.</summary>
@@ -34,7 +38,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // The prefab stage cannot own a shared scene destination.
             board = (OrderBoard)StudioGUI.ObjectField(new GUIContent("Board", "Shared board in the gameplay scene."), board, typeof(OrderBoard), true);
-            if (board != null)
+            using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode);
+            if (OrderBoardBinding.IsSceneBoard(board))
             {
                 UnityEditor.Editor.CreateCachedEditor(board, null, ref inspector);
                 inspector.OnInspectorGUI();
@@ -43,9 +48,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (StudioButton.Draw(new GUIContent("Add Text Slot", "Create one editable 3D text child and append it to this board.")))
                     AddSlot(board);
             }
-            using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode || PrefabStageUtility.GetCurrentPrefabStage() != null))
-                if (StudioButton.Draw(new GUIContent("Create Scene Board", "Create a world-space board with four editable text slots in the active scene.")))
-                    board = Create(SceneManager.GetActiveScene());
+            if (StudioButton.Draw(new GUIContent("Create Scene Board", "Choose a loaded gameplay scene for a board with four authored text slots.")))
+            {
+                GenericMenu menu = new GenericMenu();
+                for (int index = 0; index < SceneManager.sceneCount; index++)
+                {
+                    Scene scene = SceneManager.GetSceneAt(index);
+                    if (scene.isLoaded && !EditorSceneManager.IsPreviewScene(scene))
+                        menu.AddItem(new GUIContent(scene.name), false, () => board = Create(scene));
+                }
+                menu.ShowAsContext();
+            }
         }
 
         /// <summary>Releases the cached inspector when this editor window closes.</summary>
@@ -82,7 +95,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 root.transform.SetPositionAndRotation(camera.position + camera.forward * 3f, camera.rotation);
             }
             EditorSceneManager.MarkSceneDirty(scene);
-            Selection.activeGameObject = root;
+            if (PrefabStageUtility.GetCurrentPrefabStage() == null)
+                Selection.activeGameObject = root;
             return created;
         }
 
@@ -94,6 +108,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using SerializedObject data = new SerializedObject(target);
             SerializedProperty slots = data.FindProperty("slots");
             GameObject child = new GameObject("Order " + (slots.arraySize + 1), typeof(RectTransform), typeof(TextMeshPro));
+            SceneManager.MoveGameObjectToScene(child, target.gameObject.scene);
             Undo.RegisterCreatedObjectUndo(child, "Add Order Slot");
             child.transform.SetParent(target.transform, false);
             child.transform.localPosition = Vector3.down * slots.arraySize * 0.4f;

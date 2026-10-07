@@ -23,8 +23,12 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: 
         Text: 

@@ -14,6 +14,7 @@ namespace CatOnASkateboard.StudioColors.Editor
 
         internal static StudioPropertyValue Clipboard { get; set; }
         private static SerializedProperty next;
+        internal static SerializedProperty NextProperty => next;
 
         /// <summary>Adds operations that understand the owning tool's interaction and preset mapping.</summary>
         public static event Action<GenericMenu, SerializedProperty> Populate;
@@ -23,6 +24,8 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static event Action<UnityEngine.Object> BeforeChange;
         /// <summary>Protects delayed commands from workspace selection changes.</summary>
         public static event Action<UnityEngine.Object, string, List<Func<bool>>> CollectGuards;
+        /// <summary>Lets a tool translate local identities for complex clipboard operations.</summary>
+        public static event Func<GenericMenu, SerializedProperty[], bool> ClipboardMenu;
 
         #endregion
 
@@ -93,18 +96,21 @@ namespace CatOnASkateboard.StudioColors.Editor
             string path = property.propertyPath;
             StudioPropertyValue copied = new StudioPropertyValue(property);
             Func<bool> guard = Guard(owner, path);
-            menu.AddItem(new GUIContent("Copy"), false, () => Clipboard = copied);
-            if (GUI.enabled && !EditorApplication.isPlayingOrWillChangePlaymode && Clipboard != null && Clipboard.Accepts(property))
+            bool handled = TryClipboard(menu, new[] { property });
+            if (!handled)
+                menu.AddItem(new GUIContent("Copy"), false, () => Clipboard = copied);
+            if (!handled && GUI.enabled && !EditorApplication.isPlayingOrWillChangePlaymode && Clipboard != null && Clipboard.Accepts(property))
             {
                 StudioPropertyValue pasted = Clipboard;
                 menu.AddItem(new GUIContent("Paste"), false, () => Paste(owner, path, pasted, guard));
             }
-            else
+            else if (!handled)
                 menu.AddDisabledItem(new GUIContent("Paste"));
             int count = menu.GetItemCount();
             Populate?.Invoke(menu, property);
             if (menu.GetItemCount() == count)
                 Unavailable(menu);
+            StudioFieldColors.Menu(menu, StudioFieldColors.Key(property));
         }
 
         /// <summary>Gives a UI Toolkit field the same typed clipboard commands as IMGUI controls.</summary>
@@ -143,6 +149,20 @@ namespace CatOnASkateboard.StudioColors.Editor
 
         #region Persistence
 
+        /// <summary>Lets the owning tool supply mapped clipboard commands before falling back to raw serialization.</summary>
+        /// <param name="menu">Context menu receiving Copy and Paste.</param>
+        /// <param name="properties">Complete field selection represented by the menu.</param>
+        /// <returns>True when one registered tool supplied both clipboard commands.</returns>
+        public static bool TryClipboard(GenericMenu menu, SerializedProperty[] properties)
+        {
+            if (ClipboardMenu == null)
+                return false;
+            foreach (Func<GenericMenu, SerializedProperty[], bool> handler in ClipboardMenu.GetInvocationList())
+                if (handler(menu, properties))
+                    return true;
+            return false;
+        }
+
         /// <summary>Captures all registered workspace checks for a delayed field command.</summary>
         /// <param name="owner">Object storing the field.</param>
         /// <param name="path">Serialized field route.</param>
@@ -169,7 +189,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             SerializedProperty property = data.FindProperty(path);
             if (!value.Accepts(property))
                 return;
-            BeforeChange?.Invoke(owner);
+            RecordChange(owner);
             value.Apply(property);
             data.ApplyModifiedProperties();
             Notify(owner);
@@ -182,6 +202,13 @@ namespace CatOnASkateboard.StudioColors.Editor
             // Each tool keeps responsibility for its own Apply/Discard policy.
             Changed?.Invoke(owner);
             UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+        }
+
+        /// <summary>Records draft ownership before a delayed field or section edit.</summary>
+        /// <param name="owner">Draft, component or asset receiving the change.</param>
+        public static void RecordChange(UnityEngine.Object owner)
+        {
+            BeforeChange?.Invoke(owner);
         }
 
         #endregion

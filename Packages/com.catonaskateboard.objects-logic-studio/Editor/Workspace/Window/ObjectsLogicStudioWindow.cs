@@ -120,6 +120,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             window.state.Category = feature.Kind switch
             {
+                ExtendedInteractionKind.ModifyByContact => ObjectInteractionCategory.SingleInteraction,
                 ExtendedInteractionKind.Dialogue or ExtendedInteractionKind.Slice => ObjectInteractionCategory.MultipleInteraction,
                 ExtendedInteractionKind.SpawnManagement => ObjectInteractionCategory.SpawnManagement,
                 ExtendedInteractionKind.AssemblyStation or ExtendedInteractionKind.AssemblyProduct => ObjectInteractionCategory.ObjectAssemble,
@@ -343,7 +344,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         DrawHovers();
                         break;
                     case ObjectInteractionCategory.SingleInteraction:
-                        singles.Draw(state, data);
+                        singles.Draw(state, data, extended);
+                        extended.Draw(state, data, ExtendedInteractionKind.ModifyByContact, false);
                         break;
                     case ObjectInteractionCategory.MultipleInteraction:
                         extended.Draw(state, data, ExtendedInteractionKind.Dialogue);
@@ -358,7 +360,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         extended.Draw(state, data, ExtendedInteractionKind.AssemblyStation);
                         break;
                     case ObjectInteractionCategory.PassiveInteraction:
-                        extended.Draw(state, data, ExtendedInteractionKind.ModifyByContact);
+                        extended.Draw(state, data, ExtendedInteractionKind.Outline);
                         break;
                 }
             EditorGUILayout.EndScrollView();
@@ -426,7 +428,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         bool expanded = index == state.Target.InteractionIndex && state.InteractionExpanded;
                         using (new EditorGUI.DisabledScope(state.HasChanges && index != state.Target.InteractionIndex))
                         {
-                            bool requested = EditorGUILayout.Foldout(expanded, names[index], true, EditorStyles.foldoutHeader);
+                            bool requested = ObjectInteractionHeader.Draw(state, data, interactions[index], expanded, names[index]);
                             if (requested != expanded)
                             {
                                 if (index == state.Target.InteractionIndex || ObjectWorkspaceSession.Select(state, currentObject, index, out status))
@@ -454,13 +456,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // A collapsed feature does not update or discard its serialized proposal.
             HoverPresetView.Draw(state);
             data.Update();
-            if (state.HasBinding && state.Sections.Draw("Binding", "Edit this object's interaction name, enabled state and optional anchor."))
+            if (state.HasBinding && state.Sections.Draw("Binding", "Edit this object's interaction name, enabled state and optional anchor.", data.FindProperty("Binding"), "Name", "Enabled", "AnchorPath", "ToolRequirement", "FlagChange", "VisualEffect"))
                 using (new EditorGUI.IndentLevelScope())
                     DrawBinding();
             if (!state.HasBinding)
                 InteractionToolControls.Draw(data.FindProperty("Binding.ToolRequirement"));
             HoverControls.Draw(data.FindProperty("Draft"), state.Sections);
-            if (state.HasBinding && state.Sections.Draw("Debug", "Control selected-object debug geometry."))
+            if (state.HasBinding && state.Sections.Draw("Debug", "Control selected-object debug geometry.", data.FindProperty("Binding"), "DrawGizmos"))
                 using (new EditorGUI.IndentLevelScope())
                     HoverControls.Field(data.FindProperty("Binding"), "DrawGizmos");
             if (data.ApplyModifiedProperties())

@@ -18,13 +18,34 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the recipe has compatible physical slots and attainable unit requirements.</returns>
         public static bool TryValidate(GameObject owner, AssemblyProductSettings settings, out string warning)
         {
+            // Runtime and prefab Apply require an actual destination; presets use the portable overload.
+            warning = "Select an existing product object.";
+            return owner != null && Validate(settings, owner, out warning);
+        }
+
+        /// <summary>Checks reusable recipe data without requiring destination geometry or interaction instances.</summary>
+        /// <param name="settings">Portable recipe with interaction targets stored as separate mappings.</param>
+        /// <param name="warning">Receives invalid recipe, magnet or threshold data.</param>
+        /// <returns>True when destination-independent settings are valid.</returns>
+        public static bool TryValidate(AssemblyProductSettings settings, out string warning)
+        {
+            return Validate(settings, null, out warning);
+        }
+
+        /// <summary>Shares recipe validation between portable presets and bound products.</summary>
+        /// <param name="settings">Recipe to validate without modifying its values.</param>
+        /// <param name="owner">Destination product, or null to defer local binding checks.</param>
+        /// <param name="warning">Receives the first invalid setting.</param>
+        /// <returns>True when recipe data and any supplied destination are valid.</returns>
+        private static bool Validate(AssemblyProductSettings settings, GameObject owner, out string warning)
+        {
             // Validate physical slots separately from unit quantities, which depend on each incoming Grab.
             warning = "Configure at least one ingredient and enough compatible magnets.";
-            if (owner == null || settings == null || settings.Ingredients == null || settings.Ingredients.Length == 0
+            if (settings == null || settings.Ingredients == null || settings.Ingredients.Length == 0
                 || settings.Magnets == null || settings.Magnets.Length == 0 || settings.InteractionRules == null)
                 return false;
             // Completed recipes retire ingredient colliders, so carry geometry must exist on the product itself.
-            if (owner.TryGetComponent(out ObjectGrab _) && !ObjectGrab.ValidateBody(owner, out warning))
+            if (owner != null && owner.TryGetComponent(out ObjectGrab _) && !ObjectGrab.ValidateBody(owner, out warning))
             {
                 warning = "Product Physics: " + warning;
                 return false;
@@ -45,9 +66,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             HashSet<string> names = new HashSet<string>();
             HashSet<int> orders = new HashSet<int>();
-            foreach (Transform child in owner.transform)
-                if (!child.TryGetComponent(out ObjectAssemblyPart part) || part.Product == null || part.Product.gameObject != owner)
-                    names.Add(child.name);
+            if (owner != null)
+                foreach (Transform child in owner.transform)
+                    if (!child.TryGetComponent(out ObjectAssemblyPart part) || part.Product == null || part.Product.gameObject != owner)
+                        names.Add(child.name);
             foreach (AssemblyMagnet magnet in settings.Magnets)
             {
                 if (magnet == null || string.IsNullOrWhiteSpace(magnet.Name) || magnet.Name.Contains('/') || !names.Add(magnet.Name))
@@ -92,7 +114,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             }
             if (!settings.CompletedAppearance.TryValidate(out warning)
-                || !settings.CompletedAppearance.TryValidateBindings(owner.GetComponent<ObjectItem>(), out warning))
+                || owner != null && !settings.CompletedAppearance.TryValidateBindings(owner.GetComponent<ObjectItem>(), out warning))
             {
                 warning = "Completed Appearance: " + warning;
                 return false;
@@ -119,8 +141,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             HashSet<ObjectInteraction> targets = new HashSet<ObjectInteraction>();
             foreach (AssemblyInteractionRule rule in settings.InteractionRules)
             {
-                if (rule == null || rule.Target == null || !rule.Target.transform.IsChildOf(owner.transform)
-                    || rule.Target is ObjectInteractionUnlock or ObjectAssemblyProduct || !targets.Add(rule.Target))
+                if (rule == null || owner != null && (rule.Target == null || !rule.Target.transform.IsChildOf(owner.transform)
+                    || rule.Target is ObjectInteractionUnlock or ObjectAssemblyProduct || !targets.Add(rule.Target)))
                     warning = "Select each existing product interaction only once; unlock rules cannot be ingredient targets.";
                 else if (!rule.RequireComplete && (rule.MinimumIngredients <= 0 || rule.MinimumIngredients > total) || rule.Ingredients == null)
                     warning = "Choose a positive minimum ingredient count that fits this recipe.";

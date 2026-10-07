@@ -20,7 +20,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector3 previousTarget;
         private Vector3 recoveryVelocity;
         private bool tracking;
+        private bool blocked;
+        private Vector3 blockedNormal;
+        private Vector3 blockedPosition;
         private const float separationMargin = 0.001f;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Estimated mass-times-stopped-speed impulse for a newly entered carry contact.</summary>
+        internal float ImpactImpulse { get; private set; }
 
         #endregion
 
@@ -32,7 +42,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="owner">Grabbed body.</param>
         /// <param name="colliders">Colliders currently owned by that body.</param>
         /// <param name="observer">Player root excluded from world contact.</param>
-        internal void Bind(Rigidbody owner, Collider[] colliders, Transform observer)
+        /// <param name="resetImpact">Clear contact history for a new pickup; preserve it during an appearance-driven geometry refresh.</param>
+        internal void Bind(Rigidbody owner, Collider[] colliders, Transform observer, bool resetImpact = true)
         {
             // Geometry allocations belong to pickup, never to the render or physics loop.
             body = owner;
@@ -42,6 +53,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             contactClearTime = 0f;
             reach = 0f;
             tracking = false;
+            if (resetImpact)
+                blocked = false;
+            ImpactImpulse = 0f;
             recoveryVelocity = Vector3.zero;
             shapes = new CarryShape[colliders.Length];
             for (int index = 0; index < colliders.Length; index++)
@@ -65,6 +79,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Synchronize scripted obstacles once for the held item before running its virtual-pose queries.
             Physics.SyncTransforms();
+            ImpactImpulse = 0f;
+            if (blocked && Vector3.Dot(body.position - blockedPosition, blockedNormal) > settings.CollisionPadding + separationMargin)
+                blocked = false;
             Pose pose = new Pose(body.position, body.rotation);
             // Follow this frame's anchor displacement directly, easing only the error retained from earlier contact.
             Vector3 remaining = tracking && !instant ? target.position - previousTarget
@@ -88,6 +105,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 budget = Mathf.Max(0f, budget - travel);
                 if (travel >= distance)
                     break;
+                // Kinematic carry uses sweeps instead of solver impulses; report only entry into a blocking plane.
+                if (pass == 0)
+                {
+                    if (!instant && deltaTime > 0f && (!blocked || Vector3.Dot(normal, blockedNormal) < 0.95f))
+                        ImpactImpulse = body.mass * Mathf.Max(0f, -Vector3.Dot(remaining, normal)) / deltaTime;
+                    blocked = true;
+                    blockedNormal = normal;
+                    blockedPosition = pose.position;
+                }
                 // Do not store recovery velocity into a blocked plane and release it suddenly at an edge.
                 recoveryVelocity = Vector3.ProjectOnPlane(recoveryVelocity, normal);
                 if (settings.ContactRotation && pass == 0)

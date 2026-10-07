@@ -28,6 +28,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             string current = property.stringValue;
             Rect rect = EditorGUILayout.GetControlRect();
             StudioFieldMenu.Context(rect, property);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
             using EditorGUI.PropertyScope scope = new EditorGUI.PropertyScope(rect, label, property);
             rect = EditorGUI.PrefixLabel(rect, label);
             using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(root == null);

@@ -74,6 +74,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             else
                 menu.AddDisabledItem(new GUIContent("Paste"));
             StudioFieldMenu.Unavailable(menu);
+            StudioFieldColors.Menu(menu, StudioFieldColors.Key(null, label.text));
             menu.ShowAsContext();
             Event.current.Use();
             return value;

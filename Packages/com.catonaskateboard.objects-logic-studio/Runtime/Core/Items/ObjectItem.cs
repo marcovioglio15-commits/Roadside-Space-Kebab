@@ -35,6 +35,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public IReadOnlyDictionary<ObjectFlag, int> ConsumedFlags => consumedFlags;
         /// <summary>Changes only when consumption receipts change.</summary>
         public int ConsumptionRevision { get; private set; }
+        /// <summary>Whether this item has actually consumed a victim since its last explicit reset.</summary>
+        public bool HasConsumption => receipts.Count > 0;
         /// <summary>Whether this item has already been consumed, including after accidental reactivation.</summary>
         public bool IsConsumed { get; private set; }
         /// <summary>Whether this item's cached grab component currently owns the player's carry slot.</summary>

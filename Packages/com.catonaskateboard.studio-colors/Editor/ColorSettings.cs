@@ -35,6 +35,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             Save(true);
             Changed?.Invoke();
             EditorApplication.RepaintProjectWindow();
+            UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
         }
         #endregion
 

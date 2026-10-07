@@ -23,20 +23,43 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Preset edits affect future imports; already imported item snapshots stay independent.
             serializedObject.Update();
             InteractionToolControls.Draw(serializedObject.FindProperty("ToolRequirement"));
-            if (target is AmbientPreset)
-                AmbientControls.Draw(serializedObject.FindProperty("Settings"));
-            else if (target is SlicePreset)
-                SliceControls.Draw(serializedObject.FindProperty("Settings"), sections);
-            else if (target is SpawnManagementPreset)
-                SpawnManagementControls.Draw(serializedObject.FindProperty("Settings"), sections);
-            else if (target is AssemblyStationPreset)
-                AssemblyControls.DrawStation(serializedObject.FindProperty("Settings"), sections);
-            else if (target is OutlinePreset)
-                ExtendedInteractionControls.DrawOutline(serializedObject.FindProperty("Settings"), sections);
-            else if (target is ContactModificationPreset)
-                ExtendedInteractionControls.DrawContact(serializedObject.FindProperty("Settings"), sections);
-            else
-                ExtendedInteractionControls.DrawDialogue(serializedObject.FindProperty("Settings"), sections);
+            SerializedProperty settings = serializedObject.FindProperty("Settings");
+            switch (target)
+            {
+                case DegradationPreset:
+                    DegradationControls.Draw(settings, sections);
+                    break;
+                case GravityGeneratorPreset:
+                    GravityControls.Draw(settings, sections);
+                    break;
+                case AmbientPreset:
+                    AmbientControls.Draw(settings);
+                    break;
+                case SlicePreset:
+                    SliceControls.Draw(settings, sections);
+                    break;
+                case SpawnManagementPreset:
+                    SpawnManagementControls.Draw(settings, sections);
+                    break;
+                case AssemblyStationPreset:
+                    AssemblyControls.DrawStation(settings, sections);
+                    break;
+                case AssemblyProductPreset:
+                    AssemblyControls.DrawProductPreset(settings, serializedObject.FindProperty("Targets"), sections);
+                    break;
+                case AvailableOrdersPreset:
+                    OrderControls.Draw(settings, null);
+                    break;
+                case OutlinePreset:
+                    ExtendedInteractionControls.DrawOutline(settings, sections);
+                    break;
+                case ContactModificationPreset:
+                    ExtendedInteractionControls.DrawContact(settings, sections);
+                    break;
+                case DialoguePreset:
+                    ExtendedInteractionControls.DrawDialogue(settings, sections);
+                    break;
+            }
             serializedObject.ApplyModifiedProperties();
         }
 

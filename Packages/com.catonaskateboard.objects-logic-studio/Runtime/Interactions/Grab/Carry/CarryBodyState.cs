@@ -29,7 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Mass and material are not changed by carrying itself.
             kinematic = body.isKinematic;
-            gravity = body.useGravity;
+            gravity = GravitySuspension.Original(body);
             collisions = body.detectCollisions;
             constraints = body.constraints;
             detection = body.collisionDetectionMode;
@@ -47,7 +47,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Set a compatible mode before toggling kinematic state.
             body.collisionDetectionMode = CollisionDetectionMode.Discrete;
             body.isKinematic = !release && kinematic;
-            body.useGravity = gravity;
+            GravitySuspension.Set(body, gravity);
             body.detectCollisions = collisions;
             body.constraints = constraints;
             body.collisionDetectionMode = detection;

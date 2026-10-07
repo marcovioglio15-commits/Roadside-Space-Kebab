@@ -34,36 +34,56 @@ MonoBehaviour:
     Entries:
     - Name: Shadowblade Order Wrong 1
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Ugh, toxins for my delicate system.
     - Name: Shadowblade Order Wrong 2
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: The Elder Gods are not pleased.
     - Name: Shadowblade Order Wrong 3
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Pathetic.
     - Name: Shadowblade Order Wrong 4
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Get out of my sight, slowpoke!
     - Name: Shadowblade Order Wrong 5
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: 'I knew you were a FAKER. '

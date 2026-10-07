@@ -25,7 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Closing a section changes only navigation; hidden values remain in the draft.
             SerializedProperty settings = configuration.FindPropertyRelative("settings");
-            if (sections.Draw("Detection", "Choose targeting, player range and visibility checks."))
+            if (sections.Draw("Detection", "Choose targeting, player range and visibility checks.", settings, "targetMode", "playerDistance", "centerRadius", "queryInterval", "releaseDelay", "obstacleMask"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "targetMode");
@@ -36,7 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "releaseDelay");
                     Field(settings, "obstacleMask");
                 }
-            if (sections.Draw("Suspension", "Temporarily hide this hover while carried or moving."))
+            if (sections.Draw("Suspension", "Temporarily hide this hover while carried or moving.", settings, "suspendCarried", "suspendMoving", "speedThreshold"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "suspendCarried");
@@ -44,7 +44,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (settings.FindPropertyRelative("suspendMoving").boolValue)
                         Field(settings, "speedThreshold");
                 }
-            if (sections.Draw("Placement", "Offset the detection anchor and final label."))
+            if (sections.Draw("Placement", "Offset the detection anchor and final label.", settings, "anchorOffset", "worldOffset", "screenOffset", "followSmoothing"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "anchorOffset");
@@ -52,7 +52,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "screenOffset");
                     Field(settings, "followSmoothing");
                 }
-            if (sections.Draw("Appearance", "Choose instant appearance or an animated pop-up."))
+            if (sections.Draw("Appearance", "Choose instant appearance or an animated pop-up.", settings, "appearance", "duration", "startScale", "popIn", "exitDuration"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "appearance");
@@ -74,7 +74,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void DrawStyle(SerializedProperty style, ObjectStudioSections sections)
         {
             // Appearance has one reusable source instead of independent native-graphic edits.
-            if (sections.Draw("Text", "Edit the content, font and text rendering options."))
+            if (sections.Draw("Text", "Edit the content, font and text rendering options.", style, "content", "font", "fontSize", "fontStyle", "textColor", "alignment", "richText", "horizontalOverflow", "verticalOverflow"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     SerializedProperty content = style.FindPropertyRelative("content");
@@ -89,7 +89,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(style, "horizontalOverflow");
                     Field(style, "verticalOverflow");
                 }
-            if (sections.Draw("Layout", "Size and inset the preauthored label in reference pixels."))
+            if (sections.Draw("Layout", "Size and inset the preauthored label in reference pixels.", style, "size", "textSizeOffset", "textOffset", "sortingOrder"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(style, "size");
@@ -97,7 +97,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(style, "textOffset");
                     Field(style, "sortingOrder");
                 }
-            if (sections.Draw("Background", "Enable and configure the existing background graphic."))
+            if (sections.Draw("Background", "Enable and configure the existing background graphic.", style, "showBackground", "backgroundColor", "backgroundSprite", "backgroundType"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(style, "showBackground");

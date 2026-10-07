@@ -81,6 +81,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (configuration.LimitToDispenserSpace && (GetComponent<ObjectDispenser>() is not ObjectDispenser dispenser
                 || dispenser.Settings.Unlimited || dispenser.Settings.Stock <= 0))
                 warning = "Limit to Dispenser Space requires a finite Dispenser on this object with positive Stock.";
+            else if (configuration.RefillDispenser && (GetComponent<ObjectDispenser>() is not ObjectDispenser supply
+                || supply.Settings.UseContainer || supply.Settings.Unlimited || supply.Settings.Stock <= 0))
+                warning = "Refill Dispenser requires finite prefab supply on this same object.";
             return warning.Length == 0;
         }
 
@@ -109,8 +112,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Prune();
             if (transferring || !Available(InteractionChannels.Transfer) || Item.IsReserved || grab == null || !grab.IsHeld
                 || transform.IsChildOf(grab.transform) || grab.transform.IsChildOf(transform)
-                || !settings.Unlimited && stored.Count >= settings.Capacity
-                || settings.LimitToDispenserSpace && (Dispenser == null || !Dispenser.HasStorageSpace(stored.Count))
+                || !settings.RefillDispenser && (!settings.Unlimited && stored.Count >= settings.Capacity
+                    || settings.LimitToDispenserSpace && (Dispenser == null || !Dispenser.HasStorageSpace(stored.Count)))
+                || settings.RefillDispenser && (Dispenser == null || !Dispenser.CanRefill(grab.Units))
                 || grab.Identity == null || !grab.Identity.Matches(settings.AllowedFlags, settings.Match))
                 return false;
             foreach (ObjectItem item in grab.GetComponentsInChildren<ObjectItem>(true))
@@ -131,9 +135,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             try
             {
                 grab.Cancel();
-                StoredObject entry = new StoredObject(grab);
-                entry.Suspend(this, stored.Count);
-                stored.Add(entry);
+                if (settings.RefillDispenser)
+                {
+                    if (!Refill(grab))
+                        return false;
+                }
+                else
+                {
+                    StoredObject entry = new StoredObject(grab);
+                    entry.Suspend(this, stored.Count);
+                    stored.Add(entry);
+                }
                 RefreshFill();
                 Signal(InteractionMoment.Started);
                 Signal(InteractionMoment.Completed);
@@ -142,6 +154,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             finally
             {
                 transferring = false;
+            }
+        }
+
+        /// <summary>Consumes one complete refill only after both participant reservations succeed.</summary>
+        /// <param name="grab">Accepted item released from the player's carry slot.</param>
+        /// <returns>True when the dispenser stock was replenished.</returns>
+        private bool Refill(ObjectGrab grab)
+        {
+            ObjectItem victim = grab.Item;
+            if (!Item.Acquire(this, InteractionChannels.None))
+                return false;
+            try
+            {
+                if (!victim.Acquire(this, InteractionChannels.None) || !Item.Consume(victim, this, out _))
+                    return false;
+                Dispenser.Refill(grab.Units);
+                return true;
+            }
+            finally
+            {
+                victim.Release(this);
+                Item.Release(this);
             }
         }
 

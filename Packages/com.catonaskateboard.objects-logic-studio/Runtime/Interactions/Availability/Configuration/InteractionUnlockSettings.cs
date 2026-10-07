@@ -42,7 +42,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Whether the selected source can produce a consumed-item completion receipt.</summary>
         public bool SupportsConsumption => Trigger == UnlockTrigger.Interaction && Moment == InteractionMoment.Completed
-            && Source is ObjectContactModifier contact && (contact.Settings.Self.Consume || contact.Settings.Other.Consume);
+            && Source is ObjectContactModifier contact && contact.Settings.ConsumesAny;
 
         #endregion
     }

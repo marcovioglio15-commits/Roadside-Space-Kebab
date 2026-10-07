@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, bool explicitSource = false, GameObject suggested = null)
         {
             // Source selection appears only when these settings cannot use the current object's hierarchy.
-            settings.isExpanded = EditorGUILayout.Foldout(settings.isExpanded, new GUIContent(settings.displayName, settings.tooltip), true);
+            settings.isExpanded = StudioArrayGUI.Foldout(settings, new GUIContent(settings.displayName, settings.tooltip));
             if (!settings.isExpanded)
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
@@ -34,7 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void DrawList(SerializedProperty array, GameObject source, bool mesh)
         {
             // Structural edits restart the next GUI pass before using invalidated array element handles.
-            array.isExpanded = EditorGUILayout.Foldout(array.isExpanded, new GUIContent(array.displayName + " (" + array.arraySize + ")", array.tooltip), true);
+            array.isExpanded = StudioArrayGUI.Foldout(array, new GUIContent(array.displayName + " (" + array.arraySize + ")", array.tooltip));
             if (!array.isExpanded)
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();

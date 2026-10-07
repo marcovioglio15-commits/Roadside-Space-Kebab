@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty steps, ObjectStudioSections sections, string title)
         {
             // Thresholds work in both directions; explicit counts avoid percentage-rounding ambiguities.
-            if (!sections.Draw(title, steps.tooltip))
+            if (!sections.Draw(title, steps.tooltip, steps))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             for (int index = 0; index < steps.arraySize; index++)
@@ -26,8 +26,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty step = steps.GetArrayElementAtIndex(index);
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    step.isExpanded = EditorGUILayout.Foldout(step.isExpanded, new GUIContent("At least "
-                        + step.FindPropertyRelative("Count").intValue + " items", "Highest reached threshold selects this complete appearance."), true);
+                    step.isExpanded = StudioArrayGUI.Foldout(step, new GUIContent("At least "
+                        + step.FindPropertyRelative("Count").intValue + " items", "Highest reached threshold selects this complete appearance."));
                     if (GUILayout.Button(new GUIContent("−", "Remove this fill step."), GUILayout.Width(26f)))
                     {
                         steps.DeleteArrayElementAtIndex(index);

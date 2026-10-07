@@ -84,11 +84,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Disable collision and logic even for visible items, so storage cannot trigger contact consumption.
             if (preserveOrders)
                 foreach (ObjectInteraction interaction in interactions)
-                    if (interaction is ObjectMakeOrder order)
+                    if (interaction is ObjectAvailableOrders order)
                         order.HoldPresentation(true);
             Root.SetActive(false);
             foreach (ObjectInteraction interaction in interactions)
-                if (interaction != null && (!preserveOrders || interaction is not ObjectMakeOrder))
+                if (interaction != null && (!preserveOrders || interaction is not ObjectAvailableOrders))
                     interaction.enabled = false;
             foreach (ObjectItem item in items)
                 if (item != null)
@@ -114,7 +114,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Root.SetActive(true);
             if (preserveOrders)
                 foreach (ObjectInteraction interaction in interactions)
-                    if (interaction is ObjectMakeOrder order)
+                    if (interaction is ObjectAvailableOrders order)
                         order.HoldPresentation(false);
         }
 
@@ -124,7 +124,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Restore while inactive so activation callbacks observe a complete physical hierarchy.
             if (preserveOrders)
                 foreach (ObjectInteraction interaction in interactions)
-                    if (interaction is ObjectMakeOrder order)
+                    if (interaction is ObjectAvailableOrders order)
                         order.HoldPresentation(true);
             Root.SetActive(false);
             for (int index = 0; index < bodies.Length; index++)
@@ -143,7 +143,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int index = 0; index < interactions.Length; index++)
                 switch (interactions[index])
                 {
-                    case ObjectMakeOrder order when preserveOrders:
+                    case ObjectAvailableOrders order when preserveOrders:
                         order.HoldPresentation(false);
                         break;
                     case ObjectInteractionUnlock rule:

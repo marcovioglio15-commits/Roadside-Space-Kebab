@@ -13,30 +13,5 @@ MonoBehaviour:
   m_Name: ModifyByContact Preset
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ContactModificationPreset
   Settings:
-    Flags:
-    - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
-    ContactDuration: 1
-    ContactTolerance: 0.02
-    QueryInterval: 0.02
-    IncludeTriggers: 0
-    Duration: 1
-    CompleteAfterSeparation: 0
-    RepeatAfterSeparation: 0
-    Self:
-      Tint: 0
-      Multiplier: {r: 1, g: 1, b: 1, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    Other:
-      Tint: 0
-      Multiplier: {r: 1, g: 1, b: 1, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    BlockSelf: 1
-    BlockOther: 1
+    Modifications:
+    - {fileID: 11400000, guid: 1200d6709d2e43a8ba64d3873507fc15, type: 2}

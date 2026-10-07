@@ -37,36 +37,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Dialogue";
         [Tooltip("Relative selection chance in Weighted Random mode. Zero excludes this entry from weighted selection.")]
         public float Weight = 1f;
-        [Tooltip("Consumption receipts required before this entry becomes eligible. Empty means no consumption requirement.")]
-        public ItemFlagRequirement[] RequiredFlags = Array.Empty<ItemFlagRequirement>();
-        [Tooltip("Require every listed flag. When disabled, any one listed requirement is sufficient.")]
-        public bool RequireAll = true;
+        [Tooltip("Optional entry filter for the Consumption trigger, combined with the interaction's filter.")]
+        public DialogueConsumptionFilter Consumption = new DialogueConsumptionFilter();
         [Tooltip("Pages shown in this exact order. The advance action displays the next page and closes after the last one.")]
         public DialogueLine[] Lines = { new DialogueLine() };
 
         #endregion
 
-        #region Methods
-
-        #region Conditions
-
-        /// <summary>Evaluates consumption receipts without removing them or changing future eligibility.</summary>
-        /// <param name="item">Item retaining the consumption history.</param>
-        /// <returns>True when this entry's flag requirements are satisfied.</returns>
-        internal bool Matches(ObjectItem item)
-        {
-            // No requirements means the entry is available to ordinary range or input triggers.
-            if (RequiredFlags.Length == 0)
-                return true;
-            foreach (ItemFlagRequirement requirement in RequiredFlags)
-                if ((item.CountConsumed(requirement.Flags) >= requirement.Count) != RequireAll)
-                    return !RequireAll;
-            return RequireAll;
-        }
-
-        #endregion
-
-        #endregion
     }
 
     /// <summary>Stores trigger, range, arbitration and replay policy independently of input and HUD bindings.</summary>
@@ -78,6 +55,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Activation")]
         [Tooltip("Start by proximity, by a performed input action, or after new consumption receipts satisfy an entry. Spawn Arrival waits for a Day Flow walk-in request and ignores range and sight.")]
         public DialogueTrigger Trigger;
+        [Tooltip("Optional Consumption filter applied to the whole interaction before entry selection.")]
+        public DialogueConsumptionFilter Consumption = new DialogueConsumptionFilter();
         [Tooltip("Maximum player-root distance in metres for starting or resuming a dialogue.")]
         public float Distance = 3f;
         [Tooltip("Distance in metres that interrupts an active dialogue. Must be at least the activation distance.")]
@@ -118,8 +97,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Checks active flow settings and every authored page without rewriting invalid values.</summary>
         /// <param name="warning">Receives the first missing page or invalid condition.</param>
+        /// <param name="orders">Local Available Orders catalog, when validating a bound interaction.</param>
+        /// <param name="bound">Whether a destination object is known, so inactive filter data can be ignored.</param>
         /// <returns>True when the dialogue configuration is complete.</returns>
-        public bool TryValidate(out string warning)
+        public bool TryValidate(out string warning, OrderSettings orders = null, bool bound = false)
         {
             // Range hysteresis avoids restarting at the same boundary that just interrupted the HUD.
             warning = string.Empty;
@@ -135,33 +116,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Choose supported dialogue trigger, selection and interruption modes.";
             else if (Entries == null || Entries.Length == 0)
                 warning = "Add at least one dialogue entry.";
+            else if (Trigger == DialogueTrigger.Consumption && (Consumption == null || !Consumption.TryValidate(orders, out warning, !bound)))
+                warning = warning.Length > 0 ? warning : "Configure the interaction consumption filter.";
             else
             {
                 double totalWeight = 0d;
                 for (int entryIndex = 0; entryIndex < Entries.Length; entryIndex++)
                 {
                     DialogueEntry entry = Entries[entryIndex];
-                    if (entry == null || entry.RequiredFlags == null || entry.Lines == null || entry.Lines.Length == 0)
+                    if (entry == null || entry.Consumption == null || entry.Lines == null || entry.Lines.Length == 0)
                     {
                         warning = "Each dialogue entry needs conditions and at least one explicit text page.";
                         break;
                     }
                     if (Selection == DialogueSelection.WeightedRandom && (!InteractionValues.Finite(entry.Weight) || entry.Weight < 0f))
+                    {
                         warning = "Dialogue weights must be finite and non-negative.";
-                    if (Trigger == DialogueTrigger.Consumption && entry.RequiredFlags.Length == 0)
-                        warning = "Consumption-triggered entries need at least one consumed-flag requirement.";
+                        break;
+                    }
+                    if (Trigger == DialogueTrigger.Consumption && !entry.Consumption.TryValidate(orders, out warning, !bound))
+                        warning = $"Dialogue entry {entryIndex + 1} ('{entry.Name}'): {warning}";
                     if (warning.Length > 0)
                         break;
-                    // Preserve the exact flag or quantity failure and identify its authored requirement.
-                    for (int requirementIndex = 0; requirementIndex < entry.RequiredFlags.Length; requirementIndex++)
-                    {
-                        ItemFlagRequirement requirement = entry.RequiredFlags[requirementIndex];
-                        warning = "Assign a consumed-flag requirement or remove its unused entry.";
-                        if (requirement != null && requirement.TryValidate(out warning))
-                            continue;
-                        warning = $"Dialogue entry {entryIndex + 1} ('{entry.Name}'), consumed requirement {requirementIndex + 1}: {warning}";
-                        return false;
-                    }
                     foreach (DialogueLine line in entry.Lines)
                         if (line == null || string.IsNullOrWhiteSpace(line.Text))
                             warning = "Write text for every dialogue page or remove the unused page.";

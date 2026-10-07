@@ -39,3 +39,8 @@ MonoBehaviour:
     Text: {r: 0.9245283, g: 0.09158063, b: 0.09158063, a: 1}
     OverrideBackground: 1
     Background: {r: 0.18, g: 0.24, b: 0.3, a: 1}
+  - Key: CatOnASkateboard.ObjectsLogicStudio.OrderCatalog.Entries.Element
+    OverrideText: 0
+    Text: {r: 0, g: 0.32636428, b: 1, a: 1}
+    OverrideBackground: 0
+    Background: {r: 0.18, g: 0.24, b: 0.3, a: 1}

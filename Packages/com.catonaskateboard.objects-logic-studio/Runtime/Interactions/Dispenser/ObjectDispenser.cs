@@ -20,6 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private int dispensed;
+        private int withdrawals;
         private bool transferring;
 
         #endregion
@@ -30,12 +31,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public DispenserSettings Settings => settings;
         /// <summary>Successful withdrawals from finite prefab stock during this instance's lifetime.</summary>
         public int DispensedCount => dispensed;
+        /// <summary>Counter supplied to the authored appearance thresholds.</summary>
+        internal int StepCount => settings.StepCounter == DispenseStepCounter.Remaining ? RemainingCount
+            : settings.UseContainer || settings.Unlimited ? withdrawals : Mathf.Max(0, settings.Stock - RemainingCount);
         /// <summary>Actual recoverable instances plus unused prefab stock; minus one represents unbounded prefab supply.</summary>
         public int RemainingCount => !settings.UseContainer && settings.Unlimited ? -1
             : (settings.UseContainer ? 0 : Mathf.Max(0, settings.Stock - dispensed))
                 + (UsesStored && Container != null ? Container.StoredCount : 0);
         /// <summary>Whether originals are supplied from a linked Container before creating a prefab.</summary>
-        private bool UsesStored => settings.UseContainer || Container != null && Container.Settings.LimitToDispenserSpace;
+        private bool UsesStored => settings.UseContainer || Container != null && Container.Settings.LimitToDispenserSpace && !Container.Settings.RefillDispenser;
         /// <summary>Identifies this single interaction card.</summary>
         public override SingleInteractionKind Kind => SingleInteractionKind.Dispenser;
         /// <summary>Range and aiming configuration.</summary>
@@ -55,6 +59,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (ObjectDispenser dispenser in FindObjectsByType<ObjectDispenser>(FindObjectsInactive.Include))
             {
                 dispenser.dispensed = 0;
+                dispenser.withdrawals = 0;
                 dispenser.transferring = false;
             }
         }
@@ -84,10 +89,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (configuration.UseContainer && GetComponent<ObjectContainer>() == null)
                 warning = "Add Container to this same object before linking its stored items.";
+            else if (GetComponent<ObjectContainer>() is ObjectContainer refill && refill.Settings.RefillDispenser
+                && (configuration.UseContainer || configuration.Unlimited))
+                warning = "A refill Container requires finite prefab supply, not stored-only or unlimited supply.";
             else if (configuration.Unlimited && GetComponent<ObjectContainer>() is ObjectContainer container
                 && container.Settings.LimitToDispenserSpace)
                 warning = "This Container limits storage to Dispenser spaces. Keep finite Stock or remove that link first.";
-            else if ((configuration.UseContainer || !configuration.Unlimited) && !InventoryFillStep.CanBind(configuration.FillSteps, Item, out warning))
+            else if (configuration.SupportsSteps && !InventoryFillStep.CanBind(configuration.FillSteps, Item, out warning))
                 return false;
             return warning.Length == 0;
         }
@@ -95,6 +103,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
 
         #region Supply
+
+        /// <summary>Checks an entire refill against missing finite prefab stock.</summary>
+        /// <param name="units">Logical units carried by the deposited item.</param>
+        /// <returns>True when every deposited unit fits without discarding a remainder.</returns>
+        internal bool CanRefill(int units)
+        {
+            return !transferring && !settings.UseContainer && !settings.Unlimited && units > 0 && units <= dispensed;
+        }
+
+        /// <summary>Restores stock after the Container successfully consumes its reserved refill item.</summary>
+        /// <param name="units">Previously validated deposited quantity.</param>
+        internal void Refill(int units)
+        {
+            // Count and appearance change only at a successful deposit boundary.
+            dispensed -= units;
+            RefreshFill();
+        }
 
         /// <summary>Checks supply before creating or activating an item.</summary>
         /// <returns>True when the available interaction has stock.</returns>
@@ -151,6 +176,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     grab = candidate;
                     dispensed++;
                 }
+                withdrawals++;
                 RefreshFill();
                 Signal(InteractionMoment.Started);
                 Signal(InteractionMoment.Completed);

@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Identifies transferable interaction kinds without serializing references to another prefab instance.</summary>
-    public enum InteractionTemplateKind { Hover, Grab, Drop, Throw, Dispenser, Container, Dialogue, Slice, Contact, Outline, Spawn, AssemblyStation, AssemblyProduct, Ambient, MakeOrder, TriggerAnimation, Eject }
+    public enum InteractionTemplateKind { Hover, Grab, Drop, Throw, Dispenser, Container, Dialogue, Slice, Contact, Outline, Spawn, AssemblyStation, AssemblyProduct, Ambient, AvailableOrders, TriggerAnimation, Eject, ObjectDegradation, GravityGenerator }
 
     /// <summary>Describes an existing interaction for explicit remapping when a rule preset is imported.</summary>
     [Serializable]

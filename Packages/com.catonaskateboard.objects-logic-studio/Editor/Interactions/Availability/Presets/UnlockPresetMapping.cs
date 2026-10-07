@@ -61,7 +61,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="root">Source prefab root.</param>
         /// <param name="feature">Existing component or null for an unused reference.</param>
         /// <returns>A generated descriptor used only when importing a preset.</returns>
-        private static InteractionTemplateReference Capture(Transform root, ObjectInteraction feature)
+        internal static InteractionTemplateReference Capture(Transform root, ObjectInteraction feature)
         {
             // Component order disambiguates otherwise identical cards on the same branch.
             if (feature == null)
@@ -115,7 +115,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="root">Destination prefab root.</param>
         /// <param name="candidates">Existing destination interactions captured once for the import.</param>
         /// <returns>The uniquely resolved interaction, or null if missing or ambiguous.</returns>
-        private static ObjectInteraction Resolve(InteractionTemplateReference reference, Transform root, ObjectInteraction[] candidates)
+        internal static ObjectInteraction Resolve(InteractionTemplateReference reference, Transform root, ObjectInteraction[] candidates)
         {
             // Never guess among different cards merely because they share an interaction type.
             if (reference == null || !reference.Assigned)
@@ -177,7 +177,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectDialogue => InteractionTemplateKind.Dialogue,
                 ObjectSlice => InteractionTemplateKind.Slice,
                 ObjectContactModifier => InteractionTemplateKind.Contact,
-                ObjectMakeOrder => InteractionTemplateKind.MakeOrder,
+                ObjectAvailableOrders => InteractionTemplateKind.AvailableOrders,
+                ObjectDegradation => InteractionTemplateKind.ObjectDegradation,
+                ObjectGravityGenerator => InteractionTemplateKind.GravityGenerator,
                 ObjectTriggerAnimation => InteractionTemplateKind.TriggerAnimation,
                 ObjectEject => InteractionTemplateKind.Eject,
                 ObjectAmbient => InteractionTemplateKind.Ambient,

@@ -19,6 +19,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.Toggle(rect, label, StudioValueMenu.Edit(rect, label, value));
         }
 
@@ -31,6 +32,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.IntField(rect, label, StudioValueMenu.Edit(rect, label, value));
         }
 
@@ -43,6 +45,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.FloatField(rect, label, StudioValueMenu.Edit(rect, label, value));
         }
 
@@ -55,6 +58,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.TextField(rect, label, StudioValueMenu.Edit(rect, label, value));
         }
 
@@ -67,6 +71,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.wideMode ? EditorGUIUtility.singleLineHeight : EditorGUIUtility.singleLineHeight * 2f, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.Vector2Field(rect, label, StudioValueMenu.Edit(rect, label, value));
         }
 
@@ -79,6 +84,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.wideMode ? EditorGUIUtility.singleLineHeight : EditorGUIUtility.singleLineHeight * 2f, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.Vector3Field(rect, label, StudioValueMenu.Edit(rect, label, value));
         }
 
@@ -91,6 +97,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.ColorField(rect, label, StudioValueMenu.Edit(rect, label, value));
         }
 
@@ -103,6 +110,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.EnumPopup(rect, label, StudioValueMenu.Edit(rect, label, value, result => result != null && result.GetType() == value.GetType()));
         }
 
@@ -115,6 +123,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.EnumFlagsField(rect, label, StudioValueMenu.Edit(rect, label, value, result => result != null && result.GetType() == value.GetType()));
         }
 
@@ -126,6 +135,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Reserve height with the same text-area style used to render the field.
             Rect rect = GUILayoutUtility.GetRect(new GUIContent(value), EditorStyles.textArea, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, string.Empty));
             return EditorGUI.TextArea(rect, StudioValueMenu.Edit(rect, GUIContent.none, value));
         }
 
@@ -140,6 +150,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Object pickers keep Unity's drag/drop and scene-reference restrictions.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.ObjectField(rect, label, StudioValueMenu.Edit(rect, label, value,
                 result => result == null || type.IsInstanceOfType(result) && (sceneObjects || EditorUtility.IsPersistent(result))), type, sceneObjects);
         }
@@ -155,6 +166,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Reject an out-of-range paste instead of silently changing its value.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.Slider(rect, label, StudioValueMenu.Edit(rect, label, value,
                 result => result >= minimum && result <= maximum), minimum, maximum);
         }
@@ -169,6 +181,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Serialized enums use their actual enum type through StudioFieldMenu.Next.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
             return EditorGUI.Popup(rect, label, StudioValueMenu.Edit(rect, label, selected,
                 result => result >= 0 && result < choices.Length), choices);
         }
@@ -209,7 +222,12 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Unity remains responsible for custom drawers and validation of native field types.
             StudioFieldMenu.TakeNext();
+            if (includeChildren && property.isArray && property.propertyType == SerializedPropertyType.Generic)
+                return StudioArrayGUI.Draw(property, label);
+            if (includeChildren && property.propertyType == SerializedPropertyType.Generic)
+                return StudioStructureGUI.Draw(property, label);
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUI.GetPropertyHeight(property, label, includeChildren), options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
             if (Event.current.type == EventType.ContextClick && rect.Contains(Event.current.mousePosition))
             {
                 using SerializedProperty clicked = Row(property, rect, includeChildren);

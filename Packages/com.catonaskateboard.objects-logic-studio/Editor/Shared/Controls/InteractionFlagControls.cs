@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Flag changes stay with the item binding when reusable settings are imported.
-            if (!sections.Draw("Identity Change", "Optionally change object flags when this interaction starts or completes."))
+            if (!sections.Draw("Identity Change", "Optionally change object flags when this interaction starts or completes.", settings))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
             HoverControls.Field(settings, "Enabled");

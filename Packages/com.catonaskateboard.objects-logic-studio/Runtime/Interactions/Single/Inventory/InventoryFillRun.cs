@@ -38,7 +38,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // The two features may be linked for counts or use their own independent quantities.
             run = null;
             InventoryFillStep[][] configuration = { container?.FillSteps ?? System.Array.Empty<InventoryFillStep>(),
-                dispenser != null && (dispenser.UseContainer || !dispenser.Unlimited)
+                dispenser != null && dispenser.SupportsSteps
                     ? dispenser.FillSteps : System.Array.Empty<InventoryFillStep>() };
             ItemAppearanceChanges[][] prepared = new ItemAppearanceChanges[2][];
             for (int group = 0; group < configuration.Length; group++)

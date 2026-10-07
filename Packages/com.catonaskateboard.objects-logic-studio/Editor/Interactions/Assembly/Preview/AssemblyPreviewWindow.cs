@@ -12,7 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Header("Preview")]
         [Tooltip("Stable product component identity associated with this preview.")]
         [SerializeField]
-        private long componentId;
+        private AssemblyLayoutSession session = new AssemblyLayoutSession();
         [Tooltip("Currently selected magnet index.")]
         [SerializeField]
         private int selected;
@@ -47,7 +47,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private readonly AssemblyPreviewGeometry geometry = new AssemblyPreviewGeometry();
         private PreviewRenderUtility preview;
         private SerializedObject data;
-        private ObjectWorkspace state;
         private GameObject cachedRoot;
         private bool dirty = true;
         private bool framePending = true;
@@ -65,10 +64,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="product">Existing product component represented by that draft.</param>
         internal static void Open(ObjectWorkspace workspace, ObjectAssemblyProduct product)
         {
-            // This window edits the same persistent draft as the main tool.
-            AssemblyPreviewWindow window = GetWindow<AssemblyPreviewWindow>("Assembly Preview");
-            window.componentId = ObjectWorkspaceTarget.FileId(product);
-            window.state = workspace;
+            // Each layout owns its transaction independently of the main workspace.
+            AssemblyPreviewWindow window = GetWindow<AssemblyPreviewWindow>("Magnet Layout");
+            if (window.session.HasChanges)
+            {
+                window.status = "Apply or Discard before opening another layout.";
+                window.Show();
+                return;
+            }
+            window.session.Read(workspace, product);
             window.dirty = window.framePending = true;
             window.Show();
         }
@@ -77,8 +81,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnEnable()
         {
             // PreviewRenderUtility owns a private preview scene; gameplay and native prefab stages stay untouched.
-            state = ObjectWorkspace.instance;
-            data = new SerializedObject(state);
+            data = new SerializedObject(this);
             preview = new PreviewRenderUtility();
             preview.cameraFieldOfView = 35f;
             preview.camera.clearFlags = CameraClearFlags.Color;
@@ -104,8 +107,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             data = null;
             preview?.Cleanup();
             preview = null;
-            if (state != null)
-                state.Persist();
         }
 
         /// <summary>Invalidates source geometry after asset edits, Undo or native hierarchy changes.</summary>
@@ -139,14 +140,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnGUI()
         {
             // A window retained for a different or closed prefab must never expose another product's settings.
-            GameObject root = state.Target.Resolve();
-            if (!state.Target.IsOpen || root == null || state.Extended.Kind != ExtendedInteractionKind.AssemblyProduct
-                || state.Extended.ComponentId != componentId || EditorApplication.isPlayingOrWillChangePlaymode)
+            GameObject root = session.Target.Resolve();
+            if (root == null || EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 EditorGUILayout.LabelField("Open this product's Assembly Product card in Object Assemble to resume its preview.", EditorStyles.wordWrappedLabel);
                 return;
             }
-            AssemblyProductSettings settings = state.Extended.Draft.AssemblyProduct.Settings;
+            AssemblyProductSettings settings = session.Draft.Settings;
             if (dirty || cachedRoot != root)
             {
                 geometry.Refresh(root, settings, completed);
@@ -171,16 +171,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 GUILayout.FlexibleSpace();
                 GUILayout.Label(new GUIContent("RMB + WASD/QE · Alt + drag · F", "RMB: look and fly with WASD/QE; Shift: faster; wheel while flying: speed. Alt+LMB: orbit; MMB: pan; Alt+RMB or wheel: zoom. F: frame selected; Q/W/E/R: hand/move/rotate/scale."), EditorStyles.miniLabel);
             }
-            Rect viewport = new Rect(0f, 22f, Mathf.Max(200f, position.width - 390f), position.height - 46f);
+            Rect viewport = new Rect(0f, 22f, Mathf.Max(200f, position.width - 390f), position.height - 78f);
             DrawViewport(viewport, settings);
-            GUILayout.BeginArea(new Rect(viewport.xMax + 6f, 28f, 378f, position.height - 58f));
+            GUILayout.BeginArea(new Rect(viewport.xMax + 6f, 28f, 378f, position.height - 90f));
             scroll = EditorGUILayout.BeginScrollView(scroll);
             using (new ObjectStudioFieldLayout(195f))
                 DrawSelection(settings);
             EditorGUILayout.EndScrollView();
             GUILayout.EndArea();
-            GUI.Label(new Rect(8f, position.height - 22f, position.width - 16f, 20f),
-                status.Length > 0 ? status : state.HasChanges ? "Pending layout · Apply saves directly to the product prefab" : "Applied layout", EditorStyles.miniLabel);
+            hasUnsavedChanges = session.HasChanges;
+            saveChangesMessage = "Apply or discard the pending Magnet Layout changes.";
+            GUILayout.BeginArea(new Rect(8f, position.height - 52f, position.width - 16f, 48f));
+            EditorGUILayout.LabelField(status.Length > 0 ? status : hasUnsavedChanges ? "Pending layout" : "Applied layout", EditorStyles.miniLabel);
+            using (new StudioButton.RowScope())
+            using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
+            {
+                if (StudioButton.Draw(new GUIContent("Apply", "Validate and save only this window's magnet layout.")))
+                    SaveChanges();
+                if (StudioButton.Draw(new GUIContent("Discard", "Abandon this layout proposal and reload the product.")))
+                    DiscardChanges();
+            }
+            GUILayout.EndArea();
         }
 
         /// <summary>Edits the selected slot and commits through the main workspace transaction.</summary>
@@ -200,20 +211,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     selected = index;
             EditorGUILayout.Space(8f);
             data.Update();
-            AssemblyControls.DrawMagnet(data.FindProperty("Extended.Draft.AssemblyProduct.Settings.Magnets").GetArrayElementAtIndex(selected));
+            AssemblyControls.DrawMagnet(data.FindProperty("session.Draft.Settings.Magnets").GetArrayElementAtIndex(selected));
             if (data.ApplyModifiedProperties())
             {
-                state.Persist();
                 dirty = true;
                 Repaint();
             }
-            EditorGUILayout.Space(8f);
-            using (new EditorGUI.DisabledScope(!state.HasChanges))
-                if (StudioButton.Draw(new GUIContent("Apply Layout", "Validate and save the retained workspace changes directly to this prefab.")))
-                {
-                    ObjectWorkspaceSession.Apply(state, out status);
-                    Refresh();
-                }
+        }
+
+        /// <summary>Commits this window's layout and resolves the native unsaved-change prompt.</summary>
+        public override void SaveChanges()
+        {
+            if (session.Apply(out status))
+                base.SaveChanges();
+            Refresh();
+        }
+
+        /// <summary>Discards this window's proposal without changing pending main-window settings.</summary>
+        public override void DiscardChanges()
+        {
+            session.Discard();
+            status = string.Empty;
+            base.DiscardChanges();
+            Refresh();
         }
 
         #endregion
@@ -303,11 +323,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             if (!EditorGUI.EndChangeCheck())
                 return;
-            Undo.RecordObject(state, "Place assembly magnet");
+            Undo.RecordObject(this, "Place assembly magnet");
             magnet.Position = position;
             magnet.Rotation = rotation.eulerAngles;
             magnet.Scale = scale;
-            state.Persist();
             Repaint();
         }
 

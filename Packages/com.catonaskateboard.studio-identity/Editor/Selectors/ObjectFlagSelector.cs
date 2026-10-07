@@ -39,6 +39,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         {
             // The delayed popup retains only the owner and property path, never a stale serialized handle.
             StudioFieldMenu.Context(rect, property);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
             EditorGUI.BeginProperty(rect, label, property);
             Rect field = EditorGUI.PrefixLabel(rect, label);
             Rect create = new Rect(field.xMax - 26f, field.y, 26f, field.height);

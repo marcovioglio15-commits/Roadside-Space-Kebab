@@ -278,8 +278,12 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Gino
         Text: I'm on a roll... got it? Like a kebab!
@@ -326,42 +330,8 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Flags:
-    - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
-    - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
-    ContactDuration: 0
-    ContactTolerance: 0.02
-    QueryInterval: 0.02
-    IncludeTriggers: 1
-    AllowCarriedSelf: 1
-    AllowCarriedOther: 0
-    Duration: 0
-    CompleteAfterSeparation: 0
-    ResumeAfterInterruption: 0
-    RepeatAfterSeparation: 0
-    WhileContact: 0
-    RevertDelay: 0.25
-    Self:
-      Tint: 0
-      Multiplier: {r: 1, g: 1, b: 1, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    Other:
-      Tint: 0
-      Multiplier: {r: 0, g: 0, b: 0, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 1
-    ChangeContactFlag: 0
-    ContactFlag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
-    ContactFlagOperation: 0
-    BlockSelf: 1
-    BlockOther: 1
+    Modifications:
+    - {fileID: 11400000, guid: f438c0378c1d4c918f137331ef727e8e, type: 2}
 --- !u!114 &4771604094856511517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -414,11 +384,13 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
-        Count: 1
-      RequireAll: 1
+      Consumption:
+        Enabled: 1
+        RequiredFlags: []
+        Orders:
+        - "Panino gnam gnam"
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Gino
         Text: GnamGnamGnam
@@ -503,8 +475,12 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Gino
         Text: Hey, that tasted like shit, you moron!
@@ -678,8 +654,12 @@ MonoBehaviour:
     Entries:
     - Name: Dialogue
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Gino
         Text: Yum! Loved it!
@@ -702,8 +682,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 50ca51f46e77464d9b66d85a2e26af54, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectMakeOrder
-  interactionName: Make an Order
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAvailableOrders
+  interactionName: Available Orders
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -726,7 +706,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Board: Orders
-    Entries:
-    - Source: {fileID: 1741706001150086087}
-      Text: Panino gnam gnam
+    Board: "Orders"
+    DrawCount: 1
+    Selection: 0
+    Catalog: {fileID: 11400000, guid: 172dcc78f3844de9b52c0acf2091da7c, type: 2}

@@ -24,6 +24,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Header("Configuration")]
         [Tooltip("Detached contact timing and effect settings.")]
         public ContactModificationSettings Contact = new ContactModificationSettings();
+        [Tooltip("Timed or impact-driven appearance and identity stages.")]
+        public DegradationSettings ObjectDegradation = new DegradationSettings();
+        [Tooltip("Scene-body filtering, suspension, impulse and restoration settings.")]
+        public GravitySettings GravityGenerator = new GravitySettings();
         [Tooltip("Detached dialogue pages, conditions and flow settings.")]
         public DialogueSettings Dialogue = new DialogueSettings();
         [Tooltip("Detached Slice targeting and ordered appearance/output steps.")]
@@ -31,7 +35,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Detached ambient event and listening radius.")]
         public AmbientSettings Ambient = new AmbientSettings();
         [Tooltip("Selected consuming components and order text retained across prefab stages.")]
-        public OrderDraft Orders = new OrderDraft();
+        public OrderSettings Orders = new OrderSettings();
         [Tooltip("Detached outline shader settings.")]
         public OutlineSettings Outline = new OutlineSettings();
         [Tooltip("Existing target and unlock conditions retained by stable prefab identity.")]
@@ -75,10 +79,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             draft.Name = feature.InteractionName;
             draft.Enabled = feature.enabled;
             draft.DrawGizmos = feature.DrawGizmos;
+            if (feature is ObjectRequestedInteraction requested)
+                draft.StartAction = requested.Action;
             switch (feature)
             {
-                case ObjectMakeOrder orders:
-                    draft.Orders = OrderDraft.Capture(orders.Settings);
+                case ObjectDegradation degradation:
+                    draft.ObjectDegradation = ObjectWorkspace.Copy(degradation.Settings);
+                    break;
+                case ObjectGravityGenerator gravity:
+                    draft.GravityGenerator = ObjectWorkspace.Copy(gravity.Settings);
+                    break;
+                case ObjectAvailableOrders orders:
+                    draft.Orders = ObjectWorkspace.Copy(orders.Settings);
                     break;
                 case ObjectAmbient ambient:
                     draft.Ambient = ObjectWorkspace.Copy(ambient.Settings);
@@ -123,7 +135,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Unused feature payloads never determine the selected card's timing.
             return kind switch
             {
-                ExtendedInteractionKind.ModifyByContact => Contact != null ? Contact.Duration : 0f,
+                ExtendedInteractionKind.ModifyByContact => Contact != null ? Contact.MinimumDuration : 0f,
                 ExtendedInteractionKind.SpawnManagement => SpawnManagement is { Mode: SpawnManagementMode.CompletionRules, Animation: { Enabled: true } } ? SpawnManagement.Animation.Duration : 0f,
                 _ => 0f
             };
@@ -144,7 +156,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             return feature switch
             {
-                ObjectMakeOrder orders => Orders.Resolve(orders.gameObject).TryValidate(orders.gameObject, out warning),
+                ObjectAvailableOrders orders => Orders.TryValidate(orders.gameObject, out warning),
                 ObjectAmbient => Ambient.TryValidate(out warning),
                 ObjectSlice slice => slice.TryValidate(Slice, StartAction, out warning),
                 ObjectSpawnManager => SpawnSourceAuthoring.Validate(SpawnManagement, out warning),
@@ -152,7 +164,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectAssemblyProduct product => AssemblyValidation.TryValidate(product.gameObject, AssemblyProduct.Resolve(product.transform), out warning),
                 ObjectOutline outline => Outline.TryValidate(out warning),
                 ObjectInteractionUnlock unlock => Unlock.Resolve(unlock.transform.root).TryValidate(unlock.transform.root, out warning),
-                ObjectContactModifier contact => contact.TryValidate(Contact, out warning),
+                ObjectContactModifier contact => contact.TryValidate(Contact, out warning)
+                    && ObjectRequestedInteraction.ValidateInput(Contact.RequiresInput, StartAction, out warning),
+                ObjectDegradation degradation => degradation.TryValidate(ObjectDegradation, out warning),
+                ObjectGravityGenerator => GravityGenerator.TryValidate(out warning)
+                    && ObjectRequestedInteraction.ValidateInput(GravityGenerator.Restore != GravityRestoreMode.Timer, StartAction, out warning),
                 ObjectDialogue dialogue => dialogue.TryValidate(Dialogue, StartAction, AdvanceAction, out warning),
                 _ => false
             };

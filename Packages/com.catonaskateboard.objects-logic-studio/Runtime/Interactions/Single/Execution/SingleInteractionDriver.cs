@@ -17,6 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int revision = -1;
         private int inputRevision = -1;
         private int sliceRevision = -1;
+        private int requestRevision = -1;
         private bool missingInputReported;
         private bool performed;
 
@@ -53,7 +54,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Disposing signals never changes PlayerInput's maps or device pairing.
             input.ClearBindings();
             bindings.Clear();
-            revision = sliceRevision = -1;
+            revision = sliceRevision = requestRevision = -1;
         }
 
         /// <summary>Resolves PlayerInput only when player ownership changes or a missing component is retried.</summary>
@@ -67,15 +68,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 player = observer.Player;
             }
             input.Refresh(player);
-            if (revision == SingleInteractionRegistry.Revision && sliceRevision == SliceRegistry.Revision && inputRevision == input.Revision)
+            if (revision == SingleInteractionRegistry.Revision && sliceRevision == SliceRegistry.Revision
+                && requestRevision == ObjectRequestedInteraction.Revision && inputRevision == input.Revision)
                 return;
             ClearBindings();
             inputRevision = input.Revision;
             revision = SingleInteractionRegistry.Revision;
             sliceRevision = SliceRegistry.Revision;
+            requestRevision = ObjectRequestedInteraction.Revision;
             if (input.Asset == null)
             {
-                if (!missingInputReported && (SingleInteractionRegistry.Items.Count > 0 || SliceRegistry.Items.Count > 0))
+                if (!missingInputReported && (SingleInteractionRegistry.Items.Count > 0 || SliceRegistry.Items.Count > 0
+                    || ObjectRequestedInteraction.Registered.Count > 0))
                 {
                     Debug.LogWarning("Input interactions need an active PlayerInput with an Input Actions asset under the Observer's player root.", observer);
                     missingInputReported = true;
@@ -89,6 +93,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 BindFeature(feature, feature.Action);
             foreach (ObjectSlice feature in SliceRegistry.Items)
                 BindFeature(feature, feature.Action);
+            foreach (ObjectRequestedInteraction feature in ObjectRequestedInteraction.Registered)
+                if (feature.UsesInput)
+                    BindFeature(feature, feature.Action);
         }
 
         /// <summary>Registers a valid single action or Slice sequence in the shared input router.</summary>
@@ -104,6 +111,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 ObjectSingleInteraction single => single.TryValidate(out warning),
                 ObjectSlice slice => slice.TryValidate(out warning),
+                ObjectRequestedInteraction request => request.TryValidate(out warning),
                 _ => false
             };
             if (!valid)
@@ -220,17 +228,51 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool Command(HoverObserver observer, InteractionButton requested)
         {
             // A shared press selects one nearest command before carry or inventory actions consume it.
-            ObjectCommandInteraction selected = null;
+            ObjectInteraction selected = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (pair.Value.Pending && (requested == null || pair.Value == requested) && pair.Key is ObjectCommandInteraction candidate && candidate.CanExecute()
-                    && !candidate.transform.IsChildOf(observer.Player) && Eligible(observer, candidate, out float score)
-                    && Nearer(candidate, selected, score, distance))
+                if (pair.Value.Pending && (requested == null || pair.Value == requested) && CanCommand(pair.Key)
+                    && !pair.Key.transform.IsChildOf(observer.Player) && CommandTarget(observer, pair.Key, out float score)
+                    && Nearer(pair.Key, selected, score, distance))
                 {
-                    selected = candidate;
+                    selected = pair.Key;
                     distance = score;
                 }
-            return selected != null && selected.Execute();
+            return selected switch
+            {
+                ObjectCommandInteraction command => command.Execute(),
+                ObjectRequestedInteraction process => process.Request(),
+                _ => false
+            };
+        }
+
+        /// <summary>Checks command eligibility without querying physics for inactive processes.</summary>
+        /// <param name="feature">Interaction bound to a pending button.</param>
+        /// <returns>True for an executable command or a waiting process.</returns>
+        private static bool CanCommand(ObjectInteraction feature)
+        {
+            return feature switch
+            {
+                ObjectCommandInteraction command => command.CanExecute(),
+                ObjectRequestedInteraction process => process.CanRequest(),
+                _ => false
+            };
+        }
+
+        /// <summary>Uses the same geometry and obstruction checks for commands and process requests.</summary>
+        /// <param name="observer">Current camera and player.</param>
+        /// <param name="feature">Eligible command or waiting process.</param>
+        /// <param name="score">Receives squared player distance.</param>
+        /// <returns>True when the requested target is reachable.</returns>
+        private bool CommandTarget(HoverObserver observer, ObjectInteraction feature, out float score)
+        {
+            if (feature is ObjectCommandInteraction command)
+                return Eligible(observer, command, out score);
+            ObjectRequestedInteraction process = (ObjectRequestedInteraction)feature;
+            TransferTargetSettings settings = process.Target;
+            return targeting.Eligible(observer, process.transform, process.Colliders, process.transform.TransformPoint(settings.Offset),
+                settings.Distance, settings.Mode, settings.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
+                settings.ObstacleMask, settings.SolidHitOnly, out score);
         }
 
         /// <summary>Chooses the highest-priority eligible release without grabbing again in the same event.</summary>

@@ -3,7 +3,7 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Identifies contact, dialogue, outline, unlock and assembly feature cards.</summary>
-    public enum ExtendedInteractionKind { ModifyByContact, Dialogue, Outline, Unlock, AssemblyStation, AssemblyProduct, SpawnManagement, Slice, PlayAmbient, MakeOrder }
+    public enum ExtendedInteractionKind { ModifyByContact, Dialogue, Outline, Unlock, AssemblyStation, AssemblyProduct, SpawnManagement, Slice, PlayAmbient, AvailableOrders, ObjectDegradation, GravityGenerator }
 
     /// <summary>Shares validation and item ownership for interactions with persistent progress.</summary>
     [RequireComponent(typeof(ObjectItem))]

@@ -123,7 +123,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("interactionName").stringValue = Draft.Name;
                 data.FindProperty("m_Enabled").boolValue = Draft.Enabled;
                 data.FindProperty("drawGizmos").boolValue = Draft.DrawGizmos;
-                if (feature is ObjectAssemblyStation or ObjectSlice)
+                if (feature is ObjectAssemblyStation or ObjectSlice or ObjectRequestedInteraction)
                     data.FindProperty("action").objectReferenceValue = Draft.StartAction;
                 if (feature is ObjectDialogue)
                 {
@@ -134,7 +134,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             string settings = Kind switch
             {
-                ExtendedInteractionKind.MakeOrder => JsonUtility.ToJson(Draft.Orders.Resolve(feature.gameObject)),
+                ExtendedInteractionKind.ObjectDegradation => JsonUtility.ToJson(Draft.ObjectDegradation),
+                ExtendedInteractionKind.GravityGenerator => JsonUtility.ToJson(Draft.GravityGenerator),
+                ExtendedInteractionKind.AvailableOrders => JsonUtility.ToJson(Draft.Orders),
                 ExtendedInteractionKind.PlayAmbient => JsonUtility.ToJson(Draft.Ambient),
                 ExtendedInteractionKind.Slice => JsonUtility.ToJson(Draft.Slice),
                 ExtendedInteractionKind.SpawnManagement => JsonUtility.ToJson(SpawnSourceAuthoring.Resolve(Draft.SpawnManagement)),

@@ -12,7 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Scene Board")]
-        [Tooltip("Unique active board ID used by Make an Order interactions.")]
+        [Tooltip("Unique active board ID used by Available Orders interactions.")]
         [SerializeField]
         private string identity = "Orders";
         [Tooltip("Existing 3D TextMeshPro or world-space Canvas text objects, one per order slot. Runtime creates no UI.")]
@@ -22,6 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private FontStyles[] styles = Array.Empty<FontStyles>();
         private string[] originals = Array.Empty<string>();
         private bool registered;
+        private int generation = -1;
 
         #endregion
         #region Properties
@@ -48,6 +49,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Initialize()
         {
             // Rebuild is explicit for Play sessions that retain scene objects.
+            if (generation != OrderQueue.Generation)
+            {
+                registered = false;
+                Restore();
+                generation = OrderQueue.Generation;
+            }
             if (registered)
                 return;
             if (!TryValidate(out string warning))

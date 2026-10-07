@@ -248,9 +248,6 @@ GameObject:
   - component: {fileID: 8784326929505579525}
   - component: {fileID: 4512469906299410155}
   - component: {fileID: 8672783274044013755}
-  - component: {fileID: 6788238411470140411}
-  - component: {fileID: 3239263855509019359}
-  - component: {fileID: 5694990392863577520}
   m_Layer: 0
   m_Name: PF_Oven
   m_TagString: ContactTest
@@ -319,7 +316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Modify by contact Falafel Balls Raw to Cooked
+  interactionName: Cooking
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -339,44 +336,14 @@ MonoBehaviour:
     Rotation: {x: -90, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: d48ca9b03c851fd449fa64ee4d48d1d5, type: 2}
+  settingsPreset: {fileID: 11400000, guid: be420e9d974b465cb1600c42854a605d, type: 2}
   drawGizmos: 1
   settings:
-    Flags:
-    - {fileID: 11400000, guid: 5f4b721aa2d4a6f4c8f56c6da03bdb04, type: 2}
-    ContactDuration: 0.2
-    ContactTolerance: 0.02
-    QueryInterval: 0.02
-    IncludeTriggers: 0
-    AllowCarriedSelf: 1
-    AllowCarriedOther: 0
-    Duration: 10
-    CompleteAfterSeparation: 0
-    ResumeAfterInterruption: 0
-    RepeatAfterSeparation: 1
-    WhileContact: 0
-    RevertDelay: 0.25
-    Self:
-      Tint: 0
-      Multiplier: {r: 0, g: 0, b: 0, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    Other:
-      Tint: 1
-      Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 0.3019608}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    ChangeContactFlag: 1
-    ContactFlag: {fileID: 11400000, guid: fcf35914e2cc9284880bc93ea1746227, type: 2}
-    ContactFlagOperation: 0
-    BlockSelf: 1
-    BlockOther: 1
+    Modifications:
+    - {fileID: 11400000, guid: e7c78d2a700142718e559cead496d816, type: 2}
+    - {fileID: 11400000, guid: d565d370b7a543c3a05326d7897ad222, type: 2}
+    - {fileID: 11400000, guid: 7e3f727cfc4f4179a5a520801735af44, type: 2}
+    - {fileID: 11400000, guid: 58de2772da244ebe8573c26f9e10bcac, type: 2}
 --- !u!114 &8784326929505579525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -508,213 +475,3 @@ MonoBehaviour:
       backgroundSprite: {fileID: 0}
       backgroundType: 0
   drawGizmos: 1
---- !u!114 &6788238411470140411
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8999572922415677342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Modify By Contact French Fries Raw to Cooked
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 1
-    Prefab: {fileID: 2878869678474554673, guid: bf740f1a33186404e9b7e6c155d1b033, type: 3}
-    AutoTiming: 1
-    Duration: 10
-    FollowObject: 1
-    Position: {x: 0, y: 0.1, z: 0}
-    Rotation: {x: -90, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: d48ca9b03c851fd449fa64ee4d48d1d5, type: 2}
-  drawGizmos: 1
-  settings:
-    Flags:
-    - {fileID: 11400000, guid: f3810201d1372f14a8eb7eda092ab735, type: 2}
-    ContactDuration: 0.2
-    ContactTolerance: 0.02
-    QueryInterval: 0.02
-    IncludeTriggers: 0
-    AllowCarriedSelf: 1
-    AllowCarriedOther: 0
-    Duration: 10
-    CompleteAfterSeparation: 0
-    ResumeAfterInterruption: 0
-    RepeatAfterSeparation: 1
-    WhileContact: 0
-    RevertDelay: 0.25
-    Self:
-      Tint: 0
-      Multiplier: {r: 0, g: 0, b: 0, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    Other:
-      Tint: 1
-      Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 0.3019608}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    ChangeContactFlag: 1
-    ContactFlag: {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
-    ContactFlagOperation: 0
-    BlockSelf: 1
-    BlockOther: 1
---- !u!114 &3239263855509019359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8999572922415677342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Modify By Contact Nuggets Raw to Cooked
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 1
-    Prefab: {fileID: 2878869678474554673, guid: bf740f1a33186404e9b7e6c155d1b033, type: 3}
-    AutoTiming: 1
-    Duration: 1
-    FollowObject: 1
-    Position: {x: 0, y: 0.1, z: 0}
-    Rotation: {x: -90, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: d48ca9b03c851fd449fa64ee4d48d1d5, type: 2}
-  drawGizmos: 1
-  settings:
-    Flags:
-    - {fileID: 11400000, guid: b0f3691bf60a4e041bdb828b3c0edd18, type: 2}
-    ContactDuration: 0.2
-    ContactTolerance: 0.02
-    QueryInterval: 0.02
-    IncludeTriggers: 0
-    AllowCarriedSelf: 1
-    AllowCarriedOther: 0
-    Duration: 10
-    CompleteAfterSeparation: 0
-    ResumeAfterInterruption: 0
-    RepeatAfterSeparation: 1
-    WhileContact: 0
-    RevertDelay: 0.25
-    Self:
-      Tint: 0
-      Multiplier: {r: 0, g: 0, b: 0, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    Other:
-      Tint: 1
-      Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 0.3019608}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    ChangeContactFlag: 1
-    ContactFlag: {fileID: 11400000, guid: 8ea79f8ddaadf97469ae5ccc95dbb6c2, type: 2}
-    ContactFlagOperation: 0
-    BlockSelf: 1
-    BlockOther: 1
---- !u!114 &5694990392863577520
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8999572922415677342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Modify By Contact Crab Claws Raw to Cooked
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 1
-    Prefab: {fileID: 2878869678474554673, guid: bf740f1a33186404e9b7e6c155d1b033, type: 3}
-    AutoTiming: 1
-    Duration: 1
-    FollowObject: 1
-    Position: {x: 0, y: 0.1, z: 0}
-    Rotation: {x: -90, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: d48ca9b03c851fd449fa64ee4d48d1d5, type: 2}
-  drawGizmos: 1
-  settings:
-    Flags:
-    - {fileID: 11400000, guid: 7a9729a57801b554a91610d9c74a59d6, type: 2}
-    ContactDuration: 0.2
-    ContactTolerance: 0.02
-    QueryInterval: 0.02
-    IncludeTriggers: 0
-    AllowCarriedSelf: 1
-    AllowCarriedOther: 0
-    Duration: 10
-    CompleteAfterSeparation: 0
-    ResumeAfterInterruption: 0
-    RepeatAfterSeparation: 1
-    WhileContact: 0
-    RevertDelay: 0.25
-    Self:
-      Tint: 0
-      Multiplier: {r: 0, g: 0, b: 0, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    Other:
-      Tint: 1
-      Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 0.3019608}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    ChangeContactFlag: 1
-    ContactFlag: {fileID: 11400000, guid: a7939210dde959248b2f93747141a805, type: 2}
-    ContactFlagOperation: 0
-    BlockSelf: 1
-    BlockOther: 1

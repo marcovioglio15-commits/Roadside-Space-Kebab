@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
@@ -16,6 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal readonly ObjectInteraction Source;
         internal readonly string Path;
         internal readonly StudioPropertyValue Value;
+        internal readonly ObjectFieldTarget[] Fields;
 
         #endregion
 
@@ -36,6 +38,43 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Source = source;
             Path = path;
             Value = value;
+            Fields = new[] { this };
+        }
+
+        /// <summary>Combines fields of the same interaction for atomic section updates.</summary>
+        /// <param name="fields">Resolved fields sharing source, component type and preset.</param>
+        private ObjectFieldTarget(ObjectFieldTarget[] fields)
+        {
+            Fields = fields;
+            Type = fields[0].Type;
+            Preset = fields[0].Preset;
+            Source = fields[0].Source;
+            Path = fields[0].Path;
+            Value = fields[0].Value;
+        }
+
+        /// <summary>Resolves a complete section without allowing fields from different interactions.</summary>
+        /// <param name="properties">Fields represented by the selected header.</param>
+        /// <returns>A complete transfer or null when any field cannot be mapped.</returns>
+        internal static ObjectFieldTarget Create(SerializedProperty[] properties)
+        {
+            if (properties.Length == 0)
+                return null;
+            List<ObjectFieldTarget> mapped = new List<ObjectFieldTarget>();
+            foreach (SerializedProperty property in properties)
+            {
+                // Parallel editor identities are already resolved inside the corresponding settings block.
+                if (property.name is "TargetIds" or "SourceIds")
+                    continue;
+                mapped.Add(Create(property));
+            }
+            ObjectFieldTarget[] fields = mapped.ToArray();
+            if (fields.Length == 0)
+                return null;
+            foreach (ObjectFieldTarget field in fields)
+                if (field == null || fields[0] == null || field.Type != fields[0].Type || field.Source != fields[0].Source || field.Preset != fields[0].Preset)
+                    return null;
+            return new ObjectFieldTarget(fields);
         }
 
         /// <summary>Maps object workspace proposals, native interaction inspectors and reusable presets.</summary>
@@ -43,6 +82,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>A supported interaction field, or null for window navigation and unrelated settings.</returns>
         internal static ObjectFieldTarget Create(SerializedProperty property)
         {
+            if (property == null)
+                return null;
             // A workspace keeps several inactive proposals; the clicked prefix determines its actual owner.
             if (property.serializedObject.targetObject is ObjectWorkspace workspace)
                 return FromWorkspace(workspace, property);
@@ -63,8 +104,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 path = (type == typeof(ObjectDrop) || type == typeof(ObjectThrow) ? "physics" : "settings") + path.Substring(8);
             else if (path.StartsWith("Trajectory", StringComparison.Ordinal))
                 path = "trajectory" + path.Substring(10);
-            else if (path.StartsWith("ToolRequirement", StringComparison.Ordinal))
-                path = "toolRequirement" + path.Substring(15);
             else if (path.StartsWith("ToolRequirement", StringComparison.Ordinal))
                 path = "toolRequirement" + path.Substring(15);
             else if (!path.StartsWith("configuration", StringComparison.Ordinal))
@@ -99,12 +138,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 snapshotPath = ResolveIds(snapshotPath);
                 runtimePath = RuntimePath(snapshotPath.Substring(9), source);
             }
-            else if (path.StartsWith("Draft.", StringComparison.Ordinal) || path.StartsWith("Binding.", StringComparison.Ordinal))
+            else if (path == "Draft" || path.StartsWith("Draft.", StringComparison.Ordinal) || path.StartsWith("Binding.", StringComparison.Ordinal))
             {
                 source = ObjectWorkspaceSession.Resolve(workspace);
                 preset = workspace.Source;
-                snapshotPath = path.StartsWith("Draft.", StringComparison.Ordinal) ? "Hover." + path.Substring(6) : path;
-                runtimePath = path.StartsWith("Draft.", StringComparison.Ordinal) ? "configuration." + path.Substring(6) : RuntimePath(path.Substring(8), source);
+                snapshotPath = path == "Draft" ? "Hover" : path.StartsWith("Draft.", StringComparison.Ordinal) ? "Hover." + path.Substring(6) : path;
+                runtimePath = path == "Draft" ? "configuration" : path.StartsWith("Draft.", StringComparison.Ordinal) ? "configuration." + path.Substring(6) : RuntimePath(path.Substring(8), source);
                 if (path == "Binding.AnchorPath")
                 {
                     snapshotPath = "Anchor";
@@ -123,7 +162,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 snapshot.Read(workspace, source);
                 using SerializedObject data = new SerializedObject(snapshot);
                 SerializedProperty field = data.FindProperty(snapshotPath);
-                return field != null ? new ObjectFieldTarget(source.GetType(), preset, source, runtimePath, new StudioPropertyValue(field)) : null;
+                ObjectInteraction persistent = ObjectFieldClipboard.Persistent(source);
+                return field != null ? new ObjectFieldTarget(source.GetType(), preset, persistent, runtimePath,
+                    new StudioPropertyValue(field, reference => ObjectFieldBatch.MapReference(reference, source, persistent))) : null;
+            }
+            catch (InvalidOperationException exception)
+            {
+                // Unsaved local components cannot become durable references in a delayed transfer.
+                Debug.LogWarning("This selection cannot be transferred yet: " + exception.Message);
+                return null;
             }
             finally
             {
@@ -137,8 +184,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static string ResolveIds(string path)
         {
             // Array indices remain unchanged; no neighbouring order or rule is substituted.
+            if (path is "Extended.Unlock" or "Extended.AssemblyProduct")
+                return path + ".Settings";
             path = path.Replace("Unlock.TargetId", "Unlock.Settings.Target").Replace("Unlock.ReplacementId", "Unlock.Settings.Replacement");
-            path = Regex.Replace(path, @"Orders\.Sources\.Array\.data\[(\d+)\]", "Orders.Settings.Entries.Array.data[$1].Source");
             path = Regex.Replace(path, @"Unlock\.SourceIds\.Array\.data\[(\d+)\]", "Unlock.Settings.Conditions.Array.data[$1].Source");
             return Regex.Replace(path, @"AssemblyProduct\.TargetIds\.Array\.data\[(\d+)\]", "AssemblyProduct.Settings.InteractionRules.Array.data[$1].Target");
         }
@@ -168,7 +216,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 "Throw" => "trajectory",
                 _ => "settings"
             };
-            if (head is "Orders" or "Unlock" or "AssemblyProduct" && tail.StartsWith(".Settings", StringComparison.Ordinal))
+            if (head is "Unlock" or "AssemblyProduct" && tail.StartsWith(".Settings", StringComparison.Ordinal))
                 tail = tail.Substring(9);
             return mapped + tail;
         }
@@ -224,7 +272,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ExtendedInteractionKind.SpawnManagement => typeof(ObjectSpawnManager),
                 ExtendedInteractionKind.Slice => typeof(ObjectSlice),
                 ExtendedInteractionKind.PlayAmbient => typeof(ObjectAmbient),
-                ExtendedInteractionKind.MakeOrder => typeof(ObjectMakeOrder),
+                ExtendedInteractionKind.AvailableOrders => typeof(ObjectAvailableOrders),
+                ExtendedInteractionKind.ObjectDegradation => typeof(ObjectDegradation),
+                ExtendedInteractionKind.GravityGenerator => typeof(ObjectGravityGenerator),
                 _ => null
             };
         }

@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Pose capture reads the selected target without moving the source object.
             TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
-            if (!sections.Draw("Transform Animation", "Alternate between two local states on successive input presses."))
+            if (!sections.Draw("Transform Animation", "Alternate between two local states on successive input presses.", settings, "Path", "StateA", "StateB", "StartAtB", "Duration", "ForwardRotation", "ReturnRotation", "AutoReturn", "ReturnDelay", "AutoReturnDuration", "AutoReturnRotation"))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             GameObject source = HierarchyPathMenu.Source(settings);
@@ -73,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
             HoverControls.Field(settings, "SelfEject", "Self Eject");
             bool self = settings.FindPropertyRelative("SelfEject").boolValue;
-            if (sections.Draw("Ejection", "Apply one physical impulse per successful activation."))
+            if (sections.Draw("Ejection", "Apply one physical impulse per successful activation.", settings, "IncludeTriggers", "Tolerance", "ReleaseKinematic", "Mode", "SelfImpulse"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     if (!self)
@@ -89,10 +89,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings.FindPropertyRelative("SelfImpulse"), "Space");
                     }
                 }
-            if (!self && sections.Draw("Eject Impulses", "Rules run in list order. Each body receives the first matching impulse only."))
+            if (!self && sections.Draw("Eject Impulses", "Rules run in list order. Each body receives the first matching impulse only.", settings, "Rules"))
                 using (new EditorGUI.IndentLevelScope())
                     Rules(settings.FindPropertyRelative("Rules"));
-            if (sections.Draw("Eject Collisions", "Temporarily ignore selected collision layers on ejected bodies."))
+            if (sections.Draw("Eject Collisions", "Temporarily ignore selected collision layers on ejected bodies.", settings, "IgnoreCollisions", "IgnoredLayers", "IgnoreDuration"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "IgnoreCollisions");
@@ -102,7 +102,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings, "IgnoreDuration");
                     }
                 }
-            if (sections.Draw("Eject Lifetime", "Optionally destroy ejected objects after a scaled-time delay."))
+            if (sections.Draw("Eject Lifetime", "Optionally destroy ejected objects after a scaled-time delay.", settings, "Despawn", "DespawnDelay"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "Despawn");
@@ -121,8 +121,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty rule = rules.GetArrayElementAtIndex(index);
                 using (new EditorGUILayout.HorizontalScope())
                 {
-                    rule.isExpanded = EditorGUILayout.Foldout(rule.isExpanded, new GUIContent("Impulse " + (index + 1),
-                        "First matching group wins for each physical body."), true);
+                    rule.isExpanded = StudioArrayGUI.Foldout(rule, new GUIContent("Impulse " + (index + 1),
+                        "First matching group wins for each physical body."));
                     using (new EditorGUI.DisabledScope(index == 0))
                         if (GUILayout.Button(new GUIContent("↑", "Give this rule higher priority."), GUILayout.Width(26f)))
                         {

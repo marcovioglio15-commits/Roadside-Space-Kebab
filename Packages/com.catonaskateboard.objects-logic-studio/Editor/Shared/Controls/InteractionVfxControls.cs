@@ -16,7 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections, float duration)
         {
             // Every card owns its own prefab reference; this foldout never configures other interactions.
-            if (!sections.Draw("Start VFX", "Optional visual effect belonging only to this interaction."))
+            if (!sections.Draw("Start VFX", "Optional visual effect belonging only to this interaction.", settings))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             HoverControls.Field(settings, "Enabled");

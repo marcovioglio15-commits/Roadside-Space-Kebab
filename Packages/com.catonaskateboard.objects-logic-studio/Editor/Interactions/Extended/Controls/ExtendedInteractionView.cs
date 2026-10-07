@@ -51,7 +51,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="state">Persistent workspace and detached draft.</param>
         /// <param name="data">Serialized workspace wrapper.</param>
         /// <param name="kind">Feature type visible in this category.</param>
-        internal void Draw(ObjectWorkspace state, SerializedObject data, ExtendedInteractionKind kind)
+        /// <param name="showAdd">Whether this category owns the creation button.</param>
+        internal void Draw(ObjectWorkspace state, SerializedObject data, ExtendedInteractionKind kind, bool showAdd = true)
         {
             // Structural actions save immediately; settings retain the existing Apply/Discard workflow.
             if (kind == ExtendedInteractionKind.Unlock && UnlockPresetView.DrawSet(state, target))
@@ -59,9 +60,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Refresh(target);
                 data.Update();
             }
-            using (new EditorGUI.DisabledScope(state.HasChanges || target == null || EditorUtility.IsPersistent(target)))
-                if (StudioButton.Draw(new GUIContent("+ Add Interaction", "Choose an available interaction in this category."), EditorStyles.miniButton))
-                    ShowAddMenu(state, kind);
+            if (showAdd)
+                using (new EditorGUI.DisabledScope(state.HasChanges || target == null || EditorUtility.IsPersistent(target)))
+                    if (StudioButton.Draw(new GUIContent("+ Add Interaction", "Choose an available interaction in this category."), EditorStyles.miniButton))
+                        ShowAddMenu(state, kind);
             for (int index = 0; index < features.Length; index++)
             {
                 if (!InCategory(features[index].Kind, kind))
@@ -73,7 +75,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     {
                         using (new EditorGUI.DisabledScope(state.HasChanges && !selected))
                         {
-                            bool expanded = EditorGUILayout.Foldout(selected && state.Extended.Expanded, labels[index], true, EditorStyles.foldoutHeader);
+                            bool expanded = ObjectInteractionHeader.Draw(state, data, features[index], selected && state.Extended.Expanded, labels[index]);
                             if (expanded != (selected && state.Extended.Expanded))
                             {
                                 if (!selected)
@@ -111,7 +113,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return feature == category || (category switch
             {
                 ExtendedInteractionKind.Dialogue => feature == ExtendedInteractionKind.Slice,
-                ExtendedInteractionKind.ModifyByContact => feature is ExtendedInteractionKind.Outline or ExtendedInteractionKind.PlayAmbient or ExtendedInteractionKind.MakeOrder,
+                ExtendedInteractionKind.Outline => feature is ExtendedInteractionKind.PlayAmbient or ExtendedInteractionKind.AvailableOrders
+                    or ExtendedInteractionKind.ObjectDegradation or ExtendedInteractionKind.GravityGenerator,
                 ExtendedInteractionKind.AssemblyStation => feature == ExtendedInteractionKind.AssemblyProduct,
                 _ => false
             });
@@ -129,7 +132,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 if (!InCategory(kind, category))
                     continue;
-                GUIContent label = new GUIContent(kind == ExtendedInteractionKind.Unlock ? "Availability Rule" : kind == ExtendedInteractionKind.MakeOrder ? "Make an Order" : ObjectNames.NicifyVariableName(kind.ToString()),
+                GUIContent label = new GUIContent(kind == ExtendedInteractionKind.Unlock ? "Availability Rule" : kind == ExtendedInteractionKind.AvailableOrders ? "Available Orders" : ObjectNames.NicifyVariableName(kind.ToString()),
                     "Add this interaction to the selected prefab object.");
                 if (!CanAdd(kind))
                     menu.AddDisabledItem(label);
@@ -149,8 +152,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             switch (kind)
             {
-                case ExtendedInteractionKind.MakeOrder:
-                    if (target.GetComponent<ObjectMakeOrder>() != null)
+                case ExtendedInteractionKind.ObjectDegradation:
+                    return target.GetComponent<ObjectDegradation>() == null;
+                case ExtendedInteractionKind.GravityGenerator:
+                    return target.GetComponent<ObjectGravityGenerator>() == null;
+                case ExtendedInteractionKind.ModifyByContact:
+                    return target.GetComponent<ObjectContactModifier>() == null;
+                case ExtendedInteractionKind.AvailableOrders:
+                    if (target.GetComponent<ObjectAvailableOrders>() != null)
                         return false;
                     foreach (ObjectContactModifier candidate in target.GetComponents<ObjectContactModifier>())
                         if (OrderSettings.Eligible(candidate, target))
@@ -174,7 +183,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="state">Workspace receiving the new component draft.</param>
         /// <param name="owner">Object that opened the menu.</param>
         /// <param name="kind">Requested interaction kind.</param>
-        private void Add(ObjectWorkspace state, GameObject owner, ExtendedInteractionKind kind)
+        internal void Add(ObjectWorkspace state, GameObject owner, ExtendedInteractionKind kind)
         {
             // Native menus can outlive a selection change or prefab-stage closure.
             if (target != owner || state.HasChanges || !CanAdd(kind) || !ObjectAuthoringSave.TryValidate(owner, out _)
@@ -195,7 +204,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Preset import changes only configuration; local input and HUD references stay with the prefab.
             if (feature is ObjectInteractionUnlock)
                 UnlockPresetView.DrawRule(state, target);
-            else if (feature is not (ObjectAssemblyProduct or ObjectMakeOrder))
+            else
                 ExtendedInteractionPresetView.Draw(state);
             if (ExtendedInteractionControls.Draw(data, state) || validated != feature || GUI.changed)
             {

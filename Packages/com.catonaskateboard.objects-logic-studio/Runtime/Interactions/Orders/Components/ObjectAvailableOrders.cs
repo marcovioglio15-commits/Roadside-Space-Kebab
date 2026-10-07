@@ -5,27 +5,34 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Publishes selected consumption orders and retains completed rows until its customer disappears.</summary>
     [DisallowMultipleComponent]
-    [AddComponentMenu("Objects Logic Studio/Make an Order")]
-    public sealed class ObjectMakeOrder : ObjectExtendedInteraction
+    [AddComponentMenu("Objects Logic Studio/Available Orders")]
+    public sealed class ObjectAvailableOrders : ObjectExtendedInteraction
     {
         #region Fields
 
         [Header("Order Requests")]
-        [Tooltip("Shared scene board and selected consuming interactions on this same object.")]
+        [Tooltip("Shared order catalog, destination board and extraction policy for this object's current spawn.")]
         [SerializeField]
         private OrderSettings settings = new OrderSettings();
         private OrderTicket[] tickets = Array.Empty<OrderTicket>();
         private bool registered;
         private bool ready;
         private bool presentationHeld;
+        private bool drawn;
+        private ObjectContactModifier contact;
+        private int generation = -1;
 
         #endregion
         #region Properties
 
-        /// <summary>Selected consumption sources and their authored order text.</summary>
+        /// <summary>Shared catalog and per-spawn extraction configuration.</summary>
         public OrderSettings Settings => settings;
+        /// <summary>Changes only when the active ticket set or consumption result changes.</summary>
+        public int Revision { get; private set; }
+        /// <summary>Whether the latest consumption supplied units that matched no unfinished order.</summary>
+        public bool UnexpectedConsumption { get; private set; }
         /// <summary>Identifies this passive feature.</summary>
-        public override ExtendedInteractionKind Kind => ExtendedInteractionKind.MakeOrder;
+        public override ExtendedInteractionKind Kind => ExtendedInteractionKind.AvailableOrders;
 
         #endregion
         #region Methods
@@ -41,9 +48,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Validates once and queues orders as soon as this passive interaction is available.</summary>
         internal void Initialize()
         {
-            // Exact event-source references disambiguate multiple consuming actions on one customer.
+            // A new Play session also resets customers retained by disabled scene reload.
+            if (generation != OrderQueue.Generation)
+            {
+                Release();
+                presentationHeld = false;
+                generation = OrderQueue.Generation;
+            }
             ObjectInteraction.Signaled -= Observe;
             ObjectInteraction.Signaled += Observe;
+            OrderQueue.BoardAvailable -= Draw;
+            OrderQueue.BoardAvailable += Draw;
             if (registered)
                 return;
             if (!presentationHeld)
@@ -52,6 +67,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (!ready)
                     Debug.LogWarning(warning, this);
             }
+            contact = GetComponent<ObjectContactModifier>();
+            Draw();
             Publish();
         }
 
@@ -63,26 +80,46 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Publish();
         }
 
-        /// <summary>Queues one ticket per order row, including rows sharing a consuming action.</summary>
+        /// <summary>Queues one ticket per selected unit while retaining the spawn's fixed selection.</summary>
         private void Publish()
         {
             // Day Flow presentation is allowed during walk paths while gameplay physics is suspended.
             if (registered || !ready || !presentationHeld && !Available(InteractionChannels.Passive))
                 return;
+            if (!drawn || tickets.Length == 0)
+                return;
             registered = true;
-            tickets = new OrderTicket[settings.Entries.Length];
-            for (int index = 0; index < tickets.Length; index++)
-            {
-                tickets[index] = new OrderTicket(this, settings.Entries[index], settings.Board);
-                OrderQueue.Add(tickets[index]);
-            }
+            foreach (OrderTicket ticket in tickets)
+                OrderQueue.Add(ticket);
             Signal(InteractionMoment.Started);
+        }
+
+        /// <summary>Draws once when the destination board can provide its authored capacity.</summary>
+        private void Draw()
+        {
+            // Board registration may follow customer activation during scene loading.
+            if (drawn || !ready || !OrderQueue.TryCapacity(settings.Board, out int capacity))
+                return;
+            tickets = OrderDraw.Select(this, capacity);
+            drawn = true;
+            OrderQueue.BoardAvailable -= Draw;
+            Revision++;
+            if (tickets.Length == 0)
+                Debug.LogWarning("No available order fits this board's capacity and draw count.", this);
+            Publish();
         }
 
         /// <summary>Distinguishes an animation's temporary deactivation from actual customer despawn.</summary>
         /// <param name="hold">Whether the current flow transition retains board ownership.</param>
         internal void HoldPresentation(bool hold)
         {
+            // A staged clone can be suspended before its first OnEnable in the current Play session.
+            if (hold && generation != OrderQueue.Generation)
+            {
+                Release();
+                generation = OrderQueue.Generation;
+                ready = false;
+            }
             // Walk-out keeps crossed-out entries visible until the customer is actually destroyed.
             if (hold && !ready)
                 ready = TryValidate(out _);
@@ -109,42 +146,66 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Empty tickets cover invalid, unpublished and already released interactions.
             ObjectInteraction.Signaled -= Observe;
+            OrderQueue.BoardAvailable -= Draw;
             if (registered)
                 OrderQueue.Remove(this);
             registered = false;
+            drawn = false;
+            UnexpectedConsumption = false;
+            Revision++;
             tickets = Array.Empty<OrderTicket>();
         }
 
         #endregion
         #region Completion
 
-        /// <summary>Crosses out the first unfinished order matching the exact action and current consumption receipt.</summary>
+        /// <summary>Fulfils unfinished tickets from the local contact interaction's exact consumption receipt.</summary>
         /// <param name="source">Interaction publishing a lifecycle event.</param>
         /// <param name="moment">Successful start or completion boundary.</param>
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
-            // One consumption fulfils one row; completed and waiting rows retain their queue positions.
-            if (!registered || moment != InteractionMoment.Completed)
+            // Each consumed unit fulfils at most one ticket; completed tickets retain their queue positions.
+            if (!drawn || source != contact || moment != InteractionMoment.Completed || contact.ConsumedUnits <= 0)
                 return;
             bool changed = false;
             bool complete = true;
+            int remaining = contact.ConsumedUnits;
             foreach (OrderTicket ticket in tickets)
             {
-                if (!changed && !ticket.Completed && ticket.Entry.Source == source
-                    && (!ticket.Entry.FilterConsumed || ticket.Entry.Source.ConsumedAny(ticket.Entry.ConsumedFlags)))
+                if (remaining > 0 && !ticket.Completed && contact.ConsumedMatches(ticket.Entry.Flags, ticket.Entry.RequireAllFlags))
                 {
                     ticket.Completed = true;
                     ticket.Board?.Draw(ticket);
                     changed = true;
+                    remaining--;
                 }
                 complete &= ticket.Completed;
             }
+            UnexpectedConsumption = remaining > 0;
+            Revision++;
             if (changed && complete)
                 Signal(InteractionMoment.Completed);
         }
 
-        /// <summary>Checks that selected local contact actions really perform consumption.</summary>
-        /// <param name="warning">Receives a missing source, board or text.</param>
+        /// <summary>Reads progress for one named candidate in this spawn's fixed ticket set.</summary>
+        /// <param name="order">Exact catalog name selected by a dialogue filter.</param>
+        /// <param name="completed">Whether every active unit of that order is complete.</param>
+        /// <returns>True when this order was drawn for the current spawn.</returns>
+        public bool TryProgress(string order, out bool completed)
+        {
+            bool active = false;
+            completed = true;
+            foreach (OrderTicket ticket in tickets)
+                if (ticket.Entry.Name == order)
+                {
+                    active = true;
+                    completed &= ticket.Completed;
+                }
+            return active;
+        }
+
+        /// <summary>Checks the catalog and the object's local consumption capability.</summary>
+        /// <param name="warning">Receives an invalid catalog, board ID or consuming interaction.</param>
         /// <returns>True when the order interaction can publish its entries.</returns>
         public override bool TryValidate(out string warning)
         {

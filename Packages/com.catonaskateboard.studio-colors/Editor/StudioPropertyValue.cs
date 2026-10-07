@@ -26,7 +26,8 @@ namespace CatOnASkateboard.StudioColors.Editor
 
         /// <summary>Copies one field, including array contents and references, at the time Copy is chosen.</summary>
         /// <param name="property">Field whose value is retained.</param>
-        public StudioPropertyValue(SerializedProperty property)
+        /// <param name="mapReference">Optional capture-time mapping to persistent local references.</param>
+        public StudioPropertyValue(SerializedProperty property, Func<UnityEngine.Object, UnityEngine.Object> mapReference = null)
         {
             // Generic blocks are walked explicitly; boxed arrays are not supported by every Unity serializer.
             type = property.type;
@@ -38,7 +39,7 @@ namespace CatOnASkateboard.StudioColors.Editor
                 value = kind switch
                 {
                     SerializedPropertyType.Enum or SerializedPropertyType.LayerMask or SerializedPropertyType.ArraySize => property.intValue,
-                    SerializedPropertyType.ObjectReference => property.objectReferenceValue,
+                    SerializedPropertyType.ObjectReference => mapReference != null ? mapReference(property.objectReferenceValue) : property.objectReferenceValue,
                     _ => property.boxedValue
                 };
                 return;
@@ -47,7 +48,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             if (count >= 0)
             {
                 for (int index = 0; index < count; index++)
-                    children.Add(new KeyValuePair<string, StudioPropertyValue>("Array.data[" + index + "]", new StudioPropertyValue(property.GetArrayElementAtIndex(index))));
+                    children.Add(new KeyValuePair<string, StudioPropertyValue>("Array.data[" + index + "]", new StudioPropertyValue(property.GetArrayElementAtIndex(index), mapReference)));
                 return;
             }
             using SerializedProperty child = property.Copy();
@@ -55,9 +56,9 @@ namespace CatOnASkateboard.StudioColors.Editor
             if (child.Next(true))
                 do
                 {
-                    if (SerializedProperty.EqualContents(child, end))
+                    if (child.depth <= property.depth || SerializedProperty.EqualContents(child, end))
                         break;
-                    children.Add(new KeyValuePair<string, StudioPropertyValue>(child.name, new StudioPropertyValue(child)));
+                    children.Add(new KeyValuePair<string, StudioPropertyValue>(child.name, new StudioPropertyValue(child, mapReference)));
                 }
                 while (child.Next(false));
         }
@@ -109,7 +110,7 @@ namespace CatOnASkateboard.StudioColors.Editor
                 && (raw ? typeof(UnityEngine.Object).IsAssignableFrom(declaredType) : kind == SerializedPropertyType.ObjectReference))
                 return destination != null && (value == null || destination.IsInstanceOfType(value));
             // Enums must retain their exact type even when their underlying numbers coincide.
-            return (declaredType == null || declaredType == destination)
+            return (declaredType == null || declaredType == destination || destination == null && kind != SerializedPropertyType.Enum)
                 && (raw || property.propertyType == kind && property.type == type);
         }
 
@@ -120,7 +121,8 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Reject incompatible targets before touching their arrays or child values.
             if (!Accepts(property))
-                throw new InvalidOperationException("The copied field and destination have different serialized types.");
+                throw new InvalidOperationException("The copied field and destination have different serialized types: "
+                    + (property != null ? property.propertyPath + " (" + property.type + ")" : "missing field") + ", source " + type + ".");
             if (raw)
             {
                 if (property.propertyType == SerializedPropertyType.ObjectReference)

@@ -277,7 +277,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Array edits stop the current loop before any stale property handles are reused.
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
             SerializedProperty entry = array.GetArrayElementAtIndex(index);
-            entry.isExpanded = EditorGUILayout.Foldout(entry.isExpanded, label, true);
+            entry.isExpanded = StudioArrayGUI.Foldout(entry, new GUIContent(label, entry.tooltip));
             using (new EditorGUI.DisabledScope(index == 0))
                 if (GUILayout.Button(new GUIContent("↑", "Move earlier."), GUILayout.Width(24f)))
                     return array.MoveArrayElement(index, index - 1);

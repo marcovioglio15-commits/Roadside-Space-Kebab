@@ -38,20 +38,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Updates existing contacts and starts independent timers for newly eligible items.</summary>
         /// <param name="owner">Modifier supplying flag operations and timing.</param>
         /// <param name="contacts">Current physical contacts, including items whose flags have already changed.</param>
-        internal void Tick(ObjectContactModifier owner, HashSet<ObjectItem> contacts)
+        internal void Tick(ContactModificationRun owner, HashSet<ObjectItem> contacts)
         {
             // Snapshot keys so lifecycle events may disable the modifier without invalidating enumeration.
             candidates.Clear();
             candidates.AddRange(entries.Keys);
-            for (int index = 0; index < candidates.Count && owner.isActiveAndEnabled; index++)
+            for (int index = 0; index < candidates.Count && owner.Active; index++)
                 if (entries.TryGetValue(candidates[index], out Contact contact))
                     Update(owner, candidates[index], contact, contacts.Contains(candidates[index]));
-            if (!owner.isActiveAndEnabled)
+            if (!owner.Active)
                 return;
             // New arrivals retain their own dwell and transition times, even while another item is modified.
             candidates.Clear();
             candidates.AddRange(contacts);
-            for (int index = 0; index < candidates.Count && owner.isActiveAndEnabled; index++)
+            for (int index = 0; index < candidates.Count && owner.Active; index++)
             {
                 ObjectItem item = candidates[index];
                 if (item == null || entries.ContainsKey(item) || !owner.Eligible(item)
@@ -71,7 +71,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="item">Contacted item.</param>
         /// <param name="contact">Retained timers for this item.</param>
         /// <param name="touching">Whether the physical contact query still contains the item.</param>
-        private void Update(ObjectContactModifier owner, ObjectItem item, Contact contact, bool touching)
+        private void Update(ContactModificationRun owner, ObjectItem item, Contact contact, bool touching)
         {
             // Disabled, consumed or externally released items cannot retain a stale contact operation.
             if (item == null || !item.isActiveAndEnabled || item.IsConsumed
@@ -106,7 +106,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return;
             }
             // A start listener may disable either participant; do not apply effects after its cancellation.
-            if (owner.isActiveAndEnabled && contact.Running && item.isActiveAndEnabled
+            if (owner.Active && contact.Running && item.isActiveAndEnabled
                 && Time.time - contact.Started >= owner.Settings.Duration)
             {
                 if (owner.Settings.ChangeContactFlag)
@@ -122,7 +122,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="item">New participant.</param>
         /// <param name="contact">Timers to activate after successful acquisition.</param>
         /// <returns>True when this contact started successfully.</returns>
-        private bool Begin(ObjectContactModifier owner, ObjectItem item, Contact contact)
+        private bool Begin(ContactModificationRun owner, ObjectItem item, Contact contact)
         {
             // Acquiring no restrictions first avoids releasing a held object if the counterpart is unavailable.
             if (!owner.Available(InteractionChannels.Passive) || item.IsBlocked(InteractionChannels.Passive)
@@ -151,7 +151,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="owner">Modifier retaining this completed contact.</param>
         /// <param name="item">Participant whose transition ended.</param>
         /// <param name="contact">Transition being released.</param>
-        private void ReleaseTransition(ObjectContactModifier owner, ObjectItem item, Contact contact)
+        private void ReleaseTransition(ContactModificationRun owner, ObjectItem item, Contact contact)
         {
             // Completed identity-only contacts remain available to Eject, Grab and other ordinary actions.
             if (!contact.Running)
@@ -168,7 +168,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="owner">Modifier whose operation expires.</param>
         /// <param name="item">Surviving or destroyed participant.</param>
         /// <param name="contact">Stored transition state.</param>
-        private void Remove(ObjectContactModifier owner, ObjectItem item, Contact contact)
+        private void Remove(ContactModificationRun owner, ObjectItem item, Contact contact)
         {
             // Dictionary keys remain removable even after Unity destroys their native object.
             ReleaseTransition(owner, item, contact);
@@ -179,7 +179,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Restores all temporary identities when the modifier is disabled or refreshed.</summary>
         /// <param name="owner">Modifier leaving its current contact session.</param>
-        internal void Clear(ObjectContactModifier owner)
+        internal void Clear(ContactModificationRun owner)
         {
             // Restoration emits no completion events and cannot start another contact operation.
             foreach (KeyValuePair<ObjectItem, Contact> entry in entries)

@@ -34,9 +34,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Binding = ObjectWorkspace.Copy(workspace.Binding);
             switch (source)
             {
-                case ObjectMakeOrder:
-                    Extended.Orders.Settings = workspace.Extended.Draft.Orders.Resolve(source.gameObject);
-                    break;
                 case ObjectInteractionUnlock:
                     Extended.Unlock.Settings = workspace.Extended.Draft.Unlock.Resolve(source.transform.root);
                     break;

@@ -58,7 +58,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Displays a captured interaction descriptor as a noneditable label.</summary>
         /// <param name="label">Role of this reference.</param>
         /// <param name="reference">Generated portable component descriptor.</param>
-        private static void Mapping(string label, SerializedProperty reference)
+        internal static void Mapping(string label, SerializedProperty reference)
         {
             // A readable route helps diagnose import mismatches without inviting unsupported path edits.
             string path = reference.FindPropertyRelative("Path").stringValue;

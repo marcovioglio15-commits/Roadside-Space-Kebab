@@ -34,36 +34,56 @@ MonoBehaviour:
     Entries:
     - Name: Shadowblade Random Intro 1
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: The darkness inside me yearns for a feast, mortal.
     - Name: Shadowblade Random Intro 2
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Deliver me some nutrients.
     - Name: Shadowblade Random Intro 3
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: "I\u2019m Shadowblade. Shadowblade Hellfury."
     - Name: Shadowblade Random Intro 4
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: My knife? To cut your Kebab? No chance.
     - Name: Shadowblade Random Intro 5
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Shadowblade Hellfury
         Text: Food. Now.

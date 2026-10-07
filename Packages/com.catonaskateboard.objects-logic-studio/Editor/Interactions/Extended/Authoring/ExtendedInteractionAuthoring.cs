@@ -40,7 +40,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Undo.AddComponent<ObjectItem>(target);
             ObjectExtendedInteraction feature = kind switch
             {
-                ExtendedInteractionKind.MakeOrder => Undo.AddComponent<ObjectMakeOrder>(target),
+                ExtendedInteractionKind.ObjectDegradation => Undo.AddComponent<ObjectDegradation>(target),
+                ExtendedInteractionKind.GravityGenerator => Undo.AddComponent<ObjectGravityGenerator>(target),
+                ExtendedInteractionKind.AvailableOrders => Undo.AddComponent<ObjectAvailableOrders>(target),
                 ExtendedInteractionKind.PlayAmbient => Undo.AddComponent<ObjectAmbient>(target),
                 ExtendedInteractionKind.Slice => Undo.AddComponent<ObjectSlice>(target),
                 ExtendedInteractionKind.SpawnManagement => Undo.AddComponent<ObjectSpawnManager>(target),
@@ -55,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (SerializedObject data = new SerializedObject(feature))
             {
                 data.FindProperty("interactionName").stringValue = kind == ExtendedInteractionKind.Unlock
-                    ? "Availability Rule" : kind == ExtendedInteractionKind.MakeOrder ? "Make an Order" : ObjectNames.NicifyVariableName(kind.ToString());
+                    ? "Availability Rule" : kind == ExtendedInteractionKind.AvailableOrders ? "Available Orders" : ObjectNames.NicifyVariableName(kind.ToString());
                 data.ApplyModifiedProperties();
             }
             if (feature is ObjectOutline outline)

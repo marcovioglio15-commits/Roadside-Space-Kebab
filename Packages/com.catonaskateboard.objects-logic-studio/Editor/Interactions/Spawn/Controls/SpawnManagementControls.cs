@@ -78,7 +78,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             }
             // Each rule observes one source prefab; multiple rules can observe different prefabs independently.
-            if (sections.Draw("Spawn Conditions", "Each instance of the linked prefab must meet its own completion quantities."))
+            if (sections.Draw("Spawn Conditions", "Each instance of the linked prefab must meet its own completion quantities.", settings, "SourcePrefab", "Conditions", "RequireAll", "Repeat", "CyclesPerInstance"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     TransferInteractionControls.Prefab(settings.FindPropertyRelative("SourcePrefab"));
@@ -90,7 +90,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (settings.FindPropertyRelative("Repeat").boolValue)
                         HoverControls.Field(settings, "CyclesPerInstance");
                 }
-            if (sections.Draw("Spawn Draw", "Choose weighted probability, equal probability or a sequence of prefab outputs."))
+            if (sections.Draw("Spawn Draw", "Choose weighted probability, equal probability or a sequence of prefab outputs.", settings, "Selection", "Choices", "Draws", "WithoutReplacement", "Chance", "FixedSeed", "Seed"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "Selection");
@@ -104,7 +104,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings, "Seed");
                 }
             Animation(settings.FindPropertyRelative("Animation"), sections);
-            if (sections.Draw("Spawn Placement", "Configure local output placement, delayed execution and surviving object capacity."))
+            if (sections.Draw("Spawn Placement", "Configure local output placement, delayed execution and surviving object capacity.", settings, "MinimumDelay", "MaximumDelay", "Position", "Rotation", "Radius", "RandomYaw", "LimitAlive", "MaximumAlive"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "MinimumDelay");
@@ -125,7 +125,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Animation(SerializedProperty animation, ObjectStudioSections sections)
         {
             // Finishing the animation restores original enabled states and leaves all independent locks in place.
-            if (!sections.Draw("Spawn Animation", "Animate the generated object before any of its interactions or collisions become available."))
+            if (!sections.Draw("Spawn Animation", "Animate the generated object before any of its interactions or collisions become available.", animation))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             HoverControls.Field(animation, "Enabled");

@@ -1,482 +1,292 @@
 using System;
-using System.Collections.Generic;
 using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
+using CatOnASkateboard.PlayerStudio;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Runs reversible visual transitions after continuous contact and commits consumption once.</summary>
+    /// <summary>Runs independently configured contact modifications through one object-local interaction.</summary>
     [DefaultExecutionOrder(200)]
+    [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Modify By Contact")]
-    public sealed class ObjectContactModifier : ObjectExtendedInteraction
+    public sealed class ObjectContactModifier : ObjectRequestedInteraction
     {
-        #region Serialized Fields
+        #region Fields
 
         [Header("Modify By Contact")]
-        [Tooltip("Contact conditions, effects and temporary restrictions for both participants.")]
+        [Tooltip("Reusable flag-filtered modifications evaluated in array order. Each retains independent contact timers and effects.")]
         [SerializeField]
         private ContactModificationSettings settings = new ContactModificationSettings();
-
-        #endregion
-
-        #region State
-
-        private readonly ContactDetection detection = new ContactDetection();
-        private readonly ContactIdentityRun identityRun = new ContactIdentityRun();
-        private readonly HashSet<ObjectItem> contacts = new HashSet<ObjectItem>();
-        private readonly HashSet<ObjectItem> completed = new HashSet<ObjectItem>();
-        private readonly HashSet<ObjectItem> failed = new HashSet<ObjectItem>();
-        private readonly Dictionary<ObjectItem, float> entered = new Dictionary<ObjectItem, float>();
-        private readonly List<ObjectItem> departed = new List<ObjectItem>();
-        private ObjectItem other;
-        private ContactEffectRun selfEffect;
-        private ContactEffectRun otherEffect;
-        private float nextQuery;
-        private float started;
-        private float elapsed;
-        private bool paused;
-        private bool ready;
-        private bool running;
-        private bool retained;
-        private float revertAt = -1f;
-        private string lastWarning = string.Empty;
+        private ContactModificationRun[] runs = Array.Empty<ContactModificationRun>();
+        private ContactModificationRun signaling;
         private ObjectFlag[] consumedFlags = Array.Empty<ObjectFlag>();
+        private bool ready;
 
         #endregion
-
         #region Properties
 
-        /// <summary>Modification duration, excluding the contact dwell before a successful start.</summary>
-        internal override float VfxDuration => settings.Duration;
-        /// <summary>Whether the effect still belongs to a running or retained transition.</summary>
-        internal override bool VfxRunning => running || paused || identityRun.IsRunning;
-        /// <summary>Whether automatic effect timing must pause with the contact transition.</summary>
-        internal override bool VfxPaused => paused;
-
-        /// <summary>Reusable settings edited by the passive-interaction card.</summary>
+        /// <summary>Shared modification definitions selected by this interaction.</summary>
         public ContactModificationSettings Settings => settings;
-        /// <summary>Whether effects currently own both participants.</summary>
-        public bool IsModifying => running || identityRun.IsRunning;
-        /// <summary>Whether an interrupted transition retains its appearance and counterpart.</summary>
-        public bool IsPaused => paused;
-        /// <summary>Identifies the passive feature in the workspace.</summary>
+        /// <summary>Whether at least one snapped modification needs confirmation.</summary>
+        public override bool UsesInput => settings.RequiresInput;
+        /// <summary>Shared confirmation targeting for this object's modifications.</summary>
+        public override TransferTargetSettings Target => settings.Target;
+        /// <summary>Logical units exposed only during the current consumption completion event.</summary>
+        internal int ConsumedUnits { get; private set; }
+        /// <summary>Duration of the rule currently starting its visual effect.</summary>
+        internal override float VfxDuration => signaling != null ? signaling.Settings.Duration : settings.MinimumDuration;
+        /// <summary>Whether any rule still owns an active transition.</summary>
+        internal override bool VfxRunning => IsModifying || IsPaused;
+        /// <summary>Whether the active transition is temporarily paused.</summary>
+        internal override bool VfxPaused => IsPaused;
+        /// <summary>Whether any rule is actively modifying a participant.</summary>
+        public bool IsModifying => Array.Exists(runs, run => run != null && run.IsRunning);
+        /// <summary>Whether an interrupted rule retains its appearance for later resumption.</summary>
+        public bool IsPaused => Array.Exists(runs, run => run != null && run.IsPaused);
+        /// <summary>Identifies this object's sole contact interaction.</summary>
         public override ExtendedInteractionKind Kind => ExtendedInteractionKind.ModifyByContact;
 
         #endregion
-
         #region Methods
-
         #region Lifecycle
 
-        /// <summary>Validates dependencies and captures geometry at activation.</summary>
-        private void OnEnable()
+        /// <summary>Starts reusable rule state only when an object enters gameplay.</summary>
+        protected override void OnEnable()
         {
-            // Pool activation refreshes geometry while retaining this item's consumption receipts.
-            Initialize();
+            if (Application.isPlaying)
+                Initialize();
         }
 
-        /// <summary>Restores cached contact state when Play preserves scene objects and managed fields.</summary>
+        /// <summary>Recovers cached rule state when scene or domain reload is disabled.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Rebuild()
         {
-            // Discovery occurs once per Play entry, never during ordinary contact polling.
+            // Discovery is restricted to Play entry.
             foreach (ObjectContactModifier modifier in FindObjectsByType<ObjectContactModifier>())
                 if (modifier.isActiveAndEnabled)
                     modifier.Initialize();
         }
 
-        /// <summary>Starts a clean contact session and validates the currently authored collider types.</summary>
+        /// <summary>Validates once and reuses one distinct reservation owner per modification.</summary>
         private void Initialize()
         {
-            // Re-enabling starts a new contact session without clearing either item's receipts.
-            Cancel();
-            contacts.Clear();
-            entered.Clear();
-            completed.Clear();
-            failed.Clear();
+            OnDisable();
             ready = TryValidate(out string warning);
             if (!ready)
             {
-                Report(warning);
+                Debug.LogWarning(warning, this);
                 return;
             }
-            detection.Bind(Item);
-            nextQuery = 0f;
-            lastWarning = string.Empty;
+            // Runtime state needs distinct Unity identities for existing reservation and temporary-flag ownership.
+            if (runs.Length != settings.Modifications.Length)
+            {
+                DisposeRuns();
+                runs = new ContactModificationRun[settings.Modifications.Length];
+            }
+            for (int index = 0; index < runs.Length; index++)
+            {
+                if (runs[index] == null)
+                {
+                    runs[index] = ScriptableObject.CreateInstance<ContactModificationRun>();
+                    runs[index].hideFlags = HideFlags.HideAndDontSave;
+                }
+                runs[index].Initialize(this, settings.Modifications[index].Settings);
+            }
+            base.OnEnable();
         }
 
-        /// <summary>Restores unfinished appearance and releases restrictions on the surviving participant.</summary>
-        private void OnDisable()
-        {
-            // Deactivation or consumption can occur inside another feature's completion callback.
-            Cancel();
-            contacts.Clear();
-            entered.Clear();
-        }
-
-        /// <summary>Queries after carried poses settle, while animating only an active transition each frame.</summary>
+        /// <summary>Advances cached rules after carried objects settle without allocating per frame.</summary>
         private void LateUpdate()
         {
-            // Inactive items perform no physics queries or visual updates.
-            if (!ready || Item == null || !Item.isActiveAndEnabled || Item.IsConsumed)
-            {
-                Cancel();
+            if (!ready)
                 return;
-            }
-            if (Time.timeScale <= 0f)
-                return;
-            if (settings.IdentityOnly)
-            {
-                // Flag-only zones track every contacted item and release reservations when each change completes.
-                if (Time.time >= nextQuery)
+            // A callback may disable this component while a preceding rule publishes an event.
+            for (int index = 0; index < runs.Length && isActiveAndEnabled; index++)
+                runs[index].Tick();
+        }
+
+        /// <summary>Releases only this interaction's active reservations and reversible effects.</summary>
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            foreach (ContactModificationRun run in runs)
+                if (run != null)
+                    run.Disable();
+            ready = false;
+        }
+
+        /// <summary>Releases the cached runtime containers when their owning object is destroyed.</summary>
+        private void OnDestroy()
+        {
+            DisposeRuns();
+        }
+
+        /// <summary>Disposes per-rule Unity ownership identities outside the frame update path.</summary>
+        private void DisposeRuns()
+        {
+            foreach (ContactModificationRun run in runs)
+                if (run != null)
                 {
-                    nextQuery = Time.time + settings.QueryInterval;
-                    detection.Query(Item, settings, contacts);
-                    identityRun.Tick(this, contacts);
+                    run.Disable();
+                    if (Application.isPlaying)
+                        Destroy(run);
+                    else
+                        DestroyImmediate(run);
                 }
-                return;
-            }
-            // Locked effects skip contact queries but still release a lost counterpart or interrupt their active transition.
-            if ((!IsLocked && ToolAllowed || settings.WhileContact && (running || retained)) && Time.time >= nextQuery)
-            {
-                nextQuery = Time.time + settings.QueryInterval;
-                detection.Query(Item, settings, contacts);
-                UpdateContacts();
-            }
-            if ((running || paused || retained) && (other == null || !other.IsOwnedBy(this) || !Item.IsOwnedBy(this)))
-            {
-                Cancel();
-                return;
-            }
-            if (settings.WhileContact && (running || retained))
-            {
-                UpdateRetention();
-                if (retained || !running || IsLocked || !ToolAllowed || !Eligible(other))
-                    return;
-            }
-            if (!running)
-                return;
-            if (!settings.WhileContact && (IsLocked || !ToolAllowed || !Eligible(other)
-                || !settings.CompleteAfterSeparation && !contacts.Contains(other)))
-            {
-                Interrupt();
-                return;
-            }
-            float progress = settings.Duration > 0f ? Mathf.Clamp01((Time.time - started) / settings.Duration) : 1f;
-            selfEffect.Animate(progress);
-            otherEffect.Animate(progress);
-            if (progress >= 1f)
-                Complete();
+            runs = Array.Empty<ContactModificationRun>();
         }
 
         #endregion
-
         #region Validation
 
-        /// <summary>Recaches compound geometry after a completed assembly change without clearing contact history.</summary>
+        /// <summary>Recaches rule geometry after assembly changes without discarding contact history.</summary>
         internal void RefreshGeometry()
         {
-            // Assembly rejects reserved products, so an unfinished effect is never rebound here.
+            // Assembly may supply usable geometry after activation initially failed validation.
+            if (!ready || runs.Length != settings.Modifications.Length)
+            {
+                Initialize();
+                return;
+            }
             ready = TryValidate(out string warning);
-            if (ready)
-                detection.Bind(Item);
-            else
-                Report(warning);
-            nextQuery = 0f;
+            if (!ready)
+            {
+                OnDisable();
+                Debug.LogWarning(warning, this);
+                return;
+            }
+            foreach (ContactModificationRun run in runs)
+                run.RefreshGeometry();
         }
 
-        /// <summary>Checks contact settings, flag existence and owned contact geometry.</summary>
-        /// <param name="warning">Receives the first configuration or dependency issue.</param>
-        /// <returns>True when this interaction can detect contact safely.</returns>
+        /// <summary>Checks the authored rule array and this object's contact geometry.</summary>
+        /// <param name="warning">Receives invalid settings or missing dependencies.</param>
+        /// <returns>True when every modification can run on this object.</returns>
         public override bool TryValidate(out string warning)
         {
-            // Runtime activation and editor proposals share the same validation path.
-            return TryValidate(settings, out warning);
+            return TryValidate(settings, out warning) && ValidateInput(settings.RequiresInput, Action, out warning);
         }
 
-        /// <summary>Checks a detached tool proposal against this object's existing dependencies.</summary>
-        /// <param name="configuration">Contact settings proposed by the tool.</param>
-        /// <param name="warning">Receives invalid settings or missing geometry.</param>
-        /// <returns>True when the proposed configuration can run on this object.</returns>
+        /// <summary>Validates a detached proposal against the destination's existing collider hierarchy.</summary>
+        /// <param name="configuration">Proposed shared modification references.</param>
+        /// <param name="warning">Receives an invalid definition or unusable contact geometry.</param>
+        /// <returns>True when every rule has valid data and compatible geometry.</returns>
         public bool TryValidate(ContactModificationSettings configuration, out string warning)
         {
-            // Validate references before recurring contact queries.
-            warning = "Modify by contact requires an Object Item and complete settings.";
-            if (GetComponent<ObjectItem>() == null || configuration == null || !configuration.TryValidate(out warning))
+            warning = "Modify By Contact requires an Object Item and complete modification settings.";
+            ObjectItem item = GetComponent<ObjectItem>();
+            if (item == null || configuration == null || !configuration.TryValidate(out warning))
                 return false;
-            foreach (Collider collider in GetComponentsInChildren<Collider>(true))
-                if (collider.GetComponentInParent<ObjectItem>() == GetComponent<ObjectItem>()
-                    && ContactDetection.Usable(collider, configuration.IncludeTriggers))
-                {
-                    warning = string.Empty;
-                    return true;
-                }
-            if (!Application.isPlaying && GetComponent<ObjectAssemblyProduct>() != null)
+            // Collider discovery is limited to activation and explicit authoring checks.
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            foreach (ContactModificationDefinition definition in configuration.Modifications)
             {
-                warning = string.Empty;
-                return true;
+                ContactPreparationSettings preparation = definition.Settings.Preparation;
+                if (preparation.Animate)
+                {
+                    Transform animated = PlayerHierarchy.Resolve(transform, preparation.Path);
+                    if (animated == null || !item.Owns(animated) || animated.TryGetComponent(out Rigidbody body) && !body.isKinematic)
+                    {
+                        warning = "Choose an owned preparation transform without a dynamic Rigidbody; use a visual child for dynamic objects.";
+                        return false;
+                    }
+                }
+                bool found = false;
+                foreach (Collider collider in colliders)
+                    if (collider.GetComponentInParent<ObjectItem>() == item && ContactDetection.Usable(collider, definition.Settings.IncludeTriggers))
+                    {
+                        found = true;
+                        break;
+                    }
+                if (!found && (Application.isPlaying || GetComponent<ObjectAssemblyProduct>() == null))
+                {
+                    warning = "Add an enabled Box, Sphere, Capsule or convex Mesh Collider compatible with every modification's trigger policy.";
+                    return false;
+                }
             }
-            warning = "Add an enabled Box, Sphere, Capsule or convex Mesh Collider for contact detection.";
+            warning = string.Empty;
+            return true;
+        }
+
+        #endregion
+        #region Events
+
+        /// <summary>Offers confirmation only while an acquired modification is waiting.</summary>
+        /// <returns>True when the local tool and lock policies allow confirmation.</returns>
+        internal override bool CanRequest()
+        {
+            return ready && isActiveAndEnabled && !IsLocked && ToolAllowed && Array.Exists(runs, run => run.Waiting);
+        }
+
+        /// <summary>Confirms the first waiting modification in authored priority order.</summary>
+        /// <returns>True when one process consumed the player's request.</returns>
+        internal override bool Request()
+        {
+            if (!CanRequest())
+                return false;
+            foreach (ContactModificationRun run in runs)
+                if (run.Confirm())
+                    return true;
             return false;
         }
 
-        #endregion
-
-        #region Contacts
-
-        /// <summary>Maintains continuous per-item timing and selects one deterministic ready participant.</summary>
-        private void UpdateContacts()
+        /// <summary>Publishes a successful rule boundary with its exact receipt and temporary identity context.</summary>
+        /// <param name="run">Independent rule publishing the event.</param>
+        /// <param name="moment">Successful start or completion.</param>
+        /// <param name="receipt">Consumed identity flags, or an empty array for non-consumption.</param>
+        /// <param name="units">Number of logical units consumed by this completion.</param>
+        internal void Publish(ContactModificationRun run, InteractionMoment moment, ObjectFlag[] receipt, int units)
         {
-            // Compound colliders share one timer; leaving contact removes their accumulated dwell time.
-            departed.Clear();
-            foreach (ObjectItem candidate in entered.Keys)
-                if (candidate == null || !contacts.Contains(candidate) || !Eligible(candidate) || !Matches(candidate))
-                    departed.Add(candidate);
-            foreach (ObjectItem candidate in departed)
+            signaling = run;
+            consumedFlags = receipt;
+            ConsumedUnits = units;
+            try
             {
-                entered.Remove(candidate);
-                failed.Remove(candidate);
-                if (settings.RepeatAfterSeparation)
-                    completed.Remove(candidate);
+                Signal(moment);
             }
-            ObjectItem selected = null;
-            float distance = float.PositiveInfinity;
-            foreach (ObjectItem candidate in contacts)
+            finally
             {
-                if (!Eligible(candidate) || !Matches(candidate))
-                    continue;
-                if (!entered.TryGetValue(candidate, out float time))
-                    entered.Add(candidate, time = Time.time);
-                if (running || retained || paused && candidate != other
-                    || !Available(InteractionChannels.Passive) || candidate.IsBlocked(InteractionChannels.Passive)
-                    || completed.Contains(candidate) || failed.Contains(candidate) || Time.time - time < settings.ContactDuration)
-                    continue;
-                float score = (candidate.transform.position - transform.position).sqrMagnitude;
-                if (score < distance || score == distance && selected != null
-                    && EntityId.ToULong(candidate.GetEntityId()) < EntityId.ToULong(selected.GetEntityId()))
-                {
-                    selected = candidate;
-                    distance = score;
-                }
-            }
-            if (selected != null)
-            {
-                if (paused)
-                {
-                    Item.Acquire(this, settings.BlockSelf);
-                    other.Acquire(this, settings.BlockOther);
-                    started = Time.time - elapsed;
-                    paused = false;
-                    running = true;
-                }
-                else
-                    Begin(selected);
+                signaling = null;
+                consumedFlags = Array.Empty<ObjectFlag>();
+                ConsumedUnits = 0;
             }
         }
-
-        /// <summary>Checks both independently configured carry conditions before starting or continuing effects.</summary>
-        /// <param name="candidate">Other participant in this contact pair.</param>
-        /// <returns>True when neither participant violates its carry policy.</returns>
-        internal bool Eligible(ObjectItem candidate)
-        {
-            // Cached grab state avoids hierarchy searches in contact polling.
-            return (settings.AllowCarriedSelf || !Item.IsCarried) && (settings.AllowCarriedOther || !candidate.IsCarried);
-        }
-
-        /// <summary>Retains physical contact after this modifier changes its counterpart's identity.</summary>
-        /// <param name="candidate">Contacted item being evaluated.</param>
-        /// <returns>True for an accepted alternative or this modifier's retained counterpart.</returns>
-        private bool Matches(ObjectItem candidate)
-        {
-            // A completion-time flag replacement must not itself simulate separation.
-            return retained && candidate == other || candidate.Identity != null && candidate.Identity.Matches(settings.Flags);
-        }
-
-        /// <summary>Reserves both items and prepares all effects before the first visible change.</summary>
-        /// <param name="candidate">Matching item that completed its uninterrupted contact delay.</param>
-        private void Begin(ObjectItem candidate)
-        {
-            // Failed ownership acquisition does not consume contact time or modify either object.
-            if (!Item.Acquire(this, InteractionChannels.None))
-                return;
-            if (!candidate.Acquire(this, InteractionChannels.None))
-            {
-                Item.Release(this);
-                return;
-            }
-            if (!ContactEffectRun.TryPrepare(Item, settings.Self, out selfEffect, out string warning)
-                || !ContactEffectRun.TryPrepare(candidate, settings.Other, out otherEffect, out warning))
-            {
-                Item.Release(this);
-                candidate.Release(this);
-                Report(warning);
-                // Invalid bindings are retried only after separation, avoiding recurring allocations and warnings.
-                failed.Add(candidate);
-                return;
-            }
-            other = candidate;
-            revertAt = -1f;
-            Item.Acquire(this, settings.BlockSelf);
-            candidate.Acquire(this, settings.BlockOther);
-            started = Time.time;
-            elapsed = 0f;
-            running = true;
-            lastWarning = string.Empty;
-            Signal(InteractionMoment.Started);
-        }
-
-        #endregion
-
-        #region Completion
 
         /// <summary>Matches only the victim of the completion currently being published.</summary>
         /// <param name="flags">Alternative identity flags required by an order or availability condition.</param>
         /// <returns>True when this successful consumption included any requested flag.</returns>
         internal bool ConsumedAny(ObjectFlag[] flags)
         {
+            return ConsumedMatches(flags, false);
+        }
+
+        /// <summary>Checks this completion's receipt against one order's identity selection.</summary>
+        /// <param name="flags">Flags identifying the requested item.</param>
+        /// <param name="requireAll">Whether the same item must carry every selected flag.</param>
+        /// <returns>True when the current receipt satisfies the requested identity.</returns>
+        internal bool ConsumedMatches(ObjectFlag[] flags, bool requireAll)
+        {
             // Cumulative receipts and later identity changes cannot satisfy this event's filter.
+            if (flags == null || flags.Length == 0 || consumedFlags.Length == 0)
+                return false;
             foreach (ObjectFlag flag in flags)
-                if (flag != null && Array.IndexOf(consumedFlags, flag) >= 0)
-                    return true;
-            return false;
+                if ((flag != null && Array.IndexOf(consumedFlags, flag) >= 0) != requireAll)
+                    return !requireAll;
+            return requireAll;
         }
 
-        /// <summary>Retains a pair's current transition or rolls it back according to the interruption policy.</summary>
-        private void Interrupt()
-        {
-            // Keep visual ownership so another modifier cannot overwrite the retained baseline.
-            if (!settings.ResumeAfterInterruption)
-            {
-                Cancel();
-                return;
-            }
-            elapsed = Time.time - started;
-            running = false;
-            paused = true;
-            Item.Acquire(this, InteractionChannels.None);
-            other.Acquire(this, InteractionChannels.None);
-            entered.Clear();
-        }
 
-        /// <summary>Commits mesh effects and a single consumption receipt before releasing ownership.</summary>
-        private void Complete()
-        {
-            // Clear running first: deactivating the victim must not roll back an already completed tint.
-            selfEffect.Commit();
-            otherEffect.Commit();
-            if (!settings.Self.Consume && !settings.Other.Consume)
-                completed.Add(other);
-            running = false;
-            ObjectFlag[] receipt = Array.Empty<ObjectFlag>();
-            if (settings.Self.Consume)
-                other.Consume(Item, this, out receipt);
-            else if (settings.Other.Consume)
-                Item.Consume(other, this, out receipt);
-            // Receipts describe what was consumed; completion listeners observe the counterpart's final flag.
-            if (settings.ChangeContactFlag && other != null)
-            {
-                if (settings.WhileContact)
-                    other.Identity.SetTemporary(this, settings.ContactFlag, settings.ContactFlagOperation);
-                else if (!InteractionFlagChange.TryApplyFlag(other.gameObject, settings.ContactFlag, out string warning, settings.ContactFlagOperation))
-                    Report(warning);
-            }
-            if (settings.WhileContact)
-            {
-                // Keep visual ownership but release interaction restrictions so either item may move away.
-                retained = true;
-                Item.Acquire(this, InteractionChannels.None);
-                other.Acquire(this, InteractionChannels.None);
-            }
-            else
-                Release();
-            // Expose this receipt only during the exact completion event, including self-consumption.
-            consumedFlags = receipt;
-            try
-            {
-                Signal(InteractionMoment.Completed);
-            }
-            finally
-            {
-                consumedFlags = Array.Empty<ObjectFlag>();
-            }
-        }
-
-        /// <summary>Restores an active or completed temporary change after uninterrupted separation.</summary>
-        private void UpdateRetention()
-        {
-            // Physical contact remains authoritative even if completion changed the counterpart's flags.
-            if (contacts.Contains(other) && Eligible(other) && !IsLocked && ToolAllowed)
-            {
-                revertAt = -1f;
-                return;
-            }
-            if (revertAt < 0f)
-                revertAt = Time.time + settings.RevertDelay;
-            if (Time.time >= revertAt)
-                Cancel();
-        }
-
-        /// <summary>Reverses only unfinished visual effects and restarts continuous contact timing.</summary>
-        private void Cancel()
-        {
-            // Independent identity contacts may be active even when no visual transition owns the item.
-            identityRun.Clear(this);
-            // Permanent completions no longer own a snapshot; temporary completions restore theirs here.
-            if (!running && !paused && !retained)
-                return;
-            running = false;
-            paused = false;
-            retained = false;
-            selfEffect.Cancel();
-            otherEffect.Cancel();
-            if (other != null)
-            {
-                completed.Remove(other);
-                other.Identity.RemoveTemporary(this);
-            }
-            if (Item != null)
-                Item.Identity.RemoveTemporary(this);
-            Release();
-            entered.Clear();
-        }
-
-        /// <summary>Drops effect references and releases each participant's independent restrictions.</summary>
-        private void Release()
-        {
-            // Unity fake-null checks also cover a participant destroyed during a transition.
-            if (Item != null)
-                Item.Release(this);
-            if (other != null)
-                other.Release(this);
-            other = null;
-            revertAt = -1f;
-            selfEffect = otherEffect = null;
-        }
-
-        /// <summary>Keeps the owner's identity changes reversible for the lifetime of a contact effect.</summary>
-        /// <param name="moment">Successful start or completion being published.</param>
+        /// <summary>Keeps this interaction's identity change scoped to the rule that published it.</summary>
+        /// <param name="moment">Successful event being published.</param>
         protected override void ApplyIdentityChange(InteractionMoment moment)
         {
-            // A temporary contact never overwrites permanent membership or another zone's pending operation.
-            if (!settings.WhileContact)
+            if (signaling == null || !signaling.Settings.WhileContact)
                 base.ApplyIdentityChange(moment);
             else if (FlagChange.Enabled && FlagChange.Moment == moment && Item != null)
-                Item.Identity.SetTemporary(this, FlagChange.Flag, FlagChange.Operation);
-        }
-
-        /// <summary>Reports a changed configuration failure without repeating it every contact query.</summary>
-        /// <param name="warning">Action needed to make the interaction usable.</param>
-        private void Report(string warning)
-        {
-            // Successful activation clears the diagnostic so a later independent failure remains visible.
-            if (lastWarning == warning)
-                return;
-            lastWarning = warning;
-            Debug.LogWarning($"Modify by Contact '{InteractionName}' on '{name}': {warning}", this);
+                Item.Identity.SetTemporary(signaling, FlagChange.Flag, FlagChange.Operation);
         }
 
         #endregion
-
         #endregion
     }
 }

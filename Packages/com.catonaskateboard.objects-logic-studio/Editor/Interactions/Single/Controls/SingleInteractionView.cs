@@ -45,12 +45,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Draws one expanded feature card and a dependency-aware Add menu.</summary>
         /// <param name="state">Persistent workspace and draft selection.</param>
         /// <param name="data">Serialized workspace used by the settings controls.</param>
-        internal void Draw(ObjectWorkspace state, SerializedObject data)
+        /// <param name="extended">Contact card sharing this category and its creation menu.</param>
+        internal void Draw(ObjectWorkspace state, SerializedObject data, ExtendedInteractionView extended)
         {
             // Structural changes operate in the native prefab stage and immediately save its asset.
             using (new EditorGUI.DisabledScope(state.HasChanges || target == null || EditorUtility.IsPersistent(target)))
                 if (GUILayout.Button(addLabel, EditorStyles.miniButton, GUILayout.Width(135f)))
-                    ShowAddMenu(state);
+                    ShowAddMenu(state, extended);
             for (int index = 0; index < features.Length; index++)
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
@@ -60,7 +61,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         bool expanded = selected && state.Single.Expanded;
                         using (new EditorGUI.DisabledScope(!selected && state.HasChanges))
                         {
-                            bool requested = EditorGUILayout.Foldout(expanded, names[index], true, EditorStyles.foldoutHeader);
+                            bool requested = ObjectInteractionHeader.Draw(state, data, features[index], expanded, names[index]);
                             if (requested != expanded)
                             {
                                 if (!selected)
@@ -93,13 +94,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             EditorGUILayout.LabelField(validationWarning, EditorStyles.wordWrappedMiniLabel);
                     }
                 }
-            if (features.Length == 0)
+            if (features.Length == 0 && target != null && target.GetComponent<ObjectContactModifier>() == null)
                 EditorGUILayout.LabelField("Add an interaction to configure carrying or item transfers.", EditorStyles.centeredGreyMiniLabel);
         }
 
         /// <summary>Builds the small feature menu only when its button is clicked.</summary>
         /// <param name="state">Workspace receiving the new feature selection.</param>
-        private void ShowAddMenu(ObjectWorkspace state)
+        /// <param name="extended">Contact authoring sharing this menu.</param>
+        private void ShowAddMenu(ObjectWorkspace state, ExtendedInteractionView extended)
         {
             // Drop and Throw are unavailable until their same-object Grab exists and is enabled.
             GenericMenu menu = new GenericMenu();
@@ -112,6 +114,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 else
                     menu.AddItem(label, false, () => Add(state, kind));
             }
+            GameObject owner = target;
+            GUIContent contact = new GUIContent("Modify By Contact", "Configure filtered modifications with optional snap and confirmation.");
+            if (owner.GetComponent<ObjectContactModifier>() != null)
+                menu.AddDisabledItem(contact);
+            else
+                menu.AddItem(contact, false, () => extended.Add(state, owner, ExtendedInteractionKind.ModifyByContact));
             menu.ShowAsContext();
         }
 

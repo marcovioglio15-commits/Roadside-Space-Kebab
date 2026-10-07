@@ -47,6 +47,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float nextImpact;
         private ObjectDrop drop;
         private ObjectThrow throwing;
+        private ObjectDegradation degradation;
 
         #endregion
 
@@ -117,6 +118,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             body = GetComponent<Rigidbody>();
             drop = GetComponent<ObjectDrop>();
             throwing = GetComponent<ObjectThrow>();
+            degradation = GetComponent<ObjectDegradation>();
             CacheGeometry();
             hovers = GetComponentsInChildren<ObjectHover>(true);
             base.OnEnable();
@@ -330,7 +332,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             collisions.Ignore(colliders, carryPlayer);
             if (!pickupCompleted && pickupSource != null)
                 sourceCollisions.Ignore(colliders, pickupSource);
-            motion.Bind(body, colliders, carryPlayer);
+            motion.Bind(body, colliders, carryPlayer, false);
         }
 
         /// <summary>Applies pickup easing and constrained motion on the same frame as the camera.</summary>
@@ -355,6 +357,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 pickupSource = null;
                 Signal(InteractionMoment.Completed);
             }
+            if (settings.WorldCollisions && degradation != null && motion.ImpactImpulse > 0f)
+                degradation.RegisterImpact(motion.ImpactImpulse);
         }
 
         /// <summary>Restores authored carry overrides when context or component ownership disappears.</summary>

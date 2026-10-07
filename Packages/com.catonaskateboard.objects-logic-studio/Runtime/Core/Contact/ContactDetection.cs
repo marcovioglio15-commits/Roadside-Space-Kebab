@@ -39,7 +39,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="item">Owner excluded from results.</param>
         /// <param name="settings">Distance tolerance and trigger policy.</param>
         /// <param name="contacts">Reusable destination cleared before the query.</param>
-        internal void Query(ObjectItem item, ContactModificationSettings settings, HashSet<ObjectItem> contacts)
+        internal void Query(ObjectItem item, ContactModificationRule settings, HashSet<ObjectItem> contacts)
         {
             // Keep a retained counterpart detectable after a completed effect changes its identity.
             Query(item, settings.ContactTolerance, settings.IncludeTriggers, contacts);

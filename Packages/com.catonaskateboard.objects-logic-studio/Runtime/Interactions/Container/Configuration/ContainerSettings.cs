@@ -24,6 +24,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int Capacity = 10;
         [Tooltip("Accept only spaces available in this object's finite Dispenser. Prefab supply starts full; stored-only supply starts empty. Deposited originals become available to that Dispenser.")]
         public bool LimitToDispenserSpace;
+        [Tooltip("Consume an accepted carried item to replenish this object's finite prefab Dispenser by its Grab unit count. The whole item must fit the missing stock.")]
+        public bool RefillDispenser;
         [Tooltip("Keep stored objects visible. Their physics and interactions remain suspended until dispensed.")]
         public bool KeepVisible;
         [Tooltip("Local position of the first stored object.")]
@@ -33,7 +35,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Local offset between successive occupied storage slots.")]
         public Vector3 Spacing = new Vector3(0f, 0.2f, 0f);
         [Header("Fill Steps")]
-        [Tooltip("Appearance selected by actual stored count. Highest reached count wins; Dispenser steps take precedence if both target the same mesh or renderer.")]
+        [Tooltip("Appearance selected by stored count, or remaining Dispenser supply in refill mode. Highest reached count wins; Dispenser steps take precedence on shared targets.")]
         public InventoryFillStep[] FillSteps = Array.Empty<InventoryFillStep>();
 
         #endregion
@@ -57,9 +59,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (Match is not (ObjectFlagMatch.Any or ObjectFlagMatch.All))
                 warning = "Choose Any or All for the accepted flags.";
-            else if (!Unlimited && Capacity <= 0)
+            else if (!RefillDispenser && !Unlimited && Capacity <= 0)
                 warning = "Container Capacity must be a positive whole number.";
-            else if (!InteractionValues.Finite(Position) || !InteractionValues.Finite(Rotation) || !InteractionValues.Finite(Spacing))
+            else if (!RefillDispenser && (!InteractionValues.Finite(Position) || !InteractionValues.Finite(Rotation) || !InteractionValues.Finite(Spacing)))
                 warning = "Container placement values must be finite.";
             return warning.Length == 0;
         }

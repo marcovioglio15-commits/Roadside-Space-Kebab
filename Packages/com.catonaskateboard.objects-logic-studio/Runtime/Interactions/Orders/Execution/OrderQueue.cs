@@ -8,7 +8,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region State
 
-        internal readonly ObjectMakeOrder Owner;
+        internal readonly ObjectAvailableOrders Owner;
         internal readonly OrderEntry Entry;
         internal readonly string Destination;
         internal string Text => Entry.Text;
@@ -21,11 +21,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Captures one customer-owned entry in its initial queue position.</summary>
         /// <param name="owner">Customer interaction retaining the ticket.</param>
-        /// <param name="entry">Exact consumption source and authored text.</param>
+        /// <param name="entry">Selected order identity requirements and authored text.</param>
         /// <param name="destination">Scene board ID.</param>
-        internal OrderTicket(ObjectMakeOrder owner, OrderEntry entry, string destination)
+        internal OrderTicket(ObjectAvailableOrders owner, OrderEntry entry, string destination)
         {
-            // Component identity, rather than a text label, determines successful completion.
+            // The owner matches its current consumption receipt against this entry's identity flags.
             Owner = owner;
             Entry = entry;
             Destination = destination;
@@ -41,6 +41,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private static readonly List<OrderTicket> tickets = new List<OrderTicket>();
         private static readonly Dictionary<string, OrderBoard> boards = new Dictionary<string, OrderBoard>();
+        internal static event System.Action BoardAvailable;
+        /// <summary>Identifies static resets when scene and domain reload are disabled.</summary>
+        internal static int Generation { get; private set; }
 
         #endregion
         #region Methods
@@ -58,7 +61,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             }
             Fill();
+            BoardAvailable?.Invoke();
             return true;
+        }
+
+        /// <summary>Reads configured capacity without treating occupied slots as missing capacity.</summary>
+        /// <param name="identity">Destination board ID.</param>
+        /// <param name="capacity">Receives the authored slot count.</param>
+        /// <returns>True when the destination board is active.</returns>
+        internal static bool TryCapacity(string identity, out int capacity)
+        {
+            capacity = boards.TryGetValue(identity, out OrderBoard board) ? board.Capacity : 0;
+            return capacity > 0;
         }
 
         /// <summary>Queues one customer order, including when all board slots are occupied.</summary>
@@ -84,7 +98,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Frees every visible and waiting entry belonging to a departed customer.</summary>
         /// <param name="owner">Interaction being despawned or destroyed.</param>
-        internal static void Remove(ObjectMakeOrder owner)
+        internal static void Remove(ObjectAvailableOrders owner)
         {
             // Fill once after removing the whole customer, preserving FIFO order across its rows.
             for (int index = tickets.Count - 1; index >= 0; index--)
@@ -115,6 +129,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Scene components restore membership after static state is reset.
             tickets.Clear();
             boards.Clear();
+            BoardAvailable = null;
+            Generation++;
         }
 
         /// <summary>Recovers authored boards and customers when scene reload is disabled.</summary>
@@ -125,7 +141,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (OrderBoard board in Object.FindObjectsByType<OrderBoard>())
                 if (board.isActiveAndEnabled)
                     board.Initialize();
-            foreach (ObjectMakeOrder owner in Object.FindObjectsByType<ObjectMakeOrder>())
+            foreach (ObjectAvailableOrders owner in Object.FindObjectsByType<ObjectAvailableOrders>())
                 if (owner.isActiveAndEnabled)
                     owner.Initialize();
         }

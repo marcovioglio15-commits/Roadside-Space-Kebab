@@ -78,7 +78,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     Dispenser != null ? Dispenser.Settings : null, out owner.fill, out string warning))
                     Debug.LogWarning(warning, this);
             }
-            owner.fill?.Update(Container != null ? Container.StoredCount : -1, Dispenser != null ? Dispenser.RemainingCount : -1);
+            owner.fill?.Update(Container != null ? Container.Settings.RefillDispenser && Dispenser != null
+                ? Dispenser.RemainingCount : Container.StoredCount : -1, Dispenser != null ? Dispenser.StepCount : -1);
         }
 
         #endregion

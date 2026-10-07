@@ -40,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void DrawStation(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Product recipes are edited on their own prefab, avoiding nested interaction menus on the table.
-            if (!sections.Draw("Assembly Table", "Link one configured product prefab and place its output relative to the table."))
+            if (!sections.Draw("Assembly Table", "Link one configured product prefab and place its output relative to the table.", settings))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             SerializedProperty prefab = settings.FindPropertyRelative("ProductPrefab");
@@ -79,10 +79,47 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Shared requirement rows use project flags and positive integer counts throughout the tool.
             SerializedProperty settings = draft.FindPropertyRelative("Settings");
-            if (sections.Draw("Recipe", "Mandatory quantities determine completion; optional quantities limit additional ingredients."))
+            DrawRecipe(settings, sections);
+            if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly.", draft, "Settings.WaitForNextIngredient", "Settings.InteractionRules", "TargetIds"))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    if (state.Target.Resolve().GetComponent<ObjectGrab>() != null)
+                        HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
+                    DrawRules(settings.FindPropertyRelative("InteractionRules"), draft.FindPropertyRelative("TargetIds"), state);
+                }
+        }
+
+        /// <summary>Edits reusable product values while preserving the captured interaction mappings.</summary>
+        /// <param name="settings">Portable recipe settings.</param>
+        /// <param name="targets">Captured descriptors aligned with interaction rules.</param>
+        /// <param name="sections">Retained foldout visibility.</param>
+        internal static void DrawProductPreset(SerializedProperty settings, SerializedProperty targets, ObjectStudioSections sections)
+        {
+            DrawRecipe(settings, sections);
+            if (!sections.Draw("Product Interactions", "Requirements for the interactions captured when exporting this preset."))
+                return;
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
+            SerializedProperty rules = settings.FindPropertyRelative("InteractionRules");
+            // Structural changes require an actual destination hierarchy in the main workspace.
+            for (int index = 0; index < rules.arraySize; index++)
+            {
+                if (index < targets.arraySize)
+                    UnlockPresetInspector.Mapping("Interaction " + (index + 1), targets.GetArrayElementAtIndex(index));
+                DrawRuleRequirements(rules.GetArrayElementAtIndex(index));
+            }
+        }
+
+        /// <summary>Draws recipe, placement and completion controls shared by presets and live proposals.</summary>
+        /// <param name="settings">Product settings edited without committing the owning interaction.</param>
+        /// <param name="sections">Retained foldout visibility.</param>
+        private static void DrawRecipe(SerializedProperty settings, ObjectStudioSections sections)
+        {
+            // Common controls retain the same field routes for section transfers.
+            if (sections.Draw("Recipe", "Mandatory quantities determine completion; optional quantities limit additional ingredients.", settings, "Ingredients"))
                 using (new EditorGUI.IndentLevelScope())
                     FlagRequirementControls.Draw(settings.FindPropertyRelative("Ingredients"), "+ Add Ingredient", true);
-            if (sections.Draw("Magnets", "One placement slot per allowed ingredient; edit their positions in the dedicated preview."))
+            if (sections.Draw("Magnets", "One placement slot per allowed ingredient; edit their positions in the dedicated preview.", settings, "Magnets"))
                 using (new EditorGUI.IndentLevelScope())
                     DrawMagnets(settings.FindPropertyRelative("Magnets"));
             RefreshIngredients(settings.FindPropertyRelative("Ingredients"));
@@ -91,13 +128,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (completed.isExpanded && completed.FindPropertyRelative("Meshes").arraySize > 0)
                 using (new EditorGUI.IndentLevelScope())
                     HoverControls.Field(settings, "HideIngredients");
-            if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly."))
-                using (new EditorGUI.IndentLevelScope())
-                {
-                    if (state.Target.Resolve().GetComponent<ObjectGrab>() != null)
-                        HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
-                    DrawRules(settings.FindPropertyRelative("InteractionRules"), draft.FindPropertyRelative("TargetIds"), state);
-                }
         }
 
         /// <summary>Edits named generic or flag-specific slots without exposing raw array sizes.</summary>
@@ -112,8 +142,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     using (new EditorGUILayout.HorizontalScope())
                     {
-                        magnet.isExpanded = EditorGUILayout.Foldout(magnet.isExpanded,
-                            new GUIContent((index + 1) + ". " + magnet.FindPropertyRelative("Name").stringValue, "Expand this magnet's placement and ingredient guide."), true);
+                        magnet.isExpanded = StudioArrayGUI.Foldout(magnet,
+                            new GUIContent((index + 1) + ". " + magnet.FindPropertyRelative("Name").stringValue, "Expand this magnet's placement and ingredient guide."));
                         if (GUILayout.Button(new GUIContent("−", "Remove this magnet."), GUILayout.Width(28f)))
                         {
                             magnets.DeleteArrayElementAtIndex(index);
@@ -184,11 +214,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             break;
                         }
                     }
-                    HoverControls.Field(rule, "RequireComplete");
-                    if (!rule.FindPropertyRelative("RequireComplete").boolValue)
-                        HoverControls.Field(rule, "MinimumIngredients");
-                    EditorGUILayout.LabelField(new GUIContent("Required Ingredients", "Additional ingredient quantities needed by the selected interaction."), EditorStyles.miniBoldLabel);
-                    FlagRequirementControls.Draw(rule.FindPropertyRelative("Ingredients"), "+ Require Recipe Ingredient", false, DrawIngredient);
+                    DrawRuleRequirements(rule);
                 }
             }
             if (StudioButton.Draw(new GUIContent("+ Configure Interaction", "Choose an interaction already configured on this product.")))
@@ -201,6 +227,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     (long identity) => AddRule(state, productRoot, productId, identity));
                 menu.ShowAsContext();
             }
+        }
+
+        /// <summary>Shows the ingredient gate independently of its captured or live interaction selector.</summary>
+        /// <param name="rule">One interaction's product requirements.</param>
+        private static void DrawRuleRequirements(SerializedProperty rule)
+        {
+            HoverControls.Field(rule, "RequireComplete");
+            if (!rule.FindPropertyRelative("RequireComplete").boolValue)
+                HoverControls.Field(rule, "MinimumIngredients");
+            EditorGUILayout.LabelField(new GUIContent("Required Ingredients", "Additional ingredient quantities needed by the selected interaction."), EditorStyles.miniBoldLabel);
+            FlagRequirementControls.Draw(rule.FindPropertyRelative("Ingredients"), "+ Require Recipe Ingredient", false, DrawIngredient);
         }
 
         /// <summary>Appends a fully identified interaction rule after rechecking the active product.</summary>

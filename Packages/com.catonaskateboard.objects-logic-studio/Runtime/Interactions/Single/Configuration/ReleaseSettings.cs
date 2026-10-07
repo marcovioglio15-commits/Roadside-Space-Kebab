@@ -90,7 +90,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             body.mass = Mass;
             body.linearDamping = LinearDamping;
             body.angularDamping = AngularDamping;
-            body.useGravity = Gravity;
+            GravitySuspension.Set(body, Gravity);
             body.constraints = Constraints;
             body.collisionDetectionMode = CollisionDetection;
             body.maxAngularVelocity = MaxAngularSpeed;

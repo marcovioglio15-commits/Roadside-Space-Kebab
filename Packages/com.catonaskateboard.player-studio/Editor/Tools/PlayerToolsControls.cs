@@ -51,13 +51,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             bool cyclic = data.FindProperty("Layout").enumValueIndex == (int)PlayerToolLayout.Cyclic;
             bool moving = false;
             SerializedProperty entries = data.FindProperty("Tools");
-            DrawCount(entries, "Tools", () => new PlayerToolEntry());
+            StudioArrayGUI.Add(entries, "Add Tool", () => new PlayerToolEntry());
             for (int index = 0; index < entries.arraySize; index++)
             {
                 SerializedProperty entry = entries.GetArrayElementAtIndex(index);
                 moving |= entry.FindPropertyRelative("MoveVisual").boolValue;
                 PlayerTool tool = entry.FindPropertyRelative("Tool").objectReferenceValue as PlayerTool;
-                entry.isExpanded = EditorGUILayout.Foldout(entry.isExpanded, new GUIContent(tool != null ? tool.DisplayName : "Tool " + (index + 1), "Expand this tool's visual binding."), true);
+                if (StudioArrayGUI.Header(entries, index, new GUIContent(tool != null ? tool.DisplayName : "Tool " + (index + 1), "Expand this tool's visual binding.")))
+                    break;
                 if (!entry.isExpanded)
                     continue;
                 using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
@@ -86,10 +87,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (cyclic)
             {
                 SerializedProperty slots = data.FindProperty("Slots");
-                DrawCount(slots, "Slots", () => PlayerToolPose.Identity);
+                StudioArrayGUI.Add(slots, "Add Slot", () => PlayerToolPose.Identity);
                 for (int index = 0; index < slots.arraySize; index++)
-                    StudioGUI.PropertyField(slots.GetArrayElementAtIndex(index),
-                        new GUIContent(index == 0 ? "Slot 0 (Active)" : "Slot " + index, "Pose relative to the shared parent of all tool targets."), true);
+                {
+                    if (StudioArrayGUI.Header(slots, index, new GUIContent(index == 0 ? "Slot 0 (Active)" : "Slot " + index, "Pose relative to the shared parent of all tool targets.")))
+                        break;
+                    if (slots.GetArrayElementAtIndex(index).isExpanded)
+                        StudioGUI.PropertyField(slots.GetArrayElementAtIndex(index), true);
+                }
             }
             else
                 StudioGUI.PropertyField(data.FindProperty("ActivePose"), true);
@@ -107,22 +112,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
             else
                 StudioGUI.PropertyField(data.FindProperty("SlotRotation"));
-        }
-
-        /// <summary>Initializes newly added entries with usable scale instead of Unity's zeroed struct values.</summary>
-        /// <param name="array">Serialized tools or slots array.</param>
-        /// <param name="label">Compact count label.</param>
-        /// <param name="create">Initial value for an explicitly added entry.</param>
-        internal static void DrawCount(SerializedProperty array, string label, Func<object> create)
-        {
-            // Existing entries are never normalized when the count changes.
-            int count = StudioGUI.IntField(new GUIContent(label, array.tooltip), array.arraySize);
-            if (count < 0 || count == array.arraySize)
-                return;
-            int previous = array.arraySize;
-            array.arraySize = count;
-            for (int index = previous; index < count; index++)
-                array.GetArrayElementAtIndex(index).boxedValue = create();
         }
 
         #endregion
@@ -143,10 +132,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             else
             {
                 SerializedProperty bindings = settings.FindPropertyRelative("Bindings");
-                StudioGUI.PropertyField(bindings.FindPropertyRelative("Array.size"), new GUIContent("Tool Actions", bindings.tooltip));
+                StudioArrayGUI.Add(bindings, "Add Tool Action", () => new PlayerToolInputBinding());
                 for (int index = 0; index < bindings.arraySize; index++)
                 {
+                    if (StudioArrayGUI.Header(bindings, index, new GUIContent("Tool Action " + (index + 1), bindings.tooltip)))
+                        break;
                     SerializedProperty binding = bindings.GetArrayElementAtIndex(index);
+                    if (!binding.isExpanded)
+                        continue;
                     StudioGUI.PropertyField(binding.FindPropertyRelative("Tool"));
                     StudioInputActionMenu.Draw(data, binding.FindPropertyRelative("Action").propertyPath, "PlayerStudio.UseTool", IsButton);
                 }

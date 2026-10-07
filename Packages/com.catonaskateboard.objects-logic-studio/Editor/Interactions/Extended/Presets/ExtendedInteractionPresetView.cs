@@ -19,7 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Export does not Apply; imported values remain a reviewable proposal on the selected prefab.
             ExtendedInteractionPreset selected = (ExtendedInteractionPreset)StudioGUI.ObjectField(
                 new GUIContent("Preset", "Import a matching settings snapshot; item name, actions and HUD bindings remain local."),
-                state.Extended.Preset, PresetType(state.Extended.Kind), false);
+                state.Extended.Preset, ExtendedPresetTransfer.PresetType(state.Extended.Kind), false);
             if (selected != state.Extended.Preset)
             {
                 state.Extended.Preset = selected;
@@ -65,6 +65,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.RecordObject(state, "Import interaction preset");
             switch (state.Extended.Preset)
             {
+                case DegradationPreset degradation:
+                    state.Extended.Draft.ObjectDegradation = ObjectWorkspace.Copy(degradation.Settings);
+                    break;
+                case GravityGeneratorPreset gravity:
+                    state.Extended.Draft.GravityGenerator = ObjectWorkspace.Copy(gravity.Settings);
+                    break;
+                case AvailableOrdersPreset orders:
+                    state.Extended.Draft.Orders = ObjectWorkspace.Copy(orders.Settings);
+                    break;
+                case AssemblyProductPreset product:
+                    if (!AssemblyProductPresetMapping.TryResolve(product, state.Target.Resolve(), out AssemblyProductDraft draft, out warning))
+                    {
+                        Debug.LogWarning(warning, product);
+                        return;
+                    }
+                    state.Extended.Draft.AssemblyProduct = draft;
+                    break;
                 case AmbientPreset ambient:
                     state.Extended.Draft.Ambient = ObjectWorkspace.Copy(ambient.Settings);
                     break;
@@ -100,32 +117,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             string path = EditorUtility.SaveFilePanelInProject("Export interaction preset", state.Extended.Kind + " Preset", "asset", "Choose where to save these settings.");
             if (string.IsNullOrEmpty(path))
                 return;
-            ExtendedInteractionPreset preset = (ExtendedInteractionPreset)ScriptableObject.CreateInstance(PresetType(state.Extended.Kind));
-            switch (preset)
-            {
-                case AmbientPreset ambient:
-                    ambient.Settings = ObjectWorkspace.Copy(state.Extended.Draft.Ambient);
-                    break;
-                case SlicePreset slice:
-                    slice.Settings = ObjectWorkspace.Copy(state.Extended.Draft.Slice);
-                    break;
-                case SpawnManagementPreset spawn:
-                    spawn.Settings = SpawnSourceAuthoring.Resolve(state.Extended.Draft.SpawnManagement);
-                    break;
-                case AssemblyStationPreset station:
-                    station.Settings = ObjectWorkspace.Copy(state.Extended.Draft.AssemblyStation);
-                    break;
-                case OutlinePreset outline:
-                    outline.Settings = ObjectWorkspace.Copy(state.Extended.Draft.Outline);
-                    break;
-                case ContactModificationPreset contact:
-                    contact.Settings = ObjectWorkspace.Copy(state.Extended.Draft.Contact);
-                    break;
-                case DialoguePreset dialogue:
-                    dialogue.Settings = ObjectWorkspace.Copy(state.Extended.Draft.Dialogue);
-                    break;
-            }
-            preset.ToolRequirement = ObjectWorkspace.Copy(state.Extended.Draft.ToolRequirement);
+            ExtendedInteractionPreset preset = ExtendedPresetTransfer.Capture(state);
             if (!preset.TryValidate(out string warning))
             {
                 Debug.LogWarning(warning);
@@ -138,24 +130,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Extended.Preset = preset;
             state.Extended.PresetBaseline = InteractionPresetWrites.Capture(preset);
             state.Persist();
-        }
-
-        /// <summary>Maps reusable features to their dedicated asset type.</summary>
-        /// <param name="kind">Feature represented by the selected card.</param>
-        /// <returns>The matching preset type.</returns>
-        private static System.Type PresetType(ExtendedInteractionKind kind)
-        {
-            // Availability rules use separate mapping controls; product data remains on its prefab.
-            return kind switch
-            {
-                ExtendedInteractionKind.PlayAmbient => typeof(AmbientPreset),
-                ExtendedInteractionKind.Slice => typeof(SlicePreset),
-                ExtendedInteractionKind.ModifyByContact => typeof(ContactModificationPreset),
-                ExtendedInteractionKind.Outline => typeof(OutlinePreset),
-                ExtendedInteractionKind.SpawnManagement => typeof(SpawnManagementPreset),
-                ExtendedInteractionKind.AssemblyStation => typeof(AssemblyStationPreset),
-                _ => typeof(DialoguePreset)
-            };
         }
 
         #endregion

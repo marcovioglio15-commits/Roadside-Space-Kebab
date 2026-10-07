@@ -17,7 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Exact cursor targeting has no centre-radius setting.
-            if (sections.Draw("Slice Targeting", "Choose reach, aiming and priority for the next cut."))
+            if (sections.Draw("Slice Targeting", "Choose reach, aiming and priority for the next cut.", settings, "Target", "Priority", "Contact"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     SerializedProperty target = settings.FindPropertyRelative("Target");
@@ -28,14 +28,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(settings, "Priority");
                     FlagContactControls.Draw(settings.FindPropertyRelative("Contact"));
                 }
-            if (sections.Draw("Slice Audio", "Sound and Ingredient parameter for each successful cut."))
+            if (sections.Draw("Slice Audio", "Sound and Ingredient parameter for each successful cut.", settings, "Sound", "Ingredient"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "Sound");
                     if (settings.FindPropertyRelative("Sound").boolValue)
                         HoverControls.Field(settings, "Ingredient");
                 }
-            if (!sections.Draw("Slice Sequence", "Each performed press commits the next step. The last step completes this interaction."))
+            if (!sections.Draw("Slice Sequence", "Each performed press commits the next step. The last step completes this interaction.", settings, "Interval", "Steps"))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             HoverControls.Field(settings, "Interval");

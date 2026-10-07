@@ -333,22 +333,34 @@ MonoBehaviour:
     Entries:
     - Name: Fishy Business Random Intro 1
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Fishy Business
         Text: "Sir, I\u2019m here to eat, and I am to eat FAST. I\u2019ve got plenty of AMERICAN DOLLARS."
     - Name: Fishy Business Random Intro 2
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Fishy Business
         Text: My time is MONEY. Hustle up and get my order!
     - Name: Fishy Business Random Intro 3
       Weight: 1
-      RequiredFlags: []
-      RequireAll: 1
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Fishy Business
         Text: Get me something to eat, PRONTO!
@@ -393,53 +405,8 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Flags:
-    - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-    - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-    - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-    - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-    - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-    - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-    - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
-    - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-    - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-    - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-    - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-    - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-    - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-    ContactDuration: 0
-    ContactTolerance: 0.02
-    QueryInterval: 0.02
-    IncludeTriggers: 1
-    AllowCarriedSelf: 1
-    AllowCarriedOther: 0
-    Duration: 0
-    CompleteAfterSeparation: 0
-    ResumeAfterInterruption: 0
-    RepeatAfterSeparation: 0
-    WhileContact: 0
-    RevertDelay: 0.25
-    Self:
-      Tint: 0
-      Multiplier: {r: 1, g: 1, b: 1, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 0
-    Other:
-      Tint: 0
-      Multiplier: {r: 0, g: 0, b: 0, a: 1}
-      ColorProperty: _BaseColor
-      RendererPath: 
-      MaterialSlot: -1
-      Meshes: []
-      Consume: 1
-    ChangeContactFlag: 0
-    ContactFlag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
-    ContactFlagOperation: 0
-    BlockSelf: 1
-    BlockOther: 1
+    Modifications:
+    - {fileID: 11400000, guid: 90559c00c2be492f952fe40fbf295d11, type: 2}
 --- !u!136 &3151776499264896803
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -516,22 +483,13 @@ MonoBehaviour:
     Entries:
     - Name: Fishy Business Order Wrong 1
       Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
-        - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
-        - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
-        - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
-        - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
-        - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
-        - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
-        - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
-        - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
-        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-        - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
-        - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
-        Count: 1
-      RequireAll: 1
+      Consumption:
+        Enabled: 1
+        RequiredFlags: []
+        Orders:
+        - "Pizza Kebab"
+        RequireAll: 1
+        Result: 1
       Lines:
       - Speaker: Fishy Business
         Text: "Hey, CHUM, guess what? You\u2019ve got the WRONG order."
@@ -608,11 +566,13 @@ MonoBehaviour:
     Entries:
     - Name: Fishy Business Order Correct 1
       Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        Count: 1
-      RequireAll: 1
+      Consumption:
+        Enabled: 1
+        RequiredFlags: []
+        Orders:
+        - "Pizza Kebab"
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Fishy Business
         Text: 'Congratulations PAL, you just cost me 15 TRILLION dollars!
@@ -620,11 +580,13 @@ MonoBehaviour:
 '
     - Name: Fishy Business Order Correct 2
       Weight: 1
-      RequiredFlags:
-      - Flags:
-        - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
-        Count: 1
-      RequireAll: 1
+      Consumption:
+        Enabled: 1
+        RequiredFlags: []
+        Orders:
+        - "Pizza Kebab"
+        RequireAll: 1
+        Result: 0
       Lines:
       - Speaker: Fishy Business
         Text: "Don\u2019t expect a tip from me ahhahahahahhahahahahahahhahahahahahahhahahahhahahahahahahhahahahahhahaha.\n"
@@ -645,8 +607,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 50ca51f46e77464d9b66d85a2e26af54, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectMakeOrder
-  interactionName: Make an Order
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAvailableOrders
+  interactionName: Available Orders
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -669,13 +631,10 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Board: Orders
-    Entries:
-    - Source: {fileID: 1741706001150086087}
-      Text: Pizza Kebab
-      FilterConsumed: 1
-      ConsumedFlags:
-      - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+    Board: "Orders"
+    DrawCount: 1
+    Selection: 0
+    Catalog: {fileID: 11400000, guid: 88fd423660c64d36a9fe88ddace73764, type: 2}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

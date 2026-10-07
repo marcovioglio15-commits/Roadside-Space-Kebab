@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Linked storage restores original instances and has no separate prefab stock.
             Target(settings.FindPropertyRelative("Target"), sections);
-            if (sections.Draw("Dispenser Supply", "Choose prefab supply or recover the last object deposited in this object's Container."))
+            if (sections.Draw("Dispenser Supply", "Choose prefab supply or recover the last object deposited in this object's Container.", settings, "UseContainer", "Prefab", "Unlimited", "Stock"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "UseContainer");
@@ -30,14 +30,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (!settings.FindPropertyRelative("Unlimited").boolValue)
                         HoverControls.Field(settings, "Stock");
                 }
-            if (sections.Draw("Dispenser Output", "Animate from the dispenser pivot to the item carry pose while ignoring the dispenser colliders."))
+            if (sections.Draw("Dispenser Output", "Animate from the dispenser pivot to the item carry pose while ignoring the dispenser colliders.", settings, "PickupDuration", "OutputRotation"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "PickupDuration");
                     HoverControls.Field(settings, "OutputRotation");
                 }
-            if (settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue)
-                InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Dispenser Fill");
+            HoverControls.Field(settings, "StepCounter");
+            if (settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue
+                || settings.FindPropertyRelative("StepCounter").enumValueIndex == (int)DispenseStepCounter.Dispensed)
+                InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Dispense Steps");
         }
 
         /// <summary>Draws a real allowed-flag list and optional visible storage arrangement.</summary>
@@ -47,10 +49,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Hidden inventory retains the same instance; only presentation controls become irrelevant.
             Target(settings.FindPropertyRelative("Target"), sections);
-            if (sections.Draw("Container Storage", "Store carried objects with matching flags. Recovery requires a linked Dispenser."))
+            if (sections.Draw("Container Storage", "Store carried objects or use accepted items to refill finite prefab supply.", settings, "AllowedFlags", "Match", "Unlimited", "Capacity", "LimitToDispenserSpace", "RefillDispenser", "KeepVisible", "Position", "Rotation", "Spacing"))
                 using (new EditorGUI.IndentLevelScope())
                     Storage(settings);
-            InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Container Fill");
+            InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Container Steps");
         }
 
         /// <summary>Draws deposit constraints and the optional display of retained originals.</summary>
@@ -62,6 +64,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectFlagSelector.Draw(flags);
             if (flags.arraySize > 1)
                 HoverControls.Field(settings, "Match");
+            UnityEngine.Object owner = settings.serializedObject.targetObject;
+            GameObject root = owner is ObjectWorkspace workspace ? workspace.Target.Resolve() : owner is Component component ? component.gameObject : null;
+            if (root == null || root.GetComponent<ObjectDispenser>() is ObjectDispenser dispenser && !dispenser.Settings.Unlimited && !dispenser.Settings.UseContainer
+                || settings.FindPropertyRelative("RefillDispenser").boolValue)
+                HoverControls.Field(settings, "RefillDispenser");
+            if (settings.FindPropertyRelative("RefillDispenser").boolValue)
+                return;
             HoverControls.Field(settings, "Unlimited");
             if (!settings.FindPropertyRelative("Unlimited").boolValue)
                 HoverControls.Field(settings, "Capacity");
@@ -81,7 +90,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Target(SerializedProperty target, ObjectStudioSections sections)
         {
             // Exact cursor mode does not use a screen-centre tolerance.
-            if (!sections.Draw("Action Targeting", "Configure reach, aim and solid obstruction layers."))
+            if (!sections.Draw("Action Targeting", "Configure reach, aim and solid obstruction layers.", target))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             HoverControls.Field(target, "Distance");
