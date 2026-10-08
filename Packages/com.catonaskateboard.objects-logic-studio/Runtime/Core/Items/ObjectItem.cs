@@ -56,6 +56,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // All new features share this root; no component search is needed during lock checks.
             grab = GetComponent<ObjectGrab>();
             identity = GetComponent<ObjectIdentity>();
+            ObjectGravityGenerator.IncludeSpawn(gameObject);
         }
 
         /// <summary>Clears transient ownership and receipts before a Play session that retains scene instances.</summary>
@@ -193,8 +194,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             flags = new List<ObjectFlag>(victim.Identity.ActiveFlags).ToArray();
             receipts.Add((flags, units));
             ConsumptionRevision++;
-            victim.IsConsumed = true;
-            victim.gameObject.SetActive(false);
+            victim.ConsumeSelf();
             return true;
         }
 

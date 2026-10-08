@@ -338,6 +338,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 1
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
@@ -353,43 +359,9 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Mothman Random Intro 1
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Mothman
-        Text: 'I once had a dream of this place.
-
-'
-    - Name: Mothman Random Intro 2
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Mothman
-        Text: 'Greetings.
-
-'
-    - Name: Mothman Random Intro 3
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Mothman
-        Text: "I am pretty sure I\u2019m connected to the moon.\n"
+    - {fileID: 11400000, guid: e1c217722e7b4b74a5affadaaf04ff41, type: 2}
+    - {fileID: 11400000, guid: afba81f4c4b9428bb91ad117083bfc77, type: 2}
+    - {fileID: 11400000, guid: 4f74a0f83b634bae8079ad366b72c1ec, type: 2}
     Audio:
       Voice: 2
       Interval: 0.1
@@ -430,9 +402,20 @@ MonoBehaviour:
   completionBindings: []
   settingsPreset: {fileID: 0}
   drawGizmos: 1
+  action: {fileID: 0}
   settings:
     Modifications:
     - {fileID: 11400000, guid: 3bf6dd241cf04f2e9bf658ca122fa34b, type: 2}
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
 --- !u!136 &3151776499264896803
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -492,6 +475,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -507,51 +496,9 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Mothman Order Wrong 1
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Nuggets"
-        - "Water"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Mothman
-        Text: 'Oh. Oh. Ohhhh. This is not correct.
-
-'
-    - Name: Mothman Order Wrong 2
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Nuggets"
-        - "Water"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Mothman
-        Text: 'No, no, no, no, no, no, no, no, no, no.
-
-'
-    - Name: Mothman Order Wrong 3
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Nuggets"
-        - "Water"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Mothman
-        Text: 'This is the worst day of my life.
-
-'
+    - {fileID: 11400000, guid: 9faa3b5a45fd45c0bad9e61a71466e63, type: 2}
+    - {fileID: 11400000, guid: 9f3a1a8925cf450488c6860429a96d94, type: 2}
+    - {fileID: 11400000, guid: 884af15152f4413cb592655a6726f369, type: 2}
     Audio:
       Voice: 2
       Interval: 1
@@ -608,6 +555,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -623,36 +576,8 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Mothman Order Correct 1
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Nuggets"
-        - "Water"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Mothman
-        Text: 'Beautiful. Really.
-
-'
-    - Name: Mothman Order Correct 2
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Nuggets"
-        - "Water"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Mothman
-        Text: 'This reminds me of the dancing Cicada.
-
-'
+    - {fileID: 11400000, guid: 7a1a7b36079d4f6e95988462eefe72ab, type: 2}
+    - {fileID: 11400000, guid: 7ce05b0f7f13486ba0c520ef06ae75e1, type: 2}
     Audio:
       Voice: 2
       Interval: 1
@@ -694,10 +619,12 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Board: "Orders"
+    Board: Orders
     DrawCount: 2
     Selection: 0
     Catalog: {fileID: 11400000, guid: 380a3c06ec7f4723a2c991c65403bd04, type: 2}
+    WaitForCompletion: 1
+    CompletionSource: {fileID: 4488316828472950241}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

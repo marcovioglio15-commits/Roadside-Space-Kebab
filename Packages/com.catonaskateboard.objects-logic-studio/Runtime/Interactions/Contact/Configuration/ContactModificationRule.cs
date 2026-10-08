@@ -93,7 +93,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Modification")]
         [Tooltip("Name identifying this independent flag-filtered modification in the interaction.")]
         public string Name = "Modification";
-        [Tooltip("Optional snap, confirmation and owner transform animation before effects begin.")]
+        [Tooltip("Optional snap, confirmation and owner or counterpart transform animation before effects begin.")]
         public ContactPreparationSettings Preparation = new ContactPreparationSettings();
         [Header("Contact")]
         [Tooltip("Accept contact with an item bearing any of these identity flags.")]
@@ -115,7 +115,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Duration = 1f;
         [Tooltip("Finish a started modification after separation. Carried-item eligibility still applies.")]
         public bool CompleteAfterSeparation;
-        [Tooltip("Without Snap, pause appearance and resume when contact returns. Restrictions are released while paused; visual ownership is retained. Snapped processes cancel and restore their original pose when interrupted.")]
+        [Tooltip("Without controlled counterpart motion, pause appearance and resume when contact returns. Snapped or animated counterpart processes instead cancel and restore their original pose when interrupted.")]
         public bool ResumeAfterInterruption;
         [Tooltip("Allow this pair to run again after a completed interaction and a subsequent separation.")]
         public bool RepeatAfterSeparation;
@@ -162,9 +162,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = string.Empty;
             if (Preparation == null || !Preparation.TryValidate(out warning))
                 return false;
-            if (WhileContact && (Preparation.Snap || Preparation.Animate) || Self != null && Self.Consume && Preparation.Animate && Preparation.Return)
+            if (WhileContact && (Preparation.Snap || Preparation.Animate) || Preparation.Animate && Preparation.Return
+                && (Self != null && Self.Consume || Preparation.AnimateOther && Other != null && Other.Consume))
             {
-                warning = "Preparation requires permanent effects; a returning animation cannot consume its own owner.";
+                warning = "Preparation requires permanent effects; return animation cannot consume the owner or the animated participant before returning.";
                 return false;
             }
             if (!ObjectFlagRules.TryValidate(Flags, false, out warning))

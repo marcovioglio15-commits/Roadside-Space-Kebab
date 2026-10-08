@@ -41,7 +41,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     AssemblyProductPresetMapping.Capture(product, draft.AssemblyProduct, state.Target.Resolve());
                     break;
                 case AvailableOrdersPreset orders:
-                    orders.Settings = ObjectWorkspace.Copy(draft.Orders);
+                    orders.Settings = draft.ResolveOrders(state.Target.Resolve());
+                    orders.Completion = UnlockPresetMapping.Capture(state.Target.Resolve().transform, orders.Settings.CompletionSource);
+                    orders.Settings.CompletionSource = null;
                     break;
                 case OutlinePreset outline:
                     outline.Settings = ObjectWorkspace.Copy(draft.Outline);

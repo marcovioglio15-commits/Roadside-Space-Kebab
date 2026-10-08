@@ -85,7 +85,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUI.IndentLevelScope())
                     Field(draft, "DrawGizmos");
             InteractionFlagControls.Draw(draft.FindPropertyRelative("FlagChange"), state.Sections);
-            InteractionVfxControls.Draw(draft.FindPropertyRelative("VisualEffect"), state.Sections, state.Extended.Draft.VfxDuration(state.Extended.Kind));
+            InteractionVfxControls.Draw(draft.FindPropertyRelative("VisualEffect"), state.Sections, state.Extended.Draft.VfxDuration(state.Extended.Kind),
+                state.Extended.Kind == ExtendedInteractionKind.ModifyByContact);
             bool changed = data.ApplyModifiedProperties();
             if (changed)
                 state.Persist();
@@ -302,27 +303,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!sections.Draw("Dialogue Entries", "Each entry contains ordered pages and optional consumption requirements.", settings, "Entries"))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
-            SerializedProperty entries = settings.FindPropertyRelative("Entries");
-            StudioArrayGUI.Add(entries, "Add Dialogue Entry", () => new DialogueEntry());
-            // Retain native page-list editing within each indented entry.
-            for (int index = 0; index < entries.arraySize; index++)
-            {
-                SerializedProperty entry = entries.GetArrayElementAtIndex(index);
-                if (StudioArrayGUI.Header(entries, index,
-                    new GUIContent((index + 1) + ". " + entry.FindPropertyRelative("Name").stringValue, "Edit this entry's conditions and pages.")))
-                    break;
-                if (!entry.isExpanded)
-                    continue;
-                using (new EditorGUI.IndentLevelScope())
-                {
-                    Field(entry, "Name");
-                    if (settings.FindPropertyRelative("Selection").enumValueIndex == (int)DialogueSelection.WeightedRandom)
-                        Field(entry, "Weight");
-                    if (settings.FindPropertyRelative("Trigger").enumValueIndex == (int)DialogueTrigger.Consumption)
-                        DialogueConsumptionControls.Draw(entry.FindPropertyRelative("Consumption"), "Filter Entry");
-                    Field(entry, "Lines");
-                }
-            }
+            DialogueEntryControls.Draw(settings);
         }
 
         #endregion

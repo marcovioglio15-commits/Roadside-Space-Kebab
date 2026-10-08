@@ -177,6 +177,7 @@ MonoBehaviour:
   drawGizmos: 1
   action: {fileID: 0}
   settings:
+    AffectObjects: 1
     Filter:
       IncludeSelf: 1
       RequireAllGroups: 1
@@ -207,13 +208,32 @@ MonoBehaviour:
       DrawGizmos: 1
     Push: 1
     LocalDirection: 1
-    RandomDirection: 0
+    RandomDirection: 1
     Direction: {x: 0, y: 1, z: 0}
-    DirectionMinimum: {x: -1, y: 0.2, z: -1}
+    DirectionMinimum: {x: -1, y: 0.8, z: -1}
     DirectionMaximum: {x: 1, y: 1, z: 1}
     RandomIntensity: 1
     Intensity: 1
-    IntensityRange: {x: 3, y: 10}
+    IntensityRange: {x: 1, y: 15}
     RandomForceDuration: 1
     ForceDuration: 0
-    ForceDurationRange: {x: 0, y: 0.2}
+    ForceDurationRange: {x: 0, y: 0.1}
+    AffectPlayer: 1
+    FilterPlayer: 0
+    Player:
+      Mass: 75
+      ForceMultiplier: 1
+      InitialMomentum: 1
+      Damping: 0.15
+      MaximumSpeed: 12
+      DriftAcceleration: {x: 0, y: 0.06, z: 0}
+      ControlAcceleration: 3
+      FollowCameraPitch: 0
+      JumpThrust: 0
+      JumpAcceleration: 3
+      Bounce: 0.2
+      ContactFriction: 0
+      PushSuspendedBodies: 1
+      SuspendedMassScale: 0.01
+      SuspendedPushSpeed: 1.1
+      RestoredMomentum: 1

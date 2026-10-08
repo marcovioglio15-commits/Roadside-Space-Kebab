@@ -34,6 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (properties.Length == 0 || properties[0].serializedObject.targetObject is not ObjectWorkspace state
                 || !Array.Exists(properties, property => property != null
                     && (property.propertyPath.StartsWith("Extended.Draft.Unlock", StringComparison.Ordinal)
+                        || property.propertyPath.StartsWith("Extended.Draft.Orders", StringComparison.Ordinal)
                         || property.propertyPath.StartsWith("Extended.Draft.AssemblyProduct", StringComparison.Ordinal))
                     && (property.propertyType == SerializedPropertyType.Generic || property.name.EndsWith("Id", StringComparison.Ordinal)
                         || property.propertyPath.Contains(".SourceIds.Array.data[") || property.propertyPath.Contains(".TargetIds.Array.data["))))
@@ -104,6 +105,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
                 switch (source)
                 {
+                    case ObjectAvailableOrders:
+                        snapshot.Extended.OrdersCompletionId = snapshot.Extended.Orders.CompletionSource != null
+                            ? ObjectWorkspaceTarget.FileId(snapshot.Extended.Orders.CompletionSource) : 0;
+                        snapshot.Extended.Orders.CompletionSource = null;
+                        break;
                     case ObjectInteractionUnlock:
                         snapshot.Extended.Unlock = UnlockInteractionDraft.Capture(snapshot.Extended.Unlock.Settings);
                         break;

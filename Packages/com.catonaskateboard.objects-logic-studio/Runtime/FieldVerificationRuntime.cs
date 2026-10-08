@@ -294,7 +294,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Assign(dialogue, "startAction", sharedAction);
             Assign(dialogue, "advanceAction", sharedAction);
             dialogue.Settings.Trigger = DialogueTrigger.InputAction;
-            dialogue.Settings.Entries = new[] { new DialogueEntry { Lines = new[] { new DialogueLine { Text = "First" }, new DialogueLine { Text = "Second" } } } };
+            DialogueEntry entry = ScriptableObject.CreateInstance<DialogueEntry>();
+            entry.Lines = new[] { new DialogueLine { Text = "First" }, new DialogueLine { Text = "Second" } };
+            dialogue.Settings.Entries = new[] { entry };
             item.SetActive(true);
             Check(dialogue.Ready, "Dialogue is valid and ready");
             return dialogue;

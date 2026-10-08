@@ -253,6 +253,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 held.Cancel();
                 current = returning;
                 Place(current);
+                ObjectGravityGenerator.IncludeSpawn(returning.gameObject);
                 return true;
             }
             if (current != null)
@@ -301,22 +302,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 current.SourcePrefab = settings.ProductPrefab;
                 Place(current);
             }
-            bool complete = current.IsComplete;
-            if (!(sequence != null ? current.AcceptSequence(sequence) : current.Accept(ingredient, requireHeld)))
+            // Activation and completion may release table ownership through a matching gravity pulse.
+            ObjectAssemblyProduct product = current;
+            bool complete = product.IsComplete;
+            if (!(sequence != null ? product.AcceptSequence(sequence) : product.Accept(ingredient, requireHeld)))
             {
                 if (spawned)
                 {
-                    Destroy(current.gameObject);
+                    Destroy(product.gameObject);
                     current = null;
                 }
                 return false;
             }
             Pending.Release();
             if (spawned)
-                current.gameObject.SetActive(true);
-            current.PublishPending();
+                product.gameObject.SetActive(true);
+            product.PublishPending();
             Signal(InteractionMoment.Started);
-            if (!complete && current.IsComplete)
+            if (!complete && product.IsComplete)
                 Signal(InteractionMoment.Completed);
             return true;
         }

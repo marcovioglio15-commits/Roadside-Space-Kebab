@@ -316,6 +316,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 1
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
@@ -331,39 +337,9 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Fishy Business Random Intro 1
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Fishy Business
-        Text: "Sir, I\u2019m here to eat, and I am to eat FAST. I\u2019ve got plenty of AMERICAN DOLLARS."
-    - Name: Fishy Business Random Intro 2
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Fishy Business
-        Text: My time is MONEY. Hustle up and get my order!
-    - Name: Fishy Business Random Intro 3
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Fishy Business
-        Text: Get me something to eat, PRONTO!
+    - {fileID: 11400000, guid: 6e8704ca69cf405dbab7bd9b1b08a87d, type: 2}
+    - {fileID: 11400000, guid: 8f7cc85398b441f4b41af4ab3ef3c50e, type: 2}
+    - {fileID: 11400000, guid: fa54d2787dc0482bad381321f4f8dd8b, type: 2}
     Audio:
       Voice: 3
       Interval: 0.1
@@ -404,9 +380,20 @@ MonoBehaviour:
   completionBindings: []
   settingsPreset: {fileID: 0}
   drawGizmos: 1
+  action: {fileID: 0}
   settings:
     Modifications:
     - {fileID: 11400000, guid: 90559c00c2be492f952fe40fbf295d11, type: 2}
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
 --- !u!136 &3151776499264896803
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -466,6 +453,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -481,19 +474,7 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Fishy Business Order Wrong 1
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Falafel"
-        - "French Fries"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Fishy Business
-        Text: "Hey, CHUM, guess what? You\u2019ve got the WRONG order."
+    - {fileID: 11400000, guid: 22662d44411c4526adb834f460a1c560, type: 2}
     Audio:
       Voice: 3
       Interval: 1
@@ -550,6 +531,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -565,34 +552,8 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Fishy Business Order Correct 1
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Falafel"
-        - "French Fries"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Fishy Business
-        Text: 'Congratulations PAL, you just cost me 15 TRILLION dollars!
-
-'
-    - Name: Fishy Business Order Correct 2
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Falafel"
-        - "French Fries"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Fishy Business
-        Text: "Don\u2019t expect a tip from me ahhahahahahhahahahahahahhahahahahahahhahahahhahahahahahahhahahahahhahaha.\n"
+    - {fileID: 11400000, guid: 3315c9162ba24fe4a27e30f7a8551351, type: 2}
+    - {fileID: 11400000, guid: 6b59f74bd53742fca542f35c3019a7fa, type: 2}
     Audio:
       Voice: 3
       Interval: 1
@@ -634,10 +595,12 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Board: "Orders"
+    Board: Orders
     DrawCount: 2
     Selection: 0
     Catalog: {fileID: 11400000, guid: 66ff508e7c70411f8eb55b8dfc3a2222, type: 2}
+    WaitForCompletion: 1
+    CompletionSource: {fileID: 4488316828472950241}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

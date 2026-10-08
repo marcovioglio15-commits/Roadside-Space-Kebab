@@ -11,6 +11,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private ObjectInteraction owner;
+        private ContactModificationRun contact;
+        private ObjectItem counterpart;
         private ParticleSystem[] particles;
         private Animator[] animators;
         private bool[] playing;
@@ -33,14 +35,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal static void Create(ObjectInteraction owner, InteractionVfxSettings settings, float duration)
         {
             // Instantiation happens only on successful starts, never while checking interaction eligibility.
-            GameObject created = Instantiate(settings.Prefab, owner.transform.TransformPoint(settings.Position),
-                owner.transform.rotation * Quaternion.Euler(settings.Rotation));
-            SceneManager.MoveGameObjectToScene(created, owner.gameObject.scene);
+            ContactModificationRun contact = owner is ObjectContactModifier modifier ? modifier.SignalingRun : null;
+            Transform target = settings.OnContactObject && contact != null && contact.Counterpart != null
+                ? contact.Counterpart.transform : owner.transform;
+            GameObject created = Instantiate(settings.Prefab, target.TransformPoint(settings.Position),
+                target.rotation * Quaternion.Euler(settings.Rotation));
+            SceneManager.MoveGameObjectToScene(created, target.gameObject.scene);
             created.transform.localScale = Vector3.Scale(created.transform.localScale, settings.Scale);
             if (settings.FollowObject)
-                created.transform.SetParent(owner.transform, true);
+                created.transform.SetParent(target, true);
             InteractionVfxInstance effect = created.AddComponent<InteractionVfxInstance>();
             effect.owner = owner;
+            effect.contact = contact;
+            effect.counterpart = contact != null ? contact.Counterpart : null;
             effect.automatic = settings.AutoTiming;
             effect.expires = Time.time + duration;
             // Only timed interactions need playback snapshots for pause and resume.
@@ -65,6 +72,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 SetPaused(false);
             automatic = false;
             owner = null;
+            contact = null;
+            counterpart = null;
             transform.SetParent(null, true);
         }
 
@@ -76,12 +85,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             if (automatic)
             {
-                if (owner == null || !owner.isActiveAndEnabled || !owner.VfxRunning)
+                if (owner == null || !owner.isActiveAndEnabled
+                    || (contact != null ? !contact.KeepsEffect(counterpart) : !owner.VfxRunning))
                 {
                     Stop();
                     return;
                 }
-                SetPaused(owner.VfxPaused);
+                SetPaused(contact != null ? contact.IsPaused : owner.VfxPaused);
                 if (paused)
                 {
                     expires += Time.deltaTime;

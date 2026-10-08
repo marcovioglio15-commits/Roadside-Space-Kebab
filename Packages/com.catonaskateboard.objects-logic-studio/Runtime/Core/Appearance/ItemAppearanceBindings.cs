@@ -41,10 +41,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Binding checks also serve eligibility queries without allocating snapshots.
             renderer = null;
             warning = "Assign a material replacement.";
-            if (replacement == null || !TryTarget(item, replacement.Path, out Transform target, out warning))
+            return replacement != null && TryRenderer(item, replacement.Path, out renderer, out warning);
+        }
+
+        /// <summary>Shares renderer ownership checks for materials and visibility changes.</summary>
+        /// <param name="item">Item owning the renderer.</param>
+        /// <param name="path">Relative hierarchy route.</param>
+        /// <param name="renderer">Receives the existing renderer.</param>
+        /// <param name="warning">Receives an invalid route or missing component.</param>
+        /// <returns>True when the selected renderer belongs to the item.</returns>
+        internal static bool TryRenderer(ObjectItem item, string path, out Renderer renderer, out string warning)
+        {
+            // Never add renderer components when a configured branch is missing.
+            renderer = null;
+            if (!TryTarget(item, path, out Transform target, out warning))
                 return false;
             if (!target.TryGetComponent(out renderer))
-                warning = Describe(item, replacement.Path) + " needs a Renderer.";
+                warning = Describe(item, path) + " needs a Renderer.";
             return warning.Length == 0;
         }
 

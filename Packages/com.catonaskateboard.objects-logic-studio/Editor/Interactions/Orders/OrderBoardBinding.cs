@@ -50,13 +50,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>A menu of gameplay board routes.</returns>
         private static GenericMenu Menu(SerializedProperty property, OrderBoard[] boards)
         {
-            GenericMenu menu = new GenericMenu();
+            GenericMenu menu = new GenericMenu { allowDuplicateNames = true };
             UnityEngine.Object owner = property.serializedObject.targetObject;
             string path = property.propertyPath;
             Func<bool> guard = StudioFieldMenu.Guard(owner, path);
             foreach (OrderBoard board in boards)
                 if (IsSceneBoard(board))
-                    menu.AddItem(new GUIContent(board.gameObject.scene.name + "/" + board.name + " [" + board.Identity + "]"),
+                    menu.AddItem(new GUIContent(board.gameObject.scene.name + "/" + board.name),
                         board.Identity == property.stringValue, () =>
                         {
                             if (!guard() || board == null)

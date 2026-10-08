@@ -30,13 +30,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ContactMeshReplacement[] Meshes = Array.Empty<ContactMeshReplacement>();
         [Tooltip("Shared material replacements on existing renderers of the affected item.")]
         public ItemMaterialReplacement[] Materials = Array.Empty<ItemMaterialReplacement>();
+        [Tooltip("Show or hide existing renderers without disabling their colliders or interactions.")]
+        public ItemVisibilitySettings[] Visibility = Array.Empty<ItemVisibilitySettings>();
 
         #endregion
 
         #region Properties
 
         /// <summary>Whether this configuration requests any visual substitution.</summary>
-        public bool HasChanges => Meshes != null && Materials != null && (Meshes.Length > 0 || Materials.Length > 0);
+        public bool HasChanges => Meshes != null && Materials != null && Visibility != null
+            && (Meshes.Length > 0 || Materials.Length > 0 || Visibility.Length > 0);
 
         #endregion
 
@@ -50,7 +53,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool TryValidate(out string warning)
         {
             // Empty replacement lists leave the item unchanged.
-            return TryValidate(Meshes, Materials, out warning);
+            return TryValidate(Meshes, Materials, out warning) && ItemVisibilityChanges.TryValidate(Visibility, out warning);
         }
 
         /// <summary>Checks existing destination components without capturing reversible appearance snapshots.</summary>
@@ -70,13 +73,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Data validation precedes this lightweight eligibility check.
             warning = "Appearance replacements require an Object Item and complete replacement lists.";
-            if (item == null || Meshes == null || Materials == null)
+            if (item == null || Meshes == null || Materials == null || Visibility == null)
                 return false;
             foreach (ContactMeshReplacement replacement in Meshes)
                 if (!ItemAppearanceBindings.TryMesh(item, replacement, out _, out warning))
                     return false;
             foreach (ItemMaterialReplacement replacement in Materials)
                 if (!ItemAppearanceBindings.TryRenderer(item, replacement, out _, out warning))
+                    return false;
+            foreach (ItemVisibilitySettings entry in Visibility)
+                if (entry == null || !ItemAppearanceBindings.TryRenderer(item, entry.Path, out _, out warning))
                     return false;
             warning = string.Empty;
             return true;

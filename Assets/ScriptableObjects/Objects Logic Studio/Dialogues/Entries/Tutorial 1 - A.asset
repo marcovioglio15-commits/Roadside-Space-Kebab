@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b2f4ecd80964c768b91e278a5fd5bca, type: 3}
+  m_Name: Tutorial 1 - A
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
+  Name: Tutorial 1 - A
+  Weight: 1
+  Consumption:
+    Enabled: 0
+    RequiredFlags: []
+    Orders: []
+    RequireAll: 1
+    Result: 0
+  Lines:
+  - Speaker: Grandpa's Pic
+    Text: 'Child, it is I, Grandpa.
+
+'
+  - Speaker: Grandpa's Pic
+    Text: 'I am here to teach you how to cook.
+
+'
+  - Speaker: Grandpa's Pic
+    Text: 'You can take out ingredients from their packaging with the shotgun (RED TOOL). Good old classic. '
+  - Speaker: Grandpa's Pic
+    Text: Similarly, you can shred them to pieces to use them in your dishes by shooting again at them.
+  - Speaker: Grandpa's Pic
+    Text: To make a Pizza Rossa, place Pizza Dough, then Tomato Slice on it on the cutting board.
+  - Speaker: Grandpa's Pic
+    Text: To make a Pizza Margherita, place Pizza Rossa, then Cheese slice on it on the cutting board.
+  - Speaker: Grandpa's Pic
+    Text: To make a Kebab Wrap, place a Wrap, then Shawarma Slice, and then, in any order, Tomato Slice, Lettuce Slice, and Onion Slice on the cutting board.
+  - Speaker: Grandpa's Pic
+    Text: To make a Falafel Wrap, place a Wrap, then Falafel Balls, and then, in any order, Tomato Slice, Lettuce Slice, and Onion Slice on the cutting board.
+  - Speaker: Grandpa's Pic
+    Text: 'To cook Falafel, Crab Claws, French Fries and Nuggets you must cook them in the oven first. (we are still working on the fryer!) '
+  - Speaker: Grandpa's Pic
+    Text: Water and Beer needs to be popped opened with the bottle opener (BLUE TOOL) before being delivered.
+  - Speaker: Grandpa's Pic
+    Text: '(ORANGE TOOL) does not serve a purpose yet. '
+  - Speaker: Grandpa's Pic
+    Text: 'You can get more ingredients from the shelves or fridge. If you''re out of them, you can find more in the storage room. '
+  - Speaker: Grandpa's Pic
+    Text: You can discard ingredients you don't need by putting them in the Ejector on the wall.
+  - Speaker: Grandpa's Pic
+    Text: That is all. You can consult me anytime.

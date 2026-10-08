@@ -21,14 +21,4 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Dialogue
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: 
-        Text: 
+    - {fileID: 11400000, guid: 9ab8dee7389349e2946b0eb9d8a763a6, type: 2}

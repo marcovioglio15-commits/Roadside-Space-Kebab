@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 5214438582163442178}
   - component: {fileID: 3486519954631972024}
   - component: {fileID: 3957739120197029533}
+  - component: {fileID: 2110279327860431703}
   m_Layer: 6
   m_Name: PF_Base_Plate
   m_TagString: Untagged
@@ -143,6 +144,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -207,6 +209,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -256,6 +259,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -312,6 +316,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -388,6 +393,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -403,6 +409,59 @@ MonoBehaviour:
     HoverOnly: 1
   renderers:
   - {fileID: 8771118759566599616}
+--- !u!114 &2110279327860431703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3325706747342529293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d329c6bfc475d46468b93619a4c446e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDegradation
+  interactionName: Object Degradation
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Mode: 1
+    Carry: 1
+    MinimumImpulse: 1
+    ImpactInterval: 0.1
+    Steps:
+    - Name: Stage
+      Duration: 10
+      Impacts: 3
+      Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      ChangeFlag: 0
+      Flag: {fileID: 0}
+      Operation: 0
+    DestroyAtEnd: 1
+    Fragments: []
 --- !u!1 &7578880481397212249
 GameObject:
   m_ObjectHideFlags: 0

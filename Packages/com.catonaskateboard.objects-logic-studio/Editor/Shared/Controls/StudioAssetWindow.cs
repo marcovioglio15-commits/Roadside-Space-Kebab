@@ -78,7 +78,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (draft != null)
                     {
                         UnityEditor.Editor.CreateCachedEditor(draft, null, ref inspector);
-                        inspector.OnInspectorGUI();
+                        DrawInspector(inspector);
                     }
                 }
                 hasUnsavedChanges = draft != null && JsonUtility.ToJson(draft) != baseline;
@@ -88,12 +88,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new StudioButton.RowScope())
                 using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
                 {
-                    if (StudioButton.Draw(new GUIContent("Apply", "Validate and save this window's source changes.")))
+                    if (StudioButton.Draw(new GUIContent("Apply", "Validate and save this window's source changes."), expandWidth: true, minimumHeight: 26f))
                         SaveChanges();
-                    if (StudioButton.Draw(new GUIContent("Discard", "Reload the saved source and abandon this proposal.")))
+                    if (StudioButton.Draw(new GUIContent("Discard", "Reload the saved source and abandon this proposal."), expandWidth: true, minimumHeight: 26f))
                         DiscardChanges();
                 }
             }
+        }
+
+        /// <summary>Draws the detached inspector, allowing specialized windows to supply non-persistent context.</summary>
+        /// <param name="editor">Cached editor targeting the current proposal.</param>
+        protected virtual void DrawInspector(UnityEditor.Editor editor)
+        {
+            editor.OnInspectorGUI();
         }
 
         /// <summary>Releases the cached editor when the window closes or reloads.</summary>

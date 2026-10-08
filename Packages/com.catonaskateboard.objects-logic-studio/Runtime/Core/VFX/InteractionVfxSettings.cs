@@ -18,11 +18,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool AutoTiming;
         [Tooltip("Effect lifetime in game-time seconds when automatic timing is disabled.")]
         public float Duration = 1f;
-        [Tooltip("Move the effect with its owning interaction. Otherwise it remains at the initial world pose.")]
+        [Tooltip("For Modify By Contact, place the effect on the contacted object instead of the interaction owner. Other interaction types keep their own transform.")]
+        public bool OnContactObject;
+        [Tooltip("Move the effect with the selected target. Otherwise it remains at the initial world pose.")]
         public bool FollowObject = true;
-        [Tooltip("Effect position relative to this interaction's transform.")]
+        [Tooltip("Effect position offset relative to the selected target's pivot.")]
         public Vector3 Position;
-        [Tooltip("Effect Euler rotation relative to this interaction's transform.")]
+        [Tooltip("Effect Euler rotation offset relative to the selected target.")]
         public Vector3 Rotation;
         [Tooltip("Positive scale multiplier applied to the visual-effect prefab.")]
         public Vector3 Scale = Vector3.one;

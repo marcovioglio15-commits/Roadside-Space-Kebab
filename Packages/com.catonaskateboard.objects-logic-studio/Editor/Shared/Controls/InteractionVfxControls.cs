@@ -13,7 +13,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">This exact interaction's detached VFX proposal.</param>
         /// <param name="sections">Persistent foldout state.</param>
         /// <param name="duration">Positive predefined interaction duration, or zero when unavailable.</param>
-        internal static void Draw(SerializedProperty settings, ObjectStudioSections sections, float duration)
+        /// <param name="contact">Whether this interaction supplies a contacted object as an alternate target.</param>
+        internal static void Draw(SerializedProperty settings, ObjectStudioSections sections, float duration, bool contact = false)
         {
             // Every card owns its own prefab reference; this foldout never configures other interactions.
             if (!sections.Draw("Start VFX", "Optional visual effect belonging only to this interaction.", settings))
@@ -32,7 +33,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 EditorGUILayout.LabelField("Effect Duration", duration.ToString("0.###") + " s", EditorStyles.miniLabel);
             else
                 EditorGUILayout.LabelField("Choose manual timing: this interaction has no predefined duration.", EditorStyles.miniLabel);
-            HoverControls.Field(settings, "FollowObject");
+            if (contact)
+                HoverControls.Field(settings, "OnContactObject");
+            HoverControls.Field(settings, "FollowObject", "Follow Target");
             HoverControls.Field(settings, "Position");
             HoverControls.Field(settings, "Rotation");
             HoverControls.Field(settings, "Scale");

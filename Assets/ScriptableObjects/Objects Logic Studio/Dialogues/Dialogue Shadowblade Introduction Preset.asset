@@ -32,61 +32,11 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Random Intro 1
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The darkness inside me yearns for a feast, mortal.
-    - Name: Random Intro 2
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Deliver me some nutrients.
-    - Name: Random Intro 3
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "I\u2019m Shadowblade. Shadowblade Hellfury."
-    - Name: Random Intro 4
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: My knife? To cut your Kebab? No chance.
-    - Name: Random Intro 5
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Food. Now.
+    - {fileID: 11400000, guid: daad1068651446228805a35fe392d6f7, type: 2}
+    - {fileID: 11400000, guid: 080647217cc449aeae0af2d5f88f46b4, type: 2}
+    - {fileID: 11400000, guid: 059cc597f0254205a2a5070a605559f5, type: 2}
+    - {fileID: 11400000, guid: 6fc509cf0e764a799ca0ab0218f48d26, type: 2}
+    - {fileID: 11400000, guid: d000ae2b43034bf2b552eaa986cf28f0, type: 2}
     Audio:
       Voice: 1
       Interval: 0.1

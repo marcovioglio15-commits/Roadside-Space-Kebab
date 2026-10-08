@@ -1,7 +1,6 @@
 using System;
 using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
-using CatOnASkateboard.PlayerStudio;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -20,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ContactModificationRun[] runs = Array.Empty<ContactModificationRun>();
         private ContactModificationRun signaling;
         private ObjectFlag[] consumedFlags = Array.Empty<ObjectFlag>();
+        private ObjectFlag[] consumedIngredients = Array.Empty<ObjectFlag>();
         private bool ready;
 
         #endregion
@@ -33,6 +33,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public override TransferTargetSettings Target => settings.Target;
         /// <summary>Logical units exposed only during the current consumption completion event.</summary>
         internal int ConsumedUnits { get; private set; }
+        /// <summary>Rule context available only while publishing its start or completion.</summary>
+        internal ContactModificationRun SignalingRun => signaling;
         /// <summary>Duration of the rule currently starting its visual effect.</summary>
         internal override float VfxDuration => signaling != null ? signaling.Settings.Duration : settings.MinimumDuration;
         /// <summary>Whether any rule still owns an active transition.</summary>
@@ -182,15 +184,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (ContactModificationDefinition definition in configuration.Modifications)
             {
                 ContactPreparationSettings preparation = definition.Settings.Preparation;
-                if (preparation.Animate)
-                {
-                    Transform animated = PlayerHierarchy.Resolve(transform, preparation.Path);
-                    if (animated == null || !item.Owns(animated) || animated.TryGetComponent(out Rigidbody body) && !body.isKinematic)
-                    {
-                        warning = "Choose an owned preparation transform without a dynamic Rigidbody; use a visual child for dynamic objects.";
-                        return false;
-                    }
-                }
+                if (!preparation.AnimateOther && !preparation.ValidateTarget(item, out warning))
+                    return false;
                 bool found = false;
                 foreach (Collider collider in colliders)
                     if (collider.GetComponentInParent<ObjectItem>() == item && ContactDetection.Usable(collider, definition.Settings.IncludeTriggers))
@@ -235,10 +230,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="moment">Successful start or completion.</param>
         /// <param name="receipt">Consumed identity flags, or an empty array for non-consumption.</param>
         /// <param name="units">Number of logical units consumed by this completion.</param>
-        internal void Publish(ContactModificationRun run, InteractionMoment moment, ObjectFlag[] receipt, int units)
+        /// <param name="ingredients">Captured assembly ingredient flags, or null for non-consumption events.</param>
+        internal void Publish(ContactModificationRun run, InteractionMoment moment, ObjectFlag[] receipt, int units, ObjectFlag[] ingredients = null)
         {
             signaling = run;
             consumedFlags = receipt;
+            consumedIngredients = ingredients ?? Array.Empty<ObjectFlag>();
             ConsumedUnits = units;
             try
             {
@@ -248,6 +245,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 signaling = null;
                 consumedFlags = Array.Empty<ObjectFlag>();
+                consumedIngredients = Array.Empty<ObjectFlag>();
                 ConsumedUnits = 0;
             }
         }
@@ -273,6 +271,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if ((flag != null && Array.IndexOf(consumedFlags, flag) >= 0) != requireAll)
                     return !requireAll;
             return requireAll;
+        }
+
+        /// <summary>Checks both the consumed root identity and the actual recipe ingredients for one drawn candidate.</summary>
+        /// <param name="candidate">Base or recipe-specific order drawn for this spawn.</param>
+        /// <returns>True when this exact receipt satisfies every active order requirement.</returns>
+        internal bool ConsumedMatches(OrderCandidate candidate)
+        {
+            return ConsumedUnits > 0 && ConsumedMatches(candidate.Entry.Flags, candidate.Entry.RequireAllFlags)
+                && (candidate.Variant == null || candidate.Variant.Matches(consumedIngredients));
         }
 
 

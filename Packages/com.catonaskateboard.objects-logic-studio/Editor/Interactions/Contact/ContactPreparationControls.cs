@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(settings, "Snap");
             if (settings.FindPropertyRelative("Snap").boolValue)
             {
+                HoverControls.Field(settings, "SnapSpace");
                 HoverControls.Field(settings, "Position");
                 HoverControls.Field(settings, "Rotation");
                 HoverControls.Field(settings, "Instant");
@@ -29,8 +30,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(settings, "Animate");
             if (!settings.FindPropertyRelative("Animate").boolValue)
                 return;
-            // The animation belongs to the modifying object; an asset can use a sample hierarchy.
-            HierarchyPathMenu.Draw(settings.FindPropertyRelative("Path"), HierarchyPathMenu.Source(settings), false, transforms: true);
+            HoverControls.Field(settings, "AnimateOther");
+            HoverControls.Field(settings, "AnimationSpace");
+            // Counterpart paths use an explicit sample instead of borrowing the modifying object's hierarchy.
+            HierarchyPathMenu.Draw(settings.FindPropertyRelative("Path"),
+                HierarchyPathMenu.Source(settings, settings.FindPropertyRelative("AnimateOther").boolValue), false, transforms: true);
             HoverControls.Field(settings, "StateA");
             HoverControls.Field(settings, "StateB");
             HoverControls.Field(settings, "AnimationDuration");

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b2f4ecd80964c768b91e278a5fd5bca, type: 3}
+  m_Name: Shadowblade Order Wrong 1 - E
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
+  Name: Shadowblade Order Wrong 1 - E
+  Weight: 1
+  Consumption:
+    Enabled: 1
+    RequiredFlags:
+    - Flags:
+      - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+      - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+      - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+      - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+      - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+      - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+      - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
+      - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
+      - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+      - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+      Count: 1
+    Orders: []
+    RequireAll: 1
+    Result: 0
+  Lines:
+  - Speaker: Shadowblade Hellfury
+    Text: Ugh, toxins for my delicate system.

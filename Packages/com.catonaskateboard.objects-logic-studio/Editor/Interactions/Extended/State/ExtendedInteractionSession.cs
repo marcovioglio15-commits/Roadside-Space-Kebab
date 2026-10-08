@@ -136,7 +136,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.ObjectDegradation => JsonUtility.ToJson(Draft.ObjectDegradation),
                 ExtendedInteractionKind.GravityGenerator => JsonUtility.ToJson(Draft.GravityGenerator),
-                ExtendedInteractionKind.AvailableOrders => JsonUtility.ToJson(Draft.Orders),
+                ExtendedInteractionKind.AvailableOrders => JsonUtility.ToJson(Draft.ResolveOrders(target)),
                 ExtendedInteractionKind.PlayAmbient => JsonUtility.ToJson(Draft.Ambient),
                 ExtendedInteractionKind.Slice => JsonUtility.ToJson(Draft.Slice),
                 ExtendedInteractionKind.SpawnManagement => JsonUtility.ToJson(SpawnSourceAuthoring.Resolve(Draft.SpawnManagement)),

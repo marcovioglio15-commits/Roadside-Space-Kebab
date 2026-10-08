@@ -338,12 +338,22 @@ MonoBehaviour:
   completionBindings: []
   settingsPreset: {fileID: 11400000, guid: be420e9d974b465cb1600c42854a605d, type: 2}
   drawGizmos: 1
+  action: {fileID: 0}
   settings:
     Modifications:
     - {fileID: 11400000, guid: e7c78d2a700142718e559cead496d816, type: 2}
-    - {fileID: 11400000, guid: d565d370b7a543c3a05326d7897ad222, type: 2}
     - {fileID: 11400000, guid: 7e3f727cfc4f4179a5a520801735af44, type: 2}
     - {fileID: 11400000, guid: 58de2772da244ebe8573c26f9e10bcac, type: 2}
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
 --- !u!114 &8784326929505579525
 MonoBehaviour:
   m_ObjectHideFlags: 0

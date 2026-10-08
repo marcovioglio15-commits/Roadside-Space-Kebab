@@ -338,6 +338,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 1
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
@@ -353,61 +359,11 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Random Intro 1
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The darkness inside me yearns for a feast, mortal.
-    - Name: Shadowblade Random Intro 2
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Deliver me some nutrients.
-    - Name: Shadowblade Random Intro 3
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "I\u2019m Shadowblade. Shadowblade Hellfury."
-    - Name: Shadowblade Random Intro 4
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: My knife? To cut your Kebab? No chance.
-    - Name: Shadowblade Random Intro 5
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Food. Now.
+    - {fileID: 11400000, guid: 5d0b93a8649840d1b7dbae2d56d0f598, type: 2}
+    - {fileID: 11400000, guid: a86a32320d3c4deaaec8eb39f8365222, type: 2}
+    - {fileID: 11400000, guid: ae275a133f2b4909b5afdd3b5041ef1e, type: 2}
+    - {fileID: 11400000, guid: bec9a048483f435eb76a93ff234c4196, type: 2}
+    - {fileID: 11400000, guid: 3a1bcf12b45a49adbcac90a57490c4c7, type: 2}
     Audio:
       Voice: 1
       Interval: 0.1
@@ -448,9 +404,20 @@ MonoBehaviour:
   completionBindings: []
   settingsPreset: {fileID: 0}
   drawGizmos: 1
+  action: {fileID: 0}
   settings:
     Modifications:
     - {fileID: 11400000, guid: d1eca52a893546a9a05f90358696f494, type: 2}
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
 --- !u!136 &3151776499264896803
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -510,6 +477,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -525,66 +498,11 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Order Wrong 1
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Ugh, toxins for my delicate system.
-    - Name: Shadowblade Order Wrong 2
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: I knew you were a FAKER.
-    - Name: Shadowblade Order Wrong 3
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are not pleased.
-    - Name: Shadowblade Order Wrong 4
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Pathetic.
-    - Name: Shadowblade Order Wrong 5
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Get out of my sight, slowpoke!
+    - {fileID: 11400000, guid: 17ea5ee2b0714cfb9946162dd7cd8650, type: 2}
+    - {fileID: 11400000, guid: 58edba87f15749b784dff435b5a9afee, type: 2}
+    - {fileID: 11400000, guid: 181aa014f5984d3988376d0164197d14, type: 2}
+    - {fileID: 11400000, guid: 0a96e7f6c64f420f9784d599d7f1ac6d, type: 2}
+    - {fileID: 11400000, guid: 4ddc5b5a3f254a6da3eafcd7164e7a30, type: 2}
     Audio:
       Voice: 1
       Interval: 1
@@ -641,6 +559,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -656,102 +580,14 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Order Correct 1
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Ahh, manna from Pandemonium itself.
-    - Name: Shadowblade Order Correct 2
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Heh, not bad for a mortal.
-    - Name: Shadowblade Order Correct 3
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Your skills impress me, chef.
-    - Name: Shadowblade Order Correct 4
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are pleased.
-    - Name: Shadowblade Order Correct 5
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: This will do.
-    - Name: Shadowblade Order Correct 6
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "My demons\u2026 pleased\u2026"
-    - Name: Shadowblade Order Correct 7
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "\u2026I\u2019ll be back."
-    - Name: Shadowblade Order Correct 8
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Pizza Rossa"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Hmph.
+    - {fileID: 11400000, guid: 3edd241146904978892e75be65d81e3d, type: 2}
+    - {fileID: 11400000, guid: e8da4bdfea9941f885084b56b2794445, type: 2}
+    - {fileID: 11400000, guid: 02523b83f9f048b2ab7197dd25ba0c6d, type: 2}
+    - {fileID: 11400000, guid: ee4a8073548440d889b22006ddba7d1b, type: 2}
+    - {fileID: 11400000, guid: f382245bd4f44fc3a223aab296047974, type: 2}
+    - {fileID: 11400000, guid: d1fef27e40ab46e3bbf5f9b6834a5019, type: 2}
+    - {fileID: 11400000, guid: 677794b1bdcd420eaa54acd0add00f7c, type: 2}
+    - {fileID: 11400000, guid: ababe400e1b44a9895102ee80f60483a, type: 2}
     Audio:
       Voice: 1
       Interval: 1
@@ -793,10 +629,12 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Board: "Orders"
+    Board: Orders
     DrawCount: 1
     Selection: 0
     Catalog: {fileID: 11400000, guid: fae1ca908be54bc99778872aa007e719, type: 2}
+    WaitForCompletion: 1
+    CompletionSource: {fileID: 4488316828472950241}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

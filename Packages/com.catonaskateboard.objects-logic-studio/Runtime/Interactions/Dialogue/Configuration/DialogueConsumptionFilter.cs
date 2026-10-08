@@ -77,7 +77,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (Orders == null || Orders.Length == 0 || Result is not (DialogueOrderResult.Completed or DialogueOrderResult.UnexpectedDelivery))
                     return false;
                 foreach (string name in Orders)
-                    if (string.IsNullOrWhiteSpace(name) || catalog != null && Array.Find(catalog.Entries, entry => entry != null && entry.Name == name) == null)
+                    if (string.IsNullOrWhiteSpace(name) || catalog != null && (catalog.Catalog == null || !catalog.Catalog.ContainsOrder(name)))
                     {
                         warning = "An order selected by the dialogue is missing from Available Orders: " + name;
                         return false;

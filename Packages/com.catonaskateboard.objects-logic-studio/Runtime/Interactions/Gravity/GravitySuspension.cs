@@ -21,6 +21,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Methods
         #region Ownership
 
+        /// <summary>Checks active suspension without confusing authored gravity-free bodies with pulse participants.</summary>
+        /// <param name="body">Contacted or newly activated body.</param>
+        /// <param name="owner">Optional generator whose particular lease must exist.</param>
+        /// <returns>True when the body has an active matching suspension lease.</returns>
+        internal static bool Contains(Rigidbody body, ObjectGravityGenerator owner = null)
+        {
+            return body != null && bodies.TryGetValue(body, out Lease lease)
+                && (owner == null ? lease.Owners.Count > 0 : lease.Owners.Contains(owner));
+        }
+
         /// <summary>Disables gravity once while retaining independent ownership for overlapping pulses.</summary>
         /// <param name="body">Active dynamic body selected by a pulse.</param>
         /// <param name="owner">Generator acquiring the suspension.</param>

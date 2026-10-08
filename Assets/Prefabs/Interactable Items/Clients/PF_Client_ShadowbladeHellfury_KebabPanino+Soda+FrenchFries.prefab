@@ -338,6 +338,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 1
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
@@ -353,61 +359,11 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Random Intro 1
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The darkness inside me yearns for a feast, mortal.
-    - Name: Shadowblade Random Intro 2
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Deliver me some nutrients.
-    - Name: Shadowblade Random Intro 3
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "I\u2019m Shadowblade. Shadowblade Hellfury."
-    - Name: Shadowblade Random Intro 4
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: My knife? To cut your Kebab? No chance.
-    - Name: Shadowblade Random Intro 5
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Food. Now.
+    - {fileID: 11400000, guid: 5d0b93a8649840d1b7dbae2d56d0f598, type: 2}
+    - {fileID: 11400000, guid: a86a32320d3c4deaaec8eb39f8365222, type: 2}
+    - {fileID: 11400000, guid: ae275a133f2b4909b5afdd3b5041ef1e, type: 2}
+    - {fileID: 11400000, guid: bec9a048483f435eb76a93ff234c4196, type: 2}
+    - {fileID: 11400000, guid: 3a1bcf12b45a49adbcac90a57490c4c7, type: 2}
     Audio:
       Voice: 1
       Interval: 0.1
@@ -448,9 +404,20 @@ MonoBehaviour:
   completionBindings: []
   settingsPreset: {fileID: 0}
   drawGizmos: 1
+  action: {fileID: 0}
   settings:
     Modifications:
     - {fileID: 11400000, guid: d1eca52a893546a9a05f90358696f494, type: 2}
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
 --- !u!136 &3151776499264896803
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -510,6 +477,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -525,76 +498,11 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Order Wrong 1
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Ugh, toxins for my delicate system.
-    - Name: Shadowblade Order Wrong 2
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: I knew you were a FAKER.
-    - Name: Shadowblade Order Wrong 3
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are not pleased.
-    - Name: Shadowblade Order Wrong 4
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Pathetic.
-    - Name: Shadowblade Order Wrong 5
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 1
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Get out of my sight, slowpoke!
+    - {fileID: 11400000, guid: 2de566875be0465fa24ef08f106dc5fd, type: 2}
+    - {fileID: 11400000, guid: 0fe1444641f64cc29bdb012057e7692a, type: 2}
+    - {fileID: 11400000, guid: e807d679599949a6ba857b9bfc7853f2, type: 2}
+    - {fileID: 11400000, guid: 1c65cd26d4d6430b9f0f6d8c06596424, type: 2}
+    - {fileID: 11400000, guid: 17a8df86bec84faca702308f36ecbdc5, type: 2}
     Audio:
       Voice: 1
       Interval: 1
@@ -651,6 +559,12 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -666,118 +580,14 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Order Correct 1
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Ahh, manna from Pandemonium itself.
-    - Name: Shadowblade Order Correct 2
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Heh, not bad for a mortal.
-    - Name: Shadowblade Order Correct 3
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Your skills impress me, chef.
-    - Name: Shadowblade Order Correct 4
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are pleased.
-    - Name: Shadowblade Order Correct 5
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: This will do.
-    - Name: Shadowblade Order Correct 6
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "My demons\u2026 pleased\u2026"
-    - Name: Shadowblade Order Correct 7
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: "\u2026I\u2019ll be back."
-    - Name: Shadowblade Order Correct 8
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino Kebab"
-        - "French Fries"
-        - "Soda"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Hmph.
+    - {fileID: 11400000, guid: c40e009a7ad94cc4aa5f84a535184703, type: 2}
+    - {fileID: 11400000, guid: 4e2f4c3d2ec442afb56259e59278a5c3, type: 2}
+    - {fileID: 11400000, guid: 477b27b4a61e48c7a3f616dbe2ef6369, type: 2}
+    - {fileID: 11400000, guid: 300cbfa353ce43f0ae19ad76376fd7c3, type: 2}
+    - {fileID: 11400000, guid: 11778bff65de41bfb3cbe5c8946a7232, type: 2}
+    - {fileID: 11400000, guid: 26a82e849e0d46138a735f9248eb5ad3, type: 2}
+    - {fileID: 11400000, guid: 30efbd8c86b449c79d11f604d70fbc5c, type: 2}
+    - {fileID: 11400000, guid: 5cff837dc1694d94a9bb950947f2dfc4, type: 2}
     Audio:
       Voice: 1
       Interval: 1
@@ -819,10 +629,12 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Board: "Orders"
+    Board: Orders
     DrawCount: 3
     Selection: 0
     Catalog: {fileID: 11400000, guid: 2ba339f8ac334d0181c9eaae52264c68, type: 2}
+    WaitForCompletion: 1
+    CompletionSource: {fileID: 4488316828472950241}
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

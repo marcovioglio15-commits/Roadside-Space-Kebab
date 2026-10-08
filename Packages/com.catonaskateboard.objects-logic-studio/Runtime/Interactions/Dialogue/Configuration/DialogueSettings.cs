@@ -26,26 +26,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
     }
 
-    /// <summary>Groups an explicit sequence of pages with optional consumption eligibility and selection weight.</summary>
-    [Serializable]
-    public sealed class DialogueEntry
-    {
-        #region Fields
-
-        [Header("Dialogue Entry")]
-        [Tooltip("Label used to identify this dialogue entry in the tool.")]
-        public string Name = "Dialogue";
-        [Tooltip("Relative selection chance in Weighted Random mode. Zero excludes this entry from weighted selection.")]
-        public float Weight = 1f;
-        [Tooltip("Optional entry filter for the Consumption trigger, combined with the interaction's filter.")]
-        public DialogueConsumptionFilter Consumption = new DialogueConsumptionFilter();
-        [Tooltip("Pages shown in this exact order. The advance action displays the next page and closes after the last one.")]
-        public DialogueLine[] Lines = { new DialogueLine() };
-
-        #endregion
-
-    }
-
     /// <summary>Stores trigger, range, arbitration and replay policy independently of input and HUD bindings.</summary>
     [Serializable]
     public sealed class DialogueSettings
@@ -83,8 +63,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public DialogueInterruption Interruption;
         [Tooltip("Allow a completed dialogue to start again after the player leaves the exit range and returns. Consumption mode also rearms when new items are consumed.")]
         public bool ReplayOnReturn = true;
-        [Tooltip("Available dialogue sequences and their independent flag conditions.")]
-        public DialogueEntry[] Entries = { new DialogueEntry() };
+        [Tooltip("Shared dialogue entry presets containing pages, selection weights and optional consumption conditions.")]
+        public DialogueEntry[] Entries = Array.Empty<DialogueEntry>();
         [Header("Audio")]
         [Tooltip("Optional voice phrases and final-page result sound.")]
         public DialogueAudioSettings Audio = new DialogueAudioSettings();
@@ -124,26 +104,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 for (int entryIndex = 0; entryIndex < Entries.Length; entryIndex++)
                 {
                     DialogueEntry entry = Entries[entryIndex];
-                    if (entry == null || entry.Consumption == null || entry.Lines == null || entry.Lines.Length == 0)
+                    if (entry == null)
                     {
-                        warning = "Each dialogue entry needs conditions and at least one explicit text page.";
+                        warning = "Assign a preset to every dialogue entry or remove the empty reference.";
                         break;
                     }
-                    if (Selection == DialogueSelection.WeightedRandom && (!InteractionValues.Finite(entry.Weight) || entry.Weight < 0f))
-                    {
-                        warning = "Dialogue weights must be finite and non-negative.";
-                        break;
-                    }
-                    if (Trigger == DialogueTrigger.Consumption && !entry.Consumption.TryValidate(orders, out warning, !bound))
+                    if (!entry.TryValidate(out warning, Trigger == DialogueTrigger.Consumption,
+                        Selection == DialogueSelection.WeightedRandom, orders, bound))
                         warning = $"Dialogue entry {entryIndex + 1} ('{entry.Name}'): {warning}";
                     if (warning.Length > 0)
                         break;
-                    foreach (DialogueLine line in entry.Lines)
-                        if (line == null || string.IsNullOrWhiteSpace(line.Text))
-                            warning = "Write text for every dialogue page or remove the unused page.";
                     totalWeight += entry.Weight;
-                    if (warning.Length > 0)
-                        break;
                 }
                 if (warning.Length == 0 && Selection == DialogueSelection.WeightedRandom && totalWeight <= 0d)
                     warning = "At least one dialogue entry needs a positive selection weight.";

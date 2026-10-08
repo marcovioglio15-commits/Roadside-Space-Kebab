@@ -47,11 +47,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Methods
         #region Selection
 
-        /// <summary>Evaluates configured groups once when the pulse acquires its fixed set of bodies.</summary>
+        /// <summary>Evaluates configured groups when a pulse starts or an object joins an active suspension.</summary>
         /// <param name="body">Active dynamic body being considered.</param>
         /// <param name="owner">Generator defining the optional self exclusion.</param>
         /// <returns>True when this body satisfies the selected combination.</returns>
-        internal bool Matches(Rigidbody body, Transform owner)
+        internal bool Matches(Component body, Transform owner)
         {
             if (!IncludeSelf && body.transform.IsChildOf(owner))
                 return false;

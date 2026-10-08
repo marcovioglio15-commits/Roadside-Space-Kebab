@@ -216,9 +216,9 @@ MonoBehaviour:
     MinimumDistance: 8
     MaximumDistance: 45
     SingleInstance: 0
-    LimitRate: 0
+    LimitRate: 1
     MaxPlays: 8
-    WindowSeconds: 0.25
+    WindowSeconds: 0.5
     Parameters: []
   - Key: amb_neonsign
     DisplayName: amb_neonsign

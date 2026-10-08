@@ -64,6 +64,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     return;
                 string identities = field switch
                 {
+                    "Orders" => "OrdersCompletionId",
                     "Unlock.Settings.Conditions" => "Unlock.SourceIds",
                     "AssemblyProduct.Settings.InteractionRules" => "AssemblyProduct.TargetIds",
                     _ => null
@@ -130,6 +131,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!stableIds)
                 return result;
             result = result.Replace("Unlock.Settings.Target", "Unlock.TargetId").Replace("Unlock.Settings.Replacement", "Unlock.ReplacementId");
+            result = result.Replace("Orders.CompletionSource", "OrdersCompletionId");
             result = Regex.Replace(result, @"Unlock\.Settings\.Conditions\.Array\.data\[(\d+)\]\.Source", "Unlock.SourceIds.Array.data[$1]");
             return Regex.Replace(result, @"AssemblyProduct\.Settings\.InteractionRules\.Array\.data\[(\d+)\]\.Target", "AssemblyProduct.TargetIds.Array.data[$1]");
         }

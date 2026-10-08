@@ -43,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 OutlinePreset outline => outline.Settings.TryValidate(out warning),
                 SpawnManagementPreset spawn => spawn.Settings.TryValidate(out warning),
                 AssemblyStationPreset station => station.Settings.TryValidate(out warning),
-                AvailableOrdersPreset orders => orders.Settings.TryValidate(out warning),
+                AvailableOrdersPreset orders => orders.ValidateOrders(out warning),
                 AssemblyProductPreset product => product.ValidateProduct(out warning),
                 UnlockRulePreset unlock => unlock.Rule != null && unlock.Rule.TryValidate(out warning),
                 _ => false

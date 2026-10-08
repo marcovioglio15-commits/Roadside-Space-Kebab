@@ -31,6 +31,9 @@ namespace CatOnASkateboard.StudioIdentity
 
         #region Properties
 
+        /// <summary>Reports committed runtime membership changes so active systems can reevaluate their filters.</summary>
+        public static event Action<ObjectIdentity> Changed;
+
         /// <summary>Authored flags used by editor tools and restored on each new Play session.</summary>
         public IReadOnlyList<ObjectFlag> AuthoredFlags => flags;
         /// <summary>Current runtime membership for consumption receipts and diagnostics.</summary>
@@ -81,6 +84,7 @@ namespace CatOnASkateboard.StudioIdentity
         {
             // Lazy initialization also resets inactive objects without erasing changes made in Awake.
             session++;
+            Changed = null;
         }
 
         /// <summary>Builds membership once before its first runtime query.</summary>
@@ -197,23 +201,30 @@ namespace CatOnASkateboard.StudioIdentity
         {
             // Remaining contact zones and permanent changes continue to define the visible membership.
             Initialize();
+            bool removed = false;
             for (int index = temporary.Count - 1; index >= 0; index--)
                 if (temporary[index].Owner == owner)
+                {
                     temporary.RemoveAt(index);
-            RefreshTemporary();
+                    removed = true;
+                }
+            if (removed)
+                RefreshTemporary();
         }
 
         /// <summary>Rebuilds effective membership only when a permanent or temporary operation changes.</summary>
         private void RefreshTemporary()
         {
             // Ordinary membership queries read the cached set without allocations or owner searches.
-            if (temporary.Count == 0)
-                return;
             effective.Clear();
-            effective.UnionWith(current);
-            foreach ((UnityEngine.Object Owner, ObjectFlag Flag, ObjectFlagOperation Operation) entry in temporary)
-                if (entry.Owner != null)
-                    Apply(effective, entry.Flag, entry.Operation);
+            if (temporary.Count > 0)
+            {
+                effective.UnionWith(current);
+                foreach ((UnityEngine.Object Owner, ObjectFlag Flag, ObjectFlagOperation Operation) entry in temporary)
+                    if (entry.Owner != null)
+                        Apply(effective, entry.Flag, entry.Operation);
+            }
+            Changed?.Invoke(this);
         }
 
         /// <summary>Applies a validated operation to either base or temporary membership.</summary>

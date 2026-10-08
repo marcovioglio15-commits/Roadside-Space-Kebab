@@ -32,61 +32,11 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Shadowblade Order Wrong 1
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Ugh, toxins for my delicate system.
-    - Name: Shadowblade Order Wrong 2
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: The Elder Gods are not pleased.
-    - Name: Shadowblade Order Wrong 3
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Pathetic.
-    - Name: Shadowblade Order Wrong 4
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: Get out of my sight, slowpoke!
-    - Name: Shadowblade Order Wrong 5
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Shadowblade Hellfury
-        Text: 'I knew you were a FAKER. '
+    - {fileID: 11400000, guid: 71a67ef4f40d41fa972f860be59cd03a, type: 2}
+    - {fileID: 11400000, guid: 5a5b4ef764dc41d3bb983656ca8f6708, type: 2}
+    - {fileID: 11400000, guid: d824a9a6d563407a91324cd76cc5b4ec, type: 2}
+    - {fileID: 11400000, guid: b6325138e5584da7890331cc40c2a965, type: 2}
+    - {fileID: 11400000, guid: 280e89abdf6040f1a7c5308ac479a0c2, type: 2}
     Audio:
       Voice: 1
       Interval: 1

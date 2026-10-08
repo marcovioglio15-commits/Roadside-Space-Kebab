@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Remaining capacity counts units, not candidate rows.
             OrderSettings settings = owner.Settings;
             int remaining = Mathf.Min(settings.DrawCount, capacity);
-            List<OrderEntry> candidates = new List<OrderEntry>(settings.Entries);
+            List<OrderCandidate> candidates = new List<OrderCandidate>(settings.Catalog.Candidates());
             List<OrderTicket> selected = new List<OrderTicket>();
             while (remaining > 0 && candidates.Count > 0)
             {
@@ -41,7 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     selectedIndex = index;
                     break;
                 }
-                OrderEntry entry = candidates[selectedIndex];
+                OrderCandidate entry = candidates[selectedIndex];
                 for (int unit = 0; unit < entry.Quantity; unit++)
                     selected.Add(new OrderTicket(owner, entry, settings.Board));
                 remaining -= entry.Quantity;

@@ -40,9 +40,37 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     ObjectFlagSelector.Draw(entry.FindPropertyRelative("Flags"));
                     if (entry.FindPropertyRelative("Flags").arraySize > 1)
                         HoverControls.Field(entry, "RequireAllFlags");
+                    Variants(entry);
                 }
             StudioArrayGUI.Add(entries, "Add Available Order", () => new OrderEntry { Name = "Order " + entries.arraySize });
             serializedObject.ApplyModifiedProperties();
+        }
+
+        /// <summary>Edits optional recipe candidates immediately after the parent identity filters.</summary>
+        /// <param name="entry">Parent order retaining shared quantity and identity settings.</param>
+        private static void Variants(SerializedProperty entry)
+        {
+            HoverControls.Field(entry, "UseRecipeModifiers");
+            if (!entry.FindPropertyRelative("UseRecipeModifiers").boolValue)
+                return;
+            HoverControls.Field(entry, "IncludeBaseOrder");
+            SerializedProperty variants = entry.FindPropertyRelative("Variants");
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            for (int index = 0; index < variants.arraySize; index++)
+            {
+                SerializedProperty variant = variants.GetArrayElementAtIndex(index);
+                if (StudioArrayGUI.Header(variants, index, new GUIContent(variant.FindPropertyRelative("Name").stringValue, "Recipe-specific order candidate and independent dialogue selection.")))
+                    break;
+                if (!variant.isExpanded)
+                    continue;
+                HoverControls.Field(variant, "Name");
+                HoverControls.Field(variant, "Text");
+                HoverControls.Field(variant, "Weight");
+                ObjectFlagSelector.Draw(variant.FindPropertyRelative("Flags"));
+                if (variant.FindPropertyRelative("Flags").arraySize > 1)
+                    HoverControls.Field(variant, "RequireAllFlags");
+            }
+            StudioArrayGUI.Add(variants, "Add Recipe Variant", () => new OrderRecipeVariant());
         }
 
         #endregion

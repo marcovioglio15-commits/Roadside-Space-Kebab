@@ -34,7 +34,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 for (int index = 0; index < steps.arraySize; index++)
                 {
                     SerializedProperty step = steps.GetArrayElementAtIndex(index);
-                    if (!StudioArrayGUI.Header(steps, index, new GUIContent(step.FindPropertyRelative("Name").stringValue, "Edit this degradation stage.")))
+                    if (StudioArrayGUI.Header(steps, index, new GUIContent(step.FindPropertyRelative("Name").stringValue, "Edit this degradation stage.")))
+                        break;
+                    if (!step.isExpanded)
                         continue;
                     using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                     HoverControls.Field(step, "Name");

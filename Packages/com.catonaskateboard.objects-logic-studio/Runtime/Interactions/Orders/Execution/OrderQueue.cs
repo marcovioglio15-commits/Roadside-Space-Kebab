@@ -9,9 +9,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         internal readonly ObjectAvailableOrders Owner;
-        internal readonly OrderEntry Entry;
+        internal readonly OrderCandidate Candidate;
+        internal OrderEntry Entry => Candidate.Entry;
+        internal string Name => Candidate.Name;
         internal readonly string Destination;
-        internal string Text => Entry.Text;
+        internal string Text => Candidate.Text;
         internal OrderBoard Board;
         internal int Slot = -1;
         internal bool Completed;
@@ -23,11 +25,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="owner">Customer interaction retaining the ticket.</param>
         /// <param name="entry">Selected order identity requirements and authored text.</param>
         /// <param name="destination">Scene board ID.</param>
-        internal OrderTicket(ObjectAvailableOrders owner, OrderEntry entry, string destination)
+        internal OrderTicket(ObjectAvailableOrders owner, OrderCandidate entry, string destination)
         {
             // The owner matches its current consumption receipt against this entry's identity flags.
             Owner = owner;
-            Entry = entry;
+            Candidate = entry;
             Destination = destination;
         }
 

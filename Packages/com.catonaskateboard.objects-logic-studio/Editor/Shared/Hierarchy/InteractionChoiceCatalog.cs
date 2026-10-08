@@ -39,7 +39,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="product">Exclude product configuration itself when selecting ingredient-gated features.</param>
         internal void Refresh(GameObject root, bool product)
         {
-            // Duplicate names include a path, type and component index so every choice remains identifiable.
+            // Names are presentation only; parallel component IDs retain exact selections.
             List<ObjectInteraction> found = new List<ObjectInteraction>();
             if (root != null)
                 foreach (ObjectInteraction interaction in root.GetComponentsInChildren<ObjectInteraction>(true))
@@ -53,10 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             for (int index = 0; index < found.Count; index++)
             {
                 identities[index] = ObjectWorkspaceTarget.FileId(found[index]);
-                string path = AnimationUtility.CalculateTransformPath(found[index].transform, root.transform);
-                labels[index + 1] = new GUIContent(found[index].InteractionName + "  ("
-                    + found[index].GetType().Name.Replace("Object", string.Empty) + ", "
-                    + (path.Length > 0 ? path : "Root") + ", " + (index + 1) + ")", "Stable reference to this existing component.");
+                labels[index + 1] = new GUIContent(found[index].InteractionName,
+                    AnimationUtility.CalculateTransformPath(found[index].transform, root.transform));
             }
         }
 
@@ -66,6 +64,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="selected">Called with the exact selected component identity.</param>
         internal void AddChoices(GenericMenu menu, long[] excluded, Action<long> selected)
         {
+            menu.allowDuplicateNames = true;
             // A rule is never created with an empty target that can be confused with its ingredient conditions.
             if (identities.Length == 0)
                 menu.AddDisabledItem(new GUIContent("Add product interactions in the other categories first"));

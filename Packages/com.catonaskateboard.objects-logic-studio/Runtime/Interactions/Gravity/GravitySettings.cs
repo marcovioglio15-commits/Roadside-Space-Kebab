@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using CatOnASkateboard.PlayerStudio;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -13,7 +14,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Pulse")]
-        [Tooltip("Body selection evaluated once per pulse, across all loaded gameplay scenes.")]
+        [Tooltip("Suspend matching dynamic Rigidbody objects during each pulse.")]
+        public bool AffectObjects = true;
+        [Tooltip("Selection reevaluated at pulse start, object activation and identity changes. Qualifying assembled products leave their table after any active movement transaction finishes.")]
         public GravityFilter Filter = new GravityFilter();
         [Tooltip("Randomize the delay between restoration and the next pulse.")]
         public bool RandomInterval;
@@ -52,6 +55,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float ForceDuration;
         [Tooltip("Minimum and maximum acceleration duration in scaled seconds.")]
         public Vector2 ForceDurationRange = new Vector2(0.1f, 1f);
+        [Header("Player Suspension")]
+        [Tooltip("Also suspend active Player Studio CharacterController motors without adding Rigidbody components.")]
+        public bool AffectPlayer;
+        [Tooltip("Require the player to pass the same layer, identity and interaction filters as physical objects.")]
+        public bool FilterPlayer;
+        [Tooltip("Virtual body and controls while floating. With overlapping generators, the most recently acquired source controls damping and steering; forces remain additive.")]
+        public PlayerFloatSettings Player = new PlayerFloatSettings();
 
         #endregion
         #region Methods
@@ -63,7 +73,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool TryValidate(out string warning)
         {
             warning = "Configure gravity selection.";
-            if (Filter == null || !Filter.TryValidate(out warning))
+            if ((AffectObjects || AffectPlayer && FilterPlayer) && (Filter == null || !Filter.TryValidate(out warning)))
+                return false;
+            warning = "Enable affected objects, the player, or both.";
+            if (!AffectObjects && !AffectPlayer)
+                return false;
+            warning = "Configure player suspension.";
+            if (AffectPlayer && (Player == null || !Player.TryValidate(out warning)))
                 return false;
             warning = "Choose a positive interval, supported restoration mode and positive enabled timer duration.";
             if ((RandomInterval ? !Range(IntervalRange, true) : !InteractionValues.Positive(Interval))
@@ -99,6 +115,31 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private static bool Nonnegative(float value)
         {
             return float.IsFinite(value) && value >= 0f;
+        }
+
+        #endregion
+        #region Sampling
+
+        /// <summary>Samples the shared force policy once per acquired body or player.</summary>
+        /// <param name="owner">Generator orientation used for local directions.</param>
+        /// <param name="duration">Receives zero for an impulse or the sampled acceleration duration.</param>
+        /// <returns>World-space impulse or acceleration, before any player's virtual-body multiplier.</returns>
+        internal Vector3 SampleForce(Transform owner, out float duration)
+        {
+            duration = 0f;
+            if (!Push)
+                return Vector3.zero;
+            Vector3 direction = RandomDirection ? new Vector3(
+                UnityEngine.Random.Range(DirectionMinimum.x, DirectionMaximum.x),
+                UnityEngine.Random.Range(DirectionMinimum.y, DirectionMaximum.y),
+                UnityEngine.Random.Range(DirectionMinimum.z, DirectionMaximum.z)) : Direction;
+            if (direction.sqrMagnitude < 0.000001f)
+                direction = DirectionMaximum.sqrMagnitude > 0f ? DirectionMaximum : DirectionMinimum;
+            direction.Normalize();
+            if (LocalDirection)
+                direction = owner.TransformDirection(direction);
+            duration = RandomForceDuration ? UnityEngine.Random.Range(ForceDurationRange.x, ForceDurationRange.y) : ForceDuration;
+            return direction * (RandomIntensity ? UnityEngine.Random.Range(IntensityRange.x, IntensityRange.y) : Intensity);
         }
 
         #endregion

@@ -11,33 +11,45 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44f15e5399d34c7d8b9a653944ba1f3a, type: 3}
   m_Name: PF_Client_ShadowbladeHellfury_FalafelWrap+KebabWrap+CrabClaws+PizzaRossa Orders
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   Entries:
-  - Name: "Falafel Wrap"
-    Text: "Falafel Wrap"
+  - Name: Falafel Wrap
+    Text: Falafel Wrap
     Quantity: 1
     Weight: 1
     Flags:
     - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
     RequireAllFlags: 0
-  - Name: "Kebab Wrap"
-    Text: "Kebab Wrap"
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []
+  - Name: Kebab Wrap
+    Text: Kebab Wrap
     Quantity: 1
     Weight: 1
     Flags:
     - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
     RequireAllFlags: 0
-  - Name: "Fried Crab Claws"
-    Text: "Fried Crab Claws"
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []
+  - Name: Fried Crab Claws
+    Text: Fried Crab Claws
     Quantity: 1
     Weight: 1
     Flags:
     - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
     RequireAllFlags: 0
-  - Name: "Pizza Rossa"
-    Text: "Pizza Rossa"
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []
+  - Name: Pizza Rossa
+    Text: Pizza Rossa
     Quantity: 1
     Weight: 1
     Flags:
     - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     RequireAllFlags: 0
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []

@@ -36,6 +36,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public AmbientSettings Ambient = new AmbientSettings();
         [Tooltip("Selected consuming components and order text retained across prefab stages.")]
         public OrderSettings Orders = new OrderSettings();
+        [Tooltip("Stable prefab component identity required before orders appear on the board.")]
+        public long OrdersCompletionId;
         [Tooltip("Detached outline shader settings.")]
         public OutlineSettings Outline = new OutlineSettings();
         [Tooltip("Existing target and unlock conditions retained by stable prefab identity.")]
@@ -91,6 +93,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ObjectAvailableOrders orders:
                     draft.Orders = ObjectWorkspace.Copy(orders.Settings);
+                    draft.OrdersCompletionId = orders.Settings.CompletionSource != null ? ObjectWorkspaceTarget.FileId(orders.Settings.CompletionSource) : 0;
+                    draft.Orders.CompletionSource = null;
                     break;
                 case ObjectAmbient ambient:
                     draft.Ambient = ObjectWorkspace.Copy(ambient.Settings);
@@ -156,7 +160,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             return feature switch
             {
-                ObjectAvailableOrders orders => Orders.TryValidate(orders.gameObject, out warning),
+                ObjectAvailableOrders orders => ResolveOrders(orders.gameObject).TryValidate(orders.gameObject, out warning),
                 ObjectAmbient => Ambient.TryValidate(out warning),
                 ObjectSlice slice => slice.TryValidate(Slice, StartAction, out warning),
                 ObjectSpawnManager => SpawnSourceAuthoring.Validate(SpawnManagement, out warning),
@@ -172,6 +176,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectDialogue dialogue => dialogue.TryValidate(Dialogue, StartAction, AdvanceAction, out warning),
                 _ => false
             };
+        }
+
+        /// <summary>Restores the local completion reference after a prefab stage has been reopened.</summary>
+        /// <param name="owner">Current object containing the Available Orders component.</param>
+        /// <returns>A resolved copy ready for validation or Apply.</returns>
+        internal OrderSettings ResolveOrders(GameObject owner)
+        {
+            OrderSettings result = ObjectWorkspace.Copy(Orders);
+            result.CompletionSource = null;
+            if (owner != null && OrdersCompletionId != 0)
+                foreach (ObjectInteraction candidate in owner.GetComponents<ObjectInteraction>())
+                    if (ObjectWorkspaceTarget.FileId(candidate) == OrdersCompletionId)
+                    {
+                        result.CompletionSource = candidate;
+                        break;
+                    }
+            return result;
         }
 
         #endregion

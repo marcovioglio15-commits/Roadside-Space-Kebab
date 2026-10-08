@@ -187,6 +187,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (path is "Extended.Unlock" or "Extended.AssemblyProduct")
                 return path + ".Settings";
             path = path.Replace("Unlock.TargetId", "Unlock.Settings.Target").Replace("Unlock.ReplacementId", "Unlock.Settings.Replacement");
+            path = path.Replace("OrdersCompletionId", "Orders.CompletionSource");
             path = Regex.Replace(path, @"Unlock\.SourceIds\.Array\.data\[(\d+)\]", "Unlock.Settings.Conditions.Array.data[$1].Source");
             return Regex.Replace(path, @"AssemblyProduct\.TargetIds\.Array\.data\[(\d+)\]", "AssemblyProduct.Settings.InteractionRules.Array.data[$1].Target");
         }

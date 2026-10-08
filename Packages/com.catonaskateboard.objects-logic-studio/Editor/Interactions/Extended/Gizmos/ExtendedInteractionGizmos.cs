@@ -1,3 +1,4 @@
+using CatOnASkateboard.PlayerStudio;
 using UnityEditor;
 using UnityEngine;
 
@@ -62,17 +63,31 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Gizmos.color = previous;
             if (contact.Settings.Modifications != null)
                 foreach (ContactModificationDefinition definition in contact.Settings.Modifications)
-                    if (definition != null && definition.Settings?.Preparation is { Snap: true } preparation)
-                    {
-                        // Small local pose guides distinguish the snap target from the contact envelope.
-                        Vector3 point = contact.transform.TransformPoint(preparation.Position);
-                        using (new Handles.DrawingScope(new Color(0.35f, 1f, 0.65f, 0.85f)))
-                        {
-                            Handles.DrawDottedLine(contact.transform.position, point, 4f);
-                            Handles.ArrowHandleCap(0, point, contact.transform.rotation * Quaternion.Euler(preparation.Rotation),
-                                HandleUtility.GetHandleSize(point) * 0.35f, EventType.Repaint);
-                        }
-                    }
+                    if (definition != null && definition.Settings?.Preparation != null && definition.Settings.Preparation.TryValidate(out _))
+                        Preparation(contact.transform, definition.Settings.Preparation, definition.Settings.Name);
+        }
+
+        /// <summary>Projects snap and animation endpoints in the same reference spaces used by contact execution.</summary>
+        /// <param name="owner">Modifying object's pivot.</param>
+        /// <param name="settings">Validated preparation coordinates.</param>
+        /// <param name="name">Modification name distinguishing overlapping guides.</param>
+        private static void Preparation(Transform owner, ContactPreparationSettings settings, string name)
+        {
+            // Mark only authored stages and reuse the compact endpoint style from Trigger Animation.
+            if (settings.Snap)
+                using (new Handles.DrawingScope(new Color(0.35f, 1f, 0.65f, 0.85f)))
+                {
+                    Vector3 snap = CommandInteractionGizmos.Endpoint(settings.SnapSpace == ContactPoseSpace.Owner ? owner : null,
+                        new PlayerToolPose { Position = settings.Position, Rotation = settings.Rotation, Scale = Vector3.one }, name + " / Snap");
+                    Handles.DrawDottedLine(owner.position, snap, 4f);
+                }
+            if (!settings.Animate || Application.isPlaying && !settings.AnimateOther && string.IsNullOrEmpty(settings.Path))
+                return;
+            using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.45f, 0.85f, 1f));
+            Transform frame = settings.AnimationSpace == ContactPoseSpace.Owner ? owner : null;
+            Vector3 first = CommandInteractionGizmos.Endpoint(frame, settings.StateA, name + " / A");
+            Vector3 second = CommandInteractionGizmos.Endpoint(frame, settings.StateB, name + " / B");
+            Handles.DrawDottedLine(first, second, 4f);
         }
 
         /// <summary>Shows the authored force direction without drawing lines to every affected scene body.</summary>

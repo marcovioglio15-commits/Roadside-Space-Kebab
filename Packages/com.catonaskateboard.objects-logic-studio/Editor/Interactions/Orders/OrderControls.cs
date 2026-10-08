@@ -30,6 +30,60 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (StudioButton.Draw(new GUIContent("New Catalog", "Create a reusable order catalog asset.")))
                     Create(settings.FindPropertyRelative("Catalog"));
             }
+            Completion(settings, owner);
+        }
+
+        /// <summary>Selects an exact local completion source while retaining portable preset mappings.</summary>
+        /// <param name="settings">Order configuration being edited.</param>
+        /// <param name="owner">Applied object, or null for a preset.</param>
+        private static void Completion(SerializedProperty settings, GameObject owner)
+        {
+            HoverControls.Field(settings, "WaitForCompletion");
+            if (!settings.FindPropertyRelative("WaitForCompletion").boolValue)
+                return;
+            ObjectWorkspace workspace = settings.serializedObject.targetObject as ObjectWorkspace;
+            AvailableOrdersPreset preset = settings.serializedObject.targetObject as AvailableOrdersPreset;
+            owner = owner != null ? owner : HierarchyPathMenu.Source(settings, true);
+            SerializedProperty selection = workspace != null ? settings.serializedObject.FindProperty("Extended.Draft.OrdersCompletionId")
+                : preset != null ? settings.serializedObject.FindProperty("Completion") : settings.FindPropertyRelative("CompletionSource");
+            ObjectInteraction current = workspace != null ? workspace.Extended.Draft.ResolveOrders(owner).CompletionSource
+                : preset == null ? (ObjectInteraction)selection.objectReferenceValue : null;
+            string label = current != null ? current.InteractionName : preset is { Completion: { Assigned: true } } ? preset.Completion.Name : "Select Interaction";
+            Rect rect = EditorGUILayout.GetControlRect();
+            StudioFieldMenu.Context(rect, selection);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(selection));
+            rect = EditorGUI.PrefixLabel(rect, new GUIContent("After Completion", "Reveal the drawn orders after this local interaction completes."));
+            using EditorGUI.DisabledScope unavailable = new EditorGUI.DisabledScope(owner == null);
+            if (!GUI.Button(rect, label, EditorStyles.popup))
+                return;
+            // Only build the candidate list when its menu is opened.
+            UnityEngine.Object target = selection.serializedObject.targetObject;
+            string path = selection.propertyPath;
+            System.Func<bool> guard = StudioFieldMenu.Guard(target, path);
+            GenericMenu menu = new GenericMenu { allowDuplicateNames = true };
+            foreach (ObjectInteraction candidate in owner.GetComponents<ObjectInteraction>())
+            {
+                if (candidate is ObjectAvailableOrders or ObjectInteractionUnlock)
+                    continue;
+                long identity = ObjectWorkspaceTarget.FileId(candidate);
+                InteractionTemplateReference mapping = preset != null ? UnlockPresetMapping.Capture(owner.transform, candidate) : null;
+                menu.AddItem(new GUIContent(candidate.InteractionName), candidate == current, () =>
+                {
+                    if (!guard())
+                        return;
+                    using SerializedObject data = new SerializedObject(target);
+                    SerializedProperty field = data.FindProperty(path);
+                    if (workspace != null)
+                        field.longValue = identity;
+                    else if (preset != null)
+                        field.boxedValue = mapping;
+                    else
+                        field.objectReferenceValue = candidate;
+                    data.ApplyModifiedProperties();
+                    StudioFieldMenu.Notify(target);
+                });
+            }
+            menu.DropDown(rect);
         }
 
         /// <summary>Creates and assigns an empty catalog without changing the applied interaction.</summary>

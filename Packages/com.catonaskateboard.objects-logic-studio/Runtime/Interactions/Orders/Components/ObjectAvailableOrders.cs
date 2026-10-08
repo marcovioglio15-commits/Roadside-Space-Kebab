@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool ready;
         private bool presentationHeld;
         private bool drawn;
+        private bool presentationCompleted;
         private ObjectContactModifier contact;
         private int generation = -1;
 
@@ -84,7 +85,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Publish()
         {
             // Day Flow presentation is allowed during walk paths while gameplay physics is suspended.
-            if (registered || !ready || !presentationHeld && !Available(InteractionChannels.Passive))
+            if (registered || !ready || settings.WaitForCompletion && !presentationCompleted
+                || !presentationHeld && !Available(InteractionChannels.Passive))
                 return;
             if (!drawn || tickets.Length == 0)
                 return;
@@ -151,6 +153,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 OrderQueue.Remove(this);
             registered = false;
             drawn = false;
+            presentationCompleted = false;
             UnexpectedConsumption = false;
             Revision++;
             tickets = Array.Empty<OrderTicket>();
@@ -164,23 +167,33 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="moment">Successful start or completion boundary.</param>
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
+            // Presentation is independent of extraction and may complete before a late-loaded board exists.
+            if (moment == InteractionMoment.Completed && settings.WaitForCompletion && source == settings.CompletionSource)
+            {
+                presentationCompleted = true;
+                Publish();
+            }
             // Each consumed unit fulfils at most one ticket; completed tickets retain their queue positions.
             if (!drawn || source != contact || moment != InteractionMoment.Completed || contact.ConsumedUnits <= 0)
                 return;
             bool changed = false;
             bool complete = true;
             int remaining = contact.ConsumedUnits;
-            foreach (OrderTicket ticket in tickets)
-            {
-                if (remaining > 0 && !ticket.Completed && contact.ConsumedMatches(ticket.Entry.Flags, ticket.Entry.RequireAllFlags))
+            // Specific recipe tickets take precedence over a base order accepting the same root identity.
+            for (int pass = 0; pass < 2 && remaining > 0; pass++)
+                foreach (OrderTicket ticket in tickets)
                 {
+                    if (remaining <= 0)
+                        break;
+                    if (ticket.Completed || (ticket.Candidate.Variant != null) != (pass == 0) || !contact.ConsumedMatches(ticket.Candidate))
+                        continue;
                     ticket.Completed = true;
                     ticket.Board?.Draw(ticket);
                     changed = true;
                     remaining--;
                 }
+            foreach (OrderTicket ticket in tickets)
                 complete &= ticket.Completed;
-            }
             UnexpectedConsumption = remaining > 0;
             Revision++;
             if (changed && complete)
@@ -196,7 +209,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             bool active = false;
             completed = true;
             foreach (OrderTicket ticket in tickets)
-                if (ticket.Entry.Name == order)
+                if (ticket.Name == order)
                 {
                     active = true;
                     completed &= ticket.Completed;

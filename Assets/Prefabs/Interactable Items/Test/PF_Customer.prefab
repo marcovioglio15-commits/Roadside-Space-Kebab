@@ -262,9 +262,16 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 3
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
+    PreferSingleActions: 1
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -276,19 +283,7 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Dialogue
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Gino
-        Text: I'm on a roll... got it? Like a kebab!
-      - Speaker: Gino
-        Text: ... pls don't shoot me!
+    - {fileID: 11400000, guid: 7374e0849c6949098e71bd489d7eed14, type: 2}
     Audio:
       Voice: 1
       Interval: 1
@@ -329,9 +324,20 @@ MonoBehaviour:
   completionBindings: []
   settingsPreset: {fileID: 0}
   drawGizmos: 1
+  action: {fileID: 0}
   settings:
     Modifications:
     - {fileID: 11400000, guid: f438c0378c1d4c918f137331ef727e8e, type: 2}
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
 --- !u!114 &4771604094856511517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,9 +374,16 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 1
+    PreferSingleActions: 1
     RequireSightToStart: 0
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -382,18 +395,7 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Dialogue
-      Weight: 1
-      Consumption:
-        Enabled: 1
-        RequiredFlags: []
-        Orders:
-        - "Panino gnam gnam"
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Gino
-        Text: GnamGnamGnam
+    - {fileID: 11400000, guid: 7ecbb4a3f75543949f00752f39f33ae1, type: 2}
     Audio:
       Voice: 1
       Interval: 3
@@ -459,9 +461,16 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 1
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
+    PreferSingleActions: 1
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -473,19 +482,7 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Dialogue
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Gino
-        Text: Hey, that tasted like shit, you moron!
-      - Speaker: Gino
-        Text: I want my money back!
+    - {fileID: 11400000, guid: 6eadeb0920f143cd8f7bb4e58f1d103a, type: 2}
     Audio:
       Voice: 1
       Interval: 1
@@ -540,6 +537,8 @@ MonoBehaviour:
       Action: {fileID: 0}
       Distance: 3
       Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
 --- !u!114 &2534361684040139323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -588,6 +587,8 @@ MonoBehaviour:
       Action: {fileID: 0}
       Distance: 3
       Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
 --- !u!114 &962167144239944056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -638,9 +639,16 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 0
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
+    PreferSingleActions: 1
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -652,19 +660,7 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     Entries:
-    - Name: Dialogue
-      Weight: 1
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-      Lines:
-      - Speaker: Gino
-        Text: Yum! Loved it!
-      - Speaker: Gino
-        Text: Bye!
+    - {fileID: 11400000, guid: 3e0b155bdd9d430293672d88fa01e369, type: 2}
     Audio:
       Voice: 1
       Interval: 1
@@ -706,7 +702,9 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Board: "Orders"
+    Board: Orders
     DrawCount: 1
     Selection: 0
     Catalog: {fileID: 11400000, guid: 172dcc78f3844de9b52c0acf2091da7c, type: 2}
+    WaitForCompletion: 0
+    CompletionSource: {fileID: 0}

@@ -29,6 +29,8 @@ namespace CatOnASkateboard.PlayerStudio
         private Vector3 actualVelocity;
         private PlayerJumpState jumpState;
         private readonly PlayerAudioMotion audio = new PlayerAudioMotion();
+        private readonly PlayerFloatingMotion floating = new PlayerFloatingMotion();
+        private float walkingStepOffset;
         private Vector3 moveVelocity;
         private bool wasGrounded;
         private float verticalVelocity;
@@ -59,6 +61,8 @@ namespace CatOnASkateboard.PlayerStudio
 
         /// <summary>Most recent initialization issue, retained for Editor diagnostics.</summary>
         public string InitializationWarning => initializationWarning;
+        /// <summary>Whether external sources currently replace locomotion with weightless body simulation.</summary>
+        public bool IsGravitySuspended => floating.Active;
 
         #endregion
 
@@ -87,6 +91,8 @@ namespace CatOnASkateboard.PlayerStudio
         {
             // Re-enabling begins from rest instead of replaying a previous velocity.
             initialized = false;
+            RestoreStepOffset();
+            floating.Reset();
             ResetMotion();
         }
 
@@ -123,7 +129,7 @@ namespace CatOnASkateboard.PlayerStudio
             PlayerButtonSignal jump = input != null ? input.ConsumeJump() : default;
             if (!jump.IsActive || jump.Interrupted)
                 jumpState.Reset();
-            if (jump.IsActive && jumpState.TryStart(jump.Pressed, IsGrounded, Time.timeAsDouble, settings.Jump))
+            if (!floating.Active && jump.IsActive && jumpState.TryStart(jump.Pressed, IsGrounded, Time.timeAsDouble, settings.Jump))
                 verticalVelocity = settings.Jump.LaunchSpeed;
 
             // Convert intent before acceleration so stored velocity always remains in world space.
@@ -134,8 +140,21 @@ namespace CatOnASkateboard.PlayerStudio
                 Vector3 world = frame * new Vector3(command.x, 0f, command.y);
                 command = new Vector2(world.x, world.z);
             }
-            Vector3 displacement = PlayerPlanarMotion.Advance(ref requestedVelocity, command, settings, Time.deltaTime);
-            displacement.y = PlayerVerticalMotion.Advance(ref verticalVelocity, IsGrounded, settings.Gravity, Time.deltaTime);
+            Vector3 displacement;
+            if (floating.Active)
+            {
+                Vector3 direction = new Vector3(command.x, 0f, command.y);
+                if (floating.Settings.FollowCameraPitch && cameraRig != null && cameraRig.View != null)
+                    direction = cameraRig.View.transform.rotation * new Vector3(input.Movement.x, 0f, input.Movement.y);
+                displacement = floating.Advance(direction, jump, Time.deltaTime);
+                requestedVelocity = new Vector3(floating.Velocity.x, 0f, floating.Velocity.z);
+                verticalVelocity = floating.Velocity.y;
+            }
+            else
+            {
+                displacement = PlayerPlanarMotion.Advance(ref requestedVelocity, command, settings, Time.deltaTime);
+                displacement.y = PlayerVerticalMotion.Advance(ref verticalVelocity, IsGrounded, settings.Gravity, Time.deltaTime);
+            }
             actualVelocity = Vector3.zero;
             wasGrounded = IsGrounded;
             collisions = CollisionFlags.None;
@@ -155,10 +174,12 @@ namespace CatOnASkateboard.PlayerStudio
             Vector3 previousPosition = transform.position;
             moveVelocity = displacement / Time.deltaTime;
             collisions = controller.Move(displacement);
-            if (IsGrounded || ((collisions & CollisionFlags.Above) != 0 && verticalVelocity > 0f))
+            if (floating.Active)
+                verticalVelocity = floating.Velocity.y;
+            else if (IsGrounded || ((collisions & CollisionFlags.Above) != 0 && verticalVelocity > 0f))
                 verticalVelocity = 0f;
             actualVelocity = (transform.position - previousPosition) / Time.deltaTime;
-            audio.Tick(actualVelocity, IsGrounded, cameraRig != null && cameraRig.HeadTiltActive);
+            audio.Tick(actualVelocity, !floating.Active && IsGrounded, cameraRig != null && cameraRig.HeadTiltActive);
         }
 
         #endregion
@@ -178,6 +199,8 @@ namespace CatOnASkateboard.PlayerStudio
         /// <returns>True when this active motor is ready to consume its assigned input during Play.</returns>
         public bool TryInitialize(out string warning)
         {
+            RestoreStepOffset();
+            floating.Reset();
             // Invalid setup stays disabled internally; do not add components or repair presets automatically here.
             ResetMotion();
             initialized = false;
@@ -216,7 +239,7 @@ namespace CatOnASkateboard.PlayerStudio
         internal void PlayFootstep()
         {
             // A disabled motor cannot emit camera-driven walking sounds.
-            if (initialized && isActiveAndEnabled)
+            if (initialized && isActiveAndEnabled && !floating.Active)
                 audio.Step();
         }
 
@@ -224,6 +247,7 @@ namespace CatOnASkateboard.PlayerStudio
         /// <param name="hit">Actual controller contact.</param>
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
+            floating.Contact(hit.normal, hit.rigidbody);
             // Capture requested impact speed before collision response reduces achieved motion.
             if (initialized)
                 audio.Contact(hit, moveVelocity, wasGrounded);
@@ -232,6 +256,53 @@ namespace CatOnASkateboard.PlayerStudio
         #endregion
 
         #region Motion State
+
+        /// <summary>Temporarily replaces gravity with a leased virtual-body simulation using the existing controller.</summary>
+        /// <param name="owner">Source that must release the suspension when its effect ends.</param>
+        /// <param name="configuration">Virtual mass, damping, controls and contact policy.</param>
+        /// <param name="force">World impulse for zero duration, otherwise world acceleration.</param>
+        /// <param name="duration">Sustained-force seconds; zero applies one impulse.</param>
+        /// <returns>True when the initialized motor acquired this source.</returns>
+        public bool SuspendGravity(Object owner, PlayerFloatSettings configuration, Vector3 force, float duration)
+        {
+            // Invalid requests leave ordinary locomotion and other suspension owners intact.
+            if (!initialized || !isActiveAndEnabled || controller == null || !controller.enabled || owner == null
+                || configuration == null || !configuration.TryValidate(out _) || !float.IsFinite(duration) || duration < 0f
+                || !float.IsFinite(force.x) || !float.IsFinite(force.y) || !float.IsFinite(force.z))
+                return false;
+            Vector3 initial = actualVelocity;
+            if (IsGrounded)
+                initial.y = 0f;
+            jumpState.Reset();
+            if (!floating.Active)
+            {
+                walkingStepOffset = controller.stepOffset;
+                controller.stepOffset = 0f;
+            }
+            return floating.Acquire(owner, configuration, initial, force, duration);
+        }
+
+        /// <summary>Restores normal movement only when this was the final active suspension source.</summary>
+        /// <param name="owner">Source whose pulse has ended or been cancelled.</param>
+        public void RestoreGravity(Object owner)
+        {
+            bool suspended = floating.Active;
+            if (!floating.Release(owner, out Vector3 velocity))
+                return;
+            if (suspended && controller != null)
+                controller.stepOffset = walkingStepOffset;
+            requestedVelocity = new Vector3(velocity.x, 0f, velocity.z);
+            verticalVelocity = settings.Gravity.Enabled ? Mathf.Max(-settings.Gravity.TerminalSpeed, velocity.y) : 0f;
+            collisions = CollisionFlags.None;
+            jumpState.Reset();
+        }
+
+        /// <summary>Restores ground stepping before discarding a suspended motor's state.</summary>
+        private void RestoreStepOffset()
+        {
+            if (floating.Active && controller != null)
+                controller.stepOffset = walkingStepOffset;
+        }
 
         /// <summary>Clears requested and achieved velocity without changing scene position.</summary>
         private void ResetMotion()

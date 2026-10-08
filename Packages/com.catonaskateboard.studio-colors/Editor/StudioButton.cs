@@ -46,14 +46,16 @@ namespace CatOnASkateboard.StudioColors.Editor
         /// <summary>Reserves the label's natural width and applies the current field indentation.</summary>
         /// <param name="label">Command text and tooltip.</param>
         /// <param name="style">Optional native button style.</param>
+        /// <param name="expandWidth">Fill the available row width for persistent footer actions.</param>
+        /// <param name="minimumHeight">Optional minimum height for prominent actions.</param>
         /// <returns>True when the command was clicked.</returns>
-        public static bool Draw(GUIContent label, GUIStyle style = null)
+        public static bool Draw(GUIContent label, GUIStyle style = null, bool expandWidth = false, float minimumHeight = 0f)
         {
             // GUILayout buttons ignore indentLevel; reserve that space explicitly before drawing the hit area.
             style ??= GUI.skin.button;
             Vector2 size = style.CalcSize(label);
             Rect rect = GUILayoutUtility.GetRect(size.x + EditorGUI.IndentedRect(new Rect()).x,
-                Mathf.Max(EditorGUIUtility.singleLineHeight, size.y), GUILayout.ExpandWidth(false));
+                Mathf.Max(Mathf.Max(EditorGUIUtility.singleLineHeight, size.y), minimumHeight), GUILayout.ExpandWidth(expandWidth));
             return GUI.Button(EditorGUI.IndentedRect(rect), label, style);
         }
 

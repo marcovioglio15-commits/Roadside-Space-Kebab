@@ -197,9 +197,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectInteraction current = property.objectReferenceValue as ObjectInteraction;
             Rect rect = EditorGUILayout.GetControlRect();
             rect = EditorGUI.PrefixLabel(rect, new GUIContent(title, property.tooltip));
-            if (!GUI.Button(rect, current != null ? current.InteractionName + " (" + current.GetType().Name + ")" : "Select Interaction", EditorStyles.popup))
+            if (!GUI.Button(rect, current != null ? current.InteractionName : "Select Interaction", EditorStyles.popup))
                 return;
-            GenericMenu menu = new GenericMenu();
+            GenericMenu menu = new GenericMenu { allowDuplicateNames = true };
             if (prefab != null)
                 foreach (ObjectInteraction source in prefab.GetComponentsInChildren<ObjectInteraction>(true))
                     if (source is not ObjectSpawnManager && (!dialogueOnly || source is ObjectDialogue))
@@ -207,9 +207,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         ObjectInteraction selected = source;
                         string path = property.propertyPath;
                         SerializedObject data = property.serializedObject;
-                        string label = AnimationUtility.CalculateTransformPath(source.transform, prefab.transform);
-                        menu.AddItem(new GUIContent((label.Length > 0 ? label + "/" : string.Empty) + source.InteractionName
-                            + " (" + source.GetType().Name + ", " + ObjectWorkspaceTarget.FileId(source) + ")"), current == source, () =>
+                        menu.AddItem(new GUIContent(source.InteractionName), current == source, () =>
                         {
                             data.Update();
                             data.FindProperty(path).objectReferenceValue = selected;

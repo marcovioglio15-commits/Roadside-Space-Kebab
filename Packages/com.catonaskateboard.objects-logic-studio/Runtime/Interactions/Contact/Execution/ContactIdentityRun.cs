@@ -35,6 +35,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Evaluation
 
+        /// <summary>Reads the exact contact timer for its independently anchored effect.</summary>
+        /// <param name="item">Participant retained by the start effect.</param>
+        /// <returns>True while this participant is still being modified.</returns>
+        internal bool IsModifying(ObjectItem item)
+        {
+            return item != null && entries.TryGetValue(item, out Contact contact) && contact.Running;
+        }
+
         /// <summary>Updates existing contacts and starts independent timers for newly eligible items.</summary>
         /// <param name="owner">Modifier supplying flag operations and timing.</param>
         /// <param name="contacts">Current physical contacts, including items whose flags have already changed.</param>
@@ -113,7 +121,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     item.Identity.SetTemporary(owner, owner.Settings.ContactFlag, owner.Settings.ContactFlagOperation);
                 contact.Applied = true;
                 ReleaseTransition(owner, item, contact);
-                owner.Signal(InteractionMoment.Completed);
+                owner.Signal(InteractionMoment.Completed, item);
             }
         }
 
@@ -139,7 +147,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             contact.Started = Time.time;
             contact.Running = true;
             running++;
-            owner.Signal(InteractionMoment.Started);
+            owner.Signal(InteractionMoment.Started, item);
             return true;
         }
 

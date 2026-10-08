@@ -28,6 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ItemAppearanceChanges appearance;
         private AssemblyPartVisibility visibility;
         private readonly Dictionary<Collider, Collider> shapes = new Dictionary<Collider, Collider>();
+        private ObjectFlag[] ingredientFlags = System.Array.Empty<ObjectFlag>();
 
         #endregion
 
@@ -37,6 +38,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ObjectAssemblyProduct Product => attached ? product : null;
         /// <summary>Recipe flag recorded at insertion, independent of later product flag changes.</summary>
         public ObjectFlag IngredientFlag { get; private set; }
+        /// <summary>Complete ingredient identity captured at insertion, including nested assembled ingredient recipes.</summary>
+        internal IReadOnlyList<ObjectFlag> IngredientFlags => ingredientFlags;
         /// <summary>Logical units captured at insertion, independent of later Grab setting changes.</summary>
         public int Units { get; private set; }
         /// <summary>Occupied slot in the product's recipe layout.</summary>
@@ -67,6 +70,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             appearance.Commit();
             product = owner;
             IngredientFlag = flag;
+            // Preserve every insertion flag, not only the single category selected by the recipe magnet.
+            HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>(grab.Item.Identity.ActiveFlags);
+            if (ingredient != null && ingredient.IsComplete)
+                ingredient.CollectIngredientFlags(flags);
+            ingredientFlags = new ObjectFlag[flags.Count];
+            flags.CopyTo(ingredientFlags);
             Units = grab.Units;
             MagnetIndex = index;
             body = grab.Body;

@@ -149,6 +149,7 @@ MonoBehaviour:
           Mesh: {fileID: -5720851812767739229, guid: f48f102d2a2217149b28cfb678745073, type: 3}
           UpdateCollider: 0
         Materials: []
+        Visibility: []
     - Count: 5
       Appearance:
         Meshes:
@@ -156,6 +157,7 @@ MonoBehaviour:
           Mesh: {fileID: -593475255681766224, guid: 30348a1d778fef94e85d8994875f24be, type: 3}
           UpdateCollider: 0
         Materials: []
+        Visibility: []
     - Count: 8
       Appearance:
         Meshes:
@@ -163,6 +165,14 @@ MonoBehaviour:
           Mesh: {fileID: -1834084389826122708, guid: 869515fad51fc994b93f5a04a8d0b0c1, type: 3}
           UpdateCollider: 0
         Materials: []
+        Visibility: []
+    - Count: 10
+      Appearance:
+        Meshes: []
+        Materials: []
+        Visibility:
+        - Path: SM_ShawarmaStack_1Full
+          Visible: 0
 --- !u!114 &6841947802560516959
 MonoBehaviour:
   m_ObjectHideFlags: 0

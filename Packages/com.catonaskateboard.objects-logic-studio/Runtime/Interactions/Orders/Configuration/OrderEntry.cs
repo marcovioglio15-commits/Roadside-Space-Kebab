@@ -25,6 +25,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Require all selected flags on the same consumed item. Otherwise any selected flag qualifies.")]
         public bool RequireAllFlags;
+        [Header("Recipe Modifiers")]
+        [Tooltip("Add independently drawn variants requiring flags from ingredients inserted into a completed Assembly Product.")]
+        public bool UseRecipeModifiers;
+        [Tooltip("Keep the base order as a candidate alongside its variants. Base orders retain their normal identity filters; matching variant tickets are fulfilled first.")]
+        public bool IncludeBaseOrder = true;
+        [Tooltip("Recipe-specific names, board text, weights and ingredient flag filters. Each variant inherits this order's identity flags and quantity.")]
+        public OrderRecipeVariant[] Variants = Array.Empty<OrderRecipeVariant>();
 
         #endregion
     }

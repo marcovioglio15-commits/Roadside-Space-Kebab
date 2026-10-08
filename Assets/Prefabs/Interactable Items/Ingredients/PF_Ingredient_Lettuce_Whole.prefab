@@ -252,6 +252,7 @@ GameObject:
   - component: {fileID: 3944654813433322829}
   - component: {fileID: 5987195386809859929}
   - component: {fileID: 8834736741460893502}
+  - component: {fileID: 482097563746480873}
   m_Layer: 6
   m_Name: PF_Ingredient_Lettuce_Whole
   m_TagString: Untagged
@@ -377,6 +378,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -453,6 +455,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -517,6 +520,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -592,6 +596,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -641,6 +646,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -697,6 +703,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -712,6 +719,88 @@ MonoBehaviour:
     HoverOnly: 1
   renderers:
   - {fileID: 5282017039685377823}
+--- !u!114 &482097563746480873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6191959766604075906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d329c6bfc475d46468b93619a4c446e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDegradation
+  interactionName: Object Degradation
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Mode: 0
+    Carry: 2
+    MinimumImpulse: 1
+    ImpactInterval: 0.1
+    Steps:
+    - Name: Stage
+      Duration: 3
+      Impacts: 1
+      Appearance:
+        Meshes: []
+        Materials:
+        - Path: SM_Ingredient_Lettuce_Whole
+          Materials:
+          - {fileID: 2100000, guid: b4c54499bfa63404e83ec53945686245, type: 2}
+        Visibility: []
+      ChangeFlag: 0
+      Flag: {fileID: 0}
+      Operation: 0
+    - Name: Stage
+      Duration: 3
+      Impacts: 1
+      Appearance:
+        Meshes: []
+        Materials:
+        - Path: SM_Ingredient_Lettuce_Whole
+          Materials:
+          - {fileID: 2100000, guid: 8f538d34a5f4d604d92855661debc98d, type: 2}
+        Visibility: []
+      ChangeFlag: 0
+      Flag: {fileID: 0}
+      Operation: 0
+    - Name: Stage
+      Duration: 4
+      Impacts: 1
+      Appearance:
+        Meshes: []
+        Materials:
+        - Path: SM_Ingredient_Lettuce_Whole
+          Materials:
+          - {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
+        Visibility: []
+      ChangeFlag: 0
+      Flag: {fileID: 0}
+      Operation: 0
+    DestroyAtEnd: 0
+    Fragments: []
 --- !u!1001 &6813078871704028059
 PrefabInstance:
   m_ObjectHideFlags: 0

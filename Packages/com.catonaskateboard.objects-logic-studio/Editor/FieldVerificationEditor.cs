@@ -121,14 +121,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             DialoguePreset a = ScriptableObject.CreateInstance<DialoguePreset>();
             DialoguePreset b = ScriptableObject.CreateInstance<DialoguePreset>();
-            a.Settings.Entries = new[] { new DialogueEntry { Name = "A", Lines = new[] { new DialogueLine { Text = "Copied", Speaker = "Guest" } } }, new DialogueEntry { Name = "B" } };
+            DialogueEntry first = ScriptableObject.CreateInstance<DialogueEntry>();
+            first.Name = "A";
+            first.Lines = new[] { new DialogueLine { Text = "Copied", Speaker = "Guest" } };
+            DialogueEntry second = ScriptableObject.CreateInstance<DialogueEntry>();
+            second.Name = "B";
+            a.Settings.Entries = new[] { first, second };
             using SerializedObject from = new SerializedObject(a);
             using SerializedObject to = new SerializedObject(b);
             StudioPropertyValue copied = new StudioPropertyValue(from.FindProperty("Settings.Entries"));
             a.Settings.Entries[0].Lines[0].Text = "Changed after Copy";
             copied.Apply(to.FindProperty("Settings.Entries"));
             to.ApplyModifiedPropertiesWithoutUndo();
-            Check(b.Settings.Entries.Length == 2 && b.Settings.Entries[0].Lines[0].Text == "Copied", "Nested arrays deep-copy independently");
+            Check(b.Settings.Entries.Length == 2 && b.Settings.Entries[0] == first && b.Settings.Entries[1] == second,
+                "Entry arrays preserve shared preset references");
+            UnityEngine.Object.DestroyImmediate(first);
+            UnityEngine.Object.DestroyImmediate(second);
             StudioPropertyValue number = new StudioPropertyValue(from.FindProperty("Settings.Distance"));
             Check(!number.Accepts(to.FindProperty("Settings.Priority")), "Incompatible numeric types rejected");
             StudioPropertyValue mode = new StudioPropertyValue(from.FindProperty("Settings.Trigger"));

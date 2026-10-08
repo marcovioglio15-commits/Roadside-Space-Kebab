@@ -15,7 +15,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Draws one independently enabled consumption filter.</summary>
         /// <param name="filter">Serialized filter on an entry or interaction.</param>
         /// <param name="label">Scope shown beside the enabling toggle.</param>
-        internal static void Draw(SerializedProperty filter, string label)
+        /// <param name="catalog">Optional order catalog used by an independent entry window.</param>
+        internal static void Draw(SerializedProperty filter, string label, OrderCatalog catalog = null)
         {
             HoverControls.Field(filter, "Enabled", label);
             if (!filter.FindPropertyRelative("Enabled").boolValue)
@@ -28,10 +29,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 _ => null
             };
             ObjectAvailableOrders orders = root != null ? root.GetComponent<ObjectAvailableOrders>() : null;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             if (orders != null)
+                catalog = orders.Settings.Catalog;
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            if (orders != null || catalog != null)
             {
-                Names(filter.FindPropertyRelative("Orders"), orders.Settings);
+                Names(filter.FindPropertyRelative("Orders"), catalog != null ? catalog.OrderNames() : Array.Empty<string>());
                 HoverControls.Field(filter, "Result");
                 if (filter.FindPropertyRelative("Orders").arraySize > 1)
                     HoverControls.Field(filter, "RequireAll");
@@ -54,8 +57,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Draws a multiple-choice menu retaining missing names until explicitly removed.</summary>
         /// <param name="property">Selected order names.</param>
-        /// <param name="settings">Local available order catalog.</param>
-        private static void Names(SerializedProperty property, OrderSettings settings)
+        /// <param name="entries">Local or explicitly selected base and recipe-variant names.</param>
+        private static void Names(SerializedProperty property, IEnumerable<string> entries)
         {
             List<string> selected = new List<string>();
             for (int index = 0; index < property.arraySize; index++)
@@ -68,9 +71,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             GenericMenu menu = new GenericMenu();
             HashSet<string> names = new HashSet<string>(selected);
-            foreach (OrderEntry entry in settings.Entries)
-                if (entry != null && !string.IsNullOrWhiteSpace(entry.Name))
-                    names.Add(entry.Name);
+            foreach (string entry in entries)
+                if (!string.IsNullOrWhiteSpace(entry))
+                    names.Add(entry);
             UnityEngine.Object owner = property.serializedObject.targetObject;
             string path = property.propertyPath;
             Func<bool> guard = StudioFieldMenu.Guard(owner, path);

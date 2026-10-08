@@ -24,8 +24,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (target == null)
                 return;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.45f, 0.85f, 1f));
-            Vector3 first = Endpoint(target.parent, feature.Settings.StateA, "A");
-            Vector3 second = Endpoint(target.parent, feature.Settings.StateB, "B");
+            Vector3 first = Endpoint(target.parent, feature.Settings.StateA, "State A");
+            Vector3 second = Endpoint(target.parent, feature.Settings.StateB, "State B");
             Handles.DrawDottedLine(first, second, 4f);
         }
 
@@ -34,14 +34,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="pose">Local endpoint.</param>
         /// <param name="label">Short endpoint identifier.</param>
         /// <returns>World position used for the connecting guide.</returns>
-        private static Vector3 Endpoint(Transform parent, PlayerToolPose pose, string label)
+        internal static Vector3 Endpoint(Transform parent, PlayerToolPose pose, string label)
         {
             // Screen-relative marker sizes remain readable at different scene-view zoom levels.
             Vector3 position = parent != null ? parent.TransformPoint(pose.Position) : pose.Position;
             Quaternion rotation = (parent != null ? parent.rotation : Quaternion.identity) * Quaternion.Euler(pose.Rotation);
             float size = HandleUtility.GetHandleSize(position) * 0.12f;
             Handles.ArrowHandleCap(0, position, rotation, size, EventType.Repaint);
-            Handles.Label(position + Vector3.up * size, "State " + label);
+            Handles.Label(position + Vector3.up * size, label);
             return position;
         }
 

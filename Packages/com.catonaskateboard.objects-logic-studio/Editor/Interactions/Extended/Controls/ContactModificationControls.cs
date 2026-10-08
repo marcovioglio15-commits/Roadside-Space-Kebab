@@ -23,8 +23,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty entry = modifications.GetArrayElementAtIndex(index);
                 ContactModificationDefinition definition = entry.objectReferenceValue as ContactModificationDefinition;
                 string name = definition != null && definition.Settings != null ? definition.Settings.Name : "Modification " + (index + 1);
-                if (StudioArrayGUI.Header(modifications, index, new GUIContent(name, "Reusable flag-filtered contact modification.")))
-                    break;
+                using (new EditorGUI.IndentLevelScope())
+                    if (StudioArrayGUI.Header(modifications, index, new GUIContent(name, "Reusable flag-filtered contact modification.")))
+                        break;
                 if (!entry.isExpanded)
                     continue;
                 using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();

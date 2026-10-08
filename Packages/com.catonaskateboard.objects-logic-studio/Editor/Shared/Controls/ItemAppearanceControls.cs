@@ -25,6 +25,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             GameObject source = HierarchyPathMenu.Source(settings, explicitSource, suggested);
             DrawList(settings.FindPropertyRelative("Meshes"), source, true);
             DrawList(settings.FindPropertyRelative("Materials"), source, false);
+            DrawVisibility(settings.FindPropertyRelative("Visibility"), source);
+        }
+
+        /// <summary>Edits reversible renderer visibility with the same owned-hierarchy picker as materials.</summary>
+        /// <param name="array">Visibility changes on this appearance step.</param>
+        /// <param name="source">Object supplying the available renderers.</param>
+        private static void DrawVisibility(SerializedProperty array, GameObject source)
+        {
+            array.isExpanded = StudioArrayGUI.Foldout(array, new GUIContent("Renderer Visibility (" + array.arraySize + ")", array.tooltip));
+            if (!array.isExpanded)
+                return;
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            for (int index = 0; index < array.arraySize; index++)
+            {
+                if (StudioArrayGUI.Header(array, index, new GUIContent("Renderer " + (index + 1), "Show or hide an existing renderer.")))
+                    break;
+                SerializedProperty entry = array.GetArrayElementAtIndex(index);
+                if (!entry.isExpanded)
+                    continue;
+                HierarchyPathMenu.Draw(entry.FindPropertyRelative("Path"), source, false);
+                HoverControls.Field(entry, "Visible");
+            }
+            StudioArrayGUI.Add(array, "Add Renderer Visibility", () => new ItemVisibilitySettings());
         }
 
         /// <summary>Edits replacement rows without allowing free-form hierarchy routes.</summary>

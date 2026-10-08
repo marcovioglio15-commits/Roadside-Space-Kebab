@@ -21,6 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly Dictionary<ObjectItem, float> entered = new Dictionary<ObjectItem, float>();
         private readonly List<ObjectItem> departed = new List<ObjectItem>();
         private ObjectItem other;
+        private ObjectItem signalingOther;
         private ContactEffectRun selfEffect;
         private ContactEffectRun otherEffect;
         private float nextQuery;
@@ -40,6 +41,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Flags, timing and effects owned by this independent modification.</summary>
         internal ContactModificationRule Settings => settings;
+        /// <summary>Exact counterpart retained by this rule until its transaction releases.</summary>
+        internal ObjectItem Counterpart => signalingOther != null ? signalingOther : other;
         /// <summary>Shared item whose reservations use this run as a distinct ownership token.</summary>
         internal ObjectItem Item => owner != null ? owner.Item : null;
         /// <summary>Whether the containing interaction remains active.</summary>
@@ -156,7 +159,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else
                 preparation.Tick(Time.deltaTime);
             if (!settings.WhileContact && (IsLocked || !ToolAllowed || !Eligible(other)
-                || !settings.Preparation.Snap && !settings.CompleteAfterSeparation && !contacts.Contains(other)))
+                || !settings.Preparation.HoldsOther && !settings.CompleteAfterSeparation && !contacts.Contains(other)))
             {
                 Interrupt();
                 return;
@@ -189,9 +192,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Publishes a rule event while preserving its duration and reversible identity context.</summary>
         /// <param name="moment">Successful start or completion boundary.</param>
-        internal void Signal(InteractionMoment moment)
+        /// <param name="participant">Exact identity-only contact, or null for the reserved appearance participant.</param>
+        internal void Signal(InteractionMoment moment, ObjectItem participant = null)
         {
-            owner.Publish(this, moment, Array.Empty<ObjectFlag>(), 0);
+            // Temporary context lets simultaneous flag-only contacts anchor independent effects.
+            signalingOther = participant;
+            try
+            {
+                owner.Publish(this, moment, Array.Empty<ObjectFlag>(), 0);
+            }
+            finally
+            {
+                signalingOther = null;
+            }
+        }
+
+        /// <summary>Checks effect lifetime against its original contact instead of another active item.</summary>
+        /// <param name="participant">Participant captured when the effect started.</param>
+        /// <returns>True while this contact still owns its timed operation.</returns>
+        internal bool KeepsEffect(ObjectItem participant)
+        {
+            return settings.IdentityOnly ? identityRun.IsModifying(participant) : other == participant && (IsRunning || IsPaused);
         }
 
         #endregion
@@ -285,7 +306,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Item.Release(this);
                 return;
             }
-            if (!ContactEffectRun.TryPrepare(Item, settings.Self, out selfEffect, out string warning)
+            if (!settings.Preparation.ValidateTarget(settings.Preparation.AnimateOther ? candidate : Item, out string warning)
+                || !ContactEffectRun.TryPrepare(Item, settings.Self, out selfEffect, out warning)
                 || !ContactEffectRun.TryPrepare(candidate, settings.Other, out otherEffect, out warning))
             {
                 Item.Release(this);
@@ -298,7 +320,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             other = candidate;
             revertAt = -1f;
             Item.Acquire(this, settings.BlockSelf);
-            candidate.Acquire(this, settings.BlockOther | (settings.Preparation.Snap ? InteractionChannels.Grab : InteractionChannels.None));
+            candidate.Acquire(this, settings.BlockOther | (settings.Preparation.HoldsOther ? InteractionChannels.Grab : InteractionChannels.None));
             started = Time.time;
             elapsed = 0f;
             running = true;
@@ -315,7 +337,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Interrupt()
         {
             // Keep visual ownership so another modifier cannot overwrite the retained baseline.
-            if (settings.Preparation.Snap || !settings.ResumeAfterInterruption)
+            if (settings.Preparation.HoldsOther || !settings.ResumeAfterInterruption)
             {
                 Cancel();
                 return;
@@ -341,6 +363,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ObjectItem victim = settings.Self.Consume ? Item : other;
             int units = victim != null && victim.TryGetComponent(out ObjectGrab grab) ? grab.Units : 1;
             bool consumed = false;
+            ObjectFlag[] ingredients = (settings.Self.Consume || settings.Other.Consume) && victim != null
+                && victim.TryGetComponent(out ObjectAssemblyProduct product) ? product.CaptureIngredientFlags() : Array.Empty<ObjectFlag>();
             if (settings.Self.Consume)
                 consumed = other.Consume(Item, this, out receipt);
             else if (settings.Other.Consume)
@@ -365,7 +389,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else
                 Release();
             // Expose this receipt only during the exact completion event, including self-consumption.
-            owner.Publish(this, InteractionMoment.Completed, receipt, consumed ? units : 0);
+            owner.Publish(this, InteractionMoment.Completed, receipt, consumed ? units : 0, ingredients);
         }
 
         /// <summary>Restores an active or completed temporary change after uninterrupted separation.</summary>

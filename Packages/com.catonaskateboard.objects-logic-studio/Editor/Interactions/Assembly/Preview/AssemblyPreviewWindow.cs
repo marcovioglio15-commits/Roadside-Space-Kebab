@@ -186,9 +186,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new StudioButton.RowScope())
             using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
             {
-                if (StudioButton.Draw(new GUIContent("Apply", "Validate and save only this window's magnet layout.")))
+                if (StudioButton.Draw(new GUIContent("Apply", "Validate and save only this window's magnet layout."), expandWidth: true, minimumHeight: 26f))
                     SaveChanges();
-                if (StudioButton.Draw(new GUIContent("Discard", "Abandon this layout proposal and reload the product.")))
+                if (StudioButton.Draw(new GUIContent("Discard", "Abandon this layout proposal and reload the product."), expandWidth: true, minimumHeight: 26f))
                     DiscardChanges();
             }
             GUILayout.EndArea();

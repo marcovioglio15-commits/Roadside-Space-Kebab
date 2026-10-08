@@ -72,7 +72,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     state.Extended.Draft.GravityGenerator = ObjectWorkspace.Copy(gravity.Settings);
                     break;
                 case AvailableOrdersPreset orders:
+                    GameObject owner = state.Target.Resolve();
+                    ObjectInteraction completion = UnlockPresetMapping.Resolve(orders.Completion, owner.transform, owner.GetComponents<ObjectInteraction>());
+                    OrderSettings proposal = ObjectWorkspace.Copy(orders.Settings);
+                    proposal.CompletionSource = completion;
+                    if (!proposal.ValidateCompletion(owner, out warning))
+                    {
+                        Debug.LogWarning(warning, orders);
+                        return;
+                    }
                     state.Extended.Draft.Orders = ObjectWorkspace.Copy(orders.Settings);
+                    state.Extended.Draft.Orders.CompletionSource = null;
+                    state.Extended.Draft.OrdersCompletionId = completion != null ? ObjectWorkspaceTarget.FileId(completion) : 0;
                     break;
                 case AssemblyProductPreset product:
                     if (!AssemblyProductPresetMapping.TryResolve(product, state.Target.Resolve(), out AssemblyProductDraft draft, out warning))

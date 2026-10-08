@@ -297,6 +297,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Table = null;
         }
 
+        /// <summary>Lets an active gravity pulse free a table-retained product without interrupting another transaction.</summary>
+        internal void ReleaseForSuspension()
+        {
+            // Ingredient bodies belong to the composite root; only independent active products may leave the table.
+            if (!initialized || !isActiveAndEnabled || !Item.isActiveAndEnabled || Item.IsConsumed || Item.IsReserved || Item.IsCarried
+                || Table == null && !(TryGetComponent(out ObjectGrab grab) && grab.Dock != null))
+                return;
+            ReleaseTable();
+            body.isKinematic = false;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            body.WakeUp();
+        }
+
         /// <summary>Attaches exactly one carried ingredient after every recipe and ownership check succeeds.</summary>
         /// <param name="grab">Ingredient currently occupying the observer's carry slot.</param>
         /// <param name="requireHeld">Whether insertion comes from the player carry slot.</param>
@@ -386,6 +399,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 pendingCompletion = false;
                 Signal(InteractionMoment.Completed);
             }
+            ObjectGravityGenerator.IncludeSpawn(gameObject);
         }
 
         /// <summary>Updates quantity, mass and locks after an ingredient is detached or destroyed externally.</summary>
@@ -412,6 +426,31 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // An absent flag never acts as a wildcard.
             return flag != null && counts.TryGetValue(flag, out int count) ? count : 0;
+        }
+
+        /// <summary>Collects insertion identities only from ingredients still belonging to this assembled product.</summary>
+        /// <param name="destination">Caller-owned set receiving recipe modifier identities.</param>
+        internal void CollectIngredientFlags(HashSet<ObjectFlag> destination)
+        {
+            // Detached ingredients no longer participate; root identity changes cannot add recipe modifiers.
+            foreach (ObjectAssemblyPart part in parts)
+                if (part != null && part.Product == this)
+                    foreach (ObjectFlag flag in part.IngredientFlags)
+                        if (flag != null)
+                            destination.Add(flag);
+        }
+
+        /// <summary>Captures recipe provenance before consumption deactivates the product hierarchy.</summary>
+        /// <returns>Inserted ingredient flags, or an empty array for an unfinished recipe.</returns>
+        internal ObjectFlag[] CaptureIngredientFlags()
+        {
+            if (!IsComplete)
+                return System.Array.Empty<ObjectFlag>();
+            HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>();
+            CollectIngredientFlags(flags);
+            ObjectFlag[] result = new ObjectFlag[flags.Count];
+            flags.CopyTo(result);
+            return result;
         }
 
         /// <summary>Updates body mass and geometry caches only when the composition changes.</summary>

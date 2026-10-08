@@ -21,6 +21,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public OrderSelection Selection;
         [Tooltip("Available named orders. Each selected candidate contributes Quantity separate tickets and remains active until despawn.")]
         public OrderCatalog Catalog;
+        [Header("Board Presentation")]
+        [Tooltip("Draw orders at spawn, but display them only after the selected local interaction completes successfully.")]
+        public bool WaitForCompletion;
+        [Tooltip("Existing interaction on this same object whose completion reveals the drawn orders until despawn.")]
+        public ObjectInteraction CompletionSource;
 
         /// <summary>Shared candidates read at the beginning of each spawn.</summary>
         public OrderEntry[] Entries => Catalog != null ? Catalog.Entries : Array.Empty<OrderEntry>();
@@ -39,7 +44,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Destination-specific validation runs again when applying or spawning an object.
             warning = "Available Orders needs exactly one local, enabled Modify By Contact with permanent Consume Other.";
             return owner != null && owner.GetComponents<ObjectContactModifier>().Length == 1
-                && Eligible(owner.GetComponent<ObjectContactModifier>(), owner) && TryValidate(out warning);
+                && Eligible(owner.GetComponent<ObjectContactModifier>(), owner) && TryValidate(out warning)
+                && ValidateCompletion(owner, out warning);
+        }
+
+        /// <summary>Rejects missing, external or circular presentation dependencies.</summary>
+        /// <param name="owner">Object whose orders are being configured.</param>
+        /// <param name="warning">Receives an invalid completion source.</param>
+        /// <returns>True when presentation is immediate or has a usable local source.</returns>
+        public bool ValidateCompletion(GameObject owner, out string warning)
+        {
+            warning = string.Empty;
+            if (WaitForCompletion && (CompletionSource == null || CompletionSource.gameObject != owner
+                || !CompletionSource.enabled || CompletionSource is ObjectAvailableOrders or ObjectInteractionUnlock))
+                warning = "Choose an enabled interaction on this object to reveal orders after completion; Available Orders and availability rules cannot be their own prerequisite.";
+            return warning.Length == 0;
         }
 
         /// <summary>Checks a reusable configuration without requiring a destination object.</summary>
@@ -56,7 +75,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Choose a supported order selection mode.";
             if (Selection is not (OrderSelection.UniformRandom or OrderSelection.WeightedRandom))
                 return false;
-            foreach (OrderEntry entry in Entries)
+            foreach (OrderCandidate entry in Catalog.Candidates())
                 if (entry.Quantity <= DrawCount && (Selection != OrderSelection.WeightedRandom || entry.Weight > 0f))
                 {
                     warning = string.Empty;

@@ -16,6 +16,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Rigidbody body;
         private CarryBodyState physics;
         private PlayerToolPose original;
+        private Matrix4x4 ownerFrame;
+        private Quaternion ownerRotation;
+        private bool rootAnimation;
         private Vector3 position;
         private Quaternion rotation;
         private float elapsed;
@@ -44,14 +47,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             settings = configuration;
             owner = root;
+            ownerFrame = root.localToWorldMatrix;
+            ownerRotation = root.rotation;
             counterpart = other.transform;
             position = counterpart.position;
             rotation = counterpart.rotation;
-            animated = settings.Animate ? PlayerHierarchy.Resolve(root, settings.Path) : null;
+            animated = settings.Animate ? PlayerHierarchy.Resolve(settings.AnimateOther ? counterpart : root, settings.Path) : null;
+            rootAnimation = animated == counterpart;
             if (animated != null)
                 original = PlayerToolPose.Read(animated);
             // Pickup has already been cancelled by the transaction's temporary Grab restriction.
-            body = settings.Snap ? other.GetComponent<Rigidbody>() : null;
+            body = settings.HoldsOther ? other.GetComponent<Rigidbody>() : null;
             if (body != null)
             {
                 physics = new CarryBodyState(body);
@@ -74,6 +80,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!bound)
                 return;
             elapsed += delta;
+            // Align the parent before posing an animated child in world or owner space.
+            if (settings.Snap && (!rootAnimation || stage == Stage.AwaitInput) && stage != Stage.Snap
+                && counterpart != null && counterpart.gameObject.activeInHierarchy)
+                Align(1f);
             switch (stage)
             {
                 case Stage.Snap:
@@ -92,13 +102,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     float duration = returning ? settings.ReturnDuration : settings.AnimationDuration;
                     float progress = duration > 0f ? Mathf.Clamp01(elapsed / duration) : 1f;
                     if (animated != null)
-                        PlayerToolPose.Interpolate(returning ? settings.StateB : settings.StateA, returning ? settings.StateA : settings.StateB,
-                            Mathf.SmoothStep(0f, 1f, progress), returning ? settings.ReturnRotation : settings.ForwardRotation).Apply(animated);
+                        ApplyPose(PlayerToolPose.Interpolate(returning ? settings.StateB : settings.StateA, returning ? settings.StateA : settings.StateB,
+                            Mathf.SmoothStep(0f, 1f, progress), returning ? settings.ReturnRotation : settings.ForwardRotation));
                     if (progress >= 1f)
                         stage = returning ? Stage.Finished : Stage.Ready;
                     break;
+                case Stage.Ready:
+                case Stage.Finished:
+                    if (animated != null)
+                        ApplyPose(stage == Stage.Ready ? settings.StateB : settings.StateA);
+                    break;
             }
-            if (settings.Snap && stage != Stage.Snap && counterpart != null && counterpart.gameObject.activeInHierarchy)
+            // An animated owner pivot may have moved after the initial alignment above.
+            if (settings.Snap && animated == owner && stage != Stage.Snap
+                && counterpart != null && counterpart.gameObject.activeInHierarchy)
                 Align(1f);
         }
 
@@ -139,7 +156,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     counterpart.SetPositionAndRotation(position, rotation);
             }
             else if (stage == Stage.Return && animated != null)
-                settings.StateA.Apply(animated);
+                ApplyPose(settings.StateA);
             bound = false;
             body = null;
             animated = counterpart = owner = null;
@@ -151,7 +168,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             elapsed = 0f;
             stage = settings.Animate ? Stage.Forward : Stage.Ready;
             if (animated != null)
-                settings.StateA.Apply(animated);
+                ApplyPose(settings.StateA);
+        }
+
+        /// <summary>Resolves endpoints in the authored space without feeding an animated owner's pose back into itself.</summary>
+        /// <param name="pose">Interpolated endpoint relative to the owner or the world.</param>
+        private void ApplyPose(PlayerToolPose pose)
+        {
+            // Other targets follow a moving owner; animating the owner root retains its starting frame.
+            bool relative = settings.AnimationSpace == ContactPoseSpace.Owner;
+            Matrix4x4 frame = animated == owner ? ownerFrame : owner.localToWorldMatrix;
+            Quaternion rotation = animated == owner ? ownerRotation : owner.rotation;
+            animated.SetPositionAndRotation(relative ? frame.MultiplyPoint3x4(pose.Position) : pose.Position,
+                (relative ? rotation : Quaternion.identity) * Quaternion.Euler(pose.Rotation));
+            animated.localScale = pose.Scale;
         }
 
         /// <summary>Follows the current owner pivot while interpolating from the initial counterpart pose.</summary>
@@ -159,8 +189,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Align(float progress)
         {
             if (counterpart != null && owner != null)
-                counterpart.SetPositionAndRotation(Vector3.Lerp(position, owner.TransformPoint(settings.Position), progress),
-                    Quaternion.Slerp(rotation, owner.rotation * Quaternion.Euler(settings.Rotation), progress));
+                counterpart.SetPositionAndRotation(Vector3.Lerp(position,
+                    settings.SnapSpace == ContactPoseSpace.Owner ? owner.TransformPoint(settings.Position) : settings.Position, progress),
+                    Quaternion.Slerp(rotation, (settings.SnapSpace == ContactPoseSpace.Owner ? owner.rotation : Quaternion.identity)
+                        * Quaternion.Euler(settings.Rotation), progress));
         }
 
         #endregion
