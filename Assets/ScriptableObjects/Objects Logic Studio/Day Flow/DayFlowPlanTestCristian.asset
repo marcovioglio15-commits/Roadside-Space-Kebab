@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b77670925e4c3e4fa61bf42efd92efd, type: 3}
+  m_Name: DayFlowPlanTestCristian
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.SpawnFlowPlan
+  Days:
+  - Name: Day 1
+    Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_RecipeTesting.unity
+    RandomCount: 0
+    Count: 1
+    Minimum: 1
+    Maximum: 3
+    Selection: 2
+    Steps:
+    - Name: Spawn 1
+      Prefab: {fileID: 3097014450015891093, guid: 1ffcb0b9b0141834faf18db62ddc6bc4, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 1ffcb0b9b0141834faf18db62ddc6bc4, type: 3}
+      - {fileID: 5254269728490429368, guid: 1ffcb0b9b0141834faf18db62ddc6bc4, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 0
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 90, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+  Loop: 1
+  MainMenu: 
+  PauseScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_PauseMenu.unity
+  FadeOut: 0.5
+  BlackDelay: 0.2
+  FadeIn: 0.5
+  FixedSeed: 0
+  Seed: 1
