@@ -144,6 +144,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -208,6 +209,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -257,6 +259,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -313,6 +316,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -389,6 +393,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -431,6 +436,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -461,6 +467,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 1926761037992945242, guid: ab74849b39014cc468a4ec52d52c6e9d, type: 3}
     - Name: Magnet 2
       AnyIngredient: 0
@@ -473,6 +480,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 6484676068278646964, guid: a7f8a1a708ab7fc4db668aa796f19a34, type: 3}
     InteractionRules: []
     CompletedAppearance:
@@ -481,6 +489,7 @@ MonoBehaviour:
         Mesh: {fileID: -5569008325847381597, guid: 3c6bfb167b413b549b6fd77d0ff2efba, type: 3}
         UpdateCollider: 0
       Materials: []
+      Visibility: []
     HideIngredients: 1
 --- !u!1 &3515837015271225998
 GameObject:

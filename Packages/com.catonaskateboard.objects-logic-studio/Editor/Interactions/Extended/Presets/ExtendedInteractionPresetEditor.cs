@@ -26,6 +26,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SerializedProperty settings = serializedObject.FindProperty("Settings");
             switch (target)
             {
+                case ElasticDeformationPreset:
+                    SurfaceInteractionControls.ElasticDeformation(settings, sections);
+                    break;
+                case DirtTrailPreset:
+                    SurfaceInteractionControls.DirtTrail(settings, sections);
+                    break;
+                case SpraySaucePreset:
+                    SurfaceInteractionControls.SpraySauce(settings, sections);
+                    break;
                 case DegradationPreset:
                     DegradationControls.Draw(settings, sections);
                     break;

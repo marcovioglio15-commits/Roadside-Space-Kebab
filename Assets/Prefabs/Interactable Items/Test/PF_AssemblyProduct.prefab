@@ -98,12 +98,14 @@ MonoBehaviour:
   flagChange:
     Enabled: 1
     Flag: {fileID: 11400000, guid: 335669f0b58d400fb3a9532132be5d3d, type: 2}
+    Operation: 0
     Moment: 0
   visualEffect:
     Enabled: 0
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -112,6 +114,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    WaitForNextIngredient: 0
     Ingredients:
     - Flags:
       - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
@@ -133,6 +136,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 9017165495754910650, guid: eb773dd05cd83df4aa5ef91eb4a1abac, type: 3}
     - Name: Magnet 2
       AnyIngredient: 1
@@ -145,6 +149,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 9017165495754910650, guid: eb773dd05cd83df4aa5ef91eb4a1abac, type: 3}
     InteractionRules:
     - Target: {fileID: 9195871525651147916}
@@ -162,6 +167,8 @@ MonoBehaviour:
     CompletedAppearance:
       Meshes: []
       Materials: []
+      Visibility: []
+    HideIngredients: 1
 --- !u!114 &9195871525651147916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,12 +189,14 @@ MonoBehaviour:
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -198,6 +207,7 @@ MonoBehaviour:
   settings:
     Distance: 3
     TargetMode: 0
+    SolidHitOnly: 0
     CenterRadius: 0.15
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
@@ -218,6 +228,11 @@ MonoBehaviour:
     ContactAngle: 20
     ContactResponse: 8
     ShowHover: 0
+    PickupSound: 1
+    CollisionAudio:
+      Enabled: 1
+      MinimumSpeed: 1.5
+      Cooldown: 0.15
   drawGizmos: 1
 --- !u!114 &2326014492238964528
 MonoBehaviour:
@@ -239,12 +254,14 @@ MonoBehaviour:
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -287,12 +304,14 @@ MonoBehaviour:
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
     Moment: 1
   visualEffect:
     Enabled: 0
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -321,6 +340,7 @@ MonoBehaviour:
     Yaw: 0
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
+    Sound: 1
 --- !u!114 &1374417912557854080
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -136,6 +136,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.ObjectDegradation => JsonUtility.ToJson(Draft.ObjectDegradation),
                 ExtendedInteractionKind.GravityGenerator => JsonUtility.ToJson(Draft.GravityGenerator),
+                ExtendedInteractionKind.ElasticDeformation => JsonUtility.ToJson(Draft.ElasticDeformation),
+                ExtendedInteractionKind.DirtTrail => JsonUtility.ToJson(Draft.DirtTrail),
+                ExtendedInteractionKind.SpraySauce => JsonUtility.ToJson(Draft.SpraySauce),
                 ExtendedInteractionKind.AvailableOrders => JsonUtility.ToJson(Draft.ResolveOrders(target)),
                 ExtendedInteractionKind.PlayAmbient => JsonUtility.ToJson(Draft.Ambient),
                 ExtendedInteractionKind.Slice => JsonUtility.ToJson(Draft.Slice),
@@ -160,6 +163,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             if (feature is ObjectOutline outline)
                 OutlineAuthoring.Rebuild(outline);
+            if (feature is ObjectElasticDeformation or ObjectSpraySauce)
+                ElasticAuthoring.Prepare(target);
             EditorUtility.SetDirty(feature);
             if (!EditorUtility.IsPersistent(feature))
                 PrefabUtility.RecordPrefabInstancePropertyModifications(feature);

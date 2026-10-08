@@ -107,6 +107,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -136,6 +137,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 4593334166877187736, guid: 86cb68bba3bc82c439106824d49372d3, type: 3}
     - Name: Magnet 2
       AnyIngredient: 1
@@ -147,6 +149,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 4593334166877187736, guid: f6a99c1f0ee90314eb233bcc1295d1ea, type: 3}
     - Name: Magnet 3
       AnyIngredient: 1
@@ -158,6 +161,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 4593334166877187736, guid: 67cc8641c4fbaf9438f283a82f36607c, type: 3}
     - Name: Magnet 4
       AnyIngredient: 1
@@ -169,6 +173,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 4593334166877187736, guid: f4e42104d5f929b4faeaee372fcc8a1e, type: 3}
     InteractionRules:
     - Target: {fileID: 9195871525651147916}
@@ -186,6 +191,7 @@ MonoBehaviour:
     CompletedAppearance:
       Meshes: []
       Materials: []
+      Visibility: []
     HideIngredients: 1
 --- !u!114 &9195871525651147916
 MonoBehaviour:
@@ -214,6 +220,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -278,6 +285,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -327,6 +335,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -383,6 +392,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}

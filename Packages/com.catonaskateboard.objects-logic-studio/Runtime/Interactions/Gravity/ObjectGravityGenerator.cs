@@ -216,6 +216,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private static void IdentityChanged(ObjectIdentity identity)
         {
             IncludeSpawn(identity.gameObject);
+            LiquidPool.IncludeSource(identity.transform);
+        }
+
+        /// <summary>Releases pooled liquid before the same body is reused by a different emitter.</summary>
+        /// <param name="body">Body leaving its current physical lifetime.</param>
+        internal static void Forget(Rigidbody body)
+        {
+            foreach (ObjectGravityGenerator generator in active)
+                for (int index = generator.affected.Count - 1; index >= 0; index--)
+                    if (generator.affected[index].Body == body)
+                    {
+                        GravitySuspension.Release(body, generator);
+                        generator.affected.RemoveAt(index);
+                    }
         }
 
         /// <summary>Samples one late participant once, retaining the existing pulse's restoration deadline.</summary>

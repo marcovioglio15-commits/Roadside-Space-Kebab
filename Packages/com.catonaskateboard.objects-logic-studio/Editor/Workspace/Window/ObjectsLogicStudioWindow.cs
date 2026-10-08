@@ -121,6 +121,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             window.state.Category = feature.Kind switch
             {
                 ExtendedInteractionKind.ModifyByContact => ObjectInteractionCategory.SingleInteraction,
+                ExtendedInteractionKind.SpraySauce => ObjectInteractionCategory.ContinuousInteraction,
                 ExtendedInteractionKind.Dialogue or ExtendedInteractionKind.Slice => ObjectInteractionCategory.MultipleInteraction,
                 ExtendedInteractionKind.SpawnManagement => ObjectInteractionCategory.SpawnManagement,
                 ExtendedInteractionKind.AssemblyStation or ExtendedInteractionKind.AssemblyProduct => ObjectInteractionCategory.ObjectAssemble,
@@ -358,6 +359,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     case ObjectInteractionCategory.ObjectAssemble:
                         extended.Draw(state, data, ExtendedInteractionKind.AssemblyStation);
+                        break;
+                    case ObjectInteractionCategory.ContinuousInteraction:
+                        extended.Draw(state, data, ExtendedInteractionKind.SpraySauce);
                         break;
                     case ObjectInteractionCategory.PassiveInteraction:
                         extended.Draw(state, data, ExtendedInteractionKind.Outline);

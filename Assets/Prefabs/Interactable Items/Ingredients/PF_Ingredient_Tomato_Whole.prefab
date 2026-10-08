@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 5278547688757968438}
   - component: {fileID: 6755289737659734203}
   - component: {fileID: 7329995462004247437}
+  - component: {fileID: 3785863080619871995}
   m_Layer: 6
   m_Name: PF_Ingredient_Tomato_Whole
   m_TagString: Untagged
@@ -220,6 +221,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -284,6 +286,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -333,6 +336,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -389,6 +393,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -465,6 +470,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -540,6 +546,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -555,6 +562,71 @@ MonoBehaviour:
     HoverOnly: 1
   renderers:
   - {fileID: 3709411580240008641}
+--- !u!114 &3785863080619871995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945690428261504065}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7febaeac98835114fbf203be3542f63d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDirtTrail
+  interactionName: Dirt Trail
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Layers:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    FilterFlags: 0
+    Flags: []
+    MinimumSpeed: 0.25
+    Sliding: 1
+    Spacing: 0.045
+    Interval: 0.1
+    Trail:
+      Liquidity: 0.3
+      Shape: 1
+      Radius: {x: 0.025, y: 0.07}
+      Stretch: {x: 1, y: 1.7}
+      Patches: 3
+      Scatter: 0.035
+      Irregularity: 0.55
+      Gloss: 0.75
+      DetectColors: 0
+      Colors:
+      - {r: 0.6886792, g: 0.3433304, b: 0.11369702, a: 1}
+      - {r: 0.69803923, g: 0.48917964, b: 0.25098044, a: 1}
+      ColorBlend: 0.6
+      Opacity: 0.9
+      Lifetime: 16
+      FadeDuration: 6
+      ProjectionDepth: 0.08
+      SurfaceOffset: 0.001
+      MaximumAngle: 70
 --- !u!1 &6225317423193275920
 GameObject:
   m_ObjectHideFlags: 0

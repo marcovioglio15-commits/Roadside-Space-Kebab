@@ -30,6 +30,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
             switch (state.Extended.Kind)
             {
+                case ExtendedInteractionKind.ElasticDeformation:
+                    SurfaceInteractionControls.ElasticDeformation(draft.FindPropertyRelative("ElasticDeformation"), state.Sections);
+                    break;
+                case ExtendedInteractionKind.DirtTrail:
+                    SurfaceInteractionControls.DirtTrail(draft.FindPropertyRelative("DirtTrail"), state.Sections);
+                    break;
+                case ExtendedInteractionKind.SpraySauce:
+                    SurfaceInteractionControls.SpraySauce(draft.FindPropertyRelative("SpraySauce"), state.Sections);
+                    StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Spray", Button);
+                    break;
                 case ExtendedInteractionKind.ObjectDegradation:
                     DegradationControls.Draw(draft.FindPropertyRelative("ObjectDegradation"), state.Sections);
                     break;

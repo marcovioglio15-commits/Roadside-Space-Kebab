@@ -251,6 +251,8 @@ GameObject:
   - component: {fileID: -5746787573501760849}
   - component: {fileID: 7859766710552062087}
   - component: {fileID: 3977727308473586013}
+  - component: {fileID: 5944608289362405785}
+  - component: {fileID: 3143485197015912780}
   m_Layer: 6
   m_Name: PF_Ingredient_SauceKetchup_Bottle
   m_TagString: Untagged
@@ -378,6 +380,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -442,6 +445,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -491,6 +495,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -547,6 +552,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -623,6 +629,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -638,6 +645,150 @@ MonoBehaviour:
     HoverOnly: 1
   renderers:
   - {fileID: 223774817377608230}
+--- !u!114 &5944608289362405785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8117234458026244839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c1218eb5f66fcd49999bbac9694fa15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectElasticDeformation
+  interactionName: Interaction
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Collisions: 1
+    Layers:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    MinimumImpact: 0.5
+    FullImpact: 6
+    Compression: 0.065
+    Duration: 0.35
+    Oscillations: 1.5
+    Damping: 4
+    Volume: 0.7
+    Cooldown: 0.06
+    StrongestWins: 1
+    Pivot: {x: 0, y: 0, z: 0}
+    Path: 
+--- !u!114 &3143485197015912780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8117234458026244839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f81550ca70d61d4c9576cc790ed75ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectSpraySauce
+  interactionName: Spray Sauce
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  action: {fileID: -1996764827017877772, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    HeldOnly: 1
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    Nozzle:
+      Position: {x: 0, y: 0.35854793, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+    Rate: 35
+    Speed: {x: 4, y: 5}
+    Spread: 4
+    Cohesion: 1
+    Radius: {x: 0.008, y: 0.012}
+    Mass: 0.003
+    Damping: 0.1
+    Lifetime: 3
+    InheritVelocity: 1
+    Layers:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    Limited: 0
+    Capacity: 10
+    LeaveTrail: 1
+    DepositInterval: 0.08
+    Trail:
+      Liquidity: 1
+      Shape: 1
+      Radius: {x: 0.025, y: 0.045}
+      Stretch: {x: 1, y: 1.7}
+      Patches: 1
+      Scatter: 0.01
+      Irregularity: 0.55
+      Gloss: 0.75
+      DetectColors: 0
+      Colors:
+      - {r: 0.75, g: 0.06, b: 0.025, a: 1}
+      - {r: 0.95, g: 0.18, b: 0.04, a: 1}
+      ColorBlend: 0.6
+      Opacity: 0.9
+      Lifetime: 8
+      FadeDuration: 6
+      ProjectionDepth: 0.08
+      SurfaceOffset: 0.001
+      MaximumAngle: 70
+    ChangeAppearance: 0
+    Rules: []
+    Squeeze: 1
+    SqueezeAxis: {x: 1, y: 0, z: 0}
+    Compression: 0.25
+    SqueezeDuration: 0.15
 --- !u!1001 &1502680152316509858
 PrefabInstance:
   m_ObjectHideFlags: 0

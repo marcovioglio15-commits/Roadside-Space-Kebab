@@ -7,7 +7,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Interaction families that a running modification can temporarily suspend.</summary>
     [Flags]
-    public enum InteractionChannels { None = 0, Grab = 1, Release = 2, Hover = 4, Dialogue = 8, Passive = 16, Assembly = 32, Transfer = 64, Spawn = 128, Slice = 256, Animation = 512, Eject = 1024 }
+    public enum InteractionChannels { None = 0, Grab = 1, Release = 2, Hover = 4, Dialogue = 8, Passive = 16, Assembly = 32, Transfer = 64, Spawn = 128, Slice = 256, Animation = 512, Eject = 1024, Continuous = 2048 }
 
     /// <summary>Owns runtime consumption receipts and independent temporary locks for one object.</summary>
     [DisallowMultipleComponent]

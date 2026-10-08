@@ -299,6 +299,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -363,6 +364,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -412,6 +414,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -468,6 +471,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -544,6 +548,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -574,6 +579,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 3176775191320682383, guid: df2a34812f3fced4c94972c3861e05a5, type: 3}
     - Name: Magnet 2
       AnyIngredient: 0
@@ -586,6 +592,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 4357755812359040115, guid: b337591f6f4024a40a7b3024484e4fc8, type: 3}
     InteractionRules:
     - Target: {fileID: 4060919288793665968}
@@ -606,6 +613,7 @@ MonoBehaviour:
         Mesh: {fileID: 2528236585992998278, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
         UpdateCollider: 0
       Materials: []
+      Visibility: []
     HideIngredients: 1
 --- !u!114 &6654021113453119442
 MonoBehaviour:
@@ -634,6 +642,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}

@@ -65,6 +65,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.RecordObject(state, "Import interaction preset");
             switch (state.Extended.Preset)
             {
+                case ElasticDeformationPreset elasticDeformation:
+                    state.Extended.Draft.ElasticDeformation = ObjectWorkspace.Copy(elasticDeformation.Settings);
+                    break;
+                case DirtTrailPreset dirtTrail:
+                    state.Extended.Draft.DirtTrail = ObjectWorkspace.Copy(dirtTrail.Settings);
+                    break;
+                case SpraySaucePreset spraySauce:
+                    state.Extended.Draft.SpraySauce = ObjectWorkspace.Copy(spraySauce.Settings);
+                    break;
                 case DegradationPreset degradation:
                     state.Extended.Draft.ObjectDegradation = ObjectWorkspace.Copy(degradation.Settings);
                     break;

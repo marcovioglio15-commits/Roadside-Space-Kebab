@@ -12,7 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         TriggerAnimation = 64, Eject = 128, ModifyByContact = 256, Dialogue = 512, Outline = 1024,
         Availability = 2048, AssemblyStation = 4096, AssemblyProduct = 8192, SpawnManagement = 16384,
         Slice = 32768, PlayAmbient = 65536, AvailableOrders = 131072, ObjectDegradation = 262144, GravityGenerator = 524288,
-        All = 1048575
+        ElasticDeformation = 1048576, DirtTrail = 2097152, SpraySauce = 4194304, All = 8388607
     }
 
     /// <summary>Combines independently enabled layer, identity and interaction filters for a gravity pulse.</summary>
@@ -53,6 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when this body satisfies the selected combination.</returns>
         internal bool Matches(Component body, Transform owner)
         {
+            if (body.TryGetComponent(out LiquidDroplet droplet) && droplet.Source != null)
+                body = droplet.Source;
             if (!IncludeSelf && body.transform.IsChildOf(owner))
                 return false;
             ObjectItem item = body.GetComponentInParent<ObjectItem>();
@@ -111,6 +113,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 ObjectAvailableOrders => GravityInteractionFilter.AvailableOrders,
                 ObjectDegradation => GravityInteractionFilter.ObjectDegradation,
                 ObjectGravityGenerator => GravityInteractionFilter.GravityGenerator,
+                ObjectElasticDeformation => GravityInteractionFilter.ElasticDeformation,
+                ObjectDirtTrail => GravityInteractionFilter.DirtTrail,
+                ObjectSpraySauce => GravityInteractionFilter.SpraySauce,
                 _ => GravityInteractionFilter.None
             };
         }

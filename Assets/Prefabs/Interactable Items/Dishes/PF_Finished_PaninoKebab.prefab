@@ -144,6 +144,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -208,6 +209,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -257,6 +259,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -313,6 +316,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -389,6 +393,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -431,6 +436,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 2615674392044304233, guid: dbc2bd29052637e46920a7c7e7633213, type: 3}
     - Name: Magnet 2
       AnyIngredient: 0
@@ -443,6 +449,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 3974403703203748344, guid: 536ae3a8429f3e447bb8cd6f50472260, type: 3}
     - Name: Magnet 3
       AnyIngredient: 0
@@ -455,6 +462,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
     - Name: Magnet 4
       AnyIngredient: 0
@@ -467,6 +475,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 5936169737003267211, guid: 139947defc322cd48bd4a20ba12d216d, type: 3}
     - Name: Magnet 5
       AnyIngredient: 0
@@ -479,6 +488,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 2891034634997325463, guid: 750a7a35b9d541f4b805396137f7c6b6, type: 3}
     InteractionRules:
     - Target: {fileID: 8524664379613520956}
@@ -502,6 +512,7 @@ MonoBehaviour:
       - Path: SM_Finished_Panino
         Materials:
         - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
+      Visibility: []
     HideIngredients: 1
 --- !u!114 &3860033114708416769
 MonoBehaviour:
@@ -530,6 +541,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}

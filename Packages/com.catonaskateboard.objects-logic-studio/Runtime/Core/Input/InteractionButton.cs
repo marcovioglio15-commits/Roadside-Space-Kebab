@@ -19,6 +19,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool Pending => pending && action.enabled;
         /// <summary>Whether the owning PlayerInput currently enables this action.</summary>
         internal bool Enabled => action.enabled;
+        /// <summary>Current held state from the player's private action, independent of buffered presses.</summary>
+        internal bool Held => action.enabled && action.IsPressed();
 
         #endregion
 

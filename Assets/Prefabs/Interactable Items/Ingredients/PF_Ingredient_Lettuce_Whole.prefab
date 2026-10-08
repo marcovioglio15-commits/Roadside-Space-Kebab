@@ -253,6 +253,7 @@ GameObject:
   - component: {fileID: 5987195386809859929}
   - component: {fileID: 8834736741460893502}
   - component: {fileID: 482097563746480873}
+  - component: {fileID: 2249686807839885728}
   m_Layer: 6
   m_Name: PF_Ingredient_Lettuce_Whole
   m_TagString: Untagged
@@ -801,6 +802,71 @@ MonoBehaviour:
       Operation: 0
     DestroyAtEnd: 0
     Fragments: []
+--- !u!114 &2249686807839885728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6191959766604075906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7febaeac98835114fbf203be3542f63d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDirtTrail
+  interactionName: Dirt Trail
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Layers:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    FilterFlags: 0
+    Flags: []
+    MinimumSpeed: 0.08
+    Sliding: 1
+    Spacing: 0.045
+    Interval: 0.1
+    Trail:
+      Liquidity: 0.3
+      Shape: 1
+      Radius: {x: 0.015, y: 0.035}
+      Stretch: {x: 1, y: 1.7}
+      Patches: 3
+      Scatter: 0.035
+      Irregularity: 0.55
+      Gloss: 0.75
+      DetectColors: 0
+      Colors:
+      - {r: 0.35, g: 0.5, b: 0.16, a: 1}
+      - {r: 0.65, g: 0.7, b: 0.25, a: 1}
+      ColorBlend: 0.6
+      Opacity: 0.9
+      Lifetime: 8
+      FadeDuration: 6
+      ProjectionDepth: 0.08
+      SurfaceOffset: 0.001
+      MaximumAngle: 70
 --- !u!1001 &6813078871704028059
 PrefabInstance:
   m_ObjectHideFlags: 0

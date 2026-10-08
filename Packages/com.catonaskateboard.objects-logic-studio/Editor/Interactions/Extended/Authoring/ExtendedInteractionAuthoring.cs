@@ -42,6 +42,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.ObjectDegradation => Undo.AddComponent<ObjectDegradation>(target),
                 ExtendedInteractionKind.GravityGenerator => Undo.AddComponent<ObjectGravityGenerator>(target),
+                ExtendedInteractionKind.ElasticDeformation => Undo.AddComponent<ObjectElasticDeformation>(target),
+                ExtendedInteractionKind.DirtTrail => Undo.AddComponent<ObjectDirtTrail>(target),
+                ExtendedInteractionKind.SpraySauce => Undo.AddComponent<ObjectSpraySauce>(target),
                 ExtendedInteractionKind.AvailableOrders => Undo.AddComponent<ObjectAvailableOrders>(target),
                 ExtendedInteractionKind.PlayAmbient => Undo.AddComponent<ObjectAmbient>(target),
                 ExtendedInteractionKind.Slice => Undo.AddComponent<ObjectSlice>(target),
@@ -62,6 +65,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             if (feature is ObjectOutline outline)
                 OutlineAuthoring.Rebuild(outline);
+            if (feature is ObjectElasticDeformation or ObjectSpraySauce)
+                ElasticAuthoring.Prepare(target);
             if (feature is ObjectAssemblyStation station)
                 AssemblyAuthoring.Prepare(station);
             ObjectAuthoringSave.Save(target);

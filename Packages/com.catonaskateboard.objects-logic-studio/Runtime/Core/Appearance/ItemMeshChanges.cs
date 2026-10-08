@@ -75,6 +75,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Mesh replacements require an Object Item and a complete list.";
             if (item == null || replacements == null)
                 return false;
+            if (replacements.Length > 0 && item.TryGetComponent(out ObjectElasticDeformation elastic))
+                elastic.RestoreGeometry();
             MeshBinding[] bindings = new MeshBinding[replacements.Length];
             for (int index = 0; index < replacements.Length; index++)
             {

@@ -20,6 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int requestRevision = -1;
         private bool missingInputReported;
         private bool performed;
+        private ObjectSpraySauce spraying;
 
         #endregion
 
@@ -37,6 +38,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases all subscriptions and temporary carry ownership when observation stops.</summary>
         internal void Reset()
         {
+            if (spraying != null)
+                spraying.StopEmission();
+            spraying = null;
             // Context loss cannot strand a body in its held physics state.
             if (held != null)
                 held.Cancel();
@@ -168,6 +172,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A prioritized Single already owns this pass, including its carry-slot transition.
             input.Consume(consumed);
+            if (spraying != null && (!input.Usable || Time.timeScale <= 0f || !spraying.CanContinue()
+                || !bindings.TryGetValue(spraying, out InteractionButton flow) || !flow.Held
+                || consumed != null && input.Find(consumed) == flow || !CommandTarget(observer, spraying, out _)))
+            {
+                spraying.StopEmission();
+                spraying = null;
+            }
             if (!performed && input.Usable && Time.timeScale > 0f)
             {
                 bool pending = false;
@@ -241,6 +252,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return selected switch
             {
                 ObjectCommandInteraction command => command.Execute(),
+                ObjectSpraySauce spray => StartSpray(spray),
                 ObjectRequestedInteraction process => process.Request(),
                 _ => false
             };
@@ -266,6 +278,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the requested target is reachable.</returns>
         private bool CommandTarget(HoverObserver observer, ObjectInteraction feature, out float score)
         {
+            if (feature is ObjectSpraySauce spray && spray.Settings.HeldOnly)
+            {
+                score = 0f;
+                return held != null && held.Item == spray.Item;
+            }
             if (feature is ObjectCommandInteraction command)
                 return Eligible(observer, command, out score);
             ObjectRequestedInteraction process = (ObjectRequestedInteraction)feature;
@@ -273,6 +290,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return targeting.Eligible(observer, process.transform, process.Colliders, process.transform.TransformPoint(settings.Offset),
                 settings.Distance, settings.Mode, settings.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
                 settings.ObstacleMask, settings.SolidHitOnly, out score);
+        }
+
+        /// <summary>Starts one continuous source only while its selected action is still held.</summary>
+        /// <param name="spray">Emitter selected by normal command arbitration.</param>
+        /// <returns>True when the held request started emission.</returns>
+        private bool StartSpray(ObjectSpraySauce spray)
+        {
+            if (!bindings.TryGetValue(spray, out InteractionButton button) || !spray.Request(button))
+                return false;
+            if (spraying != null && spraying != spray)
+                spraying.StopEmission();
+            spraying = spray;
+            return true;
         }
 
         /// <summary>Chooses the highest-priority eligible release without grabbing again in the same event.</summary>

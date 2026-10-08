@@ -28,6 +28,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public DegradationSettings ObjectDegradation = new DegradationSettings();
         [Tooltip("Scene-body filtering, suspension, impulse and restoration settings.")]
         public GravitySettings GravityGenerator = new GravitySettings();
+        [Tooltip("Detached elastic deformation configuration.")]
+        public ElasticSettings ElasticDeformation = new ElasticSettings();
+        [Tooltip("Detached dirt trail configuration.")]
+        public DirtTrailSettings DirtTrail = new DirtTrailSettings();
+        [Tooltip("Detached spray sauce configuration.")]
+        public SpraySauceSettings SpraySauce = new SpraySauceSettings();
         [Tooltip("Detached dialogue pages, conditions and flow settings.")]
         public DialogueSettings Dialogue = new DialogueSettings();
         [Tooltip("Detached Slice targeting and ordered appearance/output steps.")]
@@ -85,6 +91,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 draft.StartAction = requested.Action;
             switch (feature)
             {
+                case ObjectElasticDeformation elasticDeformation:
+                    draft.ElasticDeformation = ObjectWorkspace.Copy(elasticDeformation.Settings);
+                    break;
+                case ObjectDirtTrail dirtTrail:
+                    draft.DirtTrail = ObjectWorkspace.Copy(dirtTrail.Settings);
+                    break;
+                case ObjectSpraySauce spraySauce:
+                    draft.SpraySauce = ObjectWorkspace.Copy(spraySauce.Settings);
+                    break;
                 case ObjectDegradation degradation:
                     draft.ObjectDegradation = ObjectWorkspace.Copy(degradation.Settings);
                     break;
@@ -162,6 +177,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ObjectAvailableOrders orders => ResolveOrders(orders.gameObject).TryValidate(orders.gameObject, out warning),
                 ObjectAmbient => Ambient.TryValidate(out warning),
+                ObjectElasticDeformation elastic => elastic.TryValidate(ElasticDeformation, out warning),
+                ObjectDirtTrail => DirtTrail.TryValidate(out warning),
+                ObjectSpraySauce spray => spray.TryValidate(SpraySauce, StartAction, out warning),
                 ObjectSlice slice => slice.TryValidate(Slice, StartAction, out warning),
                 ObjectSpawnManager => SpawnSourceAuthoring.Validate(SpawnManagement, out warning),
                 ObjectAssemblyStation station => station.TryValidate(AssemblyStation, StartAction, out warning),

@@ -204,7 +204,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return channels == (InteractionChannels)(-1) || (channels & ~(InteractionChannels.Grab | InteractionChannels.Release
                 | InteractionChannels.Hover | InteractionChannels.Dialogue | InteractionChannels.Passive
                 | InteractionChannels.Assembly | InteractionChannels.Transfer | InteractionChannels.Spawn | InteractionChannels.Slice
-                | InteractionChannels.Animation | InteractionChannels.Eject)) == 0;
+                | InteractionChannels.Animation | InteractionChannels.Eject | InteractionChannels.Continuous)) == 0;
         }
 
         #endregion

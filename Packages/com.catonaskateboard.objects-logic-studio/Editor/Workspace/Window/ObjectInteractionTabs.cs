@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
     /// <summary>Separates observation, direct actions, dialogue and automatic contact effects.</summary>
-    internal enum ObjectInteractionCategory { Hover, SingleInteraction, MultipleInteraction, PassiveInteraction, UnlockInteractions, SceneObserver, ObjectAssemble, SpawnManagement }
+    internal enum ObjectInteractionCategory { Hover, SingleInteraction, MultipleInteraction, PassiveInteraction, UnlockInteractions, SceneObserver, ObjectAssemble, SpawnManagement, ContinuousInteraction }
 
     /// <summary>Draws category navigation without changing the retained interaction draft.</summary>
     internal static class ObjectInteractionTabs
@@ -20,7 +20,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             new GUIContent("Unlock", "Lock existing interactions until their configured conditions are met."),
             new GUIContent("Observer", "Connect a camera and player independently of the edited interaction prefab."),
             new GUIContent("Assembly", "Configure assembly tables, product recipes and ingredient magnets."),
-            new GUIContent("Spawning", "Generate prefab outputs when individual source instances complete the configured interactions.")
+            new GUIContent("Spawning", "Generate prefab outputs when individual source instances complete the configured interactions."),
+            new GUIContent("Continuous", "Interactions that continue while a bound button remains held.")
         };
 
         #endregion

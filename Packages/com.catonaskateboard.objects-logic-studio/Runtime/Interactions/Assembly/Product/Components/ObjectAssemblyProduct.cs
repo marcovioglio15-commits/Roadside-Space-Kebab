@@ -472,6 +472,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     case ObjectContactModifier contact when contact.isActiveAndEnabled:
                         contact.RefreshGeometry();
                         break;
+                    case ObjectElasticDeformation elastic:
+                        elastic.RefreshGeometry();
+                        break;
+                    case ObjectDirtTrail dirt:
+                        dirt.RefreshGeometry();
+                        break;
+                    case ObjectSpraySauce spray:
+                        spray.RefreshGeometry();
+                        break;
                     case ObjectGrab grab when grab.isActiveAndEnabled:
                         grab.RefreshCarryGeometry();
                         break;

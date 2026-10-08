@@ -19,6 +19,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ExtendedInteractionDraft draft = state.Extended.Draft;
             switch (preset)
             {
+                case ElasticDeformationPreset elasticDeformation:
+                    elasticDeformation.Settings = ObjectWorkspace.Copy(draft.ElasticDeformation);
+                    break;
+                case DirtTrailPreset dirtTrail:
+                    dirtTrail.Settings = ObjectWorkspace.Copy(draft.DirtTrail);
+                    break;
+                case SpraySaucePreset spraySauce:
+                    spraySauce.Settings = ObjectWorkspace.Copy(draft.SpraySauce);
+                    break;
                 case DegradationPreset degradation:
                     degradation.Settings = ObjectWorkspace.Copy(draft.ObjectDegradation);
                     break;
@@ -68,6 +77,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.ObjectDegradation => typeof(DegradationPreset),
                 ExtendedInteractionKind.GravityGenerator => typeof(GravityGeneratorPreset),
+                ExtendedInteractionKind.ElasticDeformation => typeof(ElasticDeformationPreset),
+                ExtendedInteractionKind.DirtTrail => typeof(DirtTrailPreset),
+                ExtendedInteractionKind.SpraySauce => typeof(SpraySaucePreset),
                 ExtendedInteractionKind.PlayAmbient => typeof(AmbientPreset),
                 ExtendedInteractionKind.Slice => typeof(SlicePreset),
                 ExtendedInteractionKind.ModifyByContact => typeof(ContactModificationPreset),

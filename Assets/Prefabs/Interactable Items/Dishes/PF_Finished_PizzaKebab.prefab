@@ -299,6 +299,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -363,6 +364,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -412,6 +414,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -468,6 +471,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -544,6 +548,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -582,6 +587,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 13743455491562369, guid: 5bb456d407eb39946a0e5e5cfaf267c1, type: 3}
     - Name: Magnet 2
       AnyIngredient: 0
@@ -594,6 +600,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 3974403703203748344, guid: 536ae3a8429f3e447bb8cd6f50472260, type: 3}
     - Name: Magnet 3
       AnyIngredient: 0
@@ -606,6 +613,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 5936169737003267211, guid: 139947defc322cd48bd4a20ba12d216d, type: 3}
     - Name: Magnet 4
       AnyIngredient: 0
@@ -618,6 +626,7 @@ MonoBehaviour:
       Appearance:
         Meshes: []
         Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 2891034634997325463, guid: 750a7a35b9d541f4b805396137f7c6b6, type: 3}
     InteractionRules:
     - Target: {fileID: 4060919288793665968}
@@ -635,6 +644,7 @@ MonoBehaviour:
     CompletedAppearance:
       Meshes: []
       Materials: []
+      Visibility: []
     HideIngredients: 1
 --- !u!114 &8358541987961235531
 MonoBehaviour:
@@ -663,6 +673,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
