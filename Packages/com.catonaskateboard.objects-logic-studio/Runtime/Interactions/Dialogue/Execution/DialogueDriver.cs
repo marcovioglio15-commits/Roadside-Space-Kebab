@@ -147,7 +147,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     consumed = active.AdvanceAction;
                     // Consume a blocked dialogue press so the same action cannot unexpectedly grab or drop an item.
-                    if ((!active.Settings.PreferSingleActions || !singles.TryPrioritize(observer, consumed))
+                    if ((!active.Settings.PreferSingleActions || !singles.TryPrioritize(observer, bindings[active].Advance, active.Settings.PreferredActions))
                         && active.CanAdvance(observer, visibility))
                         active.Advance();
                 }
@@ -156,7 +156,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 InputActionReference requested = !selected.ArrivalOnly && selected.Settings.Trigger == DialogueTrigger.InputAction
                     ? selected.StartAction : null;
-                if (requested != null && selected.Settings.PreferSingleActions && singles.TryPrioritize(observer, requested))
+                if (requested != null && selected.Settings.PreferSingleActions
+                    && singles.TryPrioritize(observer, bindings[selected].Start, selected.Settings.PreferredActions))
                     consumed = requested;
                 else
                     selected.Begin(observer.DialogueHud);
@@ -166,6 +167,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     consumed = !selected.ArrivalOnly && selected.Settings.Trigger == DialogueTrigger.InputAction ? selected.StartAction : null;
                 }
             }
+            if (consumed != null)
+                singles.Suppress(input.Find(consumed));
             input.ClearSignals();
             return consumed;
         }

@@ -1,0 +1,420 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: Dialogue Shadowblade Delivery Correct Tree
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: 0b60cb5ae52b4da1878278066a06b1cb
+  Nodes:
+  - Id: 0b60cb5ae52b4da1878278066a06b1cb
+    Name: Select Entry
+    Position: {x: 30, y: 100}
+    Kind: 1
+    Entry: {fileID: 0}
+    Next: 
+    Otherwise: 
+    Selection: 0
+    Branches:
+    - Name: Shadowblade Order Correct 1 - D
+      Target: d2c19d3961ba4e2f845fc8d517db3507
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Correct 2 - D
+      Target: 82b826c1e3ee40d4bbe0ebfbd93f39ea
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Correct 3 - D
+      Target: e787726634914137995d74d591b07cde
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Correct 4 - D
+      Target: 6d5e7074cb98447e9f10971e0d646746
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Correct 5 - D
+      Target: cb8e0412c0fe41edae01ad49ee5011f3
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Correct 6 - D
+      Target: 7a7c59edd32244acbc4a349dea622847
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Correct 7 - D
+      Target: 00d155a81fa049c39e521a3fe7e21234
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Correct 8 - D
+      Target: 5c081ec059ae4c29a802fc2cb5b28a49
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: d2c19d3961ba4e2f845fc8d517db3507
+    Name: Shadowblade Order Correct 1 - D
+    Position: {x: 350, y: 100}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 7f278422ffa8461db33d2a8d1ca99d98, type: 2}
+    Next: c5d0d8074b8647529b9c73f098b0a6bb
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 82b826c1e3ee40d4bbe0ebfbd93f39ea
+    Name: Shadowblade Order Correct 2 - D
+    Position: {x: 350, y: 255}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 570080588c314935ac77216448ecce07, type: 2}
+    Next: c5d0d8074b8647529b9c73f098b0a6bb
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: e787726634914137995d74d591b07cde
+    Name: Shadowblade Order Correct 3 - D
+    Position: {x: 350, y: 410}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 51fb20533b134bae93b3eb1a84f838ab, type: 2}
+    Next: c5d0d8074b8647529b9c73f098b0a6bb
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 6d5e7074cb98447e9f10971e0d646746
+    Name: Shadowblade Order Correct 4 - D
+    Position: {x: 640, y: 100}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: f2ca564f5f934f9c971b4d5b0240b47d, type: 2}
+    Next: c5d0d8074b8647529b9c73f098b0a6bb
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: cb8e0412c0fe41edae01ad49ee5011f3
+    Name: Shadowblade Order Correct 5 - D
+    Position: {x: 640, y: 255}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 2bc7d63df0c24b29b751fdf43c42138d, type: 2}
+    Next: c5d0d8074b8647529b9c73f098b0a6bb
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 7a7c59edd32244acbc4a349dea622847
+    Name: Shadowblade Order Correct 6 - D
+    Position: {x: 640, y: 410}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: e84f5307613e4e0ca1bd65708cf6a8c4, type: 2}
+    Next: c5d0d8074b8647529b9c73f098b0a6bb
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 00d155a81fa049c39e521a3fe7e21234
+    Name: Shadowblade Order Correct 7 - D
+    Position: {x: 930, y: 100}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 42a83c2ffaa140818a45ac8079c19ecb, type: 2}
+    Next: c5d0d8074b8647529b9c73f098b0a6bb
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 5c081ec059ae4c29a802fc2cb5b28a49
+    Name: Shadowblade Order Correct 8 - D
+    Position: {x: 930, y: 255}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 329e37009ab64536a792dd1781ee05ea, type: 2}
+    Next: c5d0d8074b8647529b9c73f098b0a6bb
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: c5d0d8074b8647529b9c73f098b0a6bb
+    Name: End
+    Position: {x: 1220, y: 100}
+    Kind: 5
+    Entry: {fileID: 0}
+    Next: 
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}

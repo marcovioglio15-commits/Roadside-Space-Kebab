@@ -96,7 +96,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [DrawGizmo(GizmoType.Selected)]
         private static void DrawGravity(ObjectGravityGenerator generator, GizmoType type)
         {
-            if (!generator.DrawGizmos || generator.Settings is not { Push: true, RandomDirection: false } settings
+            if (!generator.DrawGizmos)
+                return;
+            GravitySettings settings = generator.Settings;
+            if (settings.Area is { Enabled: true } area && area.TryValidate(out _))
+            {
+                Vector3 center = generator.transform.TransformPoint(area.Offset);
+                using Handles.DrawingScope areaScope = new Handles.DrawingScope(new Color(0.3f, 0.85f, 0.75f, 0.8f),
+                    Matrix4x4.TRS(center, generator.transform.rotation * Quaternion.Euler(area.Rotation), Vector3.one));
+                if (area.Shape == GravityAreaShape.Sphere)
+                {
+                    Handles.DrawWireDisc(Vector3.zero, Vector3.up, area.Radius);
+                    Handles.DrawWireDisc(Vector3.zero, Vector3.right, area.Radius);
+                    Handles.DrawWireDisc(Vector3.zero, Vector3.forward, area.Radius);
+                }
+                else
+                    Handles.DrawWireCube(Vector3.zero, area.Size);
+            }
+            if (!settings.Push || settings.RandomDirection
                 || !float.IsFinite(settings.Direction.x) || !float.IsFinite(settings.Direction.y)
                 || !float.IsFinite(settings.Direction.z) || settings.Direction.sqrMagnitude < 0.000001f)
                 return;

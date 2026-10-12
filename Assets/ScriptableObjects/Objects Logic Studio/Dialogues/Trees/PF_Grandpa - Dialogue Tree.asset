@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: PF_Grandpa - Dialogue Tree
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: 5f0b56e6a9b844458f571ac444e8ca14
+  Nodes:
+  - Id: 5f0b56e6a9b844458f571ac444e8ca14
+    Name: Select Entry
+    Position: {x: 30, y: 100}
+    Kind: 1
+    Entry: {fileID: 0}
+    Next: 
+    Otherwise: 
+    Selection: 0
+    Branches:
+    - Name: Tutorial 1 - A
+      Target: 9df90b8fb4774ca0a5afacc859f73070
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 9df90b8fb4774ca0a5afacc859f73070
+    Name: Tutorial 1 - A
+    Position: {x: 350, y: 100}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: eb634fdb5f8a4b2f9b78dc13ec274f7e, type: 2}
+    Next: d47a95cd9c2e4b0598b1b98f2907d026
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: d47a95cd9c2e4b0598b1b98f2907d026
+    Name: End
+    Position: {x: 640, y: 100}
+    Kind: 5
+    Entry: {fileID: 0}
+    Next: 
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}

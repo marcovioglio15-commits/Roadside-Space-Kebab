@@ -27,6 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool physicsSuppressed;
         private ItemAppearanceChanges appearance;
         private AssemblyPartVisibility visibility;
+        private AssemblyPartMotion motion;
         private readonly Dictionary<Collider, Collider> shapes = new Dictionary<Collider, Collider>();
         private ObjectFlag[] ingredientFlags = System.Array.Empty<ObjectFlag>();
 
@@ -102,6 +103,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Actual ingredients remain children; separate shape transforms bypass their dormant rigidbody.
             AssemblyMagnet magnet = owner.Settings.Magnets[index];
+            Pose incoming = new Pose(transform.position, transform.rotation);
+            Vector3 incomingScale = (owner.transform.worldToLocalMatrix * transform.localToWorldMatrix).lossyScale;
             gameObject.name = magnet.Name;
             transform.SetParent(owner.transform, false);
             transform.SetLocalPositionAndRotation(magnet.Position, Quaternion.Euler(magnet.Rotation));
@@ -120,6 +123,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             physicsSuppressed = false;
             attached = true;
             RefreshPhysics();
+            if (owner.Table != null && owner.Table.Settings.AnimatePlacement)
+                motion = new AssemblyPartMotion(transform, geometry.transform, incoming, incomingScale, owner.Table.Settings.PlacementDuration);
+        }
+
+        /// <summary>Runs only while an accepted ingredient is moving into its station-authored placement.</summary>
+        private void LateUpdate()
+        {
+            if (motion == null)
+                return;
+            if (!attached || product == null || geometry == null || motion.Tick())
+                motion = null;
         }
 
         /// <summary>Restores standalone behavior when an external operation removes this ingredient from its product.</summary>
@@ -204,6 +218,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Detach()
         {
             // Disable proxy collisions before original colliders become active again.
+            motion = null;
             attached = false;
             RemoveGeometry();
             product.Remove(this);

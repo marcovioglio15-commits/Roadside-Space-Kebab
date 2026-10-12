@@ -17,16 +17,30 @@ MonoBehaviour:
     Text: Falafel Wrap
     Quantity: 1
     Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
     Flags:
     - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
     RequireAllFlags: 0
     UseRecipeModifiers: 0
-    IncludeBaseOrder: 1
-    Variants: []
+    IncludeBaseOrder: 0
+    Variants:
+    - Name: Variant
+      Text: Variant
+      Weight: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags: []
   - Name: Kebab Wrap
     Text: Kebab Wrap
     Quantity: 1
     Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
     Flags:
     - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
     RequireAllFlags: 0
@@ -37,6 +51,10 @@ MonoBehaviour:
     Text: Fried Crab Claws
     Quantity: 1
     Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
     Flags:
     - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
     RequireAllFlags: 0
@@ -47,6 +65,10 @@ MonoBehaviour:
     Text: Pizza Rossa
     Quantity: 1
     Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
     Flags:
     - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     RequireAllFlags: 0

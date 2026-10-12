@@ -6,7 +6,7 @@ namespace RoadsideSpaceKebab.Audio
 {
     /// <summary>Runs the scene's Audio Studio catalog through the installed FMOD integration.</summary>
     [DefaultExecutionOrder(-10000)]
-    public sealed class GameplayAudio : MonoBehaviour, IStudioAudioBackend
+    public sealed class GameplayAudio : MonoBehaviour, IStudioAudioBackend, IStudioMusicBackend
     {
         #region Fields
 
@@ -125,6 +125,20 @@ namespace RoadsideSpaceKebab.Audio
 
         #endregion
         #region Playback
+
+        /// <summary>Starts a fresh music voice for the next day while leaving scene effects and ambience intact.</summary>
+        public void RestartMusic()
+        {
+            // Stop before requesting the same key so single-instance and rate limits cannot suppress the restart.
+            musicVoice?.Stop();
+            musicVoice = null;
+            nextMusic = 0f;
+            if (!initialized || string.IsNullOrEmpty(music))
+                return;
+            history.Remove(music);
+            musicVoice = Play(music, null, Vector3.zero, null, null, 0f);
+            nextMusic = Time.unscaledTime + 1f;
+        }
 
         /// <summary>Queues one configured event, preserving its position if the source is consumed immediately.</summary>
         /// <param name="key">Unique Audio Studio binding key.</param>

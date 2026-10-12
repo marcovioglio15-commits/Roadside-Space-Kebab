@@ -1,0 +1,288 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: PF_Client_ShadowbladeHellfury_FalafelWrap+KebabWrap+CrabClaws+PizzaRossa - Shadowblade Delivery Wrong Tree
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: bd426152d6ed429683b1e929e279c218
+  Nodes:
+  - Id: bd426152d6ed429683b1e929e279c218
+    Name: Select Entry
+    Position: {x: 30, y: 100}
+    Kind: 1
+    Entry: {fileID: 0}
+    Next: 
+    Otherwise: 
+    Selection: 1
+    Branches:
+    - Name: Shadowblade Order Wrong 1 - A
+      Target: 69845a1063014e829dc99e971c477017
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Wrong 2 - A
+      Target: 1bad2719cbec4d23985d4c5ed277ae26
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Wrong 3 - A
+      Target: 50a30c086b7243cf819a32c934c157d5
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Wrong 4 - A
+      Target: 0cb005cca4db4746a9f6c000a0493dd8
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Shadowblade Order Wrong 5 - A
+      Target: c1b64e0a4c9a4432864d2ad869942dfe
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 69845a1063014e829dc99e971c477017
+    Name: Shadowblade Order Wrong 1 - A
+    Position: {x: 350, y: 100}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 5414d91ace7242deb931154981ddee37, type: 2}
+    Next: 6cc4a1bad57c467a8968e11b1c47f014
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 1bad2719cbec4d23985d4c5ed277ae26
+    Name: Shadowblade Order Wrong 2 - A
+    Position: {x: 350, y: 255}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 19fae814c4a14db3a6f6ff6613d0200a, type: 2}
+    Next: 6cc4a1bad57c467a8968e11b1c47f014
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 50a30c086b7243cf819a32c934c157d5
+    Name: Shadowblade Order Wrong 3 - A
+    Position: {x: 350, y: 410}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 3810e52be17f4cfb94d3f6027bb2c5ff, type: 2}
+    Next: 6cc4a1bad57c467a8968e11b1c47f014
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 0cb005cca4db4746a9f6c000a0493dd8
+    Name: Shadowblade Order Wrong 4 - A
+    Position: {x: 640, y: 100}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 5d6b6593afbb4c1d9eb119e30e1fa010, type: 2}
+    Next: 6cc4a1bad57c467a8968e11b1c47f014
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: c1b64e0a4c9a4432864d2ad869942dfe
+    Name: Shadowblade Order Wrong 5 - A
+    Position: {x: 640, y: 255}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 8272deb4945e45eda0cfd863b8d37e2b, type: 2}
+    Next: 6cc4a1bad57c467a8968e11b1c47f014
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 6cc4a1bad57c467a8968e11b1c47f014
+    Name: End
+    Position: {x: 930, y: 100}
+    Kind: 5
+    Entry: {fileID: 0}
+    Next: 
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}

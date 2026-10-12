@@ -1,0 +1,200 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: PF_Client_Mothman_Nuggets+Fries+Water - Mothman Delivery Wrong Tree
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: 0c5ca225465e4695bcb4e4086ad1fb45
+  Nodes:
+  - Id: 0c5ca225465e4695bcb4e4086ad1fb45
+    Name: Select Entry
+    Position: {x: 30, y: 100}
+    Kind: 1
+    Entry: {fileID: 0}
+    Next: 
+    Otherwise: 
+    Selection: 1
+    Branches:
+    - Name: Mothman Order Wrong 1 - A
+      Target: 7a63dbab22ef4fdb971b521db3ebb2e3
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Mothman Order Wrong 2 - A
+      Target: 2e46fc67ec87451cb5da06d811e46efe
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    - Name: Mothman Order Wrong 3 - A
+      Target: a2ebcf837df64ad0857e86dfa673dc9b
+      Weight: 1
+      Condition:
+        RequireAll: 1
+        Invert: 0
+        CheckFlags: 0
+        Flags: []
+        AllFlags: 1
+        CheckSpawn: 0
+        FirstSpawn: 1
+        LastSpawn: 0
+        Consumption:
+          Enabled: 0
+          RequiredFlags: []
+          Orders: []
+          RequireAll: 1
+          Result: 0
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 7a63dbab22ef4fdb971b521db3ebb2e3
+    Name: Mothman Order Wrong 1 - A
+    Position: {x: 350, y: 100}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 69ff920617c941af9f4eaa8f85bc0a5d, type: 2}
+    Next: 998a2169e1164a96871eb5969fc8a150
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 2e46fc67ec87451cb5da06d811e46efe
+    Name: Mothman Order Wrong 2 - A
+    Position: {x: 350, y: 255}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: 7ce062df15ef446a8c7a17d63d72c19a, type: 2}
+    Next: 998a2169e1164a96871eb5969fc8a150
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: a2ebcf837df64ad0857e86dfa673dc9b
+    Name: Mothman Order Wrong 3 - A
+    Position: {x: 640, y: 100}
+    Kind: 0
+    Entry: {fileID: 11400000, guid: ef38d877bd7641bda2bdcc3f42844cc0, type: 2}
+    Next: 998a2169e1164a96871eb5969fc8a150
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}
+  - Id: 998a2169e1164a96871eb5969fc8a150
+    Name: End
+    Position: {x: 930, y: 100}
+    Kind: 5
+    Entry: {fileID: 0}
+    Next: 
+    Otherwise: 
+    Selection: 0
+    Branches: []
+    Condition:
+      RequireAll: 1
+      Invert: 0
+      CheckFlags: 0
+      Flags: []
+      AllFlags: 1
+      CheckSpawn: 0
+      FirstSpawn: 1
+      LastSpawn: 0
+      Consumption:
+        Enabled: 0
+        RequiredFlags: []
+        Orders: []
+        RequireAll: 1
+        Result: 0
+    Duration: 1
+    Subtree: {fileID: 0}

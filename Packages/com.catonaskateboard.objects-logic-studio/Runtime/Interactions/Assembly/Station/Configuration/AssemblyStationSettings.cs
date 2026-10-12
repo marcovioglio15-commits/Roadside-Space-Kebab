@@ -35,6 +35,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Vector3 OutputPosition = new Vector3(0f, 0.5f, 0f);
         [Tooltip("Product root rotation in degrees relative to the table.")]
         public Vector3 OutputRotation;
+        [Tooltip("Ease ingredients into their station magnet instead of snapping. Applies to provisional placements and committed assembly parts.")]
+        public bool AnimatePlacement = true;
+        [Tooltip("Scaled seconds for the station's ingredient placement animation.")]
+        public float PlacementDuration = 0.25f;
         [Tooltip("Allow a carried product from this same prefab to be returned to an empty table for further assembly.")]
         public bool AcceptReturnedProduct = true;
 
@@ -68,6 +72,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || Trigger != AssemblyStationTrigger.InputAction && (!InteractionValues.Positive(ContactQueryInterval)
                     || !float.IsFinite(ContactTolerance) || ContactTolerance < 0f)
                 || !InteractionValues.Finite(OutputPosition)
+                || AnimatePlacement && !InteractionValues.Positive(PlacementDuration)
                 || !InteractionValues.Finite(OutputRotation))
                 return false;
             warning = string.Empty;

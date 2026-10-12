@@ -164,7 +164,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     if (settings.UseContainer)
                         return false;
-                    GameObject created = Instantiate(settings.Prefab, position, rotation);
+                    GameObject created = ObjectSpawnHistory.Create(settings.Prefab, position, rotation);
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
                     ObjectGrab candidate = created.GetComponent<ObjectGrab>();
                     if (candidate == null || !candidate.Begin(observer, transform, settings.PickupDuration) || !candidate.IsHeld)

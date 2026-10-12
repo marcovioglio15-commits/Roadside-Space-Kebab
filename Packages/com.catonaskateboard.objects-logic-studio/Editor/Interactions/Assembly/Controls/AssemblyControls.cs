@@ -5,6 +5,7 @@ using CatOnASkateboard.StudioIdentity;
 using System;
 using UnityEditor;
 using UnityEngine;
+using CatOnASkateboard.StudioInput.Editor;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
@@ -65,6 +66,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             HoverControls.Field(settings, "OutputPosition");
             HoverControls.Field(settings, "OutputRotation");
+            HoverControls.Field(settings, "AnimatePlacement");
+            if (settings.FindPropertyRelative("AnimatePlacement").boolValue)
+                HoverControls.Field(settings, "PlacementDuration");
         }
 
         #endregion
@@ -123,6 +127,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUI.IndentLevelScope())
                     DrawMagnets(settings.FindPropertyRelative("Magnets"));
             RefreshIngredients(settings.FindPropertyRelative("Ingredients"));
+            HoverControls.Field(settings, "FinalizeOnGrab");
+            GameObject source = HierarchyPathMenu.Source(settings, true);
+            if (settings.FindPropertyRelative("FinalizeOnGrab").boolValue && (source == null || source.GetComponent<ObjectGrab>() == null))
+            {
+                StudioInputActionMenu.Draw(settings.serializedObject, settings.FindPropertyRelative("FinalizeAction").propertyPath,
+                    "ObjectsLogicStudio.Assembly.Finalize", ExtendedInteractionControls.Button);
+                TransferInteractionControls.Target(settings.FindPropertyRelative("FinalizeTarget"), sections);
+            }
             SerializedProperty completed = settings.FindPropertyRelative("CompletedAppearance");
             ItemAppearanceControls.Draw(completed);
             if (completed.isExpanded && completed.FindPropertyRelative("Meshes").arraySize > 0)

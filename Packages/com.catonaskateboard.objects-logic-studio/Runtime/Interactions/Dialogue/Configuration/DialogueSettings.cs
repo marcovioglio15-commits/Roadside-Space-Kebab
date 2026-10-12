@@ -1,13 +1,14 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Determines what requests a dialogue after range and consumption conditions pass.</summary>
     public enum DialogueTrigger { Proximity, InputAction, Consumption, SpawnArrival }
-    /// <summary>Chooses among dialogue entries whose flag requirements are satisfied.</summary>
+    /// <summary>Chooses among eligible dialogue entries or branches of a graph selector.</summary>
     public enum DialogueSelection { Sequence, Random, WeightedRandom }
-    /// <summary>Controls the next entry after a dialogue is interrupted by range or availability.</summary>
+    /// <summary>Controls retained dialogue progress after interruption by range or availability.</summary>
     public enum DialogueInterruption { Resume, Restart, SelectNext }
 
     /// <summary>Defines one explicit dialogue page; the advance action moves to the next array entry.</summary>
@@ -43,8 +44,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float ExitDistance = 4f;
         [Tooltip("Higher values start first when several eligible dialogue interactions compete for the HUD.")]
         public int Priority;
-        [Tooltip("Let an eligible Single interaction use a shared start or advance action first. A successful Single consumes the press without starting or advancing this dialogue.")]
+        [Tooltip("Let selected interaction types use the same start or advance button first, including separate input actions bound to that physical button.")]
         public bool PreferSingleActions = true;
+        [Tooltip("Eligible interaction types that may consume a shared press before this dialogue. Only Throw has priority by default.")]
+        public DialogueActionPriority PreferredActions = DialogueActionPriority.Throw;
         [Header("Visibility")]
         [Tooltip("Require some part of the object to be inside the gameplay camera frame and unobstructed when starting or resuming dialogue.")]
         public bool RequireSightToStart;
@@ -57,14 +60,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Fallback sight point for objects without renderers or colliders. Visible geometry otherwise determines sight.")]
         public Vector3 SightOffset;
         [Header("Dialogue Flow")]
-        [Tooltip("Choose eligible entries in array order, uniformly at random, or using their relative weights.")]
-        public DialogueSelection Selection;
-        [Tooltip("After interruption, resume the current page, restart its first page, or select the next entry using the configured selection mode.")]
+        [Tooltip("After interruption, resume the current page, restart its entry, or select the next eligible entry.")]
         public DialogueInterruption Interruption;
         [Tooltip("Allow a completed dialogue to start again after the player leaves the exit range and returns. Consumption mode also rearms when new items are consumed.")]
         public bool ReplayOnReturn = true;
-        [Tooltip("Shared dialogue entry presets containing pages, selection weights and optional consumption conditions.")]
+        [Tooltip("For Input Action triggers, allow a fresh press to start another entry after completion without leaving Exit Distance. Holding the button never repeats automatically.")]
+        public bool ReplayOnInput;
+        [Tooltip("Select eligible entries in sequence, uniformly at random or using their weights.")]
+        public DialogueSelection Selection;
+        [Tooltip("Shared entry presets used by default. Each entry contains its own ordered pages and optional consumption filter.")]
         public DialogueEntry[] Entries = Array.Empty<DialogueEntry>();
+        [Tooltip("Replace entries and selection mode for exact spawn occurrences or from a spawn threshold onward.")]
+        public bool UseSpawnPresets;
+        [Tooltip("Exact rules win over the highest matching From threshold. Only Entries and Selection are read from each preset; activation, audio, inputs and nested spawn rules remain local.")]
+        public DialogueSpawnPreset[] SpawnPresets = Array.Empty<DialogueSpawnPreset>();
+        [Tooltip("Shared conversation graph containing connected entries, conditions, waits and subtrees.")]
+        [HideInInspector]
+        public DialogueTree Tree;
+        [Tooltip("Select a different tree for exact prefab spawn occurrences or from a spawn threshold onward.")]
+        [HideInInspector]
+        public bool UseSpawnTrees;
+        [Tooltip("Exact rules win over the highest applicable From threshold. Counts are shared with Available Orders.")]
+        [HideInInspector]
+        public DialogueSpawnTree[] SpawnTrees = Array.Empty<DialogueSpawnTree>();
         [Header("Audio")]
         [Tooltip("Optional voice phrases and final-page result sound.")]
         public DialogueAudioSettings Audio = new DialogueAudioSettings();
@@ -91,35 +109,104 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else if ((RequireSightToStart || RequireSightToContinue || HideWhenSightLost) && !InteractionValues.Finite(SightOffset))
                 warning = "Dialogue Sight Offset must be finite.";
             else if (Trigger is not (DialogueTrigger.Proximity or DialogueTrigger.InputAction or DialogueTrigger.Consumption or DialogueTrigger.SpawnArrival)
-                || Selection is not (DialogueSelection.Sequence or DialogueSelection.Random or DialogueSelection.WeightedRandom)
                 || Interruption is not (DialogueInterruption.Resume or DialogueInterruption.Restart or DialogueInterruption.SelectNext))
                 warning = "Choose supported dialogue trigger, selection and interruption modes.";
-            else if (Entries == null || Entries.Length == 0)
-                warning = "Add at least one dialogue entry.";
             else if (Trigger == DialogueTrigger.Consumption && (Consumption == null || !Consumption.TryValidate(orders, out warning, !bound)))
                 warning = warning.Length > 0 ? warning : "Configure the interaction consumption filter.";
+            else if (PreferSingleActions && (int)PreferredActions != -1 && (PreferredActions & ~DialogueActionPriority.All) != 0)
+                warning = "Choose supported dialogue input priority types.";
             else
             {
-                double totalWeight = 0d;
-                for (int entryIndex = 0; entryIndex < Entries.Length; entryIndex++)
+                if (!ValidateEntries(this, Trigger == DialogueTrigger.Consumption, orders, bound, out warning))
+                    return false;
+                if (!UseSpawnPresets)
+                    return true;
+                warning = "Add at least one spawn preset rule or disable spawn presets.";
+                if (SpawnPresets == null || SpawnPresets.Length == 0)
+                    return false;
+                // Reusable content is checked in the destination's context without following nested overrides.
+                HashSet<(OrderSpawnMatch, int)> rules = new HashSet<(OrderSpawnMatch, int)>();
+                foreach (DialogueSpawnPreset rule in SpawnPresets)
                 {
-                    DialogueEntry entry = Entries[entryIndex];
-                    if (entry == null)
-                    {
-                        warning = "Assign a preset to every dialogue entry or remove the empty reference.";
-                        break;
-                    }
-                    if (!entry.TryValidate(out warning, Trigger == DialogueTrigger.Consumption,
-                        Selection == DialogueSelection.WeightedRandom, orders, bound))
-                        warning = $"Dialogue entry {entryIndex + 1} ('{entry.Name}'): {warning}";
-                    if (warning.Length > 0)
-                        break;
-                    totalWeight += entry.Weight;
+                    warning = "Spawn preset rules require a positive occurrence, assigned preset and unique mode/occurrence pair.";
+                    if (rule == null || rule.Preset == null || rule.Spawn <= 0
+                        || rule.Match is not (OrderSpawnMatch.Exact or OrderSpawnMatch.From) || !rules.Add((rule.Match, rule.Spawn)))
+                        return false;
+                    if (!ValidateEntries(rule.Preset.Settings, Trigger == DialogueTrigger.Consumption, orders, bound, out warning))
+                        return false;
                 }
-                if (warning.Length == 0 && Selection == DialogueSelection.WeightedRandom && totalWeight <= 0d)
-                    warning = "At least one dialogue entry needs a positive selection weight.";
+                warning = string.Empty;
             }
             return warning.Length == 0;
+        }
+
+        /// <summary>Checks reusable entries against the consuming interaction, without following a preset's own spawn rules.</summary>
+        /// <param name="content">Default or spawn-specific entry selection.</param>
+        /// <param name="consumption">Whether receipt conditions participate.</param>
+        /// <param name="orders">Destination order catalogs.</param>
+        /// <param name="bound">Whether the destination is known.</param>
+        /// <param name="warning">Receives the first invalid entry or selection mode.</param>
+        /// <returns>True when the entry list can be selected and displayed.</returns>
+        private static bool ValidateEntries(DialogueSettings content, bool consumption, OrderSettings orders, bool bound, out string warning)
+        {
+            warning = "Add at least one entry and choose a supported selection mode.";
+            if (content == null || content.Entries == null || content.Entries.Length == 0
+                || content.Selection is not (DialogueSelection.Sequence or DialogueSelection.Random or DialogueSelection.WeightedRandom))
+                return false;
+            // Shared entries retain their own pages and predicates; the destination defines which predicates are active.
+            foreach (DialogueEntry entry in content.Entries)
+            {
+                warning = "Assign every dialogue entry preset.";
+                if (entry == null || !entry.TryValidate(out warning, consumption, content.Selection == DialogueSelection.WeightedRandom, orders, bound))
+                    return false;
+            }
+            warning = string.Empty;
+            return true;
+        }
+
+        /// <summary>Selects reusable entry content once per spawn without overriding the component's activation policy.</summary>
+        /// <param name="spawn">One-based occurrence shared with Available Orders.</param>
+        /// <returns>Matching preset content, or this interaction's default content.</returns>
+        public DialogueSettings ResolveEntries(int spawn)
+        {
+            DialogueSettings selected = this;
+            int threshold = 0;
+            // Exact overrides are independent of array order; otherwise the nearest preceding threshold wins.
+            if (UseSpawnPresets && SpawnPresets != null)
+                foreach (DialogueSpawnPreset rule in SpawnPresets)
+                    if (rule?.Preset != null && rule.Spawn <= spawn)
+                    {
+                        if (rule.Match == OrderSpawnMatch.Exact && rule.Spawn == spawn)
+                            return rule.Preset.Settings;
+                        if (rule.Match == OrderSpawnMatch.From && rule.Spawn > threshold)
+                        {
+                            selected = rule.Preset.Settings;
+                            threshold = rule.Spawn;
+                        }
+                    }
+            return selected;
+        }
+
+        /// <summary>Freezes the conversation source using the same exact/threshold precedence as orders.</summary>
+        /// <param name="spawn">One-based prefab occurrence.</param>
+        /// <returns>The exact override, latest threshold or default tree.</returns>
+        public DialogueTree ResolveTree(int spawn)
+        {
+            DialogueTree selected = Tree;
+            int threshold = 0;
+            if (UseSpawnTrees && SpawnTrees != null)
+                foreach (DialogueSpawnTree rule in SpawnTrees)
+                    if (rule != null && rule.Spawn <= spawn)
+                    {
+                        if (rule.Match == OrderSpawnMatch.Exact && rule.Spawn == spawn)
+                            return rule.Tree;
+                        if (rule.Match == OrderSpawnMatch.From && rule.Spawn > threshold)
+                        {
+                            selected = rule.Tree;
+                            threshold = rule.Spawn;
+                        }
+                    }
+            return selected;
         }
 
         #endregion

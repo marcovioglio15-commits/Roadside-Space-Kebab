@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6745016005099489948}
   - component: {fileID: 6163274015710807966}
   - component: {fileID: 1928205832445655370}
+  - component: {fileID: 9020550798633303497}
   m_Layer: 0
   m_Name: PF_GravityGenerator
   m_TagString: Untagged
@@ -168,6 +169,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -179,7 +181,7 @@ MonoBehaviour:
   settings:
     AffectObjects: 1
     Filter:
-      IncludeSelf: 1
+      IncludeSelf: 0
       RequireAllGroups: 1
       UseLayers: 1
       Layers:
@@ -190,7 +192,17 @@ MonoBehaviour:
       FlagMatch: 0
       UseInteractions: 1
       Interactions: 2
-      RequireAllInteractions: 0
+      RequireAllInteractions: 1
+    Area:
+      Enabled: 1
+      Shape: 0
+      Offset: {x: 0, y: 0, z: 0}
+      Radius: 6
+      Size: {x: 10, y: 10, z: 10}
+      Rotation: {x: 0, y: 0, z: 0}
+      TrackEntries: 1
+      QueryInterval: 0.2
+      RestoreOutside: 1
     RandomInterval: 1
     Interval: 10
     IntervalRange: {x: 5, y: 15}
@@ -218,7 +230,7 @@ MonoBehaviour:
     RandomForceDuration: 1
     ForceDuration: 0
     ForceDurationRange: {x: 0, y: 0.1}
-    AffectPlayer: 1
+    AffectPlayer: 0
     FilterPlayer: 0
     Player:
       Mass: 75
@@ -237,3 +249,43 @@ MonoBehaviour:
       SuspendedMassScale: 0.01
       SuspendedPushSpeed: 1.1
       RestoredMomentum: 1
+--- !u!114 &9020550798633303497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223708863260245989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    Flags: []
+    OffscreenDelay: 0.25

@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Chooses fulfilled orders or a delivery that matched no unfinished ticket.</summary>
-    public enum DialogueOrderResult { Completed, UnexpectedDelivery }
+    /// <summary>Chooses cumulative order progress, surplus units or the latest delivery's open-slot match.</summary>
+    public enum DialogueOrderResult { Completed, UnexpectedDelivery, NotPendingOrder, PendingOrder }
 
     /// <summary>Shares consumption eligibility between a complete dialogue and its individual entries.</summary>
     [Serializable]
@@ -21,8 +21,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string[] Orders = Array.Empty<string>();
         [Tooltip("Require every selected active order or flag requirement. Otherwise any one match is sufficient.")]
         public bool RequireAll = true;
-        [Tooltip("Completed waits for all units of a selected order. Unexpected Delivery reacts to the latest delivery when some units matched no unfinished order.")]
+        [Tooltip("Completed waits for every extracted slot to be consumed. Unexpected Delivery checks surplus units. Pending Order accepts a delivery matching an open slot before consumption; Not Pending Order accepts only deliveries matching none. Only Unexpected Delivery uses selected order names.")]
         public DialogueOrderResult Result;
+
+        /// <summary>Whether this filter classifies the latest receipt against all open slots instead of named orders.</summary>
+        public bool UsesPendingDelivery => Result is DialogueOrderResult.NotPendingOrder or DialogueOrderResult.PendingOrder;
 
         #endregion
         #region Methods
@@ -36,6 +39,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (!Enabled)
                 return true;
+            // Ticket fulfilment runs before dialogue polling; its receipt snapshot retains the pre-fulfilment classification.
+            if (UsesPendingDelivery)
+                return orders != null && orders.TryLatestDelivery(out bool pending) && pending == (Result == DialogueOrderResult.PendingOrder);
+            if (orders != null && Result == DialogueOrderResult.Completed)
+                return orders.AllCompleted;
             if (orders == null)
             {
                 // Each receipt is counted once even when it carries several accepted flags.
@@ -71,13 +79,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = string.Empty;
             if (!Enabled)
                 return true;
+            if (UsesPendingDelivery)
+            {
+                if (catalog != null || unbound)
+                    return true;
+                warning = "Pending Order and Not Pending Order require Available Orders on this object.";
+                return false;
+            }
+            // Order completion is global; flag receipts remain available on objects without orders.
+            if (Result == DialogueOrderResult.Completed && (catalog != null || unbound && (RequiredFlags == null || RequiredFlags.Length == 0)))
+                return true;
             if (catalog != null || unbound && Orders != null && Orders.Length > 0)
             {
                 warning = "Select at least one available order and a supported consumption result.";
                 if (Orders == null || Orders.Length == 0 || Result is not (DialogueOrderResult.Completed or DialogueOrderResult.UnexpectedDelivery))
                     return false;
                 foreach (string name in Orders)
-                    if (string.IsNullOrWhiteSpace(name) || catalog != null && (catalog.Catalog == null || !catalog.Catalog.ContainsOrder(name)))
+                    if (string.IsNullOrWhiteSpace(name) || catalog != null && !catalog.ContainsOrder(name))
                     {
                         warning = "An order selected by the dialogue is missing from Available Orders: " + name;
                         return false;

@@ -53,6 +53,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public DialogueHud DialogueHud => dialogueHud;
         /// <summary>Cached identified root used for distance and player-collider filtering.</summary>
         public Transform Player => player;
+        /// <summary>Current gameplay player used by scene-preserving respawn.</summary>
+        internal static Transform ActivePlayer => HasPlayer ? active.player : null;
+        /// <summary>Gameplay camera used for offscreen presence limits.</summary>
+        internal static Camera ActiveView => active != null ? active.resolvedView : null;
         /// <summary>Cached tools belonging to the sole active observer player.</summary>
         internal static CatOnASkateboard.PlayerStudio.PlayerTools ActiveTools => HasPlayer ? active.tools : null;
         /// <summary>Whether tool restrictions have an active player context.</summary>
@@ -154,6 +158,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Context
 
+        /// <summary>Releases ongoing player interactions before a scene-local respawn.</summary>
+        /// <param name="root">Player whose carry and dialogue state must stop.</param>
+        internal static void ReleasePlayer(Transform root)
+        {
+            if (active == null || active.player != root)
+                return;
+            active.singles.Reset();
+            active.dialogues.Reset();
+            HoverRegistry.HideAll();
+        }
+
         /// <summary>Requests a new camera and identified player after an explicit runtime camera or flag change.</summary>
         public void RefreshContext()
         {
@@ -192,6 +207,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (identity == null)
                 identity = ObjectIdentityRegistry.FindUnique(playerFlag);
             player = identity != null ? identity.transform : null;
+            PlayerSceneReturn.Capture(player);
             if (player == null)
                 Report("Hover Observer needs one active player with the selected flag, or a matching camera ancestor.");
             else

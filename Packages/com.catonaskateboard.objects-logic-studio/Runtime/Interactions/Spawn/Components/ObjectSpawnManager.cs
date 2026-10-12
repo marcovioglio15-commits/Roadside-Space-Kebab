@@ -293,7 +293,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 GameObject created;
                 if (batch != null)
                 {
-                    created = Instantiate(settings.Choices[selected].Prefab, staging, false);
+                    created = ObjectSpawnHistory.Create(settings.Choices[selected].Prefab, staging, false);
                     created.SetActive(false);
                     created.transform.SetParent(null, false);
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
@@ -301,7 +301,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
                 else
                 {
-                    created = Instantiate(settings.Choices[selected].Prefab, position, rotation);
+                    created = ObjectSpawnHistory.Create(settings.Choices[selected].Prefab, position, rotation);
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
                 }
                 if (settings.LimitAlive)

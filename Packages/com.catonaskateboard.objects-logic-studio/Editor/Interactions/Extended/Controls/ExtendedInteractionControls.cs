@@ -30,6 +30,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
             switch (state.Extended.Kind)
             {
+                case ExtendedInteractionKind.Deathbox:
+                    LifetimeControls.Deathbox(draft.FindPropertyRelative("Deathbox"));
+                    break;
+                case ExtendedInteractionKind.PresenceCap:
+                    LifetimeControls.PresenceCap(draft.FindPropertyRelative("PresenceCap"));
+                    break;
                 case ExtendedInteractionKind.ElasticDeformation:
                     SurfaceInteractionControls.ElasticDeformation(draft.FindPropertyRelative("ElasticDeformation"), state.Sections);
                     break;
@@ -264,7 +270,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void DrawDialogue(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Item-specific input and HUD bindings are drawn by the workspace.
-            if (sections.Draw("Dialogue Activation", "Choose trigger, range and arbitration priority.", settings, "Trigger", "Consumption", "Distance", "ExitDistance", "Priority", "PreferSingleActions"))
+            if (sections.Draw("Dialogue Activation", "Choose trigger, range and arbitration priority.", settings, "Trigger", "Consumption", "Distance", "ExitDistance", "Priority", "PreferSingleActions", "PreferredActions"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "Trigger");
@@ -277,6 +283,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                     Field(settings, "Priority");
                     Field(settings, "PreferSingleActions");
+                    if (settings.FindPropertyRelative("PreferSingleActions").boolValue)
+                        Field(settings, "PreferredActions");
                 }
             if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival
                 && sections.Draw("Dialogue Visibility", "Configure startup, page advancement and hiding independently.", settings, "RequireSightToStart", "RequireSightToContinue", "HideWhenSightLost", "ObstacleMask", "SightOffset"))
@@ -293,14 +301,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(settings, "SightOffset");
                     }
                 }
-            if (sections.Draw("Dialogue Flow", "Choose entry order and what happens when the player returns.", settings, "Selection", "Interruption", "ReplayOnReturn"))
+            if (sections.Draw("Dialogue Flow", "Choose entry selection and what happens when the player returns.", settings, "Selection", "UseSpawnPresets", "SpawnPresets", "Interruption", "ReplayOnReturn", "ReplayOnInput"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "Selection");
+                    DialogueSpawnPresetControls.Draw(settings);
                     Field(settings, "Interruption");
+                    if (settings.FindPropertyRelative("Trigger").enumValueIndex == (int)DialogueTrigger.InputAction)
+                        Field(settings, "ReplayOnInput");
                     if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival)
                         Field(settings, "ReplayOnReturn");
                 }
+            if (sections.Draw("Dialogue Entries", "Default shared entries used when no spawn preset overrides them.", settings, "Entries"))
+                using (new EditorGUI.IndentLevelScope())
+                    DialogueEntryControls.DrawEntries(settings);
             if (sections.Draw("Dialogue Audio", "Optional character phrases and final-page result sound.", settings, "Audio"))
                 using (new EditorGUI.IndentLevelScope())
                 {
@@ -310,10 +324,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(audio, "Interval");
                     Field(audio, "Completion");
                 }
-            if (!sections.Draw("Dialogue Entries", "Each entry contains ordered pages and optional consumption requirements.", settings, "Entries"))
-                return;
-            using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
-            DialogueEntryControls.Draw(settings);
         }
 
         #endregion
@@ -333,15 +343,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="name">Exact serialized field name.</param>
         private static void Field(SerializedProperty owner, string name)
         {
-            // Restriction masks need the flags control instead of an enum ordinal popup.
-            if (name is "BlockSelf" or "BlockOther")
+            // Restriction and priority masks share multi-selection without converting through enum ordinals.
+            if (name is not ("BlockSelf" or "BlockOther" or "PreferredActions"))
             {
-                SerializedProperty property = owner.FindPropertyRelative(name);
-                property.intValue = (int)(InteractionChannels)StudioGUI.EnumFlagsField(StudioFieldMenu.Value(property,
-                    new GUIContent(property.displayName, property.tooltip)), (InteractionChannels)property.intValue);
-            }
-            else
                 HoverControls.Field(owner, name);
+                return;
+            }
+            SerializedProperty property = owner.FindPropertyRelative(name);
+            System.Enum value = name switch
+            {
+                "PreferredActions" => (DialogueActionPriority)property.intValue,
+                _ => (InteractionChannels)property.intValue
+            };
+            property.intValue = System.Convert.ToInt32(StudioGUI.EnumFlagsField(StudioFieldMenu.Value(property,
+                new GUIContent(property.displayName, property.tooltip)), value));
         }
 
         #endregion

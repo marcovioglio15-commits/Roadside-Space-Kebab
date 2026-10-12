@@ -18,6 +18,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool AffectObjects = true;
         [Tooltip("Selection reevaluated at pulse start, object activation and identity changes. Qualifying assembled products leave their table after any active movement transaction finishes.")]
         public GravityFilter Filter = new GravityFilter();
+        [Tooltip("Optional sphere or oriented box affecting both physics bodies and players, combined with the normal filters.")]
+        public GravityArea Area = new GravityArea();
         [Tooltip("Randomize the delay between restoration and the next pulse.")]
         public bool RandomInterval;
         [Tooltip("Scaled seconds between restoration and the next pulse.")]
@@ -73,6 +75,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool TryValidate(out string warning)
         {
             warning = "Configure gravity selection.";
+            if (Area == null || !Area.TryValidate(out warning))
+                return false;
             if ((AffectObjects || AffectPlayer && FilterPlayer) && (Filter == null || !Filter.TryValidate(out warning)))
                 return false;
             warning = "Enable affected objects, the player, or both.";

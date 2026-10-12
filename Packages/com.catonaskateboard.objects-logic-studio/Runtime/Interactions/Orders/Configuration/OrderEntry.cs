@@ -20,13 +20,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int Quantity = 1;
         [Tooltip("Relative probability in Weighted Random mode. Zero excludes this candidate.")]
         public float Weight = 1f;
+        [Header("Draw Limits")]
+        [Tooltip("Randomize required draws once per spawn. Base and variants without their own limits share this allowance; each draw adds Quantity tickets.")]
+        public bool RandomRequiredDraws;
+        [Tooltip("Guaranteed draws before optional selection. Zero makes this order optional.")]
+        public int MinimumDraws;
+        [Tooltip("Inclusive range of guaranteed draws sampled once per spawn, before the total unit budget is selected.")]
+        public Vector2Int RequiredDrawRange = new Vector2Int(0, 1);
+        [Tooltip("Maximum total draws of this order and variants without their own limits, including guaranteed draws. Independently limited variants are excluded from this allowance.")]
+        public int MaximumDraws = 1;
         [Header("Identity")]
         [Tooltip("Identity flags identifying items that fulfil this order, captured at consumption time.")]
         public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Require all selected flags on the same consumed item. Otherwise any selected flag qualifies.")]
         public bool RequireAllFlags;
         [Header("Recipe Modifiers")]
-        [Tooltip("Add independently drawn variants requiring flags from ingredients inserted into a completed Assembly Product.")]
+        [Tooltip("Add independently drawn variants requiring or excluding ingredient flags in a completed Assembly Product.")]
         public bool UseRecipeModifiers;
         [Tooltip("Keep the base order as a candidate alongside its variants. Base orders retain their normal identity filters; matching variant tickets are fulfilled first.")]
         public bool IncludeBaseOrder = true;

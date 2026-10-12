@@ -32,6 +32,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public ElasticSettings ElasticDeformation = new ElasticSettings();
         [Tooltip("Detached dirt trail configuration.")]
         public DirtTrailSettings DirtTrail = new DirtTrailSettings();
+        [Tooltip("Death volume contact and player return policy.")]
+        public DeathboxSettings Deathbox = new DeathboxSettings();
+        [Tooltip("Offscreen identity population limit.")]
+        public PresenceCapSettings PresenceCap = new PresenceCapSettings();
         [Tooltip("Detached spray sauce configuration.")]
         public SpraySauceSettings SpraySauce = new SpraySauceSettings();
         [Tooltip("Detached dialogue pages, conditions and flow settings.")]
@@ -96,6 +100,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ObjectDirtTrail dirtTrail:
                     draft.DirtTrail = ObjectWorkspace.Copy(dirtTrail.Settings);
+                    break;
+                case ObjectDeathbox deathbox:
+                    draft.Deathbox = ObjectWorkspace.Copy(deathbox.Settings);
+                    break;
+                case ObjectPresenceCap presenceCap:
+                    draft.PresenceCap = ObjectWorkspace.Copy(presenceCap.Settings);
                     break;
                 case ObjectSpraySauce spraySauce:
                     draft.SpraySauce = ObjectWorkspace.Copy(spraySauce.Settings);
@@ -179,6 +189,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectAmbient => Ambient.TryValidate(out warning),
                 ObjectElasticDeformation elastic => elastic.TryValidate(ElasticDeformation, out warning),
                 ObjectDirtTrail => DirtTrail.TryValidate(out warning),
+                ObjectDeathbox deathbox => deathbox.TryValidate(Deathbox, out warning),
+                ObjectPresenceCap => PresenceCap.TryValidate(out warning),
                 ObjectSpraySauce spray => spray.TryValidate(SpraySauce, StartAction, out warning),
                 ObjectSlice slice => slice.TryValidate(Slice, StartAction, out warning),
                 ObjectSpawnManager => SpawnSourceAuthoring.Validate(SpawnManagement, out warning),

@@ -25,6 +25,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case DirtTrailPreset dirtTrail:
                     dirtTrail.Settings = ObjectWorkspace.Copy(draft.DirtTrail);
                     break;
+                case DeathboxPreset deathbox:
+                    deathbox.Settings = ObjectWorkspace.Copy(draft.Deathbox);
+                    break;
+                case PresenceCapPreset presenceCap:
+                    presenceCap.Settings = ObjectWorkspace.Copy(draft.PresenceCap);
+                    break;
                 case SpraySaucePreset spraySauce:
                     spraySauce.Settings = ObjectWorkspace.Copy(draft.SpraySauce);
                     break;
@@ -79,6 +85,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ExtendedInteractionKind.GravityGenerator => typeof(GravityGeneratorPreset),
                 ExtendedInteractionKind.ElasticDeformation => typeof(ElasticDeformationPreset),
                 ExtendedInteractionKind.DirtTrail => typeof(DirtTrailPreset),
+                ExtendedInteractionKind.Deathbox => typeof(DeathboxPreset),
+                ExtendedInteractionKind.PresenceCap => typeof(PresenceCapPreset),
                 ExtendedInteractionKind.SpraySauce => typeof(SpraySaucePreset),
                 ExtendedInteractionKind.PlayAmbient => typeof(AmbientPreset),
                 ExtendedInteractionKind.Slice => typeof(SlicePreset),

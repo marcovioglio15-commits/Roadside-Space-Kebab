@@ -96,7 +96,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Unregistration also supports pooled or destroyed prefab instances.
             Hide();
+            if (label != null)
+                label.Release();
             HoverRegistry.Unregister(this);
+        }
+
+        /// <summary>Preserves UI lifetime when a visible fixed HUD is temporarily outside this hierarchy.</summary>
+        private void OnDestroy()
+        {
+            if (Application.isPlaying && label != null)
+                label.Dispose(transform);
         }
 
         #endregion

@@ -7541,8 +7541,71 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7919666368900942333, guid: 8997202664fa34243a028a226dcd73ff, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 291428719740982811}
+    - targetCorrespondingSourceObject: {fileID: 7919666368900942333, guid: 8997202664fa34243a028a226dcd73ff, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 291428719740982810}
   m_SourcePrefab: {fileID: 100100000, guid: 8997202664fa34243a028a226dcd73ff, type: 3}
+--- !u!1 &291428719740982809 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7919666368900942333, guid: 8997202664fa34243a028a226dcd73ff, type: 3}
+  m_PrefabInstance: {fileID: 291428719740982808}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &291428719740982810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291428719740982809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    Flags: []
+    OffscreenDelay: 0.25
+--- !u!114 &291428719740982811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 291428719740982809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
 --- !u!1001 &1430425340661555709
 PrefabInstance:
   m_ObjectHideFlags: 0

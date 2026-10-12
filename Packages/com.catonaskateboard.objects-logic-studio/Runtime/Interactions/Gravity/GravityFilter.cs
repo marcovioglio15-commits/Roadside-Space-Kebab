@@ -12,7 +12,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         TriggerAnimation = 64, Eject = 128, ModifyByContact = 256, Dialogue = 512, Outline = 1024,
         Availability = 2048, AssemblyStation = 4096, AssemblyProduct = 8192, SpawnManagement = 16384,
         Slice = 32768, PlayAmbient = 65536, AvailableOrders = 131072, ObjectDegradation = 262144, GravityGenerator = 524288,
-        ElasticDeformation = 1048576, DirtTrail = 2097152, SpraySauce = 4194304, All = 8388607
+        ElasticDeformation = 1048576, DirtTrail = 2097152, SpraySauce = 4194304,
+        Deathbox = 8388608, PresenceCap = 16777216, All = 33554431
     }
 
     /// <summary>Combines independently enabled layer, identity and interaction filters for a gravity pulse.</summary>
@@ -36,7 +37,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Require any selected flag or all selected flags.")]
         public ObjectFlagMatch FlagMatch;
-        [Tooltip("Filter by interactions configured on the body's owning object.")]
+        [Tooltip("Filter by enabled, unlocked interactions on the body's owning object. Recipe and availability locks exclude unfinished features.")]
         public bool UseInteractions;
         [Tooltip("Object interactions accepted by this filter.")]
         public GravityInteractionFilter Interactions = GravityInteractionFilter.Grab;
@@ -79,7 +80,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 enabled++;
                 GravityInteractionFilter found = GravityInteractionFilter.None;
                 foreach (ObjectInteraction interaction in root.GetComponents<ObjectInteraction>())
-                    found |= Kind(interaction);
+                    if (interaction.isActiveAndEnabled && !interaction.IsLocked)
+                        found |= Kind(interaction);
                 if (RequireAllInteractions ? (found & Interactions) == (Interactions & GravityInteractionFilter.All) : (found & Interactions) != 0)
                     matched++;
             }
@@ -87,7 +89,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Maps known component types explicitly for pulse filtering.</summary>
-        /// <param name="interaction">Authored feature, including disabled features.</param>
+        /// <param name="interaction">Enabled, unlocked feature on the owning object.</param>
         /// <returns>The corresponding feature bit.</returns>
         private static GravityInteractionFilter Kind(ObjectInteraction interaction)
         {
@@ -115,6 +117,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 ObjectGravityGenerator => GravityInteractionFilter.GravityGenerator,
                 ObjectElasticDeformation => GravityInteractionFilter.ElasticDeformation,
                 ObjectDirtTrail => GravityInteractionFilter.DirtTrail,
+                ObjectDeathbox => GravityInteractionFilter.Deathbox,
+                ObjectPresenceCap => GravityInteractionFilter.PresenceCap,
                 ObjectSpraySauce => GravityInteractionFilter.SpraySauce,
                 _ => GravityInteractionFilter.None
             };

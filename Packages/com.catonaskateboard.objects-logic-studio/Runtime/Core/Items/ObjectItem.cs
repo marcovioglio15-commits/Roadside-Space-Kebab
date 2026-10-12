@@ -24,6 +24,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private UnityEngine.Object reservation;
         private ObjectGrab grab;
         private ObjectIdentity identity;
+        /// <summary>Shared prefab occurrence retained through technical suspension.</summary>
+        internal readonly ObjectSpawnLifetime Spawn = new ObjectSpawnLifetime();
 
         #endregion
 
@@ -80,6 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases transient ownership when an item leaves the active scene.</summary>
         private void OnDisable()
         {
+            Spawn.Disable(gameObject);
             // Receipts survive disable/enable; resetting a pooled item is an explicit operation.
             locks.Clear();
             blocked = InteractionChannels.None;
@@ -154,6 +157,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A disable/enable cycle must not silently reuse a stale visual transaction.
             return reservation == owner && isActiveAndEnabled && !IsConsumed;
+        }
+
+        #endregion
+
+        #region Spawn Lifetime
+
+        /// <summary>Reserves the item's shared occurrence before dialogue or order selection.</summary>
+        /// <param name="source">Source prefab known by the spawn boundary.</param>
+        /// <param name="occurrence">Reserved hierarchy occurrence, or zero for direct activation.</param>
+        internal void PrepareSpawn(GameObject source, int occurrence)
+        {
+            Spawn.Prepare(gameObject, source, occurrence);
         }
 
         #endregion

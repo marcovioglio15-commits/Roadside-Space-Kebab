@@ -39,6 +39,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private string lastWarning;
         private ItemAppearanceChanges completedAppearance;
         private bool completedAppearanceApplied;
+        /// <summary>Routes the first empty-hand input before product interactions are unlocked.</summary>
+        internal AssemblyPickup Pickup { get; private set; }
 
         #endregion
 
@@ -56,6 +58,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public long IngredientUnits { get; private set; }
         /// <summary>Whether all mandatory quantities have been supplied and at least one ingredient is present.</summary>
         public bool IsComplete { get; private set; }
+        /// <summary>Whether completed presentation and product interactions have been committed.</summary>
+        public bool IsFinalized { get; private set; }
         /// <summary>Recipe counts recorded independently of consumption receipts.</summary>
         public IReadOnlyDictionary<ObjectFlag, int> IngredientCounts => counts;
         /// <summary>Identifies product configuration in the assembly category.</summary>
@@ -82,6 +86,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Initialize();
             if (initialized)
                 RefreshLocks();
+            Pickup?.Register();
         }
 
         /// <summary>Publishes initial assembly events after all prefab-local unlock rules have subscribed.</summary>
@@ -94,6 +99,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases temporary magnet placement before pooling or transferring ingredient ownership.</summary>
         private void OnDisable()
         {
+            Pickup?.Unregister();
             // Completed recipe progress remains intact when the product is reenabled.
             if (TryGetComponent(out ObjectGrab grab))
                 grab.Dock?.Release();
@@ -110,6 +116,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     product.Initialize();
                     if (product.initialized)
                         product.RefreshLocks();
+                    product.Pickup?.Register();
                 }
         }
 
@@ -147,6 +154,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             initialized = true;
+            Pickup ??= new AssemblyPickup(this);
+            Pickup.RefreshGeometry();
             body = GetComponent<Rigidbody>();
             baseMass = body.mass;
             occupied = new bool[settings.Magnets.Length];
@@ -169,6 +178,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 completedAppearance?.Restore();
             completedAppearance = null;
             completedAppearanceApplied = false;
+            IsFinalized = false;
+            if (Pickup != null)
+                Pickup.Confirmed = false;
             initialized = destroying = pendingStart = pendingCompletion = IsComplete = false;
             recipeValidated = false;
             counts.Clear();
@@ -364,7 +376,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Deferred proposals remain inactive until all insertions have completed.
             bool first = parts.Count == 0;
-            bool complete = IsComplete;
             ObjectAssemblyPart part = grab.GetComponent<ObjectAssemblyPart>();
             if (part == null)
                 part = grab.gameObject.AddComponent<ObjectAssemblyPart>();
@@ -380,7 +391,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             RefreshLocks();
             RefreshGeometry();
             pendingStart |= first;
-            pendingCompletion |= !complete && IsComplete;
             if (gameObject.activeInHierarchy)
                 PublishPending();
         }
@@ -441,11 +451,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Captures recipe provenance before consumption deactivates the product hierarchy.</summary>
-        /// <returns>Inserted ingredient flags, or an empty array for an unfinished recipe.</returns>
+        /// <returns>Inserted ingredient flags, or null when the recipe is unfinished.</returns>
         internal ObjectFlag[] CaptureIngredientFlags()
         {
             if (!IsComplete)
-                return System.Array.Empty<ObjectFlag>();
+                return null;
             HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>();
             CollectIngredientFlags(flags);
             ObjectFlag[] result = new ObjectFlag[flags.Count];
@@ -486,6 +496,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         break;
                 }
             SingleInteractionRegistry.Invalidate();
+            Pickup?.RefreshGeometry();
+        }
+
+        /// <summary>Commits a validated empty-hand pickup before the carry transition captures geometry.</summary>
+        internal void ConfirmPickup()
+        {
+            Pickup.Confirmed = true;
+            RefreshLocks();
+            RefreshGeometry();
         }
 
         /// <summary>Applies assembly-owned locks while preserving independent unlock rules.</summary>
@@ -495,29 +514,37 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (features == null)
                 return;
             IsComplete = AssemblyIngredientSelection.Completes(settings, counts, occupied, parts.Count > 0);
-            if (completedAppearanceApplied != IsComplete)
+            if (!IsComplete)
             {
-                if (IsComplete)
+                Pickup.Confirmed = false;
+                pendingCompletion = false;
+            }
+            bool finalized = IsComplete && (!settings.FinalizeOnGrab || Pickup.Confirmed);
+            pendingCompletion |= finalized && !IsFinalized;
+            IsFinalized = finalized;
+            if (completedAppearanceApplied != IsFinalized)
+            {
+                if (IsFinalized)
                     completedAppearance.Commit();
                 else
                     completedAppearance.Restore();
-                completedAppearanceApplied = IsComplete;
+                completedAppearanceApplied = IsFinalized;
             }
             // Optional ingredients inserted after completion also inherit the final presentation immediately.
             foreach (ObjectAssemblyPart part in parts)
             {
-                part.SetGeometryHidden(IsComplete && settings.ReplacesIngredients);
-                part.SetPhysicsSuppressed(IsComplete);
+                part.SetGeometryHidden(IsFinalized && settings.ReplacesIngredients);
+                part.SetPhysicsSuppressed(IsFinalized);
             }
             foreach (ObjectInteraction feature in features)
             {
                 if (feature == null || feature == this || feature is ObjectInteractionUnlock)
                     continue;
-                bool available = IsComplete;
+                bool available = IsFinalized;
                 foreach (AssemblyInteractionRule rule in settings.InteractionRules)
                     if (rule.Target == feature)
                     {
-                        available = rule.RequireComplete ? IsComplete : IngredientUnits >= rule.MinimumIngredients;
+                        available = rule.RequireComplete ? IsFinalized : IngredientUnits >= rule.MinimumIngredients;
                         foreach (ItemFlagRequirement requirement in rule.Ingredients)
                             available &= AssemblyCapacity.Count(counts, requirement.Flags) >= requirement.Count;
                         break;

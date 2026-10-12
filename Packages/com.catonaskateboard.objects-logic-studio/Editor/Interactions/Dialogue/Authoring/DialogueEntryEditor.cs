@@ -27,7 +27,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="catalog">Catalog supplying named order choices, or null for consumed flags.</param>
         /// <param name="consumption">Whether consumption filters are relevant in this context.</param>
         /// <param name="weighted">Whether relative selection weight is relevant.</param>
-        internal void Draw(OrderCatalog catalog, bool consumption, bool weighted)
+        /// <param name="context">Optional union of default and spawn-specific catalogs.</param>
+        internal void Draw(OrderCatalog catalog, bool consumption, bool weighted, OrderSettings context = null)
         {
             using ObjectStudioFieldLayout layout = new ObjectStudioFieldLayout(205f);
             serializedObject.Update();
@@ -35,7 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (weighted)
                 StudioFieldGUI.PropertyField(serializedObject.FindProperty("Weight"));
             if (consumption)
-                DialogueConsumptionControls.Draw(serializedObject.FindProperty("Consumption"), "Filter Entry", catalog);
+                DialogueConsumptionControls.Draw(serializedObject.FindProperty("Consumption"), "Filter Entry", catalog, context);
             SerializedProperty pages = serializedObject.FindProperty("Lines");
             pages.isExpanded = StudioArrayGUI.Foldout(pages, new GUIContent("Pages (" + pages.arraySize + ")", pages.tooltip));
             if (pages.isExpanded)

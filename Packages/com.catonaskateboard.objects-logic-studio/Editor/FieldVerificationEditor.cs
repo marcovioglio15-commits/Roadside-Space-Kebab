@@ -130,7 +130,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using SerializedObject from = new SerializedObject(a);
             using SerializedObject to = new SerializedObject(b);
             StudioPropertyValue copied = new StudioPropertyValue(from.FindProperty("Settings.Entries"));
-            a.Settings.Entries[0].Lines[0].Text = "Changed after Copy";
+            first.Lines[0].Text = "Changed after Copy";
             copied.Apply(to.FindProperty("Settings.Entries"));
             to.ApplyModifiedPropertiesWithoutUndo();
             Check(b.Settings.Entries.Length == 2 && b.Settings.Entries[0] == first && b.Settings.Entries[1] == second,
@@ -140,7 +140,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             StudioPropertyValue number = new StudioPropertyValue(from.FindProperty("Settings.Distance"));
             Check(!number.Accepts(to.FindProperty("Settings.Priority")), "Incompatible numeric types rejected");
             StudioPropertyValue mode = new StudioPropertyValue(from.FindProperty("Settings.Trigger"));
-            Check(!mode.Accepts(to.FindProperty("Settings.Selection")), "Different enum types rejected");
+            Check(!mode.Accepts(to.FindProperty("Settings.Interruption")), "Different enum types rejected");
             mode.Apply(to.FindProperty("Settings.Trigger"));
             to.ApplyModifiedPropertiesWithoutUndo();
             Check(a.Settings.Trigger == b.Settings.Trigger, "Matching enum copied");

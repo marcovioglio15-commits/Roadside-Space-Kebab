@@ -115,7 +115,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ExtendedInteractionKind.Dialogue => feature == ExtendedInteractionKind.Slice,
                 ExtendedInteractionKind.Outline => feature is ExtendedInteractionKind.PlayAmbient or ExtendedInteractionKind.AvailableOrders
                     or ExtendedInteractionKind.ObjectDegradation or ExtendedInteractionKind.GravityGenerator
-                    or ExtendedInteractionKind.ElasticDeformation or ExtendedInteractionKind.DirtTrail,
+                    or ExtendedInteractionKind.ElasticDeformation or ExtendedInteractionKind.DirtTrail
+                    or ExtendedInteractionKind.Deathbox or ExtendedInteractionKind.PresenceCap,
                 ExtendedInteractionKind.AssemblyStation => feature == ExtendedInteractionKind.AssemblyProduct,
                 _ => false
             });
@@ -153,6 +154,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             switch (kind)
             {
+                case ExtendedInteractionKind.Deathbox:
+                    return target.GetComponent<ObjectDeathbox>() == null;
+                case ExtendedInteractionKind.PresenceCap:
+                    return target.GetComponent<ObjectPresenceCap>() == null;
                 case ExtendedInteractionKind.ElasticDeformation:
                     return target.GetComponent<ObjectElasticDeformation>() == null;
                 case ExtendedInteractionKind.DirtTrail:

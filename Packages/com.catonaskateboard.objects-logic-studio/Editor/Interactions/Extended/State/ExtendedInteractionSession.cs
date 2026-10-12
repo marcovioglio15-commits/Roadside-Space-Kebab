@@ -138,6 +138,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ExtendedInteractionKind.GravityGenerator => JsonUtility.ToJson(Draft.GravityGenerator),
                 ExtendedInteractionKind.ElasticDeformation => JsonUtility.ToJson(Draft.ElasticDeformation),
                 ExtendedInteractionKind.DirtTrail => JsonUtility.ToJson(Draft.DirtTrail),
+                ExtendedInteractionKind.Deathbox => JsonUtility.ToJson(Draft.Deathbox),
+                ExtendedInteractionKind.PresenceCap => JsonUtility.ToJson(Draft.PresenceCap),
                 ExtendedInteractionKind.SpraySauce => JsonUtility.ToJson(Draft.SpraySauce),
                 ExtendedInteractionKind.AvailableOrders => JsonUtility.ToJson(Draft.ResolveOrders(target)),
                 ExtendedInteractionKind.PlayAmbient => JsonUtility.ToJson(Draft.Ambient),

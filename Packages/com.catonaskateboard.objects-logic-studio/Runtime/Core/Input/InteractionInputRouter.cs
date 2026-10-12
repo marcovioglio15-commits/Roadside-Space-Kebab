@@ -99,6 +99,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 button.Clear();
         }
 
+        /// <summary>Discards competing performed actions originating from the same physical control.</summary>
+        /// <param name="consumed">Button already assigned to a dialogue or prioritized action.</param>
+        internal void Consume(InteractionButton consumed)
+        {
+            // Device-control identity also covers independently authored actions sharing one key.
+            foreach (InteractionButton button in buttons.Values)
+                if (button.Pending && button.SharesPress(consumed))
+                    button.Clear();
+        }
+
         /// <summary>Finds an already buffered action without subscribing to a new input.</summary>
         /// <param name="reference">Authored action shared by competing interaction drivers.</param>
         /// <returns>The existing button, or null when no interaction uses this action.</returns>

@@ -17,12 +17,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Board text for this variant. The parent order's quantity still occupies separate slots.")]
         [TextArea(2, 5)]
         public string Text = "Variant";
+        [Tooltip("Display the base order text followed by this variant's text, separated by a space. Disable to use only the variant text.")]
+        public bool AppendToBaseText = true;
         [Tooltip("Independent selection weight when Available Orders uses Weighted Random. Zero excludes this variant.")]
         public float Weight = 1f;
+        [Header("Draw Limits")]
+        [Tooltip("Give this variant independent draw limits instead of sharing the parent order's draw allowance. Quantity and identity still come from the parent.")]
+        public bool UseDrawLimits;
+        [Tooltip("Randomize the required draws once per spawn within Required Draw Range.")]
+        public bool RandomRequiredDraws;
+        [Tooltip("Guaranteed draws of this variant before optional selection. Zero makes it optional.")]
+        public int MinimumDraws;
+        [Tooltip("Inclusive range of required draws, sampled before choosing the total unit budget.")]
+        public Vector2Int RequiredDrawRange = new Vector2Int(0, 1);
+        [Tooltip("Maximum draws of this variant, including required draws. Zero excludes it from extraction.")]
+        public int MaximumDraws = 1;
+        [Header("Recipe Modifiers")]
         [Tooltip("Ingredient identity flags captured when inserted into a completed Assembly Product. Product-root flags alone never satisfy these requirements.")]
         public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Require all selected modifier flags across the assembled ingredients. Otherwise any selected modifier qualifies.")]
         public bool RequireAllFlags = true;
+        [Tooltip("Ingredient flags that must all be absent from the assembled product. These exclusions combine with the additive flags above.")]
+        public ObjectFlag[] ExcludedFlags = Array.Empty<ObjectFlag>();
 
         #endregion
         #region Methods
@@ -33,8 +49,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the assembled recipe satisfies this variant's modifiers.</returns>
         internal bool Matches(ObjectFlag[] ingredients)
         {
-            if (Flags == null || Flags.Length == 0 || ingredients == null || ingredients.Length == 0)
+            // Null marks a non-assembled receipt; an empty assembled receipt can still satisfy exclusions.
+            if (ingredients == null)
                 return false;
+            foreach (ObjectFlag flag in ExcludedFlags)
+                if (flag != null && Array.IndexOf(ingredients, flag) >= 0)
+                    return false;
+            if (Flags.Length == 0)
+                return ExcludedFlags.Length > 0;
             foreach (ObjectFlag flag in Flags)
                 if ((flag != null && Array.IndexOf(ingredients, flag) >= 0) != RequireAllFlags)
                     return !RequireAllFlags;

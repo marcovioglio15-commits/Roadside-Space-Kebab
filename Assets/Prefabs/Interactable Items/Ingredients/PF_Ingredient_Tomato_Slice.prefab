@@ -251,6 +251,7 @@ GameObject:
   - component: {fileID: -489835746666742949}
   - component: {fileID: 7669712105219200879}
   - component: {fileID: 6734849819500471505}
+  - component: {fileID: 5019185752787838569}
   m_Layer: 6
   m_Name: PF_Ingredient_Tomato_Slice
   m_TagString: Untagged
@@ -399,6 +400,10 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Instant: 1
     TransitionDuration: 0.2
+    PhysicalPickup: 0
+    PickupTimeMargin: 0.15
+    PickupSpeed: 25
+    PickupPush: 1.5
     WorldCollisions: 1
     FollowSpeed: 8
     RecoveryResponse: 12
@@ -564,12 +569,13 @@ MonoBehaviour:
       centerRadius: 0.08
       queryInterval: 0.05
       releaseDelay: 0.08
-      suspendCarried: 1
+      suspendCarried: 0
       suspendMoving: 0
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967227
+      fixedHud: 1
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -641,6 +647,47 @@ MonoBehaviour:
     HoverOnly: 1
   renderers:
   - {fileID: 1279886815774163200}
+--- !u!114 &5019185752787838569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5670531666105826227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    IncludeFixedObjects: 0
+    Flags: []
+    OffscreenDelay: 0.25
 --- !u!1001 &433057939520904580
 PrefabInstance:
   m_ObjectHideFlags: 0

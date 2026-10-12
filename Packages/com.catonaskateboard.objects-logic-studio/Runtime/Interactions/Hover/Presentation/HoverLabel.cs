@@ -5,6 +5,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Animates existing prefab UI; it never creates graphics, fonts or materials during Play.</summary>
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(1100)]
     [AddComponentMenu("Objects Logic Studio/Hover Label")]
     public sealed class HoverLabel : MonoBehaviour
     {
@@ -40,6 +41,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float scale;
         private float fromAmount;
         private float fromScale;
+        private Transform originalParent;
+        private bool detached;
+        private bool returnPending;
 
         #endregion
 
@@ -74,9 +78,57 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Hide();
         }
 
+        /// <summary>Restores ownership outside SetActive callbacks and removes UI whose original object was destroyed.</summary>
+        private void LateUpdate()
+        {
+            // Detaching the existing overlay must not extend its owner's lifetime.
+            if (!detached)
+                return;
+            if (originalParent == null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            if (!returnPending)
+                return;
+            returnPending = false;
+            detached = false;
+            transform.SetParent(originalParent, false);
+            originalParent = null;
+        }
+
         #endregion
 
         #region Presentation
+
+        /// <summary>Separates the authored overlay from rolling, scaled or physics-interpolated ancestors.</summary>
+        private void PrepareHud()
+        {
+            // Present runs at the observer's safe frame boundary, never inside parent activation callbacks.
+            returnPending = false;
+            if (detached)
+                return;
+            originalParent = transform.parent;
+            transform.SetParent(null, false);
+            transform.localRotation = Quaternion.identity;
+            transform.localScale = Vector3.one;
+            detached = true;
+        }
+
+        /// <summary>Hides immediately and returns detached UI to its prefab hierarchy on the next safe frame.</summary>
+        internal void Release()
+        {
+            Hide();
+            returnPending = detached;
+        }
+
+        /// <summary>Removes owned UI when its interaction is destroyed, including a pending return to the prefab.</summary>
+        /// <param name="owner">Interaction root whose exclusive label is being released.</param>
+        internal void Dispose(Transform owner)
+        {
+            if (OwnedBy(owner))
+                Destroy(gameObject);
+        }
 
         /// <summary>Stops rendering while retaining the complete authored UI hierarchy.</summary>
         public void Hide()
@@ -104,6 +156,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Hide();
                 return;
             }
+            if (settings.FixedHud)
+                PrepareHud();
             if (!shown)
             {
                 amount = 0f;
@@ -133,6 +187,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
 
+            float pixelScale = view.pixelHeight / 1080f;
+            if (settings.FixedHud)
+            {
+                Position(view.pixelRect.center + settings.ScreenOffset * pixelScale, pixelScale);
+                previousTime = time;
+                return;
+            }
             // Smooth world motion only; fresh camera projection avoids lag when the player turns.
             trackedAnchor = Vector3.Lerp(trackedAnchor, anchor, settings.FollowSmoothing > 0f
                 ? 1f - Mathf.Exp(-(time - previousTime) / settings.FollowSmoothing) : 1f);
@@ -146,9 +207,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
 
-            float pixelScale = view.pixelHeight / 1080f;
             Vector2 screenPoint = Vector2.Lerp(origin, (Vector2)destination + settings.ScreenOffset * pixelScale, amount);
+            Position(screenPoint, pixelScale);
+        }
 
+        /// <summary>Places the existing panel consistently for world-linked labels and fixed HUD labels.</summary>
+        /// <param name="screenPoint">Final screen pixel position including viewport offset.</param>
+        /// <param name="pixelScale">Reference-height scaling shared by placement and size.</param>
+        private void Position(Vector2 screenPoint, float pixelScale)
+        {
             // Convert actual screen pixels to the existing canvas, including partial camera viewports.
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle((RectTransform)canvas.transform, screenPoint, null, out Vector3 position))
                 panel.position = position;
@@ -158,6 +225,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
 
         #region Validation
+
+        /// <summary>Checks the authored owner while allowing the overlay's temporary scene-root placement.</summary>
+        /// <param name="owner">Interaction root expected to own this dedicated UI.</param>
+        /// <returns>True when the current or retained parent belongs to the supplied object.</returns>
+        private bool OwnedBy(Transform owner)
+        {
+            return transform != owner && (detached ? originalParent != null && originalParent.IsChildOf(owner) : transform.IsChildOf(owner));
+        }
 
         /// <summary>Checks ownership and UI references without repairing or replacing authored objects.</summary>
         /// <param name="owner">Interaction whose prefab must contain this label.</param>
@@ -169,7 +244,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = string.Empty;
             if (canvas == null || panel == null || text == null || text.font == null)
                 warning = "Create the hover UI in Objects Logic Studio and assign a font.";
-            else if (transform == owner || !transform.IsChildOf(owner) || canvas.transform != transform
+            else if (!OwnedBy(owner) || canvas.transform != transform
                 || panel == transform || !panel.IsChildOf(transform) || !text.transform.IsChildOf(panel)
                 || background != null && !background.transform.IsChildOf(panel))
                 warning = "Label, canvas, panel and graphics must belong to this object's dedicated UI child.";

@@ -294,7 +294,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             bool spawned = current == null;
             if (spawned)
             {
-                GameObject instance = Instantiate(settings.ProductPrefab, staging, false);
+                GameObject instance = ObjectSpawnHistory.Create(settings.ProductPrefab, staging, false);
                 instance.SetActive(false);
                 current = instance.GetComponent<ObjectAssemblyProduct>();
                 instance.transform.SetParent(null, true);

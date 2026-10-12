@@ -44,13 +44,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (settings.FindPropertyRelative("suspendMoving").boolValue)
                         Field(settings, "speedThreshold");
                 }
-            if (sections.Draw("Placement", "Offset the detection anchor and final label.", settings, "anchorOffset", "worldOffset", "screenOffset", "followSmoothing"))
+            if (sections.Draw("Placement", "Offset the detection anchor and final label.", settings, "anchorOffset", "fixedHud", "worldOffset", "screenOffset", "followSmoothing"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "anchorOffset");
-                    Field(settings, "worldOffset");
+                    Field(settings, "fixedHud", "Fixed HUD");
+                    if (!settings.FindPropertyRelative("fixedHud").boolValue)
+                    {
+                        Field(settings, "worldOffset");
+                        Field(settings, "followSmoothing");
+                    }
                     Field(settings, "screenOffset");
-                    Field(settings, "followSmoothing");
                 }
             if (sections.Draw("Appearance", "Choose instant appearance or an animated pop-up.", settings, "appearance", "duration", "startScale", "popIn", "exitDuration"))
                 using (new EditorGUI.IndentLevelScope())

@@ -278,6 +278,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ExtendedInteractionKind.GravityGenerator => typeof(ObjectGravityGenerator),
                 ExtendedInteractionKind.ElasticDeformation => typeof(ObjectElasticDeformation),
                 ExtendedInteractionKind.DirtTrail => typeof(ObjectDirtTrail),
+                ExtendedInteractionKind.Deathbox => typeof(ObjectDeathbox),
+                ExtendedInteractionKind.PresenceCap => typeof(ObjectPresenceCap),
                 ExtendedInteractionKind.SpraySauce => typeof(ObjectSpraySauce),
                 _ => null
             };

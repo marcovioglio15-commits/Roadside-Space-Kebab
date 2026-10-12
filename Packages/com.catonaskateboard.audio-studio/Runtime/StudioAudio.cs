@@ -25,6 +25,13 @@ namespace CatOnASkateboard.AudioStudio
         IAudioVoice Play(string key, Transform source, Vector3 position, string parameter, string label, float radius);
     }
 
+    /// <summary>Optionally exposes scene music control without requiring it from effects-only backends.</summary>
+    public interface IStudioMusicBackend
+    {
+        /// <summary>Restarts the configured scene music from its beginning without interrupting unrelated effects.</summary>
+        void RestartMusic();
+    }
+
     /// <summary>Provides optional gameplay audio while keeping packages independent of a particular SDK.</summary>
     public static class StudioAudio
     {
@@ -37,6 +44,14 @@ namespace CatOnASkateboard.AudioStudio
 
         #region Methods
         #region Playback
+
+        /// <summary>Resets scene music at a gameplay boundary, including days that preserve the loaded scene.</summary>
+        public static void RestartMusic()
+        {
+            // Effects-only adapters remain valid without implementing music control.
+            if (Backend is IStudioMusicBackend music)
+                music.RestartMusic();
+        }
 
         /// <summary>Plays an authored key at an emitter without requiring a runtime audio component on each item.</summary>
         /// <param name="key">Audio Preset event key.</param>

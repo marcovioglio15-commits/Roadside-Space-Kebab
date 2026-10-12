@@ -23,6 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly HashSet<Collider> contacts = new HashSet<Collider>();
         private readonly HashSet<Rigidbody> ejected = new HashSet<Rigidbody>();
         private bool executing;
+        private readonly EjectBodyState temporary = new EjectBodyState();
 
         #endregion
 
@@ -34,10 +35,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public override SingleInteractionKind Kind => SingleInteractionKind.Eject;
         /// <summary>Range and aiming used by the shared input driver.</summary>
         public override TransferTargetSettings Target => settings.Target;
+        /// <summary>Keeps a Day Flow visitor physical until its scheduled despawn instead of starting Walk Out.</summary>
+        internal bool AwaitingDespawn => temporary.Active && settings.Despawn;
 
         #endregion
 
         #region Methods
+
+        #region Lifecycle
+
+        /// <summary>Restores temporary launch overrides before a pooled object can be reused.</summary>
+        protected override void OnDisable()
+        {
+            temporary.Restore();
+            base.OnDisable();
+        }
+
+        #endregion
 
         #region Validation
 
@@ -61,7 +75,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (configuration == null || !configuration.TryValidate(out warning))
                 return false;
             if (configuration.SelfEject)
-                return ObjectGrab.ValidateBody(gameObject, out warning);
+                return ObjectGrab.ValidateBody(gameObject, out warning, configuration.TemporaryPhysics && !Application.isPlaying);
             if (Item != null)
                 foreach (Collider shape in GetComponentsInChildren<Collider>(true))
                     if (Item.Owns(shape.transform) && ContactDetection.Usable(shape, configuration.IncludeTriggers))
@@ -79,7 +93,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal override bool CanExecute()
         {
             // Contact queries run only after this object wins the performed input action.
-            return !executing && Available(InteractionChannels.Eject) && Item != null && !Item.IsReserved;
+            return !executing && !temporary.Active && Available(InteractionChannels.Eject) && Item != null && !Item.IsReserved;
         }
 
         /// <summary>Collects exact contacts and applies the first matching group to each distinct body.</summary>
@@ -123,7 +137,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Suspended ingredients, stored objects and in-progress modifications retain their ownership.
             if (body == null || ejected.Contains(body) || body.gameObject.isStatic
                 || !settings.SelfEject && (body.transform.IsChildOf(transform) || transform.IsChildOf(body.transform))
-                || !settings.ReleaseKinematic && body.isKinematic)
+                || !settings.ReleaseKinematic && !(settings.SelfEject && settings.TemporaryPhysics) && body.isKinematic)
                 return;
             ObjectItem item = body.GetComponentInParent<ObjectItem>();
             if (item != null && (!item.isActiveAndEnabled || item.IsReserved || item.IsBlocked(InteractionChannels.Eject)))
@@ -134,6 +148,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return;
                 grab.Cancel();
             }
+            if (settings.SelfEject && settings.TemporaryPhysics)
+                temporary.Begin(body, settings.Physics);
             body.isKinematic = false;
             body.detectCollisions = true;
             body.WakeUp();

@@ -73,6 +73,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
             HoverControls.Field(settings, "SelfEject", "Self Eject");
             bool self = settings.FindPropertyRelative("SelfEject").boolValue;
+            if (self)
+            {
+                HoverControls.Field(settings, "TemporaryPhysics");
+                if (settings.FindPropertyRelative("TemporaryPhysics").boolValue)
+                    SingleInteractionControls.DrawRelease(settings.FindPropertyRelative("Physics"), sections);
+            }
             if (sections.Draw("Ejection", "Apply one physical impulse per successful activation.", settings, "IncludeTriggers", "Tolerance", "ReleaseKinematic", "Mode", "SelfImpulse"))
                 using (new EditorGUI.IndentLevelScope())
                 {
@@ -81,7 +87,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings, "IncludeTriggers");
                         HoverControls.Field(settings, "Tolerance");
                     }
-                    HoverControls.Field(settings, "ReleaseKinematic");
+                    if (!self || !settings.FindPropertyRelative("TemporaryPhysics").boolValue)
+                        HoverControls.Field(settings, "ReleaseKinematic");
                     HoverControls.Field(settings, "Mode");
                     if (self)
                     {

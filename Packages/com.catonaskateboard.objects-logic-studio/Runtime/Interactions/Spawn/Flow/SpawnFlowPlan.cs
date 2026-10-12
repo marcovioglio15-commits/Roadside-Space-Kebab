@@ -14,6 +14,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public SpawnFlowDay[] Days = Array.Empty<SpawnFlowDay>();
         [Tooltip("Return to the first day after the last one. Otherwise load Main Menu.")]
         public bool Loop = true;
+        [Tooltip("When consecutive days use the current scene, preserve it and return the player to the initial pose under the black fade. Different scene destinations still load normally.")]
+        public bool PreserveScene = true;
         [Tooltip("Scene loaded after the final day when Loop is disabled.")]
         public string MainMenu = string.Empty;
         [Tooltip("Optional pause-menu scene loaded additively for every day.")]

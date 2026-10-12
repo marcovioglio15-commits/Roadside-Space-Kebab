@@ -12,6 +12,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Optional catalog supplying order-name choices; editing context only, never stored in the entry.")]
         [SerializeField]
         private OrderCatalog catalog;
+        [Tooltip("Catalog context copied from the consuming interaction, including spawn overrides.")]
+        [SerializeReference]
+        private OrderSettings orderContext;
         [Tooltip("Whether the requesting interaction uses the Consumption trigger.")]
         [SerializeField]
         private bool consumption = true;
@@ -34,12 +37,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="orders">Optional catalog from the consuming object's Available Orders.</param>
         /// <param name="filter">Whether to show consumption conditions.</param>
         /// <param name="weight">Whether to show the selection weight.</param>
-        public static void Open(DialogueEntry asset, OrderCatalog orders = null, bool filter = true, bool weight = true)
+        /// <param name="context">Optional complete catalog selection from the consuming interaction.</param>
+        public static void Open(DialogueEntry asset, OrderCatalog orders = null, bool filter = true, bool weight = true, OrderSettings context = null)
         {
             DialogueEntryWindow window = GetWindow<DialogueEntryWindow>("Dialogue Entry");
             if (!window.hasUnsavedChanges)
             {
                 window.catalog = orders;
+                window.orderContext = context != null ? ObjectWorkspace.Copy(context) : null;
                 window.consumption = filter;
                 window.weighted = weight;
             }
@@ -50,10 +55,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="editor">Cached inspector for the detached entry.</param>
         protected override void DrawInspector(UnityEditor.Editor editor)
         {
+            EditorGUI.BeginChangeCheck();
             if (consumption)
                 catalog = (OrderCatalog)StudioFieldGUI.ObjectField(new GUIContent("Order Catalog",
                     "Catalog used to select named orders. Leave empty for consumed flags on objects without Available Orders."), catalog, typeof(OrderCatalog), false);
-            ((DialogueEntryEditor)editor).Draw(catalog, consumption, weighted);
+            if (EditorGUI.EndChangeCheck())
+                orderContext = null;
+            ((DialogueEntryEditor)editor).Draw(catalog, consumption, weighted, orderContext);
         }
 
         /// <summary>Validates the entry before replacing its shared saved asset.</summary>
@@ -63,7 +71,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         protected override bool Validate(ScriptableObject proposal, out string issue)
         {
             return ((DialogueEntry)proposal).TryValidate(out issue, consumption, weighted,
-                catalog != null ? new OrderSettings { Catalog = catalog } : null);
+                orderContext ?? (catalog != null ? new OrderSettings { Catalog = catalog } : null));
         }
 
         #endregion

@@ -12,13 +12,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e645944704aa4df08ca58941bed9b990, type: 3}
   m_Name: Dialogue Preset Test
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialoguePreset
+  ToolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
   Settings:
     Trigger: 0
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
-    Selection: 0
+    PreferSingleActions: 1
+    RequireSightToStart: 0
+    RequireSightToContinue: 0
+    HideWhenSightLost: 0
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    SightOffset: {x: 0, y: 0, z: 0}
     Interruption: 0
     ReplayOnReturn: 1
+    Selection: 0
     Entries:
     - {fileID: 11400000, guid: 9ab8dee7389349e2946b0eb9d8a763a6, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 11400000, guid: 58ac397662624f54baff27fc44beb2ee, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
+    Audio:
+      Voice: 0
+      Interval: 3
+      Completion: 0

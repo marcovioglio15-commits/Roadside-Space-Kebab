@@ -29,6 +29,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Accepted asset type for the source picker.</summary>
         protected abstract System.Type AssetType { get; }
+        /// <summary>Whether the shared inspector needs outer scrolling; graph editors provide their own viewport.</summary>
+        protected virtual bool ScrollInspector => true;
 
         #endregion
 
@@ -72,15 +74,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
             {
-                using (EditorGUILayout.ScrollViewScope view = new EditorGUILayout.ScrollViewScope(scroll))
-                {
-                    scroll = view.scrollPosition;
-                    if (draft != null)
+                if (ScrollInspector)
+                    using (EditorGUILayout.ScrollViewScope view = new EditorGUILayout.ScrollViewScope(scroll))
                     {
-                        UnityEditor.Editor.CreateCachedEditor(draft, null, ref inspector);
-                        DrawInspector(inspector);
+                        scroll = view.scrollPosition;
+                        DrawContent();
                     }
-                }
+                else
+                    DrawContent();
                 hasUnsavedChanges = draft != null && JsonUtility.ToJson(draft) != baseline;
                 saveChangesMessage = "Apply or discard the pending " + titleContent.text + " changes.";
                 if (warning.Length > 0)
@@ -101,6 +102,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         protected virtual void DrawInspector(UnityEditor.Editor editor)
         {
             editor.OnInspectorGUI();
+        }
+
+        /// <summary>Shares cached inspector ownership between scrollable forms and fixed graph viewports.</summary>
+        private void DrawContent()
+        {
+            if (draft == null)
+                return;
+            UnityEditor.Editor.CreateCachedEditor(draft, null, ref inspector);
+            DrawInspector(inspector);
         }
 
         /// <summary>Releases the cached editor when the window closes or reloads.</summary>

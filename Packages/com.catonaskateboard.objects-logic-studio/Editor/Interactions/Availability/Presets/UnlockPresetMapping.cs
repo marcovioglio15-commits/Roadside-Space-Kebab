@@ -182,6 +182,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectGravityGenerator => InteractionTemplateKind.GravityGenerator,
                 ObjectElasticDeformation => InteractionTemplateKind.ElasticDeformation,
                 ObjectDirtTrail => InteractionTemplateKind.DirtTrail,
+                ObjectDeathbox => InteractionTemplateKind.Deathbox,
+                ObjectPresenceCap => InteractionTemplateKind.PresenceCap,
                 ObjectSpraySauce => InteractionTemplateKind.SpraySauce,
                 ObjectTriggerAnimation => InteractionTemplateKind.TriggerAnimation,
                 ObjectEject => InteractionTemplateKind.Eject,

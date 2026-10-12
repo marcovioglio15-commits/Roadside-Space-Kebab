@@ -37,6 +37,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(entry, "Text");
                     HoverControls.Field(entry, "Quantity");
                     HoverControls.Field(entry, "Weight");
+                    DrawLimits(entry);
                     ObjectFlagSelector.Draw(entry.FindPropertyRelative("Flags"));
                     if (entry.FindPropertyRelative("Flags").arraySize > 1)
                         HoverControls.Field(entry, "RequireAllFlags");
@@ -65,12 +66,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     continue;
                 HoverControls.Field(variant, "Name");
                 HoverControls.Field(variant, "Text");
+                HoverControls.Field(variant, "AppendToBaseText", "Append Base Text");
                 HoverControls.Field(variant, "Weight");
-                ObjectFlagSelector.Draw(variant.FindPropertyRelative("Flags"));
+                HoverControls.Field(variant, "UseDrawLimits");
+                if (variant.FindPropertyRelative("UseDrawLimits").boolValue)
+                    DrawLimits(variant);
+                ObjectFlagSelector.Draw(variant.FindPropertyRelative("Flags"), new GUIContent("Additive Flags", "Ingredient flags required by this assembled variant."));
                 if (variant.FindPropertyRelative("Flags").arraySize > 1)
                     HoverControls.Field(variant, "RequireAllFlags");
+                ObjectFlagSelector.Draw(variant.FindPropertyRelative("ExcludedFlags"), new GUIContent("Subtractive Flags", "None of these flags may belong to the assembled ingredients."));
             }
             StudioArrayGUI.Add(variants, "Add Recipe Variant", () => new OrderRecipeVariant());
+        }
+
+        /// <summary>Uses identical draw-limit controls for parent orders and independent variants.</summary>
+        /// <param name="definition">Order or variant containing the limit fields.</param>
+        private static void DrawLimits(SerializedProperty definition)
+        {
+            HoverControls.Field(definition, "MaximumDraws");
+            HoverControls.Field(definition, "RandomRequiredDraws", "Random Minimum");
+            HoverControls.Field(definition, definition.FindPropertyRelative("RandomRequiredDraws").boolValue ? "RequiredDrawRange" : "MinimumDraws");
         }
 
         #endregion

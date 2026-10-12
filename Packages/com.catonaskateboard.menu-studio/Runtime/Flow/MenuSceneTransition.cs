@@ -15,6 +15,7 @@ namespace CatOnASkateboard.MenuStudio
         private static MenuSceneTransition current;
         private AsyncOperation loading;
         private Action completed;
+        private Action atBlack;
         private string destination;
         private float fadeOut;
         private float fadeIn;
@@ -72,6 +73,7 @@ namespace CatOnASkateboard.MenuStudio
                 Overlay.blocksRaycasts = false;
             }
             completed = null;
+            atBlack = null;
         }
 
         #endregion
@@ -86,8 +88,33 @@ namespace CatOnASkateboard.MenuStudio
         /// <returns>True when this overlay accepted the transition.</returns>
         public bool Begin(string scene, float outSeconds, float blackSeconds, float inSeconds, Action onCompleted)
         {
+            return Application.CanStreamedLevelBeLoaded(scene) && StartFade(scene, outSeconds, blackSeconds, inSeconds, null, onCompleted);
+        }
+
+        /// <summary>Runs the same authored fade without unloading the current scene.</summary>
+        /// <param name="outSeconds">Time to full black.</param>
+        /// <param name="blackSeconds">Hold after the blackout action.</param>
+        /// <param name="inSeconds">Reveal duration.</param>
+        /// <param name="onBlack">Scene-local operation performed while hidden.</param>
+        /// <param name="onCompleted">Continuation after input and time are restored.</param>
+        /// <returns>True when the existing overlay accepts this transition.</returns>
+        public bool BeginLocal(float outSeconds, float blackSeconds, float inSeconds, Action onBlack, Action onCompleted)
+        {
+            return onBlack != null && StartFade(null, outSeconds, blackSeconds, inSeconds, onBlack, onCompleted);
+        }
+
+        /// <summary>Captures common scene-load and scene-preserving fade state.</summary>
+        /// <param name="scene">Destination path, or null for a local operation.</param>
+        /// <param name="outSeconds">Fade-out duration.</param>
+        /// <param name="blackSeconds">Black hold duration.</param>
+        /// <param name="inSeconds">Fade-in duration.</param>
+        /// <param name="onBlack">Optional local operation.</param>
+        /// <param name="onCompleted">Completion callback.</param>
+        /// <returns>True when this overlay acquired transition ownership.</returns>
+        private bool StartFade(string scene, float outSeconds, float blackSeconds, float inSeconds, Action onBlack, Action onCompleted)
+        {
             // Invalid destinations leave the current scene and time scale unchanged.
-            if (IsBusy || Overlay == null || !Application.CanStreamedLevelBeLoaded(scene)
+            if (IsBusy || Overlay == null
                 || !Valid(outSeconds) || !Valid(blackSeconds) || !Valid(inSeconds))
                 return false;
             current = this;
@@ -96,6 +123,7 @@ namespace CatOnASkateboard.MenuStudio
             fadeIn = inSeconds;
             hold = blackSeconds;
             completed = onCompleted;
+            atBlack = onBlack;
             loading = null;
             elapsed = 0f;
             phase = 0;
@@ -119,8 +147,18 @@ namespace CatOnASkateboard.MenuStudio
                     Overlay.alpha = fadeOut > 0f ? Mathf.Clamp01(elapsed / fadeOut) : 1f;
                     if (Overlay.alpha < 1f)
                         return;
-                    loading = SceneManager.LoadSceneAsync(destination, LoadSceneMode.Single);
-                    phase = 1;
+                    if (atBlack != null)
+                    {
+                        Action operation = atBlack;
+                        atBlack = null;
+                        phase = 2;
+                        operation();
+                    }
+                    else
+                    {
+                        loading = SceneManager.LoadSceneAsync(destination, LoadSceneMode.Single);
+                        phase = 1;
+                    }
                     elapsed = 0f;
                     break;
                 case 1:

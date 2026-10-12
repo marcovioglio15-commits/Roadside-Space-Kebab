@@ -461,6 +461,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -476,12 +477,13 @@ MonoBehaviour:
       centerRadius: 0.25
       queryInterval: 0.05
       releaseDelay: 0.08
-      suspendCarried: 1
+      suspendCarried: 0
       suspendMoving: 0
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967227
+      fixedHud: 1
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.7, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -537,6 +539,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -568,7 +571,9 @@ MonoBehaviour:
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
-    Tools: []
+    Tools:
+    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
   flagChange:
     Enabled: 0
     Flag: {fileID: 0}
@@ -579,6 +584,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -588,10 +594,17 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Trigger: 1
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 2
     ExitDistance: 4
     Priority: 0
     PreferSingleActions: 1
+    PreferredActions: 68
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -599,11 +612,17 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     SightOffset: {x: 0, y: 0, z: 0}
-    Selection: 0
     Interruption: 1
     ReplayOnReturn: 1
+    ReplayOnInput: 0
+    Selection: 0
     Entries:
     - {fileID: 11400000, guid: eb634fdb5f8a4b2f9b78dc13ec274f7e, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 11400000, guid: 815c1958489d23c4a976d033df0f0792, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Audio:
       Voice: 0
       Interval: 1

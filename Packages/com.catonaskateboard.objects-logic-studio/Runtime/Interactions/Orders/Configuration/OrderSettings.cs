@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Chooses uniform or weighted sampling without replacement.</summary>
+    /// <summary>Chooses uniform or weighted sampling within each order's draw limits.</summary>
     public enum OrderSelection { UniformRandom, WeightedRandom }
 
     /// <summary>Defines the available order catalog and its per-spawn unit budget.</summary>
@@ -17,10 +18,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Board = "Orders";
         [Tooltip("Maximum individual orders drawn at spawn, additionally limited by the destination board's authored slot count.")]
         public int DrawCount = 1;
-        [Tooltip("Draw candidates uniformly or by their relative weights, without replacement. Candidates exceeding the remaining unit budget are excluded before each draw.")]
+        [Tooltip("Sample the unit budget once per spawn within Draw Unit Range. Required draws are reserved first and the board slot count remains the hard cap.")]
+        public bool RandomDrawUnits;
+        [Tooltip("Inclusive unit budget range. The lower bound may be zero. A feasible budget is sampled after reserving required draws.")]
+        public Vector2Int DrawUnitRange = new Vector2Int(1, 3);
+        [Tooltip("Draw candidates uniformly or by weight within their limits. Selection fills the largest reachable unit budget; exhausted allowances leave remaining slots empty.")]
         public OrderSelection Selection;
         [Tooltip("Available named orders. Each selected candidate contributes Quantity separate tickets and remains active until despawn.")]
         public OrderCatalog Catalog;
+        [Header("Spawn Catalogs")]
+        [Tooltip("Override the default catalog by this prefab's one-based spawn count. Counts survive scene changes within one play session.")]
+        public bool UseSpawnCatalogs;
+        [Tooltip("Exact spawn overrides win over the most recent From threshold. Duplicate rules for the same mode and spawn are invalid.")]
+        public OrderSpawnCatalog[] SpawnCatalogs = Array.Empty<OrderSpawnCatalog>();
         [Header("Board Presentation")]
         [Tooltip("Draw orders at spawn, but display them only after the selected local interaction completes successfully.")]
         public bool WaitForCompletion;
@@ -68,20 +78,97 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // The board's actual slot count is evaluated at spawn, never written back into this asset.
             warning = "Choose an order catalog, a board ID and a positive draw count.";
-            if (Catalog == null || string.IsNullOrWhiteSpace(Board) || DrawCount <= 0)
-                return false;
-            if (!Catalog.TryValidate(out warning))
+            if (Catalog == null || string.IsNullOrWhiteSpace(Board)
+                || (RandomDrawUnits ? DrawUnitRange.x < 0 || DrawUnitRange.y < DrawUnitRange.x || DrawUnitRange.y == int.MaxValue : DrawCount <= 0 || DrawCount == int.MaxValue))
                 return false;
             warning = "Choose a supported order selection mode.";
             if (Selection is not (OrderSelection.UniformRandom or OrderSelection.WeightedRandom))
                 return false;
-            foreach (OrderCandidate entry in Catalog.Candidates())
-                if (entry.Quantity <= DrawCount && (Selection != OrderSelection.WeightedRandom || entry.Weight > 0f))
+            // Validate every reachable catalog without rewriting a budget or dropping an authored rule.
+            HashSet<(OrderSpawnMatch, int)> rules = new HashSet<(OrderSpawnMatch, int)>();
+            if (UseSpawnCatalogs)
+            {
+                warning = "Add valid spawn catalog rules with positive spawn numbers and no duplicate mode/number pairs.";
+                if (SpawnCatalogs == null || SpawnCatalogs.Length == 0)
+                    return false;
+                foreach (OrderSpawnCatalog rule in SpawnCatalogs)
+                    if (rule == null || rule.Spawn <= 0 || rule.Catalog == null
+                        || rule.Match is not (OrderSpawnMatch.Exact or OrderSpawnMatch.From) || !rules.Add((rule.Match, rule.Spawn)))
+                        return false;
+            }
+            foreach (OrderCatalog catalog in Catalogs())
+            {
+                if (!catalog.TryValidate(out warning))
+                    return false;
+                long required = 0;
+                foreach (OrderDrawGroup group in OrderDrawGroup.Create(catalog, Selection, false))
                 {
-                    warning = string.Empty;
-                    return true;
+                    required += (long)group.Required * group.Quantity;
+                    warning = "Required order has no selectable base or variant: " + group.Name;
+                    if (group.Required > 0 && group.Candidates.Count == 0)
+                        return false;
                 }
-            warning = "At least one selectable order must fit the draw count.";
+                warning = "Required draws in catalog '" + catalog.name + "' can exceed the maximum Draw Units. Increase the budget or reduce required draws.";
+                if (required > (RandomDrawUnits ? DrawUnitRange.y : DrawCount))
+                    return false;
+            }
+            warning = string.Empty;
+            return true;
+        }
+
+        /// <summary>Resolves a spawn rule independently of its position in the array.</summary>
+        /// <param name="spawn">One-based occurrence of this prefab.</param>
+        /// <returns>The exact catalog, latest threshold catalog, or default catalog.</returns>
+        public OrderCatalog ResolveCatalog(int spawn)
+        {
+            OrderCatalog selected = Catalog;
+            int threshold = 0;
+            if (UseSpawnCatalogs && SpawnCatalogs != null)
+                foreach (OrderSpawnCatalog rule in SpawnCatalogs)
+                    if (rule != null && rule.Spawn <= spawn)
+                    {
+                        if (rule.Match == OrderSpawnMatch.Exact && rule.Spawn == spawn)
+                            return rule.Catalog;
+                        if (rule.Match == OrderSpawnMatch.From && rule.Spawn > threshold)
+                        {
+                            selected = rule.Catalog;
+                            threshold = rule.Spawn;
+                        }
+                    }
+            return selected;
+        }
+
+        /// <summary>Enumerates catalog sources for validation and dialogue authoring.</summary>
+        /// <returns>Default and enabled override catalogs, ignoring empty references.</returns>
+        internal IEnumerable<OrderCatalog> Catalogs()
+        {
+            if (Catalog != null)
+                yield return Catalog;
+            if (UseSpawnCatalogs && SpawnCatalogs != null)
+                foreach (OrderSpawnCatalog rule in SpawnCatalogs)
+                    if (rule?.Catalog != null)
+                        yield return rule.Catalog;
+        }
+
+        /// <summary>Offers dialogue selectors all possible order names across spawn-specific catalogs.</summary>
+        /// <returns>Distinct enabled order names in authored order.</returns>
+        public IEnumerable<string> OrderNames()
+        {
+            HashSet<string> names = new HashSet<string>(StringComparer.Ordinal);
+            foreach (OrderCatalog catalog in Catalogs())
+                foreach (string name in catalog.OrderNames())
+                    if (names.Add(name))
+                        yield return name;
+        }
+
+        /// <summary>Accepts a dialogue key from any catalog reachable by this interaction.</summary>
+        /// <param name="name">Exact order or recipe-variant key.</param>
+        /// <returns>True when at least one configured catalog supplies this key.</returns>
+        public bool ContainsOrder(string name)
+        {
+            foreach (OrderCatalog catalog in Catalogs())
+                if (catalog.ContainsOrder(name))
+                    return true;
             return false;
         }
 

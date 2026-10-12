@@ -13,6 +13,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector3 originalScale;
         private Vector3 snappedScale;
         private Pose pose;
+        private Pose start;
+        private Pose target;
+        private Vector3 targetScale;
+        private float started;
+        private float duration;
+        private bool settled;
 
         #endregion
 
@@ -77,7 +83,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Placement
 
-        /// <summary>Snaps one eligible waiting product to the exact pose and scale it will have after insertion.</summary>
+        /// <summary>Places one waiting ingredient immediately or eases it into its provisional magnet.</summary>
         /// <param name="station">Empty station whose next recipe provides the magnet.</param>
         /// <param name="ingredient">Independent ingredient retaining its own interactions.</param>
         /// <param name="index">Validated slot in the proposed recipe.</param>
@@ -100,6 +106,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Matrix4x4 world = output * local;
             snappedScale = (parent != null ? parent.worldToLocalMatrix * world : world).lossyScale;
             pose = new Pose(output.MultiplyPoint3x4(magnet.Position), rotation * Quaternion.Euler(magnet.Rotation));
+            target = pose;
+            targetScale = snappedScale;
+            start = new Pose(ingredient.transform.position, ingredient.transform.rotation);
+            duration = station.Settings.AnimatePlacement ? station.Settings.PlacementDuration : 0f;
+            started = Time.time;
+            settled = false;
+            pose = start;
+            snappedScale = originalScale;
             // Suspend gravity, keeping the authored colliders and every interaction available.
             if (!body.isKinematic)
             {
@@ -109,10 +123,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             body.collisionDetectionMode = CollisionDetectionMode.Discrete;
             body.isKinematic = true;
             body.interpolation = RigidbodyInterpolation.None;
-            ingredient.transform.SetPositionAndRotation(pose.position, pose.rotation);
-            ingredient.transform.localScale = snappedScale;
+            Tick();
+        }
+
+        /// <summary>Advances only a still-owned placement and preserves external movement as a withdrawal.</summary>
+        internal void Tick()
+        {
+            if (settled || Ingredient == null || body == null || !body.isKinematic || !AtPose())
+                return;
+            float amount = duration > 0f ? Mathf.SmoothStep(0f, 1f, (Time.time - started) / duration) : 1f;
+            pose = new Pose(Vector3.Lerp(start.position, target.position, amount), Quaternion.Slerp(start.rotation, target.rotation, amount));
+            snappedScale = Vector3.Lerp(originalScale, targetScale, amount);
+            Ingredient.transform.SetPositionAndRotation(pose.position, pose.rotation);
+            Ingredient.transform.localScale = snappedScale;
             body.position = pose.position;
             body.rotation = pose.rotation;
+            settled = amount >= 1f;
         }
 
         /// <summary>Restores temporary preview overrides before pickup, actual assembly or station teardown.</summary>

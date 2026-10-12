@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // A dedicated asset editor makes changes visible to every manager referencing the same plan.
             serializedObject.Update();
             Field(serializedObject, "Loop");
+            Field(serializedObject, "PreserveScene");
             if (!serializedObject.FindProperty("Loop").boolValue)
                 Scene(serializedObject.FindProperty("MainMenu"), "Main Menu");
             Scene(serializedObject.FindProperty("PauseScene"), "Pause Scene");

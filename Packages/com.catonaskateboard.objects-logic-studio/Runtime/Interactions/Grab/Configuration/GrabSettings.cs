@@ -42,6 +42,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool Instant;
         [Tooltip("Seconds spent easing from the pickup pose to the moving carry pose.")]
         public float TransitionDuration = 0.2f;
+        [Tooltip("Use dynamic physics during a non-instant pickup. Player collisions stay ignored; blocked pickups cancel after the time margin.")]
+        public bool PhysicalPickup = true;
+        [Tooltip("Maximum extra seconds allowed after Transition Duration to settle at the carry pose before cancelling.")]
+        public float PickupTimeMargin = 0.15f;
+        [Tooltip("Maximum pickup velocity in metres per second. Increase for distant pickups with short durations.")]
+        public float PickupSpeed = 25f;
+        [Tooltip("Velocity transfer to other loose Grab objects on impact. Values above one favor the picked object.")]
+        public float PickupPush = 1.5f;
         [Tooltip("Keep collisions with the world while carrying. Player collisions are always ignored.")]
         public bool WorldCollisions = true;
         [Tooltip("Maximum physical following speed in metres per second when world collisions are enabled.")]
@@ -97,6 +105,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Grab Center Radius must be greater than zero and at most one.";
             else if (!Instant && !InteractionValues.Positive(TransitionDuration))
                 warning = "Grab Transition Duration must be positive and finite.";
+            else if (!Instant && PhysicalPickup && (!InteractionValues.Positive(PickupTimeMargin)
+                || !InteractionValues.Positive(PickupSpeed) || !InteractionValues.Positive(PickupPush)))
+                warning = "Physical pickup needs positive finite time margin, speed and push strength.";
             else if (WorldCollisions && (!InteractionValues.Positive(FollowSpeed) || !InteractionValues.Positive(RecoveryResponse) || !InteractionValues.Positive(RotationSpeed)
                 || RotationSpeed > 1080f || !InteractionValues.Positive(CollisionPadding)))
                 warning = "Grab needs positive finite follow speed, recovery response and clearance, with rotation speed in (0, 1080] degrees per second.";

@@ -70,6 +70,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private LayerMask obstacleMask = Physics.DefaultRaycastLayers;
 
         [Header("Placement")]
+        [Tooltip("Keep the label at Screen Offset from the camera viewport centre. Detection is unchanged; entry and exit animate scale only.")]
+        [SerializeField]
+        private bool fixedHud;
+
         [Tooltip("Local offset from the optional anchor, or from the object root when no anchor is assigned.")]
         [SerializeField]
         private Vector3 anchorOffset;
@@ -78,7 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private Vector3 worldOffset = new Vector3(0f, 0.25f, 0f);
 
-        [Tooltip("Final label displacement in screen pixels, scaled against a 1080-pixel viewport height.")]
+        [Tooltip("Screen-pixel displacement from the object label, or from the viewport centre in Fixed HUD mode. Scaled against a 1080-pixel viewport height.")]
         [SerializeField]
         private Vector2 screenOffset = new Vector2(0f, 35f);
 
@@ -87,7 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float followSmoothing = 0.035f;
 
         [Header("Appearance")]
-        [Tooltip("Instant displays the label at its final position. Pop Up moves and grows it from the object anchor.")]
+        [Tooltip("Instant displays the final label. Pop Up grows it and, outside Fixed HUD mode, moves it from the object anchor.")]
         [SerializeField]
         private HoverAppearance appearance = HoverAppearance.PopUp;
 
@@ -99,7 +103,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private float startScale = 0.2f;
 
-        [Tooltip("Return and shrink the label into the object when hover ends. Re-entering hover reverses from the current visible pose.")]
+        [Tooltip("Shrink the label when hover ends, also returning it to the object outside Fixed HUD mode. Re-entering reverses the current animation.")]
         [SerializeField]
         private bool popIn;
 
@@ -141,6 +145,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Vector3 WorldOffset => worldOffset;
         /// <summary>Additional label displacement at reference viewport height.</summary>
         public Vector2 ScreenOffset => screenOffset;
+        /// <summary>Whether presentation stays at a fixed viewport-centred HUD position.</summary>
+        public bool FixedHud => fixedHud;
         /// <summary>Selected entry animation.</summary>
         public HoverAppearance Appearance => appearance;
         /// <summary>Entry animation length in unscaled seconds.</summary>
@@ -173,6 +179,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             anchorOffset = source.anchorOffset;
             worldOffset = source.worldOffset;
             screenOffset = source.screenOffset;
+            fixedHud = source.fixedHud;
             appearance = source.appearance;
             duration = source.duration;
             startScale = source.startScale;
@@ -202,7 +209,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Player Distance must be greater than zero and at most 100000 world units.";
             else if (!float.IsFinite(queryInterval) || queryInterval < 0f)
                 warning = "Query Interval must be a finite, non-negative number.";
-            else if (!float.IsFinite(releaseDelay) || releaseDelay < 0f || !float.IsFinite(followSmoothing) || followSmoothing < 0f)
+            else if (!float.IsFinite(releaseDelay) || releaseDelay < 0f || !fixedHud && (!float.IsFinite(followSmoothing) || followSmoothing < 0f))
                 warning = "Release Delay and Follow Smoothing must be finite and non-negative.";
             else if (suspendMoving && !InteractionValues.Positive(speedThreshold))
                 warning = "Speed Threshold must be positive and finite.";
@@ -212,7 +219,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Center Radius must be between zero and one.";
             else if (obstacleMask.value == 0)
                 warning = "Obstacle Mask must include the layers that can block sight.";
-            else if (!IsFinite(anchorOffset) || !IsFinite(worldOffset) || !IsFinite(screenOffset))
+            else if (!IsFinite(anchorOffset) || !fixedHud && !IsFinite(worldOffset) || !IsFinite(screenOffset))
                 warning = "All offset coordinates must be finite.";
             else if (appearance != HoverAppearance.Instant && appearance != HoverAppearance.PopUp)
                 warning = "Choose a supported hover appearance.";

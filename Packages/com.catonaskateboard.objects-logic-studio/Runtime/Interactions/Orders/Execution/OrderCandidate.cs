@@ -14,7 +14,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Exact catalog key used for spawn progress and dialogue eligibility.</summary>
         internal string Name => Variant != null ? Variant.Name : Entry.Name;
         /// <summary>Board text chosen at extraction, independent of later deliveries.</summary>
-        internal string Text => Variant != null ? Variant.Text : Entry.Text;
+        internal string Text => Variant == null ? Entry.Text : Variant.AppendToBaseText ? Entry.Text + " " + Variant.Text : Variant.Text;
         /// <summary>Independent candidate weight used by weighted extraction.</summary>
         internal float Weight => Variant != null ? Variant.Weight : Entry.Weight;
         /// <summary>Number of board slots required by this candidate.</summary>

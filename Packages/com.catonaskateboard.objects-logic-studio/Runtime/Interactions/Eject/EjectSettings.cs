@@ -40,6 +40,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool SelfEject;
         [Tooltip("Single impulse for Self Eject. Flags are unused in this mode.")]
         public EjectRule SelfImpulse = new EjectRule();
+        [Tooltip("Use a temporary physics profile during Self Eject, restoring authored settings on disable. A kinematic Rigidbody is prepared by Apply if needed.")]
+        public bool TemporaryPhysics;
+        [Tooltip("Mass, gravity, damping, constraints and surface response used until despawn or disable.")]
+        public ReleaseSettings Physics = new ReleaseSettings();
         [Header("Contact")]
         [Tooltip("Include trigger colliders on the ejector and contacted objects.")]
         public bool IncludeTriggers;
@@ -78,6 +82,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Empty or invalid groups cannot silently eject unrelated objects.
             warning = "Configure Eject targeting.";
             if (Target == null || !Target.TryValidate(out warning))
+                return false;
+            if (SelfEject && TemporaryPhysics && (Physics == null || !Physics.TryValidate(out warning)))
                 return false;
             warning = "Use a finite non-negative contact tolerance, a supported force mode and at least one impulse rule.";
             if (Mode is not (EjectForceMode.Impulse or EjectForceMode.VelocityChange)

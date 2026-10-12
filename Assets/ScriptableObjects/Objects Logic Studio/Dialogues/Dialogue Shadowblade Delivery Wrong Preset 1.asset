@@ -18,9 +18,16 @@ MonoBehaviour:
     Tools: []
   Settings:
     Trigger: 2
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 15
     ExitDistance: 20
     Priority: 1
+    PreferSingleActions: 1
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -28,15 +35,20 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     SightOffset: {x: 0, y: 0, z: 0}
-    Selection: 1
     Interruption: 0
     ReplayOnReturn: 1
+    Selection: 1
     Entries:
     - {fileID: 11400000, guid: 191a711a070847bb82f79503cb5da2dc, type: 2}
     - {fileID: 11400000, guid: 373ca916699f417785fa271ef75b0eb3, type: 2}
     - {fileID: 11400000, guid: 40539d599329422ea3a169093f87c5da, type: 2}
     - {fileID: 11400000, guid: b28bd508757e4826b17b61eb240f60cf, type: 2}
     - {fileID: 11400000, guid: 8ead9e505901404ebc476cac9e04770e, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 11400000, guid: c90900fbf82f81f4f83a4cf34d30cd5f, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Audio:
       Voice: 1
       Interval: 1

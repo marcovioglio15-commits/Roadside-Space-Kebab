@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5428401238918799254}
   - component: {fileID: 2939601019064706267}
   - component: {fileID: 4667015632494646580}
+  - component: {fileID: 6674614170385219127}
   m_Layer: 0
   m_Name: PF_CustomerEjecter
   m_TagString: Untagged
@@ -109,6 +110,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -127,6 +129,28 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    SelfEject: 0
+    SelfImpulse:
+      Flags: []
+      Match: 0
+      Impulse: {x: 0, y: 5, z: 0}
+      Space: 1
+    TemporaryPhysics: 0
+    Physics:
+      OverrideBody: 1
+      Mass: 1
+      LinearDamping: 0.05
+      AngularDamping: 0.05
+      Gravity: 1
+      Constraints: 0
+      CollisionDetection: 2
+      MaxAngularSpeed: 20
+      OverrideSurface: 1
+      StaticFriction: 0.5
+      DynamicFriction: 0.4
+      Bounciness: 0.2
+      FrictionCombine: 0
+      BounceCombine: 3
     IncludeTriggers: 0
     Tolerance: 0.005
     ReleaseKinematic: 1
@@ -144,3 +168,43 @@ MonoBehaviour:
     IgnoreDuration: 0.5
     Despawn: 0
     DespawnDelay: 5
+--- !u!114 &6674614170385219127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4422197867433253775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    Flags: []
+    OffscreenDelay: 0.25

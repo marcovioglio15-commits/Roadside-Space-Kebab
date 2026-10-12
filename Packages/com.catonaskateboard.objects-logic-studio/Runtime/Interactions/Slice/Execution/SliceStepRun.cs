@@ -57,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             appearance?.Commit();
             foreach (SliceSpawn spawn in step.Spawns)
             {
-                GameObject created = Object.Instantiate(spawn.Prefab, owner.TransformPoint(spawn.Position),
+                GameObject created = ObjectSpawnHistory.Create(spawn.Prefab, owner.TransformPoint(spawn.Position),
                     owner.rotation * Quaternion.Euler(spawn.Rotation));
                 SceneManager.MoveGameObjectToScene(created, owner.gameObject.scene);
                 ProtectCollisions(created);

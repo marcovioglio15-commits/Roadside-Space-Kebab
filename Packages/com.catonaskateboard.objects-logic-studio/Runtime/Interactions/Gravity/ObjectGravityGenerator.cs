@@ -57,6 +57,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float nextPulse;
         private float elapsed;
         private bool ready;
+        private readonly GravityAreaQuery areaQuery = new GravityAreaQuery();
+        private float nextAreaQuery;
 
         #endregion
         #region Properties
@@ -131,12 +133,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (!IsSuspending || Time.timeScale <= 0f)
                 return;
+            if (settings.Area.Enabled && settings.Area.TrackEntries && elapsed >= nextAreaQuery)
+            {
+                areaQuery.Scan(this);
+                nextAreaQuery = elapsed + settings.Area.QueryInterval;
+            }
             // Deactivated or destroyed bodies release their lease immediately; no scene search occurs here.
             for (int index = affected.Count - 1; index >= 0; index--)
             {
                 AffectedBody entry = affected[index];
                 if (entry.Body == null || !entry.Body.gameObject.activeInHierarchy
-                    || entry.Item != null && (!entry.Item.isActiveAndEnabled || entry.Item.IsConsumed))
+                    || entry.Item != null && (!entry.Item.isActiveAndEnabled || entry.Item.IsConsumed)
+                    || settings.Area.RestoreOutside && !settings.Area.Contains(transform, entry.Body.worldCenterOfMass))
                 {
                     GravitySuspension.Release(entry.Body, this);
                     affected.RemoveAt(index);
@@ -153,7 +161,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
             }
             for (int index = players.Count - 1; index >= 0; index--)
-                if (players[index] == null || !players[index].isActiveAndEnabled)
+                if (players[index] == null || !players[index].isActiveAndEnabled
+                    || settings.Area.RestoreOutside && !settings.Area.Contains(transform, players[index].transform.position))
                 {
                     if (players[index] != null)
                         players[index].RestoreGravity(this);
@@ -178,6 +187,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Begin()
         {
             elapsed = 0f;
+            nextAreaQuery = settings.Area.QueryInterval;
             IsSuspending = true;
             if (active.Count == 0)
                 ObjectIdentity.Changed += IdentityChanged;
@@ -188,16 +198,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Player motors integrate their own cached forces through the existing controller's Move call.
             if (settings.AffectPlayer)
                 foreach (PlayerCharacterControllerMotor player in FindObjectsByType<PlayerCharacterControllerMotor>())
-                {
-                    if (!player.isActiveAndEnabled || settings.FilterPlayer && !settings.Filter.Matches(player, transform))
-                        continue;
-                    Vector3 force = settings.SampleForce(transform, out float duration);
-                    if (settings.Restore != GravityRestoreMode.Interaction)
-                        duration = Mathf.Min(duration, settings.Duration);
-                    if (player.SuspendGravity(this, settings.Player, force, duration))
-                        players.Add(player);
-                }
+                    IncludePlayer(player);
             Signal(InteractionMoment.Started);
+        }
+
+        /// <summary>Admits an eligible player once while keeping the current pulse's restoration deadline.</summary>
+        /// <param name="player">Motor discovered at pulse start or by a local area overlap.</param>
+        internal void IncludePlayer(PlayerCharacterControllerMotor player)
+        {
+            if (!settings.AffectPlayer || player == null || !player.isActiveAndEnabled || players.Contains(player)
+                || !settings.Area.Contains(transform, player.transform.position)
+                || settings.FilterPlayer && !settings.Filter.Matches(player, transform))
+                return;
+            Vector3 force = settings.SampleForce(transform, out float duration);
+            if (settings.Restore != GravityRestoreMode.Interaction)
+                duration = Mathf.Min(duration, settings.Duration - elapsed);
+            if (player.SuspendGravity(this, settings.Player, force, duration))
+                players.Add(player);
         }
 
         /// <summary>Admits newly active items to ongoing pulses without a per-frame scene scan.</summary>
@@ -234,10 +251,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Samples one late participant once, retaining the existing pulse's restoration deadline.</summary>
         /// <param name="body">Dynamic body selected at a pulse or spawn boundary.</param>
-        private void Include(Rigidbody body)
+        internal void Include(Rigidbody body)
         {
             if (!settings.AffectObjects || !body.gameObject.activeInHierarchy
-                || GravitySuspension.Contains(body, this) || !settings.Filter.Matches(body, transform))
+                || GravitySuspension.Contains(body, this) || !settings.Area.Contains(transform, body.worldCenterOfMass)
+                || !settings.Filter.Matches(body, transform))
                 return;
             // Exclude attached ingredient bodies and authored kinematic scenery, but retain pending item transitions.
             body.TryGetComponent(out ObjectItem item);

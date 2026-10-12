@@ -10,6 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly InputAction action;
         private bool pending;
+        private InputControl control;
 
         #endregion
 
@@ -57,6 +58,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // The interaction executes once on performed, respecting authored tap/hold interactions.
             pending = true;
+            control = context.control;
+        }
+
+        /// <summary>Recognizes the same physical press even when two actions have different stable IDs.</summary>
+        /// <param name="other">Pending button owned by the competing driver.</param>
+        /// <returns>True for the same action or the same device control in this dispatch pass.</returns>
+        internal bool SharesPress(InteractionButton other)
+        {
+            // Pending state is checked by dispatch; control identity keeps keyboard and gamepad presses separate.
+            return other != null && (ReferenceEquals(action, other.action)
+                || control != null && ReferenceEquals(control, other.control));
         }
 
         /// <summary>Prevents a disabled and re-enabled map from replaying an old button event.</summary>

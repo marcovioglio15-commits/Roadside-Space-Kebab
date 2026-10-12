@@ -16,6 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained window foldout state.</param>
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
+            if (sections.Draw("Area of Effect", "Optional spatial selection shared by objects and the player.", settings, "Area"))
+                Area(settings.FindPropertyRelative("Area"));
             HoverControls.Field(settings, "AffectObjects");
             HoverControls.Field(settings, "AffectPlayer");
             if (settings.FindPropertyRelative("AffectPlayer").boolValue)
@@ -49,6 +51,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(settings, "Direction");
             RandomScalar(settings, "RandomIntensity", "Intensity", "IntensityRange");
             RandomScalar(settings, "RandomForceDuration", "ForceDuration", "ForceDurationRange");
+        }
+
+        /// <summary>Shows dimensions and movement policies only for an enabled spatial restriction.</summary>
+        /// <param name="area">Serialized sphere or oriented box configuration.</param>
+        private static void Area(SerializedProperty area)
+        {
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            HoverControls.Field(area, "Enabled");
+            if (!area.FindPropertyRelative("Enabled").boolValue)
+                return;
+            HoverControls.Field(area, "Shape");
+            HoverControls.Field(area, "Offset");
+            if (area.FindPropertyRelative("Shape").enumValueIndex == (int)GravityAreaShape.Sphere)
+                HoverControls.Field(area, "Radius");
+            else
+            {
+                HoverControls.Field(area, "Size");
+                HoverControls.Field(area, "Rotation");
+            }
+            HoverControls.Field(area, "TrackEntries");
+            if (area.FindPropertyRelative("TrackEntries").boolValue)
+                HoverControls.Field(area, "QueryInterval");
+            HoverControls.Field(area, "RestoreOutside");
         }
 
         /// <summary>Shows only player controls that participate in the chosen suspension simulation.</summary>

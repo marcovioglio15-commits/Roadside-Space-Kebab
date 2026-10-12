@@ -29,6 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly CarryCollisions collisions = new CarryCollisions();
         private readonly CarryCollisions sourceCollisions = new CarryCollisions();
         private readonly CarryMotion motion = new CarryMotion();
+        private readonly PhysicalPickup physical = new PhysicalPickup();
         private Rigidbody body;
         private Collider[] colliders;
         private PhysicsMaterial[] surfaces;
@@ -97,6 +98,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="collision">Contact manifold supplied by Unity physics.</param>
         private void OnCollisionEnter(Collision collision)
         {
+            physical.Contact(collision);
             // Held, consumed and stored items never emit ingredient impact sounds.
             if (!grabbedOnce || IsHeld || Item != null && (Item.IsConsumed || Item.IsReserved)
                 || drop == null && throwing == null || !settings.CollisionAudio.Enabled || Time.time < nextImpact)
@@ -108,6 +110,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             nextImpact = Time.time + settings.CollisionAudio.Cooldown;
             StudioAudio.Play("sfx_ingredientcollision", transform);
+        }
+
+        /// <summary>Keeps loose objects yielding during the short solver-driven pickup.</summary>
+        /// <param name="collision">Continuing contact with the pickup body.</param>
+        private void OnCollisionStay(Collision collision)
+        {
+            physical.Contact(collision);
         }
 
 
@@ -154,6 +163,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Checks outstanding player separation only after an object has been released.</summary>
         private void FixedUpdate()
         {
+            if (physical.Active)
+                FollowPhysical();
             // Held presentation is aligned to the camera's render frame, not to physics interpolation.
             if (IsHeld)
                 return;
@@ -166,6 +177,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Follows after the player camera has produced its final pose for this render frame.</summary>
         private void LateUpdate()
         {
+            Dock?.Tick();
             // Idle objects never query world geometry or rebuild hierarchy caches.
             if (!IsHeld || Time.deltaTime <= 0f)
                 return;
@@ -179,6 +191,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 sourceCollisions.Maintain();
             else if (sourceCollisions.Pending)
                 sourceCollisions.Restore(false);
+            if (physical.Active)
+                return;
             Follow();
         }
 
@@ -199,13 +213,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Checks authored rigidbody ownership without adding or modifying components.</summary>
         /// <param name="target">Object receiving Grab.</param>
         /// <param name="warning">Receives a missing or unsupported physics setup.</param>
+        /// <param name="allowMissing">Allows editor validation before Apply prepares a temporary-ejection body.</param>
         /// <returns>True for a non-static object with one rigidbody and at least one solid collider.</returns>
-        public static bool ValidateBody(GameObject target, out string warning)
+        public static bool ValidateBody(GameObject target, out string warning, bool allowMissing = false)
         {
             // Separate physical children require separate grab roots instead of being silently detached.
             warning = string.Empty;
             Rigidbody rigidbody = target.GetComponent<Rigidbody>();
-            if (target.isStatic || rigidbody == null || HasNestedBody(target, rigidbody)
+            if (target.isStatic || rigidbody == null && !allowMissing || HasNestedBody(target, rigidbody)
                 || target.transform.parent != null && target.transform.parent.GetComponentInParent<Rigidbody>() != null)
                 warning = "Grab needs a non-static root with one Rigidbody and no nested grabbed bodies.";
             else
@@ -303,6 +318,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             body.useGravity = false;
             body.constraints = RigidbodyConstraints.None;
             body.interpolation = RigidbodyInterpolation.None;
+            if (settings.PhysicalPickup && pickupDuration > 0f)
+                physical.Begin(body, settings);
             IsHeld = true;
             grabbedOnce = true;
             if (settings.PickupSound)
@@ -361,6 +378,44 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 degradation.RegisterImpact(motion.ImpactImpulse);
         }
 
+        /// <summary>Finishes only after the solver reaches the carry anchor, cancelling an obstructed pickup on deadline.</summary>
+        private void FollowPhysical()
+        {
+            if (!IsHeld || body == null || carryFrame == null || !carryFrame.gameObject.activeInHierarchy)
+            {
+                Cancel();
+                return;
+            }
+            collisions.Maintain();
+            sourceCollisions.Maintain();
+            float elapsed = Time.time - started;
+            Pose target = new Pose(CarryPosition(), carryFrame.rotation * Quaternion.Euler(settings.Rotation));
+            // Do not complete based on the animation clock while a wall still blocks the actual body.
+            if (elapsed >= pickupDuration && (body.position - target.position).sqrMagnitude <= 0.0004f
+                && Quaternion.Angle(body.rotation, target.rotation) <= 2f)
+            {
+                physical.Stop();
+                original.Restore(body, false);
+                body.collisionDetectionMode = CollisionDetectionMode.Discrete;
+                body.isKinematic = true;
+                body.useGravity = false;
+                body.detectCollisions = settings.WorldCollisions;
+                body.constraints = RigidbodyConstraints.None;
+                body.interpolation = RigidbodyInterpolation.None;
+                motion.Bind(body, colliders, carryPlayer);
+                Follow();
+                return;
+            }
+            if (elapsed >= pickupDuration + settings.PickupTimeMargin)
+            {
+                Cancel();
+                return;
+            }
+            float progress = Mathf.SmoothStep(0f, 1f, (elapsed + Time.fixedDeltaTime) / pickupDuration);
+            physical.Move(new Pose(Vector3.Lerp(startPosition, target.position, progress),
+                Quaternion.Slerp(startRotation, target.rotation, progress)), Time.fixedDeltaTime);
+        }
+
         /// <summary>Restores authored carry overrides when context or component ownership disappears.</summary>
         internal void Cancel()
         {
@@ -368,6 +423,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!IsHeld)
                 return;
             IsHeld = false;
+            physical.Stop();
             // Early release inside the dispenser restores contact only after safe separation.
             sourceCollisions.Restore(false);
             pickupSource = null;
@@ -387,6 +443,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!IsHeld || body == null)
                 return;
             IsHeld = false;
+            physical.Stop();
             // Early release inside the dispenser restores contact only after safe separation.
             sourceCollisions.Restore(false);
             pickupSource = null;

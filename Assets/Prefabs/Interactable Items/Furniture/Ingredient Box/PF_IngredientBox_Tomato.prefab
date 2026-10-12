@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 6841947802560516959}
   - component: {fileID: 8640676104594044564}
   - component: {fileID: 5540788363025027008}
+  - component: {fileID: 48779742589018979}
   m_Layer: 0
   m_Name: PF_IngredientBox_Tomato
   m_TagString: Untagged
@@ -114,6 +115,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -138,6 +140,7 @@ MonoBehaviour:
     Stock: 1
     PickupDuration: 0.35
     OutputRotation: {x: 0, y: 0, z: 0}
+    StepCounter: 0
     FillSteps: []
 --- !u!114 &6841947802560516959
 MonoBehaviour:
@@ -166,6 +169,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -181,12 +185,13 @@ MonoBehaviour:
       centerRadius: 0.16
       queryInterval: 0.05
       releaseDelay: 0.08
-      suspendCarried: 1
+      suspendCarried: 0
       suspendMoving: 0
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967227
+      fixedHud: 1
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -242,6 +247,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -284,6 +290,47 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &48779742589018979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3996293612802824840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    IncludeFixedObjects: 0
+    Flags: []
+    OffscreenDelay: 0.25
 --- !u!1 &6559834403795863480
 GameObject:
   m_ObjectHideFlags: 0

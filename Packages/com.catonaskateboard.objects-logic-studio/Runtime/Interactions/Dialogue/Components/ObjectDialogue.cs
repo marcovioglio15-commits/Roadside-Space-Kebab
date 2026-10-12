@@ -59,6 +59,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int consumptionRevision = -1;
         private int orderRevision = -1;
         private ObjectAvailableOrders orders;
+        private DialogueSettings content;
+        private int generation = -1;
         private int startedRevision = -1;
         private int entry = -1;
         private int line;
@@ -85,6 +87,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public InputActionReference AdvanceAction => advanceAction;
         /// <summary>Whether this interaction currently owns the visible dialogue.</summary>
         public bool IsSpeaking { get; private set; }
+        /// <summary>One-based occurrence shared with the object's Available Orders.</summary>
+        public int SpawnIndex { get; private set; }
         /// <summary>Whether the latest activation validation passed.</summary>
         internal bool Ready { get; private set; }
         /// <summary>Whether Day Flow exclusively requests this clone dialogue.</summary>
@@ -132,9 +136,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             orderRevision = -1;
             audio.Stop();
             SightGeometry.Bind(transform);
+            PrepareSpawn();
             Ready = TryValidate(out string warning);
             if (!Ready)
                 Debug.LogWarning($"Dialogue '{InteractionName}' on '{name}': {warning}", this);
+        }
+
+        /// <summary>Freezes this lifetime's entry preset before activation or inactive Day Flow staging.</summary>
+        internal void PrepareSpawn()
+        {
+            // One item occurrence is shared across sibling dialogues and the order catalog.
+            ObjectItem item = GetComponent<ObjectItem>();
+            item.PrepareSpawn(ObjectSpawnHistory.Source, ObjectSpawnHistory.Occurrence);
+            if (generation == ObjectSpawnHistory.Generation && SpawnIndex == item.Spawn.Index)
+                return;
+            generation = ObjectSpawnHistory.Generation;
+            SpawnIndex = item.Spawn.Index;
+            content = settings?.ResolveEntries(SpawnIndex);
         }
 
         #endregion
@@ -189,7 +207,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
                 armed = true;
             return !IsSpeaking && distance <= settings.Distance * settings.Distance && eligible.Count > 0
-                && (armed || settings.Trigger == DialogueTrigger.Consumption && startedRevision != Item.ConsumptionRevision);
+                && (armed || settings.Trigger == DialogueTrigger.InputAction && settings.ReplayOnInput
+                    || settings.Trigger == DialogueTrigger.Consumption && startedRevision != Item.ConsumptionRevision);
         }
 
         /// <summary>Checks whether a visible dialogue still has its item, HUD and exit range.</summary>
@@ -214,9 +233,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.Trigger == DialogueTrigger.Consumption
                 && (!Item.HasConsumption || !settings.Consumption.Matches(Item, orders)))
                 return;
-            for (int index = 0; index < settings.Entries.Length; index++)
-                if ((settings.Trigger != DialogueTrigger.Consumption || settings.Entries[index].Consumption.Matches(Item, orders))
-                    && (settings.Selection != DialogueSelection.WeightedRandom || settings.Entries[index].Weight > 0f))
+            for (int index = 0; index < content.Entries.Length; index++)
+                if ((settings.Trigger != DialogueTrigger.Consumption || content.Entries[index].Consumption.Matches(Item, orders))
+                    && (content.Selection != DialogueSelection.WeightedRandom || content.Entries[index].Weight > 0f))
                     eligible.Add(index);
         }
 
@@ -322,7 +341,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             arrivalPending = false;
             audio.Begin(settings.Audio, transform, arrivalCue);
             arrivalCue = false;
-            hud.Show(settings.Entries[entry].Lines[line]);
+            hud.Show(content.Entries[entry].Lines[line]);
             if (!resumed)
                 Signal(InteractionMoment.Started);
             // A start-triggered replacement can withdraw this dialogue before arbitration returns.
@@ -337,15 +356,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Sequence skips unmet conditions while retaining the authored ordering of eligible entries.
             if (eligible.Count == 0)
                 return -1;
-            switch (settings.Selection)
+            switch (content.Selection)
             {
                 case DialogueSelection.Sequence:
-                    for (int offset = 0; offset < settings.Entries.Length; offset++)
+                    for (int offset = 0; offset < content.Entries.Length; offset++)
                     {
-                        int candidate = (nextEntry + offset) % settings.Entries.Length;
+                        int candidate = (nextEntry + offset) % content.Entries.Length;
                         if (!eligible.Contains(candidate))
                             continue;
-                        nextEntry = (candidate + 1) % settings.Entries.Length;
+                        nextEntry = (candidate + 1) % content.Entries.Length;
                         return candidate;
                     }
                     return -1;
@@ -354,11 +373,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 case DialogueSelection.WeightedRandom:
                     double total = 0d;
                     foreach (int candidate in eligible)
-                        total += settings.Entries[candidate].Weight;
+                        total += content.Entries[candidate].Weight;
                     double choice = Random.value * total;
                     foreach (int candidate in eligible)
                     {
-                        choice -= settings.Entries[candidate].Weight;
+                        choice -= content.Entries[candidate].Weight;
                         if (choice < 0d)
                             return candidate;
                     }
@@ -375,8 +394,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!IsSpeaking)
                 return;
             line++;
-            if (line < settings.Entries[entry].Lines.Length)
-                hud.Show(settings.Entries[entry].Lines[line]);
+            if (line < content.Entries[entry].Lines.Length)
+                hud.Show(content.Entries[entry].Lines[line]);
             else
             {
                 hud.Hide();

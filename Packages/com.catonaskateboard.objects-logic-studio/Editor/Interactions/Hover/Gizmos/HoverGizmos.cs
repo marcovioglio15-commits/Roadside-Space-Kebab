@@ -36,7 +36,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         if (collider.enabled)
                             Handles.DrawWireCube(collider.bounds.center, collider.bounds.size);
                 Handles.SphereHandleCap(0, anchor, Quaternion.identity, handleSize, EventType.Repaint);
-                Handles.DrawDottedLine(anchor, anchor + hover.Settings.WorldOffset, 4f);
+                if (!hover.Settings.FixedHud)
+                    Handles.DrawDottedLine(anchor, anchor + hover.Settings.WorldOffset, 4f);
                 Handles.Label(anchor + Vector3.up * handleSize, new GUIContent(hover.InteractionName + " · "
                     + hover.Settings.PlayerDistance.ToString("0.##") + " m", "Range is measured from the player to the anchor or targeted collider surface; screen offsets affect the label only."));
             }

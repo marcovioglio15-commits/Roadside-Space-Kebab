@@ -235,7 +235,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             signaling = run;
             consumedFlags = receipt;
-            consumedIngredients = ingredients ?? Array.Empty<ObjectFlag>();
+            consumedIngredients = ingredients;
             ConsumedUnits = units;
             try
             {

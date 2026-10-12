@@ -87,10 +87,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Compare live screen positions; expensive visibility queries keep each hover's own interval.
             ObjectHover selected = null;
+            ObjectHover retainedHud = null;
             float score = float.PositiveInfinity;
             foreach (ObjectHover interaction in frame)
                 if (interaction.Evaluate(observer, time) && interaction.Settings.TargetMode != HoverDetectionMode.Cursor)
                 {
+                    // Keep a fixed HUD through its authored release grace instead of flashing a background target on brief misses.
+                    if (interaction.IsHovered && interaction.Settings.FixedHud && !interaction.Detected)
+                        retainedHud = interaction;
                     float candidate = interaction.Settings.TargetMode == HoverDetectionMode.CenterCollider ? 0f
                         : ((Vector2)observer.View.WorldToScreenPoint(interaction.WorldAnchor) - observer.View.pixelRect.center).sqrMagnitude;
                     if (Closer(interaction, selected, candidate, score))
@@ -99,12 +103,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         score = candidate;
                     }
                 }
+            if (retainedHud != null)
+                selected = retainedHud;
 
             // Release the previous winner before the new one emits events; Pop In may finish independently.
             foreach (ObjectHover interaction in frame)
                 if (interaction != null && interaction.Settings != null && interaction.Settings.TargetMode != HoverDetectionMode.Cursor
                     && interaction != selected)
+                {
                     interaction.Present(observer, time, false);
+                    // Two fixed labels must never overlap while one exits and its replacement enters.
+                    if (interaction != null && interaction.Settings.FixedHud && selected != null && selected.Settings.FixedHud && interaction.Label != null)
+                        interaction.Label.Hide();
+                }
             foreach (ObjectHover interaction in frame)
                 if (interaction != null && interaction.Settings != null
                     && (interaction == selected || interaction.Settings.TargetMode == HoverDetectionMode.Cursor))

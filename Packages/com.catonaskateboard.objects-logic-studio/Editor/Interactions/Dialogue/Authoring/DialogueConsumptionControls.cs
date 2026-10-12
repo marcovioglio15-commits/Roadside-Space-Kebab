@@ -16,7 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="filter">Serialized filter on an entry or interaction.</param>
         /// <param name="label">Scope shown beside the enabling toggle.</param>
         /// <param name="catalog">Optional order catalog used by an independent entry window.</param>
-        internal static void Draw(SerializedProperty filter, string label, OrderCatalog catalog = null)
+        /// <param name="context">All spawn-specific catalogs available to an independent entry window.</param>
+        internal static void Draw(SerializedProperty filter, string label, OrderCatalog catalog = null, OrderSettings context = null)
         {
             HoverControls.Field(filter, "Enabled", label);
             if (!filter.FindPropertyRelative("Enabled").boolValue)
@@ -30,12 +31,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             };
             ObjectAvailableOrders orders = root != null ? root.GetComponent<ObjectAvailableOrders>() : null;
             if (orders != null)
-                catalog = orders.Settings.Catalog;
+                context = orders.Settings;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
-            if (orders != null || catalog != null)
-            {
-                Names(filter.FindPropertyRelative("Orders"), catalog != null ? catalog.OrderNames() : Array.Empty<string>());
+            SerializedProperty result = filter.FindPropertyRelative("Result");
+            bool pending = result.enumValueIndex is (int)DialogueOrderResult.NotPendingOrder or (int)DialogueOrderResult.PendingOrder;
+            if (context != null || catalog != null || root == null || pending)
                 HoverControls.Field(filter, "Result");
+            // Latest-delivery modes cover every open slot and have no order-name or All/Any selection.
+            if (result.enumValueIndex is (int)DialogueOrderResult.NotPendingOrder or (int)DialogueOrderResult.PendingOrder)
+                return;
+            if (result.enumValueIndex == (int)DialogueOrderResult.Completed && (context != null || catalog != null
+                || root == null && filter.FindPropertyRelative("RequiredFlags").arraySize == 0))
+                return;
+            if (context != null || catalog != null)
+            {
+                Names(filter.FindPropertyRelative("Orders"), context != null ? context.OrderNames() : catalog.OrderNames());
                 if (filter.FindPropertyRelative("Orders").arraySize > 1)
                     HoverControls.Field(filter, "RequireAll");
             }
@@ -43,7 +53,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 // Unbound presets retain order names until a local object supplies the catalog.
                 StudioFieldGUI.PropertyField(filter.FindPropertyRelative("Orders"), true);
-                HoverControls.Field(filter, "Result");
                 HoverControls.Field(filter, "RequireAll");
             }
             else

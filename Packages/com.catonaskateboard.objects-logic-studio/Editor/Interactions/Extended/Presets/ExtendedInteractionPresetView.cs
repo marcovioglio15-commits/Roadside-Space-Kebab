@@ -71,6 +71,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case DirtTrailPreset dirtTrail:
                     state.Extended.Draft.DirtTrail = ObjectWorkspace.Copy(dirtTrail.Settings);
                     break;
+                case DeathboxPreset deathbox:
+                    state.Extended.Draft.Deathbox = ObjectWorkspace.Copy(deathbox.Settings);
+                    break;
+                case PresenceCapPreset presenceCap:
+                    state.Extended.Draft.PresenceCap = ObjectWorkspace.Copy(presenceCap.Settings);
+                    break;
                 case SpraySaucePreset spraySauce:
                     state.Extended.Draft.SpraySauce = ObjectWorkspace.Copy(spraySauce.Settings);
                     break;

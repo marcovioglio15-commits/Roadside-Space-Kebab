@@ -18,19 +18,45 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Scene links use a stable board ID because prefab assets cannot store scene component references.
             OrderBoardBinding.Draw(settings.FindPropertyRelative("Board"));
-            HoverControls.Field(settings, "DrawCount", "Draw Units");
+            HoverControls.Field(settings, "RandomDrawUnits");
+            HoverControls.Field(settings, settings.FindPropertyRelative("RandomDrawUnits").boolValue ? "DrawUnitRange" : "DrawCount", "Draw Units");
             HoverControls.Field(settings, "Selection");
-            HoverControls.Field(settings, "Catalog");
-            OrderCatalog catalog = (OrderCatalog)settings.FindPropertyRelative("Catalog").objectReferenceValue;
+            Catalog(settings.FindPropertyRelative("Catalog"));
+            HoverControls.Field(settings, "UseSpawnCatalogs");
+            if (settings.FindPropertyRelative("UseSpawnCatalogs").boolValue)
+            {
+                SerializedProperty rules = settings.FindPropertyRelative("SpawnCatalogs");
+                for (int index = 0; index < rules.arraySize; index++)
+                {
+                    SerializedProperty rule = rules.GetArrayElementAtIndex(index);
+                    if (StudioArrayGUI.Header(rules, index, new GUIContent("Spawn Catalog " + (index + 1), rules.tooltip)))
+                        break;
+                    if (!rule.isExpanded)
+                        continue;
+                    using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                    HoverControls.Field(rule, "Match");
+                    HoverControls.Field(rule, "Spawn");
+                    Catalog(rule.FindPropertyRelative("Catalog"));
+                }
+                StudioArrayGUI.Add(rules, "Add Spawn Catalog", () => new OrderSpawnCatalog());
+            }
+            Completion(settings, owner);
+        }
+
+        /// <summary>Shares catalog assignment and independent edit/create commands across default and spawn overrides.</summary>
+        /// <param name="property">Catalog reference in the current detached proposal.</param>
+        private static void Catalog(SerializedProperty property)
+        {
+            StudioFieldGUI.PropertyField(property);
+            OrderCatalog catalog = (OrderCatalog)property.objectReferenceValue;
             using (new StudioButton.RowScope())
             {
                 using (new EditorGUI.DisabledScope(catalog == null))
                     if (StudioButton.Draw(new GUIContent("Edit Catalog", "Edit shared order definitions in their own Apply/Discard session.")))
                         OrderCatalogWindow.Open(catalog);
                 if (StudioButton.Draw(new GUIContent("New Catalog", "Create a reusable order catalog asset.")))
-                    Create(settings.FindPropertyRelative("Catalog"));
+                    Create(property);
             }
-            Completion(settings, owner);
         }
 
         /// <summary>Selects an exact local completion source while retaining portable preset mappings.</summary>

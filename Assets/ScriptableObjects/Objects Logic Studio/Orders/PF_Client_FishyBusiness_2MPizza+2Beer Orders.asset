@@ -17,6 +17,10 @@ MonoBehaviour:
     Text: Kebab Wrap
     Quantity: 1
     Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
     Flags:
     - {fileID: 11400000, guid: 276ef4a435786bd489b21d5d9618a862, type: 2}
     RequireAllFlags: 0
@@ -29,10 +33,22 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       RequireAllFlags: 1
+      ExcludedFlags: []
+    - Name: NoFries
+      Text: '- Fries'
+      Weight: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
   - Name: Soda
     Text: Soda
     Quantity: 1
     Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
     Flags:
     - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
     RequireAllFlags: 0

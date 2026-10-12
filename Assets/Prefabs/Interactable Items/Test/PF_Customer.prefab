@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 962167144239944056}
   - component: {fileID: 1048780206782002216}
   - component: {fileID: 4817618802008152814}
+  - component: {fileID: 7260682072978793457}
   m_Layer: 0
   m_Name: PF_Customer
   m_TagString: Untagged
@@ -242,7 +243,9 @@ MonoBehaviour:
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
-    Tools: []
+    Tools:
+    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
@@ -253,6 +256,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -272,6 +276,7 @@ MonoBehaviour:
     ExitDistance: 4
     Priority: 0
     PreferSingleActions: 1
+    PreferredActions: 68
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -279,11 +284,17 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     SightOffset: {x: 0, y: 0, z: 0}
-    Selection: 0
     Interruption: 0
     ReplayOnReturn: 1
+    ReplayOnInput: 0
+    Selection: 0
     Entries:
     - {fileID: 11400000, guid: 7374e0849c6949098e71bd489d7eed14, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 11400000, guid: 325616e8db3d7e5419dd8e5ca4c10e82, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Audio:
       Voice: 1
       Interval: 1
@@ -317,6 +328,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -354,7 +366,9 @@ MonoBehaviour:
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
-    Tools: []
+    Tools:
+    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
@@ -365,6 +379,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -384,6 +399,7 @@ MonoBehaviour:
     ExitDistance: 4
     Priority: 1
     PreferSingleActions: 1
+    PreferredActions: 68
     RequireSightToStart: 0
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -391,11 +407,17 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     SightOffset: {x: 0, y: 0, z: 0}
-    Selection: 0
     Interruption: 0
     ReplayOnReturn: 1
+    ReplayOnInput: 0
+    Selection: 0
     Entries:
     - {fileID: 11400000, guid: 7ecbb4a3f75543949f00752f39f33ae1, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 11400000, guid: ed19eabc7e0c1114794e5c9c2154b18f, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Audio:
       Voice: 1
       Interval: 3
@@ -441,7 +463,9 @@ MonoBehaviour:
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
-    Tools: []
+    Tools:
+    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
   flagChange:
     Enabled: 0
     Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
@@ -452,6 +476,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -471,6 +496,7 @@ MonoBehaviour:
     ExitDistance: 4
     Priority: 0
     PreferSingleActions: 1
+    PreferredActions: 68
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -478,11 +504,17 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     SightOffset: {x: 0, y: 0, z: 0}
-    Selection: 1
     Interruption: 0
     ReplayOnReturn: 1
+    ReplayOnInput: 0
+    Selection: 1
     Entries:
     - {fileID: 11400000, guid: 6eadeb0920f143cd8f7bb4e58f1d103a, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 11400000, guid: 7be1a1edaa8dbe443a223f2b936515db, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Audio:
       Voice: 1
       Interval: 1
@@ -516,6 +548,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -566,6 +599,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -619,7 +653,9 @@ MonoBehaviour:
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
-    Tools: []
+    Tools:
+    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
   flagChange:
     Enabled: 0
     Flag: {fileID: 0}
@@ -630,6 +666,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -649,6 +686,7 @@ MonoBehaviour:
     ExitDistance: 4
     Priority: 0
     PreferSingleActions: 1
+    PreferredActions: 68
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -656,11 +694,17 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     SightOffset: {x: 0, y: 0, z: 0}
-    Selection: 0
     Interruption: 0
     ReplayOnReturn: 1
+    ReplayOnInput: 0
+    Selection: 0
     Entries:
     - {fileID: 11400000, guid: 3e0b155bdd9d430293672d88fa01e369, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 11400000, guid: 6a9916ae6b413c144b7e1c9e5cd235eb, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Audio:
       Voice: 1
       Interval: 1
@@ -694,6 +738,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -704,7 +749,52 @@ MonoBehaviour:
   settings:
     Board: Orders
     DrawCount: 1
+    RandomDrawUnits: 1
+    DrawUnitRange: {x: 1, y: 3}
     Selection: 0
     Catalog: {fileID: 11400000, guid: 172dcc78f3844de9b52c0acf2091da7c, type: 2}
+    UseSpawnCatalogs: 0
+    SpawnCatalogs: []
     WaitForCompletion: 0
     CompletionSource: {fileID: 0}
+--- !u!114 &7260682072978793457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    IncludeFixedObjects: 0
+    Flags: []
+    OffscreenDelay: 0.25

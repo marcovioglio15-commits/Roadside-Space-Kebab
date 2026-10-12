@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 5228134902972582300}
   - component: {fileID: 3636574319120910313}
   - component: {fileID: 4271513465245405958}
+  - component: {fileID: 2844999493522304275}
   m_Layer: 0
   m_Name: PF_AssemblyStation
   m_TagString: Untagged
@@ -159,6 +160,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -180,6 +182,8 @@ MonoBehaviour:
       m_Bits: 4294967295
     OutputPosition: {x: 0, y: 0.05, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 3902492065998624986}
@@ -210,6 +214,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -231,6 +236,8 @@ MonoBehaviour:
       m_Bits: 55
     OutputPosition: {x: 0, y: 0.2, z: 0}
     OutputRotation: {x: 0, y: 90, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 4748412538439301442}
@@ -261,6 +268,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -282,6 +290,8 @@ MonoBehaviour:
       m_Bits: 4294967295
     OutputPosition: {x: 0, y: 0.05, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 6346928117622790933}
@@ -312,6 +322,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -333,6 +344,8 @@ MonoBehaviour:
       m_Bits: 55
     OutputPosition: {x: 0, y: 0.2, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 6986195324504266724}
@@ -363,6 +376,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -384,6 +398,8 @@ MonoBehaviour:
       m_Bits: 4294967295
     OutputPosition: {x: 0, y: 0.05, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 8215382090389874618}
@@ -414,6 +430,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -435,6 +452,8 @@ MonoBehaviour:
       m_Bits: 55
     OutputPosition: {x: 0, y: 0.1, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 2920779428166167326}
@@ -465,6 +484,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -486,6 +506,8 @@ MonoBehaviour:
       m_Bits: 55
     OutputPosition: {x: 0, y: 0.1, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 4524236599516636299}
@@ -516,6 +538,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -537,6 +560,8 @@ MonoBehaviour:
       m_Bits: 4294967295
     OutputPosition: {x: 0, y: 0.02, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 7480781073803684815}
@@ -567,6 +592,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -588,6 +614,8 @@ MonoBehaviour:
       m_Bits: 4294967295
     OutputPosition: {x: 0, y: 0.02, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 6239475461044599083}
@@ -618,6 +646,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -639,9 +668,52 @@ MonoBehaviour:
       m_Bits: 4294967295
     OutputPosition: {x: 0, y: 0.02, z: 0}
     OutputRotation: {x: 0, y: 0, z: 0}
+    AnimatePlacement: 1
+    PlacementDuration: 0.25
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 2760922670105443173}
+--- !u!114 &2844999493522304275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379141897293873495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    IncludeFixedObjects: 0
+    Flags: []
+    OffscreenDelay: 0.25
 --- !u!1 &820163158470653626
 GameObject:
   m_ObjectHideFlags: 0

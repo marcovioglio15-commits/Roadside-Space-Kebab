@@ -11,11 +11,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Dialogue Entry")]
         [Tooltip("Name displayed for this reusable dialogue sequence.")]
         public string Name = "Dialogue";
-        [Tooltip("Relative chance when an interaction uses Weighted Random. Zero excludes this entry from weighted selection.")]
+        [Tooltip("Relative chance in Weighted Random selection. Zero excludes the entry from weighted draws.")]
         public float Weight = 1f;
         [Tooltip("Optional filter used only by Consumption dialogues, combined with the interaction's own filter.")]
         public DialogueConsumptionFilter Consumption = new DialogueConsumptionFilter();
-        [Tooltip("Pages displayed in this order. Each advance input moves to the next page, or closes the last one.")]
+        [Tooltip("Pages displayed in this order. Advancing the last page completes this entry's dialogue.")]
         public DialogueLine[] Lines = { new DialogueLine() };
 
         #endregion

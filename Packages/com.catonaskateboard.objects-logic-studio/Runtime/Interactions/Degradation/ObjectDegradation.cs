@@ -177,7 +177,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return;
                 foreach (DegradationFragment fragment in settings.Fragments)
                 {
-                    GameObject created = Instantiate(fragment.Prefab, transform.TransformPoint(fragment.Position), transform.rotation * Quaternion.Euler(fragment.Rotation));
+                    GameObject created = ObjectSpawnHistory.Create(fragment.Prefab, transform.TransformPoint(fragment.Position), transform.rotation * Quaternion.Euler(fragment.Rotation));
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
                 }
                 grab?.Cancel();

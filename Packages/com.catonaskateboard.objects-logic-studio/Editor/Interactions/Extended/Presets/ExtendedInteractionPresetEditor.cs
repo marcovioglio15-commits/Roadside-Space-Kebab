@@ -32,6 +32,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case DirtTrailPreset:
                     SurfaceInteractionControls.DirtTrail(settings, sections);
                     break;
+                case DeathboxPreset:
+                    LifetimeControls.Deathbox(settings);
+                    break;
+                case PresenceCapPreset:
+                    LifetimeControls.PresenceCap(settings);
+                    break;
                 case SpraySaucePreset:
                     SurfaceInteractionControls.SpraySauce(settings, sections);
                     break;

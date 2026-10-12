@@ -21,7 +21,7 @@ MonoBehaviour:
     - Pizza Margherita
     - Beer
     RequireAll: 1
-    Result: 1
+    Result: 2
   Lines:
   - Speaker: Fishy Business
     Text: "Hey, CHUM, guess what? You\u2019ve got the WRONG order."

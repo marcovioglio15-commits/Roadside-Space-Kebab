@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 3925398906064348706}
   - component: {fileID: 7202886261825108978}
   - component: {fileID: 3860033114708416769}
+  - component: {fileID: 2245935117721052689}
   m_Layer: 6
   m_Name: PF_Finished_PaninoKebab
   m_TagString: Untagged
@@ -167,6 +168,10 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Instant: 1
     TransitionDuration: 0.2
+    PhysicalPickup: 0
+    PickupTimeMargin: 0.15
+    PickupSpeed: 25
+    PickupPush: 1.5
     WorldCollisions: 1
     FollowSpeed: 8
     RecoveryResponse: 12
@@ -332,12 +337,13 @@ MonoBehaviour:
       centerRadius: 0.08
       queryInterval: 0.05
       releaseDelay: 0.08
-      suspendCarried: 1
+      suspendCarried: 0
       suspendMoving: 0
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967227
+      fixedHud: 1
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -402,6 +408,18 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    FinalizeOnGrab: 1
+    FinalizeAction: {fileID: 0}
+    FinalizeTarget:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
     WaitForNextIngredient: 0
     Ingredients:
     - Flags:
@@ -557,6 +575,47 @@ MonoBehaviour:
     HoverOnly: 1
   renderers:
   - {fileID: 5810867436002175667}
+--- !u!114 &2245935117721052689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2305683179381614155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    IncludeFixedObjects: 0
+    Flags: []
+    OffscreenDelay: 0.25
 --- !u!1 &3146031304833970957
 GameObject:
   m_ObjectHideFlags: 0

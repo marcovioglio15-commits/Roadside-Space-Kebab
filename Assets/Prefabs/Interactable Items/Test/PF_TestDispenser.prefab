@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1571920681258394874}
   - component: {fileID: 5438683417763415203}
   - component: {fileID: 573242413944535872}
+  - component: {fileID: 4951665206346174637}
   m_Layer: 0
   m_Name: PF_TestDispenser
   m_TagString: Untagged
@@ -155,6 +156,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -166,6 +168,7 @@ MonoBehaviour:
     Target:
       Distance: 3
       Mode: 0
+      SolidHitOnly: 0
       CenterRadius: 0.15
       Offset: {x: 0, y: 0, z: 0}
       ObstacleMask:
@@ -178,6 +181,8 @@ MonoBehaviour:
     Stock: 1
     PickupDuration: 0.35
     OutputRotation: {x: 0, y: 0, z: 0}
+    StepCounter: 0
+    FillSteps: []
 --- !u!114 &5438683417763415203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,6 +210,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -216,6 +222,7 @@ MonoBehaviour:
     Target:
       Distance: 3
       Mode: 0
+      SolidHitOnly: 0
       CenterRadius: 0.15
       Offset: {x: 0, y: 0, z: 0}
       ObstacleMask:
@@ -227,10 +234,13 @@ MonoBehaviour:
     Match: 0
     Unlimited: 1
     Capacity: 10
+    LimitToDispenserSpace: 0
+    RefillDispenser: 0
     KeepVisible: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
     Spacing: {x: 0, y: 0.2, z: 0}
+    FillSteps: []
 --- !u!114 &573242413944535872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,3 +255,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flags:
   - {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+--- !u!114 &4951665206346174637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714663089715580423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    Flags: []
+    OffscreenDelay: 0.25

@@ -26,7 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Properties
 
         /// <summary>Whether this window has changed its independent layout.</summary>
-        internal bool HasChanges => Capture(Draft.Settings) != Initial;
+        internal bool HasChanges => !string.IsNullOrEmpty(Initial) && Capture(Draft.Settings) != Initial;
 
         #endregion
         #region Methods

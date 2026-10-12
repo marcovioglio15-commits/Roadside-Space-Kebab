@@ -12,6 +12,13 @@ namespace CatOnASkateboard.StudioIdentity
 
         #endregion
 
+        #region Properties
+
+        /// <summary>Registered active identities for allocation-free population queries.</summary>
+        public static IReadOnlyCollection<ObjectIdentity> Items => active;
+
+        #endregion
+
         #region Methods
 
         #region Lifecycle

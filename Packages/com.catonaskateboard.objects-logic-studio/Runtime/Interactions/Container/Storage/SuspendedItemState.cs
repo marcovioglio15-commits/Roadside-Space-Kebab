@@ -81,6 +81,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Deactivates the root and suspends its captured interactions, items, colliders and bodies.</summary>
         internal void Suspend()
         {
+            foreach (ObjectItem item in items)
+                if (item != null)
+                    item.Spawn.Hold(true);
             // Disable collision and logic even for visible items, so storage cannot trigger contact consumption.
             if (preserveOrders)
                 foreach (ObjectInteraction interaction in interactions)
@@ -121,6 +124,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores original component states and retained interaction progress before normal updates resume.</summary>
         internal void Restore()
         {
+            foreach (ObjectItem item in items)
+                if (item != null)
+                    item.Spawn.Hold(true);
             // Restore while inactive so activation callbacks observe a complete physical hierarchy.
             if (preserveOrders)
                 foreach (ObjectInteraction interaction in interactions)
@@ -140,6 +146,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (interactions[index] != null)
                     interactions[index].enabled = interactionStates[index];
             Root.SetActive(true);
+            foreach (ObjectItem item in items)
+                if (item != null)
+                    item.Spawn.Hold(false);
             for (int index = 0; index < interactions.Length; index++)
                 switch (interactions[index])
                 {

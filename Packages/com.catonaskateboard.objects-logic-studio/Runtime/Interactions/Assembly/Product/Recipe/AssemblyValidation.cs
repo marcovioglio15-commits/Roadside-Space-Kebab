@@ -1,6 +1,7 @@
 using CatOnASkateboard.StudioIdentity;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -44,6 +45,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings == null || settings.Ingredients == null || settings.Ingredients.Length == 0
                 || settings.Magnets == null || settings.Magnets.Length == 0 || settings.InteractionRules == null)
                 return false;
+            // A product with Grab inherits that feature's binding and targeting; standalone products need their own.
+            if (settings.FinalizeOnGrab && owner != null && owner.GetComponent<ObjectGrab>() == null)
+            {
+                warning = "Assign a finalization Button for a product without Grab, or disable Finalize On Grab.";
+                if (settings.FinalizeAction == null || settings.FinalizeAction.action == null || settings.FinalizeAction.action.type != InputActionType.Button)
+                    return false;
+                if (settings.FinalizeTarget == null || !settings.FinalizeTarget.TryValidate(out warning))
+                    return false;
+            }
             // Completed recipes retire ingredient colliders, so carry geometry must exist on the product itself.
             if (owner != null && owner.TryGetComponent(out ObjectGrab _) && !ObjectGrab.ValidateBody(owner, out warning))
             {

@@ -109,6 +109,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             ObjectSingleInteraction feature = Resolve(target, Kind);
             Undo.RecordObject(feature, "Apply " + Kind);
+            if (Kind == SingleInteractionKind.Eject && Draft.Eject.SelfEject && Draft.Eject.TemporaryPhysics && target.GetComponent<Rigidbody>() == null)
+            {
+                Rigidbody body = Undo.AddComponent<Rigidbody>(target);
+                body.isKinematic = true;
+                body.useGravity = false;
+            }
             using (SerializedObject data = new SerializedObject(feature))
             {
                 data.FindProperty("settingsPreset").objectReferenceValue = Preset;

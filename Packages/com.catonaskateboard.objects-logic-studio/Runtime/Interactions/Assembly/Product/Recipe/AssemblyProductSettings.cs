@@ -1,6 +1,7 @@
 using CatOnASkateboard.StudioIdentity;
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -56,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Product Interaction")]
         [Tooltip("Existing interaction on the product prefab. References are remapped to the spawned product automatically.")]
         public ObjectInteraction Target;
-        [Tooltip("Wait until every mandatory recipe ingredient has been supplied.")]
+        [Tooltip("Wait for all mandatory ingredients and, when Finalize On Grab is enabled, the first empty-hand pickup request.")]
         public bool RequireComplete = true;
         [Tooltip("Minimum total ingredient units before this interaction becomes available. Uses the Grab value of each inserted object.")]
         public int MinimumIngredients = 1;
@@ -73,13 +74,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Recipe")]
+        [Tooltip("Apply completed appearance and release product interaction gates only when the player first requests Grab with empty hands after mandatory ingredients are present.")]
+        public bool FinalizeOnGrab = true;
+        [Tooltip("Grab button used to finalize a product without its own Grab interaction. Products with Grab reuse its input and targeting.")]
+        public InputActionReference FinalizeAction;
+        [Tooltip("Targeting for finalization when the product has no Grab interaction.")]
+        public TransferTargetSettings FinalizeTarget = new TransferTargetSettings();
         [Tooltip("Snap this completed product to the next recipe's magnet while keeping its interactions usable. Another compatible ingredient starts assembly; Grab releases the snap. Explicit input insertion remains immediate.")]
         public bool WaitForNextIngredient;
         [Tooltip("Groups of alternative ingredient flags sharing one quantity per row. A flag belongs to only one row. Mandatory rows must be filled; optional rows can be omitted.")]
         public AssemblyIngredient[] Ingredients = Array.Empty<AssemblyIngredient>();
         [Tooltip("Placement slots in product-local space. Each object occupies one slot regardless of its Grab units. On completion, only colliders authored on the product prefab remain active.")]
         public AssemblyMagnet[] Magnets = Array.Empty<AssemblyMagnet>();
-        [Tooltip("Existing product interactions with custom availability requirements. Unlisted interactions wait for recipe completion.")]
+        [Tooltip("Existing product interactions with custom availability requirements. Unlisted interactions wait for finalization; rules without Require Complete can allow partial use.")]
         public AssemblyInteractionRule[] InteractionRules = Array.Empty<AssemblyInteractionRule>();
         [Tooltip("Mesh and material changes on the product's existing hierarchy when the recipe completes. Losing completion restores its previous appearance.")]
         public ItemAppearanceSettings CompletedAppearance = new ItemAppearanceSettings();

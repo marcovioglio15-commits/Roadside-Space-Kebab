@@ -22,16 +22,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool presentationCompleted;
         private ObjectContactModifier contact;
         private int generation = -1;
+        private int consumptionRevision = -1;
+        private bool consumedPendingOrder;
 
         #endregion
         #region Properties
 
         /// <summary>Shared catalog and per-spawn extraction configuration.</summary>
         public OrderSettings Settings => settings;
+        /// <summary>One-based occurrence shared by clones of the same source prefab during this play session.</summary>
+        public int SpawnIndex { get; private set; }
+        /// <summary>Catalog selected once for this spawn, including any matching occurrence override.</summary>
+        public OrderCatalog ActiveCatalog { get; private set; }
         /// <summary>Changes only when the active ticket set or consumption result changes.</summary>
         public int Revision { get; private set; }
         /// <summary>Whether the latest consumption supplied units that matched no unfinished order.</summary>
         public bool UnexpectedConsumption { get; private set; }
+        /// <summary>Whether a nonempty extracted ticket set has been completely consumed.</summary>
+        public bool AllCompleted { get; private set; }
         /// <summary>Identifies this passive feature.</summary>
         public override ExtendedInteractionKind Kind => ExtendedInteractionKind.AvailableOrders;
 
@@ -62,6 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             OrderQueue.BoardAvailable += Draw;
             if (registered)
                 return;
+            PrepareSpawn(ObjectSpawnHistory.Source, ObjectSpawnHistory.Occurrence);
             if (!presentationHeld)
             {
                 ready = TryValidate(out string warning);
@@ -106,9 +115,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             drawn = true;
             OrderQueue.BoardAvailable -= Draw;
             Revision++;
-            if (tickets.Length == 0)
-                Debug.LogWarning("No available order fits this board's capacity and draw count.", this);
             Publish();
+        }
+
+        /// <summary>Freezes occurrence and catalog before activation, including inactive Day Flow staging.</summary>
+        /// <param name="source">Original prefab supplied by the spawn boundary, or null for scene activation.</param>
+        /// <param name="occurrence">Reserved prefab occurrence, or zero to start a direct scene/pool lifetime.</param>
+        internal void PrepareSpawn(GameObject source, int occurrence)
+        {
+            if (generation != OrderQueue.Generation)
+            {
+                Release();
+                generation = OrderQueue.Generation;
+            }
+            if (SpawnIndex > 0)
+                return;
+            ObjectItem item = GetComponent<ObjectItem>();
+            item.PrepareSpawn(source, occurrence);
+            SpawnIndex = item.Spawn.Index;
+            ActiveCatalog = settings?.ResolveCatalog(SpawnIndex);
         }
 
         /// <summary>Distinguishes an animation's temporary deactivation from actual customer despawn.</summary>
@@ -155,8 +180,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             drawn = false;
             presentationCompleted = false;
             UnexpectedConsumption = false;
+            AllCompleted = false;
+            consumptionRevision = -1;
+            consumedPendingOrder = false;
             Revision++;
             tickets = Array.Empty<OrderTicket>();
+            SpawnIndex = 0;
+            ActiveCatalog = null;
         }
 
         #endregion
@@ -195,9 +225,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (OrderTicket ticket in tickets)
                 complete &= ticket.Completed;
             UnexpectedConsumption = remaining > 0;
+            AllCompleted = tickets.Length > 0 && complete;
+            // Classify the receipt against slots that were open before fulfilment, including repeated orders.
+            consumedPendingOrder = changed;
+            consumptionRevision = Item.ConsumptionRevision;
             Revision++;
             if (changed && complete)
                 Signal(InteractionMoment.Completed);
+        }
+
+        /// <summary>Classifies the latest delivery using the ticket state before that delivery crossed out any slots.</summary>
+        /// <param name="pending">True when at least one open slot accepted the consumed object.</param>
+        /// <returns>True only when this result belongs to the item's latest consumption receipt.</returns>
+        internal bool TryLatestDelivery(out bool pending)
+        {
+            // A later receipt from another source must never reuse this interaction's previous result.
+            pending = consumedPendingOrder;
+            return drawn && Item != null && Item.HasConsumption && consumptionRevision == Item.ConsumptionRevision;
         }
 
         /// <summary>Reads progress for one named candidate in this spawn's fixed ticket set.</summary>

@@ -37,6 +37,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (entry == null || entry.Quantity <= 0
                     || !OrderRecipeVariant.ValidateMetadata(entry.Name, entry.Text, entry.Weight, names, out warning))
                     return false;
+                warning = $"Order '{entry.Name}' needs non-negative draw limits, an ordered required range and Maximum Draws at least as large as every required value.";
+                if (!OrderDrawGroup.ValidLimits(entry.MinimumDraws, entry.MaximumDraws, entry.RandomRequiredDraws, entry.RequiredDrawRange))
+                    return false;
                 if (!ObjectFlagRules.TryValidate(entry.Flags, false, out warning))
                 {
                     warning = $"Order {index + 1}, Identity Flags: {warning}";
@@ -51,8 +54,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     warning = $"Order '{entry.Name}' contains an empty recipe variant.";
                     if (variant == null || !OrderRecipeVariant.ValidateMetadata(variant.Name, variant.Text, variant.Weight, names, out warning)
-                        || !ObjectFlagRules.TryValidate(variant.Flags, false, out warning))
+                        || !ObjectFlagRules.TryValidate(variant.Flags, true, out warning)
+                        || !ObjectFlagRules.TryValidate(variant.ExcludedFlags, true, out warning))
                         return false;
+                    warning = $"Variant '{variant.Name}' needs non-negative draw limits and a required range within Maximum Draws.";
+                    if (variant.UseDrawLimits && !OrderDrawGroup.ValidLimits(variant.MinimumDraws, variant.MaximumDraws,
+                        variant.RandomRequiredDraws, variant.RequiredDrawRange))
+                        return false;
+                    warning = $"Variant '{variant.Name}' needs additive or subtractive flags; the same flag cannot appear in both lists.";
+                    if (variant.Flags.Length + variant.ExcludedFlags.Length == 0)
+                        return false;
+                    foreach (ObjectFlag flag in variant.Flags)
+                        if (Array.IndexOf(variant.ExcludedFlags, flag) >= 0)
+                            return false;
                 }
             }
             warning = string.Empty;

@@ -44,6 +44,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ExtendedInteractionKind.GravityGenerator => Undo.AddComponent<ObjectGravityGenerator>(target),
                 ExtendedInteractionKind.ElasticDeformation => Undo.AddComponent<ObjectElasticDeformation>(target),
                 ExtendedInteractionKind.DirtTrail => Undo.AddComponent<ObjectDirtTrail>(target),
+                ExtendedInteractionKind.Deathbox => Undo.AddComponent<ObjectDeathbox>(target),
+                ExtendedInteractionKind.PresenceCap => Undo.AddComponent<ObjectPresenceCap>(target),
                 ExtendedInteractionKind.SpraySauce => Undo.AddComponent<ObjectSpraySauce>(target),
                 ExtendedInteractionKind.AvailableOrders => Undo.AddComponent<ObjectAvailableOrders>(target),
                 ExtendedInteractionKind.PlayAmbient => Undo.AddComponent<ObjectAmbient>(target),

@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 4359701446202218041}
   - component: {fileID: 7796233244604014124}
   - component: {fileID: 8833138194596862599}
+  - component: {fileID: 6814099491837568890}
   m_Layer: 0
   m_Name: PF_EjectButton
   m_TagString: Untagged
@@ -194,6 +195,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -218,6 +220,22 @@ MonoBehaviour:
       Match: 0
       Impulse: {x: 0, y: 5, z: 0}
       Space: 1
+    TemporaryPhysics: 0
+    Physics:
+      OverrideBody: 1
+      Mass: 1
+      LinearDamping: 0.05
+      AngularDamping: 0.05
+      Gravity: 1
+      Constraints: 0
+      CollisionDetection: 2
+      MaxAngularSpeed: 20
+      OverrideSurface: 1
+      StaticFriction: 0.5
+      DynamicFriction: 0.4
+      Bounciness: 0.2
+      FrictionCombine: 0
+      BounceCombine: 3
     IncludeTriggers: 1
     Tolerance: 0.005
     ReleaseKinematic: 1
@@ -262,6 +280,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -269,9 +288,20 @@ MonoBehaviour:
   completionBindings: []
   settingsPreset: {fileID: 0}
   drawGizmos: 1
+  action: {fileID: 0}
   settings:
     Modifications:
     - {fileID: 11400000, guid: 54975a55fcad4f13a91a75ba6f43ca0c, type: 2}
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
 --- !u!114 &7796233244604014124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -299,6 +329,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -320,6 +351,7 @@ MonoBehaviour:
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967227
+      fixedHud: 1
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.7, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -375,6 +407,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -390,6 +423,47 @@ MonoBehaviour:
     HoverOnly: 1
   renderers:
   - {fileID: 4808159533463803149}
+--- !u!114 &6814099491837568890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1738591984895843950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    IncludeFixedObjects: 0
+    Flags: []
+    OffscreenDelay: 0.25
 --- !u!1 &3177244989389559384
 GameObject:
   m_ObjectHideFlags: 0

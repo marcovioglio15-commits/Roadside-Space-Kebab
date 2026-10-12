@@ -100,7 +100,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(audio, "Cooldown");
                     }
                 }
-            if (!sections.Draw("Carry", "Configure the held pose, pickup transition, world collisions and hover visibility.", grab, "Space", "Offset", "Rotation", "Instant", "TransitionDuration", "WorldCollisions", "FollowSpeed", "RecoveryResponse", "RotationSpeed", "CollisionPadding", "ContactRotation", "ContactAngle", "ContactResponse", "ShowHover"))
+            if (!sections.Draw("Carry", "Configure the held pose, pickup transition, world collisions and hover visibility.", grab, "Space", "Offset", "Rotation", "Instant", "TransitionDuration", "PhysicalPickup", "PickupTimeMargin", "PickupSpeed", "PickupPush", "WorldCollisions", "FollowSpeed", "RecoveryResponse", "RotationSpeed", "CollisionPadding", "ContactRotation", "ContactAngle", "ContactResponse", "ShowHover"))
                 return;
             using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
             Field(grab, "Space");
@@ -108,7 +108,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Field(grab, "Rotation");
             Field(grab, "Instant");
             if (!grab.FindPropertyRelative("Instant").boolValue)
+            {
                 Field(grab, "TransitionDuration");
+                Field(grab, "PhysicalPickup");
+                if (grab.FindPropertyRelative("PhysicalPickup").boolValue)
+                {
+                    Field(grab, "PickupTimeMargin");
+                    Field(grab, "PickupSpeed");
+                    Field(grab, "PickupPush");
+                }
+            }
             Field(grab, "WorldCollisions");
             if (grab.FindPropertyRelative("WorldCollisions").boolValue)
             {

@@ -43,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (InteractionTemplateReference target in Targets)
                 if (target == null || !target.Assigned || target.Occurrence < 0
                     || target.Kind == InteractionTemplateKind.AssemblyProduct
-                    || target.Kind < InteractionTemplateKind.Hover || target.Kind > InteractionTemplateKind.Eject
+                    || target.Kind < InteractionTemplateKind.Hover || target.Kind > InteractionTemplateKind.PresenceCap
                     || !mappings.Add(JsonUtility.ToJson(target)))
                     return false;
             warning = string.Empty;

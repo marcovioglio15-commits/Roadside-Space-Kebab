@@ -1,4 +1,5 @@
 using System;
+using CatOnASkateboard.AudioStudio;
 using CatOnASkateboard.MenuStudio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -126,6 +127,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Draws a fresh daily budget and prepares the first visitor.</summary>
         private void StartDay()
         {
+            // Scene retention must not retain yesterday's music playback position.
+            StudioAudio.RestartMusic();
             // Random counts include both endpoints and are drawn once, including when the plan loops.
             SpawnFlowDay settings = plan.Days[day];
             completed = 0;
@@ -174,9 +177,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Completed events are retained while the manager is temporarily locked.
             if (phase is Phase.Transition or Phase.Stopped || Time.timeScale <= 0f || !owner.Available(InteractionChannels.Spawn))
                 return;
-            if (phase is Phase.Arrival or Phase.Waiting or Phase.Departure && instance == null)
+            if (phase is Phase.Arrival or Phase.Waiting or Phase.Departure && (instance == null || !instance.activeSelf))
             {
-                Fail("The current day-flow instance was destroyed before departure completed. The sequence has stopped.");
+                FinishStep();
                 return;
             }
             switch (phase)
@@ -195,7 +198,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     }
                     break;
                 case Phase.Waiting:
-                    if (!signaled)
+                    if (!signaled || instance.TryGetComponent(out ObjectEject eject) && eject.AwaitingDespawn)
                         return;
                     suspended = new SuspendedItemState(instance, true);
                     suspended.Suspend();
@@ -214,7 +217,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Spawn()
         {
             // Component order is captured before any OnEnable callback can alter the clone's hierarchy.
-            instance = Object.Instantiate(step.Prefab, staging, false);
+            instance = ObjectSpawnHistory.Create(step.Prefab, staging, false);
             instance.SetActive(false);
             instance.transform.SetParent(null, false);
             SceneManager.MoveGameObjectToScene(instance, SceneManager.GetActiveScene());
@@ -280,7 +283,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (day < plan.Days.Length || plan.Loop)
             {
                 day %= plan.Days.Length;
-                Load(plan.Days[day].Scene, StartDay);
+                if (plan.PreserveScene && SceneManager.GetActiveScene().path == plan.Days[day].Scene)
+                {
+                    if (!transition.BeginLocal(plan.FadeOut, plan.BlackDelay, plan.FadeIn, PlayerSceneReturn.ReturnActive, StartDay))
+                        Fail("Cannot start the local day transition. Check the authored black overlay.");
+                }
+                else
+                    Load(plan.Days[day].Scene, StartDay);
             }
             else
                 Load(plan.MainMenu, FinishRun);

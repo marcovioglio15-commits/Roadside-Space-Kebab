@@ -39,6 +39,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 GravityGeneratorPreset gravity => gravity.Settings.TryValidate(out warning),
                 ElasticDeformationPreset elasticDeformation => elasticDeformation.Settings.TryValidate(out warning),
                 DirtTrailPreset dirtTrail => dirtTrail.Settings.TryValidate(out warning),
+                DeathboxPreset deathbox => deathbox.Settings.TryValidate(out warning),
+                PresenceCapPreset presenceCap => presenceCap.Settings.TryValidate(out warning),
                 SpraySaucePreset spraySauce => spraySauce.Settings.TryValidate(out warning),
                 DialoguePreset dialogue => dialogue.Settings.TryValidate(out warning),
                 AmbientPreset ambient => ambient.Settings.TryValidate(out warning),

@@ -41,6 +41,7 @@ MonoBehaviour:
         Space: 1
         Keyframes: []
   Loop: 1
+  PreserveScene: 1
   MainMenu: 
   PauseScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_PauseMenu.unity
   FadeOut: 0.5

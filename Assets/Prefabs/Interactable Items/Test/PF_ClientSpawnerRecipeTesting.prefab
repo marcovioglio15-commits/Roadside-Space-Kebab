@@ -225,6 +225,7 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     AutoTiming: 0
     Duration: 1
+    OnContactObject: 0
     FollowObject: 1
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
@@ -234,7 +235,7 @@ MonoBehaviour:
   drawGizmos: 1
   settings:
     Mode: 1
-    Flow: {fileID: 11400000, guid: 4f82f2f05dae0ee44bbe300dfd329687, type: 2}
+    Flow: {fileID: 11400000, guid: a0fec5128a0b7ca49877025a49e32e5c, type: 2}
     SourcePrefab: {fileID: 0}
     Conditions: []
     RequireAll: 1

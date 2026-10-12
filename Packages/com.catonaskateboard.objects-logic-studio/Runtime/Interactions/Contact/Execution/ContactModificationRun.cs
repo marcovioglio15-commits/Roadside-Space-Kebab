@@ -364,7 +364,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             int units = victim != null && victim.TryGetComponent(out ObjectGrab grab) ? grab.Units : 1;
             bool consumed = false;
             ObjectFlag[] ingredients = (settings.Self.Consume || settings.Other.Consume) && victim != null
-                && victim.TryGetComponent(out ObjectAssemblyProduct product) ? product.CaptureIngredientFlags() : Array.Empty<ObjectFlag>();
+                && victim.TryGetComponent(out ObjectAssemblyProduct product) ? product.CaptureIngredientFlags() : null;
             if (settings.Self.Consume)
                 consumed = other.Consume(Item, this, out receipt);
             else if (settings.Other.Consume)

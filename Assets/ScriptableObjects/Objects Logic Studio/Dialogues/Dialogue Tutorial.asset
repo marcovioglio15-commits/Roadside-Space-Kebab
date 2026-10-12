@@ -18,9 +18,16 @@ MonoBehaviour:
     Tools: []
   Settings:
     Trigger: 1
+    Consumption:
+      Enabled: 0
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 0
     Distance: 3
     ExitDistance: 4
     Priority: 0
+    PreferSingleActions: 1
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -28,11 +35,16 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     SightOffset: {x: 0, y: 0, z: 0}
-    Selection: 0
     Interruption: 1
     ReplayOnReturn: 1
+    Selection: 0
     Entries:
     - {fileID: 11400000, guid: 88b94d9a5e294ae68a4e30c05f0d078d, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 11400000, guid: 5ce048c0c98848a4db8653b917c48c78, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Audio:
       Voice: 0
       Interval: 1

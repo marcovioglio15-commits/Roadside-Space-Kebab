@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 3078138421203572724}
   - component: {fileID: 392655467241966721}
   - component: {fileID: 3856206238075889047}
+  - component: {fileID: 7245906888422661357}
   m_Layer: 0
   m_Name: PF_Test_Hamburger
   m_TagString: Untagged
@@ -116,6 +117,18 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    FinalizeOnGrab: 1
+    FinalizeAction: {fileID: 0}
+    FinalizeTarget:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
     WaitForNextIngredient: 0
     Ingredients:
     - Flags:
@@ -241,8 +254,12 @@ MonoBehaviour:
     Space: 0
     Offset: {x: 0.35, y: -0.02, z: 0.7}
     Rotation: {x: 0, y: 0, z: 0}
-    Instant: 0
+    Instant: 1
     TransitionDuration: 0.2
+    PhysicalPickup: 0
+    PickupTimeMargin: 0.15
+    PickupSpeed: 25
+    PickupPush: 1.5
     WorldCollisions: 1
     FollowSpeed: 12
     RecoveryResponse: 12
@@ -408,12 +425,13 @@ MonoBehaviour:
       centerRadius: 0.08
       queryInterval: 0.05
       releaseDelay: 0.08
-      suspendCarried: 1
+      suspendCarried: 0
       suspendMoving: 0
       speedThreshold: 0.5
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
+      fixedHud: 1
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -477,6 +495,47 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.21378556, y: 0.12117137, z: 0.20000002}
   m_Center: {x: -0.0068927854, y: 0.040515706, z: 0}
+--- !u!114 &7245906888422661357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4182828039336747428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    IncludeFixedObjects: 0
+    Flags: []
+    OffscreenDelay: 0.25
 --- !u!1 &4656305680823003017
 GameObject:
   m_ObjectHideFlags: 0
