@@ -634,7 +634,7 @@ MonoBehaviour:
     DrawCount: 4
     RandomDrawUnits: 1
     DrawUnitRange: {x: 2, y: 4}
-    Selection: 0
+    Selection: 1
     Catalog: {fileID: 11400000, guid: 66ec0f0a64b1494c86e47657a5933e7b, type: 2}
     UseSpawnCatalogs: 0
     SpawnCatalogs: []
