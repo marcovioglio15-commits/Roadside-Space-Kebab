@@ -94,7 +94,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Bind by stable action ID against the private runtime asset, never the project asset's action instance.
             foreach (ObjectSingleInteraction feature in SingleInteractionRegistry.Items)
-                BindFeature(feature, feature.Action);
+                if (feature.UsesInput)
+                    BindFeature(feature, feature.Action);
             foreach (ObjectSlice feature in SliceRegistry.Items)
                 BindFeature(feature, feature.Action);
             foreach (ObjectRequestedInteraction feature in ObjectRequestedInteraction.Registered)
@@ -453,7 +454,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             TransferTargetSettings settings = target.Target;
             return targeting.Eligible(observer, target.transform, target.Colliders, target.transform.TransformPoint(settings.Offset),
                 settings.Distance, settings.Mode, settings.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
-                settings.ObstacleMask, settings.SolidHitOnly, out score);
+                settings.ObstacleMask, settings.SolidHitOnly, out score,
+                target is ObjectTriggerAnimation animation && animation.Settings.Activation == TriggerAnimationActivation.CenterCollider);
         }
 
         /// <summary>Applies independent Grab targeting even when the object has no Hover feature.</summary>

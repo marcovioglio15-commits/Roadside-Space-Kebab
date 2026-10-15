@@ -54,8 +54,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when this body satisfies the selected combination.</returns>
         internal bool Matches(Component body, Transform owner)
         {
-            if (body.TryGetComponent(out LiquidDroplet droplet) && droplet.Source != null)
-                body = droplet.Source;
+            // Liquid may opt out independently of its emitter and of the enabled filter groups.
+            if (body.TryGetComponent(out LiquidDroplet droplet))
+            {
+                if (!droplet.AllowGravitySuspension)
+                    return false;
+                if (droplet.Source != null)
+                    body = droplet.Source;
+            }
             if (!IncludeSelf && body.transform.IsChildOf(owner))
                 return false;
             ObjectItem item = body.GetComponentInParent<ObjectItem>();

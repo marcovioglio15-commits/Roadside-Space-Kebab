@@ -32,6 +32,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             internal readonly int Line;
             internal readonly int NextEntry;
             internal readonly int StartedRevision;
+            internal readonly int StartedContactRevision;
             internal readonly bool Armed;
             internal readonly bool Retained;
             internal readonly bool AwaitingSight;
@@ -45,6 +46,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Line = dialogue.line;
                 NextEntry = dialogue.nextEntry;
                 StartedRevision = dialogue.startedRevision;
+                StartedContactRevision = dialogue.startedContactRevision;
                 Armed = dialogue.armed;
                 Retained = dialogue.retained;
                 AwaitingSight = dialogue.awaitingSight;
@@ -59,6 +61,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int consumptionRevision = -1;
         private int orderRevision = -1;
         private ObjectAvailableOrders orders;
+        private ObjectContactModifier contact;
+        private int contactRevision = -1;
+        private int startedContactRevision = -1;
         private DialogueSettings content;
         private int generation = -1;
         private int startedRevision = -1;
@@ -133,6 +138,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             line = nextEntry = 0;
             eligible.Clear();
             orders = GetComponent<ObjectAvailableOrders>();
+            contact = GetComponent<ObjectContactModifier>();
+            contactRevision = startedContactRevision = -1;
             orderRevision = -1;
             audio.Stop();
             SightGeometry.Bind(transform);
@@ -208,7 +215,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 armed = true;
             return !IsSpeaking && distance <= settings.Distance * settings.Distance && eligible.Count > 0
                 && (armed || settings.Trigger == DialogueTrigger.InputAction && settings.ReplayOnInput
-                    || settings.Trigger == DialogueTrigger.Consumption && startedRevision != Item.ConsumptionRevision);
+                    || settings.Trigger == DialogueTrigger.Consumption && (startedRevision != Item.ConsumptionRevision
+                        || contact != null && contact.AwaitingContact && startedContactRevision != contact.ContactRevision));
         }
 
         /// <summary>Checks whether a visible dialogue still has its item, HUD and exit range.</summary>
@@ -225,18 +233,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void RefreshEntries()
         {
             // Zero-weight entries are excluded only in weighted mode.
-            if (consumptionRevision == Item.ConsumptionRevision && orderRevision == (orders != null ? orders.Revision : -1))
+            if (consumptionRevision == Item.ConsumptionRevision && orderRevision == (orders != null ? orders.Revision : -1)
+                && contactRevision == (contact != null ? contact.ContactRevision : -1))
                 return;
             consumptionRevision = Item.ConsumptionRevision;
+            contactRevision = contact != null ? contact.ContactRevision : -1;
             orderRevision = orders != null ? orders.Revision : -1;
             eligible.Clear();
             if (settings.Trigger == DialogueTrigger.Consumption
-                && (!Item.HasConsumption || !settings.Consumption.Matches(Item, orders)))
+                && (!Item.HasConsumption && !(contact != null && contact.AwaitingContact) || !settings.Consumption.Matches(Item, orders)))
                 return;
             for (int index = 0; index < content.Entries.Length; index++)
-                if ((settings.Trigger != DialogueTrigger.Consumption || content.Entries[index].Consumption.Matches(Item, orders))
+                if ((settings.Trigger != DialogueTrigger.Consumption || MatchesConsumption(content.Entries[index].Consumption))
                     && (content.Selection != DialogueSelection.WeightedRandom || content.Entries[index].Weight > 0f))
                     eligible.Add(index);
+        }
+
+        /// <summary>Keeps gated contact attempts separate from actual consumption receipts.</summary>
+        /// <param name="filter">Candidate entry's consumption condition.</param>
+        /// <returns>True when both the event kind and selected entry filter match.</returns>
+        private bool MatchesConsumption(DialogueConsumptionFilter filter)
+        {
+            // Unfiltered entries must not start merely because an item touched a still-closed consumption gate.
+            bool awaiting = contact != null && contact.AwaitingContact;
+            bool requestsAwaiting = filter.Enabled && filter.Result == DialogueOrderResult.AwaitingOrders
+                || settings.Consumption.Enabled && settings.Consumption.Result == DialogueOrderResult.AwaitingOrders;
+            return awaiting == requestsAwaiting && filter.Matches(Item, orders);
         }
 
         /// <summary>Checks startup or HUD visibility without repeatedly reopening an interrupted dialogue behind a wall.</summary>
@@ -311,6 +333,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             line = progress.Line;
             nextEntry = progress.NextEntry;
             startedRevision = progress.StartedRevision;
+            startedContactRevision = progress.StartedContactRevision;
             armed = progress.Armed;
             retained = progress.Retained;
             awaitingSight = progress.AwaitingSight;
@@ -337,6 +360,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             retained = false;
             armed = false;
             startedRevision = Item.ConsumptionRevision;
+            startedContactRevision = contact != null ? contact.ContactRevision : -1;
             IsSpeaking = true;
             arrivalPending = false;
             audio.Begin(settings.Audio, transform, arrivalCue);

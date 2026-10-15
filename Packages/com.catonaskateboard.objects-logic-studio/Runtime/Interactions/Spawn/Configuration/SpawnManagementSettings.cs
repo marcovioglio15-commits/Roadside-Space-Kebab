@@ -39,6 +39,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Do not select the same entry twice within one condition cycle.")]
         public bool WithoutReplacement;
         [Tooltip("Probability from zero to one that a completed condition cycle generates its selected prefabs.")]
+        [Range(0f, 1f)]
         public float Chance = 1f;
         [Tooltip("Use a repeatable random stream for this rule instance.")]
         public bool FixedSeed;
@@ -48,14 +49,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public SpawnAnimationSettings Animation = new SpawnAnimationSettings();
         [Header("Placement And Timing")]
         [Tooltip("Minimum delay in seconds after conditions complete.")]
+        [Range(0f, 60f)]
         public float MinimumDelay;
         [Tooltip("Maximum delay in seconds; equal values produce a fixed delay.")]
+        [Range(0f, 60f)]
         public float MaximumDelay;
         [Tooltip("Local spawn position relative to this rule's object.")]
         public Vector3 Position;
         [Tooltip("Local Euler rotation for generated prefabs.")]
         public Vector3 Rotation;
         [Tooltip("Random horizontal displacement in metres around the output position. Zero uses the exact point.")]
+        [Range(0f, 50f)]
         public float Radius;
         [Tooltip("Add a uniformly random rotation around the output's local up axis.")]
         public bool RandomYaw;

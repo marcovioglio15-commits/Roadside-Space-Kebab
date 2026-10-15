@@ -31,6 +31,8 @@ MonoBehaviour:
       Text: + Fries
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -41,9 +43,11 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags: []
     - Name: BaseOrder
-      Text: Complete
+      Text: 
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -57,6 +61,8 @@ MonoBehaviour:
       Text: '- Lettuce'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -70,6 +76,8 @@ MonoBehaviour:
       Text: '- Tomato'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -83,6 +91,8 @@ MonoBehaviour:
       Text: '- Onion'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -96,6 +106,8 @@ MonoBehaviour:
       Text: '- Onion - Lettuce'
       AppendToBaseText: 1
       Weight: 10
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -106,6 +118,17 @@ MonoBehaviour:
       ExcludedFlags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 2
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 1
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: Soda
     Text: Soda
     Quantity: 1
@@ -120,3 +143,14 @@ MonoBehaviour:
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1
     Variants: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1

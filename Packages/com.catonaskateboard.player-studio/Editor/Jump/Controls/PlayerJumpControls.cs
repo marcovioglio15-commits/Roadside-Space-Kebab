@@ -36,9 +36,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (!enabled || !gravityEnabled)
                 return;
 
-            height = StudioGUI.FloatField(heightLabel, height);
-            bufferTime = StudioGUI.FloatField(bufferLabel, bufferTime);
-            coyoteTime = StudioGUI.FloatField(coyoteLabel, coyoteTime);
+            height = StudioGUI.FloatField<PlayerLocomotionPreset>(heightLabel, height, "jumpHeight");
+            bufferTime = StudioGUI.FloatField<PlayerLocomotionPreset>(bufferLabel, bufferTime, "jumpBufferTime");
+            coyoteTime = StudioGUI.FloatField<PlayerLocomotionPreset>(coyoteLabel, coyoteTime, "coyoteTime");
         }
 
         #endregion

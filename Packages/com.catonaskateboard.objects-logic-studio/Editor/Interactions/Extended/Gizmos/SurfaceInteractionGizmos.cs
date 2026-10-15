@@ -23,7 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Handles.ArrowHandleCap(0, point, rotation, length, EventType.Repaint);
             if (float.IsFinite(spray.Settings.Spread) && spray.Settings.Spread >= 0f && spray.Settings.Spread < 90f)
                 Handles.DrawWireDisc(point + rotation * Vector3.forward * length, rotation * Vector3.forward,
-                    Mathf.Tan(spray.Settings.Spread * Mathf.Deg2Rad) * length);
+                    Mathf.Tan(spray.Settings.Spread * Mathf.Deg2Rad) * length * (1f - Mathf.Clamp01(spray.Settings.Cohesion)));
         }
         /// <summary>Shows the visual deformation pivot independently of the physics pivot.</summary>
         /// <param name="elastic">Selected response component.</param>

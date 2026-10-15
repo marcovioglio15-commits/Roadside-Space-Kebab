@@ -247,7 +247,10 @@ namespace CatOnASkateboard.PlayerStudio
         /// <param name="hit">Actual controller contact.</param>
         private void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            floating.Contact(hit.normal, hit.rigidbody);
+            if (floating.Active)
+                floating.Contact(hit.normal, hit.rigidbody);
+            else
+                PlayerSuspendedBodyPush.TryPush(hit.rigidbody, hit.normal, ref moveVelocity);
             // Capture requested impact speed before collision response reduces achieved motion.
             if (initialized)
                 audio.Contact(hit, moveVelocity, wasGrounded);

@@ -15,12 +15,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Header("Detection")]
         [Tooltip("Measure grab range from the Observer's flagged player, in metres.")]
+        [Range(0.1f, 20f)]
         public float Distance = 3f;
         [Tooltip("Choose proximity to the view centre or an exact cursor hit on the object's colliders.")]
         public HoverTargetMode TargetMode;
         [Tooltip("Require the view-centre or cursor ray to hit a non-trigger collider on this object. Trigger volumes and nearby anchors cannot activate it; triggers in front of a solid hit are ignored.")]
         public bool SolidHitOnly;
         [Tooltip("Allowed distance from view centre as a fraction of viewport height.")]
+        [Range(0.001f, 1f)]
         public float CenterRadius = 0.15f;
         [Tooltip("Local point used for grab range and view-centre targeting.")]
         public Vector3 TargetOffset;
@@ -41,30 +43,40 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Request the carry pose immediately on pickup, stopping at obstacles. Otherwise ease into it over Transition Duration.")]
         public bool Instant;
         [Tooltip("Seconds spent easing from the pickup pose to the moving carry pose.")]
+        [Range(0.01f, 3f)]
         public float TransitionDuration = 0.2f;
         [Tooltip("Use dynamic physics during a non-instant pickup. Player collisions stay ignored; blocked pickups cancel after the time margin.")]
         public bool PhysicalPickup = true;
         [Tooltip("Maximum extra seconds allowed after Transition Duration to settle at the carry pose before cancelling.")]
+        [Range(0.01f, 1f)]
         public float PickupTimeMargin = 0.15f;
         [Tooltip("Maximum pickup velocity in metres per second. Increase for distant pickups with short durations.")]
+        [Range(1f, 50f)]
         public float PickupSpeed = 25f;
         [Tooltip("Velocity transfer to other loose Grab objects on impact. Values above one favor the picked object.")]
+        [Range(1f, 10f)]
         public float PickupPush = 1.5f;
         [Tooltip("Keep collisions with the world while carrying. Player collisions are always ignored.")]
         public bool WorldCollisions = true;
         [Tooltip("Maximum physical following speed in metres per second when world collisions are enabled.")]
+        [Range(0.1f, 50f)]
         public float FollowSpeed = 12f;
         [Tooltip("Response per second for closing the distance left by a collision. Higher values return faster; unobstructed movement stays aligned with the carry frame.")]
+        [Range(0.1f, 50f)]
         public float RecoveryResponse = 12f;
         [Tooltip("Maximum rotation speed in degrees per second while world collisions are enabled.")]
+        [Range(1f, 1080f)]
         public float RotationSpeed = 360f;
         [Tooltip("Space kept between the held collider and world surfaces, in metres.")]
+        [Range(0.001f, 0.1f)]
         public float CollisionPadding = 0.015f;
         [Tooltip("Allow a limited, damped rotation when an off-centre contact blocks carrying.")]
         public bool ContactRotation = true;
         [Tooltip("Maximum angular deflection from the carry pose in degrees after an impact.")]
+        [Range(0.1f, 60f)]
         public float ContactAngle = 20f;
         [Tooltip("Response per second when entering contact or returning to the carry orientation.")]
+        [Range(0.1f, 30f)]
         public float ContactResponse = 8f;
         [Tooltip("Keep existing hover labels eligible for their normal detection while the object is carried.")]
         public bool ShowHover = true;

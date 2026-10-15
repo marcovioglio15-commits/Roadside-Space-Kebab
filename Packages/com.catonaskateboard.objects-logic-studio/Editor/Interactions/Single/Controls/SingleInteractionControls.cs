@@ -26,7 +26,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Field(draft, "Name");
             Field(draft, "Enabled");
             InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
-            StudioInputActionMenu.Draw(data, "Single.Draft.Action", "ObjectsLogicStudio.Button", Button);
+            if (state.Single.Kind != SingleInteractionKind.TriggerAnimation
+                || draft.FindPropertyRelative("TriggerAnimation.Activation").enumValueIndex != (int)TriggerAnimationActivation.Proximity)
+                StudioInputActionMenu.Draw(data, "Single.Draft.Action", "ObjectsLogicStudio.Button", Button);
             switch (state.Single.Kind)
             {
                 case SingleInteractionKind.TriggerAnimation:

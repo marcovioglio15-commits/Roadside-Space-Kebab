@@ -133,39 +133,12 @@ namespace CatOnASkateboard.PlayerStudio
         {
             if (!Active)
                 return;
-            if (Push(body, normal))
+            if (PlayerSuspendedBodyPush.TryPush(body, normal, ref velocity))
                 return;
             float inward = Vector3.Dot(velocity, normal);
             if (inward >= 0f)
                 return;
             velocity = (velocity - normal * inward) * (1f - Settings.ContactFriction) - normal * inward * Settings.Bounce;
-        }
-
-        /// <summary>Transfers closing speed to an explicitly suspended body using a scaled collision mass.</summary>
-        /// <param name="body">Contacted body, including null for static surfaces.</param>
-        /// <param name="normal">Outward world normal toward the player.</param>
-        /// <returns>True when the suspended-body policy handled this contact.</returns>
-        private bool Push(Rigidbody body, Vector3 normal)
-        {
-            // Never infer suspension from disabled gravity: scenery and authored floating obstacles still block.
-            if (!Settings.PushSuspendedBodies || body == null || body.isKinematic
-                || (body.constraints & RigidbodyConstraints.FreezePosition) == RigidbodyConstraints.FreezePosition)
-                return false;
-            foreach (Lease lease in leases)
-                if (lease.Owner is IPlayerSuspensionSource source && source.IsBodySuspended(body))
-                {
-                    float closing = -Vector3.Dot(velocity - body.linearVelocity, normal);
-                    if (closing > 0f)
-                    {
-                        // Updating velocity once makes repeated compound contacts observe the transferred speed.
-                        float share = (float)(Settings.Mass / (Settings.Mass + (double)body.mass * Settings.SuspendedMassScale));
-                        body.linearVelocity -= normal * (closing * share * Settings.SuspendedPushSpeed);
-                        velocity += normal * (closing * (1f - share));
-                        body.WakeUp();
-                    }
-                    return true;
-                }
-            return false;
         }
 
         #endregion

@@ -29,8 +29,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Play the configured new-customer sound when the arrival dialogue actually opens.")]
         public bool NewCustomerSound;
         [Tooltip("Relative chance used only by Weighted Random selection.")]
+        [Range(0.01f, 10f)]
         public float Weight = 1f;
         [Tooltip("Scaled seconds to wait before creating this step's instance.")]
+        [Range(0f, 120f)]
         public float Delay;
         [Tooltip("Spawn origin relative to the persistent flow object's transform.")]
         public Vector3 Position;
@@ -138,8 +140,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Destination in the path's selected coordinate space. World scale is absolute; Relative scale multiplies the prefab scale.")]
         public PlayerToolPose Pose = PlayerToolPose.Identity;
         [Tooltip("Scaled seconds held at the previous pose before movement starts.")]
+        [Range(0f, 120f)]
         public float Delay;
         [Tooltip("Scaled seconds spent moving to this keyframe. Zero applies the destination immediately.")]
+        [Range(0f, 120f)]
         public float Duration = 1f;
         [Tooltip("Choose signed clockwise/counterclockwise Euler travel, authored turns or the shortest orientation path.")]
         public TransformRotationDirection Direction = TransformRotationDirection.Shortest;

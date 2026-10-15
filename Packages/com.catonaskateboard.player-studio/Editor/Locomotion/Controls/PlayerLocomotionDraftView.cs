@@ -35,9 +35,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (sections.Draw("Locomotion.Movement", "Movement"))
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    speed = StudioGUI.FloatField(speedLabel, speed);
-                    acceleration = StudioGUI.FloatField(accelerationLabel, acceleration);
-                    deceleration = StudioGUI.FloatField(decelerationLabel, deceleration);
+                    speed = StudioGUI.FloatField<PlayerLocomotionPreset>(speedLabel, speed, "speed");
+                    acceleration = StudioGUI.FloatField<PlayerLocomotionPreset>(accelerationLabel, acceleration, "acceleration");
+                    deceleration = StudioGUI.FloatField<PlayerLocomotionPreset>(decelerationLabel, deceleration, "deceleration");
                 }
             bool useGravity = session.UseGravity;
             float gravityAcceleration = session.GravityAcceleration;

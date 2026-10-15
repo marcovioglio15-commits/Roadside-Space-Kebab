@@ -14,6 +14,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Interaction proposal containing the modification references.</param>
         internal static void Draw(SerializedProperty settings)
         {
+            ContactModificationSettings configuration = settings.boxedValue as ContactModificationSettings;
+            if (configuration != null && configuration.ConsumesAny)
+                ContactDialogueGateControls.Draw(settings.FindPropertyRelative("ConsumeOn"));
             SerializedProperty modifications = settings.FindPropertyRelative("Modifications");
             modifications.isExpanded = StudioArrayGUI.Foldout(modifications, new GUIContent("Modifications", modifications.tooltip));
             if (!modifications.isExpanded)

@@ -15,27 +15,37 @@ namespace CatOnASkateboard.PlayerStudio
         [Tooltip("Fade out footsteps while jumping or falling. Disable for movement without ground contact.")]
         public bool GroundedOnly;
         [Tooltip("Metres travelled during one complete walking cycle. Shorter strides produce faster steps.")]
+        [Range(0.1f, 5f)]
         public float StrideLength;
         [Tooltip("Speed in metres per second at which the full motion amplitude is reached.")]
+        [Range(0.1f, 20f)]
         public float ReferenceSpeed;
         [Tooltip("Vertical camera amplitude in metres. Forward and backward movement use only this axis.")]
+        [Range(0f, 0.2f)]
         public float Height;
         [Tooltip("Sideways camera amplitude in metres, scaled by the lateral movement direction.")]
+        [Range(0f, 0.2f)]
         public float SideAmplitude;
         [Tooltip("Camera roll towards lateral movement in degrees; backward movement does not invert it.")]
+        [Range(0f, 30f)]
         public float Lean;
         [Tooltip("Additional roll amplitude in degrees during lateral footsteps.")]
+        [Range(0f, 15f)]
         public float RollAmplitude;
         [Tooltip("Response rate per second when starting, changing direction or returning to the resting pose.")]
+        [Range(0.1f, 50f)]
         public float Response;
         [Header("Irregularity")]
         [Tooltip("Add smooth, repeatable variation to step timing and amplitude.")]
         public bool Irregular;
         [Tooltip("Fractional variation of vertical and lateral amplitudes, from zero to one.")]
+        [Range(0f, 1f)]
         public float AmplitudeVariation;
         [Tooltip("Fractional variation of cadence, from zero to one.")]
+        [Range(0f, 0.99f)]
         public float CadenceVariation;
         [Tooltip("Noise sampling distance per walking cycle; larger values change the pattern faster.")]
+        [Range(0.01f, 5f)]
         public float VariationRate;
         [Tooltip("Seed for a repeatable pattern without changing Unity's shared random state.")]
         public int Seed;

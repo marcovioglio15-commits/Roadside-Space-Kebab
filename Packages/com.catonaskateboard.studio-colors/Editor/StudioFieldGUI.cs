@@ -43,10 +43,47 @@ namespace CatOnASkateboard.StudioColors.Editor
         /// <returns>The value returned through the tool's usual edit transaction.</returns>
         public static float FloatField(GUIContent label, float value, params GUILayoutOption[] options)
         {
+            return FloatField(label, value, StudioPropertySchema.Range(StudioFieldMenu.NextProperty), options);
+        }
+
+        /// <summary>Shares the settings declaration's range with a transient draft control.</summary>
+        /// <typeparam name="T">Settings class declaring the field.</typeparam>
+        /// <param name="label">Field caption and tooltip.</param>
+        /// <param name="value">Current draft value.</param>
+        /// <param name="field">Declared field name or nested path.</param>
+        /// <param name="options">Optional layout constraints.</param>
+        /// <returns>The edited value without changing out-of-range data on repaint.</returns>
+        public static float FloatField<T>(GUIContent label, float value, string field, params GUILayoutOption[] options)
+        {
+            return FloatField(label, value, StudioPropertySchema.Range(typeof(T), field), options);
+        }
+
+        /// <summary>Keeps context menus and field colours identical for bound and transient float controls.</summary>
+        /// <param name="label">Field caption and tooltip.</param>
+        /// <param name="value">Current value.</param>
+        /// <param name="range">Cached declared interval, or null for unbounded fields.</param>
+        /// <param name="options">Optional layout constraints.</param>
+        /// <returns>The edited scalar.</returns>
+        private static float FloatField(GUIContent label, float value, RangeAttribute range, params GUILayoutOption[] options)
+        {
             // Keep Unity's built-in editing behavior and existing indentation.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.FloatField(rect, label, StudioValueMenu.Edit(rect, label, value));
+            return StudioFloatGUI.Draw(rect, label, StudioValueMenu.Edit(rect, label, value), range);
+        }
+
+        /// <summary>Draws a transient scalar with visible recommended endpoints and precise numeric entry.</summary>
+        /// <param name="label">Field caption and tooltip.</param>
+        /// <param name="value">Current authored value.</param>
+        /// <param name="minimum">Suggested lower endpoint.</param>
+        /// <param name="maximum">Suggested upper endpoint.</param>
+        /// <param name="options">Optional layout constraints.</param>
+        /// <returns>The edited scalar without clamping existing data on repaint.</returns>
+        public static float FloatField(GUIContent label, float value, float minimum, float maximum, params GUILayoutOption[] options)
+        {
+            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            return StudioFloatGUI.Draw(rect, label, StudioValueMenu.Edit(rect, label, value), minimum, maximum);
         }
 
         /// <summary>Draws a native TextField with typed Copy/Paste support.</summary>
@@ -167,8 +204,10 @@ namespace CatOnASkateboard.StudioColors.Editor
             // Reject an out-of-range paste instead of silently changing its value.
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.Slider(rect, label, StudioValueMenu.Edit(rect, label, value,
+            EditorGUI.BeginChangeCheck();
+            float edited = StudioFloatGUI.Draw(rect, label, StudioValueMenu.Edit(rect, label, value,
                 result => result >= minimum && result <= maximum), minimum, maximum);
+            return EditorGUI.EndChangeCheck() ? Mathf.Clamp(edited, minimum, maximum) : value;
         }
 
         /// <summary>Draws named choices with range-checked Copy/Paste.</summary>
@@ -226,12 +265,21 @@ namespace CatOnASkateboard.StudioColors.Editor
                 return StudioArrayGUI.Draw(property, label);
             if (includeChildren && property.propertyType == SerializedPropertyType.Generic)
                 return StudioStructureGUI.Draw(property, label);
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUI.GetPropertyHeight(property, label, includeChildren), options);
+            RangeAttribute range = property.propertyType == SerializedPropertyType.Float ? StudioPropertySchema.Range(property) : null;
+            if (range != null)
+                StudioFloatGUI.Decorations(property);
+            Rect rect = EditorGUILayout.GetControlRect(true, range != null ? EditorGUIUtility.singleLineHeight
+                : EditorGUI.GetPropertyHeight(property, label, includeChildren), options);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
             if (Event.current.type == EventType.ContextClick && rect.Contains(Event.current.mousePosition))
             {
                 using SerializedProperty clicked = Row(property, rect, includeChildren);
                 StudioFieldMenu.Context(rect, clicked);
+            }
+            if (range != null)
+            {
+                StudioFloatGUI.Property(rect, property, label, range);
+                return false;
             }
             return EditorGUI.PropertyField(rect, property, label, includeChildren);
         }

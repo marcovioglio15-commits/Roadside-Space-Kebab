@@ -13,6 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Animate generated prefabs before enabling any of their authored interactions or collisions.")]
         public bool Enabled;
         [Tooltip("Animation duration in game-time seconds. Other interaction locks remain intact after completion.")]
+        [Range(0.01f, 10f)]
         public float Duration = 0.5f;
         [Tooltip("Starting offset relative to the generated object's final orientation, in metres.")]
         public Vector3 Offset = new Vector3(0f, -0.3f, 0f);

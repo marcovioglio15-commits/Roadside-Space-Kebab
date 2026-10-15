@@ -70,13 +70,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(variant, "Weight");
                 HoverControls.Field(variant, "UseDrawLimits");
                 if (variant.FindPropertyRelative("UseDrawLimits").boolValue)
+                {
                     DrawLimits(variant);
+                    HoverControls.Field(variant, "UseQuantity");
+                    if (variant.FindPropertyRelative("UseQuantity").boolValue)
+                        HoverControls.Field(variant, "Quantity");
+                }
                 ObjectFlagSelector.Draw(variant.FindPropertyRelative("Flags"), new GUIContent("Additive Flags", "Ingredient flags required by this assembled variant."));
                 if (variant.FindPropertyRelative("Flags").arraySize > 1)
                     HoverControls.Field(variant, "RequireAllFlags");
                 ObjectFlagSelector.Draw(variant.FindPropertyRelative("ExcludedFlags"), new GUIContent("Subtractive Flags", "None of these flags may belong to the assembled ingredients."));
             }
             StudioArrayGUI.Add(variants, "Add Recipe Variant", () => new OrderRecipeVariant());
+            Combos(entry.FindPropertyRelative("Combos"));
+        }
+
+        /// <summary>Exposes only the policies used by enabled variant combinations.</summary>
+        /// <param name="combos">Combination configuration owned by one base order.</param>
+        private static void Combos(SerializedProperty combos)
+        {
+            HoverControls.Field(combos, "Enabled", "Allow Variant Combos");
+            if (!combos.FindPropertyRelative("Enabled").boolValue)
+                return;
+            HoverControls.Field(combos, "MaximumVariants");
+            HoverControls.Field(combos, "Weight", "Combo Pool Weight");
+            HoverControls.Field(combos, "QuantityPolicy");
+            if (combos.FindPropertyRelative("QuantityPolicy").enumValueIndex == (int)OrderComboPolicy.Fixed)
+                HoverControls.Field(combos, "Quantity");
+            HoverControls.Field(combos, "DrawLimitsPolicy", "Shared Draw Limits");
+            if (combos.FindPropertyRelative("DrawLimitsPolicy").enumValueIndex == (int)OrderComboPolicy.Fixed)
+                DrawLimits(combos);
         }
 
         /// <summary>Uses identical draw-limit controls for parent orders and independent variants.</summary>

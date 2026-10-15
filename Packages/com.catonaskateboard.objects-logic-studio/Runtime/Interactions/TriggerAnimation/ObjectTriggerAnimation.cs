@@ -32,6 +32,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool automatic;
         private float returnWait;
         private float duration;
+        private bool proximityInside;
+        private bool proximityCompleted;
+        private bool paused;
+        private bool resetPending;
 
         #endregion
 
@@ -45,14 +49,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool IsAtB => atB;
         /// <summary>Single card represented by this component.</summary>
         public override SingleInteractionKind Kind => SingleInteractionKind.TriggerAnimation;
+        /// <summary>Proximity operates without subscribing to a player button.</summary>
+        public override bool UsesInput => settings.Activation != TriggerAnimationActivation.Proximity;
         /// <summary>Reach and aiming configuration used by the shared input driver.</summary>
         public override TransferTargetSettings Target => settings.Target;
         /// <summary>Animation length offered to automatic start-effect timing.</summary>
         internal override float VfxDuration => automatic ? settings.AutoReturnDuration : settings.Duration;
         /// <summary>Whether a start effect still belongs to an active transition.</summary>
-        internal override bool VfxRunning => running;
+        internal override bool VfxRunning => running || paused;
         /// <summary>Whether tool or interaction locks temporarily pause the current transition.</summary>
-        internal override bool VfxPaused => running && !Available(InteractionChannels.Animation);
+        internal override bool VfxPaused => paused || running && !Available(InteractionChannels.Animation);
 
         #endregion
 
@@ -115,6 +121,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Item?.Release(this);
             initialized = running = false;
             returnPending = automatic = false;
+            proximityInside = proximityCompleted = paused = resetPending = false;
         }
 
         #endregion
@@ -196,6 +203,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Advances only an active transition, pausing game time and independent interaction locks.</summary>
         private void Update()
         {
+            if (initialized && settings.Activation == TriggerAnimationActivation.Proximity && Time.deltaTime > 0f)
+                UpdateProximity();
+            if (!UsesInput && !proximityInside && settings.OnExit is TriggerAnimationExit.Pause or TriggerAnimationExit.Reset)
+                return;
             // The owner's own reservation blocks competing animations, not this retained operation.
             if (animated == null || !Available(InteractionChannels.Animation) || Time.deltaTime <= 0f)
                 return;
@@ -226,7 +237,105 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             returnPending = settings.AutoReturn && atB != settings.StartAtB;
             returnWait = settings.ReturnDelay;
             Item.Release(this);
+            if (!UsesInput && !returnPending)
+                proximityCompleted = !settings.Loop || !proximityInside;
             Signal(InteractionMoment.Completed);
+        }
+
+        #endregion
+
+        #region Proximity
+
+        /// <summary>Detects range boundaries without scene searches and advances one proximity cycle at a time.</summary>
+        private void UpdateProximity()
+        {
+            Transform player = HoverObserver.ActivePlayer;
+            float distance = proximityInside ? settings.ExitDistance : settings.ProximityDistance;
+            bool inside = player != null && (player.position - transform.position).sqrMagnitude <= distance * distance;
+            if (inside != proximityInside)
+            {
+                proximityInside = inside;
+                if (!inside)
+                {
+                    ExitProximity();
+                    return;
+                }
+                proximityCompleted = false;
+                // A finishing cycle keeps ownership on reentry; paused cycles may explicitly resume.
+                if (!running && !(returnPending && settings.OnExit is TriggerAnimationExit.Finish or TriggerAnimationExit.ReturnToStart)
+                    && (settings.OnExit != TriggerAnimationExit.Pause || !settings.ResumeOnReentry || !paused && !returnPending))
+                    resetPending = true;
+            }
+            if (resetPending)
+            {
+                if (!CanExecute())
+                    return;
+                ResetProximity();
+            }
+            if (!inside || proximityCompleted || !Available(InteractionChannels.Animation))
+                return;
+            // Resume only after reacquiring ownership released while the player was away.
+            if (paused && CanExecute() && Item.Acquire(this, animated == Item.transform ? InteractionChannels.Grab : InteractionChannels.None))
+            {
+                paused = false;
+                running = true;
+            }
+            else if (!paused && !running && !returnPending)
+                Begin(false);
+        }
+
+        /// <summary>Applies the authored exit policy without publishing a false completion.</summary>
+        private void ExitProximity()
+        {
+            // A visit that never acquired the item cannot reset another interaction's transform.
+            if (!running && !paused && !returnPending && atB == settings.StartAtB)
+            {
+                resetPending = false;
+                return;
+            }
+            switch (settings.OnExit)
+            {
+                case TriggerAnimationExit.Pause:
+                    paused = running;
+                    running = false;
+                    Item.Release(this);
+                    break;
+                case TriggerAnimationExit.Reset:
+                    if (Item.IsOwnedBy(this) || CanExecute())
+                        ResetProximity();
+                    else
+                        resetPending = true;
+                    break;
+                case TriggerAnimationExit.ReturnToStart:
+                    running = paused = returnPending = false;
+                    Item.Release(this);
+                    atB = !settings.StartAtB;
+                    returnPending = true;
+                    returnWait = 0f;
+                    break;
+                case TriggerAnimationExit.Finish:
+                    break;
+            }
+        }
+
+        /// <summary>Restores the initial endpoint before restarting a new proximity cycle.</summary>
+        private void ResetProximity()
+        {
+            running = paused = returnPending = resetPending = false;
+            Item.Release(this);
+            atB = settings.StartAtB;
+            (atB ? settings.StateB : settings.StateA).Apply(animated);
+        }
+
+        /// <summary>Draws entry and exit boundaries only for a selected proximity animation.</summary>
+        private void OnDrawGizmosSelected()
+        {
+            if (settings == null || settings.Activation != TriggerAnimationActivation.Proximity)
+                return;
+            Gizmos.color = new Color(0.25f, 0.85f, 0.65f, 0.8f);
+            Gizmos.DrawWireSphere(transform.position, settings.ProximityDistance);
+            Gizmos.color = new Color(1f, 0.7f, 0.2f, 0.45f);
+            Gizmos.DrawWireSphere(transform.position, settings.ExitDistance);
         }
 
         #endregion

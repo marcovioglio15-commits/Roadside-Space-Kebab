@@ -57,6 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public FlagContactRequirement Contact = new FlagContactRequirement();
         [Header("Sequence")]
         [Tooltip("Minimum seconds between accepted presses. Zero allows one step on each performed input event.")]
+        [Range(0f, 5f)]
         public float Interval = 0.15f;
         [Tooltip("Ordered slice steps. Started is emitted on the first step and Completed after the final step. Finished sequences cannot run again on this instance.")]
         public SliceStep[] Steps = Array.Empty<SliceStep>();

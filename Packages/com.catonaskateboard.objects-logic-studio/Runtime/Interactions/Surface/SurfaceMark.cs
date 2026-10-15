@@ -1,45 +1,41 @@
+using System;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Identifies pooled cosmetic geometry so item appearance and assembly never claim it.</summary>
-    [AddComponentMenu("")]
-    internal sealed class SurfaceMark : MonoBehaviour
+    /// <summary>Retains reusable deposit geometry without a GameObject, renderer or per-mark update callback.</summary>
+    internal sealed class SurfaceMark : IDisposable
     {
-        #region Properties
-
-        internal Mesh Mesh { get; private set; }
-        internal MeshRenderer Renderer { get; private set; }
-        internal Collider Receiver { get; set; }
-        internal float Expires { get; set; }
-        internal MaterialPropertyBlock Properties { get; private set; }
-
+        #region State
+        internal Mesh Mesh;
+        internal Collider Receiver;
+        internal SurfaceTrailSettings Settings;
+        internal SurfacePalette Palette;
+        internal SurfaceMarkTiming Timing;
+        internal Vector3 LocalPoint;
+        internal Vector3 LocalNormal;
+        internal float WetTime;
+        internal float Expires;
+        internal bool Retiring;
+        internal readonly MaterialPropertyBlock Properties = new MaterialPropertyBlock();
         #endregion
         #region Methods
         #region Resources
-
-        /// <summary>Creates reusable rendering resources only during pool initialization.</summary>
-        /// <param name="material">Shared deposit shader material.</param>
-        internal void Initialize(Material material)
-        {
-            Properties = new MaterialPropertyBlock();
-            Mesh = new Mesh { name = "Surface Deposit" };
-            Mesh.MarkDynamic();
-            gameObject.AddComponent<MeshFilter>().sharedMesh = Mesh;
-            Renderer = gameObject.AddComponent<MeshRenderer>();
-            Renderer.sharedMaterial = material;
-            Renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            Renderer.receiveShadows = true;
-            Renderer.enabled = false;
-        }
-
-        /// <summary>Releases the reusable native mesh when the entire pool is destroyed.</summary>
-        private void OnDestroy()
+        /// <summary>Creates native geometry only when this pool slot is used for the first time.</summary>
+        internal void Prepare()
         {
             if (Mesh != null)
-                Destroy(Mesh);
+                return;
+            Mesh = new Mesh { name = "Surface Deposit" };
+            Mesh.MarkDynamic();
         }
 
+        /// <summary>Releases the owned native mesh when the pool exits.</summary>
+        public void Dispose()
+        {
+            if (Mesh != null)
+                UnityEngine.Object.Destroy(Mesh);
+        }
         #endregion
         #endregion
     }

@@ -11,7 +11,9 @@ Shader "Objects Logic Studio/Surface Deposit"
         [HideInInspector]
         DepositSurface ("Liquidity, gloss, colour blend, opacity", Vector) = (0.5, 0.8, 0.5, 1)
         [HideInInspector]
-        DepositTiming ("Birth time, lifetime, fade duration, reserved", Vector) = (0, 10, 3, 0)
+        DepositTiming ("Birth time, lifetime, fade duration, permanent", Vector) = (0, 10, 3, 0)
+        [HideInInspector]
+        DepositRetirement ("Budget fade start and duration", Vector) = (0, 0, 0, 0)
     }
     SubShader
     {
@@ -37,6 +39,7 @@ Shader "Objects Logic Studio/Surface Deposit"
                 float4 DepositShape;
                 float4 DepositSurface;
                 float4 DepositTiming;
+                float4 DepositRetirement;
             CBUFFER_END
 
             struct DepositInput
@@ -114,7 +117,9 @@ Shader "Objects Logic Studio/Surface Deposit"
                 if (DepositShape.w > 0.5)
                     mask = 1.0;
                 float remaining = DepositTiming.y - (_Time.y - DepositTiming.x);
-                float fade = smoothstep(0.0, max(0.001, DepositTiming.z), remaining);
+                float fade = DepositTiming.w > 0.5 ? 1.0 : smoothstep(0.0, max(0.001, DepositTiming.z), remaining);
+                if (DepositRetirement.y > 0.0)
+                    fade *= 1.0 - smoothstep(0.0, DepositRetirement.y, _Time.y - DepositRetirement.x);
                 float blend = saturate((grain * 0.4 + sin(input.UV.x * 7.0 + input.UV.y * 11.0 + DepositShape.z) * 0.3 + 0.3) * DepositSurface.z);
                 half4 tint = lerp(DepositColor, DepositBlend, blend);
                 half opacity = mask * fade * DepositSurface.w * tint.a;

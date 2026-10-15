@@ -20,7 +20,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Animation(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Pose capture reads the selected target without moving the source object.
-            TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
+            HoverControls.Field(settings, "Activation");
+            switch ((TriggerAnimationActivation)settings.FindPropertyRelative("Activation").enumValueIndex)
+            {
+                case TriggerAnimationActivation.Action:
+                    TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
+                    break;
+                case TriggerAnimationActivation.CenterCollider:
+                    HoverControls.Field(settings.FindPropertyRelative("Target"), "Distance");
+                    HoverControls.Field(settings.FindPropertyRelative("Target"), "ObstacleMask");
+                    break;
+                case TriggerAnimationActivation.Proximity:
+                    HoverControls.Field(settings, "ProximityDistance");
+                    HoverControls.Field(settings, "ExitDistance");
+                    HoverControls.Field(settings, "Loop");
+                    HoverControls.Field(settings, "OnExit");
+                    if (settings.FindPropertyRelative("OnExit").enumValueIndex == (int)TriggerAnimationExit.Pause)
+                        HoverControls.Field(settings, "ResumeOnReentry");
+                    break;
+            }
             if (!sections.Draw("Transform Animation", "Alternate between two local states on successive input presses.", settings, "Path", "StateA", "StateB", "StartAtB", "Duration", "ForwardRotation", "ReturnRotation", "AutoReturn", "ReturnDelay", "AutoReturnDuration", "AutoReturnRotation"))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
@@ -38,9 +56,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(settings, "ReturnRotation");
             }
             HoverControls.Field(settings, "AutoReturn");
-            if (settings.FindPropertyRelative("AutoReturn").boolValue)
-            {
+            bool autoReturn = settings.FindPropertyRelative("AutoReturn").boolValue;
+            if (autoReturn)
                 HoverControls.Field(settings, "ReturnDelay");
+            if (autoReturn || settings.FindPropertyRelative("Activation").enumValueIndex == (int)TriggerAnimationActivation.Proximity
+                && settings.FindPropertyRelative("OnExit").enumValueIndex == (int)TriggerAnimationExit.ReturnToStart)
+            {
                 HoverControls.Field(settings, "AutoReturnDuration");
                 if (settings.FindPropertyRelative("AutoReturnDuration").floatValue > 0f)
                     HoverControls.Field(settings, "AutoReturnRotation");

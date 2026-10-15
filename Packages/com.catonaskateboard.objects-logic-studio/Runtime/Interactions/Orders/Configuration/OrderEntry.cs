@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Number of individual orders activated by this draw. Every unit occupies a separate board slot.")]
         public int Quantity = 1;
         [Tooltip("Relative probability in Weighted Random mode. Zero excludes this candidate.")]
+        [Range(0.01f, 10f)]
         public float Weight = 1f;
         [Header("Draw Limits")]
         [Tooltip("Randomize required draws once per spawn. Base and variants without their own limits share this allowance; each draw adds Quantity tickets.")]
@@ -39,8 +40,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool UseRecipeModifiers;
         [Tooltip("Keep the base order as a candidate alongside its variants. Base orders retain their normal identity filters; matching variant tickets are fulfilled first.")]
         public bool IncludeBaseOrder = true;
-        [Tooltip("Recipe-specific names, board text, weights and ingredient flag filters. Each variant inherits this order's identity flags and quantity.")]
+        [Tooltip("Recipe-specific names, board text, weights and ingredient filters. Variants inherit this order's identity and may override their draw limits and quantity.")]
         public OrderRecipeVariant[] Variants = Array.Empty<OrderRecipeVariant>();
+        [Tooltip("Optional combinations of compatible recipe variants, with independent quantity, limits and selection weight.")]
+        public OrderComboSettings Combos = new OrderComboSettings();
 
         #endregion
     }

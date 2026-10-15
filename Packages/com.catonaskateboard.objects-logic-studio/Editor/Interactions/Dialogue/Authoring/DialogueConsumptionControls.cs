@@ -34,11 +34,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 context = orders.Settings;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             SerializedProperty result = filter.FindPropertyRelative("Result");
-            bool pending = result.enumValueIndex is (int)DialogueOrderResult.NotPendingOrder or (int)DialogueOrderResult.PendingOrder;
-            if (context != null || catalog != null || root == null || pending)
-                HoverControls.Field(filter, "Result");
+            HoverControls.Field(filter, "Result");
             // Latest-delivery modes cover every open slot and have no order-name or All/Any selection.
-            if (result.enumValueIndex is (int)DialogueOrderResult.NotPendingOrder or (int)DialogueOrderResult.PendingOrder)
+            if (result.enumValueIndex is (int)DialogueOrderResult.NotPendingOrder or (int)DialogueOrderResult.PendingOrder or (int)DialogueOrderResult.AwaitingOrders)
                 return;
             if (result.enumValueIndex == (int)DialogueOrderResult.Completed && (context != null || catalog != null
                 || root == null && filter.FindPropertyRelative("RequiredFlags").arraySize == 0))

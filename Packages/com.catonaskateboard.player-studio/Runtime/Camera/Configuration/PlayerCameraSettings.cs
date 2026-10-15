@@ -20,6 +20,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Positive response per second for focus movement. Higher values reduce follow lag; look sensitivity is unaffected.")]
         [SerializeField]
+        [Range(0.1f, 50f)]
         private float followResponse;
 
         [Tooltip("Also damp the orbit rotation around the focus. Disable to keep look rotation immediate while smoothing player movement.")]
@@ -32,6 +33,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Third-person distance behind the target in metres.")]
         [SerializeField]
+        [Range(0.1f, 20f)]
         private float distance;
 
         [Tooltip("Initial yaw relative to the player and pitch in degrees.")]
@@ -57,6 +59,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Positive response time in seconds. Smaller values stay closer to raw input; larger values smooth more and respond later.")]
         [SerializeField]
+        [Range(0.001f, 1f)]
         private float lookSmoothingTime;
 
         [Tooltip("Shorten smoothing during fast turns to reduce lag while retaining gentle filtering for small movements.")]
@@ -65,6 +68,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Angular speed in degrees per second that halves the smoothing time. Smaller values favor rapid response.")]
         [SerializeField]
+        [Range(1f, 720f)]
         private float lookSmoothingSpeed;
 
         [Tooltip("Reverse vertical look without changing bindings.")]
@@ -97,19 +101,23 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Positive multiplier for the texture's pixel dimensions or the default 14-pixel crosshair. One retains the original size.")]
         [SerializeField]
+        [Range(0.1f, 5f)]
         private float cursorScale;
 
         [Header("Lens")]
         [Tooltip("Vertical field of view in degrees; must be between 1 and 179.")]
         [SerializeField]
+        [Range(1.1f, 178.9f)]
         private float fieldOfView;
 
         [Tooltip("Positive near clipping distance smaller than the far distance.")]
         [SerializeField]
+        [Range(0.001f, 1f)]
         private float nearClip;
 
         [Tooltip("Far clipping distance in metres.")]
         [SerializeField]
+        [Range(1f, 5000f)]
         private float farClip;
 
         [Header("Obstacles")]
@@ -123,14 +131,17 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Positive camera clearance radius in metres.")]
         [SerializeField]
+        [Range(0.01f, 1f)]
         private float collisionRadius;
 
         [Tooltip("Nonnegative clearance between camera and obstacles.")]
         [SerializeField]
+        [Range(0f, 0.5f)]
         private float collisionPadding;
 
         [Tooltip("Seconds to ease the camera arm back out after an obstacle clears. Zero restores the full arm immediately; approaching obstacles always shorten it immediately.")]
         [SerializeField]
+        [Range(0f, 3f)]
         private float obstacleReturnTime;
 
         [Header("Fixed View")]
@@ -157,6 +168,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Positive maximum visual turning speed in degrees per second.")]
         [SerializeField]
+        [Range(1f, 720f)]
         private float turnSpeed;
 
         [Tooltip("Hide configured model renderers only for this first-person player camera.")]

@@ -23,6 +23,7 @@ namespace CatOnASkateboard.AudioStudio
         public AudioRouting Routing = new AudioRouting();
         [Header("Music")]
         [Tooltip("Crossfade duration for future music transitions, in real seconds.")]
+        [Range(0.01f, 10f)]
         public float MusicCrossfadeSeconds = 1.5f;
         [Tooltip("Named music contexts; add only those your project needs.")]
         public List<AudioMusic> Music = new List<AudioMusic>();

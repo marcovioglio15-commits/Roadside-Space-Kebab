@@ -29,6 +29,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         [Tooltip("World rotation around the vertical axis, in degrees.")]
         [SerializeField]
+        [Range(-180f, 180f)]
         private float yaw;
 
         [Tooltip("Use the new player view by disabling other active cameras and listeners in the destination scene, with Undo.")]
@@ -65,7 +66,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             sceneAsset = (SceneAsset)StudioGUI.ObjectField(sceneLabel, sceneAsset, typeof(SceneAsset), false);
             playerName = StudioGUI.TextField(nameLabel, playerName);
             position = StudioGUI.Vector3Field(positionLabel, position);
-            yaw = StudioGUI.FloatField(yawLabel, yaw);
+            yaw = StudioGUI.FloatField<PlayerStudioPlacement>(yawLabel, yaw, nameof(yaw));
             if (master != null && master.CameraPreset != null)
                 usePlayerView = StudioGUI.Toggle(new GUIContent("Use Player View",
                     "Disable other active cameras and audio listeners in the destination scene with Undo."), usePlayerView);

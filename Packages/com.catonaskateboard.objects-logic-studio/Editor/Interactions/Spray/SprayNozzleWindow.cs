@@ -121,13 +121,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Frame();
             }
             data.Update();
-            EditorGUILayout.PropertyField(data.FindProperty("session.Draft.Position"));
-            EditorGUILayout.PropertyField(data.FindProperty("session.Draft.Rotation"));
+            StudioFieldGUI.PropertyField(data.FindProperty("session.Draft.Position"));
+            StudioFieldGUI.PropertyField(data.FindProperty("session.Draft.Rotation"));
             data.ApplyModifiedProperties();
-            DrawViewport(new Rect(0f, 100f, position.width, Mathf.Max(100f, position.height - 156f)));
+            // Reserve the viewport after Unity has measured headers and wrapped vector controls.
+            Rect viewport = GUILayoutUtility.GetRect(1f, 100f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            DrawViewport(viewport);
             hasUnsavedChanges = session.HasChanges;
             saveChangesMessage = "Apply or discard the pending nozzle layout.";
-            GUILayout.BeginArea(new Rect(8f, position.height - 52f, position.width - 16f, 48f));
+            using EditorGUILayout.VerticalScope footer = new EditorGUILayout.VerticalScope(GUILayout.Height(52f));
             EditorGUILayout.LabelField(status.Length > 0 ? status : hasUnsavedChanges ? "Pending layout" : "Applied layout", EditorStyles.miniLabel);
             using (new StudioButton.RowScope())
             using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
@@ -137,7 +139,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (StudioButton.Draw(new GUIContent("Discard", "Reload the applied nozzle pose."), expandWidth: true, minimumHeight: 26f))
                     DiscardChanges();
             }
-            GUILayout.EndArea();
         }
         /// <summary>Renders geometry without instantiating gameplay prefabs or components.</summary>
         /// <param name="rect">Viewport in window coordinates.</param>

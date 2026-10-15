@@ -18,6 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly HashSet<ObjectItem> contacts = new HashSet<ObjectItem>();
         private readonly HashSet<ObjectItem> completed = new HashSet<ObjectItem>();
         private readonly HashSet<ObjectItem> failed = new HashSet<ObjectItem>();
+        private readonly HashSet<ObjectItem> awaiting = new HashSet<ObjectItem>();
         private readonly Dictionary<ObjectItem, float> entered = new Dictionary<ObjectItem, float>();
         private readonly List<ObjectItem> departed = new List<ObjectItem>();
         private ObjectItem other;
@@ -76,6 +77,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             entered.Clear();
             completed.Clear();
             failed.Clear();
+            awaiting.Clear();
             detection.Bind(Item);
             nextQuery = 0f;
             lastWarning = string.Empty;
@@ -238,6 +240,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 entered.Remove(candidate);
                 failed.Remove(candidate);
+                awaiting.Remove(candidate);
                 if (settings.RepeatAfterSeparation)
                     completed.Remove(candidate);
             }
@@ -253,6 +256,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     || !Available(InteractionChannels.Passive) || candidate.IsBlocked(InteractionChannels.Passive)
                     || completed.Contains(candidate) || failed.Contains(candidate) || Time.time - time < settings.ContactDuration)
                     continue;
+                // Each newly qualifying contact is reported once, without starving farther simultaneous contacts.
+                if (owner.AwaitsDialogue(settings))
+                {
+                    if (!candidate.IsReserved && !Item.IsReserved && awaiting.Add(candidate))
+                        owner.ReportAwaitingContact();
+                    continue;
+                }
                 float score = (candidate.transform.position - owner.transform.position).sqrMagnitude;
                 if (score < distance || score == distance && selected != null
                     && EntityId.ToULong(candidate.GetEntityId()) < EntityId.ToULong(selected.GetEntityId()))

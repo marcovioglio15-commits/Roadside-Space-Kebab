@@ -123,6 +123,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             body.collisionDetectionMode = CollisionDetectionMode.Discrete;
             body.isKinematic = true;
             body.interpolation = RigidbodyInterpolation.None;
+            // A moving suspended ingredient may still display an interpolated pose from the previous physics step.
+            body.position = start.position;
+            body.rotation = start.rotation;
+            ingredient.transform.SetPositionAndRotation(start.position, start.rotation);
             Tick();
         }
 

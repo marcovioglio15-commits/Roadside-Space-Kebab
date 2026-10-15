@@ -18,14 +18,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Insert by input, sustained contact or immediate contact. Recipes sharing a first ingredient on the same object keep it snapped and usable until later ingredients distinguish the recipe. Different input bindings select their recipes explicitly.")]
         public AssemblyStationTrigger Trigger;
         [Tooltip("Seconds of uninterrupted ingredient contact required before insertion.")]
+        [Range(0.01f, 5f)]
         public float ContactDuration = 0.5f;
         [Tooltip("Seconds between contact queries. Smaller values detect short separations more accurately.")]
+        [Range(0.01f, 0.5f)]
         public float ContactQueryInterval = 0.02f;
         [Tooltip("Maximum surface separation accepted as contact, in metres.")]
+        [Range(0f, 0.1f)]
         public float ContactTolerance = 0.005f;
         [Tooltip("Include trigger colliders when detecting ingredient contact.")]
         public bool IncludeTriggers;
         [Tooltip("Maximum player distance in metres for adding the currently carried ingredient.")]
+        [Range(0.1f, 20f)]
         public float Distance = 3f;
         [Tooltip("Require a clear line of sight from the player's camera to the table's output position.")]
         public bool RequireSight = true;
@@ -38,6 +42,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Ease ingredients into their station magnet instead of snapping. Applies to provisional placements and committed assembly parts.")]
         public bool AnimatePlacement = true;
         [Tooltip("Scaled seconds for the station's ingredient placement animation.")]
+        [Range(0.01f, 3f)]
         public float PlacementDuration = 0.25f;
         [Tooltip("Allow a carried product from this same prefab to be returned to an empty table for further assembly.")]
         public bool AcceptReturnedProduct = true;

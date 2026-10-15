@@ -28,6 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Dedicated Button resolved in the observer player's private PlayerInput action asset.")]
         public InputActionReference Action;
         [Tooltip("Maximum player distance in metres for this condition Button. Interaction-event conditions have no range requirement.")]
+        [Range(0.1f, 20f)]
         public float Distance = 3f;
         [Tooltip("Number of matching events or performed inputs needed for this condition during one rule cycle.")]
         public int Count = 1;

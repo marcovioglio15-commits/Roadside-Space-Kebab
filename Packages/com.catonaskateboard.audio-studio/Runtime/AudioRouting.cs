@@ -17,8 +17,10 @@ namespace CatOnASkateboard.AudioStudio
         [Tooltip("Music bus path.")]
         public string MusicBus = "bus:/Music";
         [Tooltip("Default sound-effects level.")]
+        [Range(0f, 1f)]
         public float SfxVolume = 1f;
         [Tooltip("Default music level.")]
+        [Range(0f, 1f)]
         public float MusicVolume = 1f;
         #endregion
     }

@@ -32,6 +32,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public InputActionReference Action => action;
         /// <summary>Feature represented by this component.</summary>
         public abstract SingleInteractionKind Kind { get; }
+        /// <summary>Whether this feature needs a Button binding rather than automatic activation.</summary>
+        public virtual bool UsesInput => true;
 
         #endregion
 
@@ -43,7 +45,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         protected virtual void OnEnable()
         {
             // An observer binds input later, after PlayerInput has initialized its private action copy.
-            SingleInteractionRegistry.Register(this);
+            if (UsesInput)
+                SingleInteractionRegistry.Register(this);
         }
 
         /// <summary>Removes this feature before disabled objects can consume input.</summary>
@@ -64,7 +67,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Asset actions are only identifiers; runtime input always comes from PlayerInput.
             warning = "Assign an imported Button action from the player's Input Actions asset.";
-            return action != null && action.action != null && action.action.type == InputActionType.Button
+            return (!UsesInput || action != null && action.action != null && action.action.type == InputActionType.Button)
                 && TryValidateSettings(out warning);
         }
 

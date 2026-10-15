@@ -25,6 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Apply the snap immediately instead of interpolating it.")]
         public bool Instant = true;
         [Tooltip("Seconds to interpolate the contacted item into its snap pose.")]
+        [Range(0.01f, 5f)]
         public float Duration = 0.35f;
         [Tooltip("After alignment, wait for the interaction's bound Button before starting preparation or effects.")]
         public bool RequireInput;
@@ -42,12 +43,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Final endpoint in the selected animation space. Scale is the animated transform's local scale.")]
         public PlayerToolPose StateB = PlayerToolPose.Identity;
         [Tooltip("Seconds spent moving from State A to State B.")]
+        [Range(0.01f, 5f)]
         public float AnimationDuration = 0.35f;
         [Tooltip("Direction taken by each changed rotation axis during preparation.")]
         public TransformRotationDirection ForwardRotation;
         [Tooltip("After the effects finish, return to State A before releasing blocked interactions.")]
         public bool Return;
         [Tooltip("Seconds spent returning to State A after the modification.")]
+        [Range(0.01f, 5f)]
         public float ReturnDuration = 0.35f;
         [Tooltip("Direction taken by each changed rotation axis during the return.")]
         public TransformRotationDirection ReturnRotation;

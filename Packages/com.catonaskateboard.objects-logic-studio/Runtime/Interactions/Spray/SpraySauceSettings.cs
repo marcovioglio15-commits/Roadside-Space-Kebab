@@ -1,5 +1,4 @@
 using System;
-using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -25,25 +24,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
     }
 
-    /// <summary>Changes an existing item's appearance after sustained contact with sauce.</summary>
-    [Serializable]
-    public sealed class SpraySurfaceRule
-    {
-        #region Fields
-        [Header("Surface Rule")]
-        [Tooltip("Identity flags required on the receiving object.")]
-        public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
-        [Tooltip("Accept any selected flag or require every selected flag.")]
-        public ObjectFlagMatch Match;
-        [Tooltip("Seconds of continuous wetting required before applying the appearance.")]
-        public float Exposure = 0.5f;
-        [Tooltip("Maximum gap between droplets before the exposure restarts.")]
-        public float ContactGap = 0.2f;
-        [Tooltip("Mesh, material and visibility changes on the receiving item's existing hierarchy.")]
-        public ItemAppearanceSettings Appearance = new ItemAppearanceSettings();
-        #endregion
-    }
-
     /// <summary>Defines continuous physical emission, optional capacity and surface reactions.</summary>
     [Serializable]
     public sealed class SpraySauceSettings
@@ -57,36 +37,55 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Nozzle")]
         [Tooltip("Object-local outlet pose edited in the nozzle layout window.")]
         public SprayNozzle Nozzle = new SprayNozzle();
-        [Tooltip("Physical droplets emitted each second. The shared pool bounds simultaneous droplets.")]
-        public float Rate = 35f;
+        [Tooltip("Physical samples emitted each second along the continuous jet. The shared pool bounds simultaneous liquid bodies.")]
+        [Range(1f, 120f)]
+        public float Rate = 50f;
         [Tooltip("Minimum and maximum initial speed in metres per second.")]
-        public Vector2 Speed = new Vector2(4f, 5f);
+        public Vector2 Speed = new Vector2(7f, 8f);
+        [Tooltip("Multiplier for the initial forward speed. Higher values launch the jet farther before it falls, without changing emission rate or inherited movement.")]
+        [Range(0.1f, 5f)]
+        public float LaunchPower = 1f;
         [Tooltip("Cone half-angle in degrees.")]
-        public float Spread = 4f;
-        [Tooltip("Visual connection between successive droplets. Zero shows separate drops; one forms a soft continuous jet without enlarging collision shapes.")]
+        [Range(0f, 45f)]
+        public float Spread = 1.5f;
+        [Tooltip("Continuity of the liquid column. Higher values reduce speed, radius and direction variation between neighbouring samples; zero emits separate droplets.")]
         [Range(0f, 1f)]
-        public float Cohesion = 0.8f;
+        public float Cohesion = 0.95f;
+        [Tooltip("Seconds of flight before the continuous column breaks into droplets. Gravity suspension preserves momentum but does not stop this breakup timer.")]
+        [Range(0.01f, 5f)]
+        public float BreakupTime = 0.65f;
+        [Tooltip("Maximum stretch between adjacent samples relative to their current travel speed. Falling liquid can accelerate without breaking the column; unusually large gaps still disconnect.")]
+        [Range(1f, 10f)]
+        public float StretchLimit = 3f;
         [Tooltip("Minimum and maximum physical droplet radius in metres.")]
-        public Vector2 Radius = new Vector2(0.008f, 0.012f);
+        public Vector2 Radius = new Vector2(0.01f, 0.012f);
         [Tooltip("Mass of each droplet in kilograms.")]
+        [Range(0.0001f, 0.1f)]
         public float Mass = 0.003f;
         [Tooltip("Linear damping of airborne droplets.")]
+        [Range(0f, 5f)]
         public float Damping = 0.1f;
         [Tooltip("Maximum airborne lifetime in seconds.")]
+        [Range(0.1f, 10f)]
         public float Lifetime = 3f;
         [Tooltip("Fraction of the outlet's movement inherited by newly emitted droplets.")]
+        [Range(0f, 2f)]
         public float InheritVelocity = 1f;
+        [Tooltip("Allow gravity generators to suspend emitted liquid and apply their forces. Disable to keep normal liquid gravity even when the source is suspended. Captured separately for each emitted sample.")]
+        public bool AllowGravitySuspension = true;
         [Tooltip("Layers that can receive liquid. The source hierarchy is always excluded.")]
         public LayerMask Layers = ~0;
         [Header("Capacity")]
         [Tooltip("Stop after the configured total emission time; disabling the component does not refill it.")]
         public bool Limited;
         [Tooltip("Available seconds of actual emission for a newly spawned object.")]
+        [Range(0.1f, 120f)]
         public float Capacity = 10f;
         [Header("Surface")]
         [Tooltip("Leave smoothly fading marks on contacted surfaces.")]
         public bool LeaveTrail = true;
         [Tooltip("Minimum seconds between surface deposits from this source. Exposure timing still receives every droplet hit.")]
+        [Range(0.01f, 1f)]
         public float DepositInterval = 0.08f;
         [Tooltip("Colour composition, wetness and surface deposit appearance.")]
         public SurfaceTrailSettings Trail = new SurfaceTrailSettings
@@ -105,8 +104,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Object-local compression axis.")]
         public Vector3 SqueezeAxis = Vector3.right;
         [Tooltip("Compression fraction while the nozzle is emitting.")]
+        [Range(0f, 0.65f)]
         public float Compression = 0.025f;
         [Tooltip("Seconds to reach or release the authored compression.")]
+        [Range(0.01f, 2f)]
         public float SqueezeDuration = 0.15f;
         #endregion
         #region Methods
@@ -116,20 +117,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when physics, appearance and capacity settings are complete.</returns>
         public bool TryValidate(out string warning)
         {
-            warning = "Use a valid nozzle, positive rate (up to 120), radius, speed, mass and lifetime.";
+            warning = "Use a valid nozzle, positive rate (up to 120), radius, speed, launch power, mass and lifetime. A coherent jet also needs positive breakup time and stretch limit of at least one.";
             if (Nozzle == null || !InteractionValues.Finite(Nozzle.Position) || !InteractionValues.Finite(Nozzle.Rotation)
                 || !InteractionValues.Positive(Rate) || Rate > 120f || !SurfaceValues.Range(Speed)
+                || !InteractionValues.Positive(LaunchPower) || !float.IsFinite(Speed.y * LaunchPower)
                 || !SurfaceValues.Range(Radius) || !InteractionValues.Positive(Mass) || !InteractionValues.Positive(Lifetime)
                 || !SurfaceValues.Nonnegative(Damping) || !SurfaceValues.Nonnegative(InheritVelocity)
-                || !SurfaceValues.Nonnegative(Spread) || Spread > 89f || !SurfaceValues.Unit(Cohesion) || Layers.value == 0)
+                || !SurfaceValues.Nonnegative(Spread) || Spread > 89f || !SurfaceValues.Unit(Cohesion) || Layers.value == 0
+                || Cohesion > 0f && (!InteractionValues.Positive(BreakupTime) || !float.IsFinite(StretchLimit) || StretchLimit < 1f))
                 return false;
             warning = "Capacity must be positive; squeeze needs a nonzero axis, compression below 65 percent and a positive duration.";
-            if (Limited && !InteractionValues.Positive(Capacity) || LeaveTrail && !InteractionValues.Positive(DepositInterval)
+            if (Limited && !InteractionValues.Positive(Capacity) || UsesDeposits && !InteractionValues.Positive(DepositInterval)
                 || Squeeze && (!InteractionValues.Finite(SqueezeAxis) || SqueezeAxis.sqrMagnitude < 0.000001f
                     || !SurfaceValues.Nonnegative(Compression) || Compression > 0.65f || !InteractionValues.Positive(SqueezeDuration)))
                 return false;
             warning = "Configure the liquid appearance and targeting settings.";
-            if (Trail == null || !Trail.TryValidate(out warning, LeaveTrail) || !HeldOnly && (Target == null || !Target.TryValidate(out warning)))
+            if (Trail == null || !Trail.TryValidate(out warning, UsesDeposits) || !HeldOnly && (Target == null || !Target.TryValidate(out warning)))
                 return false;
             warning = "Add at least one complete surface rule when appearance changes are enabled.";
             if (ChangeAppearance)
@@ -137,16 +140,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (Rules == null || Rules.Length == 0)
                     return false;
                 foreach (SpraySurfaceRule rule in Rules)
-                    if (rule == null || !InteractionValues.Positive(rule.Exposure) || !InteractionValues.Positive(rule.ContactGap)
-                        || rule.Match is not (ObjectFlagMatch.Any or ObjectFlagMatch.All)
-                        || !ObjectFlagRules.TryValidate(rule.Flags, false, out warning) || rule.Appearance == null
-                        || !rule.Appearance.HasChanges || !rule.Appearance.TryValidate(out warning))
+                    if (rule == null || !rule.TryValidate(out warning))
                         return false;
             }
             warning = string.Empty;
             return true;
         }
         #endregion
+        #endregion
+        #region Properties
+        /// <summary>Whether normal deposits or an identity rule needs surface geometry.</summary>
+        public bool UsesDeposits
+        {
+            get
+            {
+                if (LeaveTrail)
+                    return true;
+                if (ChangeAppearance && Rules != null)
+                    foreach (SpraySurfaceRule rule in Rules)
+                        if (rule != null && rule.TrailMode != SprayTrailMode.Normal)
+                            return true;
+                return false;
+            }
+        }
         #endregion
     }
 }

@@ -22,10 +22,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string PauseScene = string.Empty;
         [Header("Black Fade")]
         [Tooltip("Unscaled seconds to cover the current scene with black.")]
+        [Range(0f, 5f)]
         public float FadeOut = 0.5f;
         [Tooltip("Minimum unscaled seconds held at black after the destination loads.")]
+        [Range(0f, 10f)]
         public float BlackDelay = 0.2f;
         [Tooltip("Unscaled seconds to reveal the destination scene.")]
+        [Range(0f, 5f)]
         public float FadeIn = 0.5f;
         [Header("Randomness")]
         [Tooltip("Use a repeatable stream for counts and step selection throughout the run.")]

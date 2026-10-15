@@ -401,7 +401,7 @@ MonoBehaviour:
     Units: 1
     Space: 0
     Offset: {x: 0, y: -0.02, z: 0.7}
-    Rotation: {x: 0, y: 0, z: 0}
+    Rotation: {x: 25, y: 0, z: 0}
     Instant: 1
     TransitionDuration: 0.2
     PhysicalPickup: 0
@@ -752,23 +752,27 @@ MonoBehaviour:
       DrawGizmos: 1
     Nozzle:
       Position: {x: 0, y: 0.35854793, z: 0}
-      Rotation: {x: 0, y: 0, z: 0}
-    Rate: 35
-    Speed: {x: 4, y: 5}
-    Spread: 4
+      Rotation: {x: 273.27878, y: 154.5426, z: 164.6459}
+    Rate: 50
+    Speed: {x: 7, y: 8}
+    LaunchPower: 0.2
+    Spread: 1.5
     Cohesion: 1
-    Radius: {x: 0.008, y: 0.012}
+    BreakupTime: 5
+    StretchLimit: 3
+    Radius: {x: 0.01, y: 0.012}
     Mass: 0.003
     Damping: 0.1
-    Lifetime: 3
+    Lifetime: 10
     InheritVelocity: 1
+    AllowGravitySuspension: 0
     Layers:
       serializedVersion: 2
       m_Bits: 4294967295
     Limited: 0
     Capacity: 10
     LeaveTrail: 1
-    DepositInterval: 0.08
+    DepositInterval: 0.001
     Trail:
       Liquidity: 1
       Shape: 1
@@ -789,8 +793,28 @@ MonoBehaviour:
       ProjectionDepth: 0.08
       SurfaceOffset: 0.001
       MaximumAngle: 70
-    ChangeAppearance: 0
-    Rules: []
+    ChangeAppearance: 1
+    Rules:
+    - Flags:
+      - {fileID: 11400000, guid: 3c5ef8039ee36854ea371057f6cd6da6, type: 2}
+      Match: 0
+      Exposure: 0.5
+      ContactGap: 0.2
+      Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      Tint:
+        Tint: 1
+        Multiplier: {r: 0.735849, g: 0.107600555, b: 0.107600555, a: 1}
+        ColorProperty: _BaseColor
+        RendererPath: 
+        MaterialSlot: -1
+        Meshes: []
+        Consume: 0
+      TrailMode: 2
+      TrailLifetime: 30
+      TrailFadeDuration: 6
     Squeeze: 1
     SqueezeAxis: {x: 1, y: 0, z: 0}
     Compression: 0.25

@@ -232,14 +232,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Discrete effects commit only after the configured duration.
             GameObject source = HierarchyPathMenu.Source(effects, other);
-            Field(effects, "Tint");
-            if (effects.FindPropertyRelative("Tint").boolValue)
-            {
-                Field(effects, "Multiplier");
-                Field(effects, "ColorProperty");
-                HierarchyPathMenu.Draw(effects.FindPropertyRelative("RendererPath"), source, false, true);
-                Field(effects, "MaterialSlot");
-            }
+            MaterialTintControls.Draw(effects, other, source, selectSource: false);
             ItemAppearanceControls.DrawList(effects.FindPropertyRelative("Meshes"), source, true);
             if (consumption || effects.FindPropertyRelative("Consume").boolValue)
                 Field(effects, "Consume");

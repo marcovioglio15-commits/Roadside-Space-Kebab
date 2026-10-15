@@ -24,12 +24,14 @@ namespace CatOnASkateboard.MenuStudio
         [Tooltip("Animate the whole button or only its content.")]
         public MenuMotionTarget MotionTarget = MenuMotionTarget.WholeButton;
         [Tooltip("Duration of state transitions.")]
+        [Range(0f, 2f)]
         public float TransitionSeconds = 0.12f;
         [Tooltip("Keep feedback animated while time scale is zero.")]
         public bool UnscaledTime = true;
         [Tooltip("Pulse from the baseline to the hover state and back.")]
         public bool HoverPulse = false;
         [Tooltip("Duration of one complete hover pulse.")]
+        [Range(0.01f, 3f)]
         public float PulseSeconds = 0.34f;
         [Tooltip("Completed pulse cycles before settling when not looping.")]
         public int PulseCycles = 1;

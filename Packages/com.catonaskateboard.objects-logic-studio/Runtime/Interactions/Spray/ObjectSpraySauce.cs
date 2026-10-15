@@ -19,9 +19,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectElasticDeformation elastic;
         private Rigidbody body;
         private Collider[] sourceColliders;
+        private Collider[] playerColliders;
+        private LiquidDroplet latest;
+        private uint latestGeneration;
+        private float flowSpeed;
+        private float flowRadius;
+        private Color flowColor;
         private float used;
         private float pending;
         private float nextDeposit;
+        private Collider depositReceiver;
         private bool ready;
         private InteractionButton heldInput;
         #endregion
@@ -40,6 +47,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Remaining => settings.Limited ? Mathf.Max(0f, settings.Capacity - used) : float.PositiveInfinity;
         /// <summary>Cached source geometry excluded from droplet collisions.</summary>
         internal Collider[] SourceColliders => sourceColliders;
+        /// <summary>Player geometry excluded while spraying from a carried source.</summary>
+        internal Collider[] PlayerColliders => playerColliders;
+        /// <summary>World outlet used by both physical samples and the visible column.</summary>
+        internal Vector3 Outlet => transform.TransformPoint(elastic != null ? elastic.DeformPoint(settings.Nozzle.Position) : settings.Nozzle.Position);
+        /// <summary>Newest live sample, or null after release or pool saturation.</summary>
+        internal LiquidDroplet Latest => latest;
         /// <summary>Prepared palette retained by emitted liquid after the source disappears.</summary>
         internal SurfacePalette Palette => palette;
         /// <summary>Stops automatic start effects when the continuous flow finishes.</summary>
@@ -52,6 +65,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             IsEmitting = false;
             used = pending = nextDeposit = 0f;
+            depositReceiver = null;
             exposure.Clear();
             OnEnable();
         }
@@ -110,8 +124,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             heldInput = null;
             IsEmitting = true;
-            pending = 1f;
+            pending = 0f;
+            latest = null;
             palette.Refresh(settings.Trail);
+            // A coherent burst shares a speed, width and colour instead of randomizing its entire shape at every sample.
+            flowSpeed = Random.Range(settings.Speed.x, settings.Speed.y);
+            flowRadius = Random.Range(settings.Radius.x, settings.Radius.y);
+            flowColor = palette.Sample();
+            playerColliders = Item.IsCarried && HoverObserver.ActivePlayer != null
+                ? HoverObserver.ActivePlayer.GetComponentsInChildren<Collider>(true) : null;
+            Emit(0f);
             if (settings.Squeeze && elastic != null && elastic.isActiveAndEnabled)
                 elastic.SetPressure(settings.Compression, settings.SqueezeAxis, settings.SqueezeDuration);
             Signal(InteractionMoment.Started);
@@ -135,6 +157,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             IsEmitting = false;
             heldInput = null;
             pending = 0f;
+            latest = null;
             if (settings.Squeeze && elastic != null)
                 elastic.SetPressure(0f, settings.SqueezeAxis, settings.SqueezeDuration);
             Signal(InteractionMoment.Completed);
@@ -156,16 +179,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             while (pending >= 1f)
             {
                 pending -= 1f;
-                Vector3 position = transform.TransformPoint(settings.Nozzle.Position);
-                Quaternion rotation = transform.rotation * Quaternion.Euler(settings.Nozzle.Rotation);
-                Vector2 spread = Random.insideUnitCircle * Mathf.Tan(settings.Spread * Mathf.Deg2Rad);
-                Vector3 direction = rotation * new Vector3(spread.x, spread.y, 1f).normalized;
-                Vector3 velocity = direction * Random.Range(settings.Speed.x, settings.Speed.y)
-                    + (body != null ? body.GetPointVelocity(position) * settings.InheritVelocity : Vector3.zero);
-                LiquidPool.Emit(this, position, velocity, palette.Sample());
+                Emit(pending / settings.Rate);
             }
             if (Remaining <= 0f)
                 StopEmission();
+        }
+
+        /// <summary>Emits regularly spaced samples with small variations around this burst's pressure.</summary>
+        /// <param name="age">Fraction of the current physics step already elapsed since this sample was due.</param>
+        private void Emit(float age)
+        {
+            Vector3 position = Outlet;
+            Quaternion rotation = Quaternion.Euler(settings.Nozzle.Rotation);
+            float variation = 1f - settings.Cohesion;
+            Vector2 spread = Random.insideUnitCircle * Mathf.Tan(settings.Spread * Mathf.Deg2Rad) * variation;
+            Vector3 localDirection = rotation * new Vector3(spread.x, spread.y, 1f);
+            Vector3 direction = transform.TransformDirection(elastic != null ? elastic.DeformDirection(localDirection) : localDirection).normalized;
+            float speed = Mathf.Lerp(flowSpeed, Random.Range(settings.Speed.x, settings.Speed.y), variation) * settings.LaunchPower;
+            Vector3 velocity = direction * speed
+                + (body != null ? body.GetPointVelocity(position) * settings.InheritVelocity : Vector3.zero);
+            float radius = Mathf.Lerp(flowRadius, Random.Range(settings.Radius.x, settings.Radius.y), variation);
+            latest = LiquidPool.Emit(this, position, velocity, Color.Lerp(flowColor, palette.Sample(), variation), radius, age,
+                latest != null && latest.Generation == latestGeneration && latest.gameObject.activeSelf && latest.Source == this ? latest : null);
+            latestGeneration = latest != null ? latest.Generation : 0;
         }
         /// <summary>Applies shared marks and optional exposure changes at a native liquid hit.</summary>
         /// <param name="receiver">Exact collided surface.</param>
@@ -174,13 +210,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="velocity">Incoming liquid motion.</param>
         internal void Hit(Collider receiver, Vector3 point, Vector3 normal, Vector3 velocity)
         {
-            if (settings.LeaveTrail && Time.time >= nextDeposit)
+            SpraySurfaceRule rule = settings.ChangeAppearance ? exposure.Hit(this, receiver) : null;
+            bool customTrail = rule != null && rule.TrailMode != SprayTrailMode.Normal;
+            if ((settings.LeaveTrail || customTrail) && (receiver != depositReceiver || Time.time >= nextDeposit))
             {
+                if (!SurfaceMarkPool.Deposit(receiver, point, normal, velocity, settings.Trail, palette,
+                    new SurfaceMarkTiming(settings.Trail, customTrail ? rule : null)))
+                    return;
+                depositReceiver = receiver;
                 nextDeposit = Time.time + settings.DepositInterval;
-                SurfaceMarkPool.Deposit(receiver, point, normal, velocity, settings.Trail, palette);
             }
-            if (settings.ChangeAppearance)
-                exposure.Hit(this, receiver);
         }
         #endregion
         #region Validation

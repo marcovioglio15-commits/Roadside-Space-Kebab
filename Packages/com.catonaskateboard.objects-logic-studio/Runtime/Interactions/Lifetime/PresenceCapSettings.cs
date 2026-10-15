@@ -20,6 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Flags counted independently when Use Own Flags is disabled. Exceeding any selected flag's cap makes this object eligible.")]
         public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Seconds continuously outside the gameplay camera frame before an excess object can despawn. Carried, reserved and player objects remain protected.")]
+        [Range(0f, 10f)]
         public float OffscreenDelay = 0.25f;
 
         #endregion

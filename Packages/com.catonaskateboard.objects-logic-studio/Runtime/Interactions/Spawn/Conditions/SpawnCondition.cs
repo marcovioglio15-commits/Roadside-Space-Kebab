@@ -29,6 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Prefab root created when this entry is drawn.")]
         public GameObject Prefab;
         [Tooltip("Relative weighted-random probability. Zero excludes this entry from weighted draws.")]
+        [Range(0.01f, 10f)]
         public float Weight = 1f;
 
         #endregion

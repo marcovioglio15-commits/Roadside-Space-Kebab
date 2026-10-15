@@ -133,7 +133,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!ToolRequirement.TryValidate(out warning) || !VisualEffect.TryValidate(VfxDuration(feature.Kind) > 0f, out warning)
                 || !FlagChange.TryValidate(feature.gameObject, out warning))
                 return false;
-            if (Action == null || Action.action == null || Action.action.type != InputActionType.Button)
+            if (!(feature is ObjectTriggerAnimation && TriggerAnimation != null && TriggerAnimation.Activation == TriggerAnimationActivation.Proximity)
+                && (Action == null || Action.action == null || Action.action.type != InputActionType.Button))
             {
                 warning = "Choose a Button action from the player's Input Actions asset.";
                 return false;

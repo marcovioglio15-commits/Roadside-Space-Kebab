@@ -15,22 +15,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Collision layers that can trigger the response.")]
         public LayerMask Layers = ~0;
         [Tooltip("Minimum impulse divided by object mass, in metres per second, before deformation starts.")]
+        [Range(0f, 20f)]
         public float MinimumImpact = 0.5f;
         [Tooltip("Velocity change that reaches the maximum compression.")]
+        [Range(0.1f, 50f)]
         public float FullImpact = 6f;
         [Tooltip("Maximum visual compression along the impact axis. Colliders keep their original shape.")]
         [Range(0f, 0.65f)]
         public float Compression = 0.065f;
         [Tooltip("Seconds before the impact response returns exactly to its original shape.")]
+        [Range(0.01f, 3f)]
         public float Duration = 0.35f;
         [Tooltip("Squash and rebound cycles over the response duration.")]
+        [Range(0.1f, 6f)]
         public float Oscillations = 1.5f;
         [Tooltip("Exponential decay of the rebound. Higher values settle earlier.")]
+        [Range(0f, 15f)]
         public float Damping = 4f;
         [Tooltip("Blend toward volume-preserving expansion perpendicular to compression.")]
         [Range(0f, 1f)]
         public float Volume = 0.7f;
         [Tooltip("Minimum seconds between accepted impacts, avoiding repeated feedback from resting contacts.")]
+        [Range(0f, 1f)]
         public float Cooldown = 0.06f;
         [Tooltip("Keep a stronger current response when a weaker impact arrives.")]
         public bool StrongestWins = true;

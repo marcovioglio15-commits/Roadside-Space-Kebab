@@ -38,18 +38,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Tooltip("Maximum distance from the flagged player root to the anchor in View Center mode, or to the hit surface in collider modes.")]
         [SerializeField]
+        [Range(0.1f, 20f)]
         private float playerDistance = 3f;
 
         [Tooltip("Screen radius as a fraction of camera viewport height: 0.08 means 8%. Independent of resolution and aspect ratio.")]
         [SerializeField]
+        [Range(0f, 1f)]
         private float centerRadius = 0.08f;
 
         [Tooltip("Seconds between detection queries. Zero evaluates every frame; label motion still updates every visible frame.")]
         [SerializeField]
+        [Range(0f, 0.5f)]
         private float queryInterval = 0.05f;
 
         [Tooltip("Seconds an acquired target may briefly miss detection before hover ends. Reduces flicker on moving edges.")]
         [SerializeField]
+        [Range(0f, 1f)]
         private float releaseDelay = 0.08f;
 
         [Header("Suspension")]
@@ -63,6 +67,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Tooltip("World speed in metres per second that suspends hover. It resumes below 85% of this speed to avoid boundary flicker.")]
         [SerializeField]
+        [Range(0.01f, 10f)]
         private float speedThreshold = 0.5f;
 
         [Tooltip("Solid collider layers that block visibility. Include walls and other interactive objects; triggers never block sight.")]
@@ -88,6 +93,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Tooltip("Seconds of world-anchor smoothing for uneven physics motion. Zero follows the transform exactly; camera projection still updates every frame.")]
         [SerializeField]
+        [Range(0f, 1f)]
         private float followSmoothing = 0.035f;
 
         [Header("Appearance")]
@@ -97,10 +103,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Tooltip("Pop-up duration in unscaled seconds. Must be greater than zero.")]
         [SerializeField]
+        [Range(0.01f, 2f)]
         private float duration = 0.18f;
 
         [Tooltip("Initial pop-up scale, between zero and one. Final size is the authored label size.")]
         [SerializeField]
+        [Range(0f, 1f)]
         private float startScale = 0.2f;
 
         [Tooltip("Shrink the label when hover ends, also returning it to the object outside Fixed HUD mode. Re-entering reverses the current animation.")]
@@ -109,6 +117,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Tooltip("Exit animation duration in unscaled seconds.")]
         [SerializeField]
+        [Range(0.01f, 2f)]
         private float exitDuration = 0.16f;
 
         #endregion

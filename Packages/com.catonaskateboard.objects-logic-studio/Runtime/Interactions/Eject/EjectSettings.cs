@@ -48,6 +48,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Include trigger colliders on the ejector and contacted objects.")]
         public bool IncludeTriggers;
         [Tooltip("Maximum surface separation accepted as direct contact, in metres.")]
+        [Range(0f, 0.1f)]
         public float Tolerance = 0.005f;
         [Tooltip("Release carried objects and make eligible kinematic bodies dynamic before applying their impulse. Disable to affect only free dynamic bodies.")]
         public bool ReleaseKinematic = true;
@@ -61,11 +62,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Layers ignored only by ejected bodies during the exclusion interval. The project's collision matrix is unchanged.")]
         public LayerMask IgnoredLayers;
         [Tooltip("Scaled seconds from each impulse before its collision exclusions expire. Repeated impulses extend overlapping layer timers.")]
+        [Range(0.01f, 5f)]
         public float IgnoreDuration = 0.5f;
         [Header("Despawn")]
         [Tooltip("Destroy successfully ejected objects after a delay, even if the ejector is disabled or destroyed.")]
         public bool Despawn;
         [Tooltip("Scaled seconds from ejection to destruction. Pausing game time also pauses this timer.")]
+        [Range(0.01f, 60f)]
         public float DespawnDelay = 5f;
 
         #endregion

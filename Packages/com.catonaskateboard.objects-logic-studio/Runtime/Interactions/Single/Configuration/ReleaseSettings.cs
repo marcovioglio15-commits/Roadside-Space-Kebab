@@ -13,10 +13,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Override the body's mass, damping, gravity and motion constraints after release.")]
         public bool OverrideBody = true;
         [Tooltip("Released mass in kilograms. Impulse-based throws accelerate lighter objects more.")]
+        [Range(0.01f, 100f)]
         public float Mass = 1f;
         [Tooltip("Linear velocity damping after release; higher values increase air resistance.")]
+        [Range(0f, 10f)]
         public float LinearDamping = 0.05f;
         [Tooltip("Angular velocity damping after release; higher values stop spin sooner.")]
+        [Range(0f, 10f)]
         public float AngularDamping = 0.05f;
         [Tooltip("Apply the physics scene's gravity after release.")]
         public bool Gravity = true;
@@ -25,16 +28,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Collision detection after release. Continuous Dynamic is suitable for fast throws.")]
         public CollisionDetectionMode CollisionDetection = CollisionDetectionMode.ContinuousDynamic;
         [Tooltip("Maximum angular speed after release, in radians per second.")]
+        [Range(0.1f, 50f)]
         public float MaxAngularSpeed = 20f;
 
         [Header("Surface")]
         [Tooltip("Use this interaction's friction and bounce on every solid collider belonging to the object.")]
         public bool OverrideSurface = true;
         [Tooltip("Friction while the released object rests against another surface; valid range is zero to one.")]
+        [Range(0f, 1f)]
         public float StaticFriction = 0.5f;
         [Tooltip("Friction while the released object slides; valid range is zero to one.")]
+        [Range(0f, 1f)]
         public float DynamicFriction = 0.4f;
         [Tooltip("Restitution against floors and other solid objects; zero absorbs bounce, one preserves it.")]
+        [Range(0f, 1f)]
         public float Bounciness = 0.2f;
         [Tooltip("How this surface's friction combines with the contacted material's friction.")]
         public PhysicsMaterialCombine FrictionCombine = PhysicsMaterialCombine.Average;

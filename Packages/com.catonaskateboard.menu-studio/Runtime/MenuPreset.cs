@@ -39,6 +39,7 @@ namespace CatOnASkateboard.MenuStudio
         [Tooltip("Menu button size in reference pixels.")]
         public Vector2 ButtonSize = new Vector2(360f, 58f);
         [Tooltip("Vertical spacing between menu buttons.")]
+        [Range(0f, 100f)]
         public float ButtonSpacing = 12f;
         [Tooltip("Canvas sort order above gameplay UI.")]
         public int SortingOrder = 100;
