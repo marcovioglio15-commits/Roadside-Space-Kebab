@@ -27,21 +27,8 @@ MonoBehaviour:
     UseRecipeModifiers: 1
     IncludeBaseOrder: 0
     Variants:
-    - Name: WithFries
-      Text: + Fries
-      AppendToBaseText: 1
-      Weight: 1
-      UseDrawLimits: 0
-      RandomRequiredDraws: 0
-      MinimumDraws: 0
-      RequiredDrawRange: {x: 0, y: 1}
-      MaximumDraws: 1
-      Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
-      RequireAllFlags: 1
-      ExcludedFlags: []
-    - Name: BaseOrder
-      Text: Complete
+    - Name: WrapKebabBaseOrder
+      Text: (Complete)
       AppendToBaseText: 1
       Weight: 1
       UseDrawLimits: 0
@@ -53,20 +40,7 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
-    - Name: NoLettuce
-      Text: '- Lettuce'
-      AppendToBaseText: 1
-      Weight: 1
-      UseDrawLimits: 0
-      RandomRequiredDraws: 0
-      MinimumDraws: 0
-      RequiredDrawRange: {x: 0, y: 1}
-      MaximumDraws: 1
-      Flags: []
-      RequireAllFlags: 1
-      ExcludedFlags:
-      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
-    - Name: NoTomato
+    - Name: WrapKebabNoTomato
       Text: '- Tomato'
       AppendToBaseText: 1
       Weight: 1
@@ -79,7 +53,20 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
-    - Name: NoOnion
+    - Name: WrapKebabNoLettuce
+      Text: '- Lettuce'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: WrapKebabNoOnion
       Text: '- Onion'
       AppendToBaseText: 1
       Weight: 1
@@ -92,10 +79,76 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-    - Name: NoOnionNoLettuce
-      Text: '- Onion - Lettuce'
+    - Name: WrapKebabWithFries
+      Text: + Fries
       AppendToBaseText: 1
-      Weight: 10
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags: []
+  - Name: PaninoKebab
+    Text: Kebab Panino
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 1
+    IncludeBaseOrder: 0
+    Variants:
+    - Name: PaninoKebabBaseOrder
+      Text: (Complete)
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    - Name: PaninoKebabNoTomato
+      Text: '- Tomato'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+    - Name: PaninoKebabNoLettuce
+      Text: '- Lettuce'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: PaninoKebabNoOnion
+      Text: '- Onion'
+      AppendToBaseText: 1
+      Weight: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -105,9 +158,394 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+    - Name: PaninoKebabWithFries
+      Text: + Fries
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags: []
+  - Name: WrapFalafel
+    Text: Falafel Wrap
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: 5a4f9bca604020f44bc4a9dd4971e296, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 1
+    IncludeBaseOrder: 0
+    Variants:
+    - Name: WrapFalafelBaseOrder
+      Text: (Complete)
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    - Name: WrapFalafelNoTomato
+      Text: '- Tomato'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+    - Name: WrapFalafelNoLettuce
+      Text: '- Lettuce'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
-  - Name: Soda
-    Text: Soda
+    - Name: WrapFalafelNoOnion
+      Text: '- Onion'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+    - Name: WrapFalafelWithFries
+      Text: + Fries
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags: []
+  - Name: PaninoFalafel
+    Text: Falafel Panino
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: c5f0a320b63b1a643b19720518f9713d, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 1
+    IncludeBaseOrder: 0
+    Variants:
+    - Name: PaninoFalafelBaseOrder
+      Text: (Complete)
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    - Name: PaninoFalafelNoTomato
+      Text: '- Tomato'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+    - Name: PaninoFalafelNoLettuce
+      Text: '- Lettuce'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: PaninoFalafelNoOnion
+      Text: '- Onion'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+    - Name: PaninoFalafelWithFries
+      Text: + Fries
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags: []
+  - Name: PizzaRossa
+    Text: Pizza Rossa
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 1
+    IncludeBaseOrder: 0
+    Variants:
+    - Name: PizzaRossaBaseOrder
+      Text: (Complete)
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    - Name: PizzaRossaWithFries
+      Text: + Fries
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags: []
+  - Name: PizzaMargherita
+    Text: Pizza Margherita
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 1
+    IncludeBaseOrder: 0
+    Variants:
+    - Name: PizzaMargheritaBaseOrder
+      Text: (Complete)
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    - Name: PizzaMargheritaWithFries
+      Text: + Fries
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags: []
+  - Name: PizzaKebab
+    Text: Pizza Kebab
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: 1da89b5539f47a54aa1ec4d21fa1eb8f, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 1
+    IncludeBaseOrder: 0
+    Variants:
+    - Name: PizzaKebabBaseOrder
+      Text: (Complete)
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    - Name: PizzaKebabNoTomato
+      Text: '- Tomato'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+    - Name: PizzaKebabNoLettuce
+      Text: '- Lettuce'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: PizzaKebabNoOnion
+      Text: '- Onion'
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+    - Name: PizzaKebabWithFries
+      Text: + Fries
+      AppendToBaseText: 1
+      Weight: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags: []
+  - Name: FrenchFries
+    Text: French Fries
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []
+  - Name: Nuggets
+    Text: Nuggets
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []
+  - Name: CrabClaws
+    Text: Crab Claws
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []
+  - Name: WaterBottle
+    Text: Water Bottle
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: 56ca933d47b2e644c936f3ea4994394a, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []
+  - Name: SodaCan
+    Text: Soda Can
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -116,6 +554,20 @@ MonoBehaviour:
     MaximumDraws: 1
     Flags:
     - {fileID: 11400000, guid: 3540e02766c5b3f44be810718f38f9d1, type: 2}
+    RequireAllFlags: 0
+    UseRecipeModifiers: 0
+    IncludeBaseOrder: 1
+    Variants: []
+  - Name: BeerBottle
+    Text: Beer Bottle
+    Quantity: 1
+    Weight: 1
+    RandomRequiredDraws: 0
+    MinimumDraws: 0
+    RequiredDrawRange: {x: 0, y: 1}
+    MaximumDraws: 1
+    Flags:
+    - {fileID: 11400000, guid: 9227e017029ae594baec1c2d87fe11c9, type: 2}
     RequireAllFlags: 0
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1

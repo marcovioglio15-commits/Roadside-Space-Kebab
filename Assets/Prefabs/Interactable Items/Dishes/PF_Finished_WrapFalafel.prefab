@@ -668,15 +668,15 @@ MonoBehaviour:
     - Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       Count: 1
-      Optional: 0
+      Optional: 1
     - Flags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       Count: 1
-      Optional: 0
+      Optional: 1
     - Flags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       Count: 1
-      Optional: 0
+      Optional: 1
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0
