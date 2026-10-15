@@ -281,7 +281,8 @@ namespace CatOnASkateboard.AudioStudio.Editor
                         if (binding.FindPropertyRelative("OverrideDistances").boolValue)
                             StudioFields.Draw(binding, "MinimumDistance", "MaximumDistance");
                     }
-                    StudioFields.Draw(binding, "SingleInstance", "Parameters");
+                    StudioFields.Draw(binding, "SingleInstance");
+                    FmodParameterControls.Draw(binding, catalog);
                 }
                 StudioFields.Draw(binding, "LimitRate");
                 if (binding.FindPropertyRelative("LimitRate").boolValue)

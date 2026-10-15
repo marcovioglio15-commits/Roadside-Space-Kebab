@@ -13,6 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Ambient event key selected from the project's Audio Studio catalog.")]
         public string Event = "amb_neonsign";
         [Tooltip("Maximum listening distance in metres. The event follows this object.")]
+        [Range(0.1f, 50f)]
         public float Radius = 6f;
 
         #endregion

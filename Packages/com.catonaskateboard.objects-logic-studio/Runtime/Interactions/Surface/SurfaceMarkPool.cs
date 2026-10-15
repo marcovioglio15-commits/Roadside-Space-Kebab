@@ -1,42 +1,45 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Retains finite surface deposits independently of their sources with bounded reusable world geometry.</summary>
+    /// <summary>Reuses bounded surface geometry, merging repeated wetting and fading temporary marks before saturation.</summary>
     [AddComponentMenu("")]
     internal sealed class SurfaceMarkPool : MonoBehaviour
     {
         #region State
-
-        private const int capacity = 256;
+        private const int capacity = 1024;
+        private const int reserve = 256;
         private static SurfaceMarkPool instance;
         private readonly SurfaceMark[] marks = new SurfaceMark[capacity];
         private readonly SurfaceMarkGeometry geometry = new SurfaceMarkGeometry();
-        private MaterialPropertyBlock properties;
         private Material material;
         private int cursor;
+        private int active;
+        private bool warned;
         private static readonly int colorId = Shader.PropertyToID("DepositColor");
         private static readonly int blendId = Shader.PropertyToID("DepositBlend");
         private static readonly int shapeId = Shader.PropertyToID("DepositShape");
         private static readonly int surfaceId = Shader.PropertyToID("DepositSurface");
         private static readonly int timingId = Shader.PropertyToID("DepositTiming");
-
+        private static readonly int retirementId = Shader.PropertyToID("DepositRetirement");
         #endregion
         #region Methods
         #region Emission
-
-        /// <summary>Deposits a bounded group of patches using a palette prepared at this contact boundary.</summary>
+        /// <summary>Deposits a bounded group of patches using ordinary or independently overridden timing.</summary>
         /// <param name="receiver">Exact contacted surface.</param>
         /// <param name="point">World-space contact position.</param>
         /// <param name="normal">Outward surface normal.</param>
-        /// <param name="direction">Motion direction projected onto the receiving surface.</param>
+        /// <param name="direction">Motion projected onto the receiving surface.</param>
         /// <param name="settings">Validated shared mark configuration.</param>
         /// <param name="palette">Current material or manual colours.</param>
-        internal static void Deposit(Collider receiver, Vector3 point, Vector3 normal, Vector3 direction,
-            SurfaceTrailSettings settings, SurfacePalette palette)
+        /// <param name="timing">Optional receiver-specific lifetime.</param>
+        /// <returns>True when a mark was emitted or an existing wet patch refreshed.</returns>
+        internal static bool Deposit(Collider receiver, Vector3 point, Vector3 normal, Vector3 direction,
+            SurfaceTrailSettings settings, SurfacePalette palette, SurfaceMarkTiming? timing = null)
         {
             if (receiver == null || !receiver.enabled || !receiver.gameObject.activeInHierarchy || receiver.isTrigger)
-                return;
+                return false;
             if (instance == null)
             {
                 GameObject root = new GameObject("Object Surface Marks");
@@ -45,15 +48,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 instance.Initialize();
             }
             if (instance.material == null)
-                return;
+                return false;
+            SurfaceMarkTiming duration = timing ?? new SurfaceMarkTiming(settings);
+            if (instance.Rewet(receiver, point, normal, settings, palette, duration))
+                return true;
+            bool emitted = false;
             for (int index = 0; index < settings.Patches; index++)
-                instance.Emit(receiver, point, normal.normalized, direction, settings, palette);
+                emitted |= instance.Emit(receiver, point, normal.normalized, direction, settings, palette, duration);
+            return emitted;
         }
 
-        /// <summary>Allocates the bounded pool once instead of constructing renderers at every impact.</summary>
+        /// <summary>Prepares managed slots once; native meshes are created lazily and reused.</summary>
         private void Initialize()
         {
-            properties = new MaterialPropertyBlock();
             Shader shader = Resources.Load<Shader>("SurfaceDeposit");
             if (shader == null)
             {
@@ -62,79 +69,152 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             material = new Material(shader) { name = "Surface Deposit Runtime" };
             for (int index = 0; index < marks.Length; index++)
-            {
-                GameObject root = new GameObject("Surface Mark");
-                root.layer = 2;
-                root.SetActive(false);
-                root.transform.SetParent(transform, false);
-                marks[index] = root.AddComponent<SurfaceMark>();
-                marks[index].Initialize(material);
-            }
+                marks[index] = new SurfaceMark();
         }
 
-        /// <summary>Finds a free slot without abruptly replacing a still-visible deposit.</summary>
+        /// <summary>Refreshes compatible nearby residue instead of spending a slot on every stationary hit.</summary>
+        /// <param name="receiver">Receiving surface.</param>
+        /// <param name="point">New contact position.</param>
+        /// <param name="normal">Outward contact normal.</param>
+        /// <param name="settings">Shared appearance identity.</param>
+        /// <param name="palette">Emitter palette identity.</param>
+        /// <param name="timing">Required lifetime policy.</param>
+        /// <returns>True when an existing patch covers the contact.</returns>
+        private bool Rewet(Collider receiver, Vector3 point, Vector3 normal, SurfaceTrailSettings settings,
+            SurfacePalette palette, SurfaceMarkTiming timing)
+        {
+            float distance = settings.Radius.x * 0.5f;
+            foreach (SurfaceMark mark in marks)
+                if (mark.Receiver == receiver && !mark.Retiring && mark.Expires > Time.time
+                    && mark.Settings == settings && mark.Palette == palette && mark.Timing.Matches(timing)
+                    && Vector3.Dot(receiver.transform.TransformDirection(mark.LocalNormal), normal) > 0.95f
+                    && (receiver.transform.TransformPoint(mark.LocalPoint) - point).sqrMagnitude <= distance * distance)
+                {
+                    Wet(mark, timing);
+                    return true;
+                }
+            return false;
+        }
+
+        /// <summary>Projects one patch into a free slot while reserving capacity for incoming contacts.</summary>
         /// <param name="receiver">Contact collider retained until expiration.</param>
         /// <param name="point">Contact position.</param>
         /// <param name="normal">Receiver normal.</param>
         /// <param name="direction">Surface motion direction.</param>
-        /// <param name="settings">Validated geometry and fade configuration.</param>
+        /// <param name="settings">Validated geometry configuration.</param>
         /// <param name="palette">Current colour composition.</param>
-        private void Emit(Collider receiver, Vector3 point, Vector3 normal, Vector3 direction, SurfaceTrailSettings settings, SurfacePalette palette)
+        /// <param name="timing">Resolved lifetime.</param>
+        /// <returns>True when projection found a visible surface.</returns>
+        private bool Emit(Collider receiver, Vector3 point, Vector3 normal, Vector3 direction,
+            SurfaceTrailSettings settings, SurfacePalette palette, SurfaceMarkTiming timing)
         {
             for (int attempt = 0; attempt < marks.Length; attempt++)
             {
                 SurfaceMark mark = marks[cursor];
                 cursor = (cursor + 1) % marks.Length;
-                if (mark == null || mark.Receiver != null && mark.Expires > Time.time)
+                if (mark.Receiver != null && mark.Expires > Time.time && mark.Receiver.enabled && mark.Receiver.gameObject.activeInHierarchy)
                     continue;
+                Release(mark);
+                mark.Prepare();
                 if (!geometry.Build(mark.Mesh, receiver, point, normal, direction, settings))
-                    return;
+                    return false;
                 mark.Receiver = receiver;
-                mark.Expires = Time.time + settings.Lifetime;
-                properties.Clear();
-                properties.SetColor(colorId, palette.Sample());
-                properties.SetColor(blendId, palette.Sample());
-                properties.SetVector(shapeId, new Vector4((float)settings.Shape, settings.Irregularity, Random.Range(0f, 100f), 0f));
-                properties.SetVector(surfaceId, new Vector4(settings.Liquidity, settings.Gloss, settings.ColorBlend, settings.Opacity));
-                properties.SetVector(timingId, new Vector4(Time.time, settings.Lifetime, settings.FadeDuration, 0f));
-                mark.Renderer.SetPropertyBlock(properties);
-                mark.Renderer.GetPropertyBlock(mark.Properties);
-                mark.gameObject.SetActive(true);
-                return;
+                mark.Settings = settings;
+                mark.Palette = palette;
+                mark.LocalPoint = receiver.transform.InverseTransformPoint(point);
+                mark.LocalNormal = receiver.transform.InverseTransformDirection(normal);
+                mark.Retiring = false;
+                mark.Properties.Clear();
+                mark.Properties.SetColor(colorId, palette.Sample());
+                mark.Properties.SetColor(blendId, palette.Sample());
+                mark.Properties.SetVector(shapeId, new Vector4((float)settings.Shape, settings.Irregularity, Random.Range(0f, 100f), 0f));
+                mark.Properties.SetVector(surfaceId, new Vector4(settings.Liquidity, settings.Gloss, settings.ColorBlend, settings.Opacity));
+                Wet(mark, timing);
+                active++;
+                if (active >= capacity - reserve)
+                    RetireOldest();
+                return true;
             }
+            if (!warned && !RetireOldest())
+            {
+                warned = true;
+                Debug.LogWarning("Surface deposits reached the permanent-mark budget. Existing permanent marks are preserved; nearby wetting still refreshes them.", this);
+            }
+            return false;
         }
-
         #endregion
         #region Lifetime
+        /// <summary>Restarts a deposit's lifetime without rebuilding its surface geometry.</summary>
+        /// <param name="mark">New or repeatedly wetted patch.</param>
+        /// <param name="timing">Resolved lifetime policy.</param>
+        private static void Wet(SurfaceMark mark, SurfaceMarkTiming timing)
+        {
+            mark.Timing = timing;
+            mark.WetTime = Time.time;
+            mark.Expires = timing.Permanent ? float.PositiveInfinity : Time.time + timing.Lifetime;
+            mark.Properties.SetVector(timingId, timing.ShaderValue(Time.time));
+        }
 
-        /// <summary>Recycles fully faded marks; shader time performs the actual smooth fade.</summary>
+        /// <summary>Starts an additional short fade before temporary deposits exhaust the reserve.</summary>
+        /// <returns>True when at least one temporary deposit can free capacity soon.</returns>
+        private bool RetireOldest()
+        {
+            SurfaceMark oldest = null;
+            bool retiring = false;
+            foreach (SurfaceMark mark in marks)
+                if (mark.Settings != null && !mark.Timing.Permanent)
+                {
+                    retiring |= mark.Retiring;
+                    if (!mark.Retiring && (oldest == null || mark.WetTime < oldest.WetTime))
+                        oldest = mark;
+                }
+            if (oldest == null)
+                return retiring;
+            oldest.Retiring = true;
+            oldest.Expires = Mathf.Min(oldest.Expires, Time.time + 0.12f);
+            oldest.Properties.SetVector(retirementId, new Vector4(Time.time, 0.12f, 0f, 0f));
+            return true;
+        }
+
+        /// <summary>Releases references once while preserving reusable geometry.</summary>
+        /// <param name="mark">Expired or inactive receiver slot.</param>
+        private void Release(SurfaceMark mark)
+        {
+            if (mark.Settings == null)
+                return;
+            active--;
+            mark.Receiver = null;
+            mark.Settings = null;
+            mark.Palette = null;
+            mark.Retiring = false;
+        }
+
+        /// <summary>Draws live marks in receiver-local space and returns inactive surfaces to the pool.</summary>
         private void LateUpdate()
         {
             foreach (SurfaceMark mark in marks)
-                if (mark != null && mark.gameObject.activeSelf
-                    && (mark.Receiver == null || !mark.Receiver.enabled || !mark.Receiver.gameObject.activeInHierarchy || Time.time >= mark.Expires))
+                if (mark != null && mark.Settings != null)
                 {
-                    mark.gameObject.SetActive(false);
-                    mark.Receiver = null;
+                    if (mark.Receiver == null || !mark.Receiver.enabled || !mark.Receiver.gameObject.activeInHierarchy || Time.time >= mark.Expires)
+                        Release(mark);
+                    else
+                        Graphics.DrawMesh(mark.Mesh, mark.Receiver.transform.localToWorldMatrix, material, mark.Receiver.gameObject.layer,
+                            null, 0, mark.Properties, ShadowCastingMode.Off, true);
                 }
-                else if (mark != null && mark.gameObject.activeSelf)
-                    Graphics.DrawMesh(mark.Mesh, mark.Receiver.transform.localToWorldMatrix, material, mark.Receiver.gameObject.layer,
-                        null, 0, mark.Properties, UnityEngine.Rendering.ShadowCastingMode.Off, true);
         }
 
-        /// <summary>Destroys pooled geometry even when an active mark currently follows another scene object.</summary>
+        /// <summary>Releases native resources owned by this pool, including inactive slots.</summary>
         private void OnDestroy()
         {
             foreach (SurfaceMark mark in marks)
-                if (mark != null)
-                    Destroy(mark.gameObject);
+                mark?.Dispose();
             if (material != null)
                 Destroy(material);
             if (instance == this)
                 instance = null;
         }
 
-        /// <summary>Resets the pool at Play entry when managed static state is retained.</summary>
+        /// <summary>Clears residue at Play entry when managed static state is retained.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reset()
         {
@@ -142,7 +222,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Destroy(instance.gameObject);
             instance = null;
         }
-
         #endregion
         #endregion
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Chooses cumulative order progress, surplus units or the latest delivery's open-slot match.</summary>
-    public enum DialogueOrderResult { Completed, UnexpectedDelivery, NotPendingOrder, PendingOrder }
+    public enum DialogueOrderResult { Completed, UnexpectedDelivery, NotPendingOrder, PendingOrder, AwaitingOrders }
 
     /// <summary>Shares consumption eligibility between a complete dialogue and its individual entries.</summary>
     [Serializable]
@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string[] Orders = Array.Empty<string>();
         [Tooltip("Require every selected active order or flag requirement. Otherwise any one match is sufficient.")]
         public bool RequireAll = true;
-        [Tooltip("Completed waits for every extracted slot to be consumed. Unexpected Delivery checks surplus units. Pending Order accepts a delivery matching an open slot before consumption; Not Pending Order accepts only deliveries matching none. Only Unexpected Delivery uses selected order names.")]
+        [Tooltip("Completed waits for all drawn slots. Pending/Not Pending Order classify deliveries against open slots. Unexpected Delivery checks surplus units. Awaiting Orders accepts a valid contact while consumption waits for its selected Dialogue, without consuming the item.")]
         public DialogueOrderResult Result;
 
         /// <summary>Whether this filter classifies the latest receipt against all open slots instead of named orders.</summary>
@@ -39,6 +39,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (!Enabled)
                 return true;
+            if (Result == DialogueOrderResult.AwaitingOrders)
+                return item != null && item.TryGetComponent(out ObjectContactModifier contact) && contact.AwaitingContact;
             // Ticket fulfilment runs before dialogue polling; its receipt snapshot retains the pre-fulfilment classification.
             if (UsesPendingDelivery)
                 return orders != null && orders.TryLatestDelivery(out bool pending) && pending == (Result == DialogueOrderResult.PendingOrder);
@@ -78,6 +80,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             warning = string.Empty;
             if (!Enabled)
+                return true;
+            if (Result == DialogueOrderResult.AwaitingOrders)
                 return true;
             if (UsesPendingDelivery)
             {

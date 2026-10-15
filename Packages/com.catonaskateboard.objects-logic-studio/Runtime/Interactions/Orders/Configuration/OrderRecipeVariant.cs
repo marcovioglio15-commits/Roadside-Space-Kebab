@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Adds a separately selectable recipe variant while retaining its parent order's identity and quantity.</summary>
+    /// <summary>Adds a separately selectable recipe variant with parent identity and optional independent draw settings.</summary>
     [Serializable]
     public sealed class OrderRecipeVariant
     {
@@ -14,15 +14,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Recipe Variant")]
         [Tooltip("Unique catalog name selected independently by Consumption dialogue filters.")]
         public string Name = "Variant";
-        [Tooltip("Board text for this variant. The parent order's quantity still occupies separate slots.")]
+        [Tooltip("Board suffix or replacement. Empty displays only the base order text. Both actual line breaks and \\n are supported.")]
         [TextArea(2, 5)]
         public string Text = "Variant";
         [Tooltip("Display the base order text followed by this variant's text, separated by a space. Disable to use only the variant text.")]
         public bool AppendToBaseText = true;
         [Tooltip("Independent selection weight when Available Orders uses Weighted Random. Zero excludes this variant.")]
+        [Range(0.01f, 10f)]
         public float Weight = 1f;
+        [Tooltip("Override quantity when this variant has independent draw limits. Combo quantity policies use this effective quantity too.")]
+        public bool UseQuantity;
+        [Tooltip("Board slots occupied by one draw of this variant when its quantity override is enabled.")]
+        public int Quantity = 1;
         [Header("Draw Limits")]
-        [Tooltip("Give this variant independent draw limits instead of sharing the parent order's draw allowance. Quantity and identity still come from the parent.")]
+        [Tooltip("Give this variant independent draw limits instead of sharing the parent order's allowance. Identity still comes from the parent; quantity may then be overridden.")]
         public bool UseDrawLimits;
         [Tooltip("Randomize the required draws once per spawn within Required Draw Range.")]
         public bool RandomRequiredDraws;
@@ -72,11 +77,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="weight">Independent selection weight.</param>
         /// <param name="names">Names already reserved in the catalog.</param>
         /// <param name="warning">Receives invalid metadata.</param>
+        /// <param name="allowEmptyText">Variants may omit text and inherit their base order's display.</param>
         /// <returns>True when this candidate has complete, unambiguous metadata.</returns>
-        internal static bool ValidateMetadata(string name, string text, float weight, HashSet<string> names, out string warning)
+        internal static bool ValidateMetadata(string name, string text, float weight, HashSet<string> names, out string warning, bool allowEmptyText = false)
         {
             warning = "Orders and recipe variants need unique names, board text and finite, non-negative weights.";
-            if (string.IsNullOrWhiteSpace(name) || !names.Add(name) || string.IsNullOrWhiteSpace(text) || !float.IsFinite(weight) || weight < 0f)
+            if (string.IsNullOrWhiteSpace(name) || !names.Add(name) || !allowEmptyText && string.IsNullOrWhiteSpace(text) || !float.IsFinite(weight) || weight < 0f)
                 return false;
             warning = string.Empty;
             return true;

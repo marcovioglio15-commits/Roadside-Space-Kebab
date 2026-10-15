@@ -13,8 +13,10 @@ namespace CatOnASkateboard.AudioStudio
         [Tooltip("Play collision audio when the normal impact speed exceeds the threshold.")]
         public bool Enabled = true;
         [Tooltip("Minimum closing speed in metres per second, measured along a contact normal.")]
+        [Range(0f, 20f)]
         public float MinimumSpeed = 1.5f;
         [Tooltip("Minimum scaled seconds between impact sounds from this object.")]
+        [Range(0f, 2f)]
         public float Cooldown = 0.15f;
 
         #endregion

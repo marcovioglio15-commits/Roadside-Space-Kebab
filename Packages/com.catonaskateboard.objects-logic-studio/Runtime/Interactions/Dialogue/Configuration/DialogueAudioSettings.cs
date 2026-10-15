@@ -18,6 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Optional character voice played while this dialogue is visible.")]
         public DialogueVoice Voice;
         [Tooltip("Seconds between voice phrases. A phrase never overlaps another dialogue sound.")]
+        [Range(0.01f, 30f)]
         public float Interval = 3f;
         [Tooltip("Optional sound after advancing beyond the final page; interruption does not play it.")]
         public DialogueResultSound Completion;

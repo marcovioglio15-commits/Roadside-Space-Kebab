@@ -14,10 +14,12 @@ namespace CatOnASkateboard.PlayerStudio
         [Header("Capsule Dimensions")]
         [Tooltip("Capsule radius in metres. Must be finite and greater than zero.")]
         [SerializeField]
+        [Range(0.05f, 2f)]
         private float radius = 0.35f;
 
         [Tooltip("Total height in metres, including the rounded ends. Must be finite and at least twice the radius.")]
         [SerializeField]
+        [Range(0.1f, 5f)]
         private float height = 1.8f;
 
         #endregion

@@ -53,9 +53,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 foreach (OrderRecipeVariant variant in entry.Variants)
                 {
                     warning = $"Order '{entry.Name}' contains an empty recipe variant.";
-                    if (variant == null || !OrderRecipeVariant.ValidateMetadata(variant.Name, variant.Text, variant.Weight, names, out warning)
+                    if (variant == null || !OrderRecipeVariant.ValidateMetadata(variant.Name, variant.Text, variant.Weight, names, out warning, true)
                         || !ObjectFlagRules.TryValidate(variant.Flags, true, out warning)
                         || !ObjectFlagRules.TryValidate(variant.ExcludedFlags, true, out warning))
+                        return false;
+                    warning = $"Variant '{variant.Name}' needs a positive independent quantity.";
+                    if (variant.UseDrawLimits && variant.UseQuantity && variant.Quantity <= 0)
                         return false;
                     warning = $"Variant '{variant.Name}' needs non-negative draw limits and a required range within Maximum Draws.";
                     if (variant.UseDrawLimits && !OrderDrawGroup.ValidLimits(variant.MinimumDraws, variant.MaximumDraws,
@@ -67,6 +70,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     foreach (ObjectFlag flag in variant.Flags)
                         if (Array.IndexOf(variant.ExcludedFlags, flag) >= 0)
                             return false;
+                }
+                if (entry.Combos == null || !entry.Combos.TryValidate(out warning))
+                    return false;
+                warning = $"Order '{entry.Name}' exceeds {OrderComboCandidates.MaximumCombinations} possible combos. Reduce the maximum combo size or number of variants.";
+                if (entry.Combos.Enabled && !OrderComboCandidates.IsBounded(entry))
+                    return false;
+                foreach (OrderRecipeVariant[] combo in OrderComboCandidates.Enumerate(entry))
+                {
+                    warning = "A generated combo name conflicts with another order or variant: " + OrderComboCandidates.Name(entry, combo);
+                    if (!names.Add(OrderComboCandidates.Name(entry, combo)))
+                        return false;
                 }
             }
             warning = string.Empty;
@@ -89,6 +103,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     foreach (OrderRecipeVariant variant in entry.Variants)
                         if (variant != null)
                             yield return new OrderCandidate(entry, variant);
+                foreach (OrderRecipeVariant[] combo in OrderComboCandidates.Enumerate(entry))
+                    yield return new OrderCandidate(entry, combo, OrderComboCandidates.Quantity(entry, combo, false));
             }
         }
 

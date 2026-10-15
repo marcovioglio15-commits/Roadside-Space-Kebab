@@ -190,6 +190,7 @@ GameObject:
   - component: {fileID: 5527052003444599054}
   - component: {fileID: 6912887087282466169}
   - component: {fileID: 7313425721650699864}
+  - component: {fileID: 7616977171432140151}
   m_Layer: 13
   m_Name: PF_Client_FishyBusiness
   m_TagString: Untagged
@@ -332,7 +333,7 @@ MonoBehaviour:
     ExitDistance: 4
     Priority: 0
     PreferSingleActions: 1
-    PreferredActions: 68
+    PreferredActions: 69
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -371,7 +372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Order 1
+  interactionName: Consume
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -408,6 +409,10 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    ConsumeOn:
+      Enabled: 1
+      DialogueName: FishyBushiness Order
+      Occurrence: 0
 --- !u!136 &3151776499264896803
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -480,7 +485,7 @@ MonoBehaviour:
     ExitDistance: 20
     Priority: 1
     PreferSingleActions: 1
-    PreferredActions: 68
+    PreferredActions: 69
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -568,7 +573,7 @@ MonoBehaviour:
     ExitDistance: 20
     Priority: 1
     PreferSingleActions: 1
-    PreferredActions: 68
+    PreferredActions: 69
     RequireSightToStart: 1
     RequireSightToContinue: 0
     HideWhenSightLost: 0
@@ -910,6 +915,78 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &7616977171432140151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
+  interactionName: Awaiting Order
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Trigger: 2
+    Consumption:
+      Enabled: 1
+      RequiredFlags: []
+      Orders: []
+      RequireAll: 1
+      Result: 4
+    Distance: 15
+    ExitDistance: 20
+    Priority: 0
+    PreferSingleActions: 1
+    PreferredActions: 69
+    RequireSightToStart: 1
+    RequireSightToContinue: 1
+    HideWhenSightLost: 1
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    SightOffset: {x: 0, y: 0, z: 0}
+    Interruption: 0
+    ReplayOnReturn: 1
+    ReplayOnInput: 0
+    Selection: 0
+    Entries:
+    - {fileID: 11400000, guid: 6db2d56831f1593498c339ce1104944b, type: 2}
+    UseSpawnPresets: 0
+    SpawnPresets: []
+    Tree: {fileID: 0}
+    UseSpawnTrees: 0
+    SpawnTrees: []
+    Audio:
+      Voice: 3
+      Interval: 3
+      Completion: 0
+  startAction: {fileID: 0}
+  advanceAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!1 &4472445664153572561
 GameObject:
   m_ObjectHideFlags: 0

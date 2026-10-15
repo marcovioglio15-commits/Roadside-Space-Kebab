@@ -20,6 +20,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Area(settings.FindPropertyRelative("Area"));
             HoverControls.Field(settings, "AffectObjects");
             HoverControls.Field(settings, "AffectPlayer");
+            SerializedProperty player = settings.FindPropertyRelative("Player");
+            HoverControls.Field(player, "PushSuspendedBodies");
+            if (player.FindPropertyRelative("PushSuspendedBodies").boolValue)
+            {
+                if (!settings.FindPropertyRelative("AffectPlayer").boolValue)
+                    HoverControls.Field(player, "Mass");
+                HoverControls.Field(player, "SuspendedMassScale");
+                HoverControls.Field(player, "SuspendedPushSpeed");
+            }
             if (settings.FindPropertyRelative("AffectPlayer").boolValue)
             {
                 HoverControls.Field(settings, "FilterPlayer");
@@ -95,12 +104,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(settings, "JumpAcceleration");
             HoverControls.Field(settings, "Bounce");
             HoverControls.Field(settings, "ContactFriction");
-            HoverControls.Field(settings, "PushSuspendedBodies");
-            if (settings.FindPropertyRelative("PushSuspendedBodies").boolValue)
-            {
-                HoverControls.Field(settings, "SuspendedMassScale");
-                HoverControls.Field(settings, "SuspendedPushSpeed");
-            }
             HoverControls.Field(settings, "RestoredMomentum");
         }
 

@@ -314,7 +314,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Ingredient bodies belong to the composite root; only independent active products may leave the table.
             if (!initialized || !isActiveAndEnabled || !Item.isActiveAndEnabled || Item.IsConsumed || Item.IsReserved || Item.IsCarried
-                || Table == null && !(TryGetComponent(out ObjectGrab grab) && grab.Dock != null))
+                || TryGetComponent(out ObjectGrab grab) && grab.Dock != null || Table == null)
                 return;
             ReleaseTable();
             body.isKinematic = false;

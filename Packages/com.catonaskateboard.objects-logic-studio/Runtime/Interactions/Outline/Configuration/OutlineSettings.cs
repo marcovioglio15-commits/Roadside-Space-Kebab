@@ -11,12 +11,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Header("Edge Glow")]
         [Tooltip("Glow width in render pixels, from zero to sixteen. Zero hides the effect.")]
+        [Range(0f, 16f)]
         public float Thickness = 3f;
         [Tooltip("Glow tint and opacity. Black emits no light; the original surface material is preserved.")]
         public Color Color = Color.white;
         [Tooltip("Light added at the edge. Values above one can feed the camera's configured Bloom effect.")]
+        [Range(0f, 10f)]
         public float Intensity = 2f;
         [Tooltip("Minimum normal change, in degrees, treated as a geometric crease. Silhouettes remain visible independently.")]
+        [Range(0.1f, 180f)]
         public float EdgeAngle = 30f;
         [Tooltip("When this object has Hover, show its outline only while at least one Hover interaction is active.")]
         public bool HoverOnly;

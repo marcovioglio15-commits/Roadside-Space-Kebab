@@ -37,10 +37,13 @@ namespace CatOnASkateboard.MenuStudio
         public bool WrapTabs = true;
         [Header("Repeat")]
         [Tooltip("Unscaled delay before held navigation repeats.")]
+        [Range(0.01f, 2f)]
         public float RepeatDelay = 0.32f;
         [Tooltip("Unscaled delay between repeated navigation moves.")]
+        [Range(0.01f, 1f)]
         public float RepeatInterval = 0.1f;
         [Tooltip("Stick deadzone applied to the generated navigation action.")]
+        [Range(0f, 0.99f)]
         public float Deadzone = 0.55f;
         [Header("Settings Focus")]
         [Tooltip("Override the selected Settings option appearance.")]

@@ -1,3 +1,5 @@
+using CatOnASkateboard.StudioIdentity;
+
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Represents one independent draw candidate without duplicating the parent order's identity filters.</summary>
@@ -7,18 +9,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         internal readonly OrderEntry Entry;
         internal readonly OrderRecipeVariant Variant;
+        internal readonly OrderRecipeVariant[] Combo;
+        private readonly int comboQuantity;
 
         #endregion
         #region Properties
 
         /// <summary>Exact catalog key used for spawn progress and dialogue eligibility.</summary>
-        internal string Name => Variant != null ? Variant.Name : Entry.Name;
+        internal string Name => Combo != null ? OrderComboCandidates.Name(Entry, Combo) : Variant != null ? Variant.Name : Entry.Name;
         /// <summary>Board text chosen at extraction, independent of later deliveries.</summary>
-        internal string Text => Variant == null ? Entry.Text : Variant.AppendToBaseText ? Entry.Text + " " + Variant.Text : Variant.Text;
+        internal string Text => OrderComboCandidates.Text(Entry, Variant, Combo);
         /// <summary>Independent candidate weight used by weighted extraction.</summary>
-        internal float Weight => Variant != null ? Variant.Weight : Entry.Weight;
+        internal float Weight => Combo != null ? Entry.Combos.Weight : Variant != null ? Variant.Weight : Entry.Weight;
         /// <summary>Number of board slots required by this candidate.</summary>
-        internal int Quantity => Entry.Quantity;
+        internal int Quantity => Combo != null ? comboQuantity : Variant is { UseDrawLimits: true, UseQuantity: true } ? Variant.Quantity : Entry.Quantity;
+        /// <summary>More specific recipes consume matching tickets before individual variants and base orders.</summary>
+        internal int Specificity => Combo != null ? Combo.Length : Variant != null ? 1 : 0;
 
         #endregion
         #region Methods
@@ -31,6 +37,33 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             Entry = entry;
             Variant = variant;
+            Combo = null;
+            comboQuantity = 0;
+        }
+
+        /// <summary>Captures a compatible combination and its spawn-specific quantity.</summary>
+        /// <param name="entry">Parent identity and combination policies.</param>
+        /// <param name="combo">Distinct variants in catalog order.</param>
+        /// <param name="quantity">Resolved whole-draw slot cost.</param>
+        internal OrderCandidate(OrderEntry entry, OrderRecipeVariant[] combo, int quantity)
+        {
+            Entry = entry;
+            Variant = null;
+            Combo = combo;
+            comboQuantity = quantity;
+        }
+
+        /// <summary>Requires every combo member's additive and subtractive recipe conditions.</summary>
+        /// <param name="ingredients">Immutable assembly ingredient receipt.</param>
+        /// <returns>True when every selected recipe modifier matches.</returns>
+        internal bool MatchesRecipe(ObjectFlag[] ingredients)
+        {
+            if (Combo == null)
+                return Variant == null || Variant.Matches(ingredients);
+            foreach (OrderRecipeVariant variant in Combo)
+                if (!variant.Matches(ingredients))
+                    return false;
+            return true;
         }
 
         #endregion

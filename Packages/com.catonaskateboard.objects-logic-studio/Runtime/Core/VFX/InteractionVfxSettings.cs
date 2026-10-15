@@ -17,6 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Use the interaction's defined duration. Paused contact modifications also pause this effect; cancellation ends it.")]
         public bool AutoTiming;
         [Tooltip("Effect lifetime in game-time seconds when automatic timing is disabled.")]
+        [Range(0.01f, 30f)]
         public float Duration = 1f;
         [Tooltip("For Modify By Contact, place the effect on the contacted object instead of the interaction owner. Other interaction types keep their own transform.")]
         public bool OnContactObject;

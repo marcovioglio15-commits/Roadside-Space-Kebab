@@ -17,13 +17,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Layout
 
-        /// <summary>Allows nested labels more space while retaining room for field values.</summary>
+        /// <summary>Keeps labels near their controls without stretching the label column across wide windows.</summary>
         /// <param name="minimum">Preferred minimum label width before nested indentation.</param>
         internal ObjectStudioFieldLayout(float minimum)
         {
             // The width follows the current editor surface, including narrow docked Inspectors.
             labelWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth = Mathf.Min(Mathf.Clamp(EditorGUIUtility.currentViewWidth * 0.35f, minimum, 290f),
+            EditorGUIUtility.labelWidth = Mathf.Min(minimum,
                 Mathf.Max(100f, EditorGUIUtility.currentViewWidth - 135f));
         }
 

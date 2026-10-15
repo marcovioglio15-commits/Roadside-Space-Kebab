@@ -12,6 +12,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Header("Key")]
         [Tooltip("Seconds from the start of the animation. Keys must be strictly ordered.")]
+        [Range(0f, 10f)]
         public float Time;
         [Tooltip("Local pose reached at this time.")]
         public PlayerToolPose Pose = PlayerToolPose.Identity;
@@ -72,6 +73,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Header("Animation")]
         [Tooltip("Total duration in seconds; all keys must fit inside this duration.")]
+        [Range(0.01f, 10f)]
         public float Duration = 0.3f;
         [Tooltip("Independent transform tracks bound through the hierarchy selector.")]
         public PlayerToolTrack[] Tracks = Array.Empty<PlayerToolTrack>();

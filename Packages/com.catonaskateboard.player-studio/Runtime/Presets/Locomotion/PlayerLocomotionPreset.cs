@@ -11,14 +11,17 @@ namespace CatOnASkateboard.PlayerStudio
         [Header("Planar Movement")]
         [Tooltip("Maximum requested speed in metres per second. Analog input retains its magnitude; diagonal input cannot exceed this speed.")]
         [SerializeField]
+        [Range(0f, 20f)]
         private float speed = 5f;
 
         [Tooltip("Velocity change in metres per second squared while input requests a direction, including turns and changes in analog magnitude.")]
         [SerializeField]
+        [Range(0.1f, 100f)]
         private float acceleration = 20f;
 
         [Tooltip("Velocity change in metres per second squared when directional input is released. Must be greater than zero.")]
         [SerializeField]
+        [Range(0.1f, 100f)]
         private float deceleration = 30f;
 
         [Header("Gravity")]
@@ -28,14 +31,17 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Downward acceleration in metres per second squared; must be positive when gravity is enabled.")]
         [SerializeField]
+        [Range(0.1f, 50f)]
         private float gravityAcceleration = 20f;
 
         [Tooltip("Maximum downward speed in metres per second; this limits falling without changing the stored preset.")]
         [SerializeField]
+        [Range(1f, 100f)]
         private float terminalSpeed = 50f;
 
         [Tooltip("Downward request after ground contact, in metres per second. Positive and no greater than Terminal Speed; not a ground teleport.")]
         [SerializeField]
+        [Range(0.01f, 10f)]
         private float groundSpeed = 2f;
 
         [Header("Jump")]
@@ -45,14 +51,17 @@ namespace CatOnASkateboard.PlayerStudio
 
         [Tooltip("Requested free-space jump height in metres, measured above takeoff. Must be positive when jumping is enabled.")]
         [SerializeField]
+        [Range(0.01f, 10f)]
         private float jumpHeight = 1.5f;
 
         [Tooltip("Seconds a press can wait for support. Zero disables retention beyond the current motor tick.")]
         [SerializeField]
+        [Range(0f, 0.5f)]
         private float jumpBufferTime = 0.1f;
 
         [Tooltip("Seconds one jump remains available after walking off an edge. A performed jump spends this opportunity.")]
         [SerializeField]
+        [Range(0f, 0.5f)]
         private float coyoteTime = 0.1f;
 
         [Header("Audio")]

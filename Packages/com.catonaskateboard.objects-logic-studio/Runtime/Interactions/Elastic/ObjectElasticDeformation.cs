@@ -28,6 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool ready;
         private bool bound;
         private bool posed;
+        private ElasticPose pose;
 
         #endregion
         #region Properties
@@ -105,8 +106,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             BindGeometry();
+            pose = new ElasticPose(settings.Pivot, impactAxis, compression, settings.Volume, squeezeAxis, squeeze);
             foreach (ElasticMesh mesh in meshes)
-                mesh.Apply(transform, settings.Pivot, impactAxis, compression, settings.Volume, squeezeAxis, squeeze);
+                mesh.Apply(transform, pose);
             posed = true;
         }
 
@@ -146,6 +148,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
         #region Geometry
+
+        /// <summary>Keeps a visual attachment aligned with the deformation already applied to this frame's mesh.</summary>
+        /// <param name="point">Original owner-local attachment position.</param>
+        /// <returns>Current deformed position, or the original point when geometry is at rest.</returns>
+        internal Vector3 DeformPoint(Vector3 point)
+        {
+            return posed ? pose.Point(point) : point;
+        }
+
+        /// <summary>Aligns an outlet direction with the same deformation as its surrounding mesh.</summary>
+        /// <param name="direction">Original owner-local direction.</param>
+        /// <returns>Deformed direction before normalization, or the original direction at rest.</returns>
+        internal Vector3 DeformDirection(Vector3 direction)
+        {
+            return posed ? pose.Vector(direction) : direction;
+        }
 
         /// <summary>Collects owned visual geometry once, excluding other items and generated effects.</summary>
         private void BindGeometry()

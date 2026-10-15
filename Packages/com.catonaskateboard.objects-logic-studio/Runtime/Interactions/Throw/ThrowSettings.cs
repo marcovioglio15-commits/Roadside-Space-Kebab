@@ -16,10 +16,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Impulse uses newton-seconds and respects mass. Speed adds metres per second independently of mass.")]
         public ThrowStrengthMode Mode = ThrowStrengthMode.Speed;
         [Tooltip("Launch impulse or speed, according to Strength Mode.")]
+        [Range(0.1f, 40f)]
         public float Strength = 8f;
         [Tooltip("Yaw in degrees to the right of camera aim.")]
+        [Range(-180f, 180f)]
         public float Yaw;
         [Tooltip("Elevation in degrees above camera aim. Positive values create an upward arc.")]
+        [Range(-90f, 90f)]
         public float Elevation = 10f;
         [Tooltip("Initial angular velocity in radians per second around camera right, up and forward axes.")]
         public Vector3 Spin;

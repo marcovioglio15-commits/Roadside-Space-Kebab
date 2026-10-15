@@ -9,9 +9,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         internal readonly string Name;
-        internal readonly int Quantity;
+        internal int Quantity { get; private set; }
         internal readonly int Required;
         internal readonly List<OrderCandidate> Candidates = new List<OrderCandidate>();
+        internal int Pending;
         internal int Remaining;
 
         #endregion
@@ -31,6 +32,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Name = name;
             Quantity = quantity;
             Required = random ? sample ? Random.Range(range.x, range.y + 1) : range.y : minimum;
+            Pending = Required;
             Remaining = maximum - Required;
         }
 
@@ -58,7 +60,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                             shared.Add(new OrderCandidate(entry, variant), selection);
                             continue;
                         }
-                        OrderDrawGroup independent = new OrderDrawGroup(variant.Name, entry.Quantity, variant.MinimumDraws,
+                        OrderDrawGroup independent = new OrderDrawGroup(variant.Name, new OrderCandidate(entry, variant).Quantity, variant.MinimumDraws,
                             variant.MaximumDraws, variant.RandomRequiredDraws, variant.RequiredDrawRange, sample);
                         independent.Add(new OrderCandidate(entry, variant), selection);
                         groups.Add(independent);
@@ -66,8 +68,39 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 // No parent reservation remains when all enabled candidates have their own limits.
                 if (hasShared)
                     groups.Add(shared);
+                AddCombos(groups, entry, selection, sample);
             }
             return groups;
+        }
+
+        /// <summary>Shares one reservation and allowance across every compatible combo of a base order.</summary>
+        /// <param name="groups">Pools accumulated for this spawn.</param>
+        /// <param name="entry">Parent whose combo candidates share an allowance.</param>
+        /// <param name="selection">Policy controlling candidate eligibility.</param>
+        /// <param name="sample">Whether random policies may sample values.</param>
+        private static void AddCombos(List<OrderDrawGroup> groups, OrderEntry entry, OrderSelection selection, bool sample)
+        {
+            // Only members of feasible combinations contribute to derived shared limits.
+            List<OrderCandidate> candidates = new List<OrderCandidate>();
+            List<OrderRecipeVariant> members = new List<OrderRecipeVariant>();
+            foreach (OrderRecipeVariant[] combo in OrderComboCandidates.Enumerate(entry))
+            {
+                candidates.Add(new OrderCandidate(entry, combo, OrderComboCandidates.Quantity(entry, combo, sample)));
+                foreach (OrderRecipeVariant variant in combo)
+                    if (!members.Contains(variant))
+                        members.Add(variant);
+            }
+            if (candidates.Count == 0)
+                return;
+            Vector3Int limits = OrderComboCandidates.Limits(entry, members.ToArray(), sample);
+            OrderDrawGroup combined = new OrderDrawGroup(entry.Name + " Combos", int.MaxValue, limits.x, limits.z,
+                limits.x != limits.y, new Vector2Int(limits.x, limits.y), sample);
+            foreach (OrderCandidate candidate in candidates)
+            {
+                combined.Add(candidate, selection);
+                combined.Quantity = Mathf.Min(combined.Quantity, candidate.Quantity);
+            }
+            groups.Add(combined);
         }
 
         /// <summary>Filters zero weights only in weighted selection while retaining invalid mandatory pools for diagnostics.</summary>
@@ -75,7 +108,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="selection">Current extraction policy.</param>
         private void Add(OrderCandidate candidate, OrderSelection selection)
         {
-            if (selection != OrderSelection.WeightedRandom || candidate.Weight > 0f)
+            if (candidate.Weight > 0f || candidate.Combo == null && selection != OrderSelection.WeightedRandom)
                 Candidates.Add(candidate);
         }
 

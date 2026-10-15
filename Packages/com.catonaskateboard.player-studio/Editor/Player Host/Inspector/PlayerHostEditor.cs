@@ -78,8 +78,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // These values belong to the preset, so the host cannot edit a second copy.
             using (new EditorGUI.DisabledScope(true))
             {
-                StudioGUI.FloatField(radiusLabel, settings.Radius);
-                StudioGUI.FloatField(heightLabel, settings.Height);
+                StudioGUI.FloatField<PlayerBodyPreset>(radiusLabel, settings.Radius, "radius");
+                StudioGUI.FloatField<PlayerBodyPreset>(heightLabel, settings.Height, "height");
             }
         }
 

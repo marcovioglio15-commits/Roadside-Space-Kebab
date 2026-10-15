@@ -22,6 +22,7 @@ namespace CatOnASkateboard.AudioStudio
         [Tooltip("Bank containing the music event.")]
         public string Bank = "";
         [Tooltip("Music event volume.")]
+        [Range(0f, 1f)]
         public float Volume = 1f;
         [Tooltip("Request playback when the project enters this context.")]
         public bool AutoStart = true;

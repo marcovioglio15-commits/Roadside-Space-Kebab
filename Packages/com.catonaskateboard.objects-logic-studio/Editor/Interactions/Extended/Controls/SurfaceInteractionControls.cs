@@ -45,15 +45,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Shared surface-mark configuration.</param>
         /// <param name="sections">Retained foldout state.</param>
         /// <param name="deposits">Whether surface geometry and lifetime controls are used.</param>
-        private static void Trail(SerializedProperty settings, ObjectStudioSections sections, bool deposits = true)
+        internal static void Trail(SerializedProperty settings, ObjectStudioSections sections, bool deposits = true)
         {
-            if (!sections.Draw("Surface Appearance", "Shape, composition and gradual lifetime of surface deposits.", settings))
+            if (sections.Draw("Color And Wetness", "Shared color and shading of liquid and deposits.", settings,
+                "Liquidity", "Gloss", "DetectColors", "Colors", "ColorBlend", "Opacity"))
+            {
+                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                Fields(settings, "Liquidity", "Gloss", "DetectColors");
+                Colors(settings);
+                if (deposits)
+                    Fields(settings, "ColorBlend");
+                Fields(settings, "Opacity");
+            }
+            if (!deposits)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
-            Fields(settings, "Liquidity", "Gloss");
-            if (deposits)
-                Fields(settings, "Shape", "Radius", "Stretch", "Patches", "Scatter", "Irregularity");
-            Fields(settings, "DetectColors");
+            Group(settings, sections, "Deposit Shape", "Size, distribution and silhouette on receiving surfaces.",
+                "Shape", "Radius", "Stretch", "Patches", "Scatter", "Irregularity");
+            Group(settings, sections, "Deposit Lifetime", "Ordinary fading; target rules can override these durations.", "Lifetime", "FadeDuration");
+            Group(settings, sections, "Surface Projection", "How patches conform to the receiving collider.", "ProjectionDepth", "SurfaceOffset", "MaximumAngle");
+        }
+
+        /// <summary>Edits palette entries individually while preserving manual fallback colors.</summary>
+        /// <param name="settings">Shared surface appearance.</param>
+        private static void Colors(SerializedProperty settings)
+        {
             SerializedProperty colors = settings.FindPropertyRelative("Colors");
             StudioArrayGUI.Add(colors, settings.FindPropertyRelative("DetectColors").boolValue ? "Add Fallback Color" : "Add Color", () => Color.white);
             for (int index = 0; index < colors.arraySize; index++)
@@ -67,11 +82,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 }
             }
-            if (deposits)
-                Fields(settings, "ColorBlend");
-            Fields(settings, "Opacity");
-            if (deposits)
-                Fields(settings, "Lifetime", "FadeDuration", "ProjectionDepth", "SurfaceOffset", "MaximumAngle");
         }
         #endregion
         #region Spray
@@ -80,55 +90,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained foldout state.</param>
         internal static void SpraySauce(SerializedProperty settings, ObjectStudioSections sections)
         {
-            Fields(settings, "HeldOnly");
-            if (!settings.FindPropertyRelative("HeldOnly").boolValue)
-                TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
-            if (settings.serializedObject.targetObject is ObjectWorkspace workspace
-                && StudioButton.Draw(new GUIContent("Nozzle Layout", "Position and rotate the outlet against the object preview.")))
-            {
-                settings.serializedObject.ApplyModifiedProperties();
-                SprayNozzleWindow.Open(workspace);
-            }
-            SerializedProperty nozzle = settings.FindPropertyRelative("Nozzle");
-            Fields(nozzle, "Position", "Rotation");
-            if (sections.Draw("Liquid Flow", "Physical emission from the nozzle's forward axis.", settings,
-                "Rate", "Speed", "Spread", "Cohesion", "Radius", "Mass", "Damping", "Lifetime", "InheritVelocity", "Layers"))
-                Fields(settings, "Rate", "Speed", "Spread", "Cohesion", "Radius", "Mass", "Damping", "Lifetime", "InheritVelocity", "Layers");
-            Fields(settings, "Limited");
-            if (settings.FindPropertyRelative("Limited").boolValue)
-                Fields(settings, "Capacity");
-            Fields(settings, "Squeeze");
-            if (settings.FindPropertyRelative("Squeeze").boolValue)
-                Fields(settings, "SqueezeAxis", "Compression", "SqueezeDuration");
-            Fields(settings, "LeaveTrail");
-            bool deposits = settings.FindPropertyRelative("LeaveTrail").boolValue;
-            if (deposits)
-                Fields(settings, "DepositInterval");
-            Trail(settings.FindPropertyRelative("Trail"), sections, deposits);
-            Fields(settings, "ChangeAppearance");
-            if (!settings.FindPropertyRelative("ChangeAppearance").boolValue)
-                return;
-            SerializedProperty rules = settings.FindPropertyRelative("Rules");
-            StudioArrayGUI.Add(rules, "Add Surface Rule", () => new SpraySurfaceRule());
-            for (int index = 0; index < rules.arraySize; index++)
-            {
-                SerializedProperty rule = rules.GetArrayElementAtIndex(index);
-                if (StudioArrayGUI.Header(rules, index, new GUIContent("Surface Rule " + (index + 1), "Appearance after sustained wetting.")))
-                    break;
-                if (!rule.isExpanded)
-                    continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
-                ObjectFlagSelector.Draw(rule.FindPropertyRelative("Flags"));
-                Fields(rule, "Match", "Exposure", "ContactGap");
-                ItemAppearanceControls.Draw(rule.FindPropertyRelative("Appearance"), explicitSource: true);
-            }
+            SpraySauceControls.Draw(settings, sections);
         }
         #endregion
         #region Fields
+        /// <summary>Draws a themed foldout whose context menu transfers only its own fields.</summary>
+        /// <param name="owner">Serialized configuration.</param>
+        /// <param name="sections">Retained foldout state.</param>
+        /// <param name="title">Section caption.</param>
+        /// <param name="tooltip">Purpose of the section.</param>
+        /// <param name="names">Fields belonging to this section.</param>
+        internal static void Group(SerializedProperty owner, ObjectStudioSections sections, string title, string tooltip, params string[] names)
+        {
+            if (sections.Draw(title, tooltip, owner, names))
+                using (new EditorGUI.IndentLevelScope())
+                    Fields(owner, names);
+        }
+
         /// <summary>Draws scalar fields through the existing context-menu and colour system.</summary>
         /// <param name="owner">Serialized configuration.</param>
         /// <param name="names">Visible field names.</param>
-        private static void Fields(SerializedProperty owner, params string[] names)
+        internal static void Fields(SerializedProperty owner, params string[] names)
         {
             foreach (string name in names)
                 HoverControls.Field(owner, name);

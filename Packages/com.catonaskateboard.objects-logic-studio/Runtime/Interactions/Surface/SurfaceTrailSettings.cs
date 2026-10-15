@@ -25,6 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Number of independent patches per accepted impact.")]
         public int Patches = 3;
         [Tooltip("Random spread of patch centres around the contact in metres.")]
+        [Range(0f, 1f)]
         public float Scatter = 0.035f;
         [Tooltip("Random variation along deposit edges. Zero produces a smooth silhouette.")]
         [Range(0f, 1f)]
@@ -44,15 +45,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Range(0f, 1f)]
         public float Opacity = 0.9f;
         [Header("Surface And Lifetime")]
-        [Tooltip("Lifetime in scaled seconds. Marks survive the source object's despawn.")]
+        [Tooltip("Maximum lifetime in scaled seconds, refreshed by nearby wetting. Marks survive the source's despawn; dense temporary trails may fade earlier to free shared rendering capacity.")]
+        [Range(0.1f, 120f)]
         public float Lifetime = 16f;
         [Tooltip("Final portion of the lifetime spent fading smoothly to transparent.")]
+        [Range(0.1f, 60f)]
         public float FadeDuration = 6f;
         [Tooltip("Maximum projection distance on either side of the contact plane, in metres.")]
+        [Range(0.001f, 1f)]
         public float ProjectionDepth = 0.08f;
         [Tooltip("Small separation from the receiver surface to prevent depth flicker.")]
+        [Range(0f, 0.02f)]
         public float SurfaceOffset = 0.001f;
         [Tooltip("Reject surface samples whose normal differs from the contact by more than this angle.")]
+        [Range(0.1f, 89f)]
         public float MaximumAngle = 70f;
 
         #endregion

@@ -186,6 +186,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 "RequireSightToStart" => "Sight to Start",
                 "ResumeAfterInterruption" => "Resume Interrupted",
                 "HoverOnly" => "Only While Hovered",
+                "AllowGravitySuspension" => "Gravity Suspension",
                 _ => property.displayName
             };
         }

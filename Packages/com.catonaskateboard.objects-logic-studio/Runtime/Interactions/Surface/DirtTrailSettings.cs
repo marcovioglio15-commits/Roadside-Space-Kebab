@@ -18,12 +18,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Alternative identity flags on the receiving object or its parent.")]
         public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Minimum relative collision speed in metres per second for the first deposit.")]
+        [Range(0f, 10f)]
         public float MinimumSpeed = 0.25f;
         [Tooltip("Continue leaving marks while the object slides or rolls along a surface.")]
         public bool Sliding = true;
         [Tooltip("Minimum movement between consecutive sliding deposits in metres.")]
+        [Range(0.001f, 1f)]
         public float Spacing = 0.045f;
         [Tooltip("Minimum seconds between accepted contact deposits.")]
+        [Range(0.01f, 2f)]
         public float Interval = 0.1f;
         [Header("Deposit")]
         [Tooltip("Shape, colour composition, liquidity, spread and gradual fade shared with Spray Sauce.")]

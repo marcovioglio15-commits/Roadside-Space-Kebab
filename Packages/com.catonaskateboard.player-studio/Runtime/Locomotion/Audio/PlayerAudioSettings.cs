@@ -31,8 +31,10 @@ namespace CatOnASkateboard.PlayerStudio
         [Tooltip("Play footsteps while grounded and moving. Active first-person Head Tilt supplies step timing.")]
         public bool Footsteps = true;
         [Tooltip("Seconds between steps when first-person Head Tilt is inactive.")]
+        [Range(0.01f, 2f)]
         public float Interval = 0.45f;
         [Tooltip("Minimum achieved horizontal speed in metres per second for audible steps.")]
+        [Range(0f, 5f)]
         public float MinimumSpeed = 0.15f;
         [Tooltip("Surface used when no layer mapping matches the supporting collider.")]
         public FootstepSurface DefaultSurface;

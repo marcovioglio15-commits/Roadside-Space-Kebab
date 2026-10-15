@@ -53,7 +53,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal static void Register(ObjectSingleInteraction item)
         {
             // Startup recovery and OnEnable may both discover the same component.
-            if (items.Contains(item))
+            if (!item.UsesInput || items.Contains(item))
                 return;
             items.Add(item);
             Revision++;

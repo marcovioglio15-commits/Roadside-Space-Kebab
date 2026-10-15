@@ -20,6 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Require any selected flag or all selected flags on the contacted object or its parents.")]
         public ObjectFlagMatch Match;
         [Tooltip("Maximum surface separation accepted as direct contact, in metres.")]
+        [Range(0f, 0.1f)]
         public float Tolerance = 0.005f;
         [Tooltip("Allow trigger colliders to satisfy the required contact.")]
         public bool IncludeTriggers;

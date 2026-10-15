@@ -31,24 +31,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             int budget = settings.RandomDrawUnits
                 ? Random.Range(Mathf.Max(Mathf.Min(settings.DrawUnitRange.x, ceiling), (int)reserved), ceiling + 1) : ceiling;
-            List<OrderTicket> selected = new List<OrderTicket>(budget);
             foreach (OrderDrawGroup group in groups)
-            {
-                if (group.Required == 0)
-                    continue;
-                if (group.Candidates.Count == 0)
+                if (group.Required > 0 && group.Candidates.Count == 0)
                 {
                     Debug.LogWarning("Available Orders: required order has no eligible candidate: " + group.Name, owner);
                     return Array.Empty<OrderTicket>();
                 }
-                for (int draw = 0; draw < group.Required; draw++)
-                    Add(selected, Pick(group.Candidates, settings.Selection), owner);
-            }
-            // Reachability excludes choices that strand slots despite a complete alternative combination.
-            int target = budget - selected.Count;
-            bool[] reachable = Reachable(groups, target);
+            List<OrderTicket> selected = new List<OrderTicket>(budget);
+            int target = budget;
+            bool[] reachable = Reachable(groups, budget, true);
             while (target > 0 && !reachable[target])
                 target--;
+            foreach (OrderDrawGroup group in groups)
+            {
+                if (group.Required == 0)
+                    continue;
+                for (int draw = 0; draw < group.Required; draw++)
+                {
+                    // Mandatory choices must preserve the best attainable final fill, including other reservations.
+                    group.Pending--;
+                    List<OrderCandidate> mandatory = new List<OrderCandidate>();
+                    bool[] remainder = Reachable(groups, target, true);
+                    foreach (OrderCandidate candidate in group.Candidates)
+                        if (candidate.Quantity <= target && remainder[target - candidate.Quantity])
+                            mandatory.Add(candidate);
+                    OrderCandidate chosen = Pick(mandatory, settings.Selection);
+                    Add(selected, chosen, owner);
+                    target -= chosen.Quantity;
+                }
+            }
+            // Reachability excludes choices that strand slots despite a complete alternative combination.
             while (target > 0)
             {
                 List<OrderCandidate> eligible = new List<OrderCandidate>();
@@ -57,10 +69,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (group.Remaining == 0 || group.Quantity > target || group.Candidates.Count == 0)
                         continue;
                     group.Remaining--;
-                    bool fits = Reachable(groups, target - group.Quantity)[target - group.Quantity];
+                    bool[] remainder = Reachable(groups, target);
+                    foreach (OrderCandidate candidate in group.Candidates)
+                        if (candidate.Quantity <= target && remainder[target - candidate.Quantity])
+                            eligible.Add(candidate);
                     group.Remaining++;
-                    if (fits)
-                        eligible.AddRange(group.Candidates);
                 }
                 OrderCandidate chosen = Pick(eligible, settings.Selection);
                 Add(selected, chosen, owner);
@@ -79,20 +92,37 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Computes achievable unit totals with bounded repetitions and no partial quantities.</summary>
         /// <param name="groups">Shared parent pools and independently limited variants.</param>
         /// <param name="budget">Largest total relevant to this selection pass.</param>
-        /// <returns>Membership by achievable unit total, including zero.</returns>
-        private static bool[] Reachable(List<OrderDrawGroup> groups, int budget)
+        /// <param name="includeRequired">Whether outstanding mandatory draws must also be fulfilled.</param>
+        /// <returns>Achievable unit totals; zero is included only when no mandatory draws remain.</returns>
+        private static bool[] Reachable(List<OrderDrawGroup> groups, int budget, bool includeRequired = false)
         {
             bool[] reachable = new bool[budget + 1];
             reachable[0] = true;
             foreach (OrderDrawGroup group in groups)
             {
-                if (group.Candidates.Count == 0)
+                int minimum = includeRequired ? group.Pending : 0;
+                if (group.Candidates.Count == 0 && minimum == 0)
                     continue;
-                int quantity = group.Quantity;
-                int draws = Mathf.Min(group.Remaining, budget / quantity);
-                for (int draw = 0; draw < draws; draw++)
-                    for (int total = budget; total >= quantity; total--)
-                        reachable[total] |= reachable[total - quantity];
+                bool[] exact = reachable;
+                bool[] combined = new bool[budget + 1];
+                if (minimum == 0)
+                    Array.Copy(reachable, combined, reachable.Length);
+                int draws = (int)Math.Min((long)group.Remaining + minimum, budget / group.Quantity);
+                for (int draw = 1; draw <= draws; draw++)
+                {
+                    bool[] next = new bool[budget + 1];
+                    for (int total = group.Quantity; total <= budget; total++)
+                        foreach (OrderCandidate candidate in group.Candidates)
+                            if (candidate.Quantity <= total && exact[total - candidate.Quantity])
+                            {
+                                next[total] = true;
+                                if (draw >= minimum)
+                                    combined[total] = true;
+                                break;
+                            }
+                    exact = next;
+                }
+                reachable = combined;
             }
             return reachable;
         }
@@ -104,16 +134,34 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private static OrderCandidate Pick(List<OrderCandidate> candidates, OrderSelection selection)
         {
             double total = 0d;
+            Dictionary<OrderEntry, int> comboCounts = new Dictionary<OrderEntry, int>();
             foreach (OrderCandidate candidate in candidates)
-                total += selection == OrderSelection.WeightedRandom ? candidate.Weight : 1d;
+                if (candidate.Combo != null)
+                {
+                    comboCounts.TryGetValue(candidate.Entry, out int count);
+                    comboCounts[candidate.Entry] = count + 1;
+                }
+            foreach (OrderCandidate candidate in candidates)
+                total += SelectionWeight(candidate, selection, comboCounts);
             double choice = Random.value * total;
             foreach (OrderCandidate candidate in candidates)
             {
-                choice -= selection == OrderSelection.WeightedRandom ? candidate.Weight : 1d;
+                choice -= SelectionWeight(candidate, selection, comboCounts);
                 if (choice < 0d)
                     return candidate;
             }
             return candidates[candidates.Count - 1];
+        }
+
+        /// <summary>Splits one order's combo pool weight across its currently feasible combinations.</summary>
+        /// <param name="candidate">Feasible draw candidate.</param>
+        /// <param name="selection">Uniform or weighted policy for ordinary candidates.</param>
+        /// <param name="counts">Number of eligible combinations per parent order.</param>
+        /// <returns>Relative mass in this selection pass.</returns>
+        private static double SelectionWeight(OrderCandidate candidate, OrderSelection selection, Dictionary<OrderEntry, int> counts)
+        {
+            return candidate.Combo != null ? (double)candidate.Weight / counts[candidate.Entry]
+                : selection == OrderSelection.WeightedRandom ? candidate.Weight : 1d;
         }
 
         /// <summary>Expands one draw into separate board slots without merging equal orders.</summary>

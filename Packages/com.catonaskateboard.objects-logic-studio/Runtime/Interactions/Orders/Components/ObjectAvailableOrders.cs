@@ -210,12 +210,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             bool complete = true;
             int remaining = contact.ConsumedUnits;
             // Specific recipe tickets take precedence over a base order accepting the same root identity.
-            for (int pass = 0; pass < 2 && remaining > 0; pass++)
+            int specificity = 0;
+            foreach (OrderTicket ticket in tickets)
+                specificity = Mathf.Max(specificity, ticket.Candidate.Specificity);
+            for (int pass = specificity; pass >= 0 && remaining > 0; pass--)
                 foreach (OrderTicket ticket in tickets)
                 {
                     if (remaining <= 0)
                         break;
-                    if (ticket.Completed || (ticket.Candidate.Variant != null) != (pass == 0) || !contact.ConsumedMatches(ticket.Candidate))
+                    if (ticket.Completed || ticket.Candidate.Specificity != pass || !contact.ConsumedMatches(ticket.Candidate))
                         continue;
                     ticket.Completed = true;
                     ticket.Board?.Draw(ticket);

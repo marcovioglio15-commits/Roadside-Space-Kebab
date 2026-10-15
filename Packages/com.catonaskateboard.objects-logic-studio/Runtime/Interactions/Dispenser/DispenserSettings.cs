@@ -26,6 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int Stock = 1;
         [Header("Output")]
         [Tooltip("Seconds to move from this dispenser's pivot to the object's Grab carry pose. Overrides Instant and Transition Duration for this withdrawal only.")]
+        [Range(0.01f, 3f)]
         public float PickupDuration = 0.35f;
         [Tooltip("Local Euler rotation applied before the item enters the carry pose.")]
         public Vector3 OutputRotation;

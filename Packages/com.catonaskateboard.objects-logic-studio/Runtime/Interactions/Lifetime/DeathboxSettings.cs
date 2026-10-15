@@ -17,6 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Allow objects marked Static to be removed. Disable when the volume can touch permanent level geometry.")]
         public bool AffectStatic;
         [Tooltip("Seconds between overlap checks, including kinematic objects and controllers without collision callbacks.")]
+        [Range(0.02f, 1f)]
         public float QueryInterval = 0.05f;
 
         #endregion

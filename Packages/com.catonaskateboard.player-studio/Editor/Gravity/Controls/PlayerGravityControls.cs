@@ -33,9 +33,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (!enabled)
                 return;
 
-            acceleration = StudioGUI.FloatField(accelerationLabel, acceleration);
-            terminalSpeed = StudioGUI.FloatField(terminalLabel, terminalSpeed);
-            groundSpeed = StudioGUI.FloatField(groundLabel, groundSpeed);
+            acceleration = StudioGUI.FloatField<PlayerLocomotionPreset>(accelerationLabel, acceleration, "gravityAcceleration");
+            terminalSpeed = StudioGUI.FloatField<PlayerLocomotionPreset>(terminalLabel, terminalSpeed, "terminalSpeed");
+            groundSpeed = StudioGUI.FloatField<PlayerLocomotionPreset>(groundLabel, groundSpeed, "groundSpeed");
         }
 
         #endregion

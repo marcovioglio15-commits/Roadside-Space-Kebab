@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Name identifying this degradation stage.")]
         public string Name = "Stage";
         [Tooltip("Scaled seconds before entering this step, measured from the preceding step.")]
+        [Range(0.1f, 300f)]
         public float Duration = 10f;
         [Tooltip("Qualifying impacts required after the preceding step.")]
         public int Impacts = 1;
@@ -63,8 +64,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Begin at spawn, after the first successful Grab, or progress only while carried. Carry modes require Grab on this object.")]
         public DegradationCarryPolicy Carry;
         [Tooltip("Minimum impulse in newton-seconds counted as an impact. Kinematic carry estimates it from mass and the normal speed stopped by an obstacle.")]
+        [Range(0.01f, 100f)]
         public float MinimumImpulse = 1f;
         [Tooltip("Minimum scaled seconds between counted impacts; simultaneous compound contacts count only once.")]
+        [Range(0f, 5f)]
         public float ImpactInterval = 0.1f;
         [Tooltip("Stages entered in array order, each with its own time or impact requirement.")]
         public DegradationStep[] Steps = Array.Empty<DegradationStep>();

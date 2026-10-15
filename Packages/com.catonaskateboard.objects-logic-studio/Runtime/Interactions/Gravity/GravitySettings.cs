@@ -23,12 +23,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Randomize the delay between restoration and the next pulse.")]
         public bool RandomInterval;
         [Tooltip("Scaled seconds between restoration and the next pulse.")]
+        [Range(0.1f, 120f)]
         public float Interval = 10f;
         [Tooltip("Inclusive minimum and maximum interval in scaled seconds.")]
         public Vector2 IntervalRange = new Vector2(5f, 15f);
         [Tooltip("Restore after a timer, a player request, or whichever occurs first.")]
         public GravityRestoreMode Restore;
         [Tooltip("Scaled seconds without gravity when a restoration timer is enabled.")]
+        [Range(0.1f, 60f)]
         public float Duration = 5f;
         [Tooltip("Reach, aim and obstruction checks for the restoration Button.")]
         public TransferTargetSettings Target = new TransferTargetSettings();
@@ -48,12 +50,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Randomize each body's force magnitude.")]
         public bool RandomIntensity;
         [Tooltip("Impulse in newton-seconds for zero force duration; otherwise acceleration in metres per second squared.")]
+        [Range(0f, 20f)]
         public float Intensity = 1f;
         [Tooltip("Minimum and maximum impulse or acceleration magnitude.")]
         public Vector2 IntensityRange = new Vector2(0.5f, 2f);
         [Tooltip("Randomize how long acceleration is applied to each body.")]
         public bool RandomForceDuration;
         [Tooltip("Scaled seconds of acceleration. Zero applies one instantaneous impulse instead.")]
+        [Range(0f, 10f)]
         public float ForceDuration;
         [Tooltip("Minimum and maximum acceleration duration in scaled seconds.")]
         public Vector2 ForceDurationRange = new Vector2(0.1f, 1f);
@@ -62,7 +66,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool AffectPlayer;
         [Tooltip("Require the player to pass the same layer, identity and interaction filters as physical objects.")]
         public bool FilterPlayer;
-        [Tooltip("Virtual body and controls while floating. With overlapping generators, the most recently acquired source controls damping and steering; forces remain additive.")]
+        [Tooltip("Player collision assistance and optional floating simulation. Collision assistance works without Affect Player; overlapping suspension forces remain additive.")]
         public PlayerFloatSettings Player = new PlayerFloatSettings();
 
         #endregion
@@ -83,7 +87,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!AffectObjects && !AffectPlayer)
                 return false;
             warning = "Configure player suspension.";
-            if (AffectPlayer && (Player == null || !Player.TryValidate(out warning)))
+            if (Player == null || !Player.ValidatePush(out warning) || AffectPlayer && !Player.TryValidate(out warning))
                 return false;
             warning = "Choose a positive interval, supported restoration mode and positive enabled timer duration.";
             if ((RandomInterval ? !Range(IntervalRange, true) : !InteractionValues.Positive(Interval))

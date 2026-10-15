@@ -27,8 +27,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Keep entered values intact, including invalid dimensions that need correction.
             EditorGUI.BeginChangeCheck();
-            float radius = StudioGUI.FloatField(radiusLabel, session.Radius);
-            float height = StudioGUI.FloatField(heightLabel, session.Height);
+            float radius = StudioGUI.FloatField<PlayerBodyPreset>(radiusLabel, session.Radius, "radius");
+            float height = StudioGUI.FloatField<PlayerBodyPreset>(heightLabel, session.Height, "height");
             if (!EditorGUI.EndChangeCheck())
                 return false;
 

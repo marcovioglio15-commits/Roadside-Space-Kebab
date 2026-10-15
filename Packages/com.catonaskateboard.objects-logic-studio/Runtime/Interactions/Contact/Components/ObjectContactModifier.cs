@@ -21,6 +21,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectFlag[] consumedFlags = Array.Empty<ObjectFlag>();
         private ObjectFlag[] consumedIngredients = Array.Empty<ObjectFlag>();
         private bool ready;
+        private ObjectDialogue consumeDialogue;
+        private bool consumeEnabled;
+        private int gateGeneration = -1;
+        private int gateSpawn;
 
         #endregion
         #region Properties
@@ -47,6 +51,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool IsPaused => Array.Exists(runs, run => run != null && run.IsPaused);
         /// <summary>Identifies this object's sole contact interaction.</summary>
         public override ExtendedInteractionKind Kind => ExtendedInteractionKind.ModifyByContact;
+        /// <summary>Changes only on a qualifying gated contact, gate release or real consumption.</summary>
+        internal int ContactRevision { get; private set; }
+        /// <summary>Whether the latest contact event was rejected solely by the consumption dialogue gate.</summary>
+        internal bool AwaitingContact { get; private set; }
 
         #endregion
         #region Methods
@@ -79,6 +87,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning(warning, this);
                 return;
             }
+            Item.PrepareSpawn(ObjectSpawnHistory.Source, ObjectSpawnHistory.Occurrence);
+            if (gateGeneration != ObjectSpawnHistory.Generation || gateSpawn != Item.Spawn.Index)
+            {
+                consumeEnabled = false;
+                ContactRevision = 0;
+                AwaitingContact = false;
+                gateGeneration = ObjectSpawnHistory.Generation;
+                gateSpawn = Item.Spawn.Index;
+            }
+            consumeDialogue = settings.ConsumesAny && settings.ConsumeOn.Enabled ? settings.ConsumeOn.Resolve(gameObject) : null;
+            ObjectInteraction.Signaled += ObserveDialogue;
             // Runtime state needs distinct Unity identities for existing reservation and temporary-flag ownership.
             if (runs.Length != settings.Modifications.Length)
             {
@@ -111,6 +130,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         protected override void OnDisable()
         {
             base.OnDisable();
+            ObjectInteraction.Signaled -= ObserveDialogue;
+            if (AwaitingContact)
+            {
+                AwaitingContact = false;
+                ContactRevision++;
+            }
             foreach (ContactModificationRun run in runs)
                 if (run != null)
                     run.Disable();
@@ -179,6 +204,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ObjectItem item = GetComponent<ObjectItem>();
             if (item == null || configuration == null || !configuration.TryValidate(out warning))
                 return false;
+            if (configuration.ConsumesAny && configuration.ConsumeOn.Enabled && configuration.ConsumeOn.Resolve(gameObject) == null)
+            {
+                warning = "Consume On must select an existing Dialogue on this same object.";
+                return false;
+            }
             // Collider discovery is limited to activation and explicit authoring checks.
             Collider[] colliders = GetComponentsInChildren<Collider>(true);
             foreach (ContactModificationDefinition definition in configuration.Modifications)
@@ -205,6 +235,33 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
         #region Events
+
+        /// <summary>Reports whether a consuming rule is still waiting for its selected local dialogue.</summary>
+        /// <param name="rule">Rule being considered for contact activation.</param>
+        /// <returns>True only for gated consumption before successful dialogue completion.</returns>
+        internal bool AwaitsDialogue(ContactModificationRule rule)
+        {
+            return !consumeEnabled && consumeDialogue != null && (rule.Self.Consume || rule.Other.Consume);
+        }
+
+        /// <summary>Publishes a contact attempt without creating a receipt or completing an order.</summary>
+        internal void ReportAwaitingContact()
+        {
+            AwaitingContact = true;
+            ContactRevision++;
+        }
+
+        /// <summary>Opens consumption only for completion of the exact selected dialogue.</summary>
+        /// <param name="source">Interaction publishing its lifecycle event.</param>
+        /// <param name="moment">Successful start or completion.</param>
+        private void ObserveDialogue(ObjectInteraction source, InteractionMoment moment)
+        {
+            if (source != consumeDialogue || moment != InteractionMoment.Completed || consumeEnabled)
+                return;
+            consumeEnabled = true;
+            AwaitingContact = false;
+            ContactRevision++;
+        }
 
         /// <summary>Offers confirmation only while an acquired modification is waiting.</summary>
         /// <returns>True when the local tool and lock policies allow confirmation.</returns>
@@ -237,6 +294,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             consumedFlags = receipt;
             consumedIngredients = ingredients;
             ConsumedUnits = units;
+            if (units > 0)
+            {
+                AwaitingContact = false;
+                ContactRevision++;
+            }
             try
             {
                 Signal(moment);
@@ -279,7 +341,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool ConsumedMatches(OrderCandidate candidate)
         {
             return ConsumedUnits > 0 && ConsumedMatches(candidate.Entry.Flags, candidate.Entry.RequireAllFlags)
-                && (candidate.Variant == null || candidate.Variant.Matches(consumedIngredients));
+                && candidate.MatchesRecipe(consumedIngredients);
         }
 
 

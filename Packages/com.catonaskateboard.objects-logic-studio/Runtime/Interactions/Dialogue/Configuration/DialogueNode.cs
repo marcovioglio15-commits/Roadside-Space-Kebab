@@ -17,6 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Stable destination node key; the editor displays its name.")]
         public string Target = string.Empty;
         [Tooltip("Relative selection weight. Zero excludes this branch in weighted mode.")]
+        [Range(0.01f, 10f)]
         public float Weight = 1f;
         [Tooltip("Conditions combined with the destination entry's consumption filter.")]
         public DialogueCondition Condition = new DialogueCondition();
@@ -53,6 +54,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public DialogueCondition Condition = new DialogueCondition();
         [Header("Wait")]
         [Tooltip("Positive scaled seconds before moving to the next node. Interruption pauses this timer.")]
+        [Range(0f, 60f)]
         public float Duration = 1f;
         [Header("Subtree")]
         [Tooltip("Shared tree called by this node. Its End returns to this node's Next connection.")]

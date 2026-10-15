@@ -20,6 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Area centre relative to the generator pivot.")]
         public Vector3 Offset;
         [Tooltip("Sphere radius in world metres, independent of generator scale.")]
+        [Range(0.1f, 50f)]
         public float Radius = 5f;
         [Tooltip("Box dimensions in world metres, independent of generator scale.")]
         public Vector3 Size = Vector3.one * 10f;
@@ -28,6 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Admit compatible colliders entering the area during an active pulse.")]
         public bool TrackEntries = true;
         [Tooltip("Scaled seconds between nonallocating area overlap queries during a pulse.")]
+        [Range(0.02f, 1f)]
         public float QueryInterval = 0.2f;
         [Tooltip("Restore this generator's contribution when a participant leaves the area. Other generators keep their own suspension.")]
         public bool RestoreOutside = true;

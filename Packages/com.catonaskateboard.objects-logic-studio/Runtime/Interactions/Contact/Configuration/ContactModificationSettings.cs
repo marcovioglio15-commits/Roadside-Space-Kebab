@@ -14,6 +14,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ContactModificationDefinition[] Modifications = Array.Empty<ContactModificationDefinition>();
         [Tooltip("Reach and aim used when a modification waits for confirmation after snapping.")]
         public TransferTargetSettings Target = new TransferTargetSettings();
+        [Header("Consumption")]
+        [Tooltip("Optional local dialogue completion required before consuming modifications may start. Non-consuming modifications remain available.")]
+        public ContactDialogueGate ConsumeOn = new ContactDialogueGate();
 
         #endregion
 
@@ -65,6 +68,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
                 }
             warning = string.Empty;
+            if (ConsumesAny && (ConsumeOn == null || ConsumeOn.Enabled && (string.IsNullOrWhiteSpace(ConsumeOn.DialogueName) || ConsumeOn.Occurrence < 0)))
+            {
+                warning = "Select the local Dialogue that enables consumption.";
+                return false;
+            }
             return !RequiresInput || Target != null && Target.TryValidate(out warning);
         }
 

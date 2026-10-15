@@ -99,10 +99,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Accept contact with an item bearing any of these identity flags.")]
         public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Uninterrupted contact time in seconds before effects begin.")]
+        [Range(0f, 10f)]
         public float ContactDuration = 1f;
         [Tooltip("Maximum separation counted as contact, in metres. Include the carry collision padding when held objects should activate this interaction.")]
+        [Range(0.001f, 0.1f)]
         public float ContactTolerance = 0.02f;
         [Tooltip("Seconds between contact queries. Effect animation still updates every frame.")]
+        [Range(0.01f, 0.5f)]
         public float QueryInterval = 0.02f;
         [Tooltip("Allow trigger volumes to count as contact.")]
         public bool IncludeTriggers;
@@ -112,6 +115,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool AllowCarriedOther = true;
         [Header("Modification")]
         [Tooltip("Seconds for the color transition. Zero commits all effects immediately after the contact delay.")]
+        [Range(0f, 60f)]
         public float Duration = 1f;
         [Tooltip("Finish a started modification after separation. Carried-item eligibility still applies.")]
         public bool CompleteAfterSeparation;
@@ -122,6 +126,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Restore active or completed effects after contact ends and Revert Delay expires. This mode replaces interruption/repeat settings and does not support consumption.")]
         public bool WhileContact;
         [Tooltip("Scaled seconds after separation before restoring both participants. Contact returning during this delay cancels the pending restoration.")]
+        [Range(0f, 10f)]
         public float RevertDelay = 0.25f;
         [Tooltip("Effects applied to the item owning this interaction.")]
         public ContactEffects Self = new ContactEffects();

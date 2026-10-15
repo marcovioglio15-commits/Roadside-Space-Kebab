@@ -39,8 +39,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Optional Consumption filter applied to the whole interaction before entry selection.")]
         public DialogueConsumptionFilter Consumption = new DialogueConsumptionFilter();
         [Tooltip("Maximum player-root distance in metres for starting or resuming a dialogue.")]
+        [Range(0.1f, 20f)]
         public float Distance = 3f;
         [Tooltip("Distance in metres that interrupts an active dialogue. Must be at least the activation distance.")]
+        [Range(0.1f, 25f)]
         public float ExitDistance = 4f;
         [Tooltip("Higher values start first when several eligible dialogue interactions compete for the HUD.")]
         public int Priority;

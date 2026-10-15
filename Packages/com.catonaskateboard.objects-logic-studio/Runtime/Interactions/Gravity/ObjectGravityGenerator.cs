@@ -28,6 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             internal readonly float Duration;
             internal readonly ObjectItem Item;
             internal readonly ObjectAssemblyProduct Product;
+            internal readonly ObjectGrab Grab;
             internal bool Started;
             internal float ForceUntil;
 
@@ -46,6 +47,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Duration = duration;
                 Item = item;
                 Product = body.GetComponent<ObjectAssemblyProduct>();
+                Grab = body.GetComponent<ObjectGrab>();
             }
 
             #endregion
@@ -192,6 +194,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (active.Count == 0)
                 ObjectIdentity.Changed += IdentityChanged;
             active.Add(this);
+            PlayerSuspendedBodyPush.Register(this, settings.Player);
             if (settings.AffectObjects)
                 foreach (Rigidbody body in FindObjectsByType<Rigidbody>())
                     Include(body);
@@ -275,8 +278,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="entry">Participant whose force choices must not be resampled.</param>
         private void Activate(AffectedBody entry)
         {
-            // Reservations and carry retain priority over suspension forces until their own release boundary.
-            if (entry.Item != null && (entry.Item.IsReserved || entry.Item.IsCarried))
+            // Station placement owns its pose until pickup or assembly releases the dock.
+            if (entry.Item != null && (entry.Item.IsReserved || entry.Item.IsCarried)
+                || entry.Grab != null && entry.Grab.Dock != null)
                 return;
             if (entry.Body.isKinematic && entry.Product != null)
                 entry.Product.ReleaseForSuspension();
@@ -293,7 +297,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when any active generator currently suspends this body.</returns>
         public bool IsBodySuspended(Rigidbody body)
         {
-            return GravitySuspension.Contains(body);
+            return GravitySuspension.Contains(body, this);
         }
 
         /// <summary>Releases this generator's ownership and schedules its next pulse.</summary>
@@ -302,6 +306,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (!IsSuspending)
                 return;
+            PlayerSuspendedBodyPush.Release(this);
             foreach (AffectedBody entry in affected)
                 GravitySuspension.Release(entry.Body, this);
             affected.Clear();

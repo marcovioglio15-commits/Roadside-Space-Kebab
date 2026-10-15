@@ -61,6 +61,7 @@ namespace CatOnASkateboard.PlayerStudio
         [Tooltip("Rotation between direct slots and independent parked poses. Clockwise follows negative angles around each changed local axis.")]
         public TransformRotationDirection SlotRotation = TransformRotationDirection.Shortest;
         [Tooltip("Seconds used to interpolate slot changes. Zero applies slots immediately.")]
+        [Range(0.01f, 5f)]
         public float SwitchDuration = 0.3f;
 
         #endregion
