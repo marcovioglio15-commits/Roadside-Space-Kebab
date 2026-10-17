@@ -21,6 +21,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool missingInputReported;
         private bool performed;
         private ObjectSpraySauce spraying;
+        private readonly AssemblyChargeRun assembly = new AssemblyChargeRun();
+        private readonly AssemblyIngredientRetrieval retrieval = new AssemblyIngredientRetrieval();
 
         #endregion
 
@@ -28,6 +30,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>The occupied carry slot, cleared immediately when its object stops being held.</summary>
         internal ObjectGrab Held => held != null && held.IsHeld ? held : null;
+        /// <summary>Assembly-owned physical input suppressed during dialogue arbitration.</summary>
+        internal InteractionButton AssemblyButton => assembly.BlockedButton;
 
         #endregion
 
@@ -38,6 +42,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases all subscriptions and temporary carry ownership when observation stops.</summary>
         internal void Reset()
         {
+            assembly.Reset();
+            retrieval.Clear();
             if (spraying != null)
                 spraying.StopEmission();
             spraying = null;
@@ -102,8 +108,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (feature.UsesInput)
                     BindFeature(feature, feature.Action);
             foreach (AssemblyPickup pickup in AssemblyPickup.Registered)
-                if (pickup.Owner.Settings.FinalizeOnGrab)
+                if (pickup.Owner.Settings.ProlongedAssembly || pickup.Owner.Settings.FinalizeOnGrab)
                     BindFeature(pickup.Owner, pickup.Action);
+            retrieval.Bind(input, bindings);
         }
 
         /// <summary>Registers a valid single action or Slice sequence in the shared input router.</summary>
@@ -151,6 +158,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 input.Consume(action);
             if (held != null && !held.IsHeld)
                 held = null;
+            // Held finalization owns its completion frame before dialogue or another pickup can dispatch.
+            performed = assembly.Tick(observer, targeting, input, out ObjectGrab assembled);
+            if (assembled != null)
+                held = assembled;
+            input.Consume(assembly.BlockedButton);
             if (!input.Usable || Time.timeScale <= 0f)
                 input.ClearSignals();
         }
@@ -194,8 +206,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!performed && input.Usable && Time.timeScale > 0f)
             {
                 bool pending = false;
-                foreach (InteractionButton button in bindings.Values)
-                    pending |= button.Pending;
+                foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
+                    pending |= pair.Value.Pending || pair.Key is ObjectAssemblyProduct { Settings: { ProlongedAssembly: true } } && pair.Value.Pressed;
                 if (pending)
                 {
                     Physics.SyncTransforms();
@@ -224,7 +236,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when this participant has an eligible performed press.</returns>
         private static bool Pending(KeyValuePair<ObjectInteraction, InteractionButton> pair, InteractionButton requested, DialogueActionPriority allowed)
         {
-            return pair.Key != null && pair.Value.Pending && (requested == null || pair.Value.SharesPress(requested))
+            return pair.Key != null && (pair.Value.Pending
+                    || pair.Key is ObjectAssemblyProduct { Settings: { ProlongedAssembly: true } } && pair.Value.Pressed)
+                && (requested == null || pair.Value.SharesPress(requested))
                 && DialogueActionRules.Allows(pair.Key, allowed);
         }
 
@@ -385,7 +399,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 float score = float.PositiveInfinity;
                 bool eligible = pair.Key switch
                 {
-                    ObjectGrab grab => grab.Available(InteractionChannels.Grab) && !grab.IsHeld && Eligible(observer, grab, out score),
+                    ObjectGrab grab => retrieval.Contains(grab) ? retrieval.Eligible(grab, observer, targeting, out score)
+                        : grab.Available(InteractionChannels.Grab) && !grab.IsHeld && Eligible(observer, grab, out score),
                     ObjectDispenser dispenser => dispenser.CanTake() && Eligible(observer, dispenser, out score),
                     ObjectAssemblyProduct product => product.Pickup.Eligible(observer, targeting, out score),
                     _ => false
@@ -398,10 +413,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             switch (selected)
             {
+                case ObjectAssemblyProduct product when product.Settings.ProlongedAssembly:
+                    return assembly.Begin(product.Pickup, bindings[product], observer);
                 case ObjectAssemblyProduct product when product.Pickup.Execute(observer, out ObjectGrab carried):
                     held = carried;
                     return true;
-                case ObjectGrab grab when grab.Begin(observer):
+                case ObjectGrab grab when retrieval.Release(grab) && grab.Begin(observer):
                     held = grab;
                     return true;
                 case ObjectDispenser dispenser when dispenser.TryTake(observer, out ObjectGrab supplied):

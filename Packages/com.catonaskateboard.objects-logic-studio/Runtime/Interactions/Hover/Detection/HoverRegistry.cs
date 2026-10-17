@@ -10,6 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private static readonly List<ObjectHover> interactions = new List<ObjectHover>();
         private static readonly List<ObjectHover> frame = new List<ObjectHover>();
+        private static HoverLabel presentation;
 
         #endregion
 
@@ -24,6 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // With scene reload disabled, OnEnable is not a reliable reset boundary.
             interactions.Clear();
             frame.Clear();
+            presentation = null;
             foreach (HoverObserver observer in Object.FindObjectsByType<HoverObserver>())
                 observer.RefreshContext();
             foreach (ObjectHover interaction in Object.FindObjectsByType<ObjectHover>())
@@ -90,12 +92,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ObjectHover retainedHud = null;
             float score = float.PositiveInfinity;
             foreach (ObjectHover interaction in frame)
-                if (interaction.Evaluate(observer, time) && interaction.Settings.TargetMode != HoverDetectionMode.Cursor)
+                if (interaction.Evaluate(observer, time))
                 {
                     // Keep a fixed HUD through its authored release grace instead of flashing a background target on brief misses.
                     if (interaction.IsHovered && interaction.Settings.FixedHud && !interaction.Detected)
                         retainedHud = interaction;
-                    float candidate = interaction.Settings.TargetMode == HoverDetectionMode.CenterCollider ? 0f
+                    float candidate = interaction.Settings.TargetMode != HoverDetectionMode.ViewCenter ? 0f
                         : ((Vector2)observer.View.WorldToScreenPoint(interaction.WorldAnchor) - observer.View.pixelRect.center).sqrMagnitude;
                     if (Closer(interaction, selected, candidate, score))
                     {
@@ -106,20 +108,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (retainedHud != null)
                 selected = retainedHud;
 
-            // Release the previous winner before the new one emits events; Pop In may finish independently.
+            // Events remain object-local; one shared graphic presents the final surviving winner.
             foreach (ObjectHover interaction in frame)
-                if (interaction != null && interaction.Settings != null && interaction.Settings.TargetMode != HoverDetectionMode.Cursor
-                    && interaction != selected)
-                {
-                    interaction.Present(observer, time, false);
-                    // Two fixed labels must never overlap while one exits and its replacement enters.
-                    if (interaction != null && interaction.Settings.FixedHud && selected != null && selected.Settings.FixedHud && interaction.Label != null)
-                        interaction.Label.Hide();
-                }
-            foreach (ObjectHover interaction in frame)
-                if (interaction != null && interaction.Settings != null
-                    && (interaction == selected || interaction.Settings.TargetMode == HoverDetectionMode.Cursor))
-                    interaction.Present(observer, time, true);
+                if (interaction != null && interaction != selected)
+                    interaction.Present(false);
+            if (selected != null)
+                selected.Present(true);
+            // Scene restoration can retain Unity identity while replacing the managed component wrapper.
+            if (!ReferenceEquals(presentation, observer.HoverHud))
+            {
+                if (presentation != null)
+                    presentation.Hide();
+                presentation = observer.HoverHud;
+            }
+            if (presentation != null)
+                presentation.Present(observer, selected, time);
         }
 
         /// <summary>Chooses the closest screen anchor without allowing grace or equal-score ties to cause flicker.</summary>
@@ -137,7 +140,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return candidate.Detected;
             if (score != best)
                 return score < best;
-            if (candidate.Settings.TargetMode == HoverDetectionMode.CenterCollider && selected.Settings.TargetMode == HoverDetectionMode.CenterCollider
+            if (candidate.Settings.TargetMode != HoverDetectionMode.ViewCenter && selected.Settings.TargetMode != HoverDetectionMode.ViewCenter
                 && candidate.HitDistance != selected.HitDistance)
                 return candidate.HitDistance < selected.HitDistance;
             if (candidate.IsHovered != selected.IsHovered)
@@ -145,10 +148,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return EntityId.ToULong(candidate.GetEntityId()) < EntityId.ToULong(selected.GetEntityId());
         }
 
+        /// <summary>Clears only the departing object's shared label at an activation boundary.</summary>
+        /// <param name="interaction">Interaction being hidden or removed.</param>
+        internal static void Release(ObjectHover interaction)
+        {
+            if (presentation != null)
+                presentation.Release(interaction);
+        }
+
         /// <summary>Clears visible labels when observation stops or its context is missing.</summary>
         internal static void HideAll()
         {
             // This runs on context transitions, not as a redundant hidden-frame loop.
+            if (presentation != null)
+                presentation.Hide();
             foreach (ObjectHover interaction in interactions)
                 if (interaction != null)
                     interaction.Hide();

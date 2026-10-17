@@ -30,11 +30,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if ((dialogue.Settings.RequireSightToStart || dialogue.Settings.RequireSightToContinue || dialogue.Settings.HideWhenSightLost)
                 && dialogue.Settings.TryValidate(out _))
             {
-                // Mark the exact anchor used by the visibility check without drawing across the entire scene.
-                Vector3 point = dialogue.transform.TransformPoint(dialogue.Settings.SightOffset);
+                // Bounds identify the collider branches that can receive the centered player cursor.
                 Handles.color = new Color(0.4f, 1f, 0.6f, 0.8f);
-                Handles.DrawDottedLine(dialogue.transform.position, point, 4f);
-                Handles.SphereHandleCap(0, point, Quaternion.identity, HandleUtility.GetHandleSize(point) * 0.06f, EventType.Repaint);
+                foreach (Collider collider in dialogue.GetComponentsInChildren<Collider>())
+                    if (collider.enabled)
+                        Handles.DrawWireCube(collider.bounds.center, collider.bounds.size);
             }
             Handles.color = previous;
         }

@@ -1,51 +1,102 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CatOnASkateboard.PlayerStudio
 {
-    /// <summary>Draws a centered graphic for a locked pointer without creating UI objects or textures.</summary>
-    internal static class PlayerCenteredCursor
+    /// <summary>Draws the locked-pointer marker as an existing graphic on the scene Canvas.</summary>
+    [RequireComponent(typeof(CanvasRenderer))]
+    [AddComponentMenu("Player Studio/Centered Cursor")]
+    public sealed class PlayerCenteredCursor : MaskableGraphic
     {
+        #region State
+
+        private PlayerCameraRig rig;
+        private Texture2D texture;
+        private float sizeScale;
+        private bool visible;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Texture used by the shared UI material, with white geometry for the default crosshair.</summary>
+        public override Texture mainTexture => texture != null ? texture : Texture2D.whiteTexture;
+
+        #endregion
+
         #region Methods
 
-        #region Rendering
+        #region Binding
 
-        /// <summary>Repaints only the active camera's onscreen viewport; capture state is owned by its rig.</summary>
-        /// <param name="view">Existing camera that owns the pointer.</param>
-        /// <param name="texture">Optional authored graphic; null uses a built-in contrasting crosshair.</param>
-        /// <param name="scale">Validated uniform multiplier for the cursor's original pixel dimensions.</param>
-        internal static void Draw(Camera view, Texture2D texture, float scale)
+        /// <summary>Connects an existing player rig without creating UI or changing its cursor-capture policy.</summary>
+        /// <param name="owner">Rig supplying capture state, or null when the observer leaves.</param>
+        public void Bind(PlayerCameraRig owner)
         {
-            // IMGUI renders directly; no Canvas, GameObject, material or texture is instantiated.
-            if (Event.current.type != EventType.Repaint || view.targetTexture != null || view.targetDisplay != 0)
-                return;
-            Vector2 center = view.pixelRect.center;
-            center.y = Screen.height - center.y;
-            Color previous = GUI.color;
-            GUI.color = Color.white;
-            if (texture != null)
-                DrawRect(center, new Vector2(texture.width, texture.height), scale, texture);
-            else
-            {
-                // A dark border keeps the marker readable over both sky and shaded geometry.
-                GUI.color = Color.black;
-                DrawRect(center, new Vector2(14f, 4f), scale, Texture2D.whiteTexture);
-                DrawRect(center, new Vector2(4f, 14f), scale, Texture2D.whiteTexture);
-                GUI.color = Color.white;
-                DrawRect(center, new Vector2(12f, 2f), scale, Texture2D.whiteTexture);
-                DrawRect(center, new Vector2(2f, 12f), scale, Texture2D.whiteTexture);
-            }
-            GUI.color = previous;
+            rig = owner;
+            visible = false;
+            SetVerticesDirty();
         }
 
-        /// <summary>Draws a centered texture rectangle using the same scale for its size and offsets.</summary>
-        /// <param name="center">Camera viewport center in GUI pixels.</param>
-        /// <param name="size">Original rectangle dimensions.</param>
-        /// <param name="scale">Validated positive size multiplier.</param>
-        /// <param name="texture">Existing texture to draw.</param>
-        private static void DrawRect(Vector2 center, Vector2 size, float scale, Texture2D texture)
+        /// <summary>Updates visibility and texture only when they change, after the camera finishes moving.</summary>
+        private void LateUpdate()
         {
-            // Scaling the border and inner bars together preserves the procedural crosshair shape.
-            GUI.DrawTexture(new Rect(center - size * (scale * 0.5f), size * scale), texture);
+            bool next = rig != null && rig.CenteredCursorVisible;
+            if (visible != next)
+            {
+                visible = next;
+                SetVerticesDirty();
+            }
+            if (!visible)
+                return;
+            if (texture != rig.CenteredCursorTexture || sizeScale != rig.CenteredCursorScale)
+            {
+                texture = rig.CenteredCursorTexture;
+                sizeScale = rig.CenteredCursorScale;
+                SetMaterialDirty();
+                SetVerticesDirty();
+            }
+            // Preserve original-pixel sizing even when the scene Canvas uses reference-resolution scaling.
+            rectTransform.anchorMin = rectTransform.anchorMax = rig.View.rect.center;
+            rectTransform.anchoredPosition = Vector2.zero;
+            rectTransform.localScale = Vector3.one / canvas.scaleFactor;
+        }
+
+        #endregion
+
+        #region Geometry
+
+        /// <summary>Draws the selected texture or a contrasting crosshair through the existing CanvasRenderer.</summary>
+        /// <param name="vertices">Reused UI mesh builder.</param>
+        protected override void OnPopulateMesh(VertexHelper vertices)
+        {
+            vertices.Clear();
+            if (!visible)
+                return;
+            if (texture != null)
+                DrawRect(vertices, new Vector2(texture.width, texture.height), Color.white);
+            else
+            {
+                DrawRect(vertices, new Vector2(14f, 4f), Color.black);
+                DrawRect(vertices, new Vector2(4f, 14f), Color.black);
+                DrawRect(vertices, new Vector2(12f, 2f), Color.white);
+                DrawRect(vertices, new Vector2(2f, 12f), Color.white);
+            }
+        }
+
+        /// <summary>Appends one centered, textured quad using the rig's original-pixel scale.</summary>
+        /// <param name="vertices">Destination mesh builder.</param>
+        /// <param name="size">Unscaled dimensions in pixels.</param>
+        /// <param name="tint">Crosshair border, center or texture color.</param>
+        private void DrawRect(VertexHelper vertices, Vector2 size, Color tint)
+        {
+            Vector2 half = size * (sizeScale * 0.5f);
+            int start = vertices.currentVertCount;
+            vertices.AddVert(new Vector2(-half.x, -half.y), tint, Vector2.zero);
+            vertices.AddVert(new Vector2(-half.x, half.y), tint, Vector2.up);
+            vertices.AddVert(half, tint, Vector2.one);
+            vertices.AddVert(new Vector2(half.x, -half.y), tint, Vector2.right);
+            vertices.AddTriangle(start, start + 1, start + 2);
+            vertices.AddTriangle(start, start + 2, start + 3);
         }
 
         #endregion

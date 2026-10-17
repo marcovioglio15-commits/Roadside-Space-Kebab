@@ -280,7 +280,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(settings, "PreferredActions");
                 }
             if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival
-                && sections.Draw("Dialogue Visibility", "Configure startup, page advancement and hiding independently.", settings, "RequireSightToStart", "RequireSightToContinue", "HideWhenSightLost", "ObstacleMask", "SightOffset"))
+                && sections.Draw("Dialogue Visibility", "Use collider targeting under the centered player cursor for startup, advancement and hiding.", settings, "RequireSightToStart", "RequireSightToContinue", "HideWhenSightLost", "ObstacleMask"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(settings, "RequireSightToStart");
@@ -291,7 +291,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         || settings.FindPropertyRelative("HideWhenSightLost").boolValue)
                     {
                         Field(settings, "ObstacleMask");
-                        Field(settings, "SightOffset");
                     }
                 }
             if (sections.Draw("Dialogue Flow", "Choose entry selection and what happens when the player returns.", settings, "Selection", "UseSpawnPresets", "SpawnPresets", "Interruption", "ReplayOnReturn", "ReplayOnInput"))

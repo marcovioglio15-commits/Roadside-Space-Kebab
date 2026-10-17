@@ -34,7 +34,6 @@ MonoBehaviour:
     ObstacleMask:
       serializedVersion: 2
       m_Bits: 4294967295
-    SightOffset: {x: 0, y: 0, z: 0}
     Interruption: 0
     ReplayOnReturn: 1
     Selection: 1

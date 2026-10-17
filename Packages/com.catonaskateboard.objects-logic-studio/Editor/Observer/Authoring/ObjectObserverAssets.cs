@@ -19,9 +19,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="player">Flagged player root in that same asset.</param>
         /// <param name="flag">Project flag assigned to the player.</param>
         /// <param name="existing">Optional existing observer in the same asset.</param>
-        /// <param name="createHud">Prepare the observer's one shared dialogue overlay when requested.</param>
         /// <returns>The saved observer component in the persistent prefab asset.</returns>
-        internal static HoverObserver Apply(Camera camera, GameObject player, ObjectFlag flag, HoverObserver existing, bool createHud = false)
+        internal static HoverObserver Apply(Camera camera, GameObject player, ObjectFlag flag, HoverObserver existing)
         {
             // An already open stage remains authoritative, including its unsaved collider and hierarchy edits.
             string path = AssetDatabase.GetAssetPath(player);
@@ -52,8 +51,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         data.ApplyModifiedPropertiesWithoutUndo();
                     }
                 }
-                if (createHud)
-                    DialogueAuthoring.CreateHud(observer, opened);
                 if (opened)
                     ObjectAuthoringSave.Save(root);
                 else

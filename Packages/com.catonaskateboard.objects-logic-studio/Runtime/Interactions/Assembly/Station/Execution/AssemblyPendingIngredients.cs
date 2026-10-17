@@ -8,7 +8,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly List<AssemblyIngredientDock> docks = new List<AssemblyIngredientDock>();
-        private readonly HashSet<ObjectItem> withdrawn = new HashSet<ObjectItem>();
+        private readonly Dictionary<ObjectItem, uint> withdrawn = new Dictionary<ObjectItem, uint>();
         private readonly List<ObjectItem> removed = new List<ObjectItem>();
         private readonly AssemblyIngredientSelection selection = new AssemblyIngredientSelection();
 
@@ -18,24 +18,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Contacts
 
-        /// <summary>Rearms externally moved ingredients only after they leave the actual contact surface.</summary>
+        /// <summary>Rearms externally moved ingredients after separation or a deliberate player release.</summary>
         /// <param name="contacts">Physical contacts before adding retained magnet previews.</param>
         internal void Refresh(HashSet<ObjectItem> contacts)
         {
             // Movement may release a preview outside the trigger during this same query.
             RefreshDocks();
             removed.Clear();
-            foreach (ObjectItem item in withdrawn)
-                if (item == null || !contacts.Contains(item))
+            foreach (KeyValuePair<ObjectItem, uint> entry in withdrawn)
+            {
+                ObjectItem item = entry.Key;
+                if (item == null || !contacts.Contains(item) || !item.IsCarried && item.ReleaseRevision != entry.Value)
                     removed.Add(item);
+            }
             foreach (ObjectItem item in removed)
                 withdrawn.Remove(item);
         }
 
         /// <summary>Checks whether an external interaction has withdrawn this ingredient from automatic snapping.</summary>
         /// <param name="item">Physical contact candidate.</param>
-        /// <returns>True until the item leaves this contact surface.</returns>
-        internal bool IsWithdrawn(ObjectItem item) => withdrawn.Contains(item);
+        /// <returns>True until separation or a new deliberate player release.</returns>
+        internal bool IsWithdrawn(ObjectItem item) => withdrawn.ContainsKey(item);
 
         /// <summary>Shares live preview ingredients with every competing recipe on the same table.</summary>
         /// <param name="ingredients">Reusable collection receiving distinct candidates.</param>
@@ -57,7 +60,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 AssemblyIngredientDock dock = docks[index];
                 ObjectItem released = dock.Refresh(dock.Station);
                 if (released != null)
-                    withdrawn.Add(released);
+                    withdrawn[released] = released.ReleaseRevision;
                 if (dock.Ingredient == null)
                     docks.RemoveAt(index);
             }

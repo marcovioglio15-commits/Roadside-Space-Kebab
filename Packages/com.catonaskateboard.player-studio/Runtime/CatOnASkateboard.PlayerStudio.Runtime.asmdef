@@ -3,6 +3,7 @@
   "rootNamespace": "CatOnASkateboard.PlayerStudio",
   "references": [
     "Unity.InputSystem",
-    "CatOnASkateboard.AudioStudio.Runtime"
+    "CatOnASkateboard.AudioStudio.Runtime",
+    "UnityEngine.UI"
   ]
 }

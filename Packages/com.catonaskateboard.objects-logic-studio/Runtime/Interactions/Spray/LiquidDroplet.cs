@@ -137,9 +137,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Disconnects stale generations and releases gravity ownership before a sample is reused.</summary>
         internal void Recycle()
         {
-            if (!gameObject.activeSelf)
-                return;
-            ObjectGravityGenerator.Forget(Body);
+            // OnDisable also covers external pooling and destruction, keeping cleanup in one place.
+            if (gameObject.activeSelf)
+                gameObject.SetActive(false);
+        }
+
+        /// <summary>Releases native leases even when a deathbox or external owner disables the sample.</summary>
+        private void OnDisable()
+        {
+            // Native components may already be missing during hierarchy teardown.
+            if (Body != null)
+                ObjectGravityGenerator.Forget(Body);
             Ignore(ignored, false);
             Ignore(ignoredPlayer, false);
             ignored = ignoredPlayer = null;
@@ -148,12 +156,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             trail = null;
             palette = null;
             receiverTransform = null;
-            if (!Body.isKinematic)
+            if (Body != null && !Body.isKinematic)
             {
                 Body.linearVelocity = Vector3.zero;
                 Body.angularVelocity = Vector3.zero;
             }
-            gameObject.SetActive(false);
         }
         #endregion
         #region Motion
@@ -259,7 +266,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="ignore">Whether collisions should be excluded.</param>
         private void Ignore(Collider[] colliders, bool ignore)
         {
-            if (colliders != null)
+            if (shape != null && colliders != null)
                 foreach (Collider collider in colliders)
                     if (collider != null && collider.enabled && collider.gameObject.activeInHierarchy)
                         Physics.IgnoreCollision(shape, collider, ignore);

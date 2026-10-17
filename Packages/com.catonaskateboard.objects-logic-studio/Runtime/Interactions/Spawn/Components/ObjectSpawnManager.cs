@@ -22,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [HideInInspector]
         private Transform staging;
 
-        [Tooltip("Preauthored black overlay prepared by Apply for persistent day transitions.")]
+        [Tooltip("Persistent transition controller; the black panel comes from each scene's existing Canvas.")]
         [SerializeField]
         [HideInInspector]
         private MenuSceneTransition transition;
@@ -152,7 +152,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 warning = "Day Flow needs a dedicated, unparented manager root. Apply it in Objects Logic Studio to prepare staging and the black overlay.";
                 if (transform.parent != null || staging == null || staging == transform || !staging.IsChildOf(transform)
-                    || staging.gameObject.activeSelf || transition == null || transition.Overlay == null)
+                    || staging.gameObject.activeSelf || transition == null)
                     return false;
                 if (Application.isPlaying)
                 {

@@ -43,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (item.isActiveAndEnabled)
                 {
                     if (item is ObjectGrab grab)
-                        grab.ResetAudio();
+                        grab.ResetSessionState();
                     Register(item);
                 }
         }

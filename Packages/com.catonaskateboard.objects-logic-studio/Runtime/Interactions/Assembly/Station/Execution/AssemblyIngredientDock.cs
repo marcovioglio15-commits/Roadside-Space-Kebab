@@ -42,7 +42,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal static bool Allows(ObjectAssemblyStation station, ObjectGrab ingredient)
         {
             // A preview chooses only its visible pose, never which recipe will eventually consume the ingredient.
-            return ingredient != null && (ingredient.Dock == null || ingredient.Dock.Station != null
+            return ingredient != null && !ingredient.RequiresAssemblyPlacement
+                && (!station.Settings.IgnoreCarriedIngredients || !ingredient.IsHeld)
+                && (ingredient.Dock == null || ingredient.Dock.Station != null
                     && ingredient.Dock.Station.gameObject == station.gameObject)
                 && (!ingredient.IsHeld || ingredient.Dock == null
                     && (!ingredient.TryGetComponent(out ObjectAssemblyProduct product) || !product.Settings.WaitForNextIngredient));

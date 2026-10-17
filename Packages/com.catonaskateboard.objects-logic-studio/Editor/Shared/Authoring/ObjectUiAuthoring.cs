@@ -23,6 +23,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return rect;
         }
 
+        /// <summary>Stretches an existing rectangle across its parent's complete content area.</summary>
+        /// <param name="rect">Authored UI branch whose layout should follow the shared Canvas.</param>
+        internal static void Stretch(RectTransform rect)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+        }
+
         #endregion
 
         #endregion

@@ -19,9 +19,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Local Grab binding, or the standalone product's explicitly selected finalization action.</summary>
-        internal InputActionReference Action => Grab != null ? Grab.Action : Owner.Settings.FinalizeAction;
+        internal InputActionReference Action => Owner.Settings.ProlongedAssembly ? Owner.Settings.Charge.Action
+            : Grab != null ? Grab.Action : Owner.Settings.FinalizeAction;
         /// <summary>Whether this assembled recipe still needs its empty-hand pickup confirmation.</summary>
-        internal bool Waiting => Owner.Settings.FinalizeOnGrab && Owner.IsComplete && !Owner.IsFinalized
+        internal bool Waiting => Owner != null && (Owner.Settings.ProlongedAssembly || Owner.Settings.FinalizeOnGrab)
+            && Owner.IsComplete && !Owner.IsFinalized && Owner.Item != null && !Owner.Item.IsReserved
             && Owner.Available(InteractionChannels.Assembly);
 
         #endregion
@@ -77,14 +79,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             score = float.PositiveInfinity;
             if (!Waiting || observer.HeldObject != null)
                 return false;
-            if (Grab != null)
+            if (!Owner.Settings.ProlongedAssembly && Grab != null)
             {
                 GrabSettings settings = Grab.Settings;
                 return targeting.Eligible(observer, Owner.transform, colliders, Grab.WorldTarget, settings.Distance,
                     settings.TargetMode, settings.TargetMode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
                     settings.ObstacleMask, settings.SolidHitOnly, out score);
             }
-            TransferTargetSettings target = Owner.Settings.FinalizeTarget;
+            TransferTargetSettings target = Owner.Settings.ProlongedAssembly ? Owner.Settings.Charge.Target : Owner.Settings.FinalizeTarget;
             return targeting.Eligible(observer, Owner.transform, colliders, Owner.transform.TransformPoint(target.Offset),
                 target.Distance, target.Mode, target.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : target.CenterRadius,
                 target.ObstacleMask, target.SolidHitOnly, out score);
@@ -93,16 +95,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Finalizes appearance and gates, then starts an available Grab with the same button press.</summary>
         /// <param name="observer">Observer whose carry slot must still be empty.</param>
         /// <param name="carried">Receives the grabbed product when carrying is supported and available.</param>
+        /// <param name="allowGrab">Whether this completed input may also execute the product's compatible Grab.</param>
         /// <returns>True when this press finalized the product.</returns>
-        internal bool Execute(HoverObserver observer, out ObjectGrab carried)
+        internal bool Execute(HoverObserver observer, out ObjectGrab carried, bool allowGrab = true)
         {
             carried = null;
             if (!Waiting || observer.HeldObject != null)
                 return false;
             Owner.ConfirmPickup();
-            if (Grab != null && Grab.Begin(observer))
-                carried = Grab;
             Owner.PublishPending();
+            // Completion listeners may consume, disable or move the product before a same-input pickup.
+            if (allowGrab && Grab != null && Grab.Begin(observer))
+                carried = Grab;
             return true;
         }
 

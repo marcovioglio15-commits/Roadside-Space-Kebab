@@ -22,7 +22,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new EditorGUI.DisabledScope(true))
             {
                 StudioGUI.ObjectField(new GUIContent("Preset", "Applied reusable hover configuration."), hover.Preset, typeof(HoverPreset), false);
-                StudioGUI.ObjectField(new GUIContent("Label", "Preauthored UI owned by this interaction."), hover.Label, typeof(HoverLabel), true);
             }
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
                 || !ObjectAuthoringSave.TryValidate(hover.gameObject, out _)))

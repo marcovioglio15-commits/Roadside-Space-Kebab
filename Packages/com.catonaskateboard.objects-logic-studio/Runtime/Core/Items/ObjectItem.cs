@@ -43,6 +43,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool IsConsumed { get; private set; }
         /// <summary>Whether this item's cached grab component currently owns the player's carry slot.</summary>
         public bool IsCarried => grab != null && grab.IsHeld;
+        /// <summary>Deliberate player releases, retained across disable/enable to distinguish fresh offerings.</summary>
+        internal uint ReleaseRevision => grab != null ? grab.ReleaseRevision : 0;
+        /// <summary>Successful player pickups used to rearm contact dialogue independently of consumption.</summary>
+        internal uint PickupRevision => grab != null ? grab.PickupRevision : 0;
         /// <summary>Whether a modification currently owns this item's appearance or consumption state.</summary>
         public bool IsReserved => reservation != null;
 

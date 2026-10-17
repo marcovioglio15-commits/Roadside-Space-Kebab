@@ -51,16 +51,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Eligible interaction types that may consume a shared press before this dialogue. Only Throw has priority by default.")]
         public DialogueActionPriority PreferredActions = DialogueActionPriority.Throw;
         [Header("Visibility")]
-        [Tooltip("Require some part of the object to be inside the gameplay camera frame and unobstructed when starting or resuming dialogue.")]
+        [Tooltip("Require the player's centered cursor to hit an unobstructed collider on this object or its children when starting or resuming dialogue.")]
         public bool RequireSightToStart;
-        [Tooltip("Require visibility to advance to the next page or close the final page. While blocked, the current page remains unless Hide When Sight Lost is enabled.")]
+        [Tooltip("Require the centered cursor to remain over an unobstructed collider in this hierarchy to advance or close a page.")]
         public bool RequireSightToContinue;
-        [Tooltip("Hide an active dialogue when visibility is lost, independently of the start and page-advance requirements. Use the selected interruption policy when sight returns.")]
+        [Tooltip("Hide dialogue when the centered cursor leaves this object's colliders or an obstacle blocks them. Apply the interruption policy when targeting returns.")]
         public bool HideWhenSightLost;
         [Tooltip("Solid layers blocking dialogue visibility. Player and dialogue-object colliders, and all triggers, are excluded.")]
         public LayerMask ObstacleMask = ~0;
-        [Tooltip("Fallback sight point for objects without renderers or colliders. Visible geometry otherwise determines sight.")]
-        public Vector3 SightOffset;
         [Header("Dialogue Flow")]
         [Tooltip("After interruption, resume the current page, restart its entry, or select the next eligible entry.")]
         public DialogueInterruption Interruption;
@@ -108,8 +106,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Choose supported dialogue sounds and a positive voice interval.";
             else if (!InteractionValues.Positive(Distance) || !InteractionValues.Positive(ExitDistance) || ExitDistance < Distance)
                 warning = "Dialogue needs positive finite distances; Exit Distance must be at least Distance.";
-            else if ((RequireSightToStart || RequireSightToContinue || HideWhenSightLost) && !InteractionValues.Finite(SightOffset))
-                warning = "Dialogue Sight Offset must be finite.";
             else if (Trigger is not (DialogueTrigger.Proximity or DialogueTrigger.InputAction or DialogueTrigger.Consumption or DialogueTrigger.SpawnArrival)
                 || Interruption is not (DialogueInterruption.Resume or DialogueInterruption.Restart or DialogueInterruption.SelectNext))
                 warning = "Choose supported dialogue trigger, selection and interruption modes.";

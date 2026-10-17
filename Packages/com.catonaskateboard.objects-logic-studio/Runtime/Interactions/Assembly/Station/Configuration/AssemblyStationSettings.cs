@@ -28,6 +28,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float ContactTolerance = 0.005f;
         [Tooltip("Include trigger colliders when detecting ingredient contact.")]
         public bool IncludeTriggers;
+        [Tooltip("Ignore ingredients currently carried by the player during automatic contact detection. Explicit input insertion still accepts the carried ingredient.")]
+        public bool IgnoreCarriedIngredients = true;
         [Tooltip("Maximum player distance in metres for adding the currently carried ingredient.")]
         [Range(0.1f, 20f)]
         public float Distance = 3f;

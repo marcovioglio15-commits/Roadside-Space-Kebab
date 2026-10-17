@@ -140,8 +140,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     || JsonUtility.ToJson(HoverBindingDraft.Capture(hover)) != JsonUtility.ToJson(state.OriginalBinding)
                     || HoverHierarchy.Signature(hover.transform) != state.Hierarchy)
                     warning = "The selected interaction or its hierarchy changed. Discard to reload it.";
-                else if (hover.Label == null || !hover.Label.TryValidate(hover.transform, out warning))
-                    warning = warning.Length > 0 ? warning : "Create the dedicated hover label before Apply.";
                 else if (state.Binding.AnchorPath != "-" && HoverHierarchy.Resolve(hover.transform, state.Binding.AnchorPath) == null)
                     warning = "The proposed anchor is no longer inside the selected object.";
                 else if (state.Draft.Settings.TargetMode != HoverDetectionMode.ViewCenter && hover.GetComponentInChildren<Collider>(true) == null
@@ -235,18 +233,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorUtility.SetDirty(hover);
             if (!EditorUtility.IsPersistent(hover))
                 PrefabUtility.RecordPrefabInstancePropertyModifications(hover);
-            HoverLabel label = hover.Label;
-            UnityEngine.Object[] graphics = label.Background != null
-                ? new UnityEngine.Object[] { label.Text, label.Text.rectTransform, label.Panel, label.Canvas, label.Background }
-                : new UnityEngine.Object[] { label.Text, label.Text.rectTransform, label.Panel, label.Canvas };
-            Undo.RecordObjects(graphics, "Apply hover appearance");
-            state.Draft.Style.Apply(label);
-            foreach (UnityEngine.Object graphic in graphics)
-            {
-                EditorUtility.SetDirty(graphic);
-                if (!EditorUtility.IsPersistent(graphic))
-                    PrefabUtility.RecordPrefabInstancePropertyModifications(graphic);
-            }
+
         }
 
         #endregion

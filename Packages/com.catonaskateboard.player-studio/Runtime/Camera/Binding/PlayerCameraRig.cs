@@ -85,6 +85,14 @@ namespace CatOnASkateboard.PlayerStudio
         public Quaternion Heading => Quaternion.Euler(0f, settings.Mode == PlayerCameraMode.Fixed && view != null
             ? view.transform.eulerAngles.y : settings.Mode == PlayerCameraMode.ThirdPerson
                 && settings.Follow == PlayerCameraFollow.Damped && settings.DampOrbit ? orbit.eulerAngles.y : initialHeading + angles.x, 0f);
+        /// <summary>Whether the authored scene cursor should be visible for this rig.</summary>
+        public bool CenteredCursorVisible => initialized && isActiveAndEnabled && capturesCursor && settings.ShowCenteredCursor
+            && Application.isFocused && Cursor.lockState == CursorLockMode.Locked && view != null && view.isActiveAndEnabled
+            && view.targetTexture == null && view.targetDisplay == 0;
+        /// <summary>Optional texture displayed by the preauthored centered cursor graphic.</summary>
+        public Texture2D CenteredCursorTexture => settings.CursorTexture;
+        /// <summary>Original-pixel size multiplier used by the preauthored cursor.</summary>
+        public float CenteredCursorScale => settings.CursorScale;
         /// <summary>Last initialization warning, suitable for Inspector diagnostics.</summary>
         public string InitializationWarning => initializationWarning;
 
@@ -119,15 +127,6 @@ namespace CatOnASkateboard.PlayerStudio
             visibility.Dispose();
             RestoreCursor();
             RestoreModel();
-        }
-
-        /// <summary>Draws an optional centered pointer only while this rig owns active capture.</summary>
-        private void OnGUI()
-        {
-            // Released focus and disabled views must never leave a floating marker over another screen.
-            if (initialized && capturesCursor && settings.ShowCenteredCursor && Application.isFocused
-                && Cursor.lockState == CursorLockMode.Locked && view != null && view.isActiveAndEnabled)
-                PlayerCenteredCursor.Draw(view, settings.CursorTexture, settings.CursorScale);
         }
 
         /// <summary>Consumes look before movement so the motor uses this frame's camera heading.</summary>

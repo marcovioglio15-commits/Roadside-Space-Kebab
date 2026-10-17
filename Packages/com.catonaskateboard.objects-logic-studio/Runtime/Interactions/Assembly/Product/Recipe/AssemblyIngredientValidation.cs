@@ -21,7 +21,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || grab.transform.IsChildOf(product.transform) || product.transform.IsChildOf(grab.transform)
                 || !ObjectGrab.ValidateBody(grab.gameObject, out _) || grab.GetComponentsInChildren<Joint>(true).Length > 0)
                 return false;
-            if (grab.TryGetComponent(out ObjectAssemblyProduct ingredient) && (!ingredient.isActiveAndEnabled || !ingredient.IsComplete)
+            if (grab.TryGetComponent(out ObjectAssemblyProduct ingredient) && (!ingredient.isActiveAndEnabled || !ingredient.IsComplete
+                    || ingredient.Settings.ProlongedAssembly && !ingredient.IsFinalized)
                 || grab.TryGetComponent(out ObjectAssemblyPart attached) && attached.Product != null)
                 return false;
             // Retained consumption and reservation state must survive transfer without being bypassed.

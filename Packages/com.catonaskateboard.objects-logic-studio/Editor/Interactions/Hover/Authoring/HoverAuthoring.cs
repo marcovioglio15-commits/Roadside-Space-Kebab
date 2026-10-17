@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Creates and removes hover components and their dedicated UI only through explicit editor actions.</summary>
+    /// <summary>Authors object-local hover configuration and one reusable scene label.</summary>
     internal static class HoverAuthoring
     {
         #region Methods
@@ -14,7 +14,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Interactions
 
         /// <summary>Adds an independent hover interaction to the selected prefab stage and saves its asset.</summary>
-        /// <param name="root">Editable object receiving the new component and UI child.</param>
+        /// <param name="root">Editable object receiving the new hover component.</param>
         /// <returns>The newly configured hover interaction.</returns>
         internal static ObjectHover AddHover(GameObject root)
         {
@@ -31,13 +31,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("interactionName").stringValue = "First Person Hover";
                 data.ApplyModifiedProperties();
             }
-            CreateLabel(hover);
             ObjectAuthoringSave.Save(root);
             Undo.CollapseUndoOperations(group);
             return hover;
         }
 
-        /// <summary>Removes an interaction and its unshared dedicated label as one reversible action.</summary>
+        /// <summary>Removes the selected interaction while preserving the shared scene UI.</summary>
         /// <param name="hover">Interaction selected in the workspace.</param>
         internal static void RemoveHover(ObjectHover hover)
         {
@@ -47,15 +46,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             GameObject target = hover.gameObject;
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
-            HoverLabel label = hover.Label;
-            bool removeLabel = label != null && label.transform != hover.transform && label.transform.IsChildOf(hover.transform);
-            foreach (ObjectHover other in hover.transform.root.GetComponentsInChildren<ObjectHover>(true))
-                if (other != hover && other.Label == label)
-                    removeLabel = false;
-            // Capture the component while its label reference is still valid for Undo restoration.
             Undo.DestroyObjectImmediate(hover);
-            if (removeLabel)
-                Undo.DestroyObjectImmediate(label.gameObject);
             ObjectAuthoringSave.Save(target);
             Undo.CollapseUndoOperations(group);
         }
@@ -64,18 +55,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region UI Construction
 
-        /// <summary>Authors the full overlay before Play and assigns its references to an existing hover.</summary>
-        /// <param name="hover">Interaction missing its dedicated label.</param>
-        internal static void CreateLabel(ObjectHover hover)
+        /// <summary>Builds one scene label reused by all object-local hover configurations.</summary>
+        /// <param name="parent">Shared scene UI root.</param>
+        /// <param name="canvas">Existing Canvas used by every gameplay panel.</param>
+        /// <returns>The fully connected shared label.</returns>
+        internal static HoverLabel BuildLabel(Transform parent, Canvas canvas)
         {
-            // Existing authored UI is never replaced by a setup button.
-            if (hover.Label != null)
-                return;
-            RectTransform root = ObjectUiAuthoring.CreateRect("Hover UI", hover.transform);
-            Canvas canvas = root.gameObject.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 20;
-            canvas.enabled = false;
+            RectTransform root = ObjectUiAuthoring.CreateRect("Hover HUD", parent);
+            ObjectUiAuthoring.Stretch(root);
             RectTransform panel = ObjectUiAuthoring.CreateRect("Label", root);
             panel.sizeDelta = new Vector2(280f, 64f);
             Image background = panel.gameObject.AddComponent<Image>();
@@ -89,7 +76,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             textRect.offsetMin = new Vector2(12f, 6f);
             textRect.offsetMax = new Vector2(-12f, -6f);
             Text text = textRect.gameObject.AddComponent<Text>();
-            text.text = hover.gameObject.name;
+            text.text = string.Empty;
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 24;
             text.color = Color.white;
@@ -105,16 +92,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("panel").objectReferenceValue = panel;
                 data.FindProperty("text").objectReferenceValue = text;
                 data.FindProperty("background").objectReferenceValue = background;
+                data.FindProperty("defaultFont").objectReferenceValue = text.font;
                 data.ApplyModifiedPropertiesWithoutUndo();
             }
 
-            // Register the completed child before recording the component's reference change.
-            Undo.RegisterCreatedObjectUndo(root.gameObject, "Create hover UI");
-            using (SerializedObject data = new SerializedObject(hover))
-            {
-                data.FindProperty("label").objectReferenceValue = label;
-                data.ApplyModifiedProperties();
-            }
+            panel.gameObject.SetActive(false);
+            return label;
         }
 
         #endregion

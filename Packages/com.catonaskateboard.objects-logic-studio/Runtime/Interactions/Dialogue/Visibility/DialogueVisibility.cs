@@ -19,10 +19,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Queries
 
-        /// <summary>Checks partial camera framing and unobstructed sight to the target geometry.</summary>
+        /// <summary>Checks whether the centered player cursor hits unobstructed dialogue geometry.</summary>
         /// <param name="context">Observer supplying the camera, player and physics scene.</param>
         /// <param name="dialogue">Dialogue whose visibility is required.</param>
-        /// <returns>True when part of the object is in frame and unobstructed.</returns>
+        /// <returns>True while the fake cursor points at an enabled collider in the dialogue hierarchy.</returns>
         internal bool HasSight(HoverObserver context, ObjectDialogue dialogue)
         {
             // Callers skip this method when their particular visibility requirement is disabled.

@@ -54,6 +54,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal ObjectAssemblyStation Table { get; set; }
         /// <summary>Number of actual ingredient roots currently attached to the product.</summary>
         public int IngredientCount => parts.Count;
+        /// <summary>Changes only when composition changes, invalidating a held assembly attempt.</summary>
+        internal uint IngredientRevision { get; private set; }
+        /// <summary>Standalone ingredient still recoverable before a second insertion or finalization.</summary>
+        internal ObjectAssemblyPart RetrievablePart => !settings.LockFirstIngredient && !IsFinalized && parts.Count == 1 ? parts[0] : null;
         /// <summary>Total logical units supplied by the attached physical ingredients.</summary>
         public long IngredientUnits { get; private set; }
         /// <summary>Whether all mandatory quantities have been supplied and at least one ingredient is present.</summary>
@@ -381,6 +385,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 part = grab.gameObject.AddComponent<ObjectAssemblyPart>();
             part.Attach(this, grab, magnet, appearance, flag);
             parts.Add(part);
+            IngredientRevision++;
             foreach (ObjectInteraction feature in features)
                 if (feature is ObjectOutline outline)
                     outline.AddPart(part);
@@ -408,6 +413,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 pendingCompletion = false;
                 Signal(InteractionMoment.Completed);
+                if (settings.ProlongedAssembly && Table != null)
+                    Table.Complete(this);
             }
             ObjectGravityGenerator.IncludeSpawn(gameObject);
         }
@@ -419,6 +426,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Partial teardown never restores another ingredient or removes its collision branch.
             if (destroying || !parts.Remove(part))
                 return;
+            IngredientRevision++;
             occupied[part.MagnetIndex] = false;
             counts[part.IngredientFlag] -= part.Units;
             IngredientUnits -= part.Units;
@@ -427,6 +435,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     outline.RemovePart(part);
             RefreshLocks();
             RefreshGeometry();
+            // Retrieving the only ingredient frees the table and removes its now empty product shell.
+            if (parts.Count == 0 && Application.isPlaying)
+            {
+                ReleaseTable();
+                gameObject.SetActive(false);
+                Destroy(gameObject);
+            }
         }
 
         /// <summary>Reads a recipe count without exposing mutable progress.</summary>
@@ -519,7 +534,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Pickup.Confirmed = false;
                 pendingCompletion = false;
             }
-            bool finalized = IsComplete && (!settings.FinalizeOnGrab || Pickup.Confirmed);
+            bool finalized = IsComplete && (!(settings.ProlongedAssembly || settings.FinalizeOnGrab) || Pickup.Confirmed);
             pendingCompletion |= finalized && !IsFinalized;
             IsFinalized = finalized;
             if (completedAppearanceApplied != IsFinalized)
@@ -549,7 +564,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                             available &= AssemblyCapacity.Count(counts, requirement.Flags) >= requirement.Count;
                         break;
                     }
-                feature.SetLocked(this, !available);
+                // A partial-interaction override cannot bypass prolonged assembly's pickup boundary.
+                feature.SetLocked(this, !available || feature is ObjectGrab && (RetrievablePart != null || settings.ProlongedAssembly && !IsFinalized));
             }
         }
 

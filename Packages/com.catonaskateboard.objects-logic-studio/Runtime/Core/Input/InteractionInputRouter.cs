@@ -105,7 +105,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Device-control identity also covers independently authored actions sharing one key.
             foreach (InteractionButton button in buttons.Values)
-                if (button.Pending && button.SharesPress(consumed))
+                if ((button.Pending || button.Pressed) && button.SharesPress(consumed))
                     button.Clear();
         }
 

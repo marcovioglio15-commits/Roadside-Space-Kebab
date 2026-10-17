@@ -93,13 +93,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(style, "horizontalOverflow");
                     Field(style, "verticalOverflow");
                 }
-            if (sections.Draw("Layout", "Size and inset the preauthored label in reference pixels.", style, "size", "textSizeOffset", "textOffset", "sortingOrder"))
+            if (sections.Draw("Layout", "Size and inset the preauthored label in reference pixels.", style, "size", "textSizeOffset", "textOffset"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Field(style, "size");
                     Field(style, "textSizeOffset");
                     Field(style, "textOffset");
-                    Field(style, "sortingOrder");
                 }
             if (sections.Draw("Background", "Enable and configure the existing background graphic.", style, "showBackground", "backgroundColor", "backgroundSprite", "backgroundType"))
                 using (new EditorGUI.IndentLevelScope())

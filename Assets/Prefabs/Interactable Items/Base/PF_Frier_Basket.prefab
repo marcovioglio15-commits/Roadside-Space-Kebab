@@ -99,6 +99,7 @@ MonoBehaviour:
   action: {fileID: 0}
   settings:
     Modifications:
+    - {fileID: 11400000, guid: d578edb2262163c42a71ea603fbf3dd9, type: 2}
     - {fileID: 11400000, guid: d565d370b7a543c3a05326d7897ad222, type: 2}
     Target:
       Distance: 3
@@ -110,6 +111,10 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    ConsumeOn:
+      Enabled: 0
+      DialogueName: 
+      Occurrence: 0
 --- !u!65 &1446148368216571378
 BoxCollider:
   m_ObjectHideFlags: 0

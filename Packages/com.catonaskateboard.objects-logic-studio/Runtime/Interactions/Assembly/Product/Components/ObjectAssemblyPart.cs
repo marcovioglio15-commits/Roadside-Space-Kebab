@@ -47,6 +47,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int MagnetIndex { get; private set; }
         /// <summary>Mass contributed to the assembled body's total.</summary>
         public float Mass { get; private set; }
+        /// <summary>Original pickup binding retained while ingredient interactions are suspended.</summary>
+        internal ObjectGrab Grab { get; private set; }
+        /// <summary>Product-owned shapes used to target retrieval of the sole ingredient.</summary>
+        internal Collider[] PickupColliders { get; private set; }
+        /// <summary>Whether this sole ingredient can leave the product through its original Grab.</summary>
+        internal bool CanRetrieve => product != null && product.RetrievablePart == this && isActiveAndEnabled
+            && product.Available(InteractionChannels.Assembly) && !product.Item.IsReserved && !product.Item.IsCarried
+            && Grab != null && !Grab.IsLocked && Grab.ToolAllowed;
 
         #endregion
 
@@ -70,6 +78,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             appearance = changes;
             appearance.Commit();
             product = owner;
+            Grab = grab;
             IngredientFlag = flag;
             // Preserve every insertion flag, not only the single category selected by the recipe magnet.
             HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>(grab.Item.Identity.ActiveFlags);
@@ -110,6 +119,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             transform.SetLocalPositionAndRotation(magnet.Position, Quaternion.Euler(magnet.Rotation));
             transform.localScale = Vector3.Scale(originalScale, magnet.Scale);
             geometry = AssemblyGeometry.Create(transform, colliders, shapes);
+            PickupColliders = geometry.GetComponentsInChildren<Collider>(true);
             for (int entry = 0; entry < colliders.Length; entry++)
             {
                 enabledColliders[entry] = colliders[entry].enabled;
@@ -142,6 +152,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Pooling the complete product does not detach its ingredients or erase recipe progress.
             if (attached && product != null && transform.parent != product.transform)
                 Detach();
+        }
+
+        /// <summary>Restores the sole ingredient before its original Grab captures standalone physics.</summary>
+        /// <returns>True when the ingredient detached without bypassing a product or tool restriction.</returns>
+        internal bool ReleaseForPickup()
+        {
+            // Parent-change handling restores components and frees the now empty station in one transaction.
+            if (!CanRetrieve)
+                return false;
+            transform.SetParent(null, true);
+            return !attached;
         }
 
         /// <summary>Keeps proxy geometry inactive while its visible ingredient is disabled.</summary>

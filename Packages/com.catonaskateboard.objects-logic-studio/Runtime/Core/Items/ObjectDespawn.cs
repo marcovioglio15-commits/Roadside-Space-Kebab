@@ -27,6 +27,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (target == null || !target.activeSelf)
                 return;
+            // Deathboxes and respawn cleanup return pooled liquid instead of destroying its reusable body.
+            if (target.TryGetComponent(out LiquidDroplet droplet))
+            {
+                droplet.Recycle();
+                return;
+            }
             target.SetActive(false);
             Object.Destroy(target);
         }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Connects one independently configured hover interaction to its prefab anchor and authored label.</summary>
+    /// <summary>Connects object-local hover detection and style to the scene's shared label.</summary>
     [AddComponentMenu("Objects Logic Studio/Object Hover")]
     public sealed class ObjectHover : ObjectInteraction
     {
@@ -12,10 +12,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Optional anchor inside this prefab. Empty uses this object's transform and Anchor Offset.")]
         [SerializeField]
         private Transform anchor;
-
-        [Tooltip("Dedicated existing label for this interaction. Create it with Objects Logic Studio before Play.")]
-        [SerializeField]
-        private HoverLabel label;
 
         [Tooltip("Optional reusable source. Import copies detection, animation and label appearance into this interaction.")]
         [SerializeField]
@@ -64,8 +60,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public HoverConfiguration Configuration => configuration;
         /// <summary>Optional local hierarchy anchor retained independently of shared presets.</summary>
         public Transform Anchor => anchor;
-        /// <summary>Dedicated UI used by this interaction.</summary>
-        public HoverLabel Label => label;
         /// <summary>Current world point used for range and view-center tests.</summary>
         public Vector3 WorldAnchor => (anchor != null ? anchor : transform).TransformPoint(Settings.AnchorOffset);
         /// <summary>Whether this interaction owns an active hover after selection and availability checks.</summary>
@@ -96,16 +90,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Unregistration also supports pooled or destroyed prefab instances.
             Hide();
-            if (label != null)
-                label.Release();
             HoverRegistry.Unregister(this);
-        }
-
-        /// <summary>Preserves UI lifetime when a visible fixed HUD is temporarily outside this hierarchy.</summary>
-        private void OnDestroy()
-        {
-            if (Application.isPlaying && label != null)
-                label.Dispose(transform);
         }
 
         #endregion
@@ -127,40 +112,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             carrySuppressed = grab != null && grab.IsHeld && !grab.Settings.ShowHover;
             ready = TryValidate(out string warning);
             if (ready)
-            {
                 settings = new HoverSettings(configuration.Settings);
-                configuration.Style.Apply(label);
-            }
             nextQuery = 0f;
             if (!ready)
                 Debug.LogWarning(warning, this);
         }
 
-        /// <summary>Checks the active mode and dedicated UI without mutating the prefab.</summary>
+        /// <summary>Checks detection and local style without requiring UI on the object.</summary>
         /// <param name="warning">Receives the first issue preventing this interaction from running.</param>
         /// <returns>True when the interaction has valid settings and references.</returns>
         public bool TryValidate(out string warning)
         {
             // Settings validation deliberately leaves invalid authored values unchanged.
             warning = string.Empty;
-            if (configuration == null || label == null)
-                warning = "Configure Hover settings and a dedicated Hover Label using Objects Logic Studio.";
+            if (configuration == null)
+                warning = "Configure Hover settings using Objects Logic Studio.";
             else if (anchor != null && !anchor.IsChildOf(transform))
                 warning = "The hover anchor must belong to this object's prefab hierarchy.";
-            else if (!configuration.TryValidate(out warning) || !label.TryValidate(transform, out warning))
+            else if (!configuration.TryValidate(out warning))
                 return false;
             else if (configuration.Settings.TargetMode != HoverDetectionMode.ViewCenter && GetComponentInChildren<Collider>(true) == null
                 && GetComponent<ObjectAssemblyProduct>() == null)
                 warning = "Collider hover requires a 3D collider on this object or one of its children.";
 
-            // Shared graphics would make independent hover modes overwrite one another.
-            if (warning.Length == 0)
-                foreach (ObjectHover other in transform.root.GetComponentsInChildren<ObjectHover>(true))
-                    if (other != this && other.label == label)
-                    {
-                        warning = "Each hover interaction requires its own Hover Label.";
-                        break;
-                    }
             return warning.Length == 0;
         }
 
@@ -174,8 +148,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True for a detected candidate or the previous winner within its release delay.</returns>
         internal bool Evaluate(HoverObserver observer, float time)
         {
-            // Deleted UI or invalid initialization leaves the component dormant until Refresh.
-            if (!ready || label == null || !label.isActiveAndEnabled)
+            // Invalid initialization leaves the component dormant until Refresh.
+            if (!ready)
             {
                 Hide();
                 return false;
@@ -200,13 +174,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Commits selection and updates entry or exit animation after competing hovers are resolved.</summary>
-        /// <param name="observer">Observer supplying the final camera pose.</param>
-        /// <param name="time">Shared unscaled presentation time.</param>
         /// <param name="selected">Whether this candidate may activate after centre arbitration.</param>
-        internal void Present(HoverObserver observer, float time, bool selected)
+        internal void Present(bool selected)
         {
             // Callbacks on another selected interaction may have removed this component's UI or availability.
-            if (!isActiveAndEnabled || !ready || label == null || !label.isActiveAndEnabled)
+            if (!isActiveAndEnabled || !ready)
             {
                 Hide();
                 return;
@@ -219,11 +191,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Signal(InteractionMoment.Completed);
             }
             // A rule may lock or replace this hover synchronously from its own start event.
-            if (this == null || !isActiveAndEnabled || label == null || !label.isActiveAndEnabled)
+            if (this == null || !isActiveAndEnabled)
                 return;
             if (!Available(InteractionChannels.Hover))
                 hovered = false;
-            label.Present(observer.View, WorldAnchor, settings, time, hovered);
         }
 
         /// <summary>Tracks physics or authored motion with hysteresis around the configured suspension speed.</summary>
@@ -251,8 +222,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             detected = false;
             eligible = false;
             nextQuery = 0f;
-            if (label != null)
-                label.Hide();
+            HoverRegistry.Release(this);
         }
 
         /// <summary>Applies carry-only visibility without changing this component's authored enabled state.</summary>

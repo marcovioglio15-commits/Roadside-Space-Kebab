@@ -9,9 +9,6 @@ namespace CatOnASkateboard.MenuStudio
     {
         #region Fields
 
-        [Header("Authored Overlay")]
-        [Tooltip("Existing full-screen black canvas group. Its hierarchy must survive until the fade completes.")]
-        public CanvasGroup Overlay;
         private static MenuSceneTransition current;
         private AsyncOperation loading;
         private Action completed;
@@ -30,6 +27,8 @@ namespace CatOnASkateboard.MenuStudio
 
         /// <summary>Whether a scene fade currently owns gameplay and menu navigation.</summary>
         public static bool IsBusy => current != null;
+        /// <summary>Existing fade panel on the active scene Canvas, replaced automatically across scene loads.</summary>
+        public CanvasGroup Overlay => MenuTransitionOverlay.Current;
 
         #endregion
 
@@ -140,6 +139,13 @@ namespace CatOnASkateboard.MenuStudio
         private void Update()
         {
             // Loading stays asynchronous; no synchronous scene or resource work blocks the fade.
+            // A missing destination panel ends the transaction instead of dereferencing an unloaded Canvas.
+            if (Overlay == null)
+            {
+                Debug.LogWarning("Add an authored Menu Transition Overlay to the destination scene Canvas.", this);
+                enabled = false;
+                return;
+            }
             elapsed += Time.unscaledDeltaTime;
             switch (phase)
             {

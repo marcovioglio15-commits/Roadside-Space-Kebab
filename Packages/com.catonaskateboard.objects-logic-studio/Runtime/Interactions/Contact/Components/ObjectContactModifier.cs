@@ -25,6 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool consumeEnabled;
         private int gateGeneration = -1;
         private int gateSpawn;
+        private readonly ContactConsumptionRejections rejections = new ContactConsumptionRejections();
 
         #endregion
         #region Properties
@@ -91,6 +92,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (gateGeneration != ObjectSpawnHistory.Generation || gateSpawn != Item.Spawn.Index)
             {
                 consumeEnabled = false;
+                rejections.Clear();
                 ContactRevision = 0;
                 AwaitingContact = false;
                 gateGeneration = ObjectSpawnHistory.Generation;
@@ -245,10 +247,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Publishes a contact attempt without creating a receipt or completing an order.</summary>
-        internal void ReportAwaitingContact()
+        /// <param name="candidate">Offering refused until it is picked up and released again.</param>
+        internal void ReportAwaitingContact(ObjectItem candidate)
         {
+            // Repeated contact only publishes again when the player submits a new offering.
+            if (!rejections.Reject(candidate))
+                return;
             AwaitingContact = true;
             ContactRevision++;
+        }
+
+        /// <summary>Preserves dialogue-gated rejection across contact loss and modifier reactivation.</summary>
+        /// <param name="candidate">Contact being considered for a consuming modification.</param>
+        /// <param name="rule">Rule whose consumption policy determines whether rejection applies.</param>
+        /// <returns>True while a previously rejected offering still requires a new pickup and release.</returns>
+        internal bool RejectsConsumption(ObjectItem candidate, ContactModificationRule rule)
+        {
+            return (rule.Self.Consume || rule.Other.Consume) && rejections.Blocks(candidate);
         }
 
         /// <summary>Opens consumption only for completion of the exact selected dialogue.</summary>

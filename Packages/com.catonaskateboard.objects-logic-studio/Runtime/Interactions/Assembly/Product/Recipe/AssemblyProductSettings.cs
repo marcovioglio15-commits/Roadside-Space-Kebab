@@ -57,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Product Interaction")]
         [Tooltip("Existing interaction on the product prefab. References are remapped to the spawned product automatically.")]
         public ObjectInteraction Target;
-        [Tooltip("Wait for all mandatory ingredients and, when Finalize On Grab is enabled, the first empty-hand pickup request.")]
+        [Tooltip("Wait for mandatory ingredients and the configured finalization input or prolonged assembly to complete.")]
         public bool RequireComplete = true;
         [Tooltip("Minimum total ingredient units before this interaction becomes available. Uses the Grab value of each inserted object.")]
         public int MinimumIngredients = 1;
@@ -74,6 +74,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Recipe")]
+        [Tooltip("Require a separate held Button action to finalize completed appearance, flags and product interactions after the recipe is ready.")]
+        public bool ProlongedAssembly;
+        [Tooltip("Independent assembly input, charging behavior and HUD appearance. Used only by Prolonged Assembly.")]
+        public AssemblyChargeSettings Charge = new AssemblyChargeSettings();
+        [Tooltip("Keep the first inserted ingredient inside the product. Disable to let its original Grab retrieve it until a second physical ingredient is inserted or the product is finalized.")]
+        public bool LockFirstIngredient = true;
         [Tooltip("Apply completed appearance and release product interaction gates only when the player first requests Grab with empty hands after mandatory ingredients are present.")]
         public bool FinalizeOnGrab = true;
         [Tooltip("Grab button used to finalize a product without its own Grab interaction. Products with Grab reuse its input and targeting.")]

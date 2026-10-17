@@ -5,7 +5,6 @@ using CatOnASkateboard.StudioIdentity;
 using System;
 using UnityEditor;
 using UnityEngine;
-using CatOnASkateboard.StudioInput.Editor;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
@@ -63,6 +62,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(settings, "ContactQueryInterval");
                 HoverControls.Field(settings, "ContactTolerance");
                 HoverControls.Field(settings, "IncludeTriggers");
+                HoverControls.Field(settings, "IgnoreCarriedIngredients");
             }
             HoverControls.Field(settings, "OutputPosition");
             HoverControls.Field(settings, "OutputRotation");
@@ -84,9 +84,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Shared requirement rows use project flags and positive integer counts throughout the tool.
             SerializedProperty settings = draft.FindPropertyRelative("Settings");
             DrawRecipe(settings, sections);
-            if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly.", draft, "Settings.WaitForNextIngredient", "Settings.InteractionRules", "TargetIds"))
+            if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly.", draft, "Settings.LockFirstIngredient", "Settings.WaitForNextIngredient", "Settings.InteractionRules", "TargetIds"))
                 using (new EditorGUI.IndentLevelScope())
                 {
+                    HoverControls.Field(settings, "LockFirstIngredient");
                     if (state.Target.Resolve().GetComponent<ObjectGrab>() != null)
                         HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
                     DrawRules(settings.FindPropertyRelative("InteractionRules"), draft.FindPropertyRelative("TargetIds"), state);
@@ -103,6 +104,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!sections.Draw("Product Interactions", "Requirements for the interactions captured when exporting this preset."))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            HoverControls.Field(settings, "LockFirstIngredient");
             HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
             SerializedProperty rules = settings.FindPropertyRelative("InteractionRules");
             // Structural changes require an actual destination hierarchy in the main workspace.
@@ -127,14 +129,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUI.IndentLevelScope())
                     DrawMagnets(settings.FindPropertyRelative("Magnets"));
             RefreshIngredients(settings.FindPropertyRelative("Ingredients"));
-            HoverControls.Field(settings, "FinalizeOnGrab");
-            GameObject source = HierarchyPathMenu.Source(settings, true);
-            if (settings.FindPropertyRelative("FinalizeOnGrab").boolValue && (source == null || source.GetComponent<ObjectGrab>() == null))
-            {
-                StudioInputActionMenu.Draw(settings.serializedObject, settings.FindPropertyRelative("FinalizeAction").propertyPath,
-                    "ObjectsLogicStudio.Assembly.Finalize", ExtendedInteractionControls.Button);
-                TransferInteractionControls.Target(settings.FindPropertyRelative("FinalizeTarget"), sections);
-            }
+            AssemblyFinalizationControls.Draw(settings, sections);
             SerializedProperty completed = settings.FindPropertyRelative("CompletedAppearance");
             ItemAppearanceControls.Draw(completed);
             if (completed.isExpanded && completed.FindPropertyRelative("Meshes").arraySize > 0)

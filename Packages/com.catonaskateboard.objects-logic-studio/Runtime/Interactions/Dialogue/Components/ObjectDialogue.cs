@@ -64,6 +64,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectContactModifier contact;
         private int contactRevision = -1;
         private int startedContactRevision = -1;
+        private int handledAwaitingRevision = -1;
         private DialogueSettings content;
         private int generation = -1;
         private int startedRevision = -1;
@@ -158,6 +159,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (generation == ObjectSpawnHistory.Generation && SpawnIndex == item.Spawn.Index)
                 return;
             generation = ObjectSpawnHistory.Generation;
+            handledAwaitingRevision = -1;
             SpawnIndex = item.Spawn.Index;
             content = settings?.ResolveEntries(SpawnIndex);
         }
@@ -210,6 +212,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             RefreshEntries();
             if (arrivalOnly)
                 return arrivalPending && !IsSpeaking && eligible.Count > 0;
+            // Re-entry, Replay On Return and component reactivation cannot replay the same rejected offering.
+            if (!retained && settings.Trigger == DialogueTrigger.Consumption && contact != null && contact.AwaitingContact
+                && handledAwaitingRevision == contact.ContactRevision)
+                return false;
             float distance = (transform.position - player.position).sqrMagnitude;
             if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
                 armed = true;
@@ -361,6 +367,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             armed = false;
             startedRevision = Item.ConsumptionRevision;
             startedContactRevision = contact != null ? contact.ContactRevision : -1;
+            if (settings.Trigger == DialogueTrigger.Consumption && contact != null && contact.AwaitingContact)
+                handledAwaitingRevision = contact.ContactRevision;
             IsSpeaking = true;
             arrivalPending = false;
             audio.Begin(settings.Audio, transform, arrivalCue);

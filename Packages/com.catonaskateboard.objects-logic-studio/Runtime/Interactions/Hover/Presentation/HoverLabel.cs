@@ -3,22 +3,18 @@ using UnityEngine.UI;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Animates existing prefab UI; it never creates graphics, fonts or materials during Play.</summary>
+    /// <summary>Animates one shared scene label using the selected interaction's existing configuration.</summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(1100)]
     [AddComponentMenu("Objects Logic Studio/Hover Label")]
-    public sealed class HoverLabel : MonoBehaviour
+    public sealed class HoverLabel : ObserverHudPanel
     {
         #region Serialized Fields
 
-        [Header("Authored UI")]
-        [Tooltip("Dedicated overlay canvas created in Edit mode and enabled only while this label is visible.")]
+        [Header("Hover Graphics")]
+        [Tooltip("Font used when a hover leaves its optional font override empty.")]
         [SerializeField]
-        private Canvas canvas;
-
-        [Tooltip("Movable panel under the canvas. Its size is authored in pixels at a 1080-pixel viewport height.")]
-        [SerializeField]
-        private RectTransform panel;
+        private Font defaultFont;
 
         [Tooltip("Existing text component containing content, font, size, alignment and color.")]
         [SerializeField]
@@ -41,18 +37,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float scale;
         private float fromAmount;
         private float fromScale;
-        private Transform originalParent;
-        private bool detached;
-        private bool returnPending;
+        private ObjectHover source;
 
         #endregion
 
         #region Properties
 
-        /// <summary>Canvas inspected and wired by editor tooling.</summary>
-        public Canvas Canvas => canvas;
-        /// <summary>Authored layout rectangle.</summary>
-        public RectTransform Panel => panel;
+        /// <summary>Authored fallback restored when switching from an item with a custom font.</summary>
+        internal Font DefaultFont => defaultFont;
         /// <summary>Existing typography and content component.</summary>
         public Text Text => text;
         /// <summary>Optional preauthored background.</summary>
@@ -62,82 +54,46 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Methods
 
-        #region Lifecycle
-
-        /// <summary>Prevents authored preview state from leaking into the first rendered frame.</summary>
-        private void Awake()
-        {
-            // A disabled canvas preserves geometry without drawing or accepting input.
-            Hide();
-        }
-
-        /// <summary>Removes the overlay immediately when its hierarchy is disabled.</summary>
-        private void OnDisable()
-        {
-            // No UI object is destroyed when the interaction disappears.
-            Hide();
-        }
-
-        /// <summary>Restores ownership outside SetActive callbacks and removes UI whose original object was destroyed.</summary>
-        private void LateUpdate()
-        {
-            // Detaching the existing overlay must not extend its owner's lifetime.
-            if (!detached)
-                return;
-            if (originalParent == null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            if (!returnPending)
-                return;
-            returnPending = false;
-            detached = false;
-            transform.SetParent(originalParent, false);
-            originalParent = null;
-        }
-
-        #endregion
-
         #region Presentation
 
-        /// <summary>Separates the authored overlay from rolling, scaled or physics-interpolated ancestors.</summary>
-        private void PrepareHud()
+        /// <summary>Reuses the same graphics for the selected hover, retaining only its optional exit animation.</summary>
+        /// <param name="observer">Observer owning the scene Canvas.</param>
+        /// <param name="selected">Current hover winner, or null while the previous label exits.</param>
+        /// <param name="time">Shared unscaled presentation time.</param>
+        internal void Present(HoverObserver observer, ObjectHover selected, float time)
         {
-            // Present runs at the observer's safe frame boundary, never inside parent activation callbacks.
-            returnPending = false;
-            if (detached)
+            // Another interaction callback may have invalidated the selected target.
+            if (selected != null && !selected.IsHovered)
+                selected = null;
+            if (selected != null && source != selected)
+            {
+                Hide();
+                source = selected;
+                source.Configuration.Style.Apply(this);
+            }
+            if (!Ready || source == null || !source.isActiveAndEnabled)
+            {
+                Hide();
                 return;
-            originalParent = transform.parent;
-            transform.SetParent(null, false);
-            transform.localRotation = Quaternion.identity;
-            transform.localScale = Vector3.one;
-            detached = true;
+            }
+            Animate(observer.View, source.WorldAnchor, source.Settings, time, source == selected);
         }
 
-        /// <summary>Hides immediately and returns detached UI to its prefab hierarchy on the next safe frame.</summary>
-        internal void Release()
+        /// <summary>Removes a destroyed, disabled or consumed owner's text without affecting another target.</summary>
+        /// <param name="interaction">Object whose hover presentation is ending.</param>
+        internal void Release(ObjectHover interaction)
         {
-            Hide();
-            returnPending = detached;
+            if (source == interaction)
+                Hide();
         }
 
-        /// <summary>Removes owned UI when its interaction is destroyed, including a pending return to the prefab.</summary>
-        /// <param name="owner">Interaction root whose exclusive label is being released.</param>
-        internal void Dispose(Transform owner)
+        /// <summary>Clears animation and source ownership while preserving the shared Canvas.</summary>
+        public override void Hide()
         {
-            if (OwnedBy(owner))
-                Destroy(gameObject);
-        }
-
-        /// <summary>Stops rendering while retaining the complete authored UI hierarchy.</summary>
-        public void Hide()
-        {
-            // Assign only at the visible-to-hidden transition or initialization.
             shown = false;
             requested = false;
-            if (canvas != null && canvas.enabled)
-                canvas.enabled = false;
+            source = null;
+            base.Hide();
         }
 
         /// <summary>Projects current object motion every frame and reverses entry or exit without restarting from the anchor.</summary>
@@ -146,7 +102,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="settings">Validated placement and animation settings.</param>
         /// <param name="time">Current unscaled time shared by all interactions.</param>
         /// <param name="visible">Whether detection currently requests a visible label.</param>
-        internal void Present(Camera view, Vector3 anchor, HoverSettings settings, float time, bool visible = true)
+        private void Animate(Camera view, Vector3 anchor, HoverSettings settings, float time, bool visible)
         {
             // Invisible labels do no projection work; optional exits retain their existing canvas.
             if (!shown && !visible)
@@ -156,8 +112,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Hide();
                 return;
             }
-            if (settings.FixedHud)
-                PrepareHud();
             if (!shown)
             {
                 amount = 0f;
@@ -166,8 +120,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 previousTime = time;
                 shown = true;
                 requested = false;
-                canvas.targetDisplay = view.targetDisplay;
-                canvas.enabled = true;
+                ShowPanel();
             }
             if (requested != visible)
             {
@@ -217,48 +170,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Position(Vector2 screenPoint, float pixelScale)
         {
             // Convert actual screen pixels to the existing canvas, including partial camera viewports.
-            if (RectTransformUtility.ScreenPointToWorldPointInRectangle((RectTransform)canvas.transform, screenPoint, null, out Vector3 position))
-                panel.position = position;
-            panel.localScale = Vector3.one * (scale * pixelScale);
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle((RectTransform)Canvas.transform, screenPoint, null, out Vector3 position))
+                Panel.position = position;
+            Panel.localScale = Vector3.one * (scale * pixelScale / Canvas.scaleFactor);
         }
 
         #endregion
 
         #region Validation
 
-        /// <summary>Checks the authored owner while allowing the overlay's temporary scene-root placement.</summary>
-        /// <param name="owner">Interaction root expected to own this dedicated UI.</param>
-        /// <returns>True when the current or retained parent belongs to the supplied object.</returns>
-        private bool OwnedBy(Transform owner)
+        /// <summary>Checks shared graphics independently of any individual interaction hierarchy.</summary>
+        /// <returns>True when the label can render every item's local style on the scene Canvas.</returns>
+        public override bool IsValid()
         {
-            return transform != owner && (detached ? originalParent != null && originalParent.IsChildOf(owner) : transform.IsChildOf(owner));
-        }
-
-        /// <summary>Checks ownership and UI references without repairing or replacing authored objects.</summary>
-        /// <param name="owner">Interaction whose prefab must contain this label.</param>
-        /// <param name="warning">Receives a missing or unsafe reference.</param>
-        /// <returns>True when the label can render independently of its object transform.</returns>
-        public bool TryValidate(Transform owner, out string warning)
-        {
-            // Dedicated descendants prevent one label from disabling the object or another canvas.
-            warning = string.Empty;
-            if (canvas == null || panel == null || text == null || text.font == null)
-                warning = "Create the hover UI in Objects Logic Studio and assign a font.";
-            else if (!OwnedBy(owner) || canvas.transform != transform
-                || panel == transform || !panel.IsChildOf(transform) || !text.transform.IsChildOf(panel)
-                || background != null && !background.transform.IsChildOf(panel))
-                warning = "Label, canvas, panel and graphics must belong to this object's dedicated UI child.";
-            else if (canvas.renderMode != RenderMode.ScreenSpaceOverlay
-                || transform.parent != null && transform.parent.GetComponentInParent<Canvas>() != null)
-                warning = "Hover UI requires its own Screen Space Overlay canvas.";
-            else if (!gameObject.activeSelf || !panel.gameObject.activeSelf || !text.enabled || !text.gameObject.activeSelf)
-                warning = "Keep label objects and Text active; visibility is controlled by the canvas.";
-            else if (text.raycastTarget || background != null && background.raycastTarget)
-                warning = "Disable Raycast Target on hover graphics so labels cannot intercept pointer input.";
-            else if (!float.IsFinite(panel.sizeDelta.x) || !float.IsFinite(panel.sizeDelta.y)
-                || panel.sizeDelta.x <= 0f || panel.sizeDelta.y <= 0f)
-                warning = "Label Size must contain positive, finite dimensions.";
-            return warning.Length == 0;
+            return base.IsValid() && text != null && defaultFont != null && text.canvasRenderer != null
+                && text.transform.IsChildOf(Panel) && !text.raycastTarget
+                && (background == null || background.transform.IsChildOf(Panel) && !background.raycastTarget);
         }
 
         #endregion

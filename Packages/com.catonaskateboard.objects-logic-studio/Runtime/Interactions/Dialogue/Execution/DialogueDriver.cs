@@ -104,6 +104,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // The router never enables maps, changes cursor state or locks the controller.
             Bind(observer);
+            input.Consume(singles.AssemblyButton);
             input.Consume(AssemblyInteractionRegistry.Consumed);
             foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
                 input.Consume(action);

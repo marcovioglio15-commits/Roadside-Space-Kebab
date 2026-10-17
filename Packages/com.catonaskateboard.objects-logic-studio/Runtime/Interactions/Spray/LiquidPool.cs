@@ -41,7 +41,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return null;
             for (int attempt = 0; attempt < capacity; attempt++)
             {
-                LiquidDroplet droplet = instance.droplets[instance.cursor];
+                // External destruction must not leave a permanently unusable slot in the persistent pool.
+                LiquidDroplet droplet = instance.GetDroplet(instance.cursor);
                 instance.cursor = (instance.cursor + 1) % capacity;
                 if (droplet.gameObject.activeSelf)
                     continue;
@@ -75,13 +76,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             mesh = BuildSphere();
             stream = new LiquidStreamMesh(transform, material, mesh, capacity);
             for (int index = 0; index < droplets.Length; index++)
-            {
-                GameObject root = new GameObject("Sauce Droplet");
-                root.SetActive(false);
-                root.transform.SetParent(transform, false);
-                droplets[index] = root.AddComponent<LiquidDroplet>();
-                droplets[index].Initialize();
-            }
+                GetDroplet(index);
+        }
+
+        /// <summary>Creates each slot once and replaces it only if an external owner destroyed its object.</summary>
+        /// <param name="index">Bounded pool slot being initialized or reused.</param>
+        /// <returns>A surviving initialized liquid sample.</returns>
+        private LiquidDroplet GetDroplet(int index)
+        {
+            // Normal emissions only read the existing component; repair never runs for a healthy slot.
+            if (droplets[index] != null)
+                return droplets[index];
+            GameObject root = new GameObject("Sauce Droplet");
+            root.SetActive(false);
+            root.transform.SetParent(transform, false);
+            droplets[index] = root.AddComponent<LiquidDroplet>();
+            droplets[index].Initialize();
+            return droplets[index];
         }
         /// <summary>Creates one compact smooth sphere shared by every liquid body.</summary>
         /// <returns>Unit-radius geometry with outward normals and UV coordinates.</returns>

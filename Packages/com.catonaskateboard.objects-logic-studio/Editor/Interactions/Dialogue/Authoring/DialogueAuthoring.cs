@@ -11,42 +11,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Construction
 
-        /// <summary>Creates one shared overlay on an observer before any dialogue enters Play.</summary>
-        /// <param name="observer">Scene or prefab observer that owns presentation lifetime.</param>
-        /// <param name="undo">Record Undo for persistent scene or native prefab-stage edits.</param>
-        internal static void CreateHud(HoverObserver observer, bool undo = true)
+        /// <summary>Builds an editable dialogue branch under the existing shared Canvas.</summary>
+        /// <param name="owner">Scene UI root receiving the branch.</param>
+        /// <param name="canvas">Canvas used by all gameplay panels.</param>
+        /// <returns>The authored dialogue controller with its existing graphics assigned.</returns>
+        internal static DialogueHud Build(Transform owner, Canvas canvas)
         {
-            // Dialogue objects contain only content and conditions; every page uses this existing overlay.
-            if (observer.DialogueHud != null)
-                return;
-            DialogueHud hud = Build(observer.transform, undo);
-            using (SerializedObject data = new SerializedObject(observer))
-            {
-                data.FindProperty("dialogueHud").objectReferenceValue = hud;
-                if (undo)
-                    data.ApplyModifiedProperties();
-                else
-                    data.ApplyModifiedPropertiesWithoutUndo();
-            }
-        }
-
-        /// <summary>Builds an editable bottom-screen panel that never intercepts player input.</summary>
-        /// <param name="owner">Prefab branch that owns the overlay.</param>
-        /// <param name="undo">Whether the caller retains the authored hierarchy for Undo.</param>
-        /// <returns>The complete HUD with all presentation references assigned.</returns>
-        private static DialogueHud Build(Transform owner, bool undo)
-        {
-            // Screen-space layout is authored once and scales against a reference resolution.
             RectTransform root = ObjectUiAuthoring.CreateRect("Dialogue HUD", owner);
-            Canvas canvas = root.gameObject.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 30;
-            canvas.enabled = false;
-            CanvasScaler scaler = root.gameObject.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.5f;
+            ObjectUiAuthoring.Stretch(root);
             RectTransform panel = ObjectUiAuthoring.CreateRect("Panel", root);
             panel.anchorMin = new Vector2(0.15f, 0.05f);
             panel.anchorMax = new Vector2(0.85f, 0.25f);
@@ -66,12 +38,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (SerializedObject data = new SerializedObject(hud))
             {
                 data.FindProperty("canvas").objectReferenceValue = canvas;
+                data.FindProperty("panel").objectReferenceValue = panel;
                 data.FindProperty("body").objectReferenceValue = body;
                 data.FindProperty("speaker").objectReferenceValue = speaker;
                 data.ApplyModifiedPropertiesWithoutUndo();
             }
-            if (undo)
-                Undo.RegisterCreatedObjectUndo(root.gameObject, "Create dialogue HUD");
+            panel.gameObject.SetActive(false);
             return hud;
         }
 

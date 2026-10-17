@@ -248,6 +248,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // A failed proposal leaves the carry slot and existing product untouched.
             if (!CanAccept(held, requireHeld))
                 return false;
+            // Explicit placement may offer a suspended ingredient, but a failed transfer keeps its previous restriction.
+            bool requiredPlacement = held.RequiresAssemblyPlacement;
+            if (requireHeld)
+                held.RequiresAssemblyPlacement = false;
+            bool placed = PlaceIngredient(held, requireHeld);
+            if (!placed)
+                held.RequiresAssemblyPlacement = requiredPlacement;
+            return placed;
+        }
+
+        /// <summary>Commits a validated player placement or automatic contact proposal.</summary>
+        /// <param name="held">Eligible ingredient or returning product.</param>
+        /// <param name="requireHeld">Whether an explicit player command owns this placement.</param>
+        /// <returns>True after a return, insertion or provisional placement succeeds.</returns>
+        private bool PlaceIngredient(ObjectGrab held, bool requireHeld)
+        {
+            // Returning a product and offering a new ingredient retain their existing ownership paths.
             if (CanReturn(held, requireHeld, out ObjectAssemblyProduct returning))
             {
                 held.Cancel();
@@ -319,9 +336,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 product.gameObject.SetActive(true);
             product.PublishPending();
             Signal(InteractionMoment.Started);
-            if (!complete && product.IsComplete)
+            if (!product.Settings.ProlongedAssembly && !complete && product.IsComplete)
                 Signal(InteractionMoment.Completed);
             return true;
+        }
+
+        /// <summary>Publishes delayed station completion only after its product finishes prolonged assembly.</summary>
+        /// <param name="product">Finalized product still associated with this station.</param>
+        internal void Complete(ObjectAssemblyProduct product)
+        {
+            // Another station's product or a previously released product cannot complete this station.
+            if (current == product && product.IsFinalized)
+                Signal(InteractionMoment.Completed);
         }
 
         /// <summary>Separates returning this table's own product from supplying another recipe's ingredient.</summary>

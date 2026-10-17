@@ -527,14 +527,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 else
                     status = "Choose an anchor inside the selected object's hierarchy.";
             }
-            using (new EditorGUI.DisabledScope(EditorUtility.IsPersistent(hover)))
-                if (hover.Label == null && StudioButton.Draw(new GUIContent("Create Hover UI", "Author missing label objects in the prefab workspace or a loaded scene.")))
-                {
-                    HoverAuthoring.CreateLabel(hover);
-                    ObjectAuthoringSave.Save(hover.gameObject);
-                    state.Hierarchy = HoverHierarchy.Signature(hover.transform);
-                    state.Persist();
-                }
         }
 
         /// <summary>Provides the common transaction actions outside the scrolling form.</summary>

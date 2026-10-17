@@ -3578,6 +3578,103 @@ Transform:
   - {fileID: 1180821469}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &991517756
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4911381168271008827, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_Name
+      value: PF_GameplayUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
 --- !u!1001 &1024881220
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7202,6 +7299,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &17730534569783758
@@ -7268,6 +7366,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &20362243752410265
@@ -7392,6 +7491,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &291428719740982811
@@ -7458,6 +7558,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &513844241216567752
@@ -7524,6 +7625,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &684992757922442575
@@ -7590,6 +7692,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &719446844450999629
@@ -7656,6 +7759,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1190916225964739301
@@ -7722,6 +7826,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1351644378644311404
@@ -7788,6 +7893,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1492511955564994968
@@ -7854,6 +7960,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1506534986210265573
@@ -7920,6 +8027,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1648688556095581401
@@ -7986,6 +8094,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1795575305235709067
@@ -8052,6 +8161,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1797278266936323800
@@ -8118,6 +8228,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1852585522641887296
@@ -8184,6 +8295,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1852733608359398746
@@ -8250,6 +8362,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1918547899491747691
@@ -8316,6 +8429,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1981650688567087252
@@ -8382,6 +8496,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &1990284630441642137
@@ -8448,6 +8563,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &2403162754689431421
@@ -8514,6 +8630,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &2619754527881812110
@@ -8580,6 +8697,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &2681418505697549777
@@ -8703,6 +8821,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &3012324271618570239
@@ -8769,6 +8888,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &3049353292455903720
@@ -8835,6 +8955,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &3118373826492394578
@@ -8901,6 +9022,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &3201652862888819269
@@ -8967,6 +9089,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &3574023213786086645
@@ -9033,6 +9156,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &3576922521470896498
@@ -9099,6 +9223,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &4269745216623104381
@@ -9222,6 +9347,7 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
 --- !u!114 &4507073242539198532
@@ -9362,3 +9488,4 @@ SceneRoots:
   - {fileID: 2893672798677197614}
   - {fileID: 4436425023352274253}
   - {fileID: 982764584}
+  - {fileID: 991517756}

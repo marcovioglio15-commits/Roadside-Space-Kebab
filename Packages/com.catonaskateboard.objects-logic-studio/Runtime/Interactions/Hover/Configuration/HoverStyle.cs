@@ -16,7 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [TextArea]
         private string content = "Inspect";
 
-        [Tooltip("Optional font override. Empty keeps the font already authored on the label.")]
+        [Tooltip("Optional font override. Empty uses the shared label's default font.")]
         [SerializeField]
         private Font font = null;
 
@@ -60,10 +60,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Text displacement inside the label in reference pixels.")]
         [SerializeField]
         private Vector2 textOffset = Vector2.zero;
-
-        [Tooltip("Overlay order relative to other canvases.")]
-        [SerializeField]
-        private int sortingOrder = 20;
 
         [Header("Background")]
         [Tooltip("Show the existing background Image.")]
@@ -136,8 +132,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // A preset changes component values, never the UI hierarchy.
             Text text = label.Text;
             text.text = content;
-            if (font != null)
-                text.font = font;
+            text.font = font != null ? font : label.DefaultFont;
             text.fontSize = fontSize;
             text.fontStyle = fontStyle;
             text.color = textColor;
@@ -148,7 +143,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             label.Panel.sizeDelta = size;
             text.rectTransform.sizeDelta = textSizeOffset;
             text.rectTransform.anchoredPosition = textOffset;
-            label.Canvas.sortingOrder = sortingOrder;
             if (label.Background == null)
                 return;
             label.Background.enabled = showBackground;

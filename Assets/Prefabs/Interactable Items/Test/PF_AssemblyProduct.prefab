@@ -115,6 +115,34 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    ProlongedAssembly: 1
+    Charge:
+      Action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+      Target:
+        Distance: 3
+        Mode: 0
+        SolidHitOnly: 0
+        CenterRadius: 0.15
+        Offset: {x: 0, y: 0, z: 0}
+        ObstacleMask:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        DrawGizmos: 1
+      Duration: 1.5
+      CompleteOnRelease: 0
+      GrabOnComplete: 1
+      ShowHud: 1
+      Icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+      IconColor: {r: 1, g: 1, b: 1, a: 1}
+      RingColor: {r: 1, g: 0.75, b: 0.2, a: 1}
+      TrackColor: {r: 0, g: 0, b: 0, a: 0.65}
+      Size: 64
+      Thickness: 0.12
+      OffsetX: 0
+      OffsetY: -80
+      Drain: 0
+      Clockwise: 1
+    LockFirstIngredient: 0
     FinalizeOnGrab: 1
     FinalizeAction: {fileID: 0}
     FinalizeTarget:

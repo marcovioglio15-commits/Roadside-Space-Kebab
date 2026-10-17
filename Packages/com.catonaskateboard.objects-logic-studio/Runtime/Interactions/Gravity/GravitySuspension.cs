@@ -40,6 +40,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 lease = new Lease { Gravity = body.useGravity };
                 bodies.Add(body, lease);
+                // Passive floating cannot offer an ingredient; only a later player release or placement can.
+                if (body.TryGetComponent(out ObjectGrab grab))
+                    grab.RequiresAssemblyPlacement = true;
             }
             lease.Owners.Add(owner);
             body.useGravity = false;

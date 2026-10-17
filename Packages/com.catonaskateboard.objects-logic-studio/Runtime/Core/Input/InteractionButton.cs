@@ -10,6 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly InputAction action;
         private bool pending;
+        private bool pressed;
         private InputControl control;
 
         #endregion
@@ -18,6 +19,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Whether an enabled button has performed since the last observer dispatch.</summary>
         internal bool Pending => pending && action.enabled;
+        /// <summary>Fresh button actuation, including actions whose performed callback waits for Hold.</summary>
+        internal bool Pressed => pressed && action.enabled;
         /// <summary>Whether the owning PlayerInput currently enables this action.</summary>
         internal bool Enabled => action.enabled;
         /// <summary>Current held state from the player's private action, independent of buffered presses.</summary>
@@ -35,6 +38,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // One signal is shared by every object that references the same action.
             this.action = action;
+            // Registry rebuilds during a held charge must retain the control needed to suppress its later release.
+            control = action.activeControl;
+            action.started += Started;
             action.performed += Performed;
             InputSystem.onActionChange += ActionChanged;
         }
@@ -44,13 +50,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Action maps belong to PlayerInput and remain untouched.
             action.performed -= Performed;
+            action.started -= Started;
             InputSystem.onActionChange -= ActionChanged;
-            pending = false;
+            pending = pressed = false;
         }
 
         #endregion
 
         #region Signals
+
+        /// <summary>Retains initial actuation separately from tap or hold completion.</summary>
+        /// <param name="context">Input System callback identifying the actual device control.</param>
+        private void Started(InputAction.CallbackContext context)
+        {
+            // Prolonged assembly owns its duration instead of waiting for a second authored Hold timer.
+            pressed = true;
+            control = context.control;
+        }
 
         /// <summary>Retains a performed event even when button release occurs in the same input update.</summary>
         /// <param name="context">Input System callback for this button.</param>
@@ -58,6 +74,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // The interaction executes once on performed, respecting authored tap/hold interactions.
             pending = true;
+            pressed = true;
             control = context.control;
         }
 
@@ -68,7 +85,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Pending state is checked by dispatch; control identity keeps keyboard and gamepad presses separate.
             return other != null && (ReferenceEquals(action, other.action)
-                || control != null && ReferenceEquals(control, other.control));
+                || (action.activeControl ?? control) != null
+                    && ReferenceEquals(action.activeControl ?? control, other.action.activeControl ?? other.control));
         }
 
         /// <summary>Prevents a disabled and re-enabled map from replaying an old button event.</summary>
@@ -79,14 +97,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Ordinary button cancellation does not erase a same-update performed event.
             if ((change == InputActionChange.ActionDisabled && ReferenceEquals(changed, action))
                 || (change == InputActionChange.ActionMapDisabled && ReferenceEquals(changed, action.actionMap)))
-                pending = false;
+                pending = pressed = false;
         }
 
         /// <summary>Consumes the frame's buffered event after target arbitration.</summary>
         internal void Clear()
         {
             // All candidates see the same event before this shared reset.
-            pending = false;
+            pending = pressed = false;
         }
 
         #endregion

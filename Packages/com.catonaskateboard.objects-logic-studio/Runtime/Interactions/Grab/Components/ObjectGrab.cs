@@ -67,6 +67,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public override SingleInteractionKind Kind => SingleInteractionKind.Grab;
         /// <summary>Whether this object currently belongs to the observer's carry slot.</summary>
         public bool IsHeld { get; private set; }
+        /// <summary>Changes once for an explicit Drop or Throw; interrupted carry and passive movement do not count.</summary>
+        internal uint ReleaseRevision { get; private set; }
+        /// <summary>Changes only after a successful player pickup, rearming rejected-contact dialogue.</summary>
+        internal uint PickupRevision { get; private set; }
+        /// <summary>Suspended ingredients require a deliberate Drop, Throw or station placement before automatic assembly.</summary>
+        internal bool RequiresAssemblyPlacement { get; set; }
         /// <summary>Owned rigidbody used by release actions.</summary>
         public Rigidbody Body => body;
         /// <summary>Whether selected-object debug geometry is enabled.</summary>
@@ -86,10 +92,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Lifecycle
 
-        /// <summary>Clears pickup arming when entering a new Play session with scene reload disabled.</summary>
-        internal void ResetAudio()
+        /// <summary>Clears release eligibility and pickup audio when entering a new Play session with scene reload disabled.</summary>
+        internal void ResetSessionState()
         {
             // Inventory suspension within a session preserves first-grab history.
+            RequiresAssemblyPlacement = false;
+            ReleaseRevision = 0;
+            PickupRevision = 0;
             grabbedOnce = false;
             nextImpact = 0f;
         }
@@ -321,6 +330,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.PhysicalPickup && pickupDuration > 0f)
                 physical.Begin(body, settings);
             IsHeld = true;
+            PickupRevision++;
             grabbedOnce = true;
             if (settings.PickupSound)
                 StudioAudio.Play("sfx_pickup", transform);
@@ -442,6 +452,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Drop starts from rest; Throw adds its deliberate launch after this common transition.
             if (!IsHeld || body == null)
                 return;
+            RequiresAssemblyPlacement = false;
+            ReleaseRevision++;
             IsHeld = false;
             physical.Stop();
             // Early release inside the dispenser restores contact only after safe separation.

@@ -24,12 +24,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SerializedProperty flag = serializedObject.FindProperty("playerFlag");
             ObjectFlagSelector.Draw(flag);
             using (new EditorGUI.DisabledScope(Application.isPlaying))
-                StudioGUI.PropertyField(serializedObject.FindProperty("dialogueHud"));
+                StudioGUI.PropertyField(serializedObject.FindProperty("sceneHud"));
             serializedObject.ApplyModifiedProperties();
             HoverObserver observer = (HoverObserver)target;
-            if (!Application.isPlaying && !EditorUtility.IsPersistent(observer) && observer.DialogueHud == null
-                && StudioButton.Draw(new GUIContent("Create Shared Dialogue HUD", "Create one overlay for all dialogues before Play.")))
-                DialogueAuthoring.CreateHud(observer);
+            if (!Application.isPlaying)
+                ObjectSceneHudAuthoring.Draw(observer);
             if (Application.isPlaying && StudioButton.Draw(new GUIContent("Refresh Context", "Reacquire the camera and flagged player after an explicit binding change.")))
                 observer.RefreshContext();
             if (observer.Warning.Length > 0)

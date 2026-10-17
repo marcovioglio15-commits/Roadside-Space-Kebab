@@ -21,15 +21,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private ObjectFlag playerFlag;
 
-        [Tooltip("Single authored dialogue overlay shared by every object seen by this observer. Create it in Scene Observer before Play.")]
+        [Tooltip("Optional scene HUD override. Empty resolves the single authored HUD in this gameplay scene; prefab observers need no UI children.")]
         [SerializeField]
-        private DialogueHud dialogueHud;
+        private ObjectSceneHud sceneHud;
 
         #endregion
 
         #region State
 
         private static HoverObserver active;
+        private ObjectSceneHud resolvedHud;
         private readonly HoverPhysics physics = new HoverPhysics();
         private readonly SingleInteractionDriver singles = new SingleInteractionDriver();
         private readonly DialogueDriver dialogues = new DialogueDriver();
@@ -50,7 +51,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Authored camera reference available to editor setup before Play begins.</summary>
         public Camera ConfiguredView => view;
         /// <summary>Shared dialogue presentation authored on the player or in the scene.</summary>
-        public DialogueHud DialogueHud => dialogueHud;
+        public DialogueHud DialogueHud => resolvedHud != null ? resolvedHud.Dialogue : null;
+        /// <summary>Existing shared progress overlay for prolonged assembly.</summary>
+        public AssemblyChargeHud AssemblyHud => resolvedHud != null ? resolvedHud.Assembly : null;
+        /// <summary>Shared scene hover label used by every detected item.</summary>
+        internal HoverLabel HoverHud => resolvedHud != null ? resolvedHud.Hover : null;
+        /// <summary>Optional authored scene binding exposed to editor tools.</summary>
+        public ObjectSceneHud SceneHud => sceneHud;
         /// <summary>Cached identified root used for distance and player-collider filtering.</summary>
         public Transform Player => player;
         /// <summary>Current gameplay player used by scene-preserving respawn.</summary>
@@ -87,8 +94,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Reacquisition never instantiates a player, camera or UI.
             RefreshContext();
-            if (dialogueHud != null)
-                dialogueHud.Bind(this);
         }
 
         /// <summary>Releases ownership and hides all labels before another observer takes over.</summary>
@@ -97,8 +102,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Input subscriptions belong to this observer even when another observer owns the view.
             singles.Reset();
             dialogues.Reset();
-            if (dialogueHud != null)
-                dialogueHud.Unbind(this);
+            if (resolvedHud != null)
+                resolvedHud.Unbind(this);
+            resolvedHud = null;
             // A duplicate observer must not hide the active observer's output.
             if (active != this)
                 return;
@@ -117,13 +123,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Report("Only one Hover Observer can be active. Disable the previous observer before switching views.");
                 return;
             }
-            if (active != this && dialogueHud != null)
-                dialogueHud.Bind(this);
             active = this;
             if (Time.unscaledTime >= nextResolve)
             {
                 nextResolve = Time.unscaledTime + 1f;
                 ResolveContext();
+                ResolveHud();
             }
             bool available = resolvedView != null && resolvedView.isActiveAndEnabled && player != null
                 && player.gameObject.activeInHierarchy;
@@ -134,9 +139,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (available)
             {
-                // Preparation precedes the dialogue readiness check without reparenting during activation callbacks.
-                if (dialogueHud != null)
-                    dialogueHud.Prepare(this);
                 InteractionUnlockRegistry.Tick(this);
                 AssemblyInteractionRegistry.Tick(this);
                 HoverRegistry.Tick(this);
@@ -172,7 +174,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Requests a new camera and identified player after an explicit runtime camera or flag change.</summary>
         public void RefreshContext()
         {
-            // Camera replacement also releases held objects and old PlayerInput subscriptions.
+            // Camera replacement also releases held objects, scene panels and private input subscriptions.
+            if (resolvedHud != null)
+                resolvedHud.Unbind(this);
+            resolvedHud = null;
             singles.Reset();
             dialogues.Reset();
             InteractionUnlockRegistry.Reset();
@@ -184,6 +189,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             lastWarning = string.Empty;
             if (active == this)
                 HoverRegistry.HideAll();
+        }
+
+        /// <summary>Connects only preauthored scene panels at the context-resolution boundary.</summary>
+        private void ResolveHud()
+        {
+            ObjectSceneHud next = sceneHud != null ? sceneHud : ObjectSceneHud.Find(gameObject.scene);
+            if (next != resolvedHud && resolvedHud != null)
+                resolvedHud.Unbind(this);
+            resolvedHud = next;
+            if (resolvedHud == null || !resolvedHud.Bind(this))
+                Report("Add one valid Scene HUD to the gameplay scene before Play. UI is never created at runtime.");
         }
 
         /// <summary>Resolves missing context at most once per second, allowing player spawn and respawn.</summary>
