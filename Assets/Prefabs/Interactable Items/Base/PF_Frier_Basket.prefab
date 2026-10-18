@@ -101,6 +101,8 @@ MonoBehaviour:
     Modifications:
     - {fileID: 11400000, guid: d578edb2262163c42a71ea603fbf3dd9, type: 2}
     - {fileID: 11400000, guid: d565d370b7a543c3a05326d7897ad222, type: 2}
+    - {fileID: 11400000, guid: c956ba15614f51d4e95bc2e9effea6dd, type: 2}
+    - {fileID: 11400000, guid: 8fdf74ee869337344b60365a93dd27d8, type: 2}
     Target:
       Distance: 3
       Mode: 0

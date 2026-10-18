@@ -552,21 +552,6 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
-    - Name: PizzaKebabNoTomato
-      Text: '- Tomato'
-      AppendToBaseText: 1
-      Weight: 1
-      UseQuantity: 0
-      Quantity: 1
-      UseDrawLimits: 0
-      RandomRequiredDraws: 0
-      MinimumDraws: 0
-      RequiredDrawRange: {x: 0, y: 1}
-      MaximumDraws: 1
-      Flags: []
-      RequireAllFlags: 1
-      ExcludedFlags:
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
     - Name: PizzaKebabNoLettuce
       Text: '- Lettuce'
       AppendToBaseText: 1
