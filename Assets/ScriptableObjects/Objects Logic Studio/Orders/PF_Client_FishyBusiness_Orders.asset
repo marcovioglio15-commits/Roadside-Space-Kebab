@@ -28,9 +28,11 @@ MonoBehaviour:
     IncludeBaseOrder: 0
     Variants:
     - Name: WrapKebabBaseOrder
-      Text: (Complete)
+      Text: 
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -44,6 +46,8 @@ MonoBehaviour:
       Text: '- Tomato'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -57,6 +61,8 @@ MonoBehaviour:
       Text: '- Lettuce'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -70,6 +76,8 @@ MonoBehaviour:
       Text: '- Onion'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -83,6 +91,8 @@ MonoBehaviour:
       Text: + Fries
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -92,6 +102,17 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: PaninoKebab
     Text: Kebab Panino
     Quantity: 1
@@ -107,9 +128,11 @@ MonoBehaviour:
     IncludeBaseOrder: 0
     Variants:
     - Name: PaninoKebabBaseOrder
-      Text: (Complete)
+      Text: 
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -123,6 +146,8 @@ MonoBehaviour:
       Text: '- Tomato'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -136,6 +161,8 @@ MonoBehaviour:
       Text: '- Lettuce'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -149,6 +176,8 @@ MonoBehaviour:
       Text: '- Onion'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -162,6 +191,8 @@ MonoBehaviour:
       Text: + Fries
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -171,6 +202,17 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: WrapFalafel
     Text: Falafel Wrap
     Quantity: 1
@@ -186,9 +228,11 @@ MonoBehaviour:
     IncludeBaseOrder: 0
     Variants:
     - Name: WrapFalafelBaseOrder
-      Text: (Complete)
+      Text: 
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -202,6 +246,8 @@ MonoBehaviour:
       Text: '- Tomato'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -215,6 +261,8 @@ MonoBehaviour:
       Text: '- Lettuce'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -228,6 +276,8 @@ MonoBehaviour:
       Text: '- Onion'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -241,6 +291,8 @@ MonoBehaviour:
       Text: + Fries
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -250,6 +302,17 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: PaninoFalafel
     Text: Falafel Panino
     Quantity: 1
@@ -265,9 +328,11 @@ MonoBehaviour:
     IncludeBaseOrder: 0
     Variants:
     - Name: PaninoFalafelBaseOrder
-      Text: (Complete)
+      Text: 
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -281,6 +346,8 @@ MonoBehaviour:
       Text: '- Tomato'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -294,6 +361,8 @@ MonoBehaviour:
       Text: '- Lettuce'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -307,6 +376,8 @@ MonoBehaviour:
       Text: '- Onion'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -320,6 +391,8 @@ MonoBehaviour:
       Text: + Fries
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -329,6 +402,17 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: PizzaRossa
     Text: Pizza Rossa
     Quantity: 1
@@ -344,9 +428,11 @@ MonoBehaviour:
     IncludeBaseOrder: 0
     Variants:
     - Name: PizzaRossaBaseOrder
-      Text: (Complete)
+      Text: 
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -360,6 +446,8 @@ MonoBehaviour:
       Text: + Fries
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -369,6 +457,17 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: PizzaMargherita
     Text: Pizza Margherita
     Quantity: 1
@@ -384,9 +483,11 @@ MonoBehaviour:
     IncludeBaseOrder: 0
     Variants:
     - Name: PizzaMargheritaBaseOrder
-      Text: (Complete)
+      Text: 
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -400,6 +501,8 @@ MonoBehaviour:
       Text: + Fries
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -409,6 +512,17 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: PizzaKebab
     Text: Pizza Kebab
     Quantity: 1
@@ -424,9 +538,11 @@ MonoBehaviour:
     IncludeBaseOrder: 0
     Variants:
     - Name: PizzaKebabBaseOrder
-      Text: (Complete)
+      Text: 
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -440,6 +556,8 @@ MonoBehaviour:
       Text: '- Tomato'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -453,6 +571,8 @@ MonoBehaviour:
       Text: '- Lettuce'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -466,6 +586,8 @@ MonoBehaviour:
       Text: '- Onion'
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -479,6 +601,8 @@ MonoBehaviour:
       Text: + Fries
       AppendToBaseText: 1
       Weight: 1
+      UseQuantity: 0
+      Quantity: 1
       UseDrawLimits: 0
       RandomRequiredDraws: 0
       MinimumDraws: 0
@@ -488,6 +612,17 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: FrenchFries
     Text: French Fries
     Quantity: 1
@@ -502,6 +637,17 @@ MonoBehaviour:
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1
     Variants: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: Nuggets
     Text: Nuggets
     Quantity: 1
@@ -516,6 +662,17 @@ MonoBehaviour:
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1
     Variants: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: CrabClaws
     Text: Crab Claws
     Quantity: 1
@@ -530,6 +687,17 @@ MonoBehaviour:
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1
     Variants: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: WaterBottle
     Text: Water Bottle
     Quantity: 1
@@ -544,6 +712,17 @@ MonoBehaviour:
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1
     Variants: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: SodaCan
     Text: Soda Can
     Quantity: 1
@@ -558,6 +737,17 @@ MonoBehaviour:
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1
     Variants: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
   - Name: BeerBottle
     Text: Beer Bottle
     Quantity: 1
@@ -572,3 +762,14 @@ MonoBehaviour:
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1
     Variants: []
+    Combos:
+      Enabled: 0
+      MaximumVariants: 2
+      Weight: 1
+      QuantityPolicy: 0
+      Quantity: 1
+      DrawLimitsPolicy: 3
+      MinimumDraws: 0
+      RandomRequiredDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1

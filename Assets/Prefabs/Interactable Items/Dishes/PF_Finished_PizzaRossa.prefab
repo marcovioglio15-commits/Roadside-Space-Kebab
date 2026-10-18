@@ -457,6 +457,10 @@ MonoBehaviour:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       Count: 1
       Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      Count: 1
+      Optional: 1
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0
@@ -476,7 +480,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       Order: 2
-      Position: {x: 0, y: 0.031446874, z: 0}
+      Position: {x: 0, y: 0.03, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
@@ -484,6 +488,19 @@ MonoBehaviour:
         Materials: []
         Visibility: []
       PreviewPrefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
+    - Name: Magnet 3
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      Order: 0
+      Position: {x: 0, y: 0.025, z: 0}
+      Rotation: {x: 0, y: 45, z: 0}
+      Scale: {x: 0.7, y: 0.7, z: 0.7}
+      Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      PreviewPrefab: {fileID: 6484676068278646964, guid: a7f8a1a708ab7fc4db668aa796f19a34, type: 3}
     InteractionRules:
     - Target: {fileID: 9123578632224009876}
       RequireComplete: 1

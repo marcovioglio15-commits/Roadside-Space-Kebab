@@ -467,6 +467,10 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       Count: 1
       Optional: 1
+    - Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      Count: 1
+      Optional: 1
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0
@@ -533,6 +537,19 @@ MonoBehaviour:
         Materials: []
         Visibility: []
       PreviewPrefab: {fileID: 2891034634997325463, guid: 750a7a35b9d541f4b805396137f7c6b6, type: 3}
+    - Name: Magnet 6
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      Order: 0
+      Position: {x: 0, y: 0.05, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 0.8, y: 0.8, z: 0.8}
+      Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      PreviewPrefab: {fileID: 6484676068278646964, guid: a7f8a1a708ab7fc4db668aa796f19a34, type: 3}
     InteractionRules:
     - Target: {fileID: 8524664379613520956}
       RequireComplete: 1

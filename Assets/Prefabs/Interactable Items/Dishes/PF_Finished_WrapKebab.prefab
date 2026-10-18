@@ -492,7 +492,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: c69745f27196e29439f70f5d1d5c1ea1, type: 2}
       Order: 0
-      Position: {x: 0, y: -0.16162823, z: 0}
+      Position: {x: 0, y: -0.16, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
@@ -505,7 +505,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       Order: 0
-      Position: {x: 0.055758238, y: -0.13480838, z: 0.015019022}
+      Position: {x: 0.07, y: -0.155, z: -0.05}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
@@ -518,7 +518,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       Order: 0
-      Position: {x: 0, y: -0.15663356, z: 0}
+      Position: {x: 0, y: -0.16, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 2, y: 1, z: 2}
       Appearance:
@@ -531,7 +531,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       Order: 0
-      Position: {x: -0.07442255, y: -0.15060161, z: 0.039813578}
+      Position: {x: -0.07, y: -0.155, z: 0.05}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
@@ -544,9 +544,9 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       Order: 0
-      Position: {x: 0, y: 0, z: 0}
-      Rotation: {x: 0, y: 0, z: 0}
-      Scale: {x: 1, y: 1, z: 1}
+      Position: {x: 0, y: -0.15, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      Scale: {x: 0.8, y: 0.8, z: 0.8}
       Appearance:
         Meshes: []
         Materials: []
