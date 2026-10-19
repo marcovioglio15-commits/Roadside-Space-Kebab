@@ -58,13 +58,13 @@ MonoBehaviour:
     - Name: WrapKebabBaseOrder
       Text: 
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -76,7 +76,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -102,15 +102,15 @@ MonoBehaviour:
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: WrapKebabNoTomato
-      Text: \n- Tomato
+      Text: '- Tomato'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -122,7 +122,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -148,15 +148,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: WrapKebabNoLettuce
-      Text: \n- Lettuce
+      Text: '- Lettuce'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -168,7 +168,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -194,15 +194,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: WrapKebabNoOnion
-      Text: \n- Onion
+      Text: '- Onion'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -214,7 +214,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -240,15 +240,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: WrapKebabWithFries
-      Text: \n+ Fries
+      Text: + Fries
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -260,7 +260,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -341,13 +341,13 @@ MonoBehaviour:
     - Name: PaninoKebabBaseOrder
       Text: 
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -359,7 +359,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -385,15 +385,15 @@ MonoBehaviour:
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PaninoKebabNoTomato
-      Text: \n- Tomato
+      Text: '- Tomato'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -405,7 +405,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -431,15 +431,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PaninoKebabNoLettuce
-      Text: \n- Lettuce
+      Text: '- Lettuce'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -451,7 +451,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -477,15 +477,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PaninoKebabNoOnion
-      Text: \n- Onion
+      Text: '- Onion'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -497,7 +497,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -523,15 +523,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PaninoKebabWithFries
-      Text: \n+ Fries
+      Text: + Fries
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -543,7 +543,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -624,13 +624,13 @@ MonoBehaviour:
     - Name: WrapFalafelBaseOrder
       Text: 
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -642,7 +642,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -668,15 +668,15 @@ MonoBehaviour:
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: WrapFalafelNoTomato
-      Text: \n- Tomato
+      Text: '- Tomato'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -688,7 +688,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -714,15 +714,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: WrapFalafelNoLettuce
-      Text: \n- Lettuce
+      Text: '- Lettuce'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -734,7 +734,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -760,15 +760,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: WrapFalafelNoOnion
-      Text: \n- Onion
+      Text: '- Onion'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -780,7 +780,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -806,15 +806,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: WrapFalafelWithFries
-      Text: \n+ Fries
+      Text: + Fries
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -826,7 +826,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -907,13 +907,13 @@ MonoBehaviour:
     - Name: PaninoFalafelBaseOrder
       Text: 
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -925,7 +925,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -951,15 +951,15 @@ MonoBehaviour:
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PaninoFalafelNoTomato
-      Text: \n- Tomato
+      Text: '- Tomato'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -971,7 +971,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -997,15 +997,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PaninoFalafelNoLettuce
-      Text: \n- Lettuce
+      Text: '- Lettuce'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1017,7 +1017,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1043,15 +1043,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PaninoFalafelNoOnion
-      Text: \n- Onion
+      Text: '- Onion'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1063,7 +1063,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1089,15 +1089,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PaninoFalafelWithFries
-      Text: \n+ Fries
+      Text: + Fries
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1109,7 +1109,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1190,13 +1190,13 @@ MonoBehaviour:
     - Name: PizzaRossaBaseOrder
       Text: 
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1208,7 +1208,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1231,15 +1231,15 @@ MonoBehaviour:
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PizzaRossaWithFries
-      Text: \n+ Fries
+      Text: + Fries
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1251,7 +1251,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1329,13 +1329,13 @@ MonoBehaviour:
     - Name: PizzaMargheritaBaseOrder
       Text: 
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1347,7 +1347,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1370,15 +1370,15 @@ MonoBehaviour:
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PizzaMargheritaWithFries
-      Text: \n+ Fries
+      Text: + Fries
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1390,7 +1390,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1468,13 +1468,13 @@ MonoBehaviour:
     - Name: PizzaKebabBaseOrder
       Text: 
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1486,7 +1486,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1511,15 +1511,15 @@ MonoBehaviour:
       ExcludedFlags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PizzaKebabNoLettuce
-      Text: \n- Lettuce
+      Text: '- Lettuce'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1531,7 +1531,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1556,15 +1556,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PizzaKebabNoOnion
-      Text: \n- Onion
+      Text: '- Onion'
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1576,7 +1576,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1601,15 +1601,15 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     - Name: PizzaKebabWithFries
-      Text: \n+ Fries
+      Text: + Fries
       TextStyle:
-        Enabled: 0
+        Enabled: 1
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 3
+        Size: 1.5
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1621,7 +1621,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0
+        Indent: 0.3
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
