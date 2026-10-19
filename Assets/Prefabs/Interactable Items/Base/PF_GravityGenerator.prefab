@@ -205,7 +205,7 @@ MonoBehaviour:
       RestoreOutside: 1
     RandomInterval: 1
     Interval: 10
-    IntervalRange: {x: 5, y: 15}
+    IntervalRange: {x: 45, y: 60}
     Restore: 0
     Duration: 10
     Target:
@@ -226,7 +226,7 @@ MonoBehaviour:
     DirectionMaximum: {x: 1, y: 1, z: 1}
     RandomIntensity: 1
     Intensity: 1
-    IntensityRange: {x: 1, y: 15}
+    IntensityRange: {x: 1, y: 3}
     RandomForceDuration: 1
     ForceDuration: 0
     ForceDurationRange: {x: 0, y: 0.1}
@@ -287,5 +287,6 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
