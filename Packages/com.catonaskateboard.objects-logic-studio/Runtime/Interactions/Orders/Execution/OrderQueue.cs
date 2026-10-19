@@ -13,7 +13,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal OrderEntry Entry => Candidate.Entry;
         internal string Name => Candidate.Name;
         internal readonly string Destination;
-        internal string Text => Candidate.Text;
         internal OrderBoard Board;
         internal int Slot = -1;
         internal bool Completed;

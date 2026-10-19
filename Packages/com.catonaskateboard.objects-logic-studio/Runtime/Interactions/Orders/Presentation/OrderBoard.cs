@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Existing 3D TextMeshPro or world-space Canvas text objects, one per order slot. Runtime creates no UI.")]
         [SerializeField]
         private TMP_Text[] slots = Array.Empty<TMP_Text>();
-        [Tooltip("Paragraph capacity prepared in Edit mode per order slot. Include one paragraph for the base order and one per combo variant.")]
+        [Tooltip("Paragraph capacity prepared in Edit mode per order slot. Include one per variant and one more for a custom-styled base; otherwise base text stays in the main slot.")]
         [SerializeField]
         [Range(1, 33)]
         private int paragraphCapacity = 9;
@@ -144,10 +144,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             int index = ticket.Slot;
             if (index < 0 || index >= occupied.Length || occupied[index] != ticket || slots[index] == null)
                 return;
-            slots[index].text = ticket.Text;
+            slots[index].text = ticket.Candidate.MainText;
             slots[index].fontStyle = ticket.Completed ? styles[index] | FontStyles.Strikethrough
                 : styles[index] & ~FontStyles.Strikethrough;
-            formatting[index]?.Draw(ticket.Candidate, ticket.Completed);
+            if (formatting[index] == null && ticket.Candidate.HasVariants)
+                Debug.LogWarning("Prepare variant paragraphs on this Order Board before Play.", this);
+            else
+                formatting[index]?.Draw(ticket.Candidate, ticket.Completed);
         }
 
         /// <summary>Clears a departed customer's slot without shifting other visible orders.</summary>
