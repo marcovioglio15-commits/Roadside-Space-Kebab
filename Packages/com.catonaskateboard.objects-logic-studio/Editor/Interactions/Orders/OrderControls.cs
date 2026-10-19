@@ -14,14 +14,44 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Edits the board, extraction budget and shared catalog reference.</summary>
         /// <param name="settings">Serialized detached order proposal.</param>
         /// <param name="owner">Current prefab object.</param>
-        internal static void Draw(SerializedProperty settings, GameObject owner)
+        /// <param name="sections">Retained workspace section expansion.</param>
+        internal static void Draw(SerializedProperty settings, GameObject owner, ObjectStudioSections sections)
         {
             // Scene links use a stable board ID because prefab assets cannot store scene component references.
-            OrderBoardBinding.Draw(settings.FindPropertyRelative("Board"));
-            HoverControls.Field(settings, "RandomDrawUnits");
-            HoverControls.Field(settings, settings.FindPropertyRelative("RandomDrawUnits").boolValue ? "DrawUnitRange" : "DrawCount", "Draw Units");
-            HoverControls.Field(settings, "Selection");
-            Catalog(settings.FindPropertyRelative("Catalog"));
+            if (sections.Draw("Order Board & Reveal", "Board destination and the optional interaction that reveals the orders.", settings,
+                "Board", "WaitForCompletion", "CompletionSource"))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    OrderBoardBinding.Draw(settings.FindPropertyRelative("Board"));
+                    Completion(settings, owner);
+                }
+            if (sections.Draw("Order Selection", "Draw budget and selection policy.", settings, "RandomDrawUnits", "DrawUnitRange", "DrawCount", "Selection"))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    HoverControls.Field(settings, "RandomDrawUnits");
+                    HoverControls.Field(settings, settings.FindPropertyRelative("RandomDrawUnits").boolValue ? "DrawUnitRange" : "DrawCount", "Draw Units");
+                    HoverControls.Field(settings, "Selection");
+                }
+            if (sections.Draw("Order Catalog", "Shared order definitions and optional per-spawn catalog overrides.", settings, "Catalog", "UseSpawnCatalogs", "SpawnCatalogs"))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Catalog(settings.FindPropertyRelative("Catalog"));
+                    SpawnCatalogs(settings);
+                }
+            if (sections.Draw("Order Timer", "Elapsed time from order reveal until Day Flow completes the order dialogue.", settings,
+                "UseTimer", "TimerLabel", "TimerTenths", "KeepTimerResult"))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    HoverControls.Field(settings, "UseTimer", "Enabled");
+                    if (settings.FindPropertyRelative("UseTimer").boolValue)
+                        SurfaceInteractionControls.Fields(settings, "TimerLabel", "TimerTenths", "KeepTimerResult");
+                }
+        }
+
+        /// <summary>Shows each spawn override only when catalog selection depends on its origin.</summary>
+        /// <param name="settings">Detached available-orders configuration.</param>
+        private static void SpawnCatalogs(SerializedProperty settings)
+        {
             HoverControls.Field(settings, "UseSpawnCatalogs");
             if (settings.FindPropertyRelative("UseSpawnCatalogs").boolValue)
             {
@@ -40,7 +70,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
                 StudioArrayGUI.Add(rules, "Add Spawn Catalog", () => new OrderSpawnCatalog());
             }
-            Completion(settings, owner);
         }
 
         /// <summary>Shares catalog assignment and independent edit/create commands across default and spawn overrides.</summary>

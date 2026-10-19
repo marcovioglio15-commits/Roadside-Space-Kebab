@@ -24,7 +24,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Validate all optional modules before allocating a root.
             actions = null;
             warning = "Assign a saved master with a valid Body.";
-            if (master == null || requirePersistent && !EditorUtility.IsPersistent(master) || !master.TryGetBodySettings(out _, out warning))
+            if (master == null || requirePersistent && !EditorUtility.IsPersistent(master) || !master.TryGetBodySettings(out PlayerBodySettings bodySettings, out warning))
                 return false;
             if (master.LocomotionPreset != null && !master.LocomotionPreset.TryGetSettings(out _, out warning)
                 || master.CameraPreset != null && !master.CameraPreset.TryGetSettings(out _, out warning))
@@ -36,12 +36,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 using SerializedObject input = new SerializedObject(master.InputPreset);
                 if (!master.InputPreset.TryGetMovementId(out _, out warning)
                     || !master.InputPreset.TryGetJumpId(out _, out warning)
+                    || !master.InputPreset.TryGetCrouchId(out _, out warning)
                     || !master.InputPreset.TryGetLookIds(out _, out _, out _, out warning)
                     || !PlayerToolsAuthoring.ValidateInput(master, out warning))
                     return false;
                 InputActionReference movement = (InputActionReference)input.FindProperty("movementAction").objectReferenceValue;
                 actions = movement.asset;
-                foreach (string role in new[] { "jumpAction", "lookDeltaAction", "lookRateAction", "cursorToggleAction" })
+                foreach (string role in new[] { "jumpAction", "crouchAction", "lookDeltaAction", "lookRateAction", "cursorToggleAction" })
                 {
                     InputActionReference reference = (InputActionReference)input.FindProperty(role).objectReferenceValue;
                     if (reference != null && (reference.asset != actions || reference.action.actionMap != movement.action.actionMap))
@@ -56,6 +57,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             else if (master.LocomotionPreset != null && master.LocomotionPreset.TryGetSettings(out PlayerLocomotionSettings locomotion, out _)
                 && locomotion.Jump.Enabled && (!master.InputPreset.TryGetJumpId(out Guid jump, out _) || jump == Guid.Empty))
                 warning = "Enabled jumping requires an assigned Jump action.";
+            else if (master.LocomotionPreset != null && master.LocomotionPreset.Crouch.Enabled
+                && (!master.InputPreset.TryGetCrouchId(out Guid crouch, out _) || crouch == Guid.Empty))
+                warning = "Enabled crouching requires an assigned Crouch action.";
+            else if (master.LocomotionPreset != null && master.LocomotionPreset.Crouch.Enabled
+                && bodySettings.Height * master.LocomotionPreset.Crouch.HeightRatio < bodySettings.Radius * 2f)
+                warning = "Crouched height must be at least twice the Body radius. Increase Crouch Height Ratio or reduce the radius.";
             else if (master.CameraPreset != null && master.CameraPreset.TryGetSettings(out PlayerCameraSettings camera, out _)
                 && camera.Mode != PlayerCameraMode.Fixed && camera.LookEnabled
                 && (master.InputPreset == null || !master.InputPreset.TryGetLookIds(out Guid delta, out Guid rate, out _, out _)

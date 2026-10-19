@@ -24,6 +24,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #endregion
         #region Methods
         #region Transaction
+        /// <summary>Refreshes a clean preview after source edits while retaining conflicts with a pending main-window pose.</summary>
+        internal void Refresh()
+        {
+            GameObject root = Target.Resolve();
+            if (HasChanges || root == null || !root.TryGetComponent(out ObjectSpraySauce spray)
+                || JsonUtility.ToJson(spray.Settings.Nozzle) == Baseline)
+                return;
+            Draft = ObjectWorkspace.Copy(spray.Settings.Nozzle);
+            Baseline = JsonUtility.ToJson(Draft);
+            // A separate pending nozzle must still fail the original workspace conflict check.
+            ObjectWorkspace workspace = ObjectWorkspace.instance;
+            if (workspace.Target.Resolve() == root && workspace.Extended.Kind == ExtendedInteractionKind.SpraySauce
+                && JsonUtility.ToJson(workspace.Extended.Draft.SpraySauce.Nozzle) == Baseline)
+                WorkspaceBaseline = Baseline;
+        }
+
         /// <summary>Copies the selected draft without sharing its mutable nozzle object.</summary>
         /// <param name="workspace">Current main-window transaction.</param>
         internal void Read(ObjectWorkspace workspace)

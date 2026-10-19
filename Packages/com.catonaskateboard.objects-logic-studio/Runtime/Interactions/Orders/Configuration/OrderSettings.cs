@@ -37,6 +37,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Existing interaction on this same object whose completion reveals the drawn orders until despawn.")]
         public ObjectInteraction CompletionSource;
 
+        [Header("Order Timer")]
+        [Tooltip("Start the HUD stopwatch when this customer's first order actually appears on its board. Day Flow completion stops it.")]
+        public bool UseTimer;
+        [Tooltip("Caption shown before elapsed minutes and seconds.")]
+        public string TimerLabel = "Order";
+        [Tooltip("Show tenths of a second in addition to minutes and seconds.")]
+        public bool TimerTenths;
+        [Tooltip("Keep the stopped result visible until the customer leaves or a new customer's timer starts.")]
+        public bool KeepTimerResult = true;
+
         /// <summary>Shared candidates read at the beginning of each spawn.</summary>
         public OrderEntry[] Entries => Catalog != null ? Catalog.Entries : Array.Empty<OrderEntry>();
 

@@ -27,6 +27,16 @@
                     "priority": 0
                 },
                 {
+                    "name": "Crouch",
+                    "type": "Button",
+                    "id": "65fdf679-d5b2-479b-b5cd-844827ce7e48",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
                     "name": "LookDelta",
                     "type": "PassThrough",
                     "id": "fdc02722-762d-42c0-9067-c5193fbf02c1",
@@ -357,6 +367,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "UseTool",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "43b1ffb8-dda0-44de-a702-46f7dcaf07f7",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Crouch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7ca4ed27-536c-41b1-ac3e-f6610641cc86",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Crouch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

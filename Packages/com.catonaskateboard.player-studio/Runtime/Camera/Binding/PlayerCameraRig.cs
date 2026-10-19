@@ -194,6 +194,8 @@ namespace CatOnASkateboard.PlayerStudio
                 return;
             UpdateVisualFacing();
             Vector3 focus = (target != null ? target : host.transform).TransformPoint(settings.TargetOffset);
+            if (motor != null && settings.Mode != PlayerCameraMode.Fixed)
+                focus += host.transform.TransformVector(Vector3.up * motor.CrouchCameraOffset);
             Vector3 followedFocus = settings.Mode != PlayerCameraMode.Fixed && settings.Follow == PlayerCameraFollow.Damped
                 ? follow.Advance(focus, settings.FollowResponse, Time.deltaTime) : focus;
             CalculatePose(settings, followedFocus, initialHeading, angles, out Vector3 position, out Quaternion rotation);
@@ -212,6 +214,7 @@ namespace CatOnASkateboard.PlayerStudio
             if (HeadTiltActive && headTilt.Apply(settings.HeadTilt, motor != null && motor.isActiveAndEnabled ? motor.ActualVelocity : Vector3.zero,
                     motor != null && motor.isActiveAndEnabled && motor.IsGrounded, Time.deltaTime, ref position, ref rotation))
                 motor?.PlayFootstep();
+            PlayerCameraRumble.Apply(ref position, ref rotation);
             view.transform.SetPositionAndRotation(position, rotation);
         }
 
@@ -320,6 +323,7 @@ namespace CatOnASkateboard.PlayerStudio
             follow.Reset(focus);
             obstacles.Reset();
             orbit = rotation;
+            PlayerCameraRumble.Apply(ref position, ref rotation);
             view.transform.SetPositionAndRotation(position, rotation);
         }
 

@@ -133,7 +133,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!ToolRequirement.TryValidate(out warning) || !VisualEffect.TryValidate(VfxDuration(feature.Kind) > 0f, out warning)
                 || !FlagChange.TryValidate(feature.gameObject, out warning))
                 return false;
-            if (!(feature is ObjectTriggerAnimation && TriggerAnimation != null && TriggerAnimation.Activation == TriggerAnimationActivation.Proximity)
+            if (!(feature is ObjectTriggerAnimation && TriggerAnimation != null && !TriggerAnimation.UsesInput)
                 && (Action == null || Action.action == null || Action.action.type != InputActionType.Button))
             {
                 warning = "Choose a Button action from the player's Input Actions asset.";
@@ -146,7 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case ObjectTriggerAnimation animation:
                     return animation.TryValidate(TriggerAnimation, out warning);
                 case ObjectEject eject:
-                    return eject.TryValidate(Eject, out warning);
+                    return eject.TryValidate(Eject, out warning, EjectAnimationControls.Resolve(Eject.AnimationIdentity));
                 case ObjectDispenser dispenser:
                     return dispenser.TryValidate(Dispenser, out warning);
                 case ObjectContainer container:

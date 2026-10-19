@@ -14,6 +14,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Shared order catalog, destination board and extraction policy for this object's current spawn.")]
         [SerializeField]
         private OrderSettings settings = new OrderSettings();
+        private readonly OrderTimerSession timer = new OrderTimerSession();
         private OrderTicket[] tickets = Array.Empty<OrderTicket>();
         private bool registered;
         private bool ready;
@@ -88,6 +89,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Once published, completed and locked orders retain their slots until this object leaves.
             if (!registered && ready)
                 Publish();
+        }
+
+        /// <summary>Starts the optional clock at the first actual board assignment for this customer.</summary>
+        internal void NotifyDisplayed()
+        {
+            // Queued orders and additional rows never restart the same spawn's stopwatch.
+            timer.Begin(this);
         }
 
         /// <summary>Queues one ticket per selected unit while retaining the spawn's fixed selection.</summary>
@@ -171,6 +179,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Removes queue membership and event callbacks once.</summary>
         private void Release()
         {
+            timer.Release();
             // Empty tickets cover invalid, unpublished and already released interactions.
             ObjectInteraction.Signaled -= Observe;
             OrderQueue.BoardAvailable -= Draw;

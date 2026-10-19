@@ -669,6 +669,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 929879004907155742, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
+      propertyPath: PlayTransition
+      value:
+      objectReference: {fileID: 780030003}
     - target: {fileID: 296590821164827702, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
       propertyPath: m_Text
       value: ROADSIDE SPACE KEBAB
@@ -908,6 +912,50 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5522194440076522276, guid: 2e5dea47dcd9a544ebb97a293f4fbc6f, type: 3}
   m_PrefabInstance: {fileID: 6909281971860673103}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &780030001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 780030002}
+  - component: {fileID: 780030003}
+  m_Layer: 0
+  m_Name: Menu Play Transition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &780030002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780030001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &780030003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780030001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08b984ae8b5989d429cca4f5058e033c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.MenuStudio.Runtime::CatOnASkateboard.MenuStudio.MenuSceneTransition
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -916,3 +964,4 @@ SceneRoots:
   - {fileID: 1216584812}
   - {fileID: 797519894}
   - {fileID: 6909281971860673103}
+  - {fileID: 780030002}

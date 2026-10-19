@@ -296,6 +296,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (source != null && !InteractionValues.Positive(duration))
                 return false;
+            BlackHoleRun.ReleaseForGrab(body);
             Dock?.Release();
             // Restore visual magnet overrides before capturing the body's carry policy and scaled geometry.
             if (TryGetComponent(out ObjectAssemblyProduct product))

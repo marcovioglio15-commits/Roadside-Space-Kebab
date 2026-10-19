@@ -40,6 +40,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = $"Order '{entry.Name}' needs non-negative draw limits, an ordered required range and Maximum Draws at least as large as every required value.";
                 if (!OrderDrawGroup.ValidLimits(entry.MinimumDraws, entry.MaximumDraws, entry.RandomRequiredDraws, entry.RequiredDrawRange))
                     return false;
+                if (entry.TextStyle != null && !entry.TextStyle.TryValidate(out warning))
+                    return false;
                 if (!ObjectFlagRules.TryValidate(entry.Flags, false, out warning))
                 {
                     warning = $"Order {index + 1}, Identity Flags: {warning}";
@@ -56,6 +58,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (variant == null || !OrderRecipeVariant.ValidateMetadata(variant.Name, variant.Text, variant.Weight, names, out warning, true)
                         || !ObjectFlagRules.TryValidate(variant.Flags, true, out warning)
                         || !ObjectFlagRules.TryValidate(variant.ExcludedFlags, true, out warning))
+                        return false;
+                    if (variant.TextStyle != null && !variant.TextStyle.TryValidate(out warning))
                         return false;
                     warning = $"Variant '{variant.Name}' needs a positive independent quantity.";
                     if (variant.UseDrawLimits && variant.UseQuantity && variant.Quantity <= 0)

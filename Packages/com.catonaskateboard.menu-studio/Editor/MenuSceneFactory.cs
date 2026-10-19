@@ -50,6 +50,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
             foreach (MenuPage page in pages)
                 page.Root.SetActive(kind == MenuKind.Main && page.Kind == MenuPageKind.Home);
             MenuInputFactory.Configure(host);
+            MenuTransitionAuthoring.Connect(host);
             EditorSceneManager.MarkSceneDirty(scene);
             Selection.activeGameObject = root;
             return host;

@@ -7,6 +7,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Chooses mass-dependent impulse or a direct velocity increment.</summary>
     public enum EjectForceMode { Impulse, VelocityChange }
 
+    /// <summary>Chooses immediate contact ejection or a timed attraction followed by a final impulse.</summary>
+    public enum EjectBehavior { Impulse, BlackHole }
+
     /// <summary>Assigns an impulse to a group of identity flags.</summary>
     [Serializable]
     public sealed class EjectRule
@@ -35,7 +38,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Targeting")]
         [Tooltip("Player reach, aim and visibility required to press this object's eject action.")]
         public TransferTargetSettings Target = new TransferTargetSettings();
+        [Header("Before Ejection")]
+        [Tooltip("Request the selected Trigger Animation before applying impulses or starting Black Hole. Cancellation prevents the delayed effect.")]
+        public bool AnimateBeforeEject;
+        [Tooltip("Select an exact animation in a loaded gameplay scene. Its stable identity also works from prefab assets. Disable to use the local animation.")]
+        public bool ExternalAnimation;
+        [Tooltip("Persistent identity of the selected scene animation. Resolved from registered components when requested, without runtime scene searches.")]
+        public string AnimationIdentity = string.Empty;
+        [Tooltip("Wait for the automatic return and its delay when the selected animation schedules one. Otherwise the first endpoint releases Eject.")]
+        public bool WaitForAnimationReturn;
         [Header("Ejection")]
+        [Tooltip("Impulse ejects matching contacts immediately. Black Hole attracts filtered bodies to a selected collider before launching them.")]
+        public EjectBehavior Behavior;
+        [Tooltip("Destination collider, attraction, final impulse and optional camera and air feedback.")]
+        public BlackHoleSettings BlackHole = new BlackHoleSettings();
         [Tooltip("Apply one impulse to this object's own Rigidbody instead of searching for flagged contacts.")]
         public bool SelfEject;
         [Tooltip("Single impulse for Self Eject. Flags are unused in this mode.")]
@@ -67,7 +83,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Despawn")]
         [Tooltip("Destroy successfully ejected objects after a delay, even if the ejector is disabled or destroyed.")]
         public bool Despawn;
-        [Tooltip("Scaled seconds from ejection to destruction. Pausing game time also pauses this timer.")]
+        [Tooltip("Scaled seconds from the final impulse to destruction. Black Hole attraction time is excluded; pausing also pauses this timer.")]
         [Range(0.01f, 60f)]
         public float DespawnDelay = 5f;
 
@@ -86,6 +102,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Configure Eject targeting.";
             if (Target == null || !Target.TryValidate(out warning))
                 return false;
+            warning = "Select a scene Trigger Animation before enabling an external animation prerequisite.";
+            if (AnimateBeforeEject && ExternalAnimation && string.IsNullOrEmpty(AnimationIdentity))
+                return false;
+            if (Behavior == EjectBehavior.BlackHole)
+            {
+                warning = "Configure Black Hole settings and a supported force mode.";
+                return BlackHole != null && Mode is (EjectForceMode.Impulse or EjectForceMode.VelocityChange)
+                    && BlackHole.TryValidate(out warning) && ValidateLifetime(out warning);
+            }
+            if (Behavior != EjectBehavior.Impulse)
+            {
+                warning = "Choose a supported Eject behavior.";
+                return false;
+            }
             if (SelfEject && TemporaryPhysics && (Physics == null || !Physics.TryValidate(out warning)))
                 return false;
             warning = "Use a finite non-negative contact tolerance, a supported force mode and at least one impulse rule.";
@@ -102,6 +132,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (!SelfEject && !ObjectFlagRules.TryValidate(rule.Flags, false, out warning))
                     return false;
             }
+            return ValidateLifetime(out warning);
+        }
+
+        /// <summary>Checks post-impulse exclusions and lifetime for both ejection behaviors.</summary>
+        /// <param name="warning">Receives invalid collision layers or timing.</param>
+        /// <returns>True when optional post-launch policies are usable.</returns>
+        private bool ValidateLifetime(out string warning)
+        {
             warning = IgnoreCollisions && (IgnoredLayers.value == 0 || !InteractionValues.Positive(IgnoreDuration))
                 ? "Choose collision layers and a positive finite Ignore Duration."
                 : Despawn && !InteractionValues.Positive(DespawnDelay) ? "Despawn Delay must be positive and finite." : string.Empty;

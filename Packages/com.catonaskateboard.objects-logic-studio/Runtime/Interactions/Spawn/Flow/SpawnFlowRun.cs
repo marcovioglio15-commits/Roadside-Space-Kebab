@@ -12,7 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region State
 
-        private enum Phase { Delay, Arrival, Waiting, Departure, Transition, Stopped }
+        private enum Phase { Delay, Arrival, Waiting, Departure, Transition, Stopped, Entering }
         private static SpawnFlowRun active;
         private readonly ObjectSpawnManager owner;
         private readonly SpawnFlowPlan plan;
@@ -81,11 +81,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Object.DontDestroyOnLoad(owner.gameObject);
             ObjectInteraction.Signaled += Observe;
             SceneManager.activeSceneChanged += SceneChanged;
+            phase = Phase.Entering;
+            EnterFirstDay();
+            return true;
+        }
+
+        /// <summary>Waits for a menu-owned reveal before emitting day-start events or requesting another scene.</summary>
+        private void EnterFirstDay()
+        {
+            // Direct Editor Play keeps its immediate startup; a menu fade retains exclusive transition ownership.
+            if (MenuSceneTransition.IsBusy)
+                return;
             if (SceneManager.GetActiveScene().path == plan.Days[0].Scene)
                 StartDay();
             else
                 Load(plan.Days[0].Scene, StartDay);
-            return true;
         }
 
         /// <summary>Withdraws callbacks and removes only the current generated visitor.</summary>
@@ -109,7 +119,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void SceneChanged(Scene previous, Scene next)
         {
             // Flow-owned loads already have a completion callback; additive pause scenes never replace the active scene.
-            if (phase == Phase.Transition || phase == Phase.Stopped)
+            if (phase is Phase.Transition or Phase.Stopped or Phase.Entering)
                 return;
             RemoveInstance();
             if (next.path == plan.Days[day].Scene)
@@ -174,6 +184,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Advances one visitor outside interaction callback stacks and honors gameplay pause.</summary>
         internal void Tick()
         {
+            if (phase == Phase.Entering)
+            {
+                EnterFirstDay();
+                return;
+            }
             // Completed events are retained while the manager is temporarily locked.
             if (phase is Phase.Transition or Phase.Stopped || Time.timeScale <= 0f || !owner.Available(InteractionChannels.Spawn))
                 return;
@@ -260,8 +275,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
             // Dialogue starts, page advances, interruptions and completions from other clones do not advance the day.
-            if (phase == Phase.Waiting && moment == InteractionMoment.Completed)
-                signaled |= completion.Observe(source);
+            if (phase == Phase.Waiting && moment == InteractionMoment.Completed && completion.Observe(source))
+            {
+                signaled = true;
+                OrderTimerSession.Complete(instance);
+            }
         }
 
         /// <summary>Despawns a departed visitor and advances the day only after its final step.</summary>

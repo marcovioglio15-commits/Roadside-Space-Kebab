@@ -12,15 +12,9 @@ namespace CatOnASkateboard.StudioColors.Editor
     {
         #region Fields
         [Header("Workspace")]
-        [Tooltip("Preset currently being edited.")]
+        [Tooltip("Recoverable proposal and source conflict checks shared by Studio asset editors.")]
         [SerializeField]
-        private ScriptableObject source;
-        [Tooltip("Detached proposal retained across script reloads.")]
-        [SerializeField]
-        private ScriptableObject draft;
-        [Tooltip("Source snapshot used to detect edits made by another editor.")]
-        [SerializeField]
-        private string baseline;
+        private StudioAssetSession session = new StudioAssetSession();
         [Tooltip("Visible tab index; independent of draft lifetime.")]
         [SerializeField]
         private int tab;
@@ -30,16 +24,15 @@ namespace CatOnASkateboard.StudioColors.Editor
         private Button discard;
         private ObjectField selector;
         private readonly List<string> warnings = new List<string>();
-        private const HideFlags draftFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
         #endregion
 
         #region Properties
         protected abstract Type PresetType { get; }
         protected abstract string[] Tabs { get; }
-        protected ScriptableObject Draft => draft;
-        protected ScriptableObject Source => source;
+        protected ScriptableObject Draft => session.Draft;
+        protected ScriptableObject Source => session.Source;
         protected int Tab => tab;
-        protected bool Pending => draft != null && JsonUtility.ToJson(draft) != baseline;
+        protected bool Pending => session.HasChanges;
         #endregion
 
         #region Methods
@@ -51,12 +44,10 @@ namespace CatOnASkateboard.StudioColors.Editor
             minSize = new Vector2(360f, 360f);
             Undo.undoRedoPerformed += HandleUndo;
             StudioFieldMenu.Changed += FieldChanged;
-            if (draft != null)
-            {
-                // HideAndDontSave includes NotEditable, which disables SerializedProperty controls.
-                draft.hideFlags = draftFlags;
-                serialized = new SerializedObject(draft);
-            }
+            EditorApplication.projectChanged += HandleUndo;
+            session.Restore();
+            if (session.Draft != null)
+                serialized = new SerializedObject(session.Draft);
         }
 
         /// <summary>Refreshes Apply/Discard after a context-menu edit of the detached preset.</summary>
@@ -64,7 +55,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         private void FieldChanged(UnityEngine.Object edited)
         {
             // Delayed menu callbacks occur outside the IMGUI change-check scope.
-            if (edited == draft)
+            if (edited == session.Draft)
                 RefreshActions();
         }
 
@@ -73,6 +64,8 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Serialized draft references survive editor assembly reloads.
             Undo.undoRedoPerformed -= HandleUndo;
+            session.Retain();
+            EditorApplication.projectChanged -= HandleUndo;
             StudioFieldMenu.Changed -= FieldChanged;
             serialized?.Dispose();
             serialized = null;
@@ -82,8 +75,8 @@ namespace CatOnASkateboard.StudioColors.Editor
         protected virtual void OnDestroy()
         {
             // Persistent source assets are never destroyed by workspace cleanup.
-            if (draft != null && !AssetDatabase.Contains(draft))
-                DestroyImmediate(draft);
+            session.Retain();
+            session.Release();
         }
 
         /// <summary>Creates a wrapping toolbar, one scrolling content area and fixed action footer.</summary>
@@ -94,7 +87,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             Toolbar toolbar = new Toolbar();
             toolbar.style.flexWrap = Wrap.Wrap;
             toolbar.style.height = StyleKeyword.Auto;
-            selector = new ObjectField { objectType = PresetType, value = source, allowSceneObjects = false, tooltip = "Select the preset to edit." };
+            selector = new ObjectField { objectType = PresetType, value = session.Source, allowSceneObjects = false, tooltip = "Select the preset to edit." };
             StudioFieldMenu.Attach(selector, value => value == null || PresetType.IsInstanceOfType(value) && EditorUtility.IsPersistent(value));
             selector.style.flexGrow = 1f;
             selector.style.minWidth = 160f;
@@ -155,12 +148,12 @@ namespace CatOnASkateboard.StudioColors.Editor
         private void DrawContent()
         {
             // Empty workspaces create no assets until New is clicked.
-            if (draft == null)
+            if (session.Draft == null)
             {
                 EditorGUILayout.LabelField("Select a preset or create a new one.", EditorStyles.wordWrappedLabel);
                 return;
             }
-            serialized ??= new SerializedObject(draft);
+            serialized ??= new SerializedObject(session.Draft);
             serialized.UpdateIfRequiredOrScript();
             EditorGUILayout.LabelField(Tabs[tab], EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
@@ -195,17 +188,25 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // Dirty state compares serialized values, so Undo can also clear a proposal.
             hasUnsavedChanges = Pending;
+            session.Retain();
+            if (session.RecoveryWarning.Length > 0)
+                SetStatus(session.RecoveryWarning);
             saveChangesMessage = "Apply the pending preset changes?";
-            apply?.SetEnabled(source != null && Pending && !EditorApplication.isPlayingOrWillChangePlaymode);
-            discard?.SetEnabled(source != null);
+            apply?.SetEnabled(session.Source != null && Pending && !EditorApplication.isPlayingOrWillChangePlaymode);
+            discard?.SetEnabled(session.Source != null);
         }
 
         /// <summary>Refreshes the proposal and actions after Unity Undo changes editor state.</summary>
         private void HandleUndo()
         {
             // A clean proposal follows source Undo; unfinished proposals retain conflict protection.
-            if (!Pending && source != null)
-                DiscardChanges();
+            if (!Pending && session.SourceChanged)
+            {
+                serialized?.Dispose();
+                serialized = null;
+                session.Refresh();
+                RefreshActions();
+            }
             else
                 RefreshActions();
             Repaint();
@@ -220,12 +221,16 @@ namespace CatOnASkateboard.StudioColors.Editor
             // Preserve pending work instead of silently switching its target.
             if (Pending)
             {
-                selector?.SetValueWithoutNotify(source);
+                selector?.SetValueWithoutNotify(session.Source);
                 SetStatus("Apply or Discard before changing presets.");
                 return;
             }
-            source = requested;
-            DiscardChanges();
+            serialized?.Dispose();
+            serialized = null;
+            session.Select(requested, out string warning);
+            SetStatus(warning);
+            selector?.SetValueWithoutNotify(session.Source);
+            RefreshActions();
         }
 
         /// <summary>Creates or duplicates a preset at a user-selected project location.</summary>
@@ -233,7 +238,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         private void CreatePreset(bool duplicate)
         {
             // New assets never inherit unfinished edits from another preset.
-            if (Pending || duplicate && source == null)
+            if (Pending || duplicate && session.Source == null)
             {
                 SetStatus("Apply or Discard first; Duplicate also needs a selected preset.");
                 return;
@@ -241,23 +246,21 @@ namespace CatOnASkateboard.StudioColors.Editor
             string path = EditorUtility.SaveFilePanelInProject("Save preset", PresetType.Name, "asset", "Choose a project asset path.");
             if (string.IsNullOrEmpty(path))
                 return;
-            ScriptableObject created = duplicate ? Instantiate(source) : CreateInstance(PresetType);
+            ScriptableObject created = duplicate ? Instantiate(session.Source) : CreateInstance(PresetType);
             created.name = System.IO.Path.GetFileNameWithoutExtension(path);
             AssetDatabase.CreateAsset(created, AssetDatabase.GenerateUniqueAssetPath(path));
             AssetDatabase.SaveAssets();
             SelectPreset(created);
-            selector?.SetValueWithoutNotify(source);
+            selector?.SetValueWithoutNotify(session.Source);
         }
 
         /// <summary>Validates and commits the proposal while detecting concurrent source edits.</summary>
         public override void SaveChanges()
         {
-            // Another Inspector must not have its source edits overwritten by a stale proposal.
-            if (source == null || draft == null)
-                return;
-            if (JsonUtility.ToJson(source) != baseline)
+            RefreshActions();
+            if (!session.CanSave(out string warning))
             {
-                SetStatus("The source changed elsewhere. Discard to reload it before applying.");
+                SetStatus(warning);
                 return;
             }
             warnings.Clear();
@@ -267,33 +270,26 @@ namespace CatOnASkateboard.StudioColors.Editor
                 SetStatus(string.Join("\n", warnings));
                 return;
             }
-            Undo.RecordObject(source, "Apply " + PresetType.Name);
-            HideFlags flags = source.hideFlags;
-            EditorUtility.CopySerialized(draft, source);
-            source.hideFlags = flags;
-            EditorUtility.SetDirty(source);
-            AssetDatabase.SaveAssetIfDirty(source);
-            baseline = JsonUtility.ToJson(source);
-            SetStatus("Preset saved.");
+            serialized?.Dispose();
+            serialized = null;
+            if (session.Save("Apply " + PresetType.Name, out warning))
+            {
+                base.SaveChanges();
+                SetStatus("Preset saved.");
+            }
+            else
+                SetStatus(warning);
             RefreshActions();
         }
 
         /// <summary>Rebuilds the proposal from the saved source without changing the scene.</summary>
         public override void DiscardChanges()
         {
-            // Destroy only our detached copy, then rebuild serialized bindings once.
+            // Explicit discard also removes the recovery record for this exact asset.
             serialized?.Dispose();
             serialized = null;
-            if (draft != null)
-                DestroyImmediate(draft);
-            draft = source != null ? Instantiate(source) : null;
-            if (draft != null)
-            {
-                draft.name = source.name;
-                draft.hideFlags = draftFlags;
-                baseline = JsonUtility.ToJson(source);
-                serialized = new SerializedObject(draft);
-            }
+            session.Discard();
+            base.DiscardChanges();
             SetStatus(string.Empty);
             RefreshActions();
             Repaint();

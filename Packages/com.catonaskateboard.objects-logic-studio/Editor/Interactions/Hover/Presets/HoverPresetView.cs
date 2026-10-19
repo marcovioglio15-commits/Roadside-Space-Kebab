@@ -70,19 +70,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Apply never calls this method; asset writes are always explicit.
             if (state.Source == null)
                 return;
-            if (!AssetDatabase.IsOpenForEdit(state.Source) || InteractionPresetWrites.Capture(state.Source) != state.SourceBaseline)
+            if (!InteractionPresetWrites.ValidateAsset(state.Source, state.SourceBaseline, out string warning))
             {
-                Debug.LogWarning("The Hover preset is read-only or changed elsewhere. Import its current values before updating it.", state.Source);
+                Debug.LogWarning(warning, state.Source);
                 return;
             }
-            if (!state.Draft.TryValidate(out string warning) || !state.Binding.ToolRequirement.TryValidate(out warning))
+            if (!state.Draft.TryValidate(out warning) || !state.Binding.ToolRequirement.TryValidate(out warning))
             {
                 Debug.LogWarning(warning, state.Source);
                 return;
             }
             Undo.RecordObject(state, "Update hover preset");
-            Undo.RecordObject(state.Source, "Update hover preset");
-            Write(state.Source, state);
+            try
+            {
+                Write(state.Source, state);
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogWarning(exception.Message, state.Source);
+                return;
+            }
             state.SourceBaseline = InteractionPresetWrites.Capture(state.Source);
             state.Persist();
         }
@@ -115,10 +122,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Write(HoverPreset preset, ObjectWorkspace state)
         {
             // Runtime reads only the local component snapshot after Apply.
-            JsonUtility.FromJsonOverwrite("{\"configuration\":" + JsonUtility.ToJson(state.Draft)
-                + ",\"ToolRequirement\":" + JsonUtility.ToJson(state.Binding.ToolRequirement) + "}", preset);
-            EditorUtility.SetDirty(preset);
-            AssetDatabase.SaveAssetIfDirty(preset);
+            StudioAssetWrites.Save(preset, "Write hover preset", () => JsonUtility.FromJsonOverwrite("{\"configuration\":" + JsonUtility.ToJson(state.Draft)
+                + ",\"ToolRequirement\":" + JsonUtility.ToJson(state.Binding.ToolRequirement) + "}", preset));
         }
 
         #endregion

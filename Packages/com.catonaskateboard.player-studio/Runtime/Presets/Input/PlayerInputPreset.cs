@@ -20,6 +20,11 @@ namespace CatOnASkateboard.PlayerStudio
         [SerializeField]
         private InputActionReference jumpAction;
 
+        [Header("Crouch")]
+        [Tooltip("Optional Button action resolved in this player's Input Actions asset. Use a regular press binding; toggle behavior is configured in Locomotion.")]
+        [SerializeField]
+        private InputActionReference crouchAction;
+
         [Header("Camera")]
         [Tooltip("Optional Vector2 delta action, typically pointer movement. Resolved by ID in this player's action asset.")]
         [SerializeField]
@@ -93,6 +98,15 @@ namespace CatOnASkateboard.PlayerStudio
             return true;
         }
 
+        /// <summary>Reads the optional crouch identity without enabling shared asset input.</summary>
+        /// <param name="actionId">Receives the configured Button ID or an empty optional role.</param>
+        /// <param name="warning">Receives an incompatible action warning.</param>
+        /// <returns>True when crouch is unassigned or uses a Button action.</returns>
+        public bool TryGetCrouchId(out Guid actionId, out string warning)
+        {
+            return TryGetOptionalId(crouchAction, true, out actionId, out warning);
+        }
+
         /// <summary>Resolves optional view input identities without reading shared asset values.</summary>
         /// <param name="delta">Receives the displacement action ID, or empty when unassigned.</param>
         /// <param name="rate">Receives the rate action ID, or empty when unassigned.</param>
@@ -136,7 +150,7 @@ namespace CatOnASkateboard.PlayerStudio
             if (action == null || (button ? action.type != InputActionType.Button
                 : action.type == InputActionType.Button || action.expectedControlType != "Vector2"))
             {
-                warning = button ? "Cursor Toggle requires a Button action." : "Look actions require a Vector2 Value or Pass Through action.";
+                warning = button ? "Optional button roles require a Button action." : "Look actions require a Vector2 Value or Pass Through action.";
                 return false;
             }
             id = action.id;

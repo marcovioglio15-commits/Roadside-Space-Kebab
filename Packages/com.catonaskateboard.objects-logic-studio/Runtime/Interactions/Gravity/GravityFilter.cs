@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
 
@@ -51,8 +52,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Evaluates configured groups when a pulse starts or an object joins an active suspension.</summary>
         /// <param name="body">Active dynamic body being considered.</param>
         /// <param name="owner">Generator defining the optional self exclusion.</param>
+        /// <param name="interactions">Optional reusable component buffer for repeated admission checks.</param>
         /// <returns>True when this body satisfies the selected combination.</returns>
-        internal bool Matches(Component body, Transform owner)
+        internal bool Matches(Component body, Transform owner, List<ObjectInteraction> interactions = null)
         {
             // Liquid may opt out independently of its emitter and of the enabled filter groups.
             if (body.TryGetComponent(out LiquidDroplet droplet))
@@ -85,9 +87,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 enabled++;
                 GravityInteractionFilter found = GravityInteractionFilter.None;
-                foreach (ObjectInteraction interaction in root.GetComponents<ObjectInteraction>())
-                    if (interaction.isActiveAndEnabled && !interaction.IsLocked)
-                        found |= Kind(interaction);
+                IReadOnlyList<ObjectInteraction> available = interactions;
+                if (interactions != null)
+                    root.GetComponents(interactions);
+                else
+                    available = root.GetComponents<ObjectInteraction>();
+                for (int index = 0; index < available.Count; index++)
+                    if (available[index].isActiveAndEnabled && !available[index].IsLocked)
+                        found |= Kind(available[index]);
                 if (RequireAllInteractions ? (found & Interactions) == (Interactions & GravityInteractionFilter.All) : (found & Interactions) != 0)
                     matched++;
             }

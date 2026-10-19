@@ -229,6 +229,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Maintains continuous per-item timing and selects one deterministic ready participant.</summary>
         private void UpdateContacts()
         {
+            // Another modification may change flags while contact remains continuous. Only physical separation permits repetition.
+            departed.Clear();
+            foreach (ObjectItem candidate in completed)
+                if (candidate == null || settings.RepeatAfterSeparation && !contacts.Contains(candidate))
+                    departed.Add(candidate);
+            foreach (ObjectItem candidate in departed)
+                completed.Remove(candidate);
             // Compound colliders share one timer; leaving contact removes their accumulated dwell time.
             departed.Clear();
             foreach (ObjectItem candidate in entered.Keys)
@@ -238,8 +245,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 entered.Remove(candidate);
                 failed.Remove(candidate);
-                if (settings.RepeatAfterSeparation)
-                    completed.Remove(candidate);
             }
             ObjectItem selected = null;
             float distance = float.PositiveInfinity;

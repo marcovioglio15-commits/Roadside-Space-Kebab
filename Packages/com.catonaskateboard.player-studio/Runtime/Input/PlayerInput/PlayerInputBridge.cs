@@ -23,6 +23,7 @@ namespace CatOnASkateboard.PlayerStudio
 
         #region Runtime State
 
+        private readonly PlayerButtonBinding crouchBinding = new PlayerButtonBinding();
         private readonly PlayerButtonBinding jumpBinding = new PlayerButtonBinding();
         private InputAction movementAction;
         private Vector2 movement;
@@ -94,7 +95,10 @@ namespace CatOnASkateboard.PlayerStudio
         {
             // Drop previous callbacks before resolving a new owner or preset.
             Disconnect();
-            if (!TryResolve(out movementAction, out warning) || !TryResolveJump(out InputAction jumpAction, out warning))
+            if (!TryResolve(out movementAction, out warning) || !host.MasterPreset.InputPreset.TryGetJumpId(out System.Guid jumpId, out warning)
+                || !TryResolveButton(jumpId, out InputAction jumpAction, out warning)
+                || !host.MasterPreset.InputPreset.TryGetCrouchId(out System.Guid crouchId, out warning)
+                || !TryResolveButton(crouchId, out InputAction crouchAction, out warning))
             {
                 Disconnect();
                 connectionWarning = warning;
@@ -103,6 +107,7 @@ namespace CatOnASkateboard.PlayerStudio
 
             // One callback handles both changed values and cancellation; no Update polling is needed.
             jumpBinding.Bind(jumpAction);
+            crouchBinding.Bind(crouchAction);
             movementAction.performed += ReadMovement;
             movementAction.canceled += ReadMovement;
             movement = movementAction.enabled ? movementAction.ReadValue<Vector2>() : Vector2.zero;
@@ -147,16 +152,16 @@ namespace CatOnASkateboard.PlayerStudio
             return true;
         }
 
-        /// <summary>Resolves the optional Button in the same player-owned asset as continuous movement.</summary>
+        /// <summary>Resolves an optional Button in the same player-owned asset as continuous movement.</summary>
+        /// <param name="actionId">Configured Jump or Crouch action identity.</param>
         /// <param name="action">Receives the resolved Button, or null for an unassigned optional role.</param>
         /// <param name="warning">Receives an invalid mapping or missing player action warning.</param>
-        /// <returns>True when the optional jump mapping is compatible with this PlayerInput.</returns>
-        private bool TryResolveJump(out InputAction action, out string warning)
+        /// <returns>True when the optional button mapping is compatible with this PlayerInput.</returns>
+        private bool TryResolveButton(System.Guid actionId, out InputAction action, out string warning)
         {
             // Movement resolution already validated the owner, host and Input preset.
             action = null;
-            if (!host.MasterPreset.InputPreset.TryGetJumpId(out System.Guid actionId, out warning))
-                return false;
+            warning = string.Empty;
             if (actionId == System.Guid.Empty)
                 return true;
 
@@ -164,7 +169,7 @@ namespace CatOnASkateboard.PlayerStudio
             if (action != null && action.type == InputActionType.Button)
                 return true;
 
-            warning = "The assigned PlayerInput must contain the preset's Button jump action ID.";
+            warning = "The assigned PlayerInput must contain the preset's assigned Button action ID.";
             return false;
         }
 
@@ -174,6 +179,13 @@ namespace CatOnASkateboard.PlayerStudio
         {
             // The motor is the single consumer; diagnostics must not call this method.
             return jumpBinding.Consume(IsConnected, playerInput != null ? playerInput.actions : null);
+        }
+
+        /// <summary>Transfers crouch edges to the motor without taking ownership of its action map.</summary>
+        /// <returns>Cached press and held state for the current crouch role.</returns>
+        public PlayerButtonSignal ConsumeCrouch()
+        {
+            return crouchBinding.Consume(IsConnected, playerInput != null ? playerInput.actions : null);
         }
 
         /// <summary>Removes this subscriber without disabling another module's actions or destroying their owner.</summary>
@@ -187,6 +199,7 @@ namespace CatOnASkateboard.PlayerStudio
             }
 
             jumpBinding.Bind(null);
+            crouchBinding.Bind(null);
             movementAction = null;
             movement = Vector2.zero;
         }

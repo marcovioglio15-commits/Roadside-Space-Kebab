@@ -34,14 +34,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         continue;
                     using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                     HoverControls.Field(entry, "Name");
-                    HoverControls.Field(entry, "Text");
-                    HoverControls.Field(entry, "Quantity");
-                    HoverControls.Field(entry, "Weight");
-                    DrawLimits(entry);
-                    ObjectFlagSelector.Draw(entry.FindPropertyRelative("Flags"));
-                    if (entry.FindPropertyRelative("Flags").arraySize > 1)
-                        HoverControls.Field(entry, "RequireAllFlags");
-                    Variants(entry);
+                    Presentation(entry, false);
+                    if (OrderSections.Draw(entry, "Quantity & Extraction", "Unit quantity, probability and required draws.",
+                        "Quantity", "Weight", "MaximumDraws", "RandomRequiredDraws", "RequiredDrawRange", "MinimumDraws"))
+                        using (new EditorGUI.IndentLevelScope())
+                        {
+                            HoverControls.Field(entry, "Quantity");
+                            HoverControls.Field(entry, "Weight");
+                            DrawLimits(entry);
+                        }
+                    if (OrderSections.Draw(entry, "Accepted Objects", "Flags required by the main order.", "Flags", "RequireAllFlags"))
+                        using (new EditorGUI.IndentLevelScope())
+                            Flags(entry, false);
+                    if (OrderSections.Draw(entry, "Recipe Variants & Combos", "Independent recipe candidates and their combinations.",
+                        "UseRecipeModifiers", "IncludeBaseOrder", "Variants", "Combos"))
+                        using (new EditorGUI.IndentLevelScope())
+                            Variants(entry);
                 }
             StudioArrayGUI.Add(entries, "Add Available Order", () => new OrderEntry { Name = "Order " + entries.arraySize });
             serializedObject.ApplyModifiedProperties();
@@ -65,24 +73,57 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (!variant.isExpanded)
                     continue;
                 HoverControls.Field(variant, "Name");
-                HoverControls.Field(variant, "Text");
-                HoverControls.Field(variant, "AppendToBaseText", "Append Base Text");
-                HoverControls.Field(variant, "Weight");
-                HoverControls.Field(variant, "UseDrawLimits");
-                if (variant.FindPropertyRelative("UseDrawLimits").boolValue)
-                {
-                    DrawLimits(variant);
-                    HoverControls.Field(variant, "UseQuantity");
-                    if (variant.FindPropertyRelative("UseQuantity").boolValue)
-                        HoverControls.Field(variant, "Quantity");
-                }
-                ObjectFlagSelector.Draw(variant.FindPropertyRelative("Flags"), new GUIContent("Additive Flags", "Ingredient flags required by this assembled variant."));
-                if (variant.FindPropertyRelative("Flags").arraySize > 1)
-                    HoverControls.Field(variant, "RequireAllFlags");
-                ObjectFlagSelector.Draw(variant.FindPropertyRelative("ExcludedFlags"), new GUIContent("Subtractive Flags", "None of these flags may belong to the assembled ingredients."));
+                Presentation(variant, true);
+                if (OrderSections.Draw(variant, "Variant Extraction", "Independent probability, quantity and draw limits.",
+                    "Weight", "UseDrawLimits", "MaximumDraws", "RandomRequiredDraws", "RequiredDrawRange", "MinimumDraws", "UseQuantity", "Quantity"))
+                    using (new EditorGUI.IndentLevelScope())
+                    {
+                        HoverControls.Field(variant, "Weight");
+                        HoverControls.Field(variant, "UseDrawLimits");
+                        if (variant.FindPropertyRelative("UseDrawLimits").boolValue)
+                        {
+                            DrawLimits(variant);
+                            HoverControls.Field(variant, "UseQuantity");
+                            if (variant.FindPropertyRelative("UseQuantity").boolValue)
+                                HoverControls.Field(variant, "Quantity");
+                        }
+                    }
+                if (OrderSections.Draw(variant, "Variant Ingredients", "Required and forbidden ingredient flags.", "Flags", "RequireAllFlags", "ExcludedFlags"))
+                    using (new EditorGUI.IndentLevelScope())
+                        Flags(variant, true);
             }
             StudioArrayGUI.Add(variants, "Add Recipe Variant", () => new OrderRecipeVariant());
-            Combos(entry.FindPropertyRelative("Combos"));
+            if (OrderSections.Draw(entry, "Variant Combinations", "Combine independent variants while retaining each paragraph's own text style.", "Combos"))
+                using (new EditorGUI.IndentLevelScope())
+                    Combos(entry.FindPropertyRelative("Combos"));
+        }
+
+        /// <summary>Groups paragraph text and independent typography for both base orders and variants.</summary>
+        /// <param name="entry">Order or variant containing board text.</param>
+        /// <param name="variant">Whether to show the base-text append policy.</param>
+        private static void Presentation(SerializedProperty entry, bool variant)
+        {
+            if (!OrderSections.Draw(entry, "Board Text", "Text and appearance used for this exact paragraph.",
+                variant ? new[] { "Text", "TextStyle", "AppendToBaseText" } : new[] { "Text", "TextStyle" }))
+                return;
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            HoverControls.Field(entry, "Text");
+            if (variant)
+                HoverControls.Field(entry, "AppendToBaseText", "Append Base Text");
+            OrderTextControls.Draw(entry.FindPropertyRelative("TextStyle"));
+        }
+
+        /// <summary>Shares flag selection while keeping forbidden ingredients exclusive to variants.</summary>
+        /// <param name="entry">Order or variant filters.</param>
+        /// <param name="variant">Whether additive and subtractive ingredient flags apply.</param>
+        private static void Flags(SerializedProperty entry, bool variant)
+        {
+            ObjectFlagSelector.Draw(entry.FindPropertyRelative("Flags"));
+            if (entry.FindPropertyRelative("Flags").arraySize > 1)
+                HoverControls.Field(entry, "RequireAllFlags");
+            if (variant)
+                ObjectFlagSelector.Draw(entry.FindPropertyRelative("ExcludedFlags"),
+                    new GUIContent("Subtractive Flags", "None of these flags may belong to the assembled ingredients."));
         }
 
         /// <summary>Exposes only the policies used by enabled variant combinations.</summary>

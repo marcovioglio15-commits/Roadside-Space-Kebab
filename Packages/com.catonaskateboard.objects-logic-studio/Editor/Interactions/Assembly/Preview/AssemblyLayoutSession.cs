@@ -16,21 +16,37 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Independent product snapshot used to preview the pending magnets.")]
         public AssemblyProductDraft Draft = new AssemblyProductDraft();
         [Tooltip("Applied magnet state used to reject outside layout edits.")]
-        public string Baseline = string.Empty;
+        public AssemblyProductSettings Baseline;
         [Tooltip("Initial main-window layout used to protect its pending edits.")]
-        public string WorkspaceBaseline = string.Empty;
+        public AssemblyProductSettings WorkspaceBaseline;
         [Tooltip("Layout at the beginning of this window's current transaction.")]
-        public string Initial = string.Empty;
+        public AssemblyProductSettings Initial;
 
         #endregion
         #region Properties
 
         /// <summary>Whether this window has changed its independent layout.</summary>
-        internal bool HasChanges => !string.IsNullOrEmpty(Initial) && Capture(Draft.Settings) != Initial;
+        internal bool HasChanges => Initial != null && Capture(Draft.Settings) != Capture(Initial);
 
         #endregion
         #region Methods
         #region Transaction
+        /// <summary>Follows source layout updates only while this preview has no pending handle edits.</summary>
+        internal void Refresh()
+        {
+            GameObject root = Target.Resolve();
+            if (HasChanges || root == null || !root.TryGetComponent(out ObjectAssemblyProduct product)
+                || Capture(product.Settings) == Capture(Baseline))
+                return;
+            Draft = AssemblyProductDraft.Capture(product.Settings);
+            Initial = Baseline = Snapshot(product.Settings);
+            // Preserve conflicts with independently edited magnets in the main workspace.
+            ObjectWorkspace workspace = ObjectWorkspace.instance;
+            if (workspace.Target.Resolve() == root && workspace.Extended.Kind == ExtendedInteractionKind.AssemblyProduct
+                && Capture(workspace.Extended.Draft.AssemblyProduct.Settings) == Capture(Baseline))
+                WorkspaceBaseline = Baseline;
+        }
+
 
         /// <summary>Starts an independent proposal from the product card's visible configuration.</summary>
         /// <param name="workspace">Main window containing the current product proposal.</param>
@@ -40,9 +56,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Pending values are copied, so preview handles never mutate the main window directly.
             Target.Capture(product.gameObject, 0);
             Draft = ObjectWorkspace.Copy(workspace.Extended.Draft.AssemblyProduct);
-            Baseline = Capture(product.Settings);
+            Baseline = Snapshot(product.Settings);
             Initial = Baseline;
-            WorkspaceBaseline = Capture(Draft.Settings);
+            WorkspaceBaseline = Snapshot(Draft.Settings);
         }
 
         /// <summary>Reloads the applied layout while preserving the preview's product identity.</summary>
@@ -53,10 +69,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (root == null || !root.TryGetComponent(out ObjectAssemblyProduct product))
                 return;
             Draft = AssemblyProductDraft.Capture(product.Settings);
-            Initial = Baseline = Capture(product.Settings);
+            Initial = Baseline = Snapshot(product.Settings);
             ObjectWorkspace workspace = ObjectWorkspace.instance;
             if (workspace.Target.Resolve() == root && workspace.Extended.Kind == ExtendedInteractionKind.AssemblyProduct)
-                WorkspaceBaseline = Capture(workspace.Extended.Draft.AssemblyProduct.Settings);
+                WorkspaceBaseline = Snapshot(workspace.Extended.Draft.AssemblyProduct.Settings);
         }
 
         /// <summary>Saves only magnets after checking source and main-window conflicts.</summary>
@@ -72,7 +88,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             ObjectWorkspace workspace = ObjectWorkspace.instance;
             bool selected = workspace.Target.Resolve() == root && workspace.Extended.Kind == ExtendedInteractionKind.AssemblyProduct;
-            if (Capture(product.Settings) != Baseline || selected && Capture(workspace.Extended.Draft.AssemblyProduct.Settings) != WorkspaceBaseline)
+            if (Capture(product.Settings) != Capture(Baseline) || selected && Capture(workspace.Extended.Draft.AssemblyProduct.Settings) != Capture(WorkspaceBaseline))
             {
                 warning = "The layout changed in another editor. Discard to reload it.";
                 return false;
@@ -110,12 +126,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
         }
 
+        /// <summary>Retains native asset references so layout comparisons remain valid after restarting Unity.</summary>
+        /// <param name="settings">Layout whose magnets become an independent baseline.</param>
+        /// <returns>A detached magnet snapshot serialized with the preview window.</returns>
+        private static AssemblyProductSettings Snapshot(AssemblyProductSettings settings)
+        {
+            // Strings containing temporary instance identifiers cannot serve as durable reference baselines.
+            return ObjectWorkspace.Copy(new AssemblyProductSettings { Magnets = settings.Magnets });
+        }
+
         /// <summary>Captures only magnets so unrelated product edits do not cause false conflicts.</summary>
         /// <param name="settings">Product configuration containing the layout.</param>
         /// <returns>A stable serialized layout snapshot.</returns>
         private static string Capture(AssemblyProductSettings settings)
         {
-            return JsonUtility.ToJson(new AssemblyProductSettings { Magnets = settings.Magnets });
+            return settings != null ? JsonUtility.ToJson(new AssemblyProductSettings { Magnets = settings.Magnets }) : string.Empty;
         }
 
         #endregion

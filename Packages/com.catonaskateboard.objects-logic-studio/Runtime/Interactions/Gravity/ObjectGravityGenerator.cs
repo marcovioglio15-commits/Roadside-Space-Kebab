@@ -153,7 +153,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     continue;
                 }
                 Activate(entry);
-                if (entry.Started && !entry.Body.isKinematic && elapsed < entry.ForceUntil
+                if (entry.Started && !entry.Body.isKinematic && !BlackHoleRun.Contains(entry.Body) && elapsed < entry.ForceUntil
                     && (entry.Item == null || !entry.Item.IsReserved && !entry.Item.IsCarried))
                 {
                     float remaining = settings.Restore == GravityRestoreMode.Interaction ? entry.ForceUntil - elapsed
@@ -284,7 +284,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             if (entry.Body.isKinematic && entry.Product != null)
                 entry.Product.ReleaseForSuspension();
-            if (entry.Started || entry.Body.isKinematic)
+            if (entry.Started || entry.Body.isKinematic || BlackHoleRun.Contains(entry.Body))
                 return;
             entry.Started = true;
             entry.ForceUntil = elapsed + entry.Duration;

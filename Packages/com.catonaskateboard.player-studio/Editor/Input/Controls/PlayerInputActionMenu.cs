@@ -29,7 +29,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // The shared menu caches asset discovery; compatibility is evaluated only on rebuilds.
             StudioInputActionMenu.Draw(serialized, name, name, name switch
             {
-                "jumpAction" or "cursorToggleAction" => buttons,
+                "jumpAction" or "crouchAction" or "cursorToggleAction" => buttons,
                 "movementAction" => movement,
                 "lookDeltaAction" => delta,
                 _ => rate
@@ -43,7 +43,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private static bool IsCompatible(InputAction action, string role)
         {
             // Binding inspection also supports controls on devices that are currently disconnected.
-            if (role == "jumpAction" || role == "cursorToggleAction")
+            if (role is "jumpAction" or "crouchAction" or "cursorToggleAction")
                 return action.type == InputActionType.Button;
             if (action.type == InputActionType.Button || action.expectedControlType != "Vector2"
                 || role == "movementAction" && action.type != InputActionType.Value)

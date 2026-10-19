@@ -107,6 +107,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [SerializeField]
         private float coyoteTime;
 
+        [Header("Crouch Draft")]
+        [Tooltip("Detached crouch settings retained until Apply or Discard.")]
+        [SerializeField]
+        private PlayerCrouchSettings crouch = new PlayerCrouchSettings();
+        [Tooltip("Crouch baseline used to detect edits outside this session.")]
+        [SerializeField]
+        private string originalCrouch = JsonUtility.ToJson(new PlayerCrouchSettings());
+
         [Header("Audio Draft")]
         [Tooltip("Detached footstep and collision proposal.")]
         [SerializeField]
@@ -160,7 +168,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         public bool HeadTilt => headTilt;
 
         /// <summary>Detects audio changes alongside movement proposals.</summary>
-        public bool HasChanges => JsonUtility.ToJson(audio) != originalAudio || !speed.Equals(originalSpeed) || !acceleration.Equals(originalAcceleration)
+        public bool HasChanges => JsonUtility.ToJson(crouch) != originalCrouch || JsonUtility.ToJson(audio) != originalAudio || !speed.Equals(originalSpeed) || !acceleration.Equals(originalAcceleration)
             || !deceleration.Equals(originalDeceleration)
             || !useGravity.Equals(originalUseGravity)
             || !gravityAcceleration.Equals(originalGravityAcceleration)
@@ -237,7 +245,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         public bool TryValidate(out string warning)
         {
             // The immutable settings type owns the rules for both editing and runtime initialization.
-            if (!audio.TryValidate(out warning))
+            if (!audio.TryValidate(out warning) || !crouch.TryValidate(out warning))
                 return false;
             return PlayerGravitySettings.TryCreate(useGravity, gravityAcceleration, terminalSpeed, groundSpeed,
                 out PlayerGravitySettings gravity, out warning)
@@ -273,6 +281,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 originalGravityAcceleration = originalTerminalSpeed = originalGroundSpeed = 0f;
             }
 
+            originalCrouch = JsonUtility.ToJson(source != null ? source.Crouch : new PlayerCrouchSettings());
+            crouch = JsonUtility.FromJson<PlayerCrouchSettings>(originalCrouch);
             originalAudio = JsonUtility.ToJson(source != null ? source.Audio : new PlayerAudioSettings());
             audio = JsonUtility.FromJson<PlayerAudioSettings>(originalAudio);
             SetDraft(originalSpeed, originalAcceleration, originalDeceleration);
@@ -306,7 +316,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
             // Compare every edited property immediately before preparing the candidate.
             SerializedObject serialized = new SerializedObject(source);
-            if (JsonUtility.ToJson(source.Audio) != originalAudio
+            if (JsonUtility.ToJson(source.Crouch) != originalCrouch || JsonUtility.ToJson(source.Audio) != originalAudio
                 || !serialized.FindProperty("speed").floatValue.Equals(originalSpeed)
                 || !serialized.FindProperty("acceleration").floatValue.Equals(originalAcceleration)
                 || !serialized.FindProperty("deceleration").floatValue.Equals(originalDeceleration)
@@ -325,6 +335,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
 
             changes = serialized;
+            changes.FindProperty("Crouch").boxedValue = JsonUtility.FromJson<PlayerCrouchSettings>(JsonUtility.ToJson(crouch));
             changes.FindProperty("Audio").boxedValue = JsonUtility.FromJson<PlayerAudioSettings>(JsonUtility.ToJson(audio));
             changes.FindProperty("speed").floatValue = speed;
             changes.FindProperty("acceleration").floatValue = acceleration;

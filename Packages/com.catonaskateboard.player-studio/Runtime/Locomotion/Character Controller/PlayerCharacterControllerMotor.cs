@@ -28,6 +28,7 @@ namespace CatOnASkateboard.PlayerStudio
         private Vector3 requestedVelocity;
         private Vector3 actualVelocity;
         private PlayerJumpState jumpState;
+        private readonly PlayerCrouchState crouch = new PlayerCrouchState();
         private readonly PlayerAudioMotion audio = new PlayerAudioMotion();
         private readonly PlayerFloatingMotion floating = new PlayerFloatingMotion();
         private float walkingStepOffset;
@@ -58,6 +59,11 @@ namespace CatOnASkateboard.PlayerStudio
 
         /// <summary>Integrated vertical speed: positive while rising, negative while falling, zero on support.</summary>
         public float VerticalVelocity => verticalVelocity;
+
+        /// <summary>Whether the native capsule is currently below its standing height.</summary>
+        public bool IsCrouched => crouch.Active;
+        /// <summary>Local vertical camera offset supplied by the current posture.</summary>
+        public float CrouchCameraOffset => crouch.CameraOffset;
 
         /// <summary>Most recent initialization issue, retained for Editor diagnostics.</summary>
         public string InitializationWarning => initializationWarning;
@@ -92,6 +98,7 @@ namespace CatOnASkateboard.PlayerStudio
             // Re-enabling begins from rest instead of replaying a previous velocity.
             initialized = false;
             RestoreStepOffset();
+            crouch.Restore();
             floating.Reset();
             ResetMotion();
         }
@@ -105,6 +112,7 @@ namespace CatOnASkateboard.PlayerStudio
             if (Time.deltaTime <= 0f)
             {
                 input?.ConsumeJump();
+                input?.ConsumeCrouch();
                 jumpState.Reset();
                 return;
             }
@@ -126,10 +134,13 @@ namespace CatOnASkateboard.PlayerStudio
             }
 
             reportedInvalidInput = false;
+            crouch.Tick(input != null ? input.ConsumeCrouch() : default, Time.deltaTime);
+            if (floating.Active && controller.stepOffset > 0f)
+                controller.stepOffset = 0f;
             PlayerButtonSignal jump = input != null ? input.ConsumeJump() : default;
             if (!jump.IsActive || jump.Interrupted)
                 jumpState.Reset();
-            if (!floating.Active && jump.IsActive && jumpState.TryStart(jump.Pressed, IsGrounded, Time.timeAsDouble, settings.Jump))
+            if (!floating.Active && crouch.CanJump && jump.IsActive && jumpState.TryStart(jump.Pressed, IsGrounded, Time.timeAsDouble, settings.Jump))
                 verticalVelocity = settings.Jump.LaunchSpeed;
 
             // Convert intent before acceleration so stored velocity always remains in world space.
@@ -152,7 +163,7 @@ namespace CatOnASkateboard.PlayerStudio
             }
             else
             {
-                displacement = PlayerPlanarMotion.Advance(ref requestedVelocity, command, settings, Time.deltaTime);
+                displacement = PlayerPlanarMotion.Advance(ref requestedVelocity, command * crouch.Speed, settings, Time.deltaTime);
                 displacement.y = PlayerVerticalMotion.Advance(ref verticalVelocity, IsGrounded, settings.Gravity, Time.deltaTime);
             }
             actualVelocity = Vector3.zero;
@@ -200,6 +211,7 @@ namespace CatOnASkateboard.PlayerStudio
         public bool TryInitialize(out string warning)
         {
             RestoreStepOffset();
+            crouch.Restore();
             floating.Reset();
             // Invalid setup stays disabled internally; do not add components or repair presets automatically here.
             ResetMotion();
@@ -217,7 +229,10 @@ namespace CatOnASkateboard.PlayerStudio
                     || !host.MasterPreset.InputPreset.TryGetJumpId(out System.Guid jumpId, out warning)
                     || jumpId == System.Guid.Empty))
                     warning = "Enable Jump only after assigning a Button action to the Input preset's Jump field.";
-                else
+                else if (host.MasterPreset.LocomotionPreset.Crouch.Enabled && (host.MasterPreset.InputPreset == null
+                    || !host.MasterPreset.InputPreset.TryGetCrouchId(out System.Guid crouchId, out warning) || crouchId == System.Guid.Empty))
+                    warning = "Enable Crouch only after assigning its Button action in the Input preset.";
+                else if (crouch.Bind(host.BodyController, host.MasterPreset.LocomotionPreset.Crouch, out warning))
                 {
                     controller = host.BodyController;
                     // The optional rig shares this root; cache it once without a circular serialized dependency.
@@ -293,7 +308,7 @@ namespace CatOnASkateboard.PlayerStudio
             if (!floating.Release(owner, out Vector3 velocity))
                 return;
             if (suspended && controller != null)
-                controller.stepOffset = walkingStepOffset;
+                controller.stepOffset = Mathf.Min(walkingStepOffset, controller.height - controller.radius * 2f);
             requestedVelocity = new Vector3(velocity.x, 0f, velocity.z);
             verticalVelocity = settings.Gravity.Enabled ? Mathf.Max(-settings.Gravity.TerminalSpeed, velocity.y) : 0f;
             collisions = CollisionFlags.None;
@@ -304,7 +319,7 @@ namespace CatOnASkateboard.PlayerStudio
         private void RestoreStepOffset()
         {
             if (floating.Active && controller != null)
-                controller.stepOffset = walkingStepOffset;
+                controller.stepOffset = Mathf.Min(walkingStepOffset, controller.height - controller.radius * 2f);
         }
 
         /// <summary>Clears requested and achieved velocity without changing scene position.</summary>
