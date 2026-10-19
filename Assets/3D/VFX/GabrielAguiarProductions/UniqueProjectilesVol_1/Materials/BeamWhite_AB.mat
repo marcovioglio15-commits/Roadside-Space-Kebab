@@ -125,6 +125,7 @@ Material:
     - _DistortionStrengthScaled: 0.1
     - _DoubleSided: 1
     - _DstBlend: 10
+    - _DstBlendAlpha: 10
     - _EdgeSoftness: 0
     - _FlipbookBlending: 0
     - _FlipbookMode: 0
@@ -146,6 +147,7 @@ Material:
     - _Softness: 1
     - _SpecularHighlights: 1
     - _SrcBlend: 5
+    - _SrcBlendAlpha: 1
     - _Surface: 1
     - _UVSec: 0
     - _ZTest: 4
