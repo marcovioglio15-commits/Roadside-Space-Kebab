@@ -205,7 +205,7 @@ MonoBehaviour:
       RestoreOutside: 1
     RandomInterval: 1
     Interval: 10
-    IntervalRange: {x: 45, y: 60}
+    IntervalRange: {x: 60, y: 90}
     Restore: 0
     Duration: 10
     Target:
