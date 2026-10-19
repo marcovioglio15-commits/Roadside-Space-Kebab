@@ -50,6 +50,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             completed = false;
         }
 
+        /// <summary>Freezes elapsed time when this customer's order set succeeds or receives an unexpected delivery.</summary>
+        internal void Complete()
+        {
+            if (owner == null || completed)
+                return;
+            stopped = Time.timeAsDouble;
+            completed = true;
+        }
+
         /// <summary>Freezes clocks only for the visitor whose actual Day Flow condition completed.</summary>
         /// <param name="visitor">Generated visitor root accepted by Day Flow.</param>
         internal static void Complete(GameObject visitor)
@@ -57,10 +66,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Completion on another customer, consumption alone or dialogue interruption cannot stop this timer.
             foreach (OrderTimerSession timer in visible)
                 if (!timer.completed && timer.owner != null && timer.owner.transform.IsChildOf(visitor.transform))
-                {
-                    timer.stopped = Time.timeAsDouble;
-                    timer.completed = true;
-                }
+                    timer.Complete();
         }
 
         /// <summary>Returns the latest displayed customer in the HUD's scene.</summary>

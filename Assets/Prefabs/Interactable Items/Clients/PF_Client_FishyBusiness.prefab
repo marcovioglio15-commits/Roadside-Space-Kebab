@@ -565,6 +565,10 @@ MonoBehaviour:
     SpawnCatalogs: []
     WaitForCompletion: 1
     CompletionSource: {fileID: 4488316828472950241}
+    UseTimer: 1
+    TimerLabel: Order
+    TimerTenths: 1
+    KeepTimerResult: 1
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -772,6 +776,111 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    AnimateBeforeEject: 0
+    ExternalAnimation: 0
+    AnimationIdentity: 
+    WaitForAnimationReturn: 0
+    Behavior: 0
+    BlackHole:
+      ColliderPath: 
+      ColliderIndex: 0
+      Offset: {x: 0, y: 0, z: 0}
+      ArrivalRadius: 0.15
+      GuideEntrance: 0
+      EntranceOffset: {x: 0, y: 0, z: -2}
+      Radius: 15
+      Duration: 8
+      Acceleration: 100
+      MaximumSpeed: 18
+      QueryInterval: 0.1
+      Area:
+        Enabled: 0
+        Shape: 0
+        Offset: {x: 0, y: 0, z: 0}
+        Radius: 5
+        Size: {x: 10, y: 10, z: 10}
+        Rotation: {x: 0, y: 0, z: 0}
+        TrackEntries: 1
+        QueryInterval: 0.2
+        RestoreOutside: 0
+      Performance:
+        MaximumParticipants: 128
+        AdmissionsPerStep: 16
+        CandidatesPerStep: 64
+        RouteSearchesPerStep: 2
+        RouteRefreshInterval: 0.1
+      Filter:
+        IncludeSelf: 0
+        RequireAllGroups: 1
+        UseLayers: 1
+        Layers:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        UseFlags: 0
+        Flags: []
+        FlagMatch: 0
+        UseInteractions: 0
+        Interactions: 2
+        RequireAllInteractions: 0
+      ReleaseKinematic: 1
+      PassThrough: 0
+      PassageLayers:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Obstacles:
+        Enabled: 1
+        PathSpacing: 0.3
+        Padding: 0.025
+        SlideSpeed: 0.75
+        Bounce: 0.2
+        RecoveryDelay: 0.35
+        EscapeSpeed: 4
+        Friction: 0.02
+      IgnoreParticipantCollisions: 1
+      Spiral: 0
+      SpiralAxis: {x: 0, y: 1, z: 0}
+      SpiralSpeed: 6
+      Impulse: {x: 0, y: 5, z: 0}
+      ImpulseSpace: 1
+      ReplaceVelocity: 1
+      Rumble:
+        Enabled: 0
+        AtStart: 1
+        Sustained: 0
+        AtEnd: 1
+        Range: 20
+        PulseDuration: 0.35
+        Frequency: 12
+        Position: {x: 0.02, y: 0.02, z: 0}
+        Rotation: {x: 0.7, y: 0.5, z: 0.8}
+        CustomWave: 0
+        Wave:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: -1
+            inSlope: 0
+            outSlope: 2
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 2
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+      Air: 0
+      AirPath: 
+      AirSpeed: 12
     SelfEject: 1
     SelfImpulse:
       Flags: []

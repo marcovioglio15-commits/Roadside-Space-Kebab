@@ -23,6 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             }
             serializedObject.Update();
+            OrderCatalog catalog = (OrderCatalog)target;
             SerializedProperty entries = serializedObject.FindProperty("Entries");
             for (int index = 0; index < entries.arraySize; index++)
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
@@ -52,7 +53,66 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             Variants(entry);
                 }
             StudioArrayGUI.Add(entries, "Add Available Order", () => new OrderEntry { Name = "Order " + entries.arraySize });
+            DrawPools(catalog, serializedObject.FindProperty("Pools"));
             serializedObject.ApplyModifiedProperties();
+        }
+
+        /// <summary>Authors dynamic pools that can reference any base order, variant or generated combo.</summary>
+        /// <param name="catalog">Detached catalog currently edited in the order window.</param>
+        /// <param name="pools">Serialized custom extraction pools.</param>
+        private static void DrawPools(OrderCatalog catalog, SerializedProperty pools)
+        {
+            Rect rect = EditorGUILayout.GetControlRect();
+            StudioFieldMenu.Context(rect, pools);
+            pools.isExpanded = EditorGUI.Foldout(rect, pools.isExpanded,
+                new GUIContent("Extraction Pools", "Choose a pool first, then draw one of its named candidates."), true);
+            if (!pools.isExpanded)
+                return;
+            string[] candidateNames = System.Linq.Enumerable.ToArray(catalog.CandidateNames());
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            for (int index = 0; index < pools.arraySize; index++)
+            {
+                SerializedProperty pool = pools.GetArrayElementAtIndex(index);
+                if (StudioArrayGUI.Header(pools, index, new GUIContent(pool.FindPropertyRelative("Name").stringValue,
+                    "Pool chance and its internal candidate list.")))
+                    break;
+                if (!pool.isExpanded)
+                    continue;
+                using EditorGUILayout.VerticalScope box = new EditorGUILayout.VerticalScope(EditorStyles.helpBox);
+                using EditorGUI.IndentLevelScope poolIndent = new EditorGUI.IndentLevelScope();
+                HoverControls.Field(pool, "Name");
+                HoverControls.Field(pool, "Weight", "Pool Weight");
+                HoverControls.Field(pool, "Selection");
+                SerializedProperty members = pool.FindPropertyRelative("Candidates");
+                // Each row selects a stable catalog name; generated combo names appear with the other candidates.
+                for (int memberIndex = 0; memberIndex < members.arraySize; memberIndex++)
+                {
+                    SerializedProperty member = members.GetArrayElementAtIndex(memberIndex);
+                    if (StudioArrayGUI.Header(members, memberIndex, new GUIContent("Candidate " + (memberIndex + 1),
+                        member.FindPropertyRelative("Candidate").stringValue)))
+                        break;
+                    if (!member.isExpanded)
+                        continue;
+                    using EditorGUI.IndentLevelScope memberIndent = new EditorGUI.IndentLevelScope();
+                    SerializedProperty candidate = member.FindPropertyRelative("Candidate");
+                    int selected = System.Array.IndexOf(candidateNames, candidate.stringValue);
+                    if (candidateNames.Length > 0)
+                    {
+                        int next = EditorGUILayout.Popup(new GUIContent("Candidate", candidate.tooltip), selected, candidateNames);
+                        if (next >= 0)
+                            candidate.stringValue = candidateNames[next];
+                    }
+                    else
+                        EditorGUILayout.LabelField("Candidate", "Add an order or variant first.");
+                    if (pool.FindPropertyRelative("Selection").enumValueIndex == (int)OrderSelection.WeightedRandom)
+                        HoverControls.Field(member, "Weight", "Candidate Weight");
+                }
+                StudioArrayGUI.Add(members, "Add Pool Candidate", () => new OrderPoolEntry
+                {
+                    Candidate = candidateNames.Length > 0 ? candidateNames[0] : string.Empty
+                });
+            }
+            StudioArrayGUI.Add(pools, "Add Extraction Pool", () => new OrderPool { Name = "Pool " + (pools.arraySize + 1) });
         }
 
         /// <summary>Edits optional recipe candidates immediately after the parent identity filters.</summary>
@@ -72,6 +132,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 if (!variant.isExpanded)
                     continue;
+                using EditorGUI.IndentLevelScope variantIndent = new EditorGUI.IndentLevelScope();
                 HoverControls.Field(variant, "Name");
                 Presentation(variant, true);
                 if (OrderSections.Draw(variant, "Variant Extraction", "Independent probability, quantity and draw limits.",
@@ -134,7 +195,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!combos.FindPropertyRelative("Enabled").boolValue)
                 return;
             HoverControls.Field(combos, "MaximumVariants");
-            HoverControls.Field(combos, "Weight", "Combo Pool Weight");
+            HoverControls.Field(combos, "Weight", "Default Combo Weight");
             HoverControls.Field(combos, "QuantityPolicy");
             if (combos.FindPropertyRelative("QuantityPolicy").enumValueIndex == (int)OrderComboPolicy.Fixed)
                 HoverControls.Field(combos, "Quantity");

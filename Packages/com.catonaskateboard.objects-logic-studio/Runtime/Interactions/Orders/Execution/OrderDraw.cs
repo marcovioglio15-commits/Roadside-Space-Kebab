@@ -17,8 +17,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>The fixed ticket set, or an empty set when required quantities cannot fit.</returns>
         internal static OrderTicket[] Select(ObjectAvailableOrders owner, int capacity)
         {
+            // Resolve the pool stage before building the candidate limits used by feasibility checks.
             OrderSettings settings = owner.Settings;
-            List<OrderDrawGroup> groups = OrderDrawGroup.Create(owner.ActiveCatalog, settings.Selection, true);
+            List<OrderDrawPool> pools = owner.ActiveCatalog.CreateDrawPools(settings.Selection);
+            List<OrderDrawGroup> groups = OrderDrawGroup.Create(owner.ActiveCatalog, pools, true);
             long reserved = 0;
             // Reserve whole draws, including all units of each selected order.
             foreach (OrderDrawGroup group in groups)
@@ -55,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     foreach (OrderCandidate candidate in group.Candidates)
                         if (candidate.Quantity <= target && remainder[target - candidate.Quantity])
                             mandatory.Add(candidate);
-                    OrderCandidate chosen = Pick(mandatory, settings.Selection);
+                    OrderCandidate chosen = Pick(mandatory, pools);
                     Add(selected, chosen, owner);
                     target -= chosen.Quantity;
                 }
@@ -75,7 +77,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                             eligible.Add(candidate);
                     group.Remaining++;
                 }
-                OrderCandidate chosen = Pick(eligible, settings.Selection);
+                OrderCandidate chosen = Pick(eligible, pools);
                 Add(selected, chosen, owner);
                 foreach (OrderDrawGroup group in groups)
                     if (group.Candidates.Contains(chosen))
@@ -127,41 +129,59 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return reachable;
         }
 
-        /// <summary>Samples uniformly or by weight only among feasible candidates.</summary>
+        /// <summary>Chooses an eligible pool first, then samples one feasible candidate inside that pool.</summary>
         /// <param name="candidates">Nonempty set preserving the remaining budget.</param>
-        /// <param name="selection">Uniform or weighted policy.</param>
+        /// <param name="pools">Resolved pools for this customer spawn.</param>
         /// <returns>The candidate to expand into individual board tickets.</returns>
-        private static OrderCandidate Pick(List<OrderCandidate> candidates, OrderSelection selection)
+        private static OrderCandidate Pick(List<OrderCandidate> candidates, List<OrderDrawPool> pools)
         {
-            double total = 0d;
-            Dictionary<OrderEntry, int> comboCounts = new Dictionary<OrderEntry, int>();
-            foreach (OrderCandidate candidate in candidates)
-                if (candidate.Combo != null)
+            // A pool participates only when at least one candidate preserves this selection pass.
+            double totalPoolWeight = 0d;
+            foreach (OrderDrawPool pool in pools)
+                if (pool.Weight > 0f && HasCandidate(pool, candidates))
+                    totalPoolWeight += pool.Weight;
+            double poolChoice = Random.value * totalPoolWeight;
+            OrderDrawPool selectedPool = null;
+            foreach (OrderDrawPool pool in pools)
+                if (pool.Weight > 0f && HasCandidate(pool, candidates))
                 {
-                    comboCounts.TryGetValue(candidate.Entry, out int count);
-                    comboCounts[candidate.Entry] = count + 1;
+                    selectedPool = pool;
+                    poolChoice -= pool.Weight;
+                    if (poolChoice < 0d)
+                        break;
                 }
+            if (selectedPool == null)
+                return candidates[0];
+            // Candidate weights are evaluated only after the first-stage pool is selected.
+            double totalCandidateWeight = 0d;
             foreach (OrderCandidate candidate in candidates)
-                total += SelectionWeight(candidate, selection, comboCounts);
-            double choice = Random.value * total;
+                if (selectedPool.Candidates.TryGetValue(candidate.Name, out float candidateWeight))
+                    totalCandidateWeight += selectedPool.Selection == OrderSelection.WeightedRandom ? candidateWeight : 1d;
+            double candidateChoice = Random.value * totalCandidateWeight;
+            OrderCandidate fallback = candidates[0];
             foreach (OrderCandidate candidate in candidates)
-            {
-                choice -= SelectionWeight(candidate, selection, comboCounts);
-                if (choice < 0d)
-                    return candidate;
-            }
-            return candidates[candidates.Count - 1];
+                if (selectedPool.Candidates.TryGetValue(candidate.Name, out float selectedWeight))
+                {
+                    fallback = candidate;
+                    candidateChoice -= selectedPool.Selection == OrderSelection.WeightedRandom ? selectedWeight : 1d;
+                    if (candidateChoice < 0d)
+                        return candidate;
+                }
+            return fallback;
         }
 
-        /// <summary>Splits one order's combo pool weight across its currently feasible combinations.</summary>
-        /// <param name="candidate">Feasible draw candidate.</param>
-        /// <param name="selection">Uniform or weighted policy for ordinary candidates.</param>
-        /// <param name="counts">Number of eligible combinations per parent order.</param>
-        /// <returns>Relative mass in this selection pass.</returns>
-        private static double SelectionWeight(OrderCandidate candidate, OrderSelection selection, Dictionary<OrderEntry, int> counts)
+        /// <summary>Checks whether a pool contains a candidate allowed by the current budget pass.</summary>
+        /// <param name="pool">Resolved pool under consideration.</param>
+        /// <param name="candidates">Candidates that preserve required draws and remaining capacity.</param>
+        /// <returns>True when the pool can be chosen without stranding the board budget.</returns>
+        private static bool HasCandidate(OrderDrawPool pool, List<OrderCandidate> candidates)
         {
-            return candidate.Combo != null ? (double)candidate.Weight / counts[candidate.Entry]
-                : selection == OrderSelection.WeightedRandom ? candidate.Weight : 1d;
+            // Weighted pools exclude zero-mass members while uniform pools ignore their weights.
+            foreach (OrderCandidate candidate in candidates)
+                if (pool.Candidates.TryGetValue(candidate.Name, out float memberWeight)
+                    && (pool.Selection != OrderSelection.WeightedRandom || memberWeight > 0f))
+                    return true;
+            return false;
         }
 
         /// <summary>Expands one draw into separate board slots without merging equal orders.</summary>

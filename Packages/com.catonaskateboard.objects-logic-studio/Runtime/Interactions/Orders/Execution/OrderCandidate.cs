@@ -10,16 +10,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal readonly OrderEntry Entry;
         internal readonly OrderRecipeVariant Variant;
         internal readonly OrderRecipeVariant[] Combo;
+        internal readonly string Name;
         private readonly int comboQuantity;
 
         #endregion
         #region Properties
 
         /// <summary>Exact catalog key used for spawn progress and dialogue eligibility.</summary>
-        internal string Name => Combo != null ? OrderComboCandidates.Name(Entry, Combo) : Variant != null ? Variant.Name : Entry.Name;
         /// <summary>Board text chosen at extraction, independent of later deliveries.</summary>
         internal string Text => OrderComboCandidates.Text(Entry, Variant, Combo);
-        /// <summary>Independent candidate weight used by weighted extraction.</summary>
+        /// <summary>Candidate's base weight, multiplied by its membership weight in each weighted pool.</summary>
         internal float Weight => Combo != null ? Entry.Combos.Weight : Variant != null ? Variant.Weight : Entry.Weight;
         /// <summary>Number of board slots required by this candidate.</summary>
         internal int Quantity => Combo != null ? comboQuantity : Variant is { UseDrawLimits: true, UseQuantity: true } ? Variant.Quantity : Entry.Quantity;
@@ -38,6 +38,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Entry = entry;
             Variant = variant;
             Combo = null;
+            Name = variant != null ? variant.Name : entry.Name;
             comboQuantity = 0;
         }
 
@@ -50,6 +51,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Entry = entry;
             Variant = null;
             Combo = combo;
+            Name = OrderComboCandidates.Name(entry, combo);
             comboQuantity = quantity;
         }
 

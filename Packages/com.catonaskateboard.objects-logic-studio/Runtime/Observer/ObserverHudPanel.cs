@@ -30,7 +30,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Existing presentation rectangle, authored before Play.</summary>
         public RectTransform Panel => panel;
         /// <summary>Whether an active observer owns this usable scene panel.</summary>
-        internal bool Ready => owner != null && isActiveAndEnabled && canvas != null && canvas.isActiveAndEnabled && panel != null;
+        internal bool Ready => owner != null && PresentationReady;
+        /// <summary>Whether this active component can present on its authored scene Canvas.</summary>
+        protected bool PresentationReady => isActiveAndEnabled && canvas != null && canvas.isActiveAndEnabled && panel != null;
 
         #endregion
 

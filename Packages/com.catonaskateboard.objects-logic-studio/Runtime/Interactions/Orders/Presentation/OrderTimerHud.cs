@@ -30,9 +30,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Updates digits only when the displayed second or tenth changes.</summary>
         private void Update()
         {
-            // Hidden and unbound HUDs allocate no strings and never create replacement graphics.
+            // Hidden HUDs allocate no strings and never create replacement graphics.
             OrderTimerSession next = OrderTimerSession.Current(gameObject.scene);
-            if (!Ready || next == null || next.Completed && !next.Settings.KeepTimerResult)
+            if (!PresentationReady || next == null || next.Completed && !next.Settings.KeepTimerResult)
             {
                 Hide();
                 return;

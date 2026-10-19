@@ -6,7 +6,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Combines effective variant quantities or draw limits without changing their individual definitions.</summary>
     public enum OrderComboPolicy { RandomVariant, Highest, Lowest, Fixed }
 
-    /// <summary>Defines a separately weighted pool of compatible multi-variant orders.</summary>
+    /// <summary>Defines compatible multi-variant orders that can be added to any catalog extraction pool.</summary>
     [Serializable]
     public sealed class OrderComboSettings
     {
@@ -17,18 +17,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool Enabled;
         [Tooltip("Largest number of different variants in one combo. No variant is repeated within a combination.")]
         public int MaximumVariants = 2;
-        [Tooltip("Total relative weight of this order's eligible combo pool in both Uniform and Weighted selection. Zero excludes combos. Pool weight does not grow with the number of combinations.")]
+        [Tooltip("Default weight for each generated combo candidate. A pool entry can adjust a specific combo's weight.")]
         [Range(0f, 10f)]
         public float Weight = 1f;
         [Tooltip("Choose combo quantity from a random member, the greatest or smallest effective member quantity, or a fixed value. Random choices are sampled once per spawn.")]
         public OrderComboPolicy QuantityPolicy;
         [Tooltip("Slots required by each combo draw when Quantity Policy is Fixed.")]
         public int Quantity = 1;
-        [Tooltip("Shared limits for this order's entire combo pool, derived once per spawn from a random eligible member, highest or lowest member limits, or fixed values. Parent limits supply members without overrides.")]
+        [Tooltip("Shared limits for this order's combo candidates, derived from a random eligible member, highest or lowest member limits, or fixed values. Parent limits supply members without overrides.")]
         public OrderComboPolicy DrawLimitsPolicy = OrderComboPolicy.Fixed;
         [Tooltip("Guaranteed total combo draws for this base order, not a reservation for every possible combination.")]
         public int MinimumDraws;
-        [Tooltip("Randomize the combo pool's shared guaranteed count once per spawn within Required Draw Range.")]
+        [Tooltip("Randomize the shared guaranteed combo count once per spawn within Required Draw Range.")]
         public bool RandomRequiredDraws;
         [Tooltip("Inclusive range of required draws shared by all compatible combos of this order.")]
         public Vector2Int RequiredDrawRange = new Vector2Int(0, 1);

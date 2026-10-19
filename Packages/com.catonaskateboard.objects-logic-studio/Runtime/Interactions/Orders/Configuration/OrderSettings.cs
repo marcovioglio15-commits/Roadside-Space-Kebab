@@ -22,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool RandomDrawUnits;
         [Tooltip("Inclusive unit budget range. The lower bound may be zero. A feasible budget is sampled after reserving required draws.")]
         public Vector2Int DrawUnitRange = new Vector2Int(1, 3);
-        [Tooltip("Draw candidates uniformly or by weight within their limits. Selection fills the largest reachable unit budget; exhausted allowances leave remaining slots empty.")]
+        [Tooltip("Fallback candidate mode when the catalog has no custom pools. Selection fills the largest reachable unit budget; exhausted allowances leave remaining slots empty.")]
         public OrderSelection Selection;
         [Tooltip("Available named orders. Each selected candidate contributes Quantity separate tickets and remains active until despawn.")]
         public OrderCatalog Catalog;
@@ -38,14 +38,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ObjectInteraction CompletionSource;
 
         [Header("Order Timer")]
-        [Tooltip("Start the HUD stopwatch when this customer's first order actually appears on its board. Day Flow completion stops it.")]
-        public bool UseTimer;
+        [Tooltip("Show the HUD stopwatch when this customer's first order actually appears on its board. Day Flow completion stops it.")]
+        public bool UseTimer = true;
         [Tooltip("Caption shown before elapsed minutes and seconds.")]
         public string TimerLabel = "Order";
         [Tooltip("Show tenths of a second in addition to minutes and seconds.")]
         public bool TimerTenths;
         [Tooltip("Keep the stopped result visible until the customer leaves or a new customer's timer starts.")]
-        public bool KeepTimerResult = true;
+        public bool KeepTimerResult;
 
         /// <summary>Shared candidates read at the beginning of each spawn.</summary>
         public OrderEntry[] Entries => Catalog != null ? Catalog.Entries : Array.Empty<OrderEntry>();
@@ -91,8 +91,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (Catalog == null || string.IsNullOrWhiteSpace(Board)
                 || (RandomDrawUnits ? DrawUnitRange.x < 0 || DrawUnitRange.y < DrawUnitRange.x || DrawUnitRange.y == int.MaxValue : DrawCount <= 0 || DrawCount == int.MaxValue))
                 return false;
-            warning = "Choose a supported order selection mode.";
-            if (Selection is not (OrderSelection.UniformRandom or OrderSelection.WeightedRandom))
+            // Only catalogs without their own pools depend on this shared selection mode.
+            bool usesFallbackSelection = false;
+            foreach (OrderCatalog catalog in Catalogs())
+                usesFallbackSelection |= catalog.Pools == null || catalog.Pools.Length == 0;
+            warning = "Choose a supported order selection mode for catalogs without custom pools.";
+            if (usesFallbackSelection && Selection is not (OrderSelection.UniformRandom or OrderSelection.WeightedRandom))
                 return false;
             // Validate every reachable catalog without rewriting a budget or dropping an authored rule.
             HashSet<(OrderSpawnMatch, int)> rules = new HashSet<(OrderSpawnMatch, int)>();
@@ -111,10 +115,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (!catalog.TryValidate(out warning))
                     return false;
                 long required = 0;
-                foreach (OrderDrawGroup group in OrderDrawGroup.Create(catalog, Selection, false))
+                List<OrderDrawPool> pools = catalog.CreateDrawPools(Selection);
+                foreach (OrderDrawGroup group in OrderDrawGroup.Create(catalog, pools, false))
                 {
                     required += (long)group.Required * group.Quantity;
-                    warning = "Required order has no selectable base or variant: " + group.Name;
+                    warning = "Required order group has no selectable candidate: " + group.Name;
                     if (group.Required > 0 && group.Candidates.Count == 0)
                         return false;
                 }

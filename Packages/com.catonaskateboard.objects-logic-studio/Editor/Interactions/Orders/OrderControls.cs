@@ -25,12 +25,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     OrderBoardBinding.Draw(settings.FindPropertyRelative("Board"));
                     Completion(settings, owner);
                 }
-            if (sections.Draw("Order Selection", "Draw budget and selection policy.", settings, "RandomDrawUnits", "DrawUnitRange", "DrawCount", "Selection"))
+            // Hide the interaction-level mode when every reachable catalog defines its own pool policy.
+            bool fallbackSelection = UsesFallbackSelection(settings);
+            string[] selectionFields = fallbackSelection
+                ? new[] { "RandomDrawUnits", "DrawUnitRange", "DrawCount", "Selection" }
+                : new[] { "RandomDrawUnits", "DrawUnitRange", "DrawCount" };
+            if (sections.Draw("Order Selection", "Draw budget and selection policy.", settings, selectionFields))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "RandomDrawUnits");
                     HoverControls.Field(settings, settings.FindPropertyRelative("RandomDrawUnits").boolValue ? "DrawUnitRange" : "DrawCount", "Draw Units");
-                    HoverControls.Field(settings, "Selection");
+                    if (fallbackSelection)
+                        HoverControls.Field(settings, "Selection");
                 }
             if (sections.Draw("Order Catalog", "Shared order definitions and optional per-spawn catalog overrides.", settings, "Catalog", "UseSpawnCatalogs", "SpawnCatalogs"))
                 using (new EditorGUI.IndentLevelScope())
@@ -70,6 +76,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
                 StudioArrayGUI.Add(rules, "Add Spawn Catalog", () => new OrderSpawnCatalog());
             }
+        }
+
+        /// <summary>Shows the shared fallback mode only when some assigned catalog has no custom pools.</summary>
+        /// <param name="settings">Available-orders configuration, including enabled spawn overrides.</param>
+        /// <returns>True when a reachable catalog uses the interaction-level selection mode.</returns>
+        private static bool UsesFallbackSelection(SerializedProperty settings)
+        {
+            // The default catalog is used whenever no exact or threshold spawn rule applies.
+            if (UsesFallbackSelection((OrderCatalog)settings.FindPropertyRelative("Catalog").objectReferenceValue))
+                return true;
+            if (!settings.FindPropertyRelative("UseSpawnCatalogs").boolValue)
+                return false;
+            SerializedProperty rules = settings.FindPropertyRelative("SpawnCatalogs");
+            // Spawn overrides can still rely on this mode even when the default catalog has custom pools.
+            for (int index = 0; index < rules.arraySize; index++)
+                if (UsesFallbackSelection((OrderCatalog)rules.GetArrayElementAtIndex(index).FindPropertyRelative("Catalog").objectReferenceValue))
+                    return true;
+            return false;
+        }
+
+        /// <summary>Checks whether one catalog delegates candidate selection to the interaction.</summary>
+        /// <param name="catalog">Default or spawn-specific catalog.</param>
+        /// <returns>True for a missing catalog or a catalog without explicit pools.</returns>
+        private static bool UsesFallbackSelection(OrderCatalog catalog)
+        {
+            return catalog == null || catalog.Pools == null || catalog.Pools.Length == 0;
         }
 
         /// <summary>Shares catalog assignment and independent edit/create commands across default and spawn overrides.</summary>

@@ -558,6 +558,10 @@ MonoBehaviour:
     SpawnCatalogs: []
     WaitForCompletion: 1
     CompletionSource: {fileID: 4488316828472950241}
+    UseTimer: 1
+    TimerLabel: Order
+    TimerTenths: 0
+    KeepTimerResult: 0
 --- !u!114 &6388289395759616639
 MonoBehaviour:
   m_ObjectHideFlags: 0

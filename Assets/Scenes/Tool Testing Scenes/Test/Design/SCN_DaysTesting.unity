@@ -2671,6 +2671,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2168570032784757637, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_FontData.m_Alignment
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3494362566815767386, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3750595649953029657, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -2758,6 +2766,10 @@ PrefabInstance:
     - target: {fileID: 6232667911842985086, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7740284209379389251, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -238,6 +238,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 complete &= ticket.Completed;
             UnexpectedConsumption = remaining > 0;
             AllCompleted = tickets.Length > 0 && complete;
+            // Stop immediately on a fulfilled set or a delivery that matched no open ticket.
+            if (UnexpectedConsumption || changed && complete)
+                timer.Complete();
             // Classify the receipt against slots that were open before fulfilment, including repeated orders.
             consumedPendingOrder = changed;
             consumptionRevision = Item.ConsumptionRevision;

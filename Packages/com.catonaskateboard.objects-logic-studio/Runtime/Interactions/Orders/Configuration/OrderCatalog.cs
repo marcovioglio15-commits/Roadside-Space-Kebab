@@ -14,6 +14,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Available Orders")]
         [Tooltip("Named candidates shared by every interaction referencing this catalog. Quantities occupy individual board slots.")]
         public OrderEntry[] Entries = Array.Empty<OrderEntry>();
+        [Tooltip("Optional first-stage pools. Each can include orders, variants and generated combos; an empty list uses all candidates.")]
+        public OrderPool[] Pools = Array.Empty<OrderPool>();
 
         #endregion
 
@@ -22,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Reports invalid candidates without changing authored names, quantities or weights.</summary>
         /// <param name="warning">Receives the first invalid candidate.</param>
-        /// <returns>True when all candidates can be used for uniform or weighted selection.</returns>
+        /// <returns>True when definitions and active extraction pools are valid.</returns>
         public bool TryValidate(out string warning)
         {
             // Names are stable keys for Consumption dialogue filters on all catalog consumers.
@@ -87,8 +89,45 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         return false;
                 }
             }
+            if (!ValidatePools(out warning))
+                return false;
             warning = string.Empty;
             return true;
+        }
+
+        /// <summary>Builds resolved pool candidates or one implicit pool when no custom pools are authored.</summary>
+        /// <param name="defaultSelection">Selection mode used by the implicit pool for existing catalogs.</param>
+        /// <returns>Ordered extraction pools with candidate weights resolved once.</returns>
+        internal List<OrderDrawPool> CreateDrawPools(OrderSelection defaultSelection)
+        {
+            // Resolve dialogue keys once so each pool stores direct candidate data for this spawn.
+            Dictionary<string, OrderCandidate> candidates = new Dictionary<string, OrderCandidate>(StringComparer.Ordinal);
+            foreach (OrderCandidate candidate in Candidates())
+                if (!string.IsNullOrWhiteSpace(candidate.Name))
+                    candidates.TryAdd(candidate.Name, candidate);
+            List<OrderDrawPool> pools = new List<OrderDrawPool>();
+            // Existing catalogs without explicit pools keep their single-stage selection behavior.
+            if (Pools == null || Pools.Length == 0)
+            {
+                OrderDrawPool pool = new OrderDrawPool("All Orders", 1f, defaultSelection);
+                foreach (OrderCandidate candidate in candidates.Values)
+                    pool.Add(candidate, 1f);
+                pools.Add(pool);
+                return pools;
+            }
+            // Custom pool order is preserved because it controls the first extraction stage.
+            foreach (OrderPool definition in Pools)
+            {
+                if (definition == null || definition.Candidates == null)
+                    continue;
+                OrderDrawPool pool = new OrderDrawPool(definition.Name, definition.Weight, definition.Selection);
+                foreach (OrderPoolEntry member in definition.Candidates)
+                    if (member != null && !string.IsNullOrWhiteSpace(member.Candidate)
+                        && candidates.TryGetValue(member.Candidate, out OrderCandidate candidate))
+                        pool.Add(candidate, member.Weight);
+                pools.Add(pool);
+            }
+            return pools;
         }
 
         /// <summary>Enumerates each enabled base order and recipe variant as an independent draw candidate.</summary>
@@ -112,23 +151,111 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
         }
 
-        /// <summary>Checks names against enabled candidates without conflating a base order and its recipe variants.</summary>
+        /// <summary>Checks names against candidates reachable through at least one active pool.</summary>
         /// <param name="name">Exact name saved by a dialogue filter.</param>
         /// <returns>True when the named candidate can be extracted.</returns>
         public bool ContainsOrder(string name)
         {
-            foreach (OrderCandidate candidate in Candidates())
-                if (candidate.Name == name)
-                    return true;
-            return false;
+            HashSet<string> selectable = SelectableNames(OrderSelection.UniformRandom);
+            return selectable.Contains(name);
         }
 
-        /// <summary>Supplies independent base and variant names to editor selectors.</summary>
+        /// <summary>Supplies active order, variant and combo names to dialogue selectors.</summary>
         /// <returns>Names of enabled draw candidates in authored order.</returns>
         public IEnumerable<string> OrderNames()
         {
+            HashSet<string> selectable = SelectableNames(OrderSelection.UniformRandom);
             foreach (OrderCandidate candidate in Candidates())
-                yield return candidate.Name;
+                if (selectable.Contains(candidate.Name))
+                    yield return candidate.Name;
+        }
+
+        /// <summary>Supplies every valid catalog name to pool membership controls.</summary>
+        /// <returns>Base orders, enabled variants and generated compatible combos.</returns>
+        public IEnumerable<string> CandidateNames()
+        {
+            foreach (OrderCandidate candidate in Candidates())
+                if (!string.IsNullOrWhiteSpace(candidate.Name))
+                    yield return candidate.Name;
+        }
+
+        /// <summary>Validates pool names, candidate references and the availability of a weighted draw path.</summary>
+        /// <param name="warning">Receives the first invalid pool configuration.</param>
+        /// <returns>True when the implicit pool or at least one configured pool can provide a candidate.</returns>
+        private bool ValidatePools(out string warning)
+        {
+            warning = string.Empty;
+            if (Pools == null || Pools.Length == 0)
+                return true;
+            HashSet<string> poolNames = new HashSet<string>(StringComparer.Ordinal);
+            Dictionary<string, OrderCandidate> candidates = new Dictionary<string, OrderCandidate>(StringComparer.Ordinal);
+            // Candidate metadata supplies the base weight used by each pool's weighted mode.
+            foreach (OrderCandidate candidate in Candidates())
+                candidates.TryAdd(candidate.Name, candidate);
+            bool selectablePool = false;
+            // Pool labels are stable identifiers in diagnostics; member names link to catalog candidates.
+            foreach (OrderPool pool in Pools)
+            {
+                warning = "Each order pool needs a unique name, finite non-negative weight and supported selection mode.";
+                if (pool == null || string.IsNullOrWhiteSpace(pool.Name) || !poolNames.Add(pool.Name)
+                    || !float.IsFinite(pool.Weight) || pool.Weight < 0f
+                    || pool.Selection is not (OrderSelection.UniformRandom or OrderSelection.WeightedRandom))
+                    return false;
+                HashSet<string> members = new HashSet<string>(StringComparer.Ordinal);
+                // Empty pools are allowed when another active pool supplies at least one candidate.
+                if (pool.Candidates == null)
+                {
+                    warning = "Order pool '" + pool.Name + "' needs a candidate list.";
+                    return false;
+                }
+                foreach (OrderPoolEntry member in pool.Candidates)
+                {
+                    warning = "Order pool '" + pool.Name + "' contains a missing or duplicated catalog candidate.";
+                    if (member == null || string.IsNullOrWhiteSpace(member.Candidate))
+                        return false;
+                    if (!candidates.TryGetValue(member.Candidate, out OrderCandidate candidate) || !members.Add(member.Candidate))
+                        return false;
+                    warning = "Order pool '" + pool.Name + "' contains a non-finite or negative candidate weight.";
+                    if (!float.IsFinite(member.Weight) || member.Weight < 0f)
+                        return false;
+                    // Weighted extraction uses this product directly after selecting the pool.
+                    float effectiveWeight = member.Weight * candidate.Weight;
+                    warning = "Order pool '" + pool.Name + "' produces a non-finite effective candidate weight.";
+                    if (!float.IsFinite(effectiveWeight))
+                        return false;
+                    if (pool.Weight > 0f && (pool.Selection != OrderSelection.WeightedRandom
+                        || effectiveWeight > 0f))
+                        selectablePool = true;
+                }
+            }
+            warning = "Add a candidate to at least one positive-weight pool, or leave Pools empty to use all catalog candidates.";
+            return selectablePool;
+        }
+
+        /// <summary>Collects candidates that can be reached through positive-weight pools.</summary>
+        /// <param name="defaultSelection">Fallback policy for catalogs without custom pools.</param>
+        /// <returns>Unique candidate names in active pools.</returns>
+        private HashSet<string> SelectableNames(OrderSelection defaultSelection)
+        {
+            return SelectableNames(CreateDrawPools(defaultSelection));
+        }
+
+        /// <summary>Collects names reachable through positive-weight pools for selection and limit checks.</summary>
+        /// <param name="pools">Resolved pools for one interaction and spawn.</param>
+        /// <returns>Unique candidates available in the current extraction.</returns>
+        internal static HashSet<string> SelectableNames(List<OrderDrawPool> pools)
+        {
+            HashSet<string> selectable = new HashSet<string>(StringComparer.Ordinal);
+            // Uniform pools ignore candidate weights; weighted pools omit zero-mass members.
+            foreach (OrderDrawPool pool in pools)
+            {
+                if (pool.Weight <= 0f)
+                    continue;
+                foreach (KeyValuePair<string, float> member in pool.Candidates)
+                    if (pool.Selection != OrderSelection.WeightedRandom || member.Value > 0f)
+                        selectable.Add(member.Key);
+            }
+            return selectable;
         }
 
         #endregion
