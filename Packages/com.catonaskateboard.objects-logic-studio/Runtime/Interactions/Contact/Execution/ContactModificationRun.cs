@@ -13,6 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectContactModifier owner;
         private ContactModificationRule settings;
         private readonly ContactDetection detection = new ContactDetection();
+        private readonly ContactImpactBuffer impacts = new ContactImpactBuffer();
         private readonly ContactIdentityRun identityRun = new ContactIdentityRun();
         private readonly ContactPreparationRun preparation = new ContactPreparationRun();
         private readonly HashSet<ObjectItem> contacts = new HashSet<ObjectItem>();
@@ -76,6 +77,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             entered.Clear();
             completed.Clear();
             failed.Clear();
+            impacts.Clear();
             detection.Bind(Item);
             nextQuery = 0f;
             lastWarning = string.Empty;
@@ -86,6 +88,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Deactivation or consumption can occur inside another feature's completion callback.
             Cancel();
+            impacts.Clear();
             contacts.Clear();
             entered.Clear();
         }
@@ -97,9 +100,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!Active || Item == null || !Item.isActiveAndEnabled || Item.IsConsumed)
             {
                 Cancel();
+                impacts.Clear();
                 return;
             }
             if (Time.timeScale <= 0f)
+            {
+                impacts.Clear();
+                return;
+            }
+            // Brief impacts are processed once, before interval-based overlap queries can miss them.
+            if (ProcessImpacts())
                 return;
             if (returning)
             {
@@ -130,6 +140,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 detection.Query(Item, settings, contacts);
                 UpdateContacts();
             }
+            Advance(false);
+        }
+
+        /// <summary>Advances an acquired pair using live contact or one solver-confirmed impact.</summary>
+        /// <param name="impact">Whether this update is the initial response to a buffered physical hit.</param>
+        private void Advance(bool impact)
+        {
+            // Impact confirmation lasts for this update; later frames retain the authored separation policy.
             if ((running || paused || retained) && (other == null || !other.IsOwnedBy(this) || !Item.IsOwnedBy(this)))
             {
                 Cancel();
@@ -159,7 +177,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else
                 preparation.Tick(Time.deltaTime);
             if (!settings.WhileContact && (IsLocked || !ToolAllowed || !Eligible(other)
-                || !settings.Preparation.HoldsOther && !settings.CompleteAfterSeparation && !contacts.Contains(other)))
+                || !impact && !settings.Preparation.HoldsOther && !settings.CompleteAfterSeparation && !contacts.Contains(other)))
             {
                 Interrupt();
                 return;
@@ -219,6 +237,64 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Contacts
 
+        /// <summary>Captures an eligible immediate consumption before collision response separates the shapes.</summary>
+        /// <param name="candidate">Other participant identified by an actual collision.</param>
+        /// <param name="surface">Collider owned by this rule's item.</param>
+        /// <param name="otherSurface">Counterpart collider that physically touched the owner.</param>
+        internal void RecordImpact(ObjectItem candidate, Collider surface, Collider otherSurface)
+        {
+            // Dwell-time and temporary-contact rules still require uninterrupted measured contact.
+            if (settings.ContactDuration > 0f || settings.WhileContact || !settings.Self.Consume && !settings.Other.Consume
+                || !ContactDetection.Usable(surface, settings.IncludeTriggers) || !ContactDetection.Usable(otherSurface, settings.IncludeTriggers)
+                || !Eligible(candidate) || !Matches(candidate) || !CanBegin(candidate) || !AcceptsConsumption(candidate))
+                return;
+            impacts.Record(candidate);
+        }
+
+        /// <summary>Handles every eligible immediate offering once during the next modifier update.</summary>
+        /// <returns>True when an impact started or resumed a transaction in this update.</returns>
+        private bool ProcessImpacts()
+        {
+            bool processed = false;
+            // Several instant consumptions can finish in one frame without discarding simultaneous hits.
+            while (Active && Item != null && Item.isActiveAndEnabled && !Item.IsConsumed && impacts.TryTake(out ObjectItem candidate))
+            {
+                if (!Eligible(candidate) || !Matches(candidate) || !CanBegin(candidate) || !AcceptsConsumption(candidate))
+                    continue;
+                entered.TryAdd(candidate, Time.time);
+                StartContact(candidate);
+                Advance(true);
+                processed = true;
+            }
+            impacts.Clear();
+            if (processed)
+                nextQuery = 0f;
+            return processed;
+        }
+
+        /// <summary>Checks transaction state and shared restrictions before selecting a matching contact.</summary>
+        /// <param name="candidate">Already matched counterpart being considered.</param>
+        /// <returns>True when this rule can acquire or resume the counterpart.</returns>
+        private bool CanBegin(ObjectItem candidate)
+        {
+            return !running && !returning && !retained && (!paused || candidate == other)
+                && Available(InteractionChannels.Passive) && !candidate.IsBlocked(InteractionChannels.Passive)
+                && !completed.Contains(candidate) && !failed.Contains(candidate);
+        }
+
+        /// <summary>Shares dialogue gating and rejected-offering checks between polling and real impacts.</summary>
+        /// <param name="candidate">Matching item whose consumption eligibility is checked.</param>
+        /// <returns>True when the dialogue permits this offering.</returns>
+        private bool AcceptsConsumption(ObjectItem candidate)
+        {
+            // Completing a dialogue cannot retroactively accept an offering rejected before it opened.
+            if (!owner.AwaitsDialogue(settings))
+                return !owner.RejectsConsumption(candidate, settings);
+            if (!candidate.IsReserved && !Item.IsReserved)
+                owner.ReportAwaitingContact(candidate);
+            return false;
+        }
+
         /// <summary>Accepts the observer's confirmation for this rule without resetting its snap.</summary>
         /// <returns>True when this rule was awaiting the request.</returns>
         internal bool Confirm()
@@ -254,19 +330,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     continue;
                 if (!entered.TryGetValue(candidate, out float time))
                     entered.Add(candidate, time = Time.time);
-                if (running || retained || paused && candidate != other
-                    || !Available(InteractionChannels.Passive) || candidate.IsBlocked(InteractionChannels.Passive)
-                    || completed.Contains(candidate) || failed.Contains(candidate) || Time.time - time < settings.ContactDuration)
-                    continue;
-                // Each newly qualifying contact is reported once, without starving farther simultaneous contacts.
-                if (owner.AwaitsDialogue(settings))
-                {
-                    if (!candidate.IsReserved && !Item.IsReserved)
-                        owner.ReportAwaitingContact(candidate);
-                    continue;
-                }
-                // Opening dialogue cannot retroactively consume an offering that the player has not retrieved.
-                if (owner.RejectsConsumption(candidate, settings))
+                if (!CanBegin(candidate) || Time.time - time < settings.ContactDuration || !AcceptsConsumption(candidate))
                     continue;
                 float score = (candidate.transform.position - owner.transform.position).sqrMagnitude;
                 if (score < distance || score == distance && selected != null
@@ -277,18 +341,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
             }
             if (selected != null)
+                StartContact(selected);
+        }
+
+        /// <summary>Starts a new transaction or resumes the retained counterpart without repeating preparation.</summary>
+        /// <param name="candidate">Eligible contact selected by polling or a physical impact.</param>
+        private void StartContact(ObjectItem candidate)
+        {
+            // A paused pair already owns both items and retains its effect progress.
+            if (paused)
             {
-                if (paused)
-                {
-                    Item.Acquire(this, settings.BlockSelf);
-                    other.Acquire(this, settings.BlockOther);
-                    started = Time.time - elapsed;
-                    paused = false;
-                    running = true;
-                }
-                else
-                    Begin(selected);
+                Item.Acquire(this, settings.BlockSelf);
+                other.Acquire(this, settings.BlockOther);
+                started = Time.time - elapsed;
+                paused = false;
+                running = true;
             }
+            else
+                Begin(candidate);
         }
 
         /// <summary>Checks both independently configured carry conditions before starting or continuing effects.</summary>

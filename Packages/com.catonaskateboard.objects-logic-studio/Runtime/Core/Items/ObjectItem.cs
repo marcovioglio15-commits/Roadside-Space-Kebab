@@ -23,6 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private InteractionChannels blocked;
         private UnityEngine.Object reservation;
         private ObjectGrab grab;
+        private ObjectContactModifier contactModifier;
         private ObjectIdentity identity;
         /// <summary>Shared prefab occurrence retained through technical suspension.</summary>
         internal readonly ObjectSpawnLifetime Spawn = new ObjectSpawnLifetime();
@@ -61,6 +62,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // All new features share this root; no component search is needed during lock checks.
             grab = GetComponent<ObjectGrab>();
+            contactModifier = GetComponent<ObjectContactModifier>();
             identity = GetComponent<ObjectIdentity>();
             ObjectGravityGenerator.IncludeSpawn(gameObject);
         }
@@ -80,6 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 item.ConsumptionRevision++;
                 item.IsConsumed = false;
                 item.grab = item.GetComponent<ObjectGrab>();
+                item.contactModifier = item.GetComponent<ObjectContactModifier>();
             }
         }
 
@@ -91,6 +94,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             locks.Clear();
             blocked = InteractionChannels.None;
             reservation = null;
+        }
+
+        #endregion
+
+        #region Physical Contacts
+
+        /// <summary>Forwards short impacts to both participants before the next passive contact query.</summary>
+        /// <param name="collision">Current physics callback; only its item and collider references are forwarded.</param>
+        private void OnCollisionEnter(Collision collision)
+        {
+            // Either body's callback can reach a static counterpart with colliders below its item root.
+            if (!isActiveAndEnabled || IsConsumed)
+                return;
+            for (int index = 0; index < collision.contactCount; index++)
+            {
+                ContactPoint contact = collision.GetContact(index);
+                if (contact.thisCollider.GetComponentInParent<ObjectItem>() != this
+                    || contact.otherCollider.GetComponentInParent<ObjectItem>() is not ObjectItem other || other == this
+                    || !other.isActiveAndEnabled || other.IsConsumed)
+                    continue;
+                contactModifier?.RecordImpact(other, contact.thisCollider, contact.otherCollider);
+                other.contactModifier?.RecordImpact(this, contact.otherCollider, contact.thisCollider);
+            }
         }
 
         #endregion

@@ -238,6 +238,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
         #region Events
 
+        /// <summary>Retains solver-confirmed impacts without executing effects inside physics callbacks.</summary>
+        /// <param name="candidate">Other item identified by the collision.</param>
+        /// <param name="surface">Exact collider owned by this modifier's item.</param>
+        /// <param name="otherSurface">Exact counterpart collider that produced the impact.</param>
+        internal void RecordImpact(ObjectItem candidate, Collider surface, Collider otherSurface)
+        {
+            // Disabled modifiers and paused gameplay cannot retain offerings for later activation.
+            if (!ready || !isActiveAndEnabled || Time.timeScale <= 0f)
+                return;
+            foreach (ContactModificationRun run in runs)
+                run.RecordImpact(candidate, surface, otherSurface);
+        }
+
         /// <summary>Reports whether a consuming rule is still waiting for its selected local dialogue.</summary>
         /// <param name="rule">Rule being considered for contact activation.</param>
         /// <returns>True only for gated consumption before successful dialogue completion.</returns>
