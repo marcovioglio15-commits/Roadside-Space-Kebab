@@ -489,7 +489,7 @@ MonoBehaviour:
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: c69745f27196e29439f70f5d1d5c1ea1, type: 2}
-      Order: 2
+      Order: 0
       Position: {x: 0, y: 0.05, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
