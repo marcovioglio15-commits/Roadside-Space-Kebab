@@ -16,6 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private TMP_Text[] paragraphs = Array.Empty<TMP_Text>();
         private TMP_Text original;
         private OrderTextStyle[] paragraphBaselines = Array.Empty<OrderTextStyle>();
+        private Vector2[] paragraphSizes = Array.Empty<Vector2>();
+        private Vector2[] paragraphPositions = Array.Empty<Vector2>();
         private bool originalEnabled;
 
         #endregion
@@ -31,10 +33,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             original = slot;
             originalEnabled = slot.enabled;
             paragraphBaselines = new OrderTextStyle[paragraphs.Length];
+            paragraphSizes = new Vector2[paragraphs.Length];
+            paragraphPositions = new Vector2[paragraphs.Length];
             // Each paragraph keeps the exact TMP appearance authored on its own scene object.
             for (int index = 0; index < paragraphs.Length; index++)
                 if (paragraphs[index] != null)
+                {
                     paragraphBaselines[index] = OrderTextStyle.Capture(paragraphs[index]);
+                    paragraphSizes[index] = paragraphs[index].rectTransform.sizeDelta;
+                    paragraphPositions[index] = paragraphs[index].rectTransform.anchoredPosition;
+                }
             HideParagraphs();
         }
 
@@ -46,6 +54,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 original.enabled = originalEnabled;
             original = null;
             paragraphBaselines = Array.Empty<OrderTextStyle>();
+            paragraphSizes = Array.Empty<Vector2>();
+            paragraphPositions = Array.Empty<Vector2>();
         }
 
         /// <summary>Disables only preauthored paragraph children, retaining them for the next ticket.</summary>
@@ -91,7 +101,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="completed">Whether every displayed paragraph must be crossed out.</param>
         private void DrawVariants(OrderCandidate candidate, bool completed)
         {
-            // The board has assigned base-only text; restore its style before applying optional typography.
+            // Keep the main slot independent while applying optional paragraph typography.
             bool styledBase = candidate.Entry.TextStyle is { Enabled: true };
             bool includeBase = !string.IsNullOrWhiteSpace(candidate.MainText);
             int count = (candidate.Combo?.Length ?? 1) + (styledBase && includeBase ? 1 : 0);
@@ -124,8 +134,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             HideParagraphs();
             // Restore each reused child from its own scene-authored TMP settings, not from the parent slot.
             for (int index = 0; index < paragraphs.Length; index++)
-                if (paragraphs[index] != null && index < paragraphBaselines.Length && paragraphBaselines[index] != null)
+            {
+                // Reused children return to their own scene-authored appearance and dimensions.
+                if (paragraphs[index] == null)
+                    continue;
+                if (index < paragraphBaselines.Length && paragraphBaselines[index] != null)
                     paragraphBaselines[index].Apply(paragraphs[index]);
+                if (index < paragraphSizes.Length)
+                    paragraphs[index].rectTransform.sizeDelta = paragraphSizes[index];
+                if (index < paragraphPositions.Length)
+                    paragraphs[index].rectTransform.anchoredPosition = paragraphPositions[index];
+            }
             if (original != null)
                 original.enabled = originalEnabled;
         }
@@ -145,8 +164,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             style?.Apply(text);
             float indent = style is { Enabled: true } ? style.Indent : 0f;
             offset += style is { Enabled: true } ? style.SpaceBefore : 0f;
-            text.rectTransform.sizeDelta = new Vector2(original.rectTransform.rect.width - indent, original.rectTransform.rect.height);
-            text.rectTransform.anchoredPosition = new Vector2(indent, -offset);
+            if (indent > 0f)
+                text.rectTransform.sizeDelta = new Vector2(paragraphSizes[index].x - indent, paragraphSizes[index].y);
+            if (indent > 0f || offset > 0f)
+                text.rectTransform.anchoredPosition = new Vector2(paragraphPositions[index].x + indent, paragraphPositions[index].y - offset);
             text.text = content.Replace("\\n", "\n");
             if (completed)
                 text.fontStyle |= FontStyles.Strikethrough;
