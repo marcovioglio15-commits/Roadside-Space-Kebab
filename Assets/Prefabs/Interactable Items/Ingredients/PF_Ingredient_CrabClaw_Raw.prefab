@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2578056937270180844
+--- !u!1 &3003482873436781798
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,47 +8,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5094602661272066935}
-  - component: {fileID: 9013610882881487773}
-  - component: {fileID: 1112103012011359925}
-  - component: {fileID: 8848015718460716284}
-  - component: {fileID: 832429267205358134}
-  - component: {fileID: 1227115120691720151}
-  - component: {fileID: 7016335738347341644}
-  - component: {fileID: 3950651569682161542}
-  - component: {fileID: 8631066066783164916}
-  - component: {fileID: 4509882872896299198}
-  - component: {fileID: 3736181417804772347}
+  - component: {fileID: 3241382787530970060}
+  - component: {fileID: -3852034150791703620}
+  - component: {fileID: 9051745806529445878}
+  - component: {fileID: 7826810689782694497}
+  - component: {fileID: 2440491417456896859}
+  - component: {fileID: 9203553596305118150}
+  - component: {fileID: 852621493849977907}
+  - component: {fileID: 180409948016723465}
+  - component: {fileID: 374229523136999013}
+  - component: {fileID: 1048589051345839481}
+  - component: {fileID: 8880576083071098823}
   m_Layer: 6
-  m_Name: PF_Ingredient_FrenchFries_Cooking
+  m_Name: PF_Ingredient_CrabClaw_Raw
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5094602661272066935
+--- !u!4 &3241382787530970060
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4871193937920360506}
+  - {fileID: 5915428456699585526}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &9013610882881487773
+--- !u!54 &-3852034150791703620
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
@@ -69,13 +69,13 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &1112103012011359925
+--- !u!65 &9051745806529445878
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -88,29 +88,41 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.2541146, y: 0.028227009, z: 0.45589304}
-  m_Center: {x: 0.00082944334, y: 0.011829976, z: -0.00076743215}
---- !u!114 &8848015718460716284
+  m_Size: {x: 0.23543298, y: 0.026434869, z: 0.45925254}
+  m_Center: {x: 0.0046349615, y: 0.010933906, z: -0.0076145604}
+--- !u!114 &7826810689782694497
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
   flags:
-  - {fileID: 11400000, guid: f3810201d1372f14a8eb7eda092ab735, type: 2}
---- !u!114 &832429267205358134
+  - {fileID: 11400000, guid: 7a9729a57801b554a91610d9c74a59d6, type: 2}
+--- !u!114 &2440491417456896859
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
+--- !u!114 &9203553596305118150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3003482873436781798}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 938429a5d51206345b01b27c9fb3a6a6, type: 3}
@@ -163,7 +175,7 @@ MonoBehaviour:
       popIn: 1
       exitDuration: 0.16
     style:
-      content: French Fries
+      content: Crab Claws
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0
@@ -180,25 +192,13 @@ MonoBehaviour:
       backgroundSprite: {fileID: 0}
       backgroundType: 0
   drawGizmos: 1
---- !u!114 &1227115120691720151
+--- !u!114 &852621493849977907
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
---- !u!114 &7016335738347341644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
@@ -234,14 +234,14 @@ MonoBehaviour:
     EdgeAngle: 30
     HoverOnly: 1
   renderers:
-  - {fileID: 6040129534443420501}
---- !u!114 &3950651569682161542
+  - {fileID: 4781976230306977945}
+--- !u!114 &180409948016723465
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cf674ee0148e6d4b8ec13de002ad056, type: 3}
@@ -304,13 +304,13 @@ MonoBehaviour:
       MinimumSpeed: 1.5
       Cooldown: 0.15
   drawGizmos: 1
---- !u!114 &8631066066783164916
+--- !u!114 &374229523136999013
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63cd3bb8ff753194e9d968eeca2fcf2f, type: 3}
@@ -354,13 +354,13 @@ MonoBehaviour:
     Bounciness: 0.2
     FrictionCombine: 0
     BounceCombine: 3
---- !u!114 &4509882872896299198
+--- !u!114 &1048589051345839481
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f11348f8e44759459d9557849333bf6, type: 3}
@@ -411,13 +411,13 @@ MonoBehaviour:
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
     Sound: 1
---- !u!114 &3736181417804772347
+--- !u!114 &8880576083071098823
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
+  m_GameObject: {fileID: 3003482873436781798}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
@@ -452,59 +452,59 @@ MonoBehaviour:
     IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
---- !u!1001 &4905348456941021137
+--- !u!1001 &6169205444359062557
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 5094602661272066935}
+    m_TransformParent: {fileID: 3241382787530970060}
     m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalRotation.w
       value: -3.7493994e-33
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalRotation.x
       value: -6.123234e-17
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalRotation.y
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalRotation.z
       value: 6.123234e-17
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: 919132149155446097, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_Name
-      value: SM_Ingredient_FrenchFries_Cooking
+      value: SM_Ingredient_CrabClaw_Cooking
       objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
+    - target: {fileID: 919132149155446097, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
       propertyPath: m_Layer
       value: 6
       objectReference: {fileID: 0}
@@ -512,14 +512,14 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
---- !u!4 &4871193937920360506 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
-  m_PrefabInstance: {fileID: 4905348456941021137}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &6040129534443420501 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
+--- !u!23 &4781976230306977945 stripped
 MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 24592bdf17de8cd4e9fe432b49f5b5df, type: 3}
-  m_PrefabInstance: {fileID: 4905348456941021137}
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
+  m_PrefabInstance: {fileID: 6169205444359062557}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5915428456699585526 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 27babdcb49865c644bea8ab03161e753, type: 3}
+  m_PrefabInstance: {fileID: 6169205444359062557}
   m_PrefabAsset: {fileID: 0}
