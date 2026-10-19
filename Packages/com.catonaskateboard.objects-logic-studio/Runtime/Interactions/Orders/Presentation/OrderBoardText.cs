@@ -15,7 +15,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private TMP_Text[] paragraphs = Array.Empty<TMP_Text>();
         private TMP_Text original;
-        private OrderTextStyle baseline;
+        private OrderTextStyle[] paragraphBaselines = Array.Empty<OrderTextStyle>();
         private bool originalEnabled;
 
         #endregion
@@ -30,18 +30,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Restore();
             original = slot;
             originalEnabled = slot.enabled;
-            baseline = OrderTextStyle.Capture(slot);
+            paragraphBaselines = new OrderTextStyle[paragraphs.Length];
+            // Each paragraph keeps the exact TMP appearance authored on its own scene object.
+            for (int index = 0; index < paragraphs.Length; index++)
+                if (paragraphs[index] != null)
+                    paragraphBaselines[index] = OrderTextStyle.Capture(paragraphs[index]);
             HideParagraphs();
         }
 
         /// <summary>Restores original component visibility when the board or its scene is released.</summary>
         internal void Restore()
         {
-            HideParagraphs();
+            Clear();
             if (original != null)
                 original.enabled = originalEnabled;
             original = null;
-            baseline = null;
+            paragraphBaselines = Array.Empty<OrderTextStyle>();
         }
 
         /// <summary>Disables only preauthored paragraph children, retaining them for the next ticket.</summary>
@@ -62,7 +66,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Restore all existing paragraph objects before drawing a replacement ticket.
             Clear();
-            if (original == null || baseline == null)
+            if (original == null)
                 return;
             if (candidate.HasVariants)
             {
@@ -88,9 +92,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void DrawVariants(OrderCandidate candidate, bool completed)
         {
             // The board has assigned base-only text; restore its style before applying optional typography.
-            baseline.Apply(original);
-            candidate.Entry.TextStyle?.Apply(original);
-            original.fontStyle = completed ? original.fontStyle | FontStyles.Strikethrough : original.fontStyle & ~FontStyles.Strikethrough;
             bool styledBase = candidate.Entry.TextStyle is { Enabled: true };
             bool includeBase = !string.IsNullOrWhiteSpace(candidate.MainText);
             int count = (candidate.Combo?.Length ?? 1) + (styledBase && includeBase ? 1 : 0);
@@ -121,6 +122,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Clear()
         {
             HideParagraphs();
+            // Restore each reused child from its own scene-authored TMP settings, not from the parent slot.
+            for (int index = 0; index < paragraphs.Length; index++)
+                if (paragraphs[index] != null && index < paragraphBaselines.Length && paragraphBaselines[index] != null)
+                    paragraphBaselines[index].Apply(paragraphs[index]);
             if (original != null)
                 original.enabled = originalEnabled;
         }
@@ -137,14 +142,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (string.IsNullOrWhiteSpace(content))
                 return;
             TMP_Text text = paragraphs[index];
-            baseline.Apply(text);
             style?.Apply(text);
             float indent = style is { Enabled: true } ? style.Indent : 0f;
             offset += style is { Enabled: true } ? style.SpaceBefore : 0f;
             text.rectTransform.sizeDelta = new Vector2(original.rectTransform.rect.width - indent, original.rectTransform.rect.height);
             text.rectTransform.anchoredPosition = new Vector2(indent, -offset);
             text.text = content.Replace("\\n", "\n");
-            text.fontStyle = completed ? text.fontStyle | FontStyles.Strikethrough : text.fontStyle & ~FontStyles.Strikethrough;
+            if (completed)
+                text.fontStyle |= FontStyles.Strikethrough;
             text.gameObject.SetActive(true);
             offset += text.preferredHeight + (style is { Enabled: true } ? style.SpaceAfter : 0f);
         }
