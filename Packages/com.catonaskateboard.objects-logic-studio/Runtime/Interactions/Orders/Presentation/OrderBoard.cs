@@ -145,8 +145,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (index < 0 || index >= occupied.Length || occupied[index] != ticket || slots[index] == null)
                 return;
             slots[index].text = ticket.Candidate.MainText;
-            slots[index].fontStyle = ticket.Completed ? styles[index] | FontStyles.Strikethrough
-                : styles[index] & ~FontStyles.Strikethrough;
+            slots[index].fontStyle = ticket.Completed ? styles[index] | FontStyles.Strikethrough : styles[index];
             if (formatting[index] == null && ticket.Candidate.HasVariants)
                 Debug.LogWarning("Prepare variant paragraphs on this Order Board before Play.", this);
             else
