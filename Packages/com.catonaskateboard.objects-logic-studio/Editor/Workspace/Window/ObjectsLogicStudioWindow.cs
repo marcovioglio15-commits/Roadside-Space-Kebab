@@ -51,11 +51,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Lifecycle
 
         /// <summary>Opens the previous workspace without replacing its retained draft.</summary>
-        [MenuItem("Tools/Objects Logic Studio")]
+        [MenuItem("Tools/Objects Logic Studio %o")]
         private static void OpenWindow()
         {
             // Window lifetime is independent of the saved workspace and its pending values.
             GetWindow<ObjectsLogicStudioWindow>("Objects Logic Studio");
+        }
+
+        /// <summary>Opens the selected prefab branch while preserving any unfinished workspace proposal.</summary>
+        /// <param name="target">Prefab asset branch or object already in the prefab stage.</param>
+        internal static void Open(GameObject target)
+        {
+            // Use the existing transaction guard before opening Unity's native prefab workspace.
+            ObjectsLogicStudioWindow window = GetWindow<ObjectsLogicStudioWindow>("Objects Logic Studio");
+            if (ObjectWorkspaceSession.Select(window.state, target, 0, out window.status))
+                window.OpenPrefab();
+            window.Repaint();
         }
 
         /// <summary>Opens the component requested by its inspector unless another proposal is pending.</summary>

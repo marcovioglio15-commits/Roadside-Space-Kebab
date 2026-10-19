@@ -17,6 +17,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             serializedObject.Update();
             PlayerInputActionMenu.Draw(serializedObject, "movementAction");
             PlayerInputActionMenu.Draw(serializedObject, "jumpAction");
+            PlayerInputActionMenu.Draw(serializedObject, "crouchAction");
             PlayerInputActionMenu.Draw(serializedObject, "lookDeltaAction");
             PlayerInputActionMenu.Draw(serializedObject, "lookRateAction");
             PlayerInputActionMenu.Draw(serializedObject, "cursorToggleAction");

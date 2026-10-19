@@ -112,10 +112,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 throw new InvalidOperationException(warning);
             UnlockRuleSnapshot[] snapshots = UnlockPresetOperations.Capture(state, owner, set);
             Undo.RecordObject(state, "Update availability preset");
-            Undo.RecordObject(preset, "Update availability preset");
-            UnlockPresetOperations.Assign(preset, snapshots);
-            EditorUtility.SetDirty(preset);
-            AssetDatabase.SaveAssetIfDirty(preset);
+            StudioAssetWrites.Save(preset, "Update availability preset", () => UnlockPresetOperations.Assign(preset, snapshots));
             Select(state, preset, set);
         }
 

@@ -62,11 +62,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (Modifications == null || Modifications.Length == 0)
                 return false;
             for (int index = 0; index < Modifications.Length; index++)
-                if (Modifications[index] == null || !Modifications[index].TryValidate(out warning))
+            {
+                if (Modifications[index] == null)
+                {
+                    warning = $"Modification {index + 1}: assign a definition or remove this entry.";
+                    return false;
+                }
+                if (!Modifications[index].TryValidate(out warning))
                 {
                     warning = $"Modification {index + 1}: {warning}";
                     return false;
                 }
+                // One shared definition must not run twice and duplicate tint, toggle or consumption effects.
+                for (int previous = 0; previous < index; previous++)
+                    if (Modifications[previous] == Modifications[index])
+                    {
+                        warning = $"Modification {index + 1} repeats '{Modifications[index].name}' from entry {previous + 1}. Assign each definition once.";
+                        return false;
+                    }
+            }
             warning = string.Empty;
             if (ConsumesAny && (ConsumeOn == null || ConsumeOn.Enabled && (string.IsNullOrWhiteSpace(ConsumeOn.DialogueName) || ConsumeOn.Occurrence < 0)))
             {

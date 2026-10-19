@@ -91,6 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorApplication.hierarchyChanged += Refresh;
             EditorApplication.projectChanged += Refresh;
             Undo.undoRedoPerformed += Refresh;
+            StudioFieldMenu.Changed += FieldChanged;
             EditorApplication.update += UpdateNavigation;
         }
 
@@ -101,6 +102,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorApplication.hierarchyChanged -= Refresh;
             EditorApplication.projectChanged -= Refresh;
             Undo.undoRedoPerformed -= Refresh;
+            StudioFieldMenu.Changed -= FieldChanged;
             EditorApplication.update -= UpdateNavigation;
             navigation.Release();
             data?.Dispose();
@@ -112,9 +114,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Invalidates source geometry after asset edits, Undo or native hierarchy changes.</summary>
         private void Refresh()
         {
+            session.Refresh();
+            hasUnsavedChanges = session.HasChanges;
             // Mesh and material discovery is deferred until the next visible preview pass.
             dirty = true;
             Repaint();
+        }
+
+        /// <summary>Protects pending layouts when a field menu writes outside the normal GUI pass.</summary>
+        /// <param name="edited">Editor object receiving the delayed menu edit.</param>
+        private void FieldChanged(Object edited)
+        {
+            if (edited == this)
+                Refresh();
         }
 
         /// <summary>Stops keyboard flight when the preview loses focus.</summary>

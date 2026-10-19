@@ -16,6 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Order text shown until the object despawns. Completion adds strikethrough without freeing its slot.")]
         [TextArea(2, 5)]
         public string Text = "Order";
+        [Tooltip("Independent board typography and paragraph spacing. Combo members retain their individual overrides.")]
+        public OrderTextStyle TextStyle = new OrderTextStyle();
         [Tooltip("Number of individual orders activated by this draw. Every unit occupies a separate board slot.")]
         public int Quantity = 1;
         [Tooltip("Relative probability in Weighted Random mode. Zero excludes this candidate.")]

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerInputPreset
   movementAction: {fileID: 11400000, guid: cbd23c5dba48cab4c81807a88f118651, type: 2}
   jumpAction: {fileID: 11400000, guid: 4034f376fdecf1240b511c9e520f354f, type: 2}
+  crouchAction: {fileID: 11400000, guid: 61056963d9a6c8949a628df8f98cc538, type: 2}
   lookDeltaAction: {fileID: 11400000, guid: d619de326e5708c48a08da55ade90f11, type: 2}
   lookRateAction: {fileID: 11400000, guid: b4768aaf71664e046a5082421efa2ff1, type: 2}
   cursorToggleAction: {fileID: 11400000, guid: 51741a284b70188458b5c48ef1f97b1f, type: 2}

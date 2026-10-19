@@ -18,6 +18,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Existing 3D TextMeshPro or world-space Canvas text objects, one per order slot. Runtime creates no UI.")]
         [SerializeField]
         private TMP_Text[] slots = Array.Empty<TMP_Text>();
+        [Tooltip("Paragraph capacity prepared in Edit mode per order slot. Include one paragraph for the base order and one per combo variant.")]
+        [SerializeField]
+        [Range(1, 33)]
+        private int paragraphCapacity = 9;
+        private OrderBoardText[] formatting = Array.Empty<OrderBoardText>();
         private OrderTicket[] occupied = Array.Empty<OrderTicket>();
         private FontStyles[] styles = Array.Empty<FontStyles>();
         private string[] originals = Array.Empty<string>();
@@ -31,6 +36,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Identity => identity;
         /// <summary>Number of authored order slots.</summary>
         public int Capacity => slots.Length;
+        /// <summary>Number of independent text paragraphs to author for each slot before Play.</summary>
+        public int ParagraphCapacity => paragraphCapacity;
 
         #endregion
         #region Methods
@@ -65,8 +72,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             occupied = new OrderTicket[slots.Length];
             styles = new FontStyles[slots.Length];
             originals = new string[slots.Length];
+            formatting = new OrderBoardText[slots.Length];
             for (int index = 0; index < slots.Length; index++)
             {
+                formatting[index] = slots[index].GetComponent<OrderBoardText>();
+                formatting[index]?.Initialize(slots[index]);
                 styles[index] = slots[index].fontStyle;
                 originals[index] = slots[index].text;
                 slots[index].text = string.Empty;
@@ -90,6 +100,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Restore()
         {
             // No text object is instantiated, destroyed or reparented during gameplay.
+            foreach (OrderBoardText text in formatting)
+                if (text != null)
+                    text.Restore();
+            formatting = Array.Empty<OrderBoardText>();
             for (int index = 0; index < originals.Length; index++)
                 if (index < slots.Length && slots[index] != null)
                 {
@@ -116,6 +130,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     ticket.Board = this;
                     ticket.Slot = index;
                     Draw(ticket);
+                    ticket.Owner.NotifyDisplayed();
                     return true;
                 }
             return false;
@@ -132,6 +147,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             slots[index].text = ticket.Text;
             slots[index].fontStyle = ticket.Completed ? styles[index] | FontStyles.Strikethrough
                 : styles[index] & ~FontStyles.Strikethrough;
+            formatting[index]?.Draw(ticket.Candidate, ticket.Completed);
         }
 
         /// <summary>Clears a departed customer's slot without shifting other visible orders.</summary>
@@ -143,6 +159,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (index >= 0 && index < occupied.Length && occupied[index] == ticket)
             {
                 occupied[index] = null;
+                formatting[index]?.Clear();
                 if (slots[index] != null)
                 {
                     slots[index].text = string.Empty;

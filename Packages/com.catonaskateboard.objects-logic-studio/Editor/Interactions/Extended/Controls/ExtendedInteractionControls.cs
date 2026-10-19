@@ -55,7 +55,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Gravity", Button);
                     break;
                 case ExtendedInteractionKind.AvailableOrders:
-                    OrderControls.Draw(draft.FindPropertyRelative("Orders"), state.Target.Resolve());
+                    OrderControls.Draw(draft.FindPropertyRelative("Orders"), state.Target.Resolve(), state.Sections);
                     break;
                 case ExtendedInteractionKind.PlayAmbient:
                     AmbientControls.Draw(draft.FindPropertyRelative("Ambient"));

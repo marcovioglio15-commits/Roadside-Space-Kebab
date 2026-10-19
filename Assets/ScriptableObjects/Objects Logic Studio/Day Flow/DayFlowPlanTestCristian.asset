@@ -32,8 +32,8 @@ MonoBehaviour:
       NewCustomerSound: 0
       Weight: 1
       Delay: 0
-      Position: {x: 0, y: 90, z: 0}
-      Rotation: {x: 0, y: 0, z: 0}
+      Position: {x: 0, y: 1, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
       WalkIn:
         Enabled: 1
         Space: 1

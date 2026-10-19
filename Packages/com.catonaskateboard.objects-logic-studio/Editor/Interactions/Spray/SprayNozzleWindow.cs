@@ -64,6 +64,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorApplication.projectChanged += Refresh;
             EditorApplication.hierarchyChanged += Refresh;
             Undo.undoRedoPerformed += Refresh;
+            StudioFieldMenu.Changed += FieldChanged;
             EditorApplication.update += Navigate;
         }
         /// <summary>Releases the private preview scene and its input capture.</summary>
@@ -72,6 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorApplication.projectChanged -= Refresh;
             EditorApplication.hierarchyChanged -= Refresh;
             Undo.undoRedoPerformed -= Refresh;
+            StudioFieldMenu.Changed -= FieldChanged;
             EditorApplication.update -= Navigate;
             navigation.Release();
             data?.Dispose();
@@ -80,8 +82,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Refreshes cached geometry only after source or Undo changes.</summary>
         private void Refresh()
         {
+            session.Refresh();
+            hasUnsavedChanges = session.HasChanges;
             dirty = true;
             Repaint();
+        }
+        /// <summary>Updates close protection immediately after a delayed field-menu operation.</summary>
+        /// <param name="edited">Editor object whose serialized layout was changed.</param>
+        private void FieldChanged(Object edited)
+        {
+            if (edited == this)
+                Refresh();
         }
         /// <summary>Repaints while keyboard navigation is actively moving the camera.</summary>
         private void Navigate()

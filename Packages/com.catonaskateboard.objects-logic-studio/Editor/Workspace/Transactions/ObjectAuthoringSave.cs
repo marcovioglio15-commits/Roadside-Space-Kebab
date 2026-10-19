@@ -1,4 +1,5 @@
 using System;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -31,7 +32,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (stage != null && !stage.IsPartOfPrefabContents(target))
                 return false;
             string path = stage != null ? stage.assetPath : EditorUtility.IsPersistent(target) ? AssetDatabase.GetAssetPath(target) : string.Empty;
-            if (!path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase) || !AssetDatabase.IsOpenForEdit(path))
+            if (!path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase)
+                || !StudioAssetWrites.CanWrite(AssetDatabase.LoadMainAssetAtPath(path), out warning))
                 return false;
             warning = string.Empty;
             return true;

@@ -55,6 +55,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
                 case 2:
                     StudioFields.Draw(data, "Title");
                     DrawScene(data.FindProperty("GameplayScene"), "Play scene");
+                    StudioFields.Draw(data, "PlayFade");
                     DrawProfile(data.FindProperty("MainButtons"));
                     break;
                 case 3:
@@ -99,6 +100,10 @@ namespace CatOnASkateboard.MenuStudio.Editor
             using (new EditorGUI.DisabledScope(Pending || Source == null || string.IsNullOrWhiteSpace(Preset.PauseScene)))
                 if (StudioFields.Button("Connect Pause Scene", "Add an overlay loader to the selected gameplay scene. Uses the saved preset; existing scene content is retained."))
                     ConnectPause();
+            if (Preset.PlayFade != null)
+                using (new EditorGUI.DisabledScope(Pending || Source == null))
+                    if (StudioFields.Button("Connect Play Fade", "Connect existing main menus in the selected scene to the saved fade profile, using their existing Canvas."))
+                        ConnectPlayFade();
             MenuHost selected = Selection.activeGameObject != null ? Selection.activeGameObject.GetComponent<MenuHost>() : null;
             using (new EditorGUI.DisabledScope(selected == null))
                 if (StudioFields.Button("Save selected menu as prefab", "Save the selected MenuHost hierarchy as a reusable prefab, keeping its project asset references."))
@@ -144,6 +149,21 @@ namespace CatOnASkateboard.MenuStudio.Editor
             {
                 SetStatus(exception.GetBaseException().Message);
             }
+        }
+
+        /// <summary>Wires existing main menus without regenerating their authored pages or changing pause scenes.</summary>
+        private void ConnectPlayFade()
+        {
+            Scene scene = ResolveDestination();
+            int connected = 0;
+            foreach (GameObject root in scene.GetRootGameObjects())
+                foreach (MenuHost host in root.GetComponentsInChildren<MenuHost>(true))
+                    if (host.Kind == MenuKind.Main && host.Preset == Source)
+                    {
+                        MenuTransitionAuthoring.Connect(host);
+                        connected++;
+                    }
+            SetStatus(connected > 0 ? "Play fade connected. Review and save the scene." : "No main menu using this preset was found in the selected scene.");
         }
 
         /// <summary>Gets the selected scene without replacing other loaded or unsaved scenes.</summary>

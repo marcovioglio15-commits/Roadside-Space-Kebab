@@ -122,6 +122,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             slots.arraySize++;
             slots.GetArrayElementAtIndex(slots.arraySize - 1).objectReferenceValue = text;
             data.ApplyModifiedProperties();
+            OrderBoardTextAuthoring.Prepare(target);
             EditorSceneManager.MarkSceneDirty(target.gameObject.scene);
         }
 

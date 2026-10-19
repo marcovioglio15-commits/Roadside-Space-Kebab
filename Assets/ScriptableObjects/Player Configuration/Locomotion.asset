@@ -23,6 +23,17 @@ MonoBehaviour:
   jumpHeight: 1.5
   jumpBufferTime: 0.1
   coyoteTime: 0.1
+  Crouch:
+    Enabled: 1
+    Toggle: 1
+    HeightRatio: 0.65
+    SpeedMultiplier: 0.5
+    Transition: 0.18
+    LowerCamera: 1
+    AllowJump: 0
+    ClearanceLayers:
+      serializedVersion: 2
+      m_Bits: 4294967295
   Audio:
     Footsteps: 1
     Interval: 0.45

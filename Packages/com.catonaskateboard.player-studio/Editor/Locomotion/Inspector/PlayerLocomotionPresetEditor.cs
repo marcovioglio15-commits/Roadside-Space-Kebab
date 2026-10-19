@@ -16,7 +16,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Inspector edits are immediate asset edits; Player Studio owns the separate Apply/Discard draft.
             serializedObject.Update();
             DrawPropertiesExcluding(serializedObject, "useGravity", "gravityAcceleration", "terminalSpeed", "groundSpeed",
-                "useJump", "jumpHeight", "jumpBufferTime", "coyoteTime");
+                "useJump", "jumpHeight", "jumpBufferTime", "coyoteTime", "Crouch");
             bool enabled = serializedObject.FindProperty("useGravity").boolValue;
             float acceleration = serializedObject.FindProperty("gravityAcceleration").floatValue;
             float terminalSpeed = serializedObject.FindProperty("terminalSpeed").floatValue;
@@ -38,6 +38,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             serializedObject.FindProperty("jumpHeight").floatValue = height;
             serializedObject.FindProperty("jumpBufferTime").floatValue = bufferTime;
             serializedObject.FindProperty("coyoteTime").floatValue = coyoteTime;
+            PlayerCrouchControls.Draw(serializedObject.FindProperty("Crouch"));
             serializedObject.ApplyModifiedProperties();
         }
 

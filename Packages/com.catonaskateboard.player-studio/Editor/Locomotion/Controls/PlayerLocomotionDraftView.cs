@@ -61,7 +61,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 session.SetGravityDraft(useGravity, gravityAcceleration, terminalSpeed, groundSpeed);
                 session.SetJumpDraft(useJump, height, bufferTime, coyoteTime);
             }
-            return PlayerAudioControls.Draw(owner, sections, session.HeadTilt) || changed;
+            bool crouchChanged = PlayerCrouchControls.Draw(owner, sections);
+            return PlayerAudioControls.Draw(owner, sections, session.HeadTilt) || crouchChanged || changed;
         }
 
         #endregion

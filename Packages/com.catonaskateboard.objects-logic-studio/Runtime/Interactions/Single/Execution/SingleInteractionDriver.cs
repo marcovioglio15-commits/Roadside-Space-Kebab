@@ -341,7 +341,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (spraying != null && spraying != spray)
                 spraying.StopEmission();
-            spraying = spray;
+            // Autonomous bursts retain their own timer after button release or a change of aim.
+            spraying = spray.Settings.Emission == SprayEmissionMode.Hold ? spray : null;
             return true;
         }
 

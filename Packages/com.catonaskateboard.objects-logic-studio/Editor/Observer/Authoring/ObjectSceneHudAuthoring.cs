@@ -81,6 +81,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             pointer.gameObject.AddComponent<CanvasRenderer>();
             PlayerCenteredCursor cursor = pointer.gameObject.AddComponent<PlayerCenteredCursor>();
             cursor.raycastTarget = false;
+            OrderTimerHud orderTimer = OrderTimerHudAuthoring.Build(root, canvas);
             CreateTransition(root);
 
             // References are serialized now; runtime never repairs or constructs the UI hierarchy.
@@ -90,6 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             data.FindProperty("dialogue").objectReferenceValue = dialogue;
             data.FindProperty("assembly").objectReferenceValue = assembly;
             data.FindProperty("cursor").objectReferenceValue = cursor;
+            data.FindProperty("orderTimer").objectReferenceValue = orderTimer;
             data.ApplyModifiedPropertiesWithoutUndo();
             return hud;
         }

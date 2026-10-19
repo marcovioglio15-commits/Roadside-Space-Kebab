@@ -27,6 +27,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private PlayerCenteredCursor cursor;
 
+        [Tooltip("Optional preauthored stopwatch on the shared gameplay Canvas.")]
+        [SerializeField]
+        private OrderTimerHud orderTimer;
+
         #endregion
 
         #region State
@@ -106,6 +110,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return hover != null && dialogue != null && assembly != null && cursor != null
                 && hover.Canvas == canvas && dialogue.Canvas == canvas && assembly.Canvas == canvas
                 && hover.IsValid() && dialogue.IsValid() && assembly.IsValid()
+                && (orderTimer == null || orderTimer.Canvas == canvas && orderTimer.IsValid())
                 && cursor.transform.IsChildOf(transform) && cursor.canvasRenderer != null
                 && GetComponentsInChildren<Canvas>(true).Length == 1;
         }
@@ -122,6 +127,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             hover.Bind(observer);
             dialogue.Bind(observer);
             assembly.Bind(observer);
+            if (orderTimer != null)
+                orderTimer.Bind(observer);
             if (player != observer.Player)
             {
                 player = observer.Player;
@@ -142,6 +149,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 dialogue.Unbind(observer);
             if (assembly != null)
                 assembly.Unbind(observer);
+            if (orderTimer != null)
+                orderTimer.Unbind(observer);
             if (cursor != null)
                 cursor.Bind(null);
             owner = null;

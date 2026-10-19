@@ -1,11 +1,12 @@
 using System;
+using CatOnASkateboard.MenuStudio;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Defines the ordered days and scene transitions owned by one Spawn Management flow.</summary>
     [CreateAssetMenu(menuName = "Objects Logic Studio/Day Flow Plan", fileName = "DayFlowPlan")]
-    public sealed class SpawnFlowPlan : ScriptableObject
+    public sealed class SpawnFlowPlan : MenuTransitionProfile
     {
         #region Fields
 
@@ -35,6 +36,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool FixedSeed;
         [Tooltip("Seed used when Fixed Seed is enabled.")]
         public int Seed = 1;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Shares the same fade-out timing with the main menu's Play command.</summary>
+        public override float FadeOutSeconds => FadeOut;
+        /// <summary>Shares the same black hold timing with the main menu's Play command.</summary>
+        public override float BlackSeconds => BlackDelay;
+        /// <summary>Shares the same reveal timing with the main menu's Play command.</summary>
+        public override float FadeInSeconds => FadeIn;
 
         #endregion
 

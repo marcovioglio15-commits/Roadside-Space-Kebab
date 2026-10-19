@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Selects legacy aiming, exact centre-collider input or automatic proximity activation.</summary>
-    public enum TriggerAnimationActivation { Action, CenterCollider, Proximity }
+    /// <summary>Selects player input, proximity, a local interaction event or explicit requests from another feature.</summary>
+    public enum TriggerAnimationActivation { Action, CenterCollider, Proximity, Interaction, RequestOnly }
 
     /// <summary>Controls an active proximity animation when the player leaves its exit radius.</summary>
     public enum TriggerAnimationExit { Pause, Reset, Finish, ReturnToStart }
@@ -17,10 +17,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Targeting")]
-        [Tooltip("Action uses the existing aim settings. Center Collider requires a centre-screen hit. Proximity starts without an input action.")]
+        [Tooltip("Start through input, proximity or a local interaction. Request Only waits for another feature, such as Eject, to start this animation.")]
         public TriggerAnimationActivation Activation;
         [Tooltip("Player reach, aiming and obstruction settings for the input action.")]
         public TransferTargetSettings Target = new TransferTargetSettings();
+        [Header("Interaction Trigger")]
+        [Tooltip("Interaction on this exact object whose event starts one transition. The binding is resolved locally for each prefab instance.")]
+        public LocalInteractionReference Source = new LocalInteractionReference();
+        [Tooltip("Start when the selected interaction begins or completes. Busy animations ignore repeated events; an occupied item delays the first request until released.")]
+        public InteractionMoment Moment;
         [Header("Proximity")]
         [Tooltip("Player distance from the object pivot required to start the animation.")]
         [Range(0.1f, 20f)]
@@ -64,6 +69,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
 
+        #region Properties
+
+        /// <summary>Whether this activation mode participates in player input selection.</summary>
+        public bool UsesInput => Activation is TriggerAnimationActivation.Action or TriggerAnimationActivation.CenterCollider;
+
+        #endregion
+
         #region Methods
 
         #region Validation
@@ -78,11 +90,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (Activation == TriggerAnimationActivation.Action && (Target == null || !Target.TryValidate(out warning)))
                 return false;
             warning = "Choose a supported activation mode and finite positive reach. Proximity exit distance must be at least its start distance.";
-            if (Activation is not (TriggerAnimationActivation.Action or TriggerAnimationActivation.CenterCollider or TriggerAnimationActivation.Proximity)
+            if (Activation is not (TriggerAnimationActivation.Action or TriggerAnimationActivation.CenterCollider or TriggerAnimationActivation.Proximity
+                    or TriggerAnimationActivation.Interaction or TriggerAnimationActivation.RequestOnly)
                 || Activation == TriggerAnimationActivation.CenterCollider && (Target == null || !float.IsFinite(Target.Distance) || Target.Distance <= 0f)
                 || Activation == TriggerAnimationActivation.Proximity && (!float.IsFinite(ProximityDistance) || ProximityDistance <= 0f
                     || !float.IsFinite(ExitDistance) || ExitDistance < ProximityDistance
                     || OnExit is not (TriggerAnimationExit.Pause or TriggerAnimationExit.Reset or TriggerAnimationExit.Finish or TriggerAnimationExit.ReturnToStart)))
+                return false;
+            warning = "Select another local interaction and its Started or Completed event.";
+            if (Activation == TriggerAnimationActivation.Interaction && (Source == null || !Source.IsValid
+                || Source.Kind == InteractionTemplateKind.TriggerAnimation || Moment is not (InteractionMoment.Started or InteractionMoment.Completed)))
                 return false;
             warning = "Choose a hierarchy target, finite poses with positive scales, a non-negative duration and valid rotation directions.";
             if (Path == null || !StateA.IsValid() || !StateB.IsValid() || !float.IsFinite(Duration) || Duration < 0f

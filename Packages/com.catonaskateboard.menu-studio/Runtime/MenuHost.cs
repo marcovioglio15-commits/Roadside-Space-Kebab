@@ -20,6 +20,8 @@ namespace CatOnASkateboard.MenuStudio
         public MenuPage[] Pages = Array.Empty<MenuPage>();
         [Tooltip("Preauthored settings controller, when included.")]
         public MenuSettingsController Settings;
+        [Tooltip("Authored standalone controller used by Play when the preset has a fade profile. Its black panel stays on each scene's existing Canvas.")]
+        public MenuSceneTransition PlayTransition;
         [Header("Project Callbacks")]
         [Tooltip("Raised when a portable menu command is requested.")]
         public UnityEvent<MenuCommand> CommandRequested = new UnityEvent<MenuCommand>();
@@ -77,7 +79,9 @@ namespace CatOnASkateboard.MenuStudio
             CommandRequested.Invoke(command);
             switch (command)
             {
-                case MenuCommand.Play: LoadScene(Preset.GameplayScene); break;
+                case MenuCommand.Play:
+                    LoadScene(Preset.GameplayScene, true);
+                    break;
                 case MenuCommand.Resume: SetVisible(false); break;
                 case MenuCommand.Restart: LoadScene(SceneManager.GetActiveScene().path); break;
                 case MenuCommand.MainMenu: LoadScene(Preset.MainMenuScene); break;
@@ -185,12 +189,24 @@ namespace CatOnASkateboard.MenuStudio
 
         /// <summary>Loads a configured scene only when it exists in the build scene list.</summary>
         /// <param name="path">Full scene asset path authored by the project.</param>
-        private void LoadScene(string path)
+        /// <param name="play">Whether to use the optional Play fade profile.</param>
+        private void LoadScene(string path, bool play = false)
         {
             // Validation failures keep the current menu and pause ownership intact.
             if (string.IsNullOrWhiteSpace(path) || !Application.CanStreamedLevelBeLoaded(path))
             {
                 Debug.LogWarning("Menu scene is missing from Build Settings: " + path, this);
+                return;
+            }
+            // Keep the menu visible beneath the overlay until the outgoing scene actually unloads.
+            if (play && Preset.PlayFade != null)
+            {
+                if (PlayTransition == null || !PlayTransition.BeginPlay(path, Preset.PlayFade))
+                {
+                    Debug.LogWarning("Connect Play Fade in Menu Studio and check the flow timing and authored overlay.", this);
+                    return;
+                }
+                transitioning = true;
                 return;
             }
             transitioning = true;

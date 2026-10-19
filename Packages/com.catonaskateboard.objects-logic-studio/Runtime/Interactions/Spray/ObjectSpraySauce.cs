@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Emits physical sauce while the observer retains a held Button action.</summary>
+    /// <summary>Emits physical sauce from a held action or an autonomous squeeze and timed burst.</summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(ObjectElasticDeformation))]
     [AddComponentMenu("Objects Logic Studio/Spray Sauce")]
@@ -31,6 +31,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Collider depositReceiver;
         private bool ready;
         private InteractionButton heldInput;
+        private float squeezeRemaining;
+        private float burstRemaining;
+        private bool recompress;
+        private bool active;
         #endregion
         #region Properties
         /// <summary>Locally imported nozzle and flow configuration.</summary>
@@ -56,14 +60,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Prepared palette retained by emitted liquid after the source disappears.</summary>
         internal SurfacePalette Palette => palette;
         /// <summary>Stops automatic start effects when the continuous flow finishes.</summary>
-        internal override bool VfxRunning => IsEmitting;
+        internal override bool VfxRunning => active;
         #endregion
         #region Methods
         #region Lifecycle
         /// <summary>Resets the flow and capacity once at Play entry, including retained scene objects.</summary>
         internal void BeginSession()
         {
-            IsEmitting = false;
+            active = IsEmitting = recompress = false;
+            heldInput = null;
+            squeezeRemaining = burstRemaining = 0f;
             used = pending = nextDeposit = 0f;
             depositReceiver = null;
             exposure.Clear();
@@ -108,7 +114,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when a new held request may start emission.</returns>
         internal override bool CanRequest()
         {
-            return CanContinue() && !IsEmitting;
+            return CanContinue() && (!active || settings.Emission == SprayEmissionMode.TimedBurst);
         }
         /// <summary>Checks non-input conditions while an existing held request continues.</summary>
         /// <returns>True while flow is available and capacity remains.</returns>
@@ -122,8 +128,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (!CanRequest())
                 return false;
+            if (active)
+            {
+                RepeatBurst();
+                return true;
+            }
             heldInput = null;
-            IsEmitting = true;
+            active = true;
+            burstRemaining = settings.BurstDuration;
             pending = 0f;
             latest = null;
             palette.Refresh(settings.Trail);
@@ -133,9 +145,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             flowColor = palette.Sample();
             playerColliders = Item.IsCarried && HoverObserver.ActivePlayer != null
                 ? HoverObserver.ActivePlayer.GetComponentsInChildren<Collider>(true) : null;
-            Emit(0f);
-            if (settings.Squeeze && elastic != null && elastic.isActiveAndEnabled)
-                elastic.SetPressure(settings.Compression, settings.SqueezeAxis, settings.SqueezeDuration);
+            PrepareSqueeze(false);
+            if (settings.Emission == SprayEmissionMode.Hold || squeezeRemaining <= 0f)
+                BeginFlow();
             Signal(InteractionMoment.Started);
             return true;
         }
@@ -144,17 +156,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the held request started emission.</returns>
         internal bool Request(InteractionButton button)
         {
-            if (button == null || !button.Held || !Request())
+            if (button == null || settings.Emission == SprayEmissionMode.Hold && !button.Held || !Request())
                 return false;
-            heldInput = button;
+            heldInput = settings.Emission == SprayEmissionMode.Hold ? button : null;
             return true;
         }
         /// <summary>Releases visual pressure without removing liquid that has already left the nozzle.</summary>
         internal void StopEmission()
         {
-            if (!IsEmitting)
+            if (!active)
                 return;
-            IsEmitting = false;
+            active = IsEmitting = recompress = false;
+            squeezeRemaining = burstRemaining = 0f;
             heldInput = null;
             pending = 0f;
             latest = null;
@@ -165,7 +178,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Consumes capacity in simulation time and emits only from the bounded liquid pool.</summary>
         private void FixedUpdate()
         {
-            if (!IsEmitting)
+            if (!active)
                 return;
             if (!CanContinue() || heldInput != null && !heldInput.Held)
             {
@@ -173,7 +186,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             // Integrate flow and capacity in simulation time, so pausing never drains the source.
-            float duration = Mathf.Min(Time.fixedDeltaTime, Remaining);
+            float duration = PrepareFlow(Time.fixedDeltaTime);
+            if (!IsEmitting || duration <= 0f)
+                return;
+            duration = Mathf.Min(duration, Remaining);
+            if (settings.Emission == SprayEmissionMode.TimedBurst)
+            {
+                duration = Mathf.Min(duration, burstRemaining);
+                burstRemaining -= duration;
+            }
             used += duration;
             pending += duration * settings.Rate;
             while (pending >= 1f)
@@ -181,10 +202,73 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 pending -= 1f;
                 Emit(pending / settings.Rate);
             }
-            if (Remaining <= 0f)
+            if (Remaining <= 0f || settings.Emission == SprayEmissionMode.TimedBurst && burstRemaining <= 0f)
                 StopEmission();
         }
 
+        #endregion
+        #region Burst Preparation
+
+        /// <summary>Applies a repeated press without duplicating start/completion events or refilling capacity.</summary>
+        private void RepeatBurst()
+        {
+            if (settings.Repeat is SprayRepeatPolicy.ResetDuration or SprayRepeatPolicy.RepeatSqueezeAndReset)
+                burstRemaining = settings.BurstDuration;
+            if (settings.Repeat is SprayRepeatPolicy.RepeatSqueeze or SprayRepeatPolicy.RepeatSqueezeAndReset)
+                PrepareSqueeze(true);
+        }
+
+        /// <summary>Prepares pressure before a timed burst, optionally releasing the current compression first.</summary>
+        /// <param name="repeat">Whether this preparation follows another press in the same burst.</param>
+        private void PrepareSqueeze(bool repeat)
+        {
+            if (!settings.Squeeze || elastic == null || !elastic.isActiveAndEnabled)
+                return;
+            elastic.SetPressure(repeat ? 0f : settings.Compression, settings.SqueezeAxis, settings.SqueezeDuration);
+            if (settings.Emission != SprayEmissionMode.TimedBurst)
+                return;
+            IsEmitting = false;
+            latest = null;
+            pending = 0f;
+            recompress = repeat;
+            squeezeRemaining = settings.SqueezeDuration;
+        }
+
+        /// <summary>Consumes preparation time before charging any liquid capacity or burst time.</summary>
+        /// <param name="duration">Scaled time available in this physics step.</param>
+        /// <returns>Time remaining for actual emission after pressure preparation.</returns>
+        private float PrepareFlow(float duration)
+        {
+            if (IsEmitting)
+                return duration;
+            // At most two pressure phases can finish in a step, even with very short squeeze durations.
+            while (squeezeRemaining <= duration)
+            {
+                duration -= squeezeRemaining;
+                if (!recompress)
+                {
+                    squeezeRemaining = 0f;
+                    BeginFlow();
+                    return duration;
+                }
+                recompress = false;
+                squeezeRemaining = settings.SqueezeDuration;
+                if (elastic != null && elastic.isActiveAndEnabled)
+                    elastic.SetPressure(settings.Compression, settings.SqueezeAxis, settings.SqueezeDuration);
+            }
+            squeezeRemaining -= duration;
+            return 0f;
+        }
+
+        /// <summary>Starts a new connected liquid segment after any preparation gap.</summary>
+        private void BeginFlow()
+        {
+            IsEmitting = true;
+            Emit(0f);
+        }
+
+        #endregion
+        #region Liquid Samples
         /// <summary>Emits regularly spaced samples with small variations around this burst's pressure.</summary>
         /// <param name="age">Fraction of the current physics step already elapsed since this sample was due.</param>
         private void Emit(float age)

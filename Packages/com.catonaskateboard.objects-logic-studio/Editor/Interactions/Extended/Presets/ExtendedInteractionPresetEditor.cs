@@ -63,7 +63,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     AssemblyControls.DrawProductPreset(settings, serializedObject.FindProperty("Targets"), sections);
                     break;
                 case AvailableOrdersPreset:
-                    OrderControls.Draw(settings, null);
+                    OrderControls.Draw(settings, null, sections);
                     break;
                 case OutlinePreset:
                     ExtendedInteractionControls.DrawOutline(settings, sections);

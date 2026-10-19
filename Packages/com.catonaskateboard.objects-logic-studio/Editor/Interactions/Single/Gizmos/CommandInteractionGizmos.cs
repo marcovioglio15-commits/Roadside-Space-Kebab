@@ -58,6 +58,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Direction guides remain compact even for large impulse magnitudes.
             if (feature.Settings == null || !feature.Settings.TryValidate(out _) || !feature.Target.DrawGizmos)
                 return;
+            if (feature.Settings.Behavior == EjectBehavior.BlackHole)
+            {
+                BlackHoleGizmos.Draw(feature);
+                return;
+            }
             Vector3 origin = feature.Target.SolidHitOnly ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
             float size = HandleUtility.GetHandleSize(origin) * 0.7f;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(1f, 0.65f, 0.2f));

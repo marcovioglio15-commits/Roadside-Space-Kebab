@@ -20,6 +20,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 while (property.NextVisible(false))
                     StudioFieldGUI.PropertyField(property, true);
             serializedObject.ApplyModifiedProperties();
+            using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+                if (StudioButton.Draw(new UnityEngine.GUIContent("Prepare Styled Text", "Prepare existing text slots for independent order and combo typography before Play.")))
+                    OrderBoardTextAuthoring.Prepare((OrderBoard)target);
         }
 
         #endregion

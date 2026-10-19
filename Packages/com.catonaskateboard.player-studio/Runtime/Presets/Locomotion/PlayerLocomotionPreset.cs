@@ -64,6 +64,10 @@ namespace CatOnASkateboard.PlayerStudio
         [Range(0f, 0.5f)]
         private float coyoteTime = 0.1f;
 
+        [Header("Crouch")]
+        [Tooltip("Optional toggle or held crouch with capsule clearance and camera height adjustment.")]
+        public PlayerCrouchSettings Crouch = new PlayerCrouchSettings();
+
         [Header("Audio")]
         [Tooltip("Grounded footsteps, surface layers and body-impact sounds.")]
         public PlayerAudioSettings Audio = new PlayerAudioSettings();
@@ -82,7 +86,8 @@ namespace CatOnASkateboard.PlayerStudio
         {
             // Presets and drafts share the same numeric rules.
             settings = default;
-            return PlayerGravitySettings.TryCreate(useGravity, gravityAcceleration, terminalSpeed, groundSpeed,
+            warning = "Crouch settings are missing.";
+            return Crouch != null && Crouch.TryValidate(out warning) && PlayerGravitySettings.TryCreate(useGravity, gravityAcceleration, terminalSpeed, groundSpeed,
                 out PlayerGravitySettings gravity, out warning)
                 && PlayerJumpSettings.TryCreate(useJump, jumpHeight, jumpBufferTime, coyoteTime, gravity,
                     out PlayerJumpSettings jump, out warning)

@@ -12,7 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private sealed class Lease
         {
             internal bool Gravity;
-            internal readonly HashSet<ObjectGravityGenerator> Owners = new HashSet<ObjectGravityGenerator>();
+            internal readonly HashSet<Object> Owners = new HashSet<Object>();
         }
 
         private static readonly Dictionary<Rigidbody, Lease> bodies = new Dictionary<Rigidbody, Lease>();
@@ -25,7 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="body">Contacted or newly activated body.</param>
         /// <param name="owner">Optional generator whose particular lease must exist.</param>
         /// <returns>True when the body has an active matching suspension lease.</returns>
-        internal static bool Contains(Rigidbody body, ObjectGravityGenerator owner = null)
+        internal static bool Contains(Rigidbody body, Object owner = null)
         {
             return body != null && bodies.TryGetValue(body, out Lease lease)
                 && (owner == null ? lease.Owners.Count > 0 : lease.Owners.Contains(owner));
@@ -34,7 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Disables gravity once while retaining independent ownership for overlapping pulses.</summary>
         /// <param name="body">Active dynamic body selected by a pulse.</param>
         /// <param name="owner">Generator acquiring the suspension.</param>
-        internal static void Acquire(Rigidbody body, ObjectGravityGenerator owner)
+        internal static void Acquire(Rigidbody body, Object owner)
         {
             if (!bodies.TryGetValue(body, out Lease lease))
             {
@@ -51,7 +51,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores gravity only when no other generator still owns this body.</summary>
         /// <param name="body">Body retained by this pulse, possibly destroyed since acquisition.</param>
         /// <param name="owner">Generator relinquishing ownership.</param>
-        internal static void Release(Rigidbody body, ObjectGravityGenerator owner)
+        internal static void Release(Rigidbody body, Object owner)
         {
             if (ReferenceEquals(body, null) || !bodies.TryGetValue(body, out Lease lease))
                 return;

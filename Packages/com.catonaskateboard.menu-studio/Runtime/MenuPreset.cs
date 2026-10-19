@@ -17,6 +17,8 @@ namespace CatOnASkateboard.MenuStudio
         public string PauseTitle = "PAUSED";
         [Tooltip("Full scene asset path loaded by Play.")]
         public string GameplayScene = "";
+        [Tooltip("Optional flow asset supplying Play's fade-out, black hold and fade-in durations. Assign the Day Flow Plan to share its current timing.")]
+        public MenuTransitionProfile PlayFade;
         [Tooltip("Full scene asset path loaded by Main Menu.")]
         public string MainMenuScene = "";
         [Tooltip("Optional saved pause menu scene loaded additively alongside gameplay by Menu Scene Overlay or Day Flow.")]

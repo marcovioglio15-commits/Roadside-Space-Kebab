@@ -38,8 +38,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (settings.FindPropertyRelative("OnExit").enumValueIndex == (int)TriggerAnimationExit.Pause)
                         HoverControls.Field(settings, "ResumeOnReentry");
                     break;
+                case TriggerAnimationActivation.Interaction:
+                    LocalInteractionMenu.Draw(settings.FindPropertyRelative("Source"));
+                    HoverControls.Field(settings, "Moment");
+                    break;
             }
-            if (!sections.Draw("Transform Animation", "Alternate between two local states on successive input presses.", settings, "Path", "StateA", "StateB", "StartAtB", "Duration", "ForwardRotation", "ReturnRotation", "AutoReturn", "ReturnDelay", "AutoReturnDuration", "AutoReturnRotation"))
+            if (!sections.Draw("Transform Animation", "Alternate between two local states on successive activations.", settings, "Path", "StateA", "StateB", "StartAtB", "Duration", "ForwardRotation", "ReturnRotation", "AutoReturn", "ReturnDelay", "AutoReturnDuration", "AutoReturnRotation"))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             GameObject source = HierarchyPathMenu.Source(settings);
@@ -92,6 +96,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Only input-time contact queries use these settings; no passive scans are introduced.
             TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
+            EjectAnimationControls.Draw(settings, sections);
+            HoverControls.Field(settings, "Behavior");
+            if (settings.FindPropertyRelative("Behavior").enumValueIndex == (int)EjectBehavior.BlackHole)
+                BlackHoleControls.Draw(settings, sections);
+            else
+                Impulse(settings, sections);
+            if (sections.Draw("Eject Collisions", "Temporarily ignore selected collision layers on ejected bodies.", settings, "IgnoreCollisions", "IgnoredLayers", "IgnoreDuration"))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    HoverControls.Field(settings, "IgnoreCollisions");
+                    if (settings.FindPropertyRelative("IgnoreCollisions").boolValue)
+                    {
+                        HoverControls.Field(settings, "IgnoredLayers");
+                        HoverControls.Field(settings, "IgnoreDuration");
+                    }
+                }
+            if (sections.Draw("Eject Lifetime", "Optionally destroy ejected objects after a scaled-time delay.", settings, "Despawn", "DespawnDelay"))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    HoverControls.Field(settings, "Despawn");
+                    if (settings.FindPropertyRelative("Despawn").boolValue)
+                        HoverControls.Field(settings, "DespawnDelay");
+                }
+        }
+
+        /// <summary>Shows existing immediate impulse settings only for the impulse behavior.</summary>
+        /// <param name="settings">Detached ejection settings.</param>
+        /// <param name="sections">Retained foldout state.</param>
+        private static void Impulse(SerializedProperty settings, ObjectStudioSections sections)
+        {
             HoverControls.Field(settings, "SelfEject", "Self Eject");
             bool self = settings.FindPropertyRelative("SelfEject").boolValue;
             if (self)
@@ -120,23 +154,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!self && sections.Draw("Eject Impulses", "Rules run in list order. Each body receives the first matching impulse only.", settings, "Rules"))
                 using (new EditorGUI.IndentLevelScope())
                     Rules(settings.FindPropertyRelative("Rules"));
-            if (sections.Draw("Eject Collisions", "Temporarily ignore selected collision layers on ejected bodies.", settings, "IgnoreCollisions", "IgnoredLayers", "IgnoreDuration"))
-                using (new EditorGUI.IndentLevelScope())
-                {
-                    HoverControls.Field(settings, "IgnoreCollisions");
-                    if (settings.FindPropertyRelative("IgnoreCollisions").boolValue)
-                    {
-                        HoverControls.Field(settings, "IgnoredLayers");
-                        HoverControls.Field(settings, "IgnoreDuration");
-                    }
-                }
-            if (sections.Draw("Eject Lifetime", "Optionally destroy ejected objects after a scaled-time delay.", settings, "Despawn", "DespawnDelay"))
-                using (new EditorGUI.IndentLevelScope())
-                {
-                    HoverControls.Field(settings, "Despawn");
-                    if (settings.FindPropertyRelative("Despawn").boolValue)
-                        HoverControls.Field(settings, "DespawnDelay");
-                }
         }
 
         /// <summary>Edits independent flag groups with searchable selectors and deterministic priority.</summary>

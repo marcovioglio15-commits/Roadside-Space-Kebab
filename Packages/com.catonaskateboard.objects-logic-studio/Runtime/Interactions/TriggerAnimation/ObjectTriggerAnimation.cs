@@ -14,6 +14,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Hierarchy target, endpoint poses, timing and independent rotation directions.")]
         [SerializeField]
         private TriggerAnimationSettings settings = new TriggerAnimationSettings();
+        [Tooltip("Persistent scene connection assigned when this animation is selected by Eject. Save the scene after assigning a new connection.")]
+        [SerializeField]
+        [HideInInspector]
+        private string sceneIdentity = string.Empty;
 
         #endregion
 
@@ -36,6 +40,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool proximityCompleted;
         private bool paused;
         private bool resetPending;
+        private ObjectInteraction source;
+        private bool interactionPending;
+        private bool requestedCycle;
+        private TriggerAnimationPlayback playback;
 
         #endregion
 
@@ -43,14 +51,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Locally applied endpoint configuration.</summary>
         public TriggerAnimationSettings Settings => settings;
+        /// <summary>Persistent scene connection used by Eject prefabs.</summary>
+        public string SceneIdentity => sceneIdentity;
         /// <summary>Whether a transition currently owns the transform.</summary>
         public bool IsRunning => running;
         /// <summary>Whether the last completed endpoint is State B.</summary>
         public bool IsAtB => atB;
         /// <summary>Single card represented by this component.</summary>
         public override SingleInteractionKind Kind => SingleInteractionKind.TriggerAnimation;
-        /// <summary>Proximity operates without subscribing to a player button.</summary>
-        public override bool UsesInput => settings.Activation != TriggerAnimationActivation.Proximity;
+        /// <summary>Only input activation modes subscribe to a player button.</summary>
+        public override bool UsesInput => settings.UsesInput;
         /// <summary>Reach and aiming configuration used by the shared input driver.</summary>
         public override TransferTargetSettings Target => settings.Target;
         /// <summary>Animation length offered to automatic start-effect timing.</summary>
@@ -110,11 +120,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             atB = settings.StartAtB;
             (atB ? settings.StateB : settings.StateA).Apply(animated);
             initialized = true;
+            SceneAnimationRegistry.Register(this);
+            // Resolve once per activation; unrelated interaction events perform only a reference comparison.
+            if (settings.Activation == TriggerAnimationActivation.Interaction)
+            {
+                source = settings.Source.Resolve(gameObject);
+                Signaled -= Observe;
+                Signaled += Observe;
+            }
         }
 
         /// <summary>Restores only the transform owned by this animation and releases its temporary item reservation.</summary>
         private void Release()
         {
+            SceneAnimationRegistry.Unregister(this);
+            Signaled -= Observe;
+            source = null;
+            interactionPending = requestedCycle = false;
+            playback?.Cancel();
+            playback = null;
             // Disabling other interactions never restores unrelated parent or camera transforms.
             if (initialized && animated != null)
                 original.Apply(animated);
@@ -147,6 +171,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Configure the transform animation first.";
             if (configuration == null || !configuration.TryValidate(out warning))
                 return false;
+            if (configuration.Activation == TriggerAnimationActivation.Interaction && configuration.Source.Resolve(gameObject) == null)
+            {
+                warning = "Select an existing source interaction on the same GameObject as Trigger Animation.";
+                return false;
+            }
             Transform target = PlayerHierarchy.Resolve(transform, configuration.Path);
             if (target == null || Item == null || !Item.Owns(target))
                 warning = "Choose an unambiguous transform owned by this object.";
@@ -164,7 +193,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal override bool CanExecute()
         {
             // Repeated input during a transition cannot flip the destination halfway through it.
-            return initialized && animated != null && !running && Available(InteractionChannels.Animation)
+            return initialized && animated != null && !running && !(playback?.AwaitingEffect ?? false) && Available(InteractionChannels.Animation)
                 && Item != null && !Item.IsReserved && (animated != Item.transform || !Item.IsCarried);
         }
 
@@ -173,7 +202,43 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal override bool Execute()
         {
             // Root motion blocks pickup; child-only motion can continue on an already carried item.
+            if (requestedCycle)
+                return false;
             return Begin(false);
+        }
+
+        /// <summary>Starts one externally requested transition whose completion can safely release an Eject effect.</summary>
+        /// <param name="request">Receives a result tied to this transition, including zero-duration completion.</param>
+        /// <param name="waitForReturn">Wait for the scheduled automatic return, if this transition has one.</param>
+        /// <returns>True when the animation accepted ownership for this request.</returns>
+        internal bool TryRequest(out TriggerAnimationPlayback request, bool waitForReturn = false)
+        {
+            // Requests do not join unrelated motion or wait for a proximity entry boundary.
+            request = null;
+            if (paused || returnPending || !CanExecute())
+                return false;
+            playback = request = new TriggerAnimationPlayback(this, waitForReturn);
+            requestedCycle = true;
+            interactionPending = false;
+            if (Begin(false))
+                return true;
+            request.Cancel();
+            requestedCycle = false;
+            return false;
+        }
+
+        /// <summary>Accepts one matching local event and defers only while another interaction owns the item.</summary>
+        /// <param name="interaction">Interaction that emitted the event.</param>
+        /// <param name="moment">Actual event phase emitted by that component.</param>
+        private void Observe(ObjectInteraction interaction, InteractionMoment moment)
+        {
+            // Eject already requests this animation explicitly when its prerequisite is enabled.
+            if (interaction != source || moment != settings.Moment || !initialized || running || paused || returnPending
+                || !isActiveAndEnabled || IsLocked || !ToolAllowed || interaction is ObjectEject eject && eject.Settings.AnimateBeforeEject && eject.Prerequisite == this)
+                return;
+            interactionPending = true;
+            if (CanExecute())
+                Begin(false);
         }
 
         /// <summary>Starts a manual toggle or a scheduled return through the same ownership boundary.</summary>
@@ -185,6 +250,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!CanExecute() || !Item.Acquire(this, animated == Item.transform ? InteractionChannels.Grab : InteractionChannels.None))
                 return false;
             automatic = returning;
+            interactionPending = false;
             returnPending = false;
             from = PlayerToolPose.Read(animated);
             if (Quaternion.Angle(Quaternion.Euler(from.Rotation), Quaternion.Euler((atB ? settings.StateB : settings.StateA).Rotation)) < 0.001f)
@@ -203,16 +269,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Advances only an active transition, pausing game time and independent interaction locks.</summary>
         private void Update()
         {
-            if (initialized && settings.Activation == TriggerAnimationActivation.Proximity && Time.deltaTime > 0f)
+            // Destroying the animated branch cancels its prerequisite instead of retaining Eject indefinitely.
+            if (initialized && animated == null)
+            {
+                Release();
+                return;
+            }
+            if (initialized && !requestedCycle && settings.Activation == TriggerAnimationActivation.Proximity && Time.deltaTime > 0f)
                 UpdateProximity();
-            if (!UsesInput && !proximityInside && settings.OnExit is TriggerAnimationExit.Pause or TriggerAnimationExit.Reset)
+            if (!requestedCycle && settings.Activation == TriggerAnimationActivation.Proximity
+                && !proximityInside && settings.OnExit is TriggerAnimationExit.Pause or TriggerAnimationExit.Reset)
                 return;
             // The owner's own reservation blocks competing animations, not this retained operation.
             if (animated == null || !Available(InteractionChannels.Animation) || Time.deltaTime <= 0f)
                 return;
             if (!running)
             {
-                if (returnPending && CanExecute())
+                if (interactionPending && CanExecute())
+                    Begin(false);
+                else if (returnPending && CanExecute())
                 {
                     returnWait -= Time.deltaTime;
                     if (returnWait <= 0f)
@@ -237,7 +312,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             returnPending = settings.AutoReturn && atB != settings.StartAtB;
             returnWait = settings.ReturnDelay;
             Item.Release(this);
-            if (!UsesInput && !returnPending)
+            playback?.Complete(returnPending);
+            if (!returnPending)
+                requestedCycle = false;
+            if (settings.Activation == TriggerAnimationActivation.Proximity && !returnPending)
                 proximityCompleted = !settings.Loop || !proximityInside;
             Signal(InteractionMoment.Completed);
         }

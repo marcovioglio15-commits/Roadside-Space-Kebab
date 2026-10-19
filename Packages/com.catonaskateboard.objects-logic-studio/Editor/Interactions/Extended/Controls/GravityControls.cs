@@ -109,10 +109,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Edits optional groups with independent any/all policies.</summary>
         /// <param name="filter">Serialized body selection configuration.</param>
-        private static void Filter(SerializedProperty filter)
+        /// <param name="includeSelf">Whether this effect supports including its own hierarchy.</param>
+        internal static void Filter(SerializedProperty filter, bool includeSelf = true)
         {
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
-            HoverControls.Field(filter, "IncludeSelf");
+            if (includeSelf)
+                HoverControls.Field(filter, "IncludeSelf");
             HoverControls.Field(filter, "RequireAllGroups");
             HoverControls.Field(filter, "UseLayers");
             if (filter.FindPropertyRelative("UseLayers").boolValue)

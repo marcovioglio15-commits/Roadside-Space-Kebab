@@ -36,39 +36,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Remaining = maximum - Required;
         }
 
-        /// <summary>Builds active draw pools using the same grouping for validation and extraction.</summary>
+        /// <summary>Builds candidate groups using only names reachable through configured extraction pools.</summary>
         /// <param name="catalog">Validated shared order definitions.</param>
-        /// <param name="selection">Selection policy controlling zero-weight exclusion.</param>
+        /// <param name="pools">Resolved pool membership for this spawn.</param>
         /// <param name="sample">Whether to sample the required ranges for an actual spawn.</param>
-        /// <returns>Parent pools and independently limited variants in authored order.</returns>
-        internal static List<OrderDrawGroup> Create(OrderCatalog catalog, OrderSelection selection, bool sample)
+        /// <returns>Parent groups and independently limited variants in authored order.</returns>
+        internal static List<OrderDrawGroup> Create(OrderCatalog catalog, List<OrderDrawPool> pools, bool sample)
         {
+            // Build one name set so group construction does not inspect pool membership repeatedly.
             List<OrderDrawGroup> groups = new List<OrderDrawGroup>();
+            HashSet<string> selectable = OrderCatalog.SelectableNames(pools);
+            // Parent, variant and combo limits remain independent where they were authored independently.
             foreach (OrderEntry entry in catalog.Entries)
             {
                 OrderDrawGroup shared = new OrderDrawGroup(entry.Name, entry.Quantity, entry.MinimumDraws,
                     entry.MaximumDraws, entry.RandomRequiredDraws, entry.RequiredDrawRange, sample);
-                bool hasShared = !entry.UseRecipeModifiers || entry.IncludeBaseOrder;
-                if (hasShared)
-                    shared.Add(new OrderCandidate(entry), selection);
+                bool hasShared = false;
+                if (!entry.UseRecipeModifiers || entry.IncludeBaseOrder)
+                    hasShared = shared.Add(new OrderCandidate(entry), selectable);
                 if (entry.UseRecipeModifiers)
                     foreach (OrderRecipeVariant variant in entry.Variants)
                     {
                         if (!variant.UseDrawLimits)
                         {
-                            hasShared = true;
-                            shared.Add(new OrderCandidate(entry, variant), selection);
+                            hasShared |= shared.Add(new OrderCandidate(entry, variant), selectable);
                             continue;
                         }
                         OrderDrawGroup independent = new OrderDrawGroup(variant.Name, new OrderCandidate(entry, variant).Quantity, variant.MinimumDraws,
                             variant.MaximumDraws, variant.RandomRequiredDraws, variant.RequiredDrawRange, sample);
-                        independent.Add(new OrderCandidate(entry, variant), selection);
-                        groups.Add(independent);
+                        if (independent.Add(new OrderCandidate(entry, variant), selectable))
+                            groups.Add(independent);
                     }
                 // No parent reservation remains when all enabled candidates have their own limits.
                 if (hasShared)
                     groups.Add(shared);
-                AddCombos(groups, entry, selection, sample);
+                AddCombos(groups, entry, selectable, sample);
             }
             return groups;
         }
@@ -76,20 +78,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Shares one reservation and allowance across every compatible combo of a base order.</summary>
         /// <param name="groups">Pools accumulated for this spawn.</param>
         /// <param name="entry">Parent whose combo candidates share an allowance.</param>
-        /// <param name="selection">Policy controlling candidate eligibility.</param>
+        /// <param name="selectable">Names available through at least one active pool.</param>
         /// <param name="sample">Whether random policies may sample values.</param>
-        private static void AddCombos(List<OrderDrawGroup> groups, OrderEntry entry, OrderSelection selection, bool sample)
+        private static void AddCombos(List<OrderDrawGroup> groups, OrderEntry entry, HashSet<string> selectable, bool sample)
         {
             // Only members of feasible combinations contribute to derived shared limits.
             List<OrderCandidate> candidates = new List<OrderCandidate>();
             List<OrderRecipeVariant> members = new List<OrderRecipeVariant>();
             foreach (OrderRecipeVariant[] combo in OrderComboCandidates.Enumerate(entry))
             {
-                candidates.Add(new OrderCandidate(entry, combo, OrderComboCandidates.Quantity(entry, combo, sample)));
+                OrderCandidate candidate = new OrderCandidate(entry, combo, OrderComboCandidates.Quantity(entry, combo, sample));
+                if (!selectable.Contains(candidate.Name))
+                    continue;
+                candidates.Add(candidate);
                 foreach (OrderRecipeVariant variant in combo)
                     if (!members.Contains(variant))
                         members.Add(variant);
             }
+            // Unlisted combinations do not create a draw-limit group.
             if (candidates.Count == 0)
                 return;
             Vector3Int limits = OrderComboCandidates.Limits(entry, members.ToArray(), sample);
@@ -97,19 +103,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 limits.x != limits.y, new Vector2Int(limits.x, limits.y), sample);
             foreach (OrderCandidate candidate in candidates)
             {
-                combined.Add(candidate, selection);
+                combined.Add(candidate, selectable);
                 combined.Quantity = Mathf.Min(combined.Quantity, candidate.Quantity);
             }
-            groups.Add(combined);
+            if (combined.Candidates.Count > 0)
+                groups.Add(combined);
         }
 
-        /// <summary>Filters zero weights only in weighted selection while retaining invalid mandatory pools for diagnostics.</summary>
+        /// <summary>Adds a candidate only when at least one active pool exposes its exact name.</summary>
         /// <param name="candidate">Base order or recipe variant sharing this allowance.</param>
-        /// <param name="selection">Current extraction policy.</param>
-        private void Add(OrderCandidate candidate, OrderSelection selection)
+        /// <param name="selectable">Names available through active pools.</param>
+        /// <returns>True when the group gained a candidate.</returns>
+        private bool Add(OrderCandidate candidate, HashSet<string> selectable)
         {
-            if (candidate.Weight > 0f || candidate.Combo == null && selection != OrderSelection.WeightedRandom)
-                Candidates.Add(candidate);
+            // One shared group can serve several pool members while preserving its original allowance.
+            if (!selectable.Contains(candidate.Name))
+                return false;
+            Candidates.Add(candidate);
+            return true;
         }
 
         #endregion

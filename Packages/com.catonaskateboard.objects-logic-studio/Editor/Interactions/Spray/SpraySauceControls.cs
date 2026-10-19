@@ -16,7 +16,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained foldout state.</param>
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
-            Fields(settings, "HeldOnly");
+            if (sections.Draw("Activation And Burst", "Choose held flow or one-press timed emission after squeezing.", settings,
+                "Emission", "BurstDuration", "Repeat", "HeldOnly"))
+                using (new EditorGUI.IndentLevelScope())
+                {
+                    Fields(settings, "Emission", "HeldOnly");
+                    if (settings.FindPropertyRelative("Emission").enumValueIndex == (int)SprayEmissionMode.TimedBurst)
+                        Fields(settings, "BurstDuration", "Repeat");
+                }
             if (!settings.FindPropertyRelative("HeldOnly").boolValue)
                 TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
             Nozzle(settings, sections);
@@ -48,7 +55,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (settings.FindPropertyRelative("Limited").boolValue)
                         HoverControls.Field(settings, "Capacity", "Capacity (Seconds)");
                 }
-            if (sections.Draw("Bottle Squeeze", "Optional visual compression while the player holds the spray action.", settings,
+            if (sections.Draw("Bottle Squeeze", "Compression during held emission or before a timed burst.", settings,
                 "Squeeze", "SqueezeAxis", "Compression", "SqueezeDuration"))
                 using (new EditorGUI.IndentLevelScope())
                 {

@@ -20,6 +20,7 @@ namespace CatOnASkateboard.MenuStudio
         private float elapsed;
         private float previousScale;
         private int phase;
+        private bool disposeAfterFade;
 
         #endregion
 
@@ -50,7 +51,7 @@ namespace CatOnASkateboard.MenuStudio
             if (current == this)
                 return;
             enabled = false;
-            if (Overlay != null)
+            if (!IsBusy && Overlay != null)
             {
                 Overlay.alpha = 0f;
                 Overlay.blocksRaycasts = false;
@@ -73,10 +74,27 @@ namespace CatOnASkateboard.MenuStudio
             }
             completed = null;
             atBlack = null;
+            if (disposeAfterFade)
+                Destroy(gameObject);
         }
 
         #endregion
         #region Loading
+
+        /// <summary>Preserves an authored standalone controller across the menu unload, then removes it after the reveal.</summary>
+        /// <param name="scene">Build-registered gameplay scene.</param>
+        /// <param name="profile">Flow asset supplying the same timing used between days.</param>
+        /// <returns>True when the menu's fade transaction starts.</returns>
+        public bool BeginPlay(string scene, MenuTransitionProfile profile)
+        {
+            // Only the controller persists; scene Canvases and their authored overlays unload normally.
+            if (profile == null || transform.parent != null || transform.childCount != 0 || GetComponent<Canvas>() != null
+                || !Begin(scene, profile.FadeOutSeconds, profile.BlackSeconds, profile.FadeInSeconds, null))
+                return false;
+            disposeAfterFade = true;
+            DontDestroyOnLoad(gameObject);
+            return true;
+        }
 
         /// <summary>Starts a validated fade while preserving the previous gameplay time scale.</summary>
         /// <param name="scene">Build-registered destination scene path.</param>

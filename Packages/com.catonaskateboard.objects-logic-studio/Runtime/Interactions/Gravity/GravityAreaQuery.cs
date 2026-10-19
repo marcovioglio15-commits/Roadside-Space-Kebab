@@ -20,15 +20,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Scan(ObjectGravityGenerator owner)
         {
             GravityArea area = owner.Settings.Area;
-            Vector3 center = owner.transform.TransformPoint(area.Offset);
-            Quaternion rotation = owner.transform.rotation * Quaternion.Euler(area.Rotation);
             int count;
             // Repeat a saturated query so a dense area never silently omits compatible objects.
             while (true)
             {
-                count = area.Shape == GravityAreaShape.Sphere
-                    ? Physics.OverlapSphereNonAlloc(center, area.Radius, hits, ~0, QueryTriggerInteraction.Collide)
-                    : Physics.OverlapBoxNonAlloc(center, area.Size * 0.5f, hits, rotation, ~0, QueryTriggerInteraction.Collide);
+                count = area.Overlap(owner.transform, hits);
                 if (count < hits.Length)
                     break;
                 Array.Resize(ref hits, checked(hits.Length * 2));

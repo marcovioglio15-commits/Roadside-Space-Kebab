@@ -69,13 +69,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             InteractionTemplateReference reference = new InteractionTemplateReference
             {
                 Assigned = true, Path = AnimationUtility.CalculateTransformPath(feature.transform, root),
-                Kind = Kind(feature), Name = feature.InteractionName
+                Kind = InteractionTemplateKinds.Of(feature) ?? throw new ArgumentException("Unsupported interaction mapping.", nameof(feature)), Name = feature.InteractionName
             };
             foreach (ObjectInteraction candidate in feature.GetComponents<ObjectInteraction>())
             {
                 if (candidate == feature)
                     break;
-                if (candidate is not ObjectInteractionUnlock && Kind(candidate) == reference.Kind)
+                if (candidate is not ObjectInteractionUnlock && InteractionTemplateKinds.Of(candidate) == reference.Kind)
                     reference.Occurrence++;
             }
             return reference;
@@ -123,7 +123,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             List<ObjectInteraction> typed = new List<ObjectInteraction>();
             List<ObjectInteraction> branch = new List<ObjectInteraction>();
             foreach (ObjectInteraction candidate in candidates)
-                if (candidate is not ObjectInteractionUnlock && Kind(candidate) == reference.Kind)
+                if (candidate is not ObjectInteractionUnlock && InteractionTemplateKinds.Of(candidate) == reference.Kind)
                 {
                     typed.Add(candidate);
                     if (AnimationUtility.CalculateTransformPath(candidate.transform, root) == reference.Path)
@@ -160,41 +160,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return selected;
         }
 
-        /// <summary>Maps supported components explicitly so presets never depend on runtime reflection.</summary>
-        /// <param name="feature">Existing ordinary interaction.</param>
-        /// <returns>The stable serialized interaction kind.</returns>
-        private static InteractionTemplateKind Kind(ObjectInteraction feature)
-        {
-            // Rules cannot reference other rules, matching the existing unlock validation contract.
-            return feature switch
-            {
-                ObjectHover => InteractionTemplateKind.Hover,
-                ObjectGrab => InteractionTemplateKind.Grab,
-                ObjectDrop => InteractionTemplateKind.Drop,
-                ObjectThrow => InteractionTemplateKind.Throw,
-                ObjectDispenser => InteractionTemplateKind.Dispenser,
-                ObjectContainer => InteractionTemplateKind.Container,
-                ObjectDialogue => InteractionTemplateKind.Dialogue,
-                ObjectSlice => InteractionTemplateKind.Slice,
-                ObjectContactModifier => InteractionTemplateKind.Contact,
-                ObjectAvailableOrders => InteractionTemplateKind.AvailableOrders,
-                ObjectDegradation => InteractionTemplateKind.ObjectDegradation,
-                ObjectGravityGenerator => InteractionTemplateKind.GravityGenerator,
-                ObjectElasticDeformation => InteractionTemplateKind.ElasticDeformation,
-                ObjectDirtTrail => InteractionTemplateKind.DirtTrail,
-                ObjectDeathbox => InteractionTemplateKind.Deathbox,
-                ObjectPresenceCap => InteractionTemplateKind.PresenceCap,
-                ObjectSpraySauce => InteractionTemplateKind.SpraySauce,
-                ObjectTriggerAnimation => InteractionTemplateKind.TriggerAnimation,
-                ObjectEject => InteractionTemplateKind.Eject,
-                ObjectAmbient => InteractionTemplateKind.Ambient,
-                ObjectOutline => InteractionTemplateKind.Outline,
-                ObjectSpawnManager => InteractionTemplateKind.Spawn,
-                ObjectAssemblyStation => InteractionTemplateKind.AssemblyStation,
-                ObjectAssemblyProduct => InteractionTemplateKind.AssemblyProduct,
-                _ => throw new ArgumentException("Unsupported interaction mapping.", nameof(feature))
-            };
-        }
 
         #endregion
 

@@ -503,6 +503,9 @@ MonoBehaviour:
   drawGizmos: 1
   action: {fileID: -1996764827017877772, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   settings:
+    Emission: 1
+    BurstDuration: 0.2
+    Repeat: 1
     HeldOnly: 1
     Target:
       Distance: 3

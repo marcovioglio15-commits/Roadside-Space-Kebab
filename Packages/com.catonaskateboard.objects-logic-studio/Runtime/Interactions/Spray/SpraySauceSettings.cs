@@ -3,6 +3,12 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
+    /// <summary>Chooses held emission or a complete burst started by one button press.</summary>
+    public enum SprayEmissionMode { Hold, TimedBurst }
+
+    /// <summary>Controls repeated presses during preparation or automatic emission.</summary>
+    public enum SprayRepeatPolicy { Ignore, ResetDuration, RepeatSqueeze, RepeatSqueezeAndReset }
+
     /// <summary>Stores a nozzle pose independently of mesh and collider transforms.</summary>
     [Serializable]
     public sealed class SprayNozzle
@@ -30,6 +36,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region Fields
         [Header("Input")]
+        [Tooltip("Hold emits while pressed. Timed Burst completes the optional squeeze before emitting automatically for its duration.")]
+        public SprayEmissionMode Emission;
+        [Tooltip("Seconds of actual liquid emission per button-triggered burst; squeeze time does not consume this duration.")]
+        [Range(0.05f, 30f)]
+        public float BurstDuration = 1f;
+        [Tooltip("Ignore consumes extra presses without changing the burst. Reset Duration refills its timer. Repeat Squeeze briefly releases and reapplies pressure, optionally resetting the timer as well.")]
+        public SprayRepeatPolicy Repeat = SprayRepeatPolicy.Ignore;
         [Tooltip("Allow emission only while this object occupies the player's carry slot.")]
         public bool HeldOnly = true;
         [Tooltip("Reach and aiming used when emission does not require carrying the object.")]
@@ -117,6 +130,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when physics, appearance and capacity settings are complete.</returns>
         public bool TryValidate(out string warning)
         {
+            warning = "Select a supported emission and repeat policy; a timed burst needs a positive duration.";
+            if (Emission is not (SprayEmissionMode.Hold or SprayEmissionMode.TimedBurst)
+                || Emission == SprayEmissionMode.TimedBurst && (!InteractionValues.Positive(BurstDuration)
+                    || Repeat is not (SprayRepeatPolicy.Ignore or SprayRepeatPolicy.ResetDuration or SprayRepeatPolicy.RepeatSqueeze or SprayRepeatPolicy.RepeatSqueezeAndReset)))
+                return false;
             warning = "Use a valid nozzle, positive rate (up to 120), radius, speed, launch power, mass and lifetime. A coherent jet also needs positive breakup time and stretch limit of at least one.";
             if (Nozzle == null || !InteractionValues.Finite(Nozzle.Position) || !InteractionValues.Finite(Nozzle.Rotation)
                 || !InteractionValues.Positive(Rate) || Rate > 120f || !SurfaceValues.Range(Speed)

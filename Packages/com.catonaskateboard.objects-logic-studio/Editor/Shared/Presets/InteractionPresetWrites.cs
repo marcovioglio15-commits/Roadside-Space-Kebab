@@ -1,4 +1,5 @@
 using System;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -54,8 +55,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // A selected asset must have a known baseline before a proposed update can overwrite it.
             warning = string.Empty;
-            if (!EditorUtility.IsPersistent(preset) || !AssetDatabase.IsOpenForEdit(preset))
-                warning = "Select a writable preset asset before updating it.";
+            if (!StudioAssetWrites.CanWrite(preset, out warning))
+                return false;
             else if (Capture(preset) != baseline)
                 warning = "The preset changed outside this session. Import its current values or select the intended preset again before updating it.";
             return warning.Length == 0;
@@ -126,10 +127,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Preserve identity, name and unrelated serialized fields on the existing asset.
             Undo.RecordObject(state, "Update interaction preset");
-            Undo.RecordObject(preset, "Update interaction preset");
-            JsonUtility.FromJsonOverwrite(payload, preset);
-            EditorUtility.SetDirty(preset);
-            AssetDatabase.SaveAssetIfDirty(preset);
+            StudioAssetWrites.Save(preset, "Update interaction preset", () => JsonUtility.FromJsonOverwrite(payload, preset));
         }
 
         #endregion

@@ -185,6 +185,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 if (sections.Draw("Input.Jump", "Jump"))
                     using (new EditorGUI.IndentLevelScope())
                         PlayerPresetField.DrawAction(serialized, "jumpAction");
+                        PlayerPresetField.DrawAction(serialized, "crouchAction");
                 if (sections.Draw("Input.Tools", "Use Tool"))
                     using (new EditorGUI.IndentLevelScope())
                         PlayerToolsControls.DrawInput(serialized);

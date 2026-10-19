@@ -5,26 +5,20 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Owns a detached asset proposal with conflict detection and an independent Apply/Discard footer.</summary>
+    /// <summary>Owns a recoverable asset proposal with conflict detection and an independent Apply/Discard footer.</summary>
     public abstract class StudioAssetWindow : EditorWindow
     {
         #region Fields
 
-        [Tooltip("Shared asset currently open in this window.")]
+        [Header("Editing")]
+        [Tooltip("Detached asset session, retained independently of the inspector and editor process.")]
         [SerializeField]
-        private ScriptableObject source;
-        [Tooltip("Independent proposal retained through editor reloads.")]
-        [SerializeField]
-        private ScriptableObject draft;
-        [Tooltip("Saved source state used to detect changes from another editor.")]
-        [SerializeField]
-        private string baseline = string.Empty;
+        private StudioAssetSession session = new StudioAssetSession();
         private UnityEditor.Editor inspector;
         private Vector2 scroll;
         private string warning = string.Empty;
 
         #endregion
-
         #region Properties
 
         /// <summary>Accepted asset type for the source picker.</summary>
@@ -33,30 +27,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         protected virtual bool ScrollInspector => true;
 
         #endregion
-
         #region Methods
         #region Window
 
-        /// <summary>Keeps retained proposals editable after the editor reloads their native object state.</summary>
+        /// <summary>Recovers unfinished edits and observes source imports, Undo and delayed field menus.</summary>
         protected virtual void OnEnable()
         {
-            // Native property scopes respect NotEditable even when ordinary text fields do not.
-            if (draft != null)
-                draft.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
+            session.Restore();
+            EditorApplication.projectChanged += RefreshSource;
+            Undo.undoRedoPerformed += RefreshSource;
+            StudioFieldMenu.Changed += FieldChanged;
+            UpdatePending();
         }
 
-        /// <summary>Opens the selected source in a focused authoring window.</summary>
-        /// <param name="asset">Shared source to edit without changing its saved data.</param>
+        /// <summary>Opens the selected source while preserving unfinished work on another asset.</summary>
+        /// <param name="asset">Shared source to edit without changing saved data.</param>
         protected void Select(ScriptableObject asset)
         {
-            // A retained proposal must be resolved before selecting another source.
-            if (source != asset && hasUnsavedChanges)
-                warning = "Apply or Discard before changing assets.";
-            else if (source != asset || draft == null)
-            {
-                source = asset;
-                Reload();
-            }
+            ReleaseInspector();
+            session.Select(asset, out warning);
+            UpdatePending();
             minSize = new Vector2(480f, 360f);
             Show();
         }
@@ -64,13 +54,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Shares the asset inspector with the dedicated scrollable window.</summary>
         protected virtual void OnGUI()
         {
-            // Selection remains locked while this window owns pending changes.
-            using (new EditorGUI.DisabledScope(hasUnsavedChanges))
+            // The source picker cannot redirect a pending transaction.
+            using (new EditorGUI.DisabledScope(session.HasChanges))
             {
                 EditorGUI.BeginChangeCheck();
-                source = (ScriptableObject)StudioGUI.ObjectField(new GUIContent("Asset", "Shared asset receiving Apply."), source, AssetType, false);
+                ScriptableObject selected = (ScriptableObject)StudioGUI.ObjectField(new GUIContent("Asset", "Shared asset receiving Apply."),
+                    session.Source, AssetType, false);
                 if (EditorGUI.EndChangeCheck())
-                    Reload();
+                    Select(selected);
             }
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
             {
@@ -82,17 +73,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 else
                     DrawContent();
-                hasUnsavedChanges = draft != null && JsonUtility.ToJson(draft) != baseline;
-                saveChangesMessage = "Apply or discard the pending " + titleContent.text + " changes.";
-                if (warning.Length > 0)
-                    EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
+                UpdatePending();
+                string message = session.RecoveryWarning.Length > 0 ? session.RecoveryWarning : warning;
+                if (message.Length > 0)
+                    EditorGUILayout.LabelField(message, EditorStyles.wordWrappedMiniLabel);
                 using (new StudioButton.RowScope())
-                using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
                 {
-                    if (StudioButton.Draw(new GUIContent("Apply", "Validate and save this window's source changes."), expandWidth: true, minimumHeight: 26f))
-                        SaveChanges();
-                    if (StudioButton.Draw(new GUIContent("Discard", "Reload the saved source and abandon this proposal."), expandWidth: true, minimumHeight: 26f))
-                        DiscardChanges();
+                    using (new EditorGUI.DisabledScope(!session.HasChanges))
+                        if (StudioButton.Draw(new GUIContent("Apply", "Validate and save this shared asset to its project file."), expandWidth: true, minimumHeight: 26f))
+                            SaveChanges();
+                    using (new EditorGUI.DisabledScope(session.Source == null))
+                        if (StudioButton.Draw(new GUIContent("Discard", "Abandon the retained proposal and reload the latest source."), expandWidth: true, minimumHeight: 26f))
+                            DiscardChanges();
                 }
             }
         }
@@ -107,25 +99,65 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Shares cached inspector ownership between scrollable forms and fixed graph viewports.</summary>
         private void DrawContent()
         {
-            if (draft == null)
+            if (session.Draft == null)
                 return;
-            UnityEditor.Editor.CreateCachedEditor(draft, null, ref inspector);
+            UnityEditor.Editor.CreateCachedEditor(session.Draft, null, ref inspector);
             DrawInspector(inspector);
         }
 
-        /// <summary>Releases the cached editor when the window closes or reloads.</summary>
+        /// <summary>Retains proposals before an editor reload or window close releases native references.</summary>
         protected virtual void OnDisable()
         {
-            // Shared source assets remain intact; only the transient inspector is released.
-            if (inspector != null)
-                DestroyImmediate(inspector);
+            session.Retain();
+            EditorApplication.projectChanged -= RefreshSource;
+            Undo.undoRedoPerformed -= RefreshSource;
+            StudioFieldMenu.Changed -= FieldChanged;
+            ReleaseInspector();
         }
 
-        /// <summary>Releases the temporary source after the window has resolved its close prompt.</summary>
+        /// <summary>Releases the temporary copy after retaining any unresolved close-time proposal.</summary>
         protected virtual void OnDestroy()
         {
-            if (draft != null)
-                DestroyImmediate(draft);
+            session.Retain();
+            session.Release();
+        }
+
+        /// <summary>Destroys the cached inspector before replacing its detached target.</summary>
+        private void ReleaseInspector()
+        {
+            if (inspector != null)
+                DestroyImmediate(inspector);
+            inspector = null;
+        }
+
+        /// <summary>Refreshes clean copies when another editor or a source-control import changes their asset.</summary>
+        private void RefreshSource()
+        {
+            if (!session.HasChanges && session.SourceChanged)
+            {
+                ReleaseInspector();
+                session.Refresh();
+            }
+            UpdatePending();
+            Repaint();
+        }
+
+        /// <summary>Captures delayed menu edits before a window can be closed without another GUI pass.</summary>
+        /// <param name="edited">Object written by a field or group menu.</param>
+        private void FieldChanged(Object edited)
+        {
+            if (edited != session.Draft)
+                return;
+            UpdatePending();
+            Repaint();
+        }
+
+        /// <summary>Updates close prompts and writes recovery data only when the proposal actually changes.</summary>
+        private void UpdatePending()
+        {
+            hasUnsavedChanges = session.HasChanges;
+            saveChangesMessage = "Apply or discard the pending " + titleContent.text + " changes.";
+            session.Retain();
         }
 
         #endregion
@@ -137,53 +169,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>True when the proposal may be saved.</returns>
         protected abstract bool Validate(ScriptableObject proposal, out string issue);
 
-
-        /// <summary>Validates the proposal and rejects external source edits before saving.</summary>
+        /// <summary>Validates and saves the exact shared asset while retaining any rejected proposal.</summary>
         public override void SaveChanges()
         {
-            // Validation reports invalid data without rewriting the proposal.
-            if (source == null || draft == null || EditorApplication.isPlayingOrWillChangePlaymode)
-                return;
-            if (JsonUtility.ToJson(source) != baseline)
-                warning = "The saved source changed outside this window. Discard to reload it.";
-            else if (!AssetDatabase.IsOpenForEdit(source))
-                warning = "The selected source is not writable.";
-            else if (Validate(draft, out warning))
+            UpdatePending();
+            if (session.CanSave(out warning) && Validate(session.Draft, out warning))
             {
-                Undo.RecordObject(source, "Apply " + titleContent.text);
-                JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(draft), source);
-                EditorUtility.SetDirty(source);
-                AssetDatabase.SaveAssetIfDirty(source);
-                Reload();
-                base.SaveChanges();
+                ReleaseInspector();
+                if (session.Save("Apply " + titleContent.text, out warning))
+                    base.SaveChanges();
             }
+            UpdatePending();
             Repaint();
         }
 
-        /// <summary>Abandons only this window's proposal and reloads its source.</summary>
+        /// <summary>Explicitly abandons this proposal and reloads the latest shared source.</summary>
         public override void DiscardChanges()
         {
-            Reload();
-            base.DiscardChanges();
-        }
-
-        /// <summary>Creates a detached source while retaining native asset references.</summary>
-        private void Reload()
-        {
-            // Destroy the old inspector before replacing its target.
-            if (inspector != null)
-                DestroyImmediate(inspector);
-            if (draft != null)
-                DestroyImmediate(draft);
-            draft = source != null ? Instantiate(source) : null;
-            if (draft != null)
-            {
-                draft.name = source.name;
-                draft.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
-            }
-            baseline = source != null ? JsonUtility.ToJson(source) : string.Empty;
+            ReleaseInspector();
+            session.Discard();
             warning = string.Empty;
-            hasUnsavedChanges = false;
+            base.DiscardChanges();
+            UpdatePending();
         }
 
         #endregion
