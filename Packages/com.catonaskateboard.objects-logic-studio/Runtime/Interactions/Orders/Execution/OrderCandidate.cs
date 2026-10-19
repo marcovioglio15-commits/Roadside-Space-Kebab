@@ -17,8 +17,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Exact catalog key used for spawn progress and dialogue eligibility.</summary>
-        /// <summary>Board text chosen at extraction, independent of later deliveries.</summary>
-        internal string Text => OrderComboCandidates.Text(Entry, Variant, Combo);
+        /// <summary>Main slot text retained separately from variant paragraphs.</summary>
+        internal string MainText => Variant == null || Variant.AppendToBaseText || string.IsNullOrWhiteSpace(Variant.Text)
+            ? OrderComboCandidates.BaseText(Entry) : string.Empty;
+        /// <summary>Whether this candidate adds one or more recipe paragraphs to its main slot.</summary>
+        internal bool HasVariants => Variant != null || Combo != null;
         /// <summary>Candidate's base weight, multiplied by its membership weight in each weighted pool.</summary>
         internal float Weight => Combo != null ? Entry.Combos.Weight : Variant != null ? Variant.Weight : Entry.Weight;
         /// <summary>Number of board slots required by this candidate.</summary>

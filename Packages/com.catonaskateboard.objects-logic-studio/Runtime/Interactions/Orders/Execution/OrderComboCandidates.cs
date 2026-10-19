@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
@@ -163,35 +162,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return entry.Name + " [" + string.Join(" + ", names) + "]";
         }
 
-        /// <summary>Formats base and variant text with literal newline support and no orphan separators.</summary>
-        /// <param name="entry">Base board text.</param>
-        /// <param name="variant">Individual variant, or null.</param>
-        /// <param name="combo">Combination members, or null for ordinary candidates.</param>
-        /// <returns>Final text frozen into the extracted ticket.</returns>
-        internal static string Text(OrderEntry entry, OrderRecipeVariant variant, OrderRecipeVariant[] combo)
+        /// <summary>Returns the base order paragraph with escaped newlines converted for TMP.</summary>
+        /// <param name="entry">Base order whose text is shown in the main board slot.</param>
+        /// <returns>Base text, or the order name when no text is authored.</returns>
+        internal static string BaseText(OrderEntry entry)
         {
-            string text = (entry.Text ?? entry.Name).Replace("\\n", "\n");
-            if (combo != null)
-            {
-                foreach (OrderRecipeVariant member in combo)
-                    text = Append(text, member.Text);
-                return text;
-            }
-            if (variant == null || string.IsNullOrWhiteSpace(variant.Text))
-                return text;
-            return variant.AppendToBaseText ? Append(text, variant.Text) : variant.Text.Replace("\\n", "\n");
-        }
-
-        /// <summary>Preserves authored leading line breaks when adding a recipe suffix.</summary>
-        /// <param name="text">Text already accumulated.</param>
-        /// <param name="suffix">Optional variant text, including escaped newlines.</param>
-        /// <returns>Combined text without adding a space before a newline.</returns>
-        private static string Append(string text, string suffix)
-        {
-            if (string.IsNullOrWhiteSpace(suffix))
-                return text;
-            suffix = suffix.Replace("\\n", "\n");
-            return text + (suffix.StartsWith("\n", StringComparison.Ordinal) || suffix.StartsWith("\r", StringComparison.Ordinal) ? string.Empty : " ") + suffix;
+            return (entry.Text ?? entry.Name).Replace("\\n", "\n");
         }
 
         #endregion

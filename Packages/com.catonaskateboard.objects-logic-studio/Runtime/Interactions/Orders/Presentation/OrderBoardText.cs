@@ -11,7 +11,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Authored Paragraphs")]
-        [Tooltip("Existing TMP children for the base order and its variant paragraphs, prepared before Play.")]
+        [Tooltip("Existing TMP children for variant paragraphs and optional base-order typography, prepared before Play.")]
         [SerializeField]
         private TMP_Text[] paragraphs = Array.Empty<TMP_Text>();
         private TMP_Text original;
@@ -55,38 +55,65 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
         #region Drawing
 
-        /// <summary>Draws each selected variant with its own appearance, preserving uncustomized orders exactly.</summary>
+        /// <summary>Keeps base text in the main slot and draws selected variants in separate authored paragraphs.</summary>
         /// <param name="candidate">Base, single variant or combo currently occupying this slot.</param>
         /// <param name="completed">Whether every displayed paragraph must be crossed out.</param>
         internal void Draw(OrderCandidate candidate, bool completed)
         {
-            // The original text remains the fast path for catalogs with no paragraph overrides.
+            // Restore all existing paragraph objects before drawing a replacement ticket.
             Clear();
-            bool styled = candidate.Entry.TextStyle is { Enabled: true };
-            if (candidate.Combo != null)
-                foreach (OrderRecipeVariant variant in candidate.Combo)
-                    styled |= variant.TextStyle is { Enabled: true };
-            else
-                styled |= candidate.Variant?.TextStyle is { Enabled: true };
-            if (!styled || original == null || baseline == null)
+            if (original == null || baseline == null)
                 return;
-            bool includeBase = candidate.Combo != null || candidate.Variant == null
-                || candidate.Variant.AppendToBaseText || string.IsNullOrWhiteSpace(candidate.Variant.Text);
-            int count = (includeBase ? 1 : 0) + (candidate.Combo?.Length ?? (candidate.Variant != null ? 1 : 0));
+            if (candidate.HasVariants)
+            {
+                DrawVariants(candidate, completed);
+                return;
+            }
+            // Base-only orders without custom styling keep the original slot's direct text path.
+            if (candidate.Entry.TextStyle is not { Enabled: true })
+                return;
+            if (paragraphs.Length == 0)
+            {
+                Debug.LogWarning("Prepare an Order Board text paragraph before Play to use custom base-order typography.", this);
+                return;
+            }
+            original.enabled = false;
+            float offset = 0f;
+            Present(0, candidate.Entry.Text, candidate.Entry.TextStyle, completed, ref offset);
+        }
+
+        /// <summary>Draws recipe paragraphs while keeping base text in the main slot or its own styled paragraph.</summary>
+        /// <param name="candidate">Variant or combo currently occupying this slot.</param>
+        /// <param name="completed">Whether every displayed paragraph must be crossed out.</param>
+        private void DrawVariants(OrderCandidate candidate, bool completed)
+        {
+            // The board has assigned base-only text; restore its style before applying optional typography.
+            baseline.Apply(original);
+            candidate.Entry.TextStyle?.Apply(original);
+            original.fontStyle = completed ? original.fontStyle | FontStyles.Strikethrough : original.fontStyle & ~FontStyles.Strikethrough;
+            bool styledBase = candidate.Entry.TextStyle is { Enabled: true };
+            bool includeBase = !string.IsNullOrWhiteSpace(candidate.MainText);
+            int count = (candidate.Combo?.Length ?? 1) + (styledBase && includeBase ? 1 : 0);
             if (count > paragraphs.Length)
             {
                 Debug.LogWarning("Prepare more Order Board text paragraphs before Play for this variant combo.", this);
                 return;
             }
-            original.enabled = false;
+            // A custom base style uses its own paragraph; otherwise variants begin below the main slot text.
             float offset = 0f;
             int index = 0;
-            if (includeBase)
-                Present(index++, candidate.Entry.Text, candidate.Entry.TextStyle, completed, ref offset);
+            if (styledBase && includeBase)
+            {
+                original.enabled = false;
+                Present(index++, candidate.MainText, candidate.Entry.TextStyle, completed, ref offset);
+            }
+            else if (includeBase)
+                offset = original.preferredHeight;
+            // Variant members follow the base line and never enter the main order text.
             if (candidate.Combo != null)
                 foreach (OrderRecipeVariant variant in candidate.Combo)
                     Present(index++, variant.Text, variant.TextStyle, completed, ref offset);
-            else if (candidate.Variant != null)
+            else
                 Present(index, candidate.Variant.Text, candidate.Variant.TextStyle, completed, ref offset);
         }
 
