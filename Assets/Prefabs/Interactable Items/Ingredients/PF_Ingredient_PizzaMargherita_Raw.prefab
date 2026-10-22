@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 3130483404712554534}
   - component: {fileID: 7182461161852162158}
   - component: {fileID: 6256670230900404138}
-  - component: {fileID: 4156791856574593789}
+  - component: {fileID: 2064559402467439019}
   m_Layer: 6
   m_Name: PF_Ingredient_PizzaMargherita_Raw
   m_TagString: Untagged
@@ -352,7 +352,7 @@ MonoBehaviour:
       popIn: 1
       exitDuration: 0.16
     style:
-      content: Pizza Dough
+      content: Pizza Margherita
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0
@@ -453,7 +453,7 @@ MonoBehaviour:
     IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
---- !u!114 &4156791856574593789
+--- !u!114 &2064559402467439019
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -472,7 +472,7 @@ MonoBehaviour:
     Tools: []
   flagChange:
     Enabled: 1
-    Flag: {fileID: 11400000, guid: c002ebc4f280efe4d9e1c2c4c33e5c71, type: 2}
+    Flag: {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
     Operation: 0
     Moment: 1
   visualEffect:
@@ -532,7 +532,11 @@ MonoBehaviour:
     WaitForNextIngredient: 1
     Ingredients:
     - Flags:
-      - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+      - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
+      Count: 1
+      Optional: 0
+    - Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       Count: 1
       Optional: 0
     - Flags:
@@ -547,7 +551,7 @@ MonoBehaviour:
     - Name: Magnet 1
       AnyIngredient: 0
       Flags:
-      - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+      - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
       Order: 1
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
@@ -556,12 +560,25 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
-      PreviewPrefab: {fileID: 3176775191320682383, guid: df2a34812f3fced4c94972c3861e05a5, type: 3}
+      PreviewPrefab: {fileID: 13743455491562369, guid: 5bb456d407eb39946a0e5e5cfaf267c1, type: 3}
     - Name: Magnet 2
       AnyIngredient: 0
       Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      Order: 0
+      Position: {x: 0, y: 0.03, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      PreviewPrefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
+    - Name: Magnet 3
+      AnyIngredient: 0
+      Flags:
       - {fileID: 11400000, guid: a0e42af0629e8484fa131faa689723bf, type: 2}
-      Order: 2
+      Order: 0
       Position: {x: 0, y: 0.03, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
@@ -570,7 +587,7 @@ MonoBehaviour:
         Materials: []
         Visibility: []
       PreviewPrefab: {fileID: 4357755812359040115, guid: b337591f6f4024a40a7b3024484e4fc8, type: 3}
-    - Name: Magnet 3
+    - Name: Magnet 4
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}

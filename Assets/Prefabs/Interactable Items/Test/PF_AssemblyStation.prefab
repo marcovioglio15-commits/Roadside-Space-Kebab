@@ -175,6 +175,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -229,6 +230,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -277,12 +279,13 @@ MonoBehaviour:
   settingsPreset: {fileID: 11400000, guid: c45be141bdfc377408c0dc37af3c24b5, type: 2}
   drawGizmos: 1
   settings:
-    ProductPrefab: {fileID: 3748823794255209065, guid: c684292326866854fb5205e178ec9fbe, type: 3}
+    ProductPrefab: {fileID: 13743455491562369, guid: b8f4a4793d8b4204290540eb23b99a3c, type: 3}
     Trigger: 2
     ContactDuration: 0.5
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -337,6 +340,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -391,6 +395,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -445,6 +450,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -499,6 +505,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -553,6 +560,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -607,6 +615,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
@@ -661,6 +670,7 @@ MonoBehaviour:
     ContactQueryInterval: 0.02
     ContactTolerance: 0.005
     IncludeTriggers: 1
+    IgnoreCarriedIngredients: 1
     Distance: 3
     RequireSight: 1
     Obstacles:
