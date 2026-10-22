@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &13743455491562369
+--- !u!1 &5984455871580098207
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,46 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5775207508657234930}
-  - component: {fileID: 4907730719137518617}
-  - component: {fileID: 8617591487790029805}
-  - component: {fileID: 4940161601249561732}
-  - component: {fileID: 5122342605487321613}
-  - component: {fileID: 4990179376837830831}
-  - component: {fileID: -1763852175486581062}
-  - component: {fileID: -473097877863273688}
-  - component: {fileID: 3130483404712554534}
-  - component: {fileID: 7182461161852162158}
-  - component: {fileID: 6256670230900404138}
-  - component: {fileID: 2064559402467439019}
-  m_Layer: 6
+  - component: {fileID: 760084287854165806}
+  - component: {fileID: 7157230654937660015}
+  - component: {fileID: 6767113163487435023}
+  - component: {fileID: 1484167545093622184}
+  - component: {fileID: 6363087225178644662}
+  - component: {fileID: 2088839932694997764}
+  - component: {fileID: 2597272258431737081}
+  - component: {fileID: 8229651701788113747}
+  - component: {fileID: 8301739050056970611}
+  - component: {fileID: 5689392277525764882}
+  - component: {fileID: 3332910872620502676}
+  m_Layer: 0
   m_Name: PF_Ingredient_PizzaMargherita_Raw
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5775207508657234930
+--- !u!4 &760084287854165806
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8016938133415084804}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &4907730719137518617
+--- !u!54 &7157230654937660015
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
@@ -70,13 +68,13 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &8617591487790029805
+--- !u!65 &6767113163487435023
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -91,13 +89,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.4507923, y: 0.06249873, z: 0.4466531}
   m_Center: {x: -0.001249373, y: 0.028750634, z: 0.0008329004}
---- !u!114 &4940161601249561732
+--- !u!114 &1484167545093622184
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
+--- !u!114 &6363087225178644662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5984455871580098207}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
@@ -105,25 +115,89 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
   flags:
   - {fileID: 11400000, guid: c002ebc4f280efe4d9e1c2c4c33e5c71, type: 2}
---- !u!114 &5122342605487321613
+--- !u!114 &2088839932694997764
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Script: {fileID: 11500000, guid: 938429a5d51206345b01b27c9fb3a6a6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
---- !u!114 &4990179376837830831
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
+  interactionName: First Person Hover
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  anchor: {fileID: 0}
+  preset: {fileID: 0}
+  configuration:
+    settings:
+      targetMode: 0
+      playerDistance: 3
+      centerRadius: 0.08
+      queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
+      obstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967291
+      fixedHud: 0
+      anchorOffset: {x: 0, y: 0, z: 0}
+      worldOffset: {x: 0, y: 0.25, z: 0}
+      screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
+      appearance: 1
+      duration: 0.18
+      startScale: 0.2
+      popIn: 0
+      exitDuration: 0.16
+    style:
+      content: Inspect
+      font: {fileID: 0}
+      fontSize: 24
+      fontStyle: 0
+      textColor: {r: 1, g: 1, b: 1, a: 1}
+      alignment: 4
+      richText: 1
+      horizontalOverflow: 0
+      verticalOverflow: 1
+      size: {x: 280, y: 64}
+      textSizeOffset: {x: -24, y: -12}
+      textOffset: {x: 0, y: 0}
+      showBackground: 1
+      backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
+      backgroundSprite: {fileID: 0}
+      backgroundType: 0
+  drawGizmos: 1
+--- !u!114 &2597272258431737081
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cf674ee0148e6d4b8ec13de002ad056, type: 3}
@@ -160,14 +234,14 @@ MonoBehaviour:
     TargetOffset: {x: 0, y: 0, z: 0}
     ObstacleMask:
       serializedVersion: 2
-      m_Bits: 3959
+      m_Bits: 4294967295
     Units: 1
     Space: 0
     Offset: {x: 0, y: -0.02, z: 0.7}
     Rotation: {x: 0, y: 0, z: 0}
     Instant: 1
     TransitionDuration: 0.2
-    PhysicalPickup: 0
+    PhysicalPickup: 1
     PickupTimeMargin: 0.15
     PickupSpeed: 25
     PickupPush: 1.5
@@ -186,13 +260,13 @@ MonoBehaviour:
       MinimumSpeed: 1.5
       Cooldown: 0.15
   drawGizmos: 1
---- !u!114 &-1763852175486581062
+--- !u!114 &8229651701788113747
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63cd3bb8ff753194e9d968eeca2fcf2f, type: 3}
@@ -236,13 +310,13 @@ MonoBehaviour:
     Bounciness: 0.2
     FrictionCombine: 0
     BounceCombine: 3
---- !u!114 &-473097877863273688
+--- !u!114 &8301739050056970611
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f11348f8e44759459d9557849333bf6, type: 3}
@@ -293,173 +367,13 @@ MonoBehaviour:
     Elevation: 10
     Spin: {x: 0, y: 0, z: 0}
     Sound: 1
---- !u!114 &3130483404712554534
+--- !u!114 &5689392277525764882
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 938429a5d51206345b01b27c9fb3a6a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
-  interactionName: First Person Hover
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  anchor: {fileID: 0}
-  preset: {fileID: 11400000, guid: 43f220aa71cf7144cb5c32d44417af6b, type: 2}
-  configuration:
-    settings:
-      targetMode: 2
-      playerDistance: 3
-      centerRadius: 0.08
-      queryInterval: 0.05
-      releaseDelay: 0.08
-      suspendCarried: 0
-      suspendMoving: 0
-      speedThreshold: 0.5
-      obstacleMask:
-        serializedVersion: 2
-        m_Bits: 4294967227
-      fixedHud: 1
-      anchorOffset: {x: 0, y: 0, z: 0}
-      worldOffset: {x: 0, y: 0.25, z: 0}
-      screenOffset: {x: 0, y: 35}
-      followSmoothing: 0.035
-      appearance: 1
-      duration: 0.18
-      startScale: 0.2
-      popIn: 1
-      exitDuration: 0.16
-    style:
-      content: Pizza Margherita
-      font: {fileID: 0}
-      fontSize: 24
-      fontStyle: 0
-      textColor: {r: 1, g: 1, b: 1, a: 1}
-      alignment: 4
-      richText: 1
-      horizontalOverflow: 0
-      verticalOverflow: 1
-      size: {x: 280, y: 64}
-      textSizeOffset: {x: -24, y: -12}
-      textOffset: {x: 0, y: 0}
-      showBackground: 1
-      backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
-      backgroundSprite: {fileID: 0}
-      backgroundType: 0
-  drawGizmos: 1
---- !u!114 &7182461161852162158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
-  interactionName: Outline
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
-  drawGizmos: 1
-  settings:
-    Thickness: 6
-    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
-    Intensity: 5
-    EdgeAngle: 30
-    HoverOnly: 1
-  renderers:
-  - {fileID: 9154355816808233067}
---- !u!114 &6256670230900404138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
-  interactionName: Presence Cap
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 0}
-  drawGizmos: 1
-  settings:
-    Maximum: 20
-    UseOwnFlags: 1
-    IncludeFixedObjects: 0
-    Flags: []
-    OffscreenDelay: 0.25
---- !u!114 &2064559402467439019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13743455491562369}
+  m_GameObject: {fileID: 5984455871580098207}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70b3f1b34465481291b768662cedce04, type: 3}
@@ -471,8 +385,8 @@ MonoBehaviour:
     Tool: {fileID: 0}
     Tools: []
   flagChange:
-    Enabled: 1
-    Flag: {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+    Enabled: 0
+    Flag: {fileID: 0}
     Operation: 0
     Moment: 1
   visualEffect:
@@ -489,6 +403,8 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
+    PriceEnabled: 0
+    Price: 5
     ProlongedAssembly: 1
     Charge:
       Action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
@@ -516,7 +432,7 @@ MonoBehaviour:
       OffsetY: -80
       Drain: 0
       Clockwise: 1
-    LockFirstIngredient: 0
+    LockFirstIngredient: 1
     FinalizeOnGrab: 1
     FinalizeAction: {fileID: 0}
     FinalizeTarget:
@@ -529,7 +445,7 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
-    WaitForNextIngredient: 1
+    WaitForNextIngredient: 0
     Ingredients:
     - Flags:
       - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
@@ -566,7 +482,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       Order: 0
-      Position: {x: 0, y: 0.03, z: 0}
+      Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
@@ -579,7 +495,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: a0e42af0629e8484fa131faa689723bf, type: 2}
       Order: 0
-      Position: {x: 0, y: 0.03, z: 0}
+      Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
@@ -592,107 +508,71 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       Order: 0
-      Position: {x: 0, y: 0.025, z: 0}
-      Rotation: {x: 0, y: 45, z: 0}
-      Scale: {x: 0.7, y: 0.7, z: 0.7}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
       Appearance:
         Meshes: []
         Materials: []
         Visibility: []
       PreviewPrefab: {fileID: 6484676068278646964, guid: a7f8a1a708ab7fc4db668aa796f19a34, type: 3}
     InteractionRules:
-    - Target: {fileID: 4990179376837830831}
+    - Target: {fileID: 2597272258431737081}
       RequireComplete: 1
       MinimumIngredients: 1
       Ingredients: []
-    - Target: {fileID: -1763852175486581062}
+    - Target: {fileID: 8229651701788113747}
       RequireComplete: 1
       MinimumIngredients: 1
       Ingredients: []
-    - Target: {fileID: -473097877863273688}
+    - Target: {fileID: 8301739050056970611}
       RequireComplete: 1
       MinimumIngredients: 1
       Ingredients: []
     CompletedAppearance:
-      Meshes:
-      - Path: SM_Base_PizzaDough
-        Mesh: {fileID: 2528236585992998278, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-        UpdateCollider: 0
+      Meshes: []
       Materials: []
       Visibility: []
     HideIngredients: 1
---- !u!1001 &7551230066496120047
-PrefabInstance:
+--- !u!114 &3332910872620502676
+MonoBehaviour:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 5775207508657234930}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -3.7493994e-33
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -6.123234e-17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 6.123234e-17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -5754084199372789682, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 2528236585992998278, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-    - target: {fileID: 919132149155446097, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_Name
-      value: SM_Base_PizzaDough
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-      propertyPath: m_Layer
-      value: 6
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
---- !u!4 &8016938133415084804 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-  m_PrefabInstance: {fileID: 7551230066496120047}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
---- !u!23 &9154355816808233067 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 37dbf9a0c23872e42a9e31366a80489d, type: 3}
-  m_PrefabInstance: {fileID: 7551230066496120047}
-  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5984455871580098207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  settingsPreset: {fileID: 0}
+  drawGizmos: 1
+  settings:
+    Thickness: 3
+    Color: {r: 1, g: 1, b: 1, a: 1}
+    Intensity: 2
+    EdgeAngle: 30
+    HoverOnly: 0
+  renderers: []

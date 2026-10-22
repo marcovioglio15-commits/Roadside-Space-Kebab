@@ -279,7 +279,7 @@ MonoBehaviour:
   settingsPreset: {fileID: 11400000, guid: c45be141bdfc377408c0dc37af3c24b5, type: 2}
   drawGizmos: 1
   settings:
-    ProductPrefab: {fileID: 13743455491562369, guid: b8f4a4793d8b4204290540eb23b99a3c, type: 3}
+    ProductPrefab: {fileID: 5984455871580098207, guid: f67dd383e0afd174e8de4fbf06303230, type: 3}
     Trigger: 2
     ContactDuration: 0.5
     ContactQueryInterval: 0.02

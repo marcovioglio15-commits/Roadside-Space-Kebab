@@ -896,7 +896,7 @@ MonoBehaviour:
       AirSpeed: 12
     SelfEject: 1
     UseBulletImpulse: 1
-    BulletImpulseMultiplier: 2
+    BulletImpulseMultiplier: 6.5
     SelfImpulse:
       Flags: []
       Match: 0
