@@ -13,30 +13,25 @@ MonoBehaviour:
   m_Name: PlayerToolsPreset
   m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerToolsPreset
   RootPath: Player Camera/PF_PlayerArmTest
+  Arm:
+    Enabled: 1
+    SmoothRotation: 1
+    RotationResponse: 14
+    MaximumRotationLag: 10
+    Path:
+    IdleEnabled: 1
+    Idle: {fileID: 11400000, guid: b7062ae87c9e4474b8fbe2d80c490a11, type: 2}
+  SingleTool: 1
   Tools:
   - Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
-    MoveVisual: 1
+    MoveVisual: 0
     Path: PF_PlayerArmTest_Visual/Tool_A
     PassivePose:
       Position: {x: 0, y: 0.69, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
-  - Tool: {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
-    MoveVisual: 1
-    Path: PF_PlayerArmTest_Visual/Tool_B
-    PassivePose:
-      Position: {x: 0, y: 0.69, z: 0}
-      Rotation: {x: 87.04991, y: 0, z: 0}
-      Scale: {x: 1, y: 1, z: 1}
-  - Tool: {fileID: 11400000, guid: 07cdba6c534bc36429a324061e639905, type: 2}
-    MoveVisual: 1
-    Path: PF_PlayerArmTest_Visual/Tool_C
-    PassivePose:
-      Position: {x: 0, y: 0.69, z: 0}
-      Rotation: {x: 309.4, y: 0, z: 0}
-      Scale: {x: 1, y: 1, z: 1}
   InitialTool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
-  Layout: 1
+  Layout: 0
   ActivePose:
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 90, y: 0, z: 0}
@@ -44,12 +39,6 @@ MonoBehaviour:
   Slots:
   - Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 90, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  - Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  - Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: -50, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   SlotMotion: 0
   Pivot: {x: 0, y: 0, z: 0}

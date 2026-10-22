@@ -39,7 +39,7 @@ namespace CatOnASkateboard.PlayerStudio
         private InputActionReference cursorToggleAction;
 
         [Header("Tools")]
-        [Tooltip("Use Tool commands select one tool or cycle through the configured tools.")]
+        [Tooltip("Separate commands for tool activation, reload and optional tool selection or cycling.")]
         [SerializeField]
         private PlayerToolInputSettings tools = new PlayerToolInputSettings();
 

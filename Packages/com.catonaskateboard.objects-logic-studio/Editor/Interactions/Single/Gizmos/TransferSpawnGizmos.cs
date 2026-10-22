@@ -1,4 +1,5 @@
 using UnityEditor;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
@@ -26,7 +27,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             switch (feature)
             {
                 case ObjectDispenser dispenser when dispenser.Settings.TryValidate(out _):
-                    Pose(dispenser.transform, Vector3.zero, dispenser.Settings.OutputRotation, "Dispenser pickup origin");
+                    if (dispenser.Settings.Mode == DispenseMode.ToHand)
+                        Pose(dispenser.transform, Vector3.zero, dispenser.Settings.OutputRotation, "Dispenser pickup origin");
+                    else
+                        for (int index = 0; index < dispenser.Settings.Outlets.Length; index++)
+                        {
+                            DispenserOutlet outlet = dispenser.Settings.Outlets[index];
+                            Vector3 position = dispenser.transform.TransformPoint(outlet.Position);
+                            StudioOutletHandles.Marker(position, dispenser.transform.rotation * Quaternion.Euler(outlet.Rotation));
+                            Handles.Label(position, "Outlet " + (index + 1));
+                        }
                     break;
                 case ObjectContainer container when container.Settings.KeepVisible && container.Settings.TryValidate(out _):
                     int count = Application.isPlaying ? container.StoredCount : container.Settings.Unlimited ? 3 : Mathf.Min(12, container.Settings.Capacity);

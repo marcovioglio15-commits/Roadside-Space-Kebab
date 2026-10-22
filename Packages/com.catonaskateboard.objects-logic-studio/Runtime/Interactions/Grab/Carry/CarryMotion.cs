@@ -73,13 +73,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="target">Requested position and orientation after pickup easing.</param>
         /// <param name="settings">Validated carry limits and clearance.</param>
         /// <param name="deltaTime">Elapsed render time.</param>
-        /// <param name="instant">Allow the full pickup distance while retaining collision sweeps.</param>
+        /// <param name="instant">Place at the carry endpoint without sweeping out of the original pile.</param>
         /// <returns>A collision-constrained world pose.</returns>
         internal Pose Resolve(Pose target, GrabSettings settings, float deltaTime, bool instant)
         {
             // Synchronize scripted obstacles once for the held item before running its virtual-pose queries.
             Physics.SyncTransforms();
             ImpactImpulse = 0f;
+            if (instant)
+            {
+                // Instant pickup skips obstacles around the original item, while the destination must still be clear.
+                Pose placement = target;
+                float clearanceBudget = Mathf.Max(reach, settings.CollisionPadding);
+                if (Separate(ref placement, ref clearanceBudget))
+                {
+                    previousTarget = target.position;
+                    tracking = true;
+                    recoveryVelocity = Vector3.zero;
+                    blocked = false;
+                    return placement;
+                }
+            }
             if (blocked && Vector3.Dot(body.position - blockedPosition, blockedNormal) > settings.CollisionPadding + separationMargin)
                 blocked = false;
             Pose pose = new Pose(body.position, body.rotation);
@@ -135,7 +149,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 contactTarget = Vector3.zero;
             contactRotation = settings.ContactRotation
                 ? Vector3.Lerp(contactRotation, contactTarget, 1f - Mathf.Exp(-settings.ContactResponse * deltaTime)) : Vector3.zero;
-            Quaternion rotation = Quaternion.RotateTowards(pose.rotation,
+            Quaternion rotation = instant ? target.rotation : Quaternion.RotateTowards(pose.rotation,
                 Quaternion.Euler(contactRotation) * target.rotation, settings.RotationSpeed * deltaTime);
             float angle = Quaternion.Angle(pose.rotation, rotation);
             if (angle <= 0.001f)

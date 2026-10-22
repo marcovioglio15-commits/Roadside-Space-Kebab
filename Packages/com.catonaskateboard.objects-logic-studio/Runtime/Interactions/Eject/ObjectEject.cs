@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CatOnASkateboard.PlayerStudio;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -26,6 +27,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly BlackHoleRun attraction = new BlackHoleRun();
         private readonly EjectBodyState temporary = new EjectBodyState();
         private TriggerAnimationPlayback pendingAnimation;
+        private bool effectStarted;
+        private Vector3 bulletImpulse;
+        private PlayerTool pendingTool;
 
         #endregion
 
@@ -33,6 +37,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Applied flag groups, contact policy and lifetime settings.</summary>
         public EjectSettings Settings => settings;
+        /// <summary>Whether this self-launch takes its entire vector from an accepted bullet impact.</summary>
+        private bool UsesBulletImpulse => settings.Behavior == EjectBehavior.Impulse && settings.SelfEject && settings.UseBulletImpulse;
         /// <summary>Animation requested by the active prerequisite policy.</summary>
         internal ObjectTriggerAnimation Prerequisite => settings.ExternalAnimation ? SceneAnimationRegistry.Resolve(settings.AnimationIdentity) : GetComponent<ObjectTriggerAnimation>();
         /// <summary>Single card represented by this component.</summary>
@@ -62,20 +68,52 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Advances active attraction and restores destination contacts after each final launch.</summary>
         private void FixedUpdate()
         {
-            // Physics starts only after an actual endpoint, including pauses and zero-duration transitions.
-            if (pendingAnimation != null)
-            {
-                if (pendingAnimation.Cancelled)
-                    pendingAnimation = null;
-                else if (pendingAnimation.Completed && CanApplyEffect())
-                {
-                    pendingAnimation.Release();
-                    pendingAnimation = null;
-                    ApplyEffect();
-                }
-            }
-            if (attraction.Pending && attraction.Tick(Time.fixedDeltaTime))
+            // Keep an animation handle only while its prerequisite or forced return still needs coordination.
+            UpdatePrerequisite();
+            bool completed = attraction.Pending && attraction.Tick(Time.fixedDeltaTime);
+            if (effectStarted && (!attraction.Active || settings.ReturnOverlap > 0f
+                && attraction.Progress >= 1f - settings.ReturnOverlap * 0.01f))
+                FinishAnimation();
+            if (completed)
                 Signal(InteractionMoment.Completed);
+        }
+
+        /// <summary>Starts one accepted prerequisite and releases its handle when no forced return is required.</summary>
+        private void UpdatePrerequisite()
+        {
+            if (pendingAnimation == null || effectStarted)
+                return;
+            if (pendingAnimation.Cancelled)
+            {
+                CancelAnimation();
+                return;
+            }
+            if (!CanStartEffect() || !CanApplyEffect())
+                return;
+            // Detach ordinary requests before signaling: completion listeners can disable or retrigger Eject.
+            TriggerAnimationPlayback request = pendingAnimation;
+            if (!request.HoldEndpoint)
+            {
+                pendingAnimation = null;
+                request.Release();
+            }
+            bool applied = ApplyEffect();
+            pendingTool = null;
+            if (pendingAnimation != request)
+                return;
+            effectStarted = applied && settings.Behavior == EjectBehavior.BlackHole;
+            if (!effectStarted)
+                FinishAnimation();
+        }
+
+        /// <summary>Detaches the held endpoint before asking the linked animation to return from its live pose.</summary>
+        private void FinishAnimation()
+        {
+            // Clear coordination first so return listeners cannot observe a stale request.
+            TriggerAnimationPlayback request = pendingAnimation;
+            pendingAnimation = null;
+            effectStarted = false;
+            request?.Return();
         }
 
         /// <summary>Restores retained physics when entering Play without scene reload.</summary>
@@ -89,11 +127,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
         }
 
-        /// <summary>Clears a pending prerequisite without interrupting unrelated automatic return settings.</summary>
+        /// <summary>Cancels the pending effect and releases or returns only its own linked animation.</summary>
         private void CancelAnimation()
         {
-            pendingAnimation?.Cancel();
+            TriggerAnimationPlayback request = pendingAnimation;
             pendingAnimation = null;
+            effectStarted = false;
+            pendingTool = null;
+            request?.Cancel();
         }
 
         #endregion
@@ -130,6 +171,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     if (!selected.enabled || !selected.TryValidate(selected.Settings, out warning))
                         return false;
+                    if (configuration.ForceAutoReturn && !configuration.WaitForAnimationReturn
+                        && (!float.IsFinite(selected.Settings.AutoReturnDuration) || selected.Settings.AutoReturnDuration < 0f
+                            || !TransformRotation.IsValid(selected.Settings.AutoReturnRotation)))
+                    {
+                        warning = "The connected animation needs a finite non-negative Auto Return Duration and valid rotation direction.";
+                        return false;
+                    }
                 }
                 // Bind input even while a remote endpoint is disabled or its additive scene is not loaded yet.
                 // Execution resolves it again and cannot apply an effect without a successful animation request.
@@ -172,7 +220,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal override bool CanExecute()
         {
             // Contact queries run only after this object wins the performed input action.
-            return pendingAnimation == null && CanApplyEffect();
+            return pendingAnimation == null && CanApplyEffect() && (!UsesBulletImpulse
+                || InteractionProjectileInput.Active && InteractionProjectileInput.Allows(this) && InteractionProjectileInput.Velocity.sqrMagnitude > 0f);
         }
 
         /// <summary>Accepts one activation, optionally requesting the selected animation before any physics changes.</summary>
@@ -181,12 +230,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (!CanExecute())
                 return false;
+            // Snapshot the actual incoming velocity before a delayed animation outlives the impact input scope.
+            bulletImpulse = UsesBulletImpulse ? InteractionProjectileInput.Velocity * settings.BulletImpulseMultiplier : Vector3.zero;
             // Contact collection is deferred so moving geometry is evaluated at its final pose.
             if (!settings.AnimateBeforeEject)
                 return ApplyEffect();
+            pendingTool = InteractionProjectileInput.Active ? InteractionProjectileInput.Tool : null;
             ObjectTriggerAnimation selected = Prerequisite;
-            if (selected == null || !selected.TryRequest(out pendingAnimation, settings.WaitForAnimationReturn))
+            if (selected == null || !selected.TryRequest(out pendingAnimation, settings.WaitForAnimationReturn,
+                settings.ForceAutoReturn && !settings.WaitForAnimationReturn))
+            {
+                pendingTool = null;
                 return false;
+            }
             // Start listeners may disable Eject synchronously before TryRequest returns its result.
             if (isActiveAndEnabled)
                 return true;
@@ -198,8 +254,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the current item may apply its Eject effect.</returns>
         private bool CanApplyEffect()
         {
-            return !executing && !attraction.Active && !temporary.Active && Available(InteractionChannels.Eject)
-                && Item != null && !Item.IsReserved;
+            return !executing && !attraction.Active && !temporary.Active && Available(InteractionChannels.Eject, pendingTool)
+                && Item != null && (!Item.IsReserved || pendingAnimation != null && Item.IsOwnedBy(pendingAnimation.Source));
+        }
+
+        /// <summary>Checks the requested animation fraction against the optional Black Hole overlap.</summary>
+        /// <returns>True after the endpoint or configured overlap threshold is reached.</returns>
+        private bool CanStartEffect()
+        {
+            return pendingAnimation.Completed || settings.Behavior == EjectBehavior.BlackHole
+                && settings.AnimationOverlap > 0f && pendingAnimation.Progress >= 1f - settings.AnimationOverlap * 0.01f;
         }
 
         /// <summary>Collects final contacts and applies impulses or starts attraction after all prerequisites pass.</summary>
@@ -268,7 +332,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.IgnoreCollisions)
                 EjectCollisionGrace.Apply(body, settings.IgnoredLayers, settings.IgnoreDuration);
             // Both force modes are single physics impulses; no Update loop reapplies the force.
-            body.AddForce(rule.Space == Space.Self ? transform.rotation * rule.Impulse : rule.Impulse,
+            body.AddForce(UsesBulletImpulse ? bulletImpulse : rule.Space == Space.Self ? transform.rotation * rule.Impulse : rule.Impulse,
                 settings.Mode == EjectForceMode.Impulse ? ForceMode.Impulse : ForceMode.VelocityChange);
             ejected.Add(body);
             if (settings.Despawn)

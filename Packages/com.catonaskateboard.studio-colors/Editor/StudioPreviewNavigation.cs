@@ -1,10 +1,10 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CatOnASkateboard.ObjectsLogicStudio.Editor
+namespace CatOnASkateboard.StudioColors.Editor
 {
-    /// <summary>Provides Scene View mouse gestures and keyboard flight inside the isolated assembly viewport.</summary>
-    internal sealed class AssemblyPreviewNavigation
+    /// <summary>Provides Scene View mouse gestures and keyboard flight inside isolated tool viewports.</summary>
+    public sealed class StudioPreviewNavigation
     {
         #region State
 
@@ -27,7 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Properties
 
         /// <summary>Whether a captured view gesture should suspend magnet handles.</summary>
-        internal bool Active => button >= 0;
+        public bool Active => button >= 0;
 
         #endregion
 
@@ -42,7 +42,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="distance">Retained camera distance.</param>
         /// <param name="mode">Move, rotate, scale or hand tool index.</param>
         /// <returns>True when F requests framing the selected magnet.</returns>
-        internal bool Handle(Rect rect, ref Vector2 orbit, ref Vector3 pivot, ref float distance, ref int mode)
+        public bool Handle(Rect rect, ref Vector2 orbit, ref Vector3 pivot, ref float distance, ref int mode)
         {
             // Hot-control capture keeps drags coherent when the pointer temporarily leaves the viewport.
             Event current = Event.current;
@@ -100,7 +100,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="orbit">Current camera orientation.</param>
         /// <param name="pivot">View focus moved together with the flying camera.</param>
         /// <returns>True when a new camera position needs repainting.</returns>
-        internal bool Tick(Vector2 orbit, ref Vector3 pivot)
+        public bool Tick(Vector2 orbit, ref Vector3 pivot)
         {
             // Inactive previews do no continuous repainting; delta is bounded after editor stalls.
             double now = EditorApplication.timeSinceStartup;
@@ -117,7 +117,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         }
 
         /// <summary>Releases pointer and keyboard state when a gesture, focus or window lifetime ends.</summary>
-        internal void Release()
+        public void Release()
         {
             // Focus loss must not leave the next viewport repaint flying or suppressing handles.
             if (control != 0 && GUIUtility.hotControl == control)

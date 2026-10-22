@@ -21,6 +21,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool missingInputReported;
         private bool performed;
         private ObjectSpraySauce spraying;
+        private ObjectDispenser dispensing;
+        private float nextDispense;
         private readonly AssemblyChargeRun assembly = new AssemblyChargeRun();
         private readonly AssemblyIngredientRetrieval retrieval = new AssemblyIngredientRetrieval();
 
@@ -39,6 +41,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Ownership
 
+        /// <summary>Transfers the occupied slot to a prepared replacement without dispatching another pickup input.</summary>
+        /// <param name="observer">Observer already carrying the sliced source.</param>
+        /// <param name="source">Current carried item being replaced by its outputs.</param>
+        /// <param name="replacement">Activated temporary group with validated carry geometry.</param>
+        /// <returns>True when the replacement now owns this same carry slot.</returns>
+        internal bool ReplaceHeld(HoverObserver observer, ObjectGrab source, ObjectGrab replacement)
+        {
+            // Replacement is restricted to the item already owning this player's slot.
+            if (held != source || source == null || !source.IsHeld || replacement == null)
+                return false;
+            source.Cancel();
+            if (replacement.Begin(observer))
+            {
+                held = replacement;
+                return true;
+            }
+            // A rejected replacement leaves the original carry available until the cut consumes it.
+            source.Begin(observer);
+            return false;
+        }
+
         /// <summary>Releases all subscriptions and temporary carry ownership when observation stops.</summary>
         internal void Reset()
         {
@@ -47,6 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (spraying != null)
                 spraying.StopEmission();
             spraying = null;
+            dispensing = null;
             // Context loss cannot strand a body in its held physics state.
             if (held != null)
                 held.Cancel();
@@ -148,7 +172,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Prepares buffered actions before dialogue chooses whether to yield its shared input.</summary>
         /// <param name="observer">Shared camera and player context.</param>
-        internal void Prepare(HoverObserver observer)
+        /// <param name="advanceProcesses">Whether this is the normal frame pass that advances ongoing holds.</param>
+        internal void Prepare(HoverObserver observer, bool advanceProcesses = true)
         {
             // Registry changes are resolved before either driver dispatches an action.
             Bind(observer);
@@ -159,9 +184,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (held != null && !held.IsHeld)
                 held = null;
             // Held finalization owns its completion frame before dialogue or another pickup can dispatch.
-            performed = assembly.Tick(observer, targeting, input, out ObjectGrab assembled);
-            if (assembled != null)
-                held = assembled;
+            if (advanceProcesses)
+            {
+                performed = assembly.Tick(observer, targeting, input, out ObjectGrab assembled);
+                if (assembled != null)
+                    held = assembled;
+            }
             input.Consume(assembly.BlockedButton);
             if (!input.Usable || Time.timeScale <= 0f)
                 input.ClearSignals();
@@ -187,6 +215,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Suppress(InteractionButton consumed)
         {
             input.Consume(consumed);
+            if (dispensing != null && bindings.TryGetValue(dispensing, out InteractionButton button) && button.SharesPress(consumed))
+                dispensing = null;
         }
 
         /// <summary>Processes remaining input after dialogue arbitration, allowing only one Single per pass.</summary>
@@ -196,13 +226,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A prioritized Single already owns this pass, including its carry-slot transition.
             input.Consume(consumed);
-            if (spraying != null && (!input.Usable || Time.timeScale <= 0f || !spraying.CanContinue()
+            if (!InteractionProjectileInput.Active && spraying != null && (!input.Usable || Time.timeScale <= 0f || !spraying.CanContinue()
                 || !bindings.TryGetValue(spraying, out InteractionButton flow) || !flow.Held
                 || consumed != null && input.Find(consumed) == flow || !CommandTarget(observer, spraying, out _)))
             {
                 spraying.StopEmission();
                 spraying = null;
             }
+            AdvanceDispenser(observer, consumed);
             if (!performed && input.Usable && Time.timeScale > 0f)
             {
                 bool pending = false;
@@ -236,7 +267,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when this participant has an eligible performed press.</returns>
         private static bool Pending(KeyValuePair<ObjectInteraction, InteractionButton> pair, InteractionButton requested, DialogueActionPriority allowed)
         {
-            return pair.Key != null && (pair.Value.Pending
+            return pair.Key != null && InteractionProjectileInput.Allows(pair.Key) && (pair.Value.Pending
                     || pair.Key is ObjectAssemblyProduct { Settings: { ProlongedAssembly: true } } && pair.Value.Pressed)
                 && (requested == null || pair.Value.SharesPress(requested))
                 && DialogueActionRules.Allows(pair.Key, allowed);
@@ -293,6 +324,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 ObjectCommandInteraction command => command.Execute(),
                 ObjectSpraySauce spray => StartSpray(spray),
+                ObjectDispenser dispenser => StartDispenser(observer, dispenser),
                 ObjectRequestedInteraction process => process.Request(),
                 _ => false
             };
@@ -307,6 +339,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 ObjectCommandInteraction command => command.CanExecute(),
                 ObjectRequestedInteraction process => process.CanRequest(),
+                ObjectDispenser dispenser => dispenser.Settings.Mode != DispenseMode.ToHand && dispenser.CanTake(),
                 _ => false
             };
         }
@@ -323,8 +356,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 score = 0f;
                 return held != null && held.Item == spray.Item;
             }
-            if (feature is ObjectCommandInteraction command)
-                return Eligible(observer, command, out score);
+            if (feature is ObjectTargetedInteraction targeted)
+                return Eligible(observer, targeted, out score);
             ObjectRequestedInteraction process = (ObjectRequestedInteraction)feature;
             TransferTargetSettings settings = process.Target;
             return targeting.Eligible(observer, process.transform, process.Colliders, process.transform.TransformPoint(settings.Offset),
@@ -346,6 +379,42 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return true;
         }
 
+        /// <summary>Emits one world output and retains only an ordinary held continuous request.</summary>
+        /// <param name="observer">Player targeting this dispenser, possibly already carrying another item.</param>
+        /// <param name="dispenser">Supply selected by normal command arbitration.</param>
+        /// <returns>True after one atomic withdrawal succeeds.</returns>
+        private bool StartDispenser(HoverObserver observer, ObjectDispenser dispenser)
+        {
+            if (!dispenser.TryTake(observer, out _))
+                return false;
+            dispensing = dispenser.Settings.Mode == DispenseMode.ContinuousOutput && !InteractionProjectileInput.Active ? dispenser : null;
+            nextDispense = Time.time + dispenser.Settings.Interval;
+            return true;
+        }
+
+        /// <summary>Advances one held supply without catch-up bursts, and stops on release, pause, lost aim or stock exhaustion.</summary>
+        /// <param name="observer">Current camera and player used for normal reach and obstruction checks.</param>
+        /// <param name="consumed">Action already owned by dialogue during this pass.</param>
+        private void AdvanceDispenser(HoverObserver observer, InputActionReference consumed)
+        {
+            if (InteractionProjectileInput.Active || dispensing == null)
+                return;
+            if (!input.Usable || Time.timeScale <= 0f || dispensing.Settings.Mode != DispenseMode.ContinuousOutput || !dispensing.CanTake()
+                || !bindings.TryGetValue(dispensing, out InteractionButton button) || !button.Held
+                || consumed != null && input.Find(consumed) == button || !Eligible(observer, dispensing, out _))
+            {
+                dispensing = null;
+                return;
+            }
+            // At most one output per observation pass keeps long frames from allocating a burst of missed intervals.
+            if (performed || Time.time < nextDispense)
+                return;
+            performed = dispensing.TryTake(observer, out _);
+            nextDispense = Time.time + dispensing.Settings.Interval;
+            if (!performed)
+                dispensing = null;
+        }
+
         /// <summary>Chooses the highest-priority eligible release without grabbing again in the same event.</summary>
         /// <param name="observer">Camera defining the release aim.</param>
         /// <param name="requested">Optional shared button restricting this arbitration pass.</param>
@@ -355,9 +424,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A successful deposit consumes this event before a same-key Drop can release the item.
             ObjectContainer container = null;
+            SliceCarryGroup group = held.GetComponent<SliceCarryGroup>();
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (Pending(pair, requested, allowed) && pair.Key is ObjectContainer candidate && candidate.CanStore(held)
+                if (group == null && Pending(pair, requested, allowed) && pair.Key is ObjectContainer candidate && candidate.CanStore(held)
                     && Eligible(observer, candidate, out float score) && Nearer(candidate, container, score, distance))
                 {
                     container = candidate;
@@ -378,6 +448,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             selected.Signal(InteractionMoment.Started);
             selected.Execute(observer.View.transform);
+            group?.ReleaseMembers(selected.PhysicsSettings);
             selected.Signal(InteractionMoment.Completed);
             held = null;
             return true;
@@ -402,7 +473,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     ObjectGrab grab => retrieval.Contains(grab) ? retrieval.Eligible(grab, observer, targeting, out score)
                         : grab.Available(InteractionChannels.Grab) && !grab.IsHeld && Eligible(observer, grab, out score),
-                    ObjectDispenser dispenser => dispenser.CanTake() && Eligible(observer, dispenser, out score),
+                    ObjectDispenser dispenser => dispenser.Settings.Mode == DispenseMode.ToHand && dispenser.CanTake() && Eligible(observer, dispenser, out score),
                     ObjectAssemblyProduct product => product.Pickup.Eligible(observer, targeting, out score),
                     _ => false
                 };

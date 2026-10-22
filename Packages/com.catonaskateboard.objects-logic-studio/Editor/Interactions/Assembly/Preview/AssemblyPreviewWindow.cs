@@ -43,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             new GUIContent("Scale", "Scale the ingredient relative to its original prefab scale."),
             new GUIContent("Hand", "Pan the view with the left mouse button (Q).")
         };
-        private readonly AssemblyPreviewNavigation navigation = new AssemblyPreviewNavigation();
+        private readonly StudioPreviewNavigation navigation = new StudioPreviewNavigation();
         private readonly AssemblyPreviewGeometry geometry = new AssemblyPreviewGeometry();
         private PreviewRenderUtility preview;
         private SerializedObject data;

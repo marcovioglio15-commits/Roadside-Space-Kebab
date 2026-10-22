@@ -76,14 +76,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                     HoverControls.Field(day, "Name");
                     Scene(day.FindPropertyRelative("Scene"), "Scene");
-                    HoverControls.Field(day, "RandomCount");
-                    if (day.FindPropertyRelative("RandomCount").boolValue)
-                    {
-                        HoverControls.Field(day, "Minimum");
-                        HoverControls.Field(day, "Maximum");
-                    }
+                    SpawnFlowSceneControls.Draw(day);
+                    HoverControls.Field(day, "LengthMode");
+                    if ((DayLengthMode)day.FindPropertyRelative("LengthMode").enumValueIndex == DayLengthMode.Timer)
+                        HoverControls.Field(day, "DayDuration");
                     else
-                        HoverControls.Field(day, "Count");
+                    {
+                        HoverControls.Field(day, "RandomCount");
+                        if (day.FindPropertyRelative("RandomCount").boolValue)
+                        {
+                            HoverControls.Field(day, "Minimum");
+                            HoverControls.Field(day, "Maximum");
+                        }
+                        else
+                            HoverControls.Field(day, "Count");
+                    }
                     HoverControls.Field(day, "Selection");
                     Steps(day.FindPropertyRelative("Steps"), day.FindPropertyRelative("Selection").enumValueIndex == (int)SpawnSelection.WeightedRandom);
                 }
@@ -93,7 +100,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty added = days.GetArrayElementAtIndex(days.arraySize - 1);
                 added.FindPropertyRelative("Name").stringValue = "Day " + days.arraySize;
                 added.FindPropertyRelative("Scene").stringValue = string.Empty;
+                added.FindPropertyRelative("WaitBeforeFirstSpawn").boolValue = false;
+                added.FindPropertyRelative("StartInteraction").boxedValue = new SceneInteractionReference();
+                added.FindPropertyRelative("ResetAnimations").enumValueIndex = (int)DayAnimationReset.None;
+                added.FindPropertyRelative("AnimationsToReset").arraySize = 0;
                 added.FindPropertyRelative("RandomCount").boolValue = false;
+                added.FindPropertyRelative("LengthMode").enumValueIndex = (int)DayLengthMode.SpawnCount;
+                added.FindPropertyRelative("DayDuration").floatValue = 300f;
                 added.FindPropertyRelative("Count").intValue = 1;
                 added.FindPropertyRelative("Minimum").intValue = 1;
                 added.FindPropertyRelative("Maximum").intValue = 3;

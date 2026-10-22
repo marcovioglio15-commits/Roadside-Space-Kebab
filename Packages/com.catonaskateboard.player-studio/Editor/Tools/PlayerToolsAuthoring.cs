@@ -11,6 +11,19 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         #region Validation
 
+        /// <summary>Resolves selection visibility and validation from the same pending Tools proposal.</summary>
+        /// <param name="state">Workspace containing pending master and module changes.</param>
+        /// <returns>True unless the resulting Tools preset enables single-tool mode.</returns>
+        internal static bool AllowsSwitching(PlayerStudioState state)
+        {
+            // A replaced master slot takes priority over an unrelated retained module draft.
+            PlayerToolsPreset tools = state.Selection.MasterSession.HasChanges ? state.Selection.MasterSession.ToolsPreset
+                : state.Selection.Master?.ToolsPreset;
+            if (tools != null && state.Tools.Source == tools && state.Tools.GetEditor()?.targetObject is PlayerToolsPreset draft)
+                tools = draft;
+            return tools == null || !tools.SingleTool;
+        }
+
         /// <summary>Validates tool selection against the player's initial action map and configured identities.</summary>
         /// <param name="master">Master or detached validation copy.</param>
         /// <param name="warning">Receives a missing tool or incompatible action ownership.</param>
@@ -19,14 +32,24 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // Shared Input presets may be used by players without a Tools module.
             PlayerToolInputSettings settings = master.InputPreset.Tools;
-            if (!settings.TryValidate(out warning) || master.ToolsPreset == null)
+            bool switching = master.ToolsPreset == null || !master.ToolsPreset.SingleTool;
+            if (!settings.TryValidate(out warning, switching) || master.ToolsPreset == null)
                 return warning.Length == 0;
             using SerializedObject data = new SerializedObject(master.InputPreset);
             InputActionReference movement = (InputActionReference)data.FindProperty("movementAction").objectReferenceValue;
-            warning = "Use Tool actions must share the initial movement map and reference tools assigned to this master.";
+            warning = "Tool actions must share the initial movement map and reference tools assigned to this master.";
+            if (movement == null || movement.action == null)
+                return false;
+            if (!SameMap(settings.Activate, movement) || !SameMap(settings.Reload, movement))
+                return false;
+            if (!switching)
+            {
+                warning = string.Empty;
+                return true;
+            }
             if (settings.Mode == PlayerToolInputMode.SharedCycle)
             {
-                if (settings.UseTool != null && settings.UseTool.action.actionMap != movement.action.actionMap)
+                if (!SameMap(settings.UseTool, movement))
                     return false;
             }
             else
@@ -35,6 +58,16 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                         return false;
             warning = string.Empty;
             return true;
+        }
+
+        /// <summary>Checks optional tool commands against the initial player map.</summary>
+        /// <param name="reference">Optional command role.</param>
+        /// <param name="movement">Validated movement role defining the player's initial map.</param>
+        /// <returns>True for an unassigned role or an action from the same asset and map.</returns>
+        private static bool SameMap(InputActionReference reference, InputActionReference movement)
+        {
+            return reference == null || reference.action != null && reference.asset == movement.asset
+                && reference.action.actionMap == movement.action.actionMap;
         }
 
         #endregion

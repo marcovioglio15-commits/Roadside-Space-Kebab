@@ -386,7 +386,7 @@ MonoBehaviour:
   interactionName: Slice
   toolRequirement:
     Mode: 2
-    Tool: {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
+    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
     Tools: []
   flagChange:
     Enabled: 0
@@ -429,6 +429,7 @@ MonoBehaviour:
     Steps:
     - Name: Slice 1
       Consume: 1
+      KeepOutputsHeld: 1
       Meshes: []
       Materials: []
       Spawns:

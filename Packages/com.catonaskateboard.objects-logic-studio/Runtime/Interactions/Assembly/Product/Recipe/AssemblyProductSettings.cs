@@ -74,6 +74,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Recipe")]
+        [Tooltip("Give this assembled product a base sale price when a consuming Modify By Contact collects prices.")]
+        public bool PriceEnabled;
+        [Tooltip("Base price per consumed logical product unit. A fulfilled order's price override has priority.")]
+        [Range(0f, 10000f)]
+        public float Price = 5f;
         [Tooltip("Require a separate held Button action to finalize completed appearance, flags and product interactions after the recipe is ready.")]
         public bool ProlongedAssembly;
         [Tooltip("Independent assembly input, charging behavior and HUD appearance. Used only by Prolonged Assembly.")]

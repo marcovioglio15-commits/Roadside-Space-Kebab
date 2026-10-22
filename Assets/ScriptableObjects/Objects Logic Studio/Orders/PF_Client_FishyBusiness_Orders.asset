@@ -43,6 +43,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -326,6 +328,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -609,6 +613,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -892,6 +898,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1175,6 +1183,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1314,6 +1324,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1453,6 +1465,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1686,6 +1700,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1739,6 +1755,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1792,6 +1810,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 1
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1845,6 +1865,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 1
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1898,6 +1920,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 1
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0
@@ -1951,6 +1975,8 @@ MonoBehaviour:
       TopRight: {r: 1, g: 1, b: 1, a: 1}
       BottomLeft: {r: 1, g: 1, b: 1, a: 1}
       BottomRight: {r: 1, g: 1, b: 1, a: 1}
+    OverridePrice: 0
+    Price: 5
     Quantity: 1
     Weight: 1
     RandomRequiredDraws: 0

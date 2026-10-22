@@ -6,6 +6,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Selects the counter driving dispenser appearance thresholds.</summary>
     public enum DispenseStepCounter { Remaining, Dispensed }
 
+    /// <summary>Chooses carried withdrawal, a single world output, or repeated world outputs while the action is held.</summary>
+    public enum DispenseMode { ToHand, SingleOutput, ContinuousOutput }
+
     /// <summary>Configures either new prefab supply or recovery from this object's Container.</summary>
     [Serializable]
     public sealed class DispenserSettings
@@ -25,6 +28,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Initial prefab stock, or total spaces for stored-only supply. Returned originals refill vacancies when Container limits storage to this Dispenser.")]
         public int Stock = 1;
         [Header("Output")]
+        [Tooltip("To Hand carries one item. Single Output releases one at an outlet. Continuous Output repeats while the bound button stays held and the dispenser remains targeted.")]
+        public DispenseMode Mode;
+        [Tooltip("Scaled seconds between continuous outputs. The initial press dispenses immediately; paused time produces no items.")]
+        [Range(0.02f, 30f)]
+        public float Interval = 0.25f;
+        [Tooltip("Output poses relative to the dispenser root. One is selected uniformly at random for each successful output.")]
+        public DispenserOutlet[] Outlets = { new DispenserOutlet() };
         [Tooltip("Seconds to move from this dispenser's pivot to the object's Grab carry pose. Overrides Instant and Transition Duration for this withdrawal only.")]
         [Range(0.01f, 3f)]
         public float PickupDuration = 0.35f;
@@ -60,7 +70,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Choose a supported dispense step counter.";
                 return false;
             }
-            if (!InteractionValues.Positive(PickupDuration) || !InteractionValues.Finite(OutputRotation))
+            warning = "Select a supported dispenser output mode.";
+            if (Mode is not (DispenseMode.ToHand or DispenseMode.SingleOutput or DispenseMode.ContinuousOutput))
+                return false;
+            if (Mode != DispenseMode.ToHand)
+            {
+                warning = "World output requires at least one finite outlet pose and a positive continuous interval.";
+                if (Outlets == null || Outlets.Length == 0 || Mode == DispenseMode.ContinuousOutput && !InteractionValues.Positive(Interval))
+                    return false;
+                foreach (DispenserOutlet outlet in Outlets)
+                    if (outlet is not { IsValid: true })
+                        return false;
+            }
+            warning = string.Empty;
+            if (Mode == DispenseMode.ToHand && (!InteractionValues.Positive(PickupDuration) || !InteractionValues.Finite(OutputRotation)))
                 warning = "Dispenser pickup duration must be positive and finite, with a finite output rotation.";
             else if (!Unlimited && Stock <= 0)
                 warning = "Dispenser Stock must be a positive whole number.";

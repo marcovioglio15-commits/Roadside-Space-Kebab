@@ -32,6 +32,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Slice";
         [Tooltip("Deactivate the sliced item after this final step. Prefab outputs and running VFX keep their own lifetime.")]
         public bool Consume;
+        [Tooltip("When this consuming cut replaces a held item, carry all outputs together until Drop or Throw. Overlapping output shapes are separated once before the group starts carrying.")]
+        public bool KeepOutputsHeld;
         [Tooltip("Mesh substitutions on existing branches, optionally updating their MeshColliders.")]
         public ContactMeshReplacement[] Meshes = Array.Empty<ContactMeshReplacement>();
         [Tooltip("Complete material-slot replacements on existing renderers.")]
@@ -104,15 +106,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     warning = "Consumption must be the last Slice step; a consumed item cannot perform later cuts.";
                     return false;
                 }
+                if (step.Consume && step.KeepOutputsHeld && step.Spawns.Length == 0)
+                {
+                    warning = "Keep Outputs Held needs at least one replacement prefab on the consuming step.";
+                    return false;
+                }
                 if (!step.Consume && !ItemAppearanceSettings.TryValidate(step.Meshes, step.Materials, out warning))
                     return false;
                 foreach (SliceSpawn spawn in step.Spawns)
+                {
                     if (spawn == null || !SpawnManagementSettings.Prefab(spawn.Prefab) || !spawn.Prefab.activeSelf
                         || !InteractionValues.Finite(spawn.Position) || !InteractionValues.Finite(spawn.Rotation))
                     {
                         warning = "Choose active prefab roots and finite local poses for Slice outputs.";
                         return false;
                     }
+                    if (step.Consume && step.KeepOutputsHeld && !ObjectGrab.ValidateBody(spawn.Prefab, out warning))
+                        return false;
+                }
             }
             warning = string.Empty;
             return true;

@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
             if (!sections.Draw("Before Ejection", "Request an exact animation before applying the physical effect.", settings,
-                "AnimateBeforeEject", "ExternalAnimation", "AnimationIdentity", "WaitForAnimationReturn"))
+                "AnimateBeforeEject", "ExternalAnimation", "AnimationIdentity", "WaitForAnimationReturn", "ForceAutoReturn", "AnimationOverlap", "ReturnOverlap"))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             HoverControls.Field(settings, "AnimateBeforeEject", "Animate Before Trigger");
@@ -28,6 +28,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (settings.FindPropertyRelative("ExternalAnimation").boolValue)
                 Connection(settings.FindPropertyRelative("AnimationIdentity"));
             HoverControls.Field(settings, "WaitForAnimationReturn");
+            bool forceReturnAvailable = !settings.FindPropertyRelative("WaitForAnimationReturn").boolValue;
+            if (forceReturnAvailable)
+            {
+                HoverControls.Field(settings, "ForceAutoReturn");
+                forceReturnAvailable = settings.FindPropertyRelative("ForceAutoReturn").boolValue;
+            }
+            if ((EjectBehavior)settings.FindPropertyRelative("Behavior").enumValueIndex != EjectBehavior.BlackHole)
+                return;
+            HoverControls.Field(settings, "AnimationOverlap", "Start Overlap (%)");
+            if (forceReturnAvailable)
+                HoverControls.Field(settings, "ReturnOverlap", "Return Overlap (%)");
         }
 
         /// <summary>Selects a scene component even while the source prefab is isolated in Prefab Mode.</summary>

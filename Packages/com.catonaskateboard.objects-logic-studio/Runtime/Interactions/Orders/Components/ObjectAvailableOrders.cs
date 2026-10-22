@@ -230,6 +230,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (ticket.Completed || ticket.Candidate.Specificity != pass || !contact.ConsumedMatches(ticket.Candidate))
                         continue;
                     ticket.Completed = true;
+                    contact.OverrideConsumedPrice(ticket.Candidate.Entry);
                     ticket.Board?.Draw(ticket);
                     changed = true;
                     remaining--;

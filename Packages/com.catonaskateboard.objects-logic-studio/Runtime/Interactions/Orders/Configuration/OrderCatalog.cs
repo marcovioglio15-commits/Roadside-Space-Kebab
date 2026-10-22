@@ -44,6 +44,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
                 if (entry.TextStyle != null && !entry.TextStyle.TryValidate(out warning))
                     return false;
+                warning = $"Order '{entry.Name}' Price must be finite and between zero and ten thousand.";
+                if (entry.OverridePrice && !CollectedPrice.Valid(entry.Price))
+                    return false;
                 if (!ObjectFlagRules.TryValidate(entry.Flags, false, out warning))
                 {
                     warning = $"Order {index + 1}, Identity Flags: {warning}";

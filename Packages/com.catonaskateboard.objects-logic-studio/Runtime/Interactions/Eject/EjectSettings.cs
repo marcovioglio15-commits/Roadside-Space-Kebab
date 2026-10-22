@@ -47,6 +47,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string AnimationIdentity = string.Empty;
         [Tooltip("Wait for the automatic return and its delay when the selected animation schedules one. Otherwise the first endpoint releases Eject.")]
         public bool WaitForAnimationReturn;
+        [Tooltip("Hold the first endpoint until Eject finishes, then return to the animation's initial state using its automatic return settings. Available when waiting for the full return is disabled.")]
+        public bool ForceAutoReturn;
+        [Tooltip("Start Black Hole this percentage before the awaited animation duration ends. Zero waits for the animation; 25 starts at 75% progress.")]
+        [Range(0f, 100f)]
+        public float AnimationOverlap;
+        [Tooltip("Start the forced return this percentage before Black Hole ends. Zero returns at completion; 25 starts at 75% of its duration.")]
+        [Range(0f, 100f)]
+        public float ReturnOverlap;
         [Header("Ejection")]
         [Tooltip("Impulse ejects matching contacts immediately. Black Hole attracts filtered bodies to a selected collider before launching them.")]
         public EjectBehavior Behavior;
@@ -54,6 +62,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public BlackHoleSettings BlackHole = new BlackHoleSettings();
         [Tooltip("Apply one impulse to this object's own Rigidbody instead of searching for flagged contacts.")]
         public bool SelfEject;
+        [Tooltip("Require a matching weapon bullet impact and replace Self Impulse with its incoming velocity multiplied by Bullet Impulse Multiplier. The direction is captured before any prerequisite animation.")]
+        public bool UseBulletImpulse;
+        [Tooltip("Multiplier applied to the bullet's world velocity at firing time. Impulse mode then respects the ejected body's mass; Velocity Change uses the result directly.")]
+        [Range(0.001f, 10f)]
+        public float BulletImpulseMultiplier = 0.1f;
         [Tooltip("Single impulse for Self Eject. Flags are unused in this mode.")]
         public EjectRule SelfImpulse = new EjectRule();
         [Tooltip("Use a temporary physics profile during Self Eject, restoring authored settings on disable. A kinematic Rigidbody is prepared by Apply if needed.")]
@@ -107,6 +120,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (Behavior == EjectBehavior.BlackHole)
             {
+                warning = "Animation overlap percentages must be finite and between 0 and 100.";
+                if (AnimateBeforeEject && (!float.IsFinite(AnimationOverlap) || AnimationOverlap < 0f || AnimationOverlap > 100f
+                    || ForceAutoReturn && !WaitForAnimationReturn && (!float.IsFinite(ReturnOverlap) || ReturnOverlap < 0f || ReturnOverlap > 100f)))
+                    return false;
                 warning = "Configure Black Hole settings and a supported force mode.";
                 return BlackHole != null && Mode is (EjectForceMode.Impulse or EjectForceMode.VelocityChange)
                     && BlackHole.TryValidate(out warning) && ValidateLifetime(out warning);
@@ -118,12 +135,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (SelfEject && TemporaryPhysics && (Physics == null || !Physics.TryValidate(out warning)))
                 return false;
+            warning = "Bullet Impulse Multiplier must be positive and finite.";
+            if (SelfEject && UseBulletImpulse && !InteractionValues.Positive(BulletImpulseMultiplier))
+                return false;
             warning = "Use a finite non-negative contact tolerance, a supported force mode and at least one impulse rule.";
             if (Mode is not (EjectForceMode.Impulse or EjectForceMode.VelocityChange)
                 || !SelfEject && (!float.IsFinite(Tolerance) || Tolerance < 0f || Rules == null || Rules.Length == 0))
                 return false;
             for (int index = 0; index < (SelfEject ? 1 : Rules.Length); index++)
             {
+                if (SelfEject && UseBulletImpulse)
+                    break;
                 EjectRule rule = SelfEject ? SelfImpulse : Rules[index];
                 warning = "Each Eject rule needs flags, a finite non-zero impulse, Any or All matching, and Self or World space.";
                 if (rule == null || !InteractionValues.Finite(rule.Impulse) || rule.Impulse.sqrMagnitude <= 0f

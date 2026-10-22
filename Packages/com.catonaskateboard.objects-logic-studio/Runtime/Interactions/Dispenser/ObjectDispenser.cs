@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Starts carrying a new prefab or an original item recovered from this object's Container.</summary>
+    /// <summary>Supplies a prefab or stored original to the carry slot or an authored world outlet.</summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Object Dispenser")]
     public sealed class ObjectDispenser : ObjectInventoryInteraction
@@ -140,25 +140,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return !transferring && !settings.Unlimited && stored < (settings.UseContainer ? settings.Stock : dispensed);
         }
 
-        /// <summary>Commits stock only after an item has acquired the observer's empty carry slot.</summary>
+        /// <summary>Commits stock only after carrying succeeds or an item is released at the selected world outlet.</summary>
         /// <param name="observer">Player receiving one object.</param>
-        /// <param name="grab">Receives the object now being carried.</param>
+        /// <param name="grab">Receives the carried object; world output leaves this null.</param>
         /// <returns>True for a successful atomic withdrawal.</returns>
         internal bool TryTake(HoverObserver observer, out ObjectGrab grab)
         {
             // A second button event cannot re-enter this transaction through lifecycle events.
             grab = null;
-            if (observer == null || observer.HeldObject != null || !CanTake())
+            bool carry = settings.Mode == DispenseMode.ToHand;
+            if (carry && (observer == null || observer.HeldObject != null) || !CanTake())
                 return false;
             transferring = true;
             try
             {
                 Vector3 position = transform.position;
                 Quaternion rotation = transform.rotation * Quaternion.Euler(settings.OutputRotation);
+                if (!carry)
+                {
+                    // Only the successful withdrawal path samples an outlet; held objects never block world output.
+                    DispenserOutlet outlet = settings.Outlets[Random.Range(0, settings.Outlets.Length)];
+                    position = transform.TransformPoint(outlet.Position);
+                    rotation = transform.rotation * Quaternion.Euler(outlet.Rotation);
+                }
                 if (UsesStored && Container != null && Container.HasStoredItem())
                 {
-                    if (!Container.TryTake(observer, position, rotation, out grab, transform, settings.PickupDuration))
+                    if (!Container.TryTake(observer, position, rotation, out grab, transform, settings.PickupDuration, carry))
                         return false;
+                    if (!carry)
+                        grab = null;
                 }
                 else
                 {
@@ -167,13 +177,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     GameObject created = ObjectSpawnHistory.Create(settings.Prefab, position, rotation);
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
                     ObjectGrab candidate = created.GetComponent<ObjectGrab>();
-                    if (candidate == null || !candidate.Begin(observer, transform, settings.PickupDuration) || !candidate.IsHeld)
+                    if (candidate == null || carry && (!candidate.Begin(observer, transform, settings.PickupDuration) || !candidate.IsHeld))
                     {
                         created.SetActive(false);
                         Destroy(created);
                         return false;
                     }
-                    grab = candidate;
+                    grab = carry ? candidate : null;
                     dispensed++;
                 }
                 withdrawals++;

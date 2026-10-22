@@ -40,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Vector3 Offset = new Vector3(0.35f, -0.2f, 1.5f);
         [Tooltip("Euler rotation in degrees relative to the selected carry frame.")]
         public Vector3 Rotation;
-        [Tooltip("Request the carry pose immediately on pickup, stopping at obstacles. Otherwise ease into it over Transition Duration.")]
+        [Tooltip("Place immediately at a clear carry pose without sweeping through obstacles around the original object. The destination and subsequent carry motion still respect world collisions.")]
         public bool Instant;
         [Tooltip("Seconds spent easing from the pickup pose to the moving carry pose.")]
         [Range(0.01f, 3f)]

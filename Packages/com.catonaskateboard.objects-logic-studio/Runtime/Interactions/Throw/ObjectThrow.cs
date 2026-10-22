@@ -53,8 +53,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Use an impulse or velocity change without multiplying a one-shot action by frame time.
             base.Execute(view);
-            Grab.Body.AddForce(trajectory.Direction(view.rotation) * trajectory.Strength,
-                trajectory.Mode == ThrowStrengthMode.Impulse ? ForceMode.Impulse : ForceMode.VelocityChange);
+            Vector3 launch = trajectory.Direction(view.rotation) * trajectory.Strength;
+            // A slice carrier separates in this input frame, before PhysX could integrate a queued impulse.
+            if (Grab.TryGetComponent(out SliceCarryGroup _))
+                Grab.Body.linearVelocity = launch / (trajectory.Mode == ThrowStrengthMode.Impulse ? Grab.Body.mass : 1f);
+            else
+                Grab.Body.AddForce(launch, trajectory.Mode == ThrowStrengthMode.Impulse ? ForceMode.Impulse : ForceMode.VelocityChange);
             Grab.Body.angularVelocity = view.rotation * trajectory.Spin;
             if (trajectory.Sound)
                 StudioAudio.Play("sfx_throw", transform);

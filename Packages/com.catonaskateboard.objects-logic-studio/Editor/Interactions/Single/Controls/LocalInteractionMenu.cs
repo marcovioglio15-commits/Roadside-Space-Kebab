@@ -14,7 +14,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Lists only supported interactions on the animation's exact object or the preset's sample source.</summary>
         /// <param name="property">Detached source descriptor receiving a menu selection.</param>
-        internal static void Draw(SerializedProperty property)
+        /// <param name="includeAnimations">Whether animation completions can also be selected.</param>
+        internal static void Draw(SerializedProperty property, bool includeAnimations = false)
         {
             // Component inspectors use the component's own object, even when its ObjectItem belongs to a parent.
             GameObject owner = property.serializedObject.targetObject is Component component
@@ -30,7 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             rect = EditorGUI.PrefixLabel(rect, new GUIContent("Source Interaction", property.tooltip));
             using (new EditorGUI.DisabledScope(owner == null))
                 if (GUI.Button(rect, new GUIContent(label, property.tooltip), EditorStyles.popup))
-                    Show(property, owner, selected, rect);
+                    Show(property, owner, selected, rect, includeAnimations);
         }
 
         /// <summary>Builds the component list on demand and guards delayed choices against workspace changes.</summary>
@@ -38,7 +39,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="owner">Exact object supplying source cards.</param>
         /// <param name="selected">Currently resolved source, if present.</param>
         /// <param name="rect">Popup anchor in the current editor window.</param>
-        private static void Show(SerializedProperty property, GameObject owner, ObjectInteraction selected, Rect rect)
+        /// <param name="includeAnimations">Whether animation cards are valid sources for this selection.</param>
+        private static void Show(SerializedProperty property, GameObject owner, ObjectInteraction selected, Rect rect, bool includeAnimations)
         {
             UnityEngine.Object target = property.serializedObject.targetObject;
             string path = property.propertyPath;
@@ -47,7 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Bind a snapshot of the selected card; no source GameObject reference enters a preset.
             foreach (ObjectInteraction candidate in owner.GetComponents<ObjectInteraction>())
             {
-                if (candidate is ObjectTriggerAnimation || InteractionTemplateKinds.Of(candidate) is not InteractionTemplateKind kind)
+                if (candidate is ObjectTriggerAnimation && !includeAnimations || InteractionTemplateKinds.Of(candidate) is not InteractionTemplateKind kind)
                     continue;
                 LocalInteractionReference reference = LocalInteractionReference.Capture(candidate);
                 string label = kind + "/" + candidate.InteractionName + " [" + (reference.Occurrence + 1) + "]";

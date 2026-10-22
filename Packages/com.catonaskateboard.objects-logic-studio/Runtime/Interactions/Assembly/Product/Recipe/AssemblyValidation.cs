@@ -45,6 +45,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings == null || settings.Ingredients == null || settings.Ingredients.Length == 0
                 || settings.Magnets == null || settings.Magnets.Length == 0 || settings.InteractionRules == null)
                 return false;
+            warning = "Recipe Price must be finite and between zero and ten thousand.";
+            if (settings.PriceEnabled && !CollectedPrice.Valid(settings.Price))
+                return false;
             // A product with Grab inherits that feature's binding and targeting; standalone products need their own.
             if (settings.ProlongedAssembly)
             {

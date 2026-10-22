@@ -12,7 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region State
 
-        private enum Phase { Delay, Arrival, Waiting, Departure, Transition, Stopped, Entering }
+        private enum Phase { Delay, Arrival, Waiting, Departure, Transition, Stopped, Entering, AwaitingStart, Resetting }
         private static SpawnFlowRun active;
         private readonly ObjectSpawnManager owner;
         private readonly SpawnFlowPlan plan;
@@ -30,7 +30,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int completed;
         private int total;
         private float remaining;
+        private float dayRemaining;
         private bool signaled;
+        private ObjectInteraction startInteraction;
+        private SpawnFlowSceneState sceneState;
 
         #endregion
 
@@ -40,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal int Day => phase == Phase.Stopped ? 0 : day + 1;
         /// <summary>Number of completed steps in the current day.</summary>
         internal int Completed => completed;
-        /// <summary>Spawn budget drawn once at the start of the current day.</summary>
+        /// <summary>Fixed spawn budget drawn once at day start, or zero in timer mode.</summary>
         internal int Total => phase == Phase.Stopped ? 0 : total;
 
         #endregion
@@ -104,6 +107,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Disabling or destroying the manager cannot strand input, suspended visitors or an active fade.
             phase = Phase.Stopped;
             ObjectInteraction.Signaled -= Observe;
+            startInteraction = null;
+            sceneState?.Dispose();
+            sceneState = null;
             SceneManager.activeSceneChanged -= SceneChanged;
             RemoveInstance();
             if (active != this)
@@ -122,6 +128,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (phase is Phase.Transition or Phase.Stopped or Phase.Entering)
                 return;
             RemoveInstance();
+            sceneState?.Dispose();
+            sceneState = null;
             if (next.path == plan.Days[day].Scene)
                 StartDay();
             else
@@ -137,14 +145,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Draws a fresh daily budget and prepares the first visitor.</summary>
         private void StartDay()
         {
+            // Keep reset animations dormant throughout the fade, then restore their normal activation for this day.
+            sceneState?.Dispose();
+            sceneState = null;
             // Scene retention must not retain yesterday's music playback position.
             StudioAudio.RestartMusic();
             // Random counts include both endpoints and are drawn once, including when the plan loops.
             SpawnFlowDay settings = plan.Days[day];
             completed = 0;
-            total = settings.RandomCount ? random.Next(settings.Minimum, settings.Maximum + 1) : settings.Count;
+            total = settings.LengthMode == DayLengthMode.Timer ? 0 : settings.RandomCount ? random.Next(settings.Minimum, settings.Maximum + 1) : settings.Count;
+            dayRemaining = settings.DayDuration;
             MenuSceneOverlay.Ensure(plan.PauseScene);
-            PrepareStep();
+            if (!SpawnFlowSceneState.Bind(settings, out startInteraction))
+            {
+                Fail("Day Flow could not resolve its first-spawn scene interaction. Select it again in the day plan.");
+                return;
+            }
+            if (settings.WaitBeforeFirstSpawn)
+            {
+                phase = Phase.AwaitingStart;
+                signaled = false;
+            }
+            else
+                PrepareStep();
             owner.Signal(InteractionMoment.Started);
         }
 
@@ -190,7 +213,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             // Completed events are retained while the manager is temporarily locked.
-            if (phase is Phase.Transition or Phase.Stopped || Time.timeScale <= 0f || !owner.Available(InteractionChannels.Spawn))
+            if (phase is Phase.Transition or Phase.Stopped || Time.timeScale <= 0f)
+                return;
+            if (phase == Phase.Resetting)
+            {
+                if (sceneState.Tick(Time.deltaTime))
+                    CompleteDay();
+                return;
+            }
+            // Admission time starts only after the optional scene gate; the current visitor retains its full completion cycle.
+            if (plan.Days[day].LengthMode == DayLengthMode.Timer && phase != Phase.AwaitingStart)
+            {
+                dayRemaining -= Time.deltaTime;
+                if (dayRemaining <= 0f && phase == Phase.Delay)
+                {
+                    FinishDay();
+                    return;
+                }
+            }
+            if (!owner.Available(InteractionChannels.Spawn))
                 return;
             if (phase is Phase.Arrival or Phase.Waiting or Phase.Departure && (instance == null || !instance.activeSelf))
             {
@@ -199,6 +240,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             switch (phase)
             {
+                case Phase.AwaitingStart:
+                    if (signaled)
+                    {
+                        startInteraction = null;
+                        PrepareStep();
+                    }
+                    break;
                 case Phase.Delay:
                     remaining -= Time.deltaTime;
                     if (remaining <= 0f)
@@ -274,6 +322,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="moment">Successful lifecycle boundary.</param>
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
+            // Only a completion after this day's start opens the first spawn; unrelated scene events are ignored.
+            if (phase == Phase.AwaitingStart && source == startInteraction && moment == InteractionMoment.Completed)
+                signaled = true;
             // Dialogue starts, page advances, interruptions and completions from other clones do not advance the day.
             if (phase == Phase.Waiting && moment == InteractionMoment.Completed && completion.Observe(source))
             {
@@ -288,11 +339,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Disable immediately so the next spawn cannot overlap a still-active outgoing visitor.
             RemoveInstance();
             completed++;
-            if (completed < total)
+            if (plan.Days[day].LengthMode == DayLengthMode.Timer ? dayRemaining > 0f : completed < total)
             {
                 PrepareStep();
                 return;
             }
+            FinishDay();
+        }
+
+        /// <summary>Closes admission and begins all authored scene returns before publishing day completion.</summary>
+        private void FinishDay()
+        {
+            phase = Phase.Resetting;
+            sceneState = SpawnFlowSceneState.Reset(plan.Days[day], owner);
+            if (sceneState.Tick(0f))
+                CompleteDay();
+        }
+
+        /// <summary>Publishes day completion only after every scene return, then begins the next scene or local fade.</summary>
+        private void CompleteDay()
+        {
             phase = Phase.Transition;
             owner.Signal(InteractionMoment.Completed);
             if (owner == null || !owner.isActiveAndEnabled)
@@ -347,6 +413,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Spawned products unrelated to the visitor remain in their own scene until normal scene unload.
             if (instance != null)
             {
+                ObjectContactModifier.EndPrices(instance);
                 instance.SetActive(false);
                 Object.Destroy(instance);
             }

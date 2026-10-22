@@ -114,6 +114,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (!configuration.Contact.TryValidate(out warning))
                 return false;
+            if (System.Array.Exists(configuration.Steps, step => step.Consume && step.KeepOutputsHeld)
+                && TryGetComponent(out ObjectGrab grab) && grab.enabled)
+            {
+                ObjectDrop drop = GetComponent<ObjectDrop>();
+                ObjectThrow throwing = GetComponent<ObjectThrow>();
+                warning = "Keep Outputs Held requires an enabled Drop or Throw with a valid action on the sliced item.";
+                if (!(drop != null && drop.enabled && drop.TryValidate(out _))
+                    && !(throwing != null && throwing.enabled && throwing.TryValidate(out _)))
+                    return false;
+            }
             if (configuration.Contact.Enabled)
             {
                 // A flagged-contact condition needs an owned primitive or convex shape to query.

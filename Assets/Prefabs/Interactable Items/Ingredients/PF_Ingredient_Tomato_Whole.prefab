@@ -428,6 +428,7 @@ MonoBehaviour:
     Steps:
     - Name: Slice 1
       Consume: 1
+      KeepOutputsHeld: 1
       Meshes: []
       Materials: []
       Spawns:

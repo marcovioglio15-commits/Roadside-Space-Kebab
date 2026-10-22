@@ -96,7 +96,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (input.Usable && Time.timeScale > 0f)
                 foreach (ObjectInteractionUnlock rule in items)
-                    if (rule != null)
+                    if (rule != null && InteractionProjectileInput.Allows(rule))
                         rule.Tick(observer.Player);
             input.ClearSignals();
         }

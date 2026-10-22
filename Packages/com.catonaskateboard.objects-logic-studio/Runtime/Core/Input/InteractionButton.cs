@@ -12,19 +12,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool pending;
         private bool pressed;
         private InputControl control;
+        private int consumedPulse = -1;
 
         #endregion
 
         #region Properties
 
         /// <summary>Whether an enabled button has performed since the last observer dispatch.</summary>
-        internal bool Pending => pending && action.enabled;
+        internal bool Pending => InteractionProjectileInput.Active
+            ? InteractionProjectileInput.Matches(action) && consumedPulse != InteractionProjectileInput.Serial
+            : pending && action.enabled && !InteractionProjectileInput.Blocks(action);
         /// <summary>Fresh button actuation, including actions whose performed callback waits for Hold.</summary>
-        internal bool Pressed => pressed && action.enabled;
+        internal bool Pressed => InteractionProjectileInput.Active ? Pending : pressed && action.enabled && !InteractionProjectileInput.Blocks(action);
         /// <summary>Whether the owning PlayerInput currently enables this action.</summary>
         internal bool Enabled => action.enabled;
         /// <summary>Current held state from the player's private action, independent of buffered presses.</summary>
-        internal bool Held => action.enabled && action.IsPressed();
+        internal bool Held => InteractionProjectileInput.Active ? Pending : action.enabled && action.IsPressed() && !InteractionProjectileInput.Blocks(action);
 
         #endregion
 
@@ -103,6 +106,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Consumes the frame's buffered event after target arbitration.</summary>
         internal void Clear()
         {
+            // Consuming a virtual hit never erases unrelated physical presses buffered for the normal pass.
+            if (InteractionProjectileInput.Active)
+            {
+                if (InteractionProjectileInput.Matches(action))
+                    consumedPulse = InteractionProjectileInput.Serial;
+                return;
+            }
             // All candidates see the same event before this shared reset.
             pending = pressed = false;
         }

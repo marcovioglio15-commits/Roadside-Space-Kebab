@@ -62,7 +62,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 Add(locomotion);
             }
             if (!state.Input.TryPrepare(state.Selection.Master != null ? state.Selection.Master.InputPreset : null,
-                    out SerializedObject input, out warning))
+                    out SerializedObject input, out warning, PlayerToolsAuthoring.AllowsSwitching(state)))
                 return false;
             Add(input);
             if (!state.Camera.TryPrepare(state.Selection.Master != null ? state.Selection.Master.CameraPreset : null,

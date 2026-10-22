@@ -217,6 +217,9 @@ MonoBehaviour:
     ExternalAnimation: 1
     AnimationIdentity: GlobalObjectId_V1-2-aaf7f12b272a0594bad61f802187bcc0-8964409603296850226-1373450179099226014
     WaitForAnimationReturn: 0
+    ForceAutoReturn: 1
+    AnimationOverlap: 25
+    ReturnOverlap: 5
     Behavior: 1
     BlackHole:
       ColliderPath: 
@@ -589,7 +592,7 @@ ParticleSystem:
       m_RotationOrder: 4
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
-  scalingMode: 1
+  scalingMode: 0
   randomSeed: 0
   InitialModule:
     serializedVersion: 3

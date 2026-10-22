@@ -148,7 +148,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     case 1 when state.Locomotion.Source != null || state.Locomotion.HasChanges:
                         return PlayerLocomotionDraftView.Draw(state.Locomotion, owner, sections);
                     case 2 when state.Input.Source != null || state.Input.HasChanges:
-                        return DrawModule(state.Input, owner, false);
+                        return DrawModule(state.Input, owner, false, PlayerToolsAuthoring.AllowsSwitching(state));
                     case 4 when state.Tools.Source != null || state.Tools.HasChanges:
                         return PlayerToolsControls.Draw(state, owner);
                     case 3 when state.Camera.Source != null || state.Camera.HasChanges:
@@ -167,8 +167,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="session">Retained module draft.</param>
         /// <param name="owner">Window owning the serialized draft.</param>
         /// <param name="camera">Whether to use conditional Camera controls.</param>
+        /// <param name="switching">Whether the selected player uses tool selection commands.</param>
         /// <returns>True when serialized draft values changed.</returns>
-        private bool DrawModule(PlayerModuleEditSession session, UnityEngine.Object owner, bool camera)
+        private bool DrawModule(PlayerModuleEditSession session, UnityEngine.Object owner, bool camera, bool switching = true)
         {
             // Property fields target the temporary copy, never the saved asset.
             SerializedObject serialized = session.GetEditor(owner);
@@ -186,9 +187,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     using (new EditorGUI.IndentLevelScope())
                         PlayerPresetField.DrawAction(serialized, "jumpAction");
                         PlayerPresetField.DrawAction(serialized, "crouchAction");
-                if (sections.Draw("Input.Tools", "Use Tool"))
+                if (sections.Draw("Input.Tools", "Tool Commands"))
                     using (new EditorGUI.IndentLevelScope())
-                        PlayerToolsControls.DrawInput(serialized);
+                        PlayerToolsControls.DrawInput(serialized, switching);
                 if (sections.Draw("Input.Camera", "Camera"))
                     using (new EditorGUI.IndentLevelScope())
                     {

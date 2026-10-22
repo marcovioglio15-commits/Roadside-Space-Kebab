@@ -104,6 +104,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // The router never enables maps, changes cursor state or locks the controller.
             Bind(observer);
+            // A hit on another object cannot interrupt or advance the dialogue currently owning the HUD.
+            if (InteractionProjectileInput.Active && active != null && !InteractionProjectileInput.Allows(active))
+                return null;
             input.Consume(singles.AssemblyButton);
             input.Consume(AssemblyInteractionRegistry.Consumed);
             foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
@@ -135,7 +138,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ObjectDialogue selected = null;
             // Observe all ranges even while another dialogue is speaking, so completed entries rearm on departure.
             foreach (KeyValuePair<ObjectDialogue, Buttons> pair in bindings)
-                if (pair.Key != null && pair.Key.CanStart(player) && active == null && pair.Value.Advance.Enabled
+                if (pair.Key != null && InteractionProjectileInput.Allows(pair.Key)
+                    && (!InteractionProjectileInput.Active || !pair.Key.ArrivalOnly && pair.Key.Settings.Trigger == DialogueTrigger.InputAction)
+                    && pair.Key.CanStart(player) && active == null && pair.Value.Advance.Enabled
                     && (pair.Key.ArrivalOnly || pair.Key.Settings.Trigger != DialogueTrigger.InputAction || pair.Value.Start.Pending)
                     && (selected == null || pair.Key.Settings.Priority > selected.Settings.Priority
                         || pair.Key.Settings.Priority == selected.Settings.Priority

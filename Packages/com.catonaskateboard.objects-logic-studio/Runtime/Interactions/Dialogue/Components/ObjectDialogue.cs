@@ -72,6 +72,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int line;
         private int nextEntry;
         private bool armed = true;
+        private bool projectileStarted;
         private bool retained;
         private bool awaitingSight;
         private DialogueHud hud;
@@ -219,7 +220,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float distance = (transform.position - player.position).sqrMagnitude;
             if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
                 armed = true;
-            return !IsSpeaking && distance <= settings.Distance * settings.Distance && eligible.Count > 0
+            return !IsSpeaking && (InteractionProjectileInput.Active || distance <= settings.Distance * settings.Distance) && eligible.Count > 0
                 && (armed || settings.Trigger == DialogueTrigger.InputAction && settings.ReplayOnInput
                     || settings.Trigger == DialogueTrigger.Consumption && (startedRevision != Item.ConsumptionRevision
                         || contact != null && contact.AwaitingContact && startedContactRevision != contact.ContactRevision));
@@ -232,7 +233,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // No controller, cursor or movement state is changed when range is lost.
             return Available(InteractionChannels.Dialogue) && hud != null && hud.Ready
-                && (arrivalOnly || (transform.position - player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance);
+                && (arrivalOnly || projectileStarted || (transform.position - player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance);
         }
 
         /// <summary>Rebuilds the compact entry catalog only after consumption history changes.</summary>
@@ -275,7 +276,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanPresent(HoverObserver observer, DialogueVisibility visibility, bool continuing)
         {
             // After sight interrupts a running page, wait for visibility before applying its resume/restart policy.
-            if (arrivalOnly || (continuing ? !settings.HideWhenSightLost : !settings.RequireSightToStart && !awaitingSight))
+            if (arrivalOnly || InteractionProjectileInput.Active || continuing && projectileStarted
+                || (continuing ? !settings.HideWhenSightLost : !settings.RequireSightToStart && !awaitingSight))
                 return true;
             bool visible = visibility.HasSight(observer, this);
             if (visible || continuing)
@@ -290,7 +292,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanAdvance(HoverObserver observer, DialogueVisibility visibility)
         {
             // Blocking an advance does not interrupt presentation or change its retained page.
-            return arrivalOnly || !settings.RequireSightToContinue || visibility.HasSight(observer, this);
+            return arrivalOnly || InteractionProjectileInput.Active || !settings.RequireSightToContinue || visibility.HasSight(observer, this);
         }
 
         #endregion
@@ -370,6 +372,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.Trigger == DialogueTrigger.Consumption && contact != null && contact.AwaitingContact)
                 handledAwaitingRevision = contact.ContactRevision;
             IsSpeaking = true;
+            projectileStarted = InteractionProjectileInput.Active;
             arrivalPending = false;
             audio.Begin(settings.Audio, transform, arrivalCue);
             arrivalCue = false;
