@@ -61,6 +61,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             ItemAppearanceControls.DrawList(step.FindPropertyRelative("Materials"), source, false);
                         }
                         DrawSpawns(step.FindPropertyRelative("Spawns"));
+                        if (step.FindPropertyRelative("Consume").boolValue && step.FindPropertyRelative("Spawns").arraySize > 0)
+                            HoverControls.Field(step, "KeepOutputsHeld");
                     }
                 }
             }
@@ -70,6 +72,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty added = steps.GetArrayElementAtIndex(steps.arraySize - 1);
                 added.FindPropertyRelative("Name").stringValue = "Slice " + steps.arraySize;
                 added.FindPropertyRelative("Consume").boolValue = false;
+                added.FindPropertyRelative("KeepOutputsHeld").boolValue = false;
                 added.FindPropertyRelative("Meshes").arraySize = 0;
                 added.FindPropertyRelative("Materials").arraySize = 0;
                 added.FindPropertyRelative("Spawns").arraySize = 0;

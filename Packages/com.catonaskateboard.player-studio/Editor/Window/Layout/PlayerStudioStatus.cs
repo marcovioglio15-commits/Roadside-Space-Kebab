@@ -26,7 +26,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             bool isValid = TryGetPreviewSettings(state, out _, out string warning);
             if (isValid && (state.Transform.HasChanges && !state.Transform.TryValidateNumbers(out warning)
                 || state.Locomotion.HasChanges && !state.Locomotion.TryValidate(out warning)
-                || state.Input.HasChanges && !state.Input.TryValidate(out warning)
+                || state.Input.HasChanges && !state.Input.TryValidate(out warning, PlayerToolsAuthoring.AllowsSwitching(state))
                 || state.Camera.HasChanges && !state.Camera.TryValidate(out warning)
                 || state.Tools.HasChanges && !state.Tools.TryValidate(out warning)))
                 isValid = false;

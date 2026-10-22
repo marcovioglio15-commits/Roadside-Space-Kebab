@@ -31,6 +31,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             main.playOnAwake = false;
             main.loop = true;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+            main.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
             main.maxParticles = 256;
             main.startLifetime = Mathf.Max(0.5f, settings.Radius / settings.AirSpeed + 0.5f);
             main.startSpeed = 0f;

@@ -12,6 +12,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7606ca6142c12d34d973bc21ea52b7de, type: 3}
   m_Name: Player Tool A
   m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerTool
-  DisplayName: Tool
+  DisplayName: Plasma Blaster
   SwitchIn: {fileID: 0}
   SwitchOut: {fileID: 0}
+  UseAnimation: {fileID: 11400000, guid: 6825bcfb0ed086744ba0c14e49484c4e, type: 2}
+  UseInterval: 0.22
+  IsWeapon: 1
+  InteractOnBulletImpact: 1
+  Weapon:
+    MuzzlePath: 
+    MuzzlePosition: {x: 0.047999978, y: 0.0084, z: 0.87900007}
+    MuzzleRotation: {x: 0, y: 0, z: 0}
+    Bullet: {fileID: 1004704275401146556, guid: 2d99985baae67e447a2b4292781b8464, type: 3}
+    Speed: 15
+    Distance: 70
+    Radius: 0
+    Layers:
+      serializedVersion: 2
+      m_Bits: 16193
+    HitTriggers: 0
+    Capacity: 12
+    Impact: {fileID: 8532630750271246076, guid: 949c50cb6e0bf6d46814c9cb3089a06a, type: 3}
+    AutomaticImpactPlacement: 1
+    ImpactPlacementMode: 0
+    ImpactPenetration: 0.25
+    ImpactScale: 0.15
+    ImpactLifetime: 1.2
+    ImpactOrientation: 1
+    ImpactSurfaceAligned: 1
+    ImpactRotation: {x: 0, y: 0, z: 0}
+    ImpactOffset: 0.01
+    ImpactAtRange: 0
+    AutoAim: 1
+    AimPath: 
+    AimDistance: 70
+    AimResponse: 10
+    RepositionAim: 1
+    RepositionDistance: 1.5
+    RepositionRadius: 0.06
+    RepositionResponse: 18
+    AlignBeforeShot: 0
+    ShotAlignmentDuration: 0.12
+    ShotAlignmentSamples: 24
+  ReloadEnabled: 1
+  AutoReload: 1
+  ReloadCombo:
+  - {fileID: 11400000, guid: 66bdce2abbb0a3c42bcd9559b4b594d4, type: 2}
+  - {fileID: 11400000, guid: 09618b02ba3918440aad6b3682018d25, type: 2}
+  - {fileID: 11400000, guid: 887e64c6a022a2045b84e9863ee12364, type: 2}

@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Positions a nozzle against shared source geometry in an isolated editor viewport.</summary>
-    internal sealed class SprayNozzleWindow : EditorWindow
+    /// <summary>Positions spray nozzles and dispenser outlets against shared geometry in one isolated viewport.</summary>
+    internal sealed class OutletLayoutWindow : EditorWindow
     {
         #region Fields
         [Header("Preview")]
-        [Tooltip("Independent nozzle Apply and Discard transaction.")]
+        [Tooltip("Independent output layout Apply and Discard transaction.")]
         [SerializeField]
-        private SprayLayoutSession session = new SprayLayoutSession();
+        private OutletLayoutSession session = new OutletLayoutSession();
         [Tooltip("Orbit angles retained by the preview.")]
         [SerializeField]
         private Vector2 orbit = new Vector2(25f, 145f);
@@ -24,8 +24,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Active transform handle.")]
         [SerializeField]
         private int mode;
+        [Tooltip("Output point currently edited by the preview handles.")]
+        [SerializeField]
+        private int selected;
         private readonly AssemblyPreviewGeometry geometry = new AssemblyPreviewGeometry();
-        private readonly AssemblyPreviewNavigation navigation = new AssemblyPreviewNavigation();
+        private readonly StudioPreviewNavigation navigation = new StudioPreviewNavigation();
         private readonly AssemblyProductSettings geometrySettings = new AssemblyProductSettings();
         private PreviewRenderUtility preview;
         private SerializedObject data;
@@ -35,18 +38,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #endregion
         #region Methods
         #region Lifecycle
-        /// <summary>Opens an independent nozzle transaction from the selected Spray Sauce card.</summary>
+        /// <summary>Opens an independent layout transaction from the selected spray or dispenser card.</summary>
         /// <param name="workspace">Main tool containing the pending emitter settings.</param>
-        internal static void Open(ObjectWorkspace workspace)
+        /// <param name="dispenser">Whether to edit multiple dispenser points instead of a single spray nozzle.</param>
+        internal static void Open(ObjectWorkspace workspace, bool dispenser)
         {
-            SprayNozzleWindow window = GetWindow<SprayNozzleWindow>("Nozzle Layout");
+            OutletLayoutWindow window = GetWindow<OutletLayoutWindow>(dispenser ? "Outlet Layout" : "Nozzle Layout");
             if (window.session.HasChanges)
             {
-                window.status = "Apply or Discard before opening another nozzle.";
+                window.status = "Apply or Discard before opening another layout.";
                 window.Show();
                 return;
             }
-            window.session.Read(workspace);
+            window.session.Read(workspace, dispenser);
+            window.selected = 0;
+            window.titleContent = new GUIContent(dispenser ? "Outlet Layout" : "Nozzle Layout");
             window.cached = null;
             window.dirty = true;
             window.Show();
@@ -123,31 +129,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                if (GUILayout.Toggle(mode == 0, new GUIContent(EditorGUIUtility.IconContent("MoveTool").image, "Move nozzle"), EditorStyles.toolbarButton, GUILayout.Width(36f)))
-                    mode = 0;
-                if (GUILayout.Toggle(mode == 1, new GUIContent(EditorGUIUtility.IconContent("RotateTool").image, "Rotate nozzle"), EditorStyles.toolbarButton, GUILayout.Width(36f)))
-                    mode = 1;
+                StudioOutletHandles.Toolbar(ref mode);
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button(new GUIContent("Frame", "Fit the object in the preview."), EditorStyles.toolbarButton, GUILayout.Width(60f)))
                     Frame();
             }
-            data.Update();
-            StudioFieldGUI.PropertyField(data.FindProperty("session.Draft.Position"));
-            StudioFieldGUI.PropertyField(data.FindProperty("session.Draft.Rotation"));
-            data.ApplyModifiedProperties();
-            // Reserve the viewport after Unity has measured headers and wrapped vector controls.
-            Rect viewport = GUILayoutUtility.GetRect(1f, 100f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            DrawViewport(viewport);
+            Points();
+            if (session.Draft.Points is { Length: > 0 })
+            {
+                selected = Mathf.Clamp(selected, 0, session.Draft.Points.Length - 1);
+                data.Update();
+                SerializedProperty point = data.FindProperty("session.Draft.Points").GetArrayElementAtIndex(selected);
+                StudioFieldGUI.PropertyField(point.FindPropertyRelative("Position"));
+                StudioFieldGUI.PropertyField(point.FindPropertyRelative("Rotation"));
+                data.ApplyModifiedProperties();
+                // Reserve the viewport after Unity has measured headers and wrapped vector controls.
+                Rect viewport = GUILayoutUtility.GetRect(1f, 100f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                DrawViewport(viewport);
+            }
+            else
+                EditorGUILayout.LabelField("Add an outlet to place it in the preview.", EditorStyles.miniLabel);
             hasUnsavedChanges = session.HasChanges;
-            saveChangesMessage = "Apply or discard the pending nozzle layout.";
+            saveChangesMessage = "Apply or discard the pending outlet layout.";
             using EditorGUILayout.VerticalScope footer = new EditorGUILayout.VerticalScope(GUILayout.Height(52f));
             EditorGUILayout.LabelField(status.Length > 0 ? status : hasUnsavedChanges ? "Pending layout" : "Applied layout", EditorStyles.miniLabel);
             using (new StudioButton.RowScope())
             using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
             {
-                if (StudioButton.Draw(new GUIContent("Apply", "Save the nozzle pose."), expandWidth: true, minimumHeight: 26f))
+                if (StudioButton.Draw(new GUIContent("Apply", "Save only these outlet poses."), expandWidth: true, minimumHeight: 26f))
                     SaveChanges();
-                if (StudioButton.Draw(new GUIContent("Discard", "Reload the applied nozzle pose."), expandWidth: true, minimumHeight: 26f))
+                if (StudioButton.Draw(new GUIContent("Discard", "Reload the applied outlet poses."), expandWidth: true, minimumHeight: 26f))
                     DiscardChanges();
             }
         }
@@ -192,24 +203,51 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Updates only the detached nozzle with standard move and rotate handles.</summary>
         private void DrawHandle()
         {
-            SprayNozzle nozzle = session.Draft;
-            if (!nozzle.IsValid())
+            DispenserOutlet nozzle = session.Draft.Points[selected];
+            if (!nozzle.IsValid)
                 return;
             Quaternion rotation = Quaternion.Euler(nozzle.Rotation);
-            float size = HandleUtility.GetHandleSize(nozzle.Position) * 0.35f;
-            Handles.color = new Color(0.25f, 0.9f, 0.75f);
-            Handles.ArrowHandleCap(0, nozzle.Position, rotation, size, EventType.Repaint);
-            if (Event.current.alt || navigation.Active)
-                return;
-            EditorGUI.BeginChangeCheck();
-            Vector3 point = mode == 0 ? Handles.PositionHandle(nozzle.Position, rotation) : nozzle.Position;
-            Quaternion turn = mode == 1 ? Handles.RotationHandle(rotation, point) : rotation;
-            if (!EditorGUI.EndChangeCheck())
+            for (int index = 0; index < session.Draft.Points.Length; index++)
+                if (session.Draft.Points[index] is { IsValid: true } outlet)
+                    StudioOutletHandles.Marker(outlet.Position, Quaternion.Euler(outlet.Rotation), index == selected);
+            Vector3 point = nozzle.Position;
+            if (!StudioOutletHandles.Edit(ref point, ref rotation, mode, navigation.Active))
                 return;
             Undo.RecordObject(this, "Place Nozzle");
             nozzle.Position = point;
-            nozzle.Rotation = turn.eulerAngles;
+            nozzle.Rotation = rotation.eulerAngles;
             Repaint();
+        }
+        /// <summary>Selects, appends or removes independent dispenser points without modifying the source component.</summary>
+        private void Points()
+        {
+            if (!session.Dispenser)
+                return;
+            int count = session.Draft.Points?.Length ?? 0;
+            using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
+            using (new EditorGUI.DisabledScope(selected <= 0))
+                if (GUILayout.Button(new GUIContent("◀", "Edit the previous outlet."), GUILayout.Width(28f)))
+                    selected--;
+            EditorGUILayout.LabelField(count > 0 ? "Outlet " + (selected + 1) + " / " + count : "No outlets", EditorStyles.miniLabel);
+            using (new EditorGUI.DisabledScope(selected >= count - 1))
+                if (GUILayout.Button(new GUIContent("▶", "Edit the next outlet."), GUILayout.Width(28f)))
+                    selected++;
+            if (GUILayout.Button(new GUIContent("+", "Add a new output point."), GUILayout.Width(28f)))
+            {
+                Undo.RecordObject(this, "Add Outlet");
+                System.Array.Resize(ref session.Draft.Points, count + 1);
+                selected = session.Draft.Points.Length - 1;
+                session.Draft.Points[selected] = new DispenserOutlet();
+            }
+            using (new EditorGUI.DisabledScope(count <= 1))
+                if (GUILayout.Button(new GUIContent("−", "Remove the selected output point."), GUILayout.Width(28f)))
+                {
+                    Undo.RecordObject(this, "Remove Outlet");
+                    for (int index = selected; index < session.Draft.Points.Length - 1; index++)
+                        session.Draft.Points[index] = session.Draft.Points[index + 1];
+                    System.Array.Resize(ref session.Draft.Points, session.Draft.Points.Length - 1);
+                    selected = Mathf.Min(selected, session.Draft.Points.Length - 1);
+                }
         }
         /// <summary>Fits the current source mesh without changing the nozzle pose.</summary>
         private void Frame()

@@ -26,6 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int gateGeneration = -1;
         private int gateSpawn;
         private readonly ContactConsumptionRejections rejections = new ContactConsumptionRejections();
+        private readonly ContactPriceRun price = new ContactPriceRun();
 
         #endregion
         #region Properties
@@ -89,7 +90,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             Item.PrepareSpawn(ObjectSpawnHistory.Source, ObjectSpawnHistory.Occurrence);
-            if (gateGeneration != ObjectSpawnHistory.Generation || gateSpawn != Item.Spawn.Index)
+            bool newSpawn = gateGeneration != ObjectSpawnHistory.Generation || gateSpawn != Item.Spawn.Index;
+            if (newSpawn)
             {
                 consumeEnabled = false;
                 rejections.Clear();
@@ -98,6 +100,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 gateGeneration = ObjectSpawnHistory.Generation;
                 gateSpawn = Item.Spawn.Index;
             }
+            price.Configure(settings.ConsumesAny ? settings.Price : null, gameObject, newSpawn);
             consumeDialogue = settings.ConsumesAny && settings.ConsumeOn.Enabled ? settings.ConsumeOn.Resolve(gameObject) : null;
             ObjectInteraction.Signaled += ObserveDialogue;
             // Runtime state needs distinct Unity identities for existing reservation and temporary-flag ownership.
@@ -141,13 +144,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (ContactModificationRun run in runs)
                 if (run != null)
                     run.Disable();
+            // Feature toggles and held animation/inventory suspension do not end the customer's lifetime.
+            if (!gameObject.activeInHierarchy && Item != null && !Item.Spawn.IsRetained)
+                price.EndLifetime();
             ready = false;
         }
 
         /// <summary>Releases the cached runtime containers when their owning object is destroyed.</summary>
         private void OnDestroy()
         {
+            price.EndLifetime();
             DisposeRuns();
+        }
+
+        /// <summary>Closes prices before a whole root is permanently removed, including collectors suspended during walk-out.</summary>
+        /// <param name="root">Visitor or physical root whose current lifetime is ending.</param>
+        internal static void EndPrices(GameObject root)
+        {
+            // Discovery occurs only at explicit despawn boundaries, never during ordinary frame updates.
+            foreach (ObjectContactModifier modifier in root.GetComponentsInChildren<ObjectContactModifier>(true))
+                modifier.price.EndLifetime();
         }
 
         /// <summary>Disposes per-rule Unity ownership identities outside the frame update path.</summary>
@@ -206,6 +222,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ObjectItem item = GetComponent<ObjectItem>();
             if (item == null || configuration == null || !configuration.TryValidate(out warning))
                 return false;
+            if (configuration.ConsumesAny && !configuration.Price.TryValidate(gameObject, out warning))
+                return false;
             if (configuration.ConsumesAny && configuration.ConsumeOn.Enabled && configuration.ConsumeOn.Resolve(gameObject) == null)
             {
                 warning = "Consume On must select an existing Dialogue on this same object.";
@@ -237,6 +255,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
         #region Events
+
+        /// <summary>Opens pricing before a consumption can deactivate its own collector or trigger despawn callbacks.</summary>
+        /// <param name="victim">Reserved physical item proposed for consumption.</param>
+        /// <param name="units">Positive logical units captured before deactivation.</param>
+        internal void BeginPrice(ObjectItem victim, int units)
+        {
+            // Publish confirms whether consumption succeeded before any price reaches the ledger.
+            price.Begin(victim, units);
+        }
 
         /// <summary>Retains solver-confirmed impacts without executing effects inside physics callbacks.</summary>
         /// <param name="candidate">Other item identified by the collision.</param>
@@ -316,12 +343,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="receipt">Consumed identity flags, or an empty array for non-consumption.</param>
         /// <param name="units">Number of logical units consumed by this completion.</param>
         /// <param name="ingredients">Captured assembly ingredient flags, or null for non-consumption events.</param>
-        internal void Publish(ContactModificationRun run, InteractionMoment moment, ObjectFlag[] receipt, int units, ObjectFlag[] ingredients = null)
+        /// <param name="victim">Consumed item retaining its recipe price, or null for non-consumption events.</param>
+        internal void Publish(ContactModificationRun run, InteractionMoment moment, ObjectFlag[] receipt, int units, ObjectFlag[] ingredients = null, ObjectItem victim = null)
         {
             signaling = run;
             consumedFlags = receipt;
             consumedIngredients = ingredients;
             ConsumedUnits = units;
+            if (moment == InteractionMoment.Completed)
+                price.Confirm(victim, units);
             if (units > 0)
             {
                 AwaitingContact = false;
@@ -337,7 +367,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 consumedFlags = Array.Empty<ObjectFlag>();
                 consumedIngredients = Array.Empty<ObjectFlag>();
                 ConsumedUnits = 0;
+                if (moment == InteractionMoment.Completed)
+                    price.Commit();
             }
+        }
+
+        /// <summary>Applies a ticket's price to the same receipt that fulfilled it, before HUD settlement.</summary>
+        /// <param name="order">Catalog entry whose open ticket accepted one consumed unit.</param>
+        internal void OverrideConsumedPrice(OrderEntry order)
+        {
+            price.Override(order);
         }
 
         /// <summary>Matches only the victim of the completion currently being published.</summary>

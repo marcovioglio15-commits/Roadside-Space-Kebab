@@ -15,7 +15,25 @@ MonoBehaviour:
   Days:
   - Name: Day 1
     Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_DaysTesting.unity
+    WaitBeforeFirstSpawn: 1
+    StartInteraction:
+      Path: PF_Shutter
+      Interaction:
+        Assigned: 1
+        Kind: 15
+        Name: Trigger Animation
+        Occurrence: 0
+    ResetAnimations: 2
+    AnimationsToReset:
+    - Path: PF_Shutter
+      Interaction:
+        Assigned: 1
+        Kind: 15
+        Name: Trigger Animation
+        Occurrence: 0
     RandomCount: 0
+    LengthMode: 1
+    DayDuration: 300
     Count: 1
     Minimum: 1
     Maximum: 3

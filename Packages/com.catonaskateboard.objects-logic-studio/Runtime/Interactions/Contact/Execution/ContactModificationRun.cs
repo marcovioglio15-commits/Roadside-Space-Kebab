@@ -441,15 +441,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Clear running first: deactivating the victim must not roll back an already completed tint.
             selfEffect.Commit();
             otherEffect.Commit();
-            if (!settings.Self.Consume && !settings.Other.Consume)
+            bool consumes = settings.Self.Consume || settings.Other.Consume;
+            if (!consumes)
                 completed.Add(other);
             running = false;
             ObjectFlag[] receipt = Array.Empty<ObjectFlag>();
             ObjectItem victim = settings.Self.Consume ? Item : other;
             int units = victim != null && victim.TryGetComponent(out ObjectGrab grab) ? grab.Units : 1;
             bool consumed = false;
-            ObjectFlag[] ingredients = (settings.Self.Consume || settings.Other.Consume) && victim != null
+            ObjectFlag[] ingredients = consumes && victim != null
                 && victim.TryGetComponent(out ObjectAssemblyProduct product) ? product.CaptureIngredientFlags() : null;
+            if (consumes)
+                owner.BeginPrice(victim, units);
             if (settings.Self.Consume)
                 consumed = other.Consume(Item, this, out receipt);
             else if (settings.Other.Consume)
@@ -474,7 +477,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else
                 Release();
             // Expose this receipt only during the exact completion event, including self-consumption.
-            owner.Publish(this, InteractionMoment.Completed, receipt, consumed ? units : 0, ingredients);
+            owner.Publish(this, InteractionMoment.Completed, receipt, consumed ? units : 0, ingredients, consumed ? victim : null);
         }
 
         /// <summary>Restores an active or completed temporary change after uninterrupted separation.</summary>

@@ -17,6 +17,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Consumption")]
         [Tooltip("Optional local dialogue completion required before consuming modifications may start. Non-consuming modifications remain available.")]
         public ContactDialogueGate ConsumeOn = new ContactDialogueGate();
+        [Tooltip("Collect recipe prices or order price overrides, with optional deferred HUD settlement for consumed items.")]
+        public ContactPriceSettings Price = new ContactPriceSettings();
 
         #endregion
 
@@ -81,6 +83,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         return false;
                     }
             }
+            warning = "Price collection settings are missing.";
+            if (ConsumesAny && (Price == null || !Price.TryValidate(null, out warning)))
+                return false;
             warning = string.Empty;
             if (ConsumesAny && (ConsumeOn == null || ConsumeOn.Enabled && (string.IsNullOrWhiteSpace(ConsumeOn.DialogueName) || ConsumeOn.Occurrence < 0)))
             {

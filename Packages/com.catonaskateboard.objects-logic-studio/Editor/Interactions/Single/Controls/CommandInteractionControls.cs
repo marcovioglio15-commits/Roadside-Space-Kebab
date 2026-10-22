@@ -63,13 +63,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             bool autoReturn = settings.FindPropertyRelative("AutoReturn").boolValue;
             if (autoReturn)
                 HoverControls.Field(settings, "ReturnDelay");
-            if (autoReturn || settings.FindPropertyRelative("Activation").enumValueIndex == (int)TriggerAnimationActivation.Proximity
-                && settings.FindPropertyRelative("OnExit").enumValueIndex == (int)TriggerAnimationExit.ReturnToStart)
-            {
-                HoverControls.Field(settings, "AutoReturnDuration");
-                if (settings.FindPropertyRelative("AutoReturnDuration").floatValue > 0f)
-                    HoverControls.Field(settings, "AutoReturnRotation");
-            }
+            // Day Flow can request this return independently of the ordinary automatic-return toggle.
+            HoverControls.Field(settings, "AutoReturnDuration");
+            if (settings.FindPropertyRelative("AutoReturnDuration").floatValue > 0f)
+                HoverControls.Field(settings, "AutoReturnRotation");
         }
 
         /// <summary>Shows one endpoint and reads the current local transform only on an explicit command.</summary>
@@ -134,7 +131,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (settings.FindPropertyRelative("TemporaryPhysics").boolValue)
                     SingleInteractionControls.DrawRelease(settings.FindPropertyRelative("Physics"), sections);
             }
-            if (sections.Draw("Ejection", "Apply one physical impulse per successful activation.", settings, "IncludeTriggers", "Tolerance", "ReleaseKinematic", "Mode", "SelfImpulse"))
+            if (sections.Draw("Ejection", "Apply one physical impulse per successful activation.", settings, "IncludeTriggers", "Tolerance", "ReleaseKinematic", "Mode", "SelfImpulse", "UseBulletImpulse", "BulletImpulseMultiplier"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     if (!self)
@@ -147,8 +144,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(settings, "Mode");
                     if (self)
                     {
-                        HoverControls.Field(settings.FindPropertyRelative("SelfImpulse"), "Impulse");
-                        HoverControls.Field(settings.FindPropertyRelative("SelfImpulse"), "Space");
+                        HoverControls.Field(settings, "UseBulletImpulse");
+                        if (settings.FindPropertyRelative("UseBulletImpulse").boolValue)
+                            HoverControls.Field(settings, "BulletImpulseMultiplier");
+                        else
+                        {
+                            HoverControls.Field(settings.FindPropertyRelative("SelfImpulse"), "Impulse");
+                            HoverControls.Field(settings.FindPropertyRelative("SelfImpulse"), "Space");
+                        }
                     }
                 }
             if (!self && sections.Draw("Eject Impulses", "Rules run in list order. Each body receives the first matching impulse only.", settings, "Rules"))

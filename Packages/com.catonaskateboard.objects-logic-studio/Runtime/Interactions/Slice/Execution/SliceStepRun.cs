@@ -55,14 +55,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Material arrays use shared references; no source asset or material instance is modified.
             appearance?.Commit();
+            SliceCarryGroup group = step.Consume && step.KeepOutputsHeld && owner.TryGetComponent(out ObjectGrab carried) && carried.IsHeld
+                ? SliceCarryGroup.Create(carried, step.Spawns.Length) : null;
             foreach (SliceSpawn spawn in step.Spawns)
             {
-                GameObject created = ObjectSpawnHistory.Create(spawn.Prefab, owner.TransformPoint(spawn.Position),
-                    owner.rotation * Quaternion.Euler(spawn.Rotation));
-                SceneManager.MoveGameObjectToScene(created, owner.gameObject.scene);
+                GameObject created = group != null ? ObjectSpawnHistory.Create(spawn.Prefab, group.transform, false)
+                    : ObjectSpawnHistory.Create(spawn.Prefab, owner.TransformPoint(spawn.Position), owner.rotation * Quaternion.Euler(spawn.Rotation));
+                if (group != null)
+                    created.transform.SetPositionAndRotation(owner.TransformPoint(spawn.Position), owner.rotation * Quaternion.Euler(spawn.Rotation));
+                else
+                    SceneManager.MoveGameObjectToScene(created, owner.gameObject.scene);
                 ProtectCollisions(created);
                 ObjectGravityGenerator.IncludeSpawn(created);
+                group?.Add(created);
             }
+            group?.Take(owner.GetComponent<ObjectGrab>());
         }
 
         /// <summary>Protects thin falling outputs from crossing a floor between discrete physics steps.</summary>

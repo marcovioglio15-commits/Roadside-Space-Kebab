@@ -122,9 +122,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void DrawRecipe(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Common controls retain the same field routes for section transfers.
-            if (sections.Draw("Recipe", "Mandatory quantities determine completion; optional quantities limit additional ingredients.", settings, "Ingredients"))
+            if (sections.Draw("Recipe", "Mandatory quantities determine completion; optional quantities limit additional ingredients.", settings, "Ingredients", "PriceEnabled", "Price"))
                 using (new EditorGUI.IndentLevelScope())
+                {
+                    HoverControls.Field(settings, "PriceEnabled", "Price Enabled");
+                    if (settings.FindPropertyRelative("PriceEnabled").boolValue)
+                        HoverControls.Field(settings, "Price");
                     FlagRequirementControls.Draw(settings.FindPropertyRelative("Ingredients"), "+ Add Ingredient", true);
+                }
             if (sections.Draw("Magnets", "One placement slot per allowed ingredient; edit their positions in the dedicated preview.", settings, "Magnets"))
                 using (new EditorGUI.IndentLevelScope())
                     DrawMagnets(settings.FindPropertyRelative("Magnets"));

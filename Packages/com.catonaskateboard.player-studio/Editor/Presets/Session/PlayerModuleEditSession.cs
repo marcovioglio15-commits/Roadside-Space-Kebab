@@ -145,20 +145,22 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         /// <summary>Validates the active module fields on its temporary copy.</summary>
         /// <param name="warning">Receives unsupported roles or numeric values.</param>
+        /// <param name="toolSwitching">Whether selection roles are used by the pending player configuration.</param>
         /// <returns>True when this proposal can be confirmed.</returns>
-        public bool TryValidate(out string warning)
+        public bool TryValidate(out string warning, bool toolSwitching = true)
         {
             // Validation reads current raw draft values, including invalid values still being edited.
             GetEditor();
-            return PlayerModuleValidation.TryValidate(working, out warning);
+            return PlayerModuleValidation.TryValidate(working, out warning, toolSwitching);
         }
 
         /// <summary>Prepares pending properties after checking source identity and outside changes.</summary>
         /// <param name="assigned">Asset still assigned to the current master slot.</param>
         /// <param name="changes">Receives properties for the shared transaction.</param>
         /// <param name="warning">Receives a conflict or validation warning.</param>
+        /// <param name="toolSwitching">Whether the resulting player configuration uses tool selection roles.</param>
         /// <returns>True when the unchanged source can receive this proposal.</returns>
-        public bool TryPrepare(ScriptableObject assigned, out SerializedObject changes, out string warning)
+        public bool TryPrepare(ScriptableObject assigned, out SerializedObject changes, out string warning, bool toolSwitching = true)
         {
             // Never write to a redirected slot or save over external Inspector changes.
             changes = null;
@@ -171,7 +173,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 warning = "The module source changed outside this session. Discard to reload its current values.";
                 return false;
             }
-            if (!TryValidate(out warning))
+            if (!TryValidate(out warning, toolSwitching))
                 return false;
             changes = new SerializedObject(source);
             using SerializedProperty property = editor.GetIterator();

@@ -196,19 +196,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="grab">Receives the recovered carried instance on success.</param>
         /// <param name="source">Dispenser root ignored during the pickup transition.</param>
         /// <param name="duration">Seconds spent travelling from the dispenser to the carry pose.</param>
+        /// <param name="carry">Whether to acquire the player's carry slot or release the original at the output pose.</param>
         /// <returns>True when recovery acquired the empty carry slot.</returns>
-        internal bool TryTake(HoverObserver observer, Vector3 position, Quaternion rotation, out ObjectGrab grab, Transform source, float duration)
+        internal bool TryTake(HoverObserver observer, Vector3 position, Quaternion rotation, out ObjectGrab grab, Transform source, float duration, bool carry)
         {
             // A failed pickup never drops an item out of the retained inventory.
             grab = null;
-            if (!HasStoredItem() || observer.HeldObject != null)
+            if (!HasStoredItem() || carry && (observer == null || observer.HeldObject != null))
                 return false;
             transferring = true;
             StoredObject entry = stored[stored.Count - 1];
             try
             {
                 entry.Restore(position, rotation);
-                if (entry.Grab.Begin(observer, source, duration) && entry.Grab.IsHeld)
+                if (!carry || entry.Grab.Begin(observer, source, duration) && entry.Grab.IsHeld)
                 {
                     grab = entry.Grab;
                     stored.RemoveAt(stored.Count - 1);

@@ -139,6 +139,11 @@ MonoBehaviour:
     Prefab: {fileID: 3974403703203748344, guid: 536ae3a8429f3e447bb8cd6f50472260, type: 3}
     Unlimited: 0
     Stock: 10
+    Mode: 2
+    Interval: 0.25
+    Outlets:
+    - Position: {x: 0, y: 0.5, z: 0.25}
+      Rotation: {x: 0, y: 0, z: 0}
     PickupDuration: 0.35
     OutputRotation: {x: 0, y: 0, z: 0}
     StepCounter: 1

@@ -41,6 +41,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Lifecycle
 
+        /// <summary>Assigns an existing action identifier before activating a temporary carry interaction.</summary>
+        /// <param name="binding">Imported button reference inherited from the replaced item.</param>
+        internal void BindAction(InputActionReference binding)
+        {
+            // The Observer resolves this identifier against the player's private action asset.
+            action = binding;
+        }
+
         /// <summary>Registers this feature once when its component becomes available.</summary>
         protected virtual void OnEnable()
         {

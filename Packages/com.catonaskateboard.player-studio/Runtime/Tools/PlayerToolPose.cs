@@ -3,16 +3,19 @@ using UnityEngine;
 
 namespace CatOnASkateboard.PlayerStudio
 {
-    /// <summary>Stores a local transform pose shared by tool slots and animation keys.</summary>
+    /// <summary>Chooses parent-relative or world position and rotation; scale always remains local.</summary>
+    public enum PlayerToolSpace { Local, World }
+
+    /// <summary>Stores a transform pose shared by tool slots and animation keys.</summary>
     [Serializable]
     public struct PlayerToolPose
     {
         #region Fields
 
         [Header("Local Pose")]
-        [Tooltip("Position relative to the animated child's parent.")]
+        [Tooltip("Position in the track's selected space. Slots always use parent-relative coordinates.")]
         public Vector3 Position;
-        [Tooltip("Local Euler angles in degrees. Animation keys preserve full turns between values.")]
+        [Tooltip("Euler angles in the selected space. Animation keys preserve full turns between values.")]
         public Vector3 Rotation;
         [Tooltip("Local scale of the animated child; every axis must be positive.")]
         public Vector3 Scale;
@@ -32,19 +35,29 @@ namespace CatOnASkateboard.PlayerStudio
 
         /// <summary>Captures a child before a transition.</summary>
         /// <param name="target">Transform whose local values are captured.</param>
+        /// <param name="space">Coordinate space for position and rotation.</param>
         /// <returns>An independent value snapshot.</returns>
-        public static PlayerToolPose Read(Transform target)
+        public static PlayerToolPose Read(Transform target, PlayerToolSpace space = PlayerToolSpace.Local)
         {
             // Capture local values so moving the player does not change the animation.
-            return new PlayerToolPose { Position = target.localPosition, Rotation = target.localEulerAngles, Scale = target.localScale };
+            return new PlayerToolPose
+            {
+                Position = space == PlayerToolSpace.World ? target.position : target.localPosition,
+                Rotation = space == PlayerToolSpace.World ? target.eulerAngles : target.localEulerAngles,
+                Scale = target.localScale
+            };
         }
 
         /// <summary>Applies a sampled pose without touching the player's body.</summary>
         /// <param name="target">Visual child receiving the pose.</param>
-        public void Apply(Transform target)
+        /// <param name="space">Coordinate space for position and rotation.</param>
+        public void Apply(Transform target, PlayerToolSpace space = PlayerToolSpace.Local)
         {
             // Position and rotation share one native transform write.
-            target.SetLocalPositionAndRotation(Position, Quaternion.Euler(Rotation));
+            if (space == PlayerToolSpace.World)
+                target.SetPositionAndRotation(Position, Quaternion.Euler(Rotation));
+            else
+                target.SetLocalPositionAndRotation(Position, Quaternion.Euler(Rotation));
             target.localScale = Scale;
         }
 

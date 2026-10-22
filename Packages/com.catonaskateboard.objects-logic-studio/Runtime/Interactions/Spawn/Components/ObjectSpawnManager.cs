@@ -62,7 +62,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int CurrentDay => flow?.Day ?? 0;
         /// <summary>Visitors completed during the current day.</summary>
         public int CompletedSpawns => flow?.Completed ?? 0;
-        /// <summary>Spawn budget selected at the beginning of this day.</summary>
+        /// <summary>Fixed spawn budget selected at day start, or zero when the day uses a timed admission window.</summary>
         public int PlannedSpawns => flow?.Total ?? 0;
 
         #endregion

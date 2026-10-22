@@ -38,8 +38,12 @@ namespace CatOnASkateboard.PlayerStudio
         [Header("Hierarchy")]
         [Tooltip("Selected hierarchy root relative to the player. Tool targets and animation tracks are resolved below it. Empty uses the player hierarchy.")]
         public string RootPath = string.Empty;
+        [Tooltip("Optional existing arm carrying the tools, with its own idle tracks.")]
+        public PlayerToolArmSettings Arm = new PlayerToolArmSettings();
 
         [Header("Tools")]
+        [Tooltip("Use exactly one tool and disable all selection commands, switch animations and slot movement.")]
+        public bool SingleTool;
         [Tooltip("Tools in cycling order. Each identity may appear only once.")]
         public PlayerToolEntry[] Tools = Array.Empty<PlayerToolEntry>();
         [Tooltip("Initially active tool, or empty to start with no active tool.")]
@@ -61,7 +65,7 @@ namespace CatOnASkateboard.PlayerStudio
         [Tooltip("Rotation between direct slots and independent parked poses. Clockwise follows negative angles around each changed local axis.")]
         public TransformRotationDirection SlotRotation = TransformRotationDirection.Shortest;
         [Tooltip("Seconds used to interpolate slot changes. Zero applies slots immediately.")]
-        [Range(0.01f, 5f)]
+        [Range(0f, 5f)]
         public float SwitchDuration = 0.3f;
 
         #endregion
@@ -108,6 +112,13 @@ namespace CatOnASkateboard.PlayerStudio
             warning = "Assign unique tools, valid poses and a finite non-negative switch duration.";
             if (Tools == null)
                 return false;
+            if (SingleTool && Tools.Length != 1)
+            {
+                warning = "Single Tool mode requires exactly one tool entry.";
+                return false;
+            }
+            if (Arm == null || !Arm.TryValidate(out warning))
+                return false;
             HashSet<PlayerTool> identities = new HashSet<PlayerTool>();
             HashSet<string> paths = new HashSet<string>(StringComparer.Ordinal);
             bool moving = false;
@@ -115,14 +126,13 @@ namespace CatOnASkateboard.PlayerStudio
             {
                 warning = "Assign unique tools, valid names and distinct visual paths with valid passive poses.";
                 if (entry == null || entry.Tool == null || !identities.Add(entry.Tool) || string.IsNullOrWhiteSpace(entry.Tool.DisplayName)
-                    || entry.MoveVisual && (entry.Path == null || !paths.Add(entry.Path) || !entry.PassivePose.IsValid()))
+                    || !SingleTool && entry.MoveVisual && (entry.Path == null || !paths.Add(entry.Path) || !entry.PassivePose.IsValid()))
                     return false;
-                if (entry.Tool.SwitchIn != null && !entry.Tool.SwitchIn.TryValidate(out warning)
-                    || entry.Tool.SwitchOut != null && !entry.Tool.SwitchOut.TryValidate(out warning))
+                if (!entry.Tool.TryValidate(!SingleTool, out warning))
                     return false;
-                moving |= entry.MoveVisual;
+                moving |= !SingleTool && entry.MoveVisual;
             }
-            if (InitialTool != null && IndexOf(InitialTool) < 0)
+            if (!SingleTool && InitialTool != null && IndexOf(InitialTool) < 0)
             {
                 warning = "The initial tool must belong to this Tools preset.";
                 return false;

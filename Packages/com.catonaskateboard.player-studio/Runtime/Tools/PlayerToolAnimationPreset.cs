@@ -14,7 +14,7 @@ namespace CatOnASkateboard.PlayerStudio
         [Tooltip("Seconds from the start of the animation. Keys must be strictly ordered.")]
         [Range(0f, 10f)]
         public float Time;
-        [Tooltip("Local pose reached at this time.")]
+        [Tooltip("Transform pose reached at this time in the track's selected coordinate space.")]
         public PlayerToolPose Pose = PlayerToolPose.Identity;
         [Tooltip("Travel into this key. Clockwise uses negative angles around changed local axes; Counter Clockwise uses positive angles. Authored full turns are retained.")]
         public TransformRotationDirection RotationDirection;
@@ -29,9 +29,13 @@ namespace CatOnASkateboard.PlayerStudio
         #region Fields
 
         [Header("Track")]
-        [Tooltip("Target selected below the Tools hierarchy root. Empty selects that root when it is a player child.")]
+        [Tooltip("Target below Tools Hierarchy Root for use/reload/switch, or below the selected arm for idle. Empty selects that root.")]
         public string Path = string.Empty;
-        [Tooltip("Local transform keys in increasing time order. The current pose is used before the first key.")]
+        [Tooltip("Local uses the target's parent coordinates. World uses scene position and rotation. Scale stays local.")]
+        public PlayerToolSpace Space;
+        [Tooltip("Treat keys as offsets from the pose captured at playback start. Identity leaves the target unchanged.")]
+        public bool RelativeToStart;
+        [Tooltip("Transform keys in increasing time order. The current pose is used before the first key.")]
         public PlayerToolKey[] Keys = Array.Empty<PlayerToolKey>();
 
         #endregion
@@ -65,7 +69,7 @@ namespace CatOnASkateboard.PlayerStudio
         #endregion
     }
 
-    /// <summary>Reusable switch-in or switch-out animation without Animator dependencies or scene references.</summary>
+    /// <summary>Reusable transform tracks for switching, idle, tool use and sequential reload steps.</summary>
     [CreateAssetMenu(fileName = "Tool Animation", menuName = "Player Studio/Tool Animation Preset")]
     public sealed class PlayerToolAnimationPreset : ScriptableObject
     {
@@ -104,7 +108,8 @@ namespace CatOnASkateboard.PlayerStudio
             HashSet<string> paths = new HashSet<string>(StringComparer.Ordinal);
             foreach (PlayerToolTrack track in Tracks)
             {
-                if (track == null || track.Path == null || !paths.Add(track.Path) || track.Keys == null)
+                if (track == null || track.Path == null || !paths.Add(track.Path) || track.Keys == null
+                    || track.Space is not (PlayerToolSpace.Local or PlayerToolSpace.World))
                     return false;
                 float previous = -1f;
                 foreach (PlayerToolKey key in track.Keys)

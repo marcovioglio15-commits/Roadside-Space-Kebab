@@ -110,6 +110,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.HoverObserver
   view: {fileID: 1640477754329738882}
   playerFlag: {fileID: 11400000, guid: 281d8342d7ff4b9c8c600666d1bf4d00, type: 2}
+  sceneHud: {fileID: 0}
 --- !u!114 &1904688808913706109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,7 +278,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: fb6bd279-596c-44d5-bea8-6d10543ae29b
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!114 &2017691531927634199
@@ -374,9 +375,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 9112511775868941515}
     m_Modifications:
+    - target: {fileID: 1494078147043126828, guid: 803de206423184a48a9fdb46d49cbd21, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 1494078147043126828, guid: 803de206423184a48a9fdb46d49cbd21, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.7071068
+      objectReference: {fileID: 0}
     - target: {fileID: 4782199198887498379, guid: 803de206423184a48a9fdb46d49cbd21, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.533
+      value: 0.529
       objectReference: {fileID: 0}
     - target: {fileID: 4782199198887498379, guid: 803de206423184a48a9fdb46d49cbd21, type: 3}
       propertyPath: m_LocalPosition.y

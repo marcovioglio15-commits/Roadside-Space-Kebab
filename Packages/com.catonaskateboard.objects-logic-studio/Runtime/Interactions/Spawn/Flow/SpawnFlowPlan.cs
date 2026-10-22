@@ -96,8 +96,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Day";
         [Tooltip("Gameplay scene for this day, selected through the scene picker.")]
         public string Scene = string.Empty;
+        [Tooltip("Wait for the selected scene interaction to complete after day start before starting the first spawn delay.")]
+        public bool WaitBeforeFirstSpawn;
+        [Tooltip("Interaction in this day's gameplay scene whose completion opens the first spawn.")]
+        public SceneInteractionReference StartInteraction = new SceneInteractionReference();
+        [Tooltip("Animate scene Trigger Animations back to their initial state using Auto Return Duration and Rotation, even with Auto Return disabled. Day completion waits for every return; no interaction events are emitted.")]
+        public DayAnimationReset ResetAnimations;
+        [Tooltip("Exact scene Trigger Animations reset when Selected is chosen.")]
+        public SceneInteractionReference[] AnimationsToReset = Array.Empty<SceneInteractionReference>();
         [Tooltip("Choose the spawn count once at day start, including both range endpoints.")]
         public bool RandomCount;
+        [Tooltip("Spawn Count ends after the configured visits. Timer stops new spawns after Day Duration and ends after the current visit finishes. No timer UI is created.")]
+        public DayLengthMode LengthMode;
+        [Tooltip("Scaled seconds from opening the first-spawn gate, including spawn delays, arrivals and visits. Pause stops the timer. An active visitor finishes normally after expiry.")]
+        [Range(1f, 3600f)]
+        public float DayDuration = 300f;
         [Tooltip("Number of completed spawn steps before the day ends.")]
         public int Count = 1;
         [Tooltip("Smallest number of spawn steps for this day.")]
@@ -122,11 +135,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Counts are positive; an empty day cannot cause an endless scene-loading loop.
             warning = "Each day needs a scene, positive spawn counts and at least one step.";
             if (string.IsNullOrWhiteSpace(Scene) || Steps == null || Steps.Length == 0
-                || (RandomCount ? Minimum <= 0 || Maximum < Minimum || Maximum == int.MaxValue : Count <= 0))
+                || LengthMode == DayLengthMode.SpawnCount && (RandomCount ? Minimum <= 0 || Maximum < Minimum || Maximum == int.MaxValue : Count <= 0))
+                return false;
+            warning = "Choose a supported day length mode and a positive finite Day Duration for Timer mode.";
+            if (LengthMode is not (DayLengthMode.SpawnCount or DayLengthMode.Timer)
+                || LengthMode == DayLengthMode.Timer && !InteractionValues.Positive(DayDuration))
                 return false;
             warning = "Choose a supported spawn selection mode.";
             if (Selection is not (SpawnSelection.Sequence or SpawnSelection.UniformRandom or SpawnSelection.WeightedRandom))
                 return false;
+            warning = "Select a valid first-spawn interaction and supported animation reset policy.";
+            if (WaitBeforeFirstSpawn && StartInteraction is not { IsValid: true }
+                || ResetAnimations is not (DayAnimationReset.None or DayAnimationReset.All or DayAnimationReset.Selected))
+                return false;
+            if (ResetAnimations == DayAnimationReset.Selected)
+            {
+                warning = "Select at least one scene Trigger Animation to reset.";
+                if (AnimationsToReset == null || AnimationsToReset.Length == 0)
+                    return false;
+                foreach (SceneInteractionReference animation in AnimationsToReset)
+                    if (animation is not { IsValid: true } || animation.Interaction.Kind != InteractionTemplateKind.TriggerAnimation)
+                        return false;
+            }
             bool weighted = false;
             foreach (SpawnFlowStep step in Steps)
             {
@@ -141,4 +171,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
         #endregion
     }
+
+    /// <summary>Selects which scene animations return to their initial endpoint when a day finishes.</summary>
+    public enum DayAnimationReset { None, All, Selected }
+
+    /// <summary>Chooses a fixed visit budget or a hidden timed window for admitting new visitors.</summary>
+    public enum DayLengthMode { SpawnCount, Timer }
 }

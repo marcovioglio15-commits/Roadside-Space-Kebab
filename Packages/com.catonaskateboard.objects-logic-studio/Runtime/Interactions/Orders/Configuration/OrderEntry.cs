@@ -18,6 +18,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Text = "Order";
         [Tooltip("Independent board typography and paragraph spacing. Combo members retain their individual overrides.")]
         public OrderTextStyle TextStyle = new OrderTextStyle();
+        [Tooltip("Replace the recipe price when a consumed assembly product fulfils an open ticket for this order. Recipe variants and combos inherit this override.")]
+        public bool OverridePrice;
+        [Tooltip("Price per fulfilled order unit, used only when Override Price is enabled and the consuming interaction collects prices.")]
+        [Range(0f, 10000f)]
+        public float Price = 5f;
         [Tooltip("Number of individual orders activated by this draw. Every unit occupies a separate board slot.")]
         public int Quantity = 1;
         [Tooltip("Relative probability in Weighted Random mode. Zero excludes this candidate.")]

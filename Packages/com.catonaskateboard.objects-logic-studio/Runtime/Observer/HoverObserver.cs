@@ -139,6 +139,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (available)
             {
+                // Contact pulses use the normal drivers, but never advance a continuous process twice in one frame.
+                while (InteractionProjectileInput.TryTake(this, out CatOnASkateboard.PlayerStudio.PlayerToolHit hit))
+                {
+                    using InteractionProjectileInput.Scope scope = new InteractionProjectileInput.Scope(hit);
+                    InteractionUnlockRegistry.Tick(this);
+                    AssemblyInteractionRegistry.Tick(this);
+                    singles.Prepare(this, false);
+                    singles.Tick(this, dialogues.Tick(this, singles));
+                }
                 InteractionUnlockRegistry.Tick(this);
                 AssemblyInteractionRegistry.Tick(this);
                 HoverRegistry.Tick(this);
@@ -159,6 +168,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
 
         #region Context
+
+        /// <summary>Replaces only the active observer's actual carried source after a consuming slice.</summary>
+        /// <param name="source">Held item whose outputs replace it.</param>
+        /// <param name="replacement">Prepared temporary carry group.</param>
+        /// <returns>True when the existing observer transferred its carry ownership.</returns>
+        internal static bool ReplaceHeld(ObjectGrab source, ObjectGrab replacement)
+        {
+            return active != null && active.singles.ReplaceHeld(active, source, replacement);
+        }
 
         /// <summary>Releases ongoing player interactions before a scene-local respawn.</summary>
         /// <param name="root">Player whose carry and dialogue state must stop.</param>

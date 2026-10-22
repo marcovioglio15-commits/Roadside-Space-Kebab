@@ -269,7 +269,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     && candidate.transform.IsChildOf(part.Product.transform);
                 ObjectContainer container = candidate.transform.parent.GetComponentInParent<ObjectContainer>(true);
                 bool stored = container != null && container.transform.IsChildOf(target.transform) && container.OwnsStoredBody(candidate);
-                if (!suspended || !assembly && !stored)
+                SliceCarryGroup group = candidate.transform.parent.GetComponentInParent<SliceCarryGroup>(true);
+                bool sliced = group != null && group.gameObject == target && group.Owns(candidate);
+                if (!suspended || !assembly && !stored && !sliced)
                     return true;
             }
             return false;
@@ -443,6 +445,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (body != null)
                 original.Restore(body, false);
             SetHoverSuppression(false);
+            if (TryGetComponent(out SliceCarryGroup group))
+                group.ReleaseMembers(null);
         }
 
         /// <summary>Releases in place, discarding carry velocity before optional launch velocity is added.</summary>

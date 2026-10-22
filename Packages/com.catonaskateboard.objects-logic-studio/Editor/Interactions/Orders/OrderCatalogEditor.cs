@@ -36,6 +36,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                     HoverControls.Field(entry, "Name");
                     Presentation(entry, false);
+                    HoverControls.Field(entry, "OverridePrice");
+                    if (entry.FindPropertyRelative("OverridePrice").boolValue)
+                        HoverControls.Field(entry, "Price");
                     if (OrderSections.Draw(entry, "Quantity & Extraction", "Unit quantity, probability and required draws.",
                         "Quantity", "Weight", "MaximumDraws", "RandomRequiredDraws", "RequiredDrawRange", "MinimumDraws"))
                         using (new EditorGUI.IndentLevelScope())

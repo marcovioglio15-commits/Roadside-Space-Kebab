@@ -66,6 +66,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Vector3 origin = feature.Target.SolidHitOnly ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
             float size = HandleUtility.GetHandleSize(origin) * 0.7f;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(1f, 0.65f, 0.2f));
+            if (feature.Settings.SelfEject && feature.Settings.UseBulletImpulse)
+            {
+                // The incoming shot owns this direction; a fixed arrow would misrepresent the configured behavior.
+                Handles.DrawWireDisc(origin, Vector3.up, size * 0.15f);
+                Handles.Label(origin, "Bullet velocity × " + feature.Settings.BulletImpulseMultiplier.ToString("0.###"));
+                return;
+            }
             for (int index = 0; index < (feature.Settings.SelfEject ? 1 : feature.Settings.Rules.Length); index++)
             {
                 EjectRule rule = feature.Settings.SelfEject ? feature.Settings.SelfImpulse : feature.Settings.Rules[index];

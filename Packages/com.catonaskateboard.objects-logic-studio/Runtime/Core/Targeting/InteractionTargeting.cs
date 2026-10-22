@@ -32,6 +32,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool Eligible(HoverObserver observer, Transform root, Collider[] colliders, Vector3 anchor,
             float distance, HoverTargetMode mode, float radius, int mask, bool solidHitOnly, out float score, bool centerCollider = false)
         {
+            // An actual swept bullet hit already establishes target and line of fire, regardless of observer reach.
+            if (InteractionProjectileInput.Active)
+            {
+                score = 0f;
+                return InteractionProjectileInput.Allows(root);
+            }
             // Target geometry may have moved since the last physics step or assembly insertion.
             Camera view = observer.View;
             Rect viewport = view.pixelRect;

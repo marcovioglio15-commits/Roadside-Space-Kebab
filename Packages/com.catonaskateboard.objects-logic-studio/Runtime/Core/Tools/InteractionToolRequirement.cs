@@ -39,8 +39,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!hasPlayer || player != null && player.isActiveAndEnabled && (!player.IsReady || player.IsSwitching))
                 return false;
             PlayerTool active = player != null && player.isActiveAndEnabled ? player.ActiveTool : null;
+            return Accepts(active);
+        }
+
+        /// <summary>Checks a captured tool identity independently of the player's later selection.</summary>
+        /// <param name="active">Tool carried by a physical projectile or settled player selection.</param>
+        /// <returns>True when the authored tool mode accepts this identity.</returns>
+        public bool Accepts(PlayerTool active)
+        {
+            // Projectile input preserves the identity that fired instead of reading a newly equipped tool.
             switch (Mode)
             {
+                case InteractionToolMode.All:
+                    return true;
                 case InteractionToolMode.None:
                     return active == null;
                 case InteractionToolMode.Specific:

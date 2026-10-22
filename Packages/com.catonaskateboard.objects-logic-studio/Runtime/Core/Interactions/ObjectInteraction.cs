@@ -1,4 +1,5 @@
 using CatOnASkateboard.StudioIdentity;
+using CatOnASkateboard.PlayerStudio;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -45,6 +46,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int itemSession = -1;
         private bool effectChecked;
         private bool effectReady;
+        private PlayerTool projectileTool;
         private static int session;
 
         #endregion
@@ -56,7 +58,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Tool identities accepted by this interaction.</summary>
         public InteractionToolRequirement ToolRequirement => toolRequirement;
         /// <summary>Current tool eligibility shared by active and passive interaction paths.</summary>
-        internal bool ToolAllowed => toolRequirement == null || toolRequirement.Allows(HoverObserver.ActiveTools, HoverObserver.HasPlayer);
+        internal bool ToolAllowed => !InteractionProjectileInput.Active && projectileTool != null && VfxRunning
+            ? toolRequirement == null || toolRequirement.Accepts(projectileTool) : RequestToolAllowed;
+        /// <summary>New input requests always require the current input tool or the exact fired tool in a contact pulse.</summary>
+        internal bool RequestToolAllowed => toolRequirement == null || (InteractionProjectileInput.Active
+            ? toolRequirement.Accepts(InteractionProjectileInput.Tool) : toolRequirement.Allows(HoverObserver.ActiveTools, HoverObserver.HasPlayer));
         /// <summary>Independent start effect configured on this interaction, never shared with another card.</summary>
         public InteractionVfxSettings VisualEffect => visualEffect;
         /// <summary>Positive predefined duration available to automatic VFX timing, or zero for untimed interactions.</summary>
@@ -118,16 +124,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 interaction.unlockOwners?.Clear();
                 interaction.ruleLocks?.Clear();
                 interaction.effectChecked = false;
+                interaction.projectileTool = null;
             }
         }
 
         /// <summary>Combines authored component availability with temporary item restrictions.</summary>
         /// <param name="channels">Interaction family currently being attempted.</param>
+        /// <param name="acceptedTool">Captured tool retained by an already accepted delayed projectile request, or null for normal eligibility.</param>
         /// <returns>True when the interaction may participate.</returns>
-        internal bool Available(InteractionChannels channels)
+        internal bool Available(InteractionChannels channels, PlayerTool acceptedTool = null)
         {
             // A missing Object Item preserves the behavior of existing prefab features.
-            return isActiveAndEnabled && !IsLocked && ToolAllowed && (Item == null || !Item.IsBlocked(channels));
+            return isActiveAndEnabled && !IsLocked && (acceptedTool != null ? toolRequirement == null || toolRequirement.Accepts(acceptedTool) : ToolAllowed)
+                && (Item == null || !Item.IsBlocked(channels));
         }
 
         /// <summary>Adds or removes one rule's independent lock without changing the authored enabled state.</summary>
@@ -198,6 +207,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="moment">Lifecycle boundary reached by this interaction.</param>
         internal void Signal(InteractionMoment moment)
         {
+            // A hit-started operation can finish after selection changes; fresh input still uses RequestToolAllowed.
+            if (moment == InteractionMoment.Started)
+                projectileTool = InteractionProjectileInput.Active ? InteractionProjectileInput.Tool : null;
+            else if (moment == InteractionMoment.Completed)
+                projectileTool = null;
             // Cancellations and interrupted transitions never emit completion.
             ApplyIdentityChange(moment);
             if (moment == InteractionMoment.Started)

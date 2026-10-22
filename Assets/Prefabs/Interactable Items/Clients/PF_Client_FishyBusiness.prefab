@@ -335,6 +335,16 @@ MonoBehaviour:
       Enabled: 1
       DialogueName: FishyBushiness Order
       Occurrence: 0
+    Price:
+      CollectPrice: 1
+      DeferDisplay: 1
+      CompletionMode: 0
+      OnDespawn: 0
+      CompletionSources:
+      - Assigned: 1
+        Kind: 6
+        Name: 'FishyBusiness Delivery Correct '
+        Occurrence: 0
 --- !u!136 &3151776499264896803
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -745,7 +755,7 @@ MonoBehaviour:
   interactionName: Eject
   toolRequirement:
     Mode: 2
-    Tool: {fileID: 11400000, guid: 07cdba6c534bc36429a324061e639905, type: 2}
+    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
     Tools: []
   flagChange:
     Enabled: 0
@@ -780,6 +790,9 @@ MonoBehaviour:
     ExternalAnimation: 0
     AnimationIdentity: 
     WaitForAnimationReturn: 0
+    ForceAutoReturn: 0
+    AnimationOverlap: 0
+    ReturnOverlap: 0
     Behavior: 0
     BlackHole:
       ColliderPath: 
@@ -882,6 +895,8 @@ MonoBehaviour:
       AirPath: 
       AirSpeed: 12
     SelfEject: 1
+    UseBulletImpulse: 1
+    BulletImpulseMultiplier: 2
     SelfImpulse:
       Flags: []
       Match: 0

@@ -11,6 +11,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool held;
         /// <summary>Reserved occurrence, or zero before the item's next activation.</summary>
         internal int Index { get; private set; }
+        /// <summary>Whether inventory or spawn animation currently retains this same logical lifetime.</summary>
+        internal bool IsRetained => held;
         #endregion
         #region Methods
         #region Lifetime

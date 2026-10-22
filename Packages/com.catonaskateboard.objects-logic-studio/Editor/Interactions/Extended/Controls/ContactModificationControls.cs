@@ -16,7 +16,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             ContactModificationSettings configuration = settings.boxedValue as ContactModificationSettings;
             if (configuration != null && configuration.ConsumesAny)
+            {
                 ContactDialogueGateControls.Draw(settings.FindPropertyRelative("ConsumeOn"));
+                ContactPriceControls.Draw(settings.FindPropertyRelative("Price"));
+            }
             SerializedProperty modifications = settings.FindPropertyRelative("Modifications");
             modifications.isExpanded = StudioArrayGUI.Foldout(modifications, new GUIContent("Modifications", modifications.tooltip));
             if (!modifications.isExpanded)

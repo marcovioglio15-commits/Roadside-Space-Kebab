@@ -46,7 +46,10 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 if (capture != null)
                     capture();
                 else
+                {
                     data.ApplyModifiedProperties();
+                    StudioFieldMenu.Notify(data.targetObject);
+                }
                 Notify(owner);
             });
         }

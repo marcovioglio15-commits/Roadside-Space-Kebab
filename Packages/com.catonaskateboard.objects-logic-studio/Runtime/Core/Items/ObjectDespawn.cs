@@ -33,6 +33,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 droplet.Recycle();
                 return;
             }
+            ObjectContactModifier.EndPrices(target);
             target.SetActive(false);
             Object.Destroy(target);
         }

@@ -45,6 +45,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool Active { get; private set; }
         /// <summary>Whether physics or post-launch collision restoration still needs a tick.</summary>
         internal bool Pending => Active || bodies.Count > 0 || traffic.Pending;
+        /// <summary>Elapsed attraction fraction, excluding collision restoration after the effect ends.</summary>
+        internal float Progress => owner != null && owner.Settings.BlackHole.Duration > 0f
+            ? Mathf.Clamp01(1f - remaining / owner.Settings.BlackHole.Duration) : 1f;
 
         #endregion
         #region Methods

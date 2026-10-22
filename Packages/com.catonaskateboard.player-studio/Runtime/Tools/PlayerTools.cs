@@ -7,6 +7,7 @@ namespace CatOnASkateboard.PlayerStudio
 {
     /// <summary>Owns active tool selection and staged transform transitions for one player.</summary>
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(200)]
     [RequireComponent(typeof(PlayerHost))]
     [AddComponentMenu("Player Studio/Player Tools")]
     public sealed class PlayerTools : MonoBehaviour
@@ -14,10 +15,9 @@ namespace CatOnASkateboard.PlayerStudio
         #region State
 
         private PlayerToolsPreset configuration;
-        private PlayerToolInputSettings inputSettings;
-        private PlayerInput input;
-        private InputActionAsset boundAsset;
-        private InputAction[] actions = Array.Empty<InputAction>();
+        private PlayerToolCommands commands;
+        private PlayerToolRuntime[] behaviors;
+        private PlayerToolIdleMotion arm;
         private Transform[] targets;
         private Transform[] modelChildren;
         private PlayerToolPose[] original;
@@ -31,6 +31,9 @@ namespace CatOnASkateboard.PlayerStudio
         private float elapsed;
         private bool ready;
         private bool hasSlots;
+        private bool useRequested;
+        private bool reloadRequested;
+        private Guid useActionId;
 
         #endregion
 
@@ -42,8 +45,18 @@ namespace CatOnASkateboard.PlayerStudio
         public bool IsSwitching => phase != 0;
         /// <summary>Whether configuration and visual bindings passed initialization.</summary>
         public bool IsReady => ready;
+        /// <summary>Whether the active tool is playing use or reload keyframes.</summary>
+        public bool IsUsing => ready && active >= 0 && behaviors[active].IsBusy;
+        /// <summary>Whether the active tool is playing its reload combo.</summary>
+        public bool IsReloading => ready && active >= 0 && behaviors[active].IsReloading;
         /// <summary>Emitted after a tool has reached its active slot and completed its incoming animation.</summary>
         public event Action<PlayerTool> Changed;
+        /// <summary>Emitted when an active tool accepts a use command, before its final muzzle shot.</summary>
+        public event Action<PlayerTool> Used;
+        /// <summary>Stable action currently assigned to Use Tool, shared with optional impact interaction routing.</summary>
+        public Guid UseActionId => useActionId;
+        /// <summary>Emitted once for each real bullet collision after the bullet returns to its pool.</summary>
+        public static event Action<PlayerToolHit> ProjectileHit;
 
         #endregion
 
@@ -51,10 +64,26 @@ namespace CatOnASkateboard.PlayerStudio
 
         #region Lifecycle
 
+        /// <summary>Clears external projectile listeners before packages register for a new Play session.</summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetProjectileEvents()
+        {
+            // Disabled domain reload must not preserve listeners from a previous gameplay session.
+            ProjectileHit = null;
+        }
+
+        /// <summary>Publishes a physical hit without depending on any optional interaction package.</summary>
+        /// <param name="hit">Shot and exact physics contact.</param>
+        internal static void PublishHit(PlayerToolHit hit)
+        {
+            // Subscribers may queue work until their own normal gameplay update.
+            ProjectileHit?.Invoke(hit);
+        }
+
         /// <summary>Initializes after PlayerInput have completed startup.</summary>
         private void Start()
         {
-            // Resolve authored modules once, without creating runtime components or visuals.
+            // Resolve authored modules once; weapon visual pools are prewarmed after binding succeeds.
             Initialize();
         }
 
@@ -85,7 +114,14 @@ namespace CatOnASkateboard.PlayerStudio
         private void Release()
         {
             // Disabling during a switch must not leave a half-animated model on the next enable.
-            Bind(null);
+            commands?.Dispose();
+            commands = null;
+            RestorePresentation();
+            if (behaviors != null)
+                foreach (PlayerToolRuntime behavior in behaviors)
+                    behavior?.Dispose();
+            behaviors = null;
+            arm = null;
             if (modelChildren != null)
                 for (int index = 0; index < modelChildren.Length; index++)
                     if (modelChildren[index] != null)
@@ -94,6 +130,7 @@ namespace CatOnASkateboard.PlayerStudio
             configuration = null;
             ready = false;
             phase = 0;
+            useRequested = reloadRequested = false;
             active = requested = destination = -1;
         }
 
@@ -107,15 +144,60 @@ namespace CatOnASkateboard.PlayerStudio
                     Initialize();
                 return;
             }
-            InputActionAsset asset = input != null && input.isActiveAndEnabled && input.inputIsActive ? input.actions : null;
-            if (asset != boundAsset)
-                Bind(asset);
+            commands?.Refresh();
             if (Time.timeScale <= 0f)
+            {
+                useRequested = reloadRequested = false;
                 return;
-            if (phase == 0 && requested != active)
+            }
+            RestorePresentation();
+            if (active >= 0)
+                behaviors[active].Advance(Time.deltaTime);
+            if (phase == 0 && requested != active && !IsUsing)
                 BeginSwitch();
             if (phase != 0)
                 Advance(Time.deltaTime);
+            // Selection has priority over an activation queued during the same frame.
+            if (ActiveTool != null && requested == active)
+            {
+                if (reloadRequested)
+                    behaviors[active].Reload();
+                else if (useRequested && behaviors[active].CanUse)
+                {
+                    behaviors[active].Use();
+                    Used?.Invoke(ActiveTool);
+                }
+            }
+            useRequested = reloadRequested = false;
+        }
+
+        /// <summary>Applies reversible idle and aim after the camera and all authored animation poses.</summary>
+        private void LateUpdate()
+        {
+            if (!ready || Time.deltaTime <= 0f || ActiveTool == null)
+                return;
+            if (!IsUsing)
+                arm?.Sample(Time.deltaTime);
+            arm?.SampleRotation(Time.deltaTime);
+            behaviors[active].Present(Time.deltaTime);
+        }
+
+        /// <summary>Continues bullets and impact lifetimes independently of the selected tool.</summary>
+        private void FixedUpdate()
+        {
+            if (!ready)
+                return;
+            foreach (PlayerToolRuntime behavior in behaviors)
+                behavior.Simulate(Time.fixedDeltaTime);
+        }
+
+        /// <summary>Removes procedural layers in reverse order before editing or restoring base transforms.</summary>
+        private void RestorePresentation()
+        {
+            // Aim was applied after idle, so it is removed first.
+            if (behaviors != null && active >= 0)
+                behaviors[active]?.RestoreAim();
+            arm?.Restore();
         }
 
         /// <summary>Builds immutable target bindings and validates every animation before moving anything.</summary>
@@ -134,15 +216,23 @@ namespace CatOnASkateboard.PlayerStudio
                 Debug.LogWarning(warning, this);
                 return;
             }
-            input = GetComponent<PlayerInput>();
-            inputSettings = host.MasterPreset.InputPreset != null ? host.MasterPreset.InputPreset.Tools : null;
-            if (inputSettings != null && !inputSettings.TryValidate(out warning))
+            PlayerToolInputSettings inputSettings = host.MasterPreset.InputPreset != null ? host.MasterPreset.InputPreset.Tools : null;
+            useActionId = inputSettings?.Activate != null && inputSettings.Activate.action != null ? inputSettings.Activate.action.id : Guid.Empty;
+            if (inputSettings != null && !inputSettings.TryValidate(out warning, !configuration.SingleTool))
             {
                 Debug.LogWarning(warning, this);
                 return;
             }
             Transform model = PlayerHierarchy.Resolve(transform, configuration.RootPath);
             HashSet<Transform> moved = new HashSet<Transform>();
+            PlayerCameraRig camera = GetComponent<PlayerCameraRig>();
+            behaviors = new PlayerToolRuntime[configuration.Tools.Length];
+            arm = configuration.Arm.Enabled ? new PlayerToolIdleMotion(configuration.Arm, model) : null;
+            if (model == null || arm != null && !arm.CollectTargets(moved, transform, camera != null && camera.View != null ? camera.View.transform : null))
+            {
+                Debug.LogWarning("Select an existing Tools hierarchy and a player arm below the player root. A smoothed arm must not contain the camera.", this);
+                return;
+            }
             targets = new Transform[configuration.Tools.Length];
             transitions = new PlayerToolSlotTransition[targets.Length];
             entrances = new PlayerToolAnimationRun[targets.Length];
@@ -152,15 +242,18 @@ namespace CatOnASkateboard.PlayerStudio
             for (int index = 0; index < targets.Length; index++)
             {
                 PlayerToolEntry entry = configuration.Tools[index];
-                targets[index] = entry.MoveVisual ? PlayerHierarchy.Resolve(model, entry.Path) : null;
-                entrances[index] = new PlayerToolAnimationRun(entry.Tool.SwitchIn, model);
-                exits[index] = new PlayerToolAnimationRun(entry.Tool.SwitchOut, model);
-                if (entry.MoveVisual && (targets[index] == null || targets[index] == transform)
+                bool moveVisual = !configuration.SingleTool && entry.MoveVisual;
+                targets[index] = moveVisual ? PlayerHierarchy.Resolve(model, entry.Path) : null;
+                entrances[index] = new PlayerToolAnimationRun(!configuration.SingleTool ? entry.Tool.SwitchIn : null, model);
+                exits[index] = new PlayerToolAnimationRun(!configuration.SingleTool ? entry.Tool.SwitchOut : null, model);
+                behaviors[index] = new PlayerToolRuntime(entry.Tool, model, transform, camera);
+                if (moveVisual && (targets[index] == null || targets[index] == transform)
                     || !entrances[index].CollectTargets(moved, transform) || !exits[index].CollectTargets(moved, transform)
+                    || !behaviors[index].CollectTargets(moved, transform)
                     || configuration.Layout == PlayerToolLayout.Cyclic && targets[index] != null
                     && commonParent != null && targets[index].parent != commonParent)
                 {
-                    Debug.LogWarning("Select existing tool children; cyclic slots need a common parent. The player root cannot be animated.", this);
+                    Debug.LogWarning("Select existing tool/animation children. Cyclic slots need a common parent; Auto Aim needs an existing player camera and a visual pivot containing its muzzle.", this);
                     return;
                 }
                 if (targets[index] != null)
@@ -175,12 +268,14 @@ namespace CatOnASkateboard.PlayerStudio
             original = new PlayerToolPose[modelChildren.Length];
             for (int index = 0; index < modelChildren.Length; index++)
                 original[index] = PlayerToolPose.Read(modelChildren[index]);
-            active = requested = configuration.IndexOf(configuration.InitialTool);
+            active = requested = configuration.SingleTool ? 0 : configuration.IndexOf(configuration.InitialTool);
             for (int index = 0; index < targets.Length; index++)
                 if (targets[index] != null)
                     configuration.Destination(index, active).Apply(targets[index]);
+            foreach (PlayerToolRuntime behavior in behaviors)
+                behavior.Prepare(transform);
             ready = true;
-            Bind(input != null && input.isActiveAndEnabled && input.inputIsActive ? input.actions : null);
+            commands = new PlayerToolCommands(this, GetComponent<PlayerInput>(), inputSettings, !configuration.SingleTool);
         }
 
         #endregion
@@ -193,7 +288,7 @@ namespace CatOnASkateboard.PlayerStudio
         public bool Select(PlayerTool tool)
         {
             // A request made during motion starts after the current transition finishes.
-            if (!ready || !isActiveAndEnabled || tool != null && configuration.IndexOf(tool) < 0)
+            if (!ready || !isActiveAndEnabled || configuration.SingleTool || tool != null && configuration.IndexOf(tool) < 0)
                 return false;
             requested = configuration.IndexOf(tool);
             return true;
@@ -203,50 +298,31 @@ namespace CatOnASkateboard.PlayerStudio
         public void Cycle()
         {
             // Rapid input advances from the pending selection without interrupting a transform mid-track.
-            if (ready && isActiveAndEnabled && configuration.Tools.Length > 0)
+            if (ready && isActiveAndEnabled && !configuration.SingleTool && configuration.Tools.Length > 0)
                 requested = (requested + 1) % configuration.Tools.Length;
         }
 
-        /// <summary>Connects only to this player's action instances and releases stale subscriptions.</summary>
-        /// <param name="asset">Current private action asset, or null when input ownership ends.</param>
-        private void Bind(InputActionAsset asset)
+        /// <summary>Queues one use of the settled tool for the next update.</summary>
+        /// <returns>True when the tool is available and the request was queued.</returns>
+        public bool Use()
         {
-            // Never enable or disable maps owned by PlayerInput.
-            foreach (InputAction action in actions)
-                if (action != null)
-                    action.performed -= OnPerformed;
-            boundAsset = asset;
-            actions = Array.Empty<InputAction>();
-            if (asset == null || inputSettings == null)
-                return;
-            actions = new InputAction[inputSettings.Mode == PlayerToolInputMode.SharedCycle ? 1 : inputSettings.Bindings.Length];
-            for (int index = 0; index < actions.Length; index++)
-            {
-                InputActionReference reference = inputSettings.Mode == PlayerToolInputMode.SharedCycle
-                    ? inputSettings.UseTool : inputSettings.Bindings[index].Action;
-                actions[index] = reference != null ? asset.FindAction(reference.action.id) : null;
-                if (actions[index] != null)
-                    actions[index].performed += OnPerformed;
-            }
+            // No delayed activation is retained through a switch, pause or cooldown.
+            if (!isActiveAndEnabled || Time.timeScale <= 0f || ActiveTool == null || requested != active
+                || useRequested || reloadRequested || !behaviors[active].CanUse)
+                return false;
+            useRequested = true;
+            return true;
         }
 
-        /// <summary>Routes one performed Button command to shared cycling or explicit selection.</summary>
-        /// <param name="context">Immediate callback from the player's action instance.</param>
-        private void OnPerformed(InputAction.CallbackContext context)
+        /// <summary>Queues the settled tool's optional reload combo.</summary>
+        /// <returns>True when a reload request was accepted.</returns>
+        public bool Reload()
         {
-            // Paused and inactive owners cannot queue commands for a later unpause.
-            if (!ready || Time.timeScale <= 0f || input == null || !input.isActiveAndEnabled || !input.inputIsActive
-                || input.actions != boundAsset)
-                return;
-            if (inputSettings.Mode == PlayerToolInputMode.SharedCycle)
-                Cycle();
-            else
-                for (int index = 0; index < actions.Length; index++)
-                    if (actions[index] == context.action)
-                    {
-                        Select(inputSettings.Bindings[index].Tool);
-                        break;
-                    }
+            if (!isActiveAndEnabled || Time.timeScale <= 0f || ActiveTool == null || requested != active
+                || IsUsing || useRequested || reloadRequested || !ActiveTool.ReloadEnabled)
+                return false;
+            reloadRequested = true;
+            return true;
         }
 
         #endregion
@@ -261,7 +337,10 @@ namespace CatOnASkateboard.PlayerStudio
             phase = 1;
             elapsed = 0f;
             if (active >= 0)
+            {
+                behaviors[active].Park();
                 exits[active].Begin();
+            }
         }
 
         /// <summary>Completes outgoing animation, slot interpolation and incoming animation in order.</summary>

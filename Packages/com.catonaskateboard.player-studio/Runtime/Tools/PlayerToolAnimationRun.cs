@@ -12,6 +12,9 @@ namespace CatOnASkateboard.PlayerStudio
         private readonly PlayerToolAnimationPreset preset;
         private readonly Transform[] targets;
         private readonly PlayerToolPose[] initial;
+        private readonly PlayerToolPose[] restore;
+        private readonly int[] order;
+        private bool captured;
 
         #endregion
 
@@ -35,8 +38,15 @@ namespace CatOnASkateboard.PlayerStudio
             preset = source;
             targets = source != null ? new Transform[source.Tracks.Length] : Array.Empty<Transform>();
             initial = source != null ? new PlayerToolPose[targets.Length] : Array.Empty<PlayerToolPose>();
+            restore = new PlayerToolPose[targets.Length];
+            order = new int[targets.Length];
             for (int index = 0; index < targets.Length; index++)
+            {
                 targets[index] = PlayerHierarchy.Resolve(model, source.Tracks[index].Path);
+                order[index] = index;
+            }
+            // Parents are sampled first so world-space children keep their authored world pose.
+            Array.Sort(order, CompareDepth);
         }
 
         /// <summary>Rejects missing targets before any visual pose is modified.</summary>
@@ -65,7 +75,11 @@ namespace CatOnASkateboard.PlayerStudio
             // Reuse fixed buffers for every switch.
             for (int index = 0; index < targets.Length; index++)
                 if (targets[index] != null)
-                    initial[index] = PlayerToolPose.Read(targets[index]);
+                {
+                    initial[index] = PlayerToolPose.Read(targets[index], preset.Tracks[index].Space);
+                    restore[index] = PlayerToolPose.Read(targets[index]);
+                }
+            captured = true;
         }
 
         /// <summary>Applies all tracks at an elapsed animation time.</summary>
@@ -73,9 +87,54 @@ namespace CatOnASkateboard.PlayerStudio
         internal void Sample(float time)
         {
             // Missing children cannot redirect animation to another object.
+            foreach (int index in order)
+                if (targets[index] != null)
+                {
+                    PlayerToolTrack track = preset.Tracks[index];
+                    PlayerToolPose pose = track.Sample(time, track.RelativeToStart ? PlayerToolPose.Identity : initial[index]);
+                    if (track.RelativeToStart)
+                    {
+                        pose.Position += initial[index].Position;
+                        pose.Rotation = (Quaternion.Euler(initial[index].Rotation) * Quaternion.Euler(pose.Rotation)).eulerAngles;
+                        pose.Scale = Vector3.Scale(initial[index].Scale, pose.Scale);
+                    }
+                    pose.Apply(targets[index], track.Space);
+                }
+        }
+
+        /// <summary>Restores local poses captured before temporary idle, use or reload motion.</summary>
+        internal void Restore()
+        {
+            // Restore only after a successful Begin; repeated cleanup is harmless.
+            if (!captured)
+                return;
             for (int index = 0; index < targets.Length; index++)
                 if (targets[index] != null)
-                    preset.Tracks[index].Sample(time, initial[index]).Apply(targets[index]);
+                    restore[index].Apply(targets[index]);
+            captured = false;
+        }
+
+        /// <summary>Orders bindings by hierarchy depth once, before any animation sampling.</summary>
+        /// <param name="left">First track index.</param>
+        /// <param name="right">Second track index.</param>
+        /// <returns>Parent tracks before descendants, retaining authored order at equal depth.</returns>
+        private int CompareDepth(int left, int right)
+        {
+            // Missing targets are rejected by CollectTargets before playback.
+            int comparison = Depth(targets[left]).CompareTo(Depth(targets[right]));
+            return comparison != 0 ? comparison : left.CompareTo(right);
+        }
+
+        /// <summary>Counts parents only while building the playback binding.</summary>
+        /// <param name="target">Optional bound transform.</param>
+        /// <returns>Number of ancestors in the hierarchy.</returns>
+        private static int Depth(Transform target)
+        {
+            int depth = 0;
+            // No hierarchy traversal is needed while sampling a frame.
+            for (Transform parent = target != null ? target.parent : null; parent != null; parent = parent.parent)
+                depth++;
+            return depth;
         }
 
         #endregion

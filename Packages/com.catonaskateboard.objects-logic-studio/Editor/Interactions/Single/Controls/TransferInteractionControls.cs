@@ -30,11 +30,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (!settings.FindPropertyRelative("Unlimited").boolValue)
                         HoverControls.Field(settings, "Stock");
                 }
-            if (sections.Draw("Dispenser Output", "Animate from the dispenser pivot to the item carry pose while ignoring the dispenser colliders.", settings, "PickupDuration", "OutputRotation"))
+            if (sections.Draw("Dispenser Output", "Choose carried pickup or release objects at independently placed outlets.", settings, "Mode", "Interval", "Outlets", "PickupDuration", "OutputRotation"))
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    HoverControls.Field(settings, "PickupDuration");
-                    HoverControls.Field(settings, "OutputRotation");
+                    HoverControls.Field(settings, "Mode");
+                    if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex == DispenseMode.ToHand)
+                    {
+                        HoverControls.Field(settings, "PickupDuration");
+                        HoverControls.Field(settings, "OutputRotation");
+                    }
+                    else
+                    {
+                        if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex == DispenseMode.ContinuousOutput)
+                            HoverControls.Field(settings, "Interval");
+                        DispenserOutletControls.Draw(settings);
+                    }
                 }
             HoverControls.Field(settings, "StepCounter");
             if (settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue

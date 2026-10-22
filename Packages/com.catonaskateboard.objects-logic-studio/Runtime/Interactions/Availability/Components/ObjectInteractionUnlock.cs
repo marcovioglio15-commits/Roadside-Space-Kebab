@@ -176,8 +176,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             for (int index = 0; index < buttons.Length; index++)
                 if (counts[index] < settings.Conditions[index].Count && buttons[index] is { Pending: true }
-                    && (settings.Target.transform.position - player.position).sqrMagnitude
-                    <= settings.Conditions[index].Distance * settings.Conditions[index].Distance)
+                    && (InteractionProjectileInput.Active || (settings.Target.transform.position - player.position).sqrMagnitude
+                    <= settings.Conditions[index].Distance * settings.Conditions[index].Distance))
                 {
                     counts[index]++;
                     InteractionUnlockRegistry.Consume(settings.Conditions[index].Action);

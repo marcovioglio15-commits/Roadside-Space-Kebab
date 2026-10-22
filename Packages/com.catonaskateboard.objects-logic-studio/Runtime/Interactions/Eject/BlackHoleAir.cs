@@ -10,6 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private ParticleSystem system;
         private ParticleSystem.Particle[] particles;
+        private ParticleSystemCullingMode originalCullingMode;
 
         #endregion
         #region Methods
@@ -29,6 +30,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             if (particles == null || particles.Length < system.main.maxParticles)
                 particles = new ParticleSystem.Particle[system.main.maxParticles];
+            ParticleSystem.MainModule main = system.main;
+            originalCullingMode = main.cullingMode;
+            main.cullingMode = ParticleSystemCullingMode.AlwaysSimulate;
             system.Play();
         }
 
@@ -62,7 +66,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Stop()
         {
             if (system != null)
+            {
+                ParticleSystem.MainModule main = system.main;
+                main.cullingMode = originalCullingMode;
                 system.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            }
             system = null;
         }
 

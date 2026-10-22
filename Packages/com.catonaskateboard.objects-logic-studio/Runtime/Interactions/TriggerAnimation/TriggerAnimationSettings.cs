@@ -61,10 +61,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Scaled seconds spent at the altered state before returning automatically. Locks pause this countdown.")]
         [Range(0f, 30f)]
         public float ReturnDelay = 1f;
-        [Tooltip("Seconds for the automatic return transition. Zero restores the initial state immediately.")]
+        [Tooltip("Seconds for automatic, proximity-exit and Day Flow returns. Day Flow uses this duration even when Auto Return is disabled. Zero restores the initial state immediately.")]
         [Range(0.01f, 10f)]
         public float AutoReturnDuration = 0.35f;
-        [Tooltip("Rotation direction used only by the automatic return, independent of manual toggles.")]
+        [Tooltip("Rotation direction for automatic, proximity-exit and Day Flow returns, independent of manual toggles.")]
         public TransformRotationDirection AutoReturnRotation = TransformRotationDirection.Shortest;
 
         #endregion

@@ -22,3 +22,5 @@ MonoBehaviour:
     Mode: 0
     UseTool: {fileID: -3093786942460160410, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
     Bindings: []
+    Activate: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+    Reload: {fileID: 382328113666854361, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
