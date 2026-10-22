@@ -436,7 +436,7 @@ MonoBehaviour:
       OffsetY: -80
       Drain: 0
       Clockwise: 1
-    LockFirstIngredient: 0
+    LockFirstIngredient: 1
     FinalizeOnGrab: 1
     FinalizeAction: {fileID: 0}
     FinalizeTarget:
@@ -481,7 +481,7 @@ MonoBehaviour:
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
-      Order: 2
+      Order: 0
       Position: {x: 0, y: 0.03, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
