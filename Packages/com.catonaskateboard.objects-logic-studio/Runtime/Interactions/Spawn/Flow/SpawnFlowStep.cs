@@ -26,8 +26,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool ArrivalDialogueEnabled;
         [Tooltip("Dialogue component on this prefab to request once after walk-in. Its advance action still controls pages.")]
         public ObjectDialogue ArrivalDialogue;
-        [Tooltip("Play the configured new-customer sound when the arrival dialogue actually opens.")]
-        public bool NewCustomerSound;
+        [Tooltip("Play sfx_newcustomer when walk-in finishes, or immediately after spawning without a walk-in. Independent of arrival dialogue.")]
+        public bool NewCustomerSound = true;
         [Tooltip("Relative chance used only by Weighted Random selection.")]
         [Range(0.01f, 10f)]
         public float Weight = 1f;

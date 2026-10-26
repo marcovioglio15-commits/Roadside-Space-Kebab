@@ -140,6 +140,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         && first.Action.action.id == second.Action.action.id);
         }
 
+        /// <summary>Finds a sibling recipe accepting every retained ingredient and the newly offered object.</summary>
+        /// <param name="station">Station owning the unfinished prolonged product.</param>
+        /// <param name="ingredients">Original insertion order followed by the new ingredient.</param>
+        /// <param name="requireHeld">Whether an explicit input supplied the new ingredient.</param>
+        /// <returns>The best available continuation, preferring a ready recipe and then stable component identity.</returns>
+        internal static ObjectAssemblyStation FindContinuation(ObjectAssemblyStation station, IReadOnlyList<ObjectGrab> ingredients, bool requireHeld)
+        {
+            ObjectAssemblyStation selected = null;
+            bool selectedComplete = false;
+            ObjectAssemblyProduct previous = station.CurrentProduct;
+            // Different tables, commands and already occupied alternatives cannot take ownership of this prefix.
+            foreach (ObjectAssemblyStation other in items)
+            {
+                if (other == station || !SharesChoices(station, other) || !other.CanPlan
+                    || other.Settings.ProductPrefab == previous.SourcePrefab
+                    || !requireHeld && !AssemblyIngredientDock.Allows(other, ingredients[ingredients.Count - 1])
+                    || !other.Template.CanAcceptSequence(ingredients, out bool complete, previous)
+                    || selected != null && (!complete && selectedComplete || complete == selectedComplete
+                        && EntityId.ToULong(other.GetEntityId()) > EntityId.ToULong(selected.GetEntityId())))
+                    continue;
+                selected = other;
+                selectedComplete = complete;
+            }
+            return selected;
+        }
+
         #endregion
 
         #region Input

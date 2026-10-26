@@ -31,6 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private AssemblyContactRun contact;
         private bool contactReady;
         private string lastWarning;
+        private AssemblyRecipeContinuation continuation;
 
         #endregion
 
@@ -189,8 +190,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             current = CurrentProduct;
             if (CanReturn(held, requireHeld, out _))
                 return true;
-            if (current != null || !requireHeld)
-                return (current != null ? current : Template).CanAccept(held, out _, requireHeld);
+            if (current != null)
+                return current.CanAccept(held, out _, requireHeld)
+                    || (continuation ??= new AssemblyRecipeContinuation()).Find(this, held, requireHeld) != null;
+            if (!requireHeld)
+                return Template.CanAccept(held, out _, false);
             // Shared input actions retain explicitly placed ingredients until a later command distinguishes a recipe.
             proposed.Clear();
             AssemblyInteractionRegistry.CollectPending(this, proposed);
@@ -274,7 +278,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return true;
             }
             if (current != null)
-                return Commit(held, requireHeld, null);
+                return current.CanAccept(held, out _, requireHeld) ? Commit(held, requireHeld, null)
+                    : continuation.Execute(this, held, requireHeld);
             if (!requireHeld)
             {
                 proposed.Clear();
@@ -310,15 +315,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Inactive staging prevents premature locks and callbacks before all starting ingredients exist.
             bool spawned = current == null;
             if (spawned)
-            {
-                GameObject instance = ObjectSpawnHistory.Create(settings.ProductPrefab, staging, false);
-                instance.SetActive(false);
-                current = instance.GetComponent<ObjectAssemblyProduct>();
-                instance.transform.SetParent(null, true);
-                current.Initialize();
-                current.SourcePrefab = settings.ProductPrefab;
-                Place(current);
-            }
+                current = PrepareProduct();
             // Activation and completion may release table ownership through a matching gravity pulse.
             ObjectAssemblyProduct product = current;
             bool complete = product.IsComplete;
@@ -331,14 +328,37 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
                 return false;
             }
+            ActivateProduct(product, complete);
+            return true;
+        }
+
+        /// <summary>Prepares an inactive product before ingredient ownership or completion events can change.</summary>
+        /// <returns>The initialized product placed at this station's authored output.</returns>
+        internal ObjectAssemblyProduct PrepareProduct()
+        {
+            GameObject instance = ObjectSpawnHistory.Create(settings.ProductPrefab, staging, false);
+            instance.SetActive(false);
+            instance.transform.SetParent(null, true);
+            ObjectAssemblyProduct product = instance.GetComponent<ObjectAssemblyProduct>();
+            product.Initialize();
+            product.SourcePrefab = settings.ProductPrefab;
+            Place(product);
+            return product;
+        }
+
+        /// <summary>Publishes one successful insertion after an ordinary commit or a full recipe revision.</summary>
+        /// <param name="product">Prepared product that now owns all accepted ingredients.</param>
+        /// <param name="wasComplete">Whether this same recipe was already complete before the insertion.</param>
+        internal void ActivateProduct(ObjectAssemblyProduct product, bool wasComplete)
+        {
+            current = product;
             Pending.Release();
-            if (spawned)
+            if (!product.gameObject.activeSelf)
                 product.gameObject.SetActive(true);
             product.PublishPending();
             Signal(InteractionMoment.Started);
-            if (!product.Settings.ProlongedAssembly && !complete && product.IsComplete)
+            if (!product.Settings.ProlongedAssembly && !wasComplete && product.IsComplete)
                 Signal(InteractionMoment.Completed);
-            return true;
         }
 
         /// <summary>Publishes delayed station completion only after its product finishes prolonged assembly.</summary>

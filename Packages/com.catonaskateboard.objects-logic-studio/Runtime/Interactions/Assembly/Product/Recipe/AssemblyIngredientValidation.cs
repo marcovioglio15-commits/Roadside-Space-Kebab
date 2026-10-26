@@ -13,16 +13,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="product">Destination product or its source prefab.</param>
         /// <param name="grab">Proposed ingredient's root interaction.</param>
         /// <param name="requireHeld">Whether the player must currently carry the ingredient.</param>
+        /// <param name="previous">Unfinished product explicitly releasing its suspended ingredients, or null for normal insertion.</param>
         /// <returns>True when the whole ingredient can transfer into one magnet.</returns>
-        internal static bool Allows(ObjectAssemblyProduct product, ObjectGrab grab, bool requireHeld)
+        internal static bool Allows(ObjectAssemblyProduct product, ObjectGrab grab, bool requireHeld, ObjectAssemblyProduct previous = null)
         {
+            // Only the exact retained ingredient may bypass its temporary suspension during a recipe revision.
+            if (!requireHeld && previous != null && previous.CanRevise && grab != null
+                && grab.TryGetComponent(out ObjectAssemblyPart retained) && retained.Product == previous && retained.Grab == grab)
+                return grab.Item != null && !grab.Item.IsConsumed && !grab.Item.IsReserved;
             // Match only the outer ingredient identity; its retained recipe children never count twice.
             if (grab == null || !grab.isActiveAndEnabled || requireHeld && !grab.IsHeld || grab.Identity == null
                 || grab.transform.IsChildOf(product.transform) || product.transform.IsChildOf(grab.transform)
                 || !ObjectGrab.ValidateBody(grab.gameObject, out _) || grab.GetComponentsInChildren<Joint>(true).Length > 0)
                 return false;
-            if (grab.TryGetComponent(out ObjectAssemblyProduct ingredient) && (!ingredient.isActiveAndEnabled || !ingredient.IsComplete
-                    || ingredient.Settings.ProlongedAssembly && !ingredient.IsFinalized)
+            if (grab.TryGetComponent(out ObjectAssemblyProduct ingredient) && (!ingredient.isActiveAndEnabled || !ingredient.IsComplete)
                 || grab.TryGetComponent(out ObjectAssemblyPart attached) && attached.Product != null)
                 return false;
             // Retained consumption and reservation state must survive transfer without being bypassed.

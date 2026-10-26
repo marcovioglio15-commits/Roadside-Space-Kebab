@@ -179,7 +179,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 run.Commit(transform);
                 if (settings.Sound)
-                    StudioAudio.Play("sfx_ingredientslice", transform, "Ingredient", settings.Ingredient.ToString());
+                    StudioAudio.Play(settings.SoundEvent == SliceSound.BottleOpen ? "sfx_bottleopen" : "sfx_ingredientslice", transform,
+                        settings.SoundEvent == SliceSound.IngredientSlice ? "Ingredient" : null, settings.Ingredient.ToString());
                 CompletedSteps++;
                 nextPress = Time.time + settings.Interval;
                 if (CompletedSteps == 1)

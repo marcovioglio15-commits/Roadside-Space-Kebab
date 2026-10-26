@@ -1,3 +1,4 @@
+using CatOnASkateboard.AudioStudio;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -35,6 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float burstRemaining;
         private bool recompress;
         private bool active;
+        private readonly InteractionAudioLoop flowAudio = new InteractionAudioLoop();
         #endregion
         #region Properties
         /// <summary>Locally imported nozzle and flow configuration.</summary>
@@ -67,6 +69,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Resets the flow and capacity once at Play entry, including retained scene objects.</summary>
         internal void BeginSession()
         {
+            flowAudio.Stop();
             active = IsEmitting = recompress = false;
             heldInput = null;
             squeezeRemaining = burstRemaining = 0f;
@@ -164,6 +167,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases visual pressure without removing liquid that has already left the nozzle.</summary>
         internal void StopEmission()
         {
+            flowAudio.Stop();
             if (!active)
                 return;
             active = IsEmitting = recompress = false;
@@ -204,6 +208,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (Remaining <= 0f || settings.Emission == SprayEmissionMode.TimedBurst && burstRemaining <= 0f)
                 StopEmission();
+            flowAudio.Tick(settings.FlowSound && IsEmitting, "sfx_saucespread", transform);
         }
 
         #endregion
@@ -225,9 +230,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!settings.Squeeze || elastic == null || !elastic.isActiveAndEnabled)
                 return;
             elastic.SetPressure(repeat ? 0f : settings.Compression, settings.SqueezeAxis, settings.SqueezeDuration);
+            if (!repeat && settings.SqueezeSound)
+                StudioAudio.Play("sfx_bottlesqueze", transform);
             if (settings.Emission != SprayEmissionMode.TimedBurst)
                 return;
             IsEmitting = false;
+            flowAudio.Stop();
             latest = null;
             pending = 0f;
             recompress = repeat;
@@ -254,7 +262,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 recompress = false;
                 squeezeRemaining = settings.SqueezeDuration;
                 if (elastic != null && elastic.isActiveAndEnabled)
+                {
                     elastic.SetPressure(settings.Compression, settings.SqueezeAxis, settings.SqueezeDuration);
+                    if (settings.SqueezeSound)
+                        StudioAudio.Play("sfx_bottlesqueze", transform);
+                }
             }
             squeezeRemaining -= duration;
             return 0f;
@@ -264,6 +276,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void BeginFlow()
         {
             IsEmitting = true;
+            flowAudio.Tick(settings.FlowSound, "sfx_saucespread", transform);
             Emit(0f);
         }
 

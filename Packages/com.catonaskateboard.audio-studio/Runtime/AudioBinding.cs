@@ -37,7 +37,7 @@ namespace CatOnASkateboard.AudioStudio
         [Tooltip("Far attenuation distance.")]
         [Range(1f, 200f)]
         public float MaximumDistance = 45f;
-        [Tooltip("Request at most one simultaneous voice for this key.")]
+        [Tooltip("Request at most one simultaneous voice for this key on each emitter. Scene-wide playback has its own shared slot.")]
         public bool SingleInstance = false;
         [Header("Rate Limit")]
         [Tooltip("Enable a per-key repetition cap.")]

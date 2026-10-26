@@ -257,7 +257,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     {
                         phase = Phase.Waiting;
                         suspended.Restore();
-                        arrivalDialogue?.RequestArrival(step.NewCustomerSound);
+                        AnnounceArrival();
                     }
                     break;
                 case Phase.Waiting:
@@ -314,7 +314,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else
                 instance.SetActive(true);
             if (!step.WalkIn.Enabled)
-                arrivalDialogue?.RequestArrival(step.NewCustomerSound);
+                AnnounceArrival();
+        }
+
+        /// <summary>Announces physical arrival once, independently of whether dialogue can open immediately.</summary>
+        private void AnnounceArrival()
+        {
+            if (instance == null || !instance.activeSelf)
+                return;
+            if (step.NewCustomerSound)
+                DialogueAudioRun.AnnounceArrival(instance.transform);
+            arrivalDialogue?.RequestArrival();
         }
 
         /// <summary>Records only the selected component's successful completion on the current clone.</summary>

@@ -186,7 +186,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return feature switch
             {
                 ObjectAvailableOrders orders => ResolveOrders(orders.gameObject).TryValidate(orders.gameObject, out warning),
-                ObjectAmbient => Ambient.TryValidate(out warning),
+                ObjectAmbient => Ambient.TryValidate(out warning)
+                    && ObjectRequestedInteraction.ValidateInput(Ambient.Mode == AmbientMode.Radio, StartAction, out warning),
                 ObjectElasticDeformation elastic => elastic.TryValidate(ElasticDeformation, out warning),
                 ObjectDirtTrail => DirtTrail.TryValidate(out warning),
                 ObjectDeathbox deathbox => deathbox.TryValidate(Deathbox, out warning),

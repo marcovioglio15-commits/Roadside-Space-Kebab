@@ -6,6 +6,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Matches the Ingredient labels authored in FMOD.</summary>
     public enum SliceIngredient { Bread, Crunchy, Full }
 
+    /// <summary>Chooses the cue emitted by a successful Slice step.</summary>
+    public enum SliceSound { IngredientSlice, BottleOpen }
+
     /// <summary>Places one independent prefab when its slice step succeeds.</summary>
     [Serializable]
     public sealed class SliceSpawn
@@ -67,6 +70,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Slice Audio")]
         [Tooltip("Play the slice cue for each successfully committed cut.")]
         public bool Sound = true;
+        [Tooltip("Play an ingredient cut or the bottle-opening event for each committed step.")]
+        public SliceSound SoundEvent;
         [Tooltip("Ingredient parameter label supplied to the slice event.")]
         public SliceIngredient Ingredient = SliceIngredient.Full;
 
@@ -86,6 +91,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (Target == null || !Target.TryValidate(out warning))
                 return false;
             if (Contact == null || !Contact.TryValidate(out warning))
+                return false;
+            warning = "Choose a supported Slice sound and ingredient label for the enabled cue.";
+            if (Sound && (SoundEvent is not (SliceSound.IngredientSlice or SliceSound.BottleOpen)
+                || SoundEvent == SliceSound.IngredientSlice && Ingredient is not (SliceIngredient.Bread or SliceIngredient.Crunchy or SliceIngredient.Full)))
                 return false;
             if (!InteractionValues.Finite(Interval) || Interval < 0f || Steps == null || Steps.Length == 0)
             {

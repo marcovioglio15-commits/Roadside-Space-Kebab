@@ -55,14 +55,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Identifies this component in the prefab workspace.</summary>
         public string InteractionName => interactionName;
+
         /// <summary>Tool identities accepted by this interaction.</summary>
         public InteractionToolRequirement ToolRequirement => toolRequirement;
         /// <summary>Current tool eligibility shared by active and passive interaction paths.</summary>
         internal bool ToolAllowed => !InteractionProjectileInput.Active && projectileTool != null && VfxRunning
             ? toolRequirement == null || toolRequirement.Accepts(projectileTool) : RequestToolAllowed;
         /// <summary>New input requests always require the current input tool or the exact fired tool in a contact pulse.</summary>
-        internal bool RequestToolAllowed => toolRequirement == null || (InteractionProjectileInput.Active
-            ? toolRequirement.Accepts(InteractionProjectileInput.Tool) : toolRequirement.Allows(HoverObserver.ActiveTools, HoverObserver.HasPlayer));
+        internal bool RequestToolAllowed => toolRequirement == null || 
+            (InteractionProjectileInput.Active
+            ? toolRequirement.Accepts(InteractionProjectileInput.Tool) : 
+            toolRequirement.Allows(HoverObserver.ActiveTools, HoverObserver.HasPlayer));
+
         /// <summary>Independent start effect configured on this interaction, never shared with another card.</summary>
         public InteractionVfxSettings VisualEffect => visualEffect;
         /// <summary>Positive predefined duration available to automatic VFX timing, or zero for untimed interactions.</summary>
@@ -75,6 +79,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Optional flag change configured independently for this interaction.</summary>
         public InteractionFlagChange FlagChange => flagChange;
         /// <summary>Whether any active unlock rule still owns a lock on this feature.</summary>
+
         public bool IsLocked => unlockOwners != null && unlockOwners.Count > 0 || ruleLocks != null && ruleLocks.Count > 0;
         /// <summary>Successful interaction lifecycle events used by prefab-local unlock rules.</summary>
         public static event Action<ObjectInteraction, InteractionMoment> Signaled;
@@ -169,6 +174,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 ruleLocks?.Clear();
         }
 
+
         /// <summary>Releases only the active lock owned by a disabled or reset rule.</summary>
         /// <param name="owner">Rule whose own lock is being withdrawn.</param>
         internal void ReleaseRuleLock(ObjectInteractionUnlock owner)
@@ -185,7 +191,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // A later Unlock may already have released this rule even though its conditions once completed.
             return ruleLocks != null && ruleLocks.Contains(owner);
         }
-
         /// <summary>Resolves an editor-authored prefab identity to this clone's corresponding instance root.</summary>
         /// <param name="identity">Stable component identity selected by a spawn condition.</param>
         /// <param name="root">Receives the runtime root remapped by Unity during prefab instantiation.</param>

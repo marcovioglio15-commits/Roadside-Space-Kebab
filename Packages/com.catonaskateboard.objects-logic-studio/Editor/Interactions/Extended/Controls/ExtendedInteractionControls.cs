@@ -58,7 +58,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     OrderControls.Draw(draft.FindPropertyRelative("Orders"), state.Target.Resolve(), state.Sections);
                     break;
                 case ExtendedInteractionKind.PlayAmbient:
-                    AmbientControls.Draw(draft.FindPropertyRelative("Ambient"));
+                    AmbientControls.Draw(draft.FindPropertyRelative("Ambient"), state.Sections);
+                    if (draft.FindPropertyRelative("Ambient.Mode").enumValueIndex == (int)AmbientMode.Radio)
+                        StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Radio", Button);
                     break;
                 case ExtendedInteractionKind.Slice:
                     SliceControls.Draw(draft.FindPropertyRelative("Slice"), state.Sections);
@@ -153,6 +155,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained foldout visibility.</param>
         internal static void DrawContact(SerializedProperty settings, ObjectStudioSections sections)
         {
+            if (settings.boxedValue is ContactModificationSettings { SupportsFrying: true })
+                HoverControls.Field(settings, "FryingSound");
             ContactModificationControls.Draw(settings);
             if (ContactPreparationControls.RequiresInput(settings))
                 TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);

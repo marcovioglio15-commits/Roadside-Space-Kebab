@@ -437,6 +437,7 @@ MonoBehaviour:
         Position: {x: 0, y: 0, z: 0}
         Rotation: {x: 0, y: 0, z: 0}
     Sound: 1
+    SoundEvent: 1
     Ingredient: 2
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!114 &6354227486815829116

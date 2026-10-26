@@ -320,6 +320,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     selected = pair.Key;
                     distance = score;
                 }
+            // Releasing the held item or picking up a nearer piece takes precedence over another world output.
+            if (selected is ObjectDispenser)
+            {
+                if (held != null)
+                {
+                    if (Release(observer, bindings[selected], allowed, false))
+                        return true;
+                }
+                else
+                {
+                    ObjectInteraction pickup = FindPickup(observer, requested, allowed, bindings[selected], distance);
+                    if (pickup != null)
+                        return TakePickup(observer, pickup);
+                }
+            }
             return selected switch
             {
                 ObjectCommandInteraction command => command.Execute(),
@@ -399,8 +414,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (InteractionProjectileInput.Active || dispensing == null)
                 return;
+            // A fresh press returns to selection even when release occurred between observer passes.
             if (!input.Usable || Time.timeScale <= 0f || dispensing.Settings.Mode != DispenseMode.ContinuousOutput || !dispensing.CanTake()
-                || !bindings.TryGetValue(dispensing, out InteractionButton button) || !button.Held
+                || !bindings.TryGetValue(dispensing, out InteractionButton button) || !button.Held || button.Pending
                 || consumed != null && input.Find(consumed) == button || !Eligible(observer, dispensing, out _))
             {
                 dispensing = null;
@@ -419,20 +435,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="observer">Camera defining the release aim.</param>
         /// <param name="requested">Optional shared button restricting this arbitration pass.</param>
         /// <param name="allowed">Input types allowed to take this press.</param>
+        /// <param name="allowDeposit">Whether a container may claim the release before Throw or Drop.</param>
         /// <returns>True when the operation successfully consumes the input.</returns>
-        private bool Release(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed)
+        private bool Release(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed, bool allowDeposit = true)
         {
             // A successful deposit consumes this event before a same-key Drop can release the item.
             ObjectContainer container = null;
             SliceCarryGroup group = held.GetComponent<SliceCarryGroup>();
             float distance = float.PositiveInfinity;
-            foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (group == null && Pending(pair, requested, allowed) && pair.Key is ObjectContainer candidate && candidate.CanStore(held)
-                    && Eligible(observer, candidate, out float score) && Nearer(candidate, container, score, distance))
-                {
-                    container = candidate;
-                    distance = score;
-                }
+            if (allowDeposit && group == null)
+                foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
+                    if (Pending(pair, requested, allowed) && pair.Key is ObjectContainer candidate && candidate.CanStore(held)
+                        && Eligible(observer, candidate, out float score) && Nearer(candidate, container, score, distance))
+                    {
+                        container = candidate;
+                        distance = score;
+                    }
             if (container != null && container.Store(held))
             {
                 held = null;
@@ -454,19 +472,34 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return true;
         }
 
-        /// <summary>Selects a hovered eligible pickup first, then resolves equal hover priority by distance.</summary>
+        /// <summary>Selects one eligible pickup using hover priority and distance when competing with a dispenser.</summary>
         /// <param name="observer">Camera, player and visibility context.</param>
         /// <param name="requested">Optional shared button restricting this arbitration pass.</param>
         /// <param name="allowed">Input types allowed to take this press.</param>
         /// <returns>True when the operation successfully consumes the input.</returns>
         private bool Grab(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed)
         {
+            // Selection and commitment are shared with the dispenser's nearer-pickup arbitration.
+            return TakePickup(observer, FindPickup(observer, requested, allowed));
+        }
+
+        /// <summary>Finds an eligible pickup, optionally restricting it to grabs nearer than a competing dispenser.</summary>
+        /// <param name="observer">Player, camera and current targeting context.</param>
+        /// <param name="requested">Optional dialogue button restricting this pass.</param>
+        /// <param name="allowed">Interaction types permitted to claim the input.</param>
+        /// <param name="competing">Dispenser button that must share the pickup's physical press, or null for ordinary selection.</param>
+        /// <param name="maximumDistance">Exclusive squared distance limit supplied by the dispenser's visible surface.</param>
+        /// <returns>The preferred eligible pickup, or null when none can claim this press.</returns>
+        private ObjectInteraction FindPickup(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed,
+            InteractionButton competing = null, float maximumDistance = float.PositiveInfinity)
+        {
             // Only one eligible feature can claim the empty carry slot for this input event.
             ObjectInteraction selected = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
             {
-                if (!Pending(pair, requested, allowed) || pair.Key.transform.IsChildOf(observer.Player))
+                if (!Pending(pair, requested, allowed) || pair.Key.transform.IsChildOf(observer.Player)
+                    || competing != null && (pair.Key is not ObjectGrab || !pair.Value.SharesPress(competing)))
                     continue;
                 float score = float.PositiveInfinity;
                 bool eligible = pair.Key switch
@@ -477,12 +510,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     ObjectAssemblyProduct product => product.Pickup.Eligible(observer, targeting, out score),
                     _ => false
                 };
-                if (eligible && PreferPickup(pair.Key, selected, score, distance))
+                if (eligible && score < maximumDistance && PreferPickup(pair.Key, selected, score, distance))
                 {
                     selected = pair.Key;
                     distance = score;
                 }
             }
+            return selected;
+        }
+
+        /// <summary>Commits the selected pickup without rerunning geometry queries or changing its input priority.</summary>
+        /// <param name="observer">Player receiving the selected object.</param>
+        /// <param name="selected">Eligible grab, assembly product or direct-to-hand dispenser.</param>
+        /// <returns>True when the carry slot or prolonged assembly request was acquired.</returns>
+        private bool TakePickup(HoverObserver observer, ObjectInteraction selected)
+        {
+            // Each pickup family retains its own atomic ownership and rollback behavior.
             switch (selected)
             {
                 case ObjectAssemblyProduct product when product.Settings.ProlongedAssembly:
@@ -500,7 +543,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return false;
         }
 
-        /// <summary>Prioritizes hovered pickups while retaining distance ordering within each group.</summary>
+        /// <summary>Uses distance between grabs and dispensers, retaining hover priority among other pickups.</summary>
         /// <param name="candidate">Eligible grab or dispenser.</param>
         /// <param name="selected">Current best eligible pickup.</param>
         /// <param name="score">Candidate distance score.</param>
@@ -511,6 +554,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Hover affects priority only after the candidate passed its own Grab targeting and locks.
             if (selected == null)
                 return true;
+            if (candidate is ObjectGrab && selected is ObjectDispenser || candidate is ObjectDispenser && selected is ObjectGrab)
+                return Nearer(candidate, selected, score, distance);
             bool hovered = HoverRegistry.IsHovered(candidate);
             return hovered != HoverRegistry.IsHovered(selected) ? hovered : Nearer(candidate, selected, score, distance);
         }

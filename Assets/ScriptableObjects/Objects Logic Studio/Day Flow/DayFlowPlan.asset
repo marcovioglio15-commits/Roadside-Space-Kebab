@@ -15,7 +15,19 @@ MonoBehaviour:
   Days:
   - Name: Day 1
     Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_DaysTesting.unity
+    WaitBeforeFirstSpawn: 0
+    StartInteraction:
+      Path: 
+      Interaction:
+        Assigned: 0
+        Kind: 0
+        Name: 
+        Occurrence: 0
+    ResetAnimations: 0
+    AnimationsToReset: []
     RandomCount: 0
+    LengthMode: 0
+    DayDuration: 300
     Count: 3
     Minimum: 5
     Maximum: 10
@@ -64,7 +76,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -99,7 +111,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -134,7 +146,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -169,7 +181,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -204,7 +216,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -239,7 +251,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -274,7 +286,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -309,7 +321,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -344,7 +356,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -379,7 +391,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -414,7 +426,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -449,7 +461,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -478,7 +490,19 @@ MonoBehaviour:
           Direction: 1
   - Name: Day 2
     Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_DaysTesting.unity
+    WaitBeforeFirstSpawn: 0
+    StartInteraction:
+      Path: 
+      Interaction:
+        Assigned: 0
+        Kind: 0
+        Name: 
+        Occurrence: 0
+    ResetAnimations: 0
+    AnimationsToReset: []
     RandomCount: 0
+    LengthMode: 0
+    DayDuration: 300
     Count: 3
     Minimum: 1
     Maximum: 3
@@ -527,7 +551,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -562,7 +586,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -597,7 +621,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -632,7 +656,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -667,7 +691,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -702,7 +726,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -737,7 +761,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -772,7 +796,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}
@@ -807,7 +831,7 @@ MonoBehaviour:
       RequireAll: 0
       ArrivalDialogueEnabled: 0
       ArrivalDialogue: {fileID: 0}
-      NewCustomerSound: 0
+      NewCustomerSound: 1
       Weight: 1
       Delay: 0
       Position: {x: 0, y: 0, z: 0}

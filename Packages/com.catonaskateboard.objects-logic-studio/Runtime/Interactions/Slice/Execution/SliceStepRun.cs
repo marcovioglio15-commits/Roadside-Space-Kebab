@@ -65,28 +65,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     created.transform.SetPositionAndRotation(owner.TransformPoint(spawn.Position), owner.rotation * Quaternion.Euler(spawn.Rotation));
                 else
                     SceneManager.MoveGameObjectToScene(created, owner.gameObject.scene);
-                ProtectCollisions(created);
+                ObjectSpawnPhysics.Protect(created);
                 ObjectGravityGenerator.IncludeSpawn(created);
                 group?.Add(created);
             }
             group?.Take(owner.GetComponent<ObjectGrab>());
-        }
-
-        /// <summary>Protects thin falling outputs from crossing a floor between discrete physics steps.</summary>
-        /// <param name="created">Independent output whose dynamic bodies have just been instantiated.</param>
-        private static void ProtectCollisions(GameObject created)
-        {
-            // Keep existing continuous modes; sweep CCD covers primitives and speculative CCD covers convex meshes.
-            foreach (Rigidbody body in created.GetComponentsInChildren<Rigidbody>())
-            {
-                if (body.isKinematic || body.collisionDetectionMode != CollisionDetectionMode.Discrete)
-                    continue;
-                bool primitive = true;
-                foreach (Collider collider in body.GetComponentsInChildren<Collider>())
-                    if (collider.attachedRigidbody == body && collider.enabled && !collider.isTrigger)
-                        primitive &= collider is BoxCollider or SphereCollider or CapsuleCollider;
-                body.collisionDetectionMode = primitive ? CollisionDetectionMode.ContinuousDynamic : CollisionDetectionMode.ContinuousSpeculative;
-            }
         }
 
         #endregion

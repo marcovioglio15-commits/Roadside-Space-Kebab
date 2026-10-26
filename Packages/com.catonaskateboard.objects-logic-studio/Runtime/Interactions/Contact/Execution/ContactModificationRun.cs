@@ -58,6 +58,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool Waiting => preparation.Waiting;
         /// <summary>Whether an interrupted visual transition retains its counterpart.</summary>
         internal bool IsPaused => paused;
+        /// <summary>Whether the effect is actively advancing rather than preparing, retaining or returning.</summary>
+        internal bool IsAudible => running && effectsStarted && !paused && !IsLocked && ToolAllowed;
 
         #endregion
 

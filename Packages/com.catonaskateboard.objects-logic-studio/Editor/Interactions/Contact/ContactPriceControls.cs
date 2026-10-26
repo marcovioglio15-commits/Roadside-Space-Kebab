@@ -18,6 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(settings, "CollectPrice");
             if (!settings.FindPropertyRelative("CollectPrice").boolValue)
                 return;
+            HoverControls.Field(settings, "Sound", "Collection Sound");
             HoverControls.Field(settings, "DeferDisplay");
             if (!settings.FindPropertyRelative("DeferDisplay").boolValue)
                 return;

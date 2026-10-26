@@ -25,6 +25,7 @@ namespace RoadsideSpaceKebab.Audio
         private float deadline;
         private IAudioVoice musicVoice;
         private float nextMusic;
+        private readonly HashSet<Object> localMusicOwners = new HashSet<Object>();
 
         #endregion
 
@@ -76,7 +77,7 @@ namespace RoadsideSpaceKebab.Audio
             // Native voices own their lifetimes even after an emitted item is consumed.
             if (!initialized)
                 return;
-            if (preset.Playback.Enabled && !string.IsNullOrEmpty(music) && Time.unscaledTime >= nextMusic
+            if (preset.Playback.Enabled && localMusicOwners.Count == 0 && !string.IsNullOrEmpty(music) && Time.unscaledTime >= nextMusic
                 && (musicVoice == null || !musicVoice.IsPlaying))
             {
                 musicVoice = Play(music, null, Vector3.zero, null, null, 0f);
@@ -118,6 +119,7 @@ namespace RoadsideSpaceKebab.Audio
             bindings.Clear();
             history.Clear();
             warnings.Clear();
+            localMusicOwners.Clear();
             initialized = false;
             if (ReferenceEquals(StudioAudio.Backend, this))
                 StudioAudio.Backend = null;
@@ -133,11 +135,28 @@ namespace RoadsideSpaceKebab.Audio
             musicVoice?.Stop();
             musicVoice = null;
             nextMusic = 0f;
-            if (!initialized || string.IsNullOrEmpty(music))
+            if (!initialized || localMusicOwners.Count > 0 || string.IsNullOrEmpty(music))
                 return;
             history.Remove(music);
             musicVoice = Play(music, null, Vector3.zero, null, null, 0f);
             nextMusic = Time.unscaledTime + 1f;
+        }
+
+        /// <summary>Gives local radios exclusive music ownership while preserving independent radio emitters.</summary>
+        /// <param name="owner">Radio retaining ownership through its OFF channel.</param>
+        /// <param name="active">Whether the radio is available.</param>
+        public void SetLocalMusicOwner(Object owner, bool active)
+        {
+            if (active)
+            {
+                if (owner != null && localMusicOwners.Add(owner))
+                {
+                    musicVoice?.Stop();
+                    musicVoice = null;
+                }
+            }
+            else if (localMusicOwners.Remove(owner))
+                nextMusic = 0f;
         }
 
         /// <summary>Queues one configured event, preserving its position if the source is consumed immediately.</summary>
@@ -147,8 +166,9 @@ namespace RoadsideSpaceKebab.Audio
         /// <param name="parameter">Optional labeled local parameter.</param>
         /// <param name="label">FMOD parameter label.</param>
         /// <param name="radius">Optional positive attenuation override.</param>
+        /// <param name="value">Optional numeric value supplied before event startup.</param>
         /// <returns>A queued or playing voice, or null when suppressed.</returns>
-        public IAudioVoice Play(string key, Transform source, Vector3 position, string parameter, string label, float radius)
+        public IAudioVoice Play(string key, Transform source, Vector3 position, string parameter, string label, float radius, float? value = null)
         {
             // Validate configuration at the event boundary, never through runtime reflection.
             if (!initialized || !preset.Playback.Enabled || string.IsNullOrEmpty(key))
@@ -161,11 +181,11 @@ namespace RoadsideSpaceKebab.Audio
             }
             if (binding.SingleInstance)
                 foreach (GameplayVoice voice in voices)
-                    if (voice.Key == key && voice.IsPlaying)
+                    if (voice.Key == key && voice.Source == source && voice.IsPlaying)
                         return null;
             if (!AcceptRate(binding))
                 return null;
-            GameplayVoice created = new GameplayVoice(binding, preset.Playback, source, position, parameter, label, radius);
+            GameplayVoice created = new GameplayVoice(binding, preset.Playback, source, position, parameter, label, radius, value);
             voices.Add(created);
             created.Tick(FMODUnity.RuntimeManager.HaveAllBanksLoaded, Time.timeScale <= 0f, this);
             return created;

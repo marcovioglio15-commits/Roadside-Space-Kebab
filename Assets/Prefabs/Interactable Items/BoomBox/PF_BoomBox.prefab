@@ -207,6 +207,31 @@ MonoBehaviour:
   completionBindings: []
   settingsPreset: {fileID: 0}
   drawGizmos: 1
+  action: {fileID: -4000642286508704843, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   settings:
-    Event: amb_neonsign
-    Radius: 10
+    Mode: 0
+    Event: amb_traffic
+    Radius: 20
+    Radio:
+      SeparateBackgroundMusic: 1
+      Parameter: Channels
+      InitialChannel: 3
+      Channels:
+      - Name: OFF
+        Value: 0
+      - Name: ONE
+        Value: 1
+      - Name: TWO
+        Value: 2
+      - Name: THREE
+        Value: 3
+      Target:
+        Distance: 3
+        Mode: 0
+        SolidHitOnly: 0
+        CenterRadius: 0.15
+        Offset: {x: 0, y: 0, z: 0}
+        ObstacleMask:
+          serializedVersion: 2
+          m_Bits: 4294967295
+        DrawGizmos: 1

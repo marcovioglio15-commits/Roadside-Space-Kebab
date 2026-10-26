@@ -23,7 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             : Grab != null ? Grab.Action : Owner.Settings.FinalizeAction;
         /// <summary>Whether this assembled recipe still needs its empty-hand pickup confirmation.</summary>
         internal bool Waiting => Owner != null && (Owner.Settings.ProlongedAssembly || Owner.Settings.FinalizeOnGrab)
-            && Owner.IsComplete && !Owner.IsFinalized && Owner.Item != null && !Owner.Item.IsReserved
+            && Owner.RecipeReady && !Owner.IsFinalized && Owner.Item != null && !Owner.Item.IsReserved
             && Owner.Available(InteractionChannels.Assembly);
 
         #endregion

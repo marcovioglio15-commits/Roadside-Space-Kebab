@@ -36,6 +36,24 @@ namespace CatOnASkateboard.StudioColors.Editor
             return EditorGUI.IntField(rect, label, StudioValueMenu.Edit(rect, label, value));
         }
 
+        /// <summary>Edits an index through a bounded slider without changing saved data on repaint.</summary>
+        /// <param name="label">Field caption and tooltip.</param>
+        /// <param name="value">Current authored index.</param>
+        /// <param name="minimum">First selectable index.</param>
+        /// <param name="maximum">Last selectable index.</param>
+        /// <param name="options">Optional layout constraints.</param>
+        /// <returns>The index selected or pasted by the user.</returns>
+        public static int IntField(GUIContent label, int value, int minimum, int maximum, params GUILayoutOption[] options)
+        {
+            // Keep the shared context menu and leave validation to the owning settings.
+            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            value = StudioValueMenu.Edit(rect, label, value);
+            EditorGUI.BeginChangeCheck();
+            int selected = EditorGUI.IntSlider(rect, label, value, minimum, maximum);
+            return EditorGUI.EndChangeCheck() ? selected : value;
+        }
+
         /// <summary>Draws a native FloatField with typed Copy/Paste support.</summary>
         /// <param name="label">Field caption and tooltip.</param>
         /// <param name="value">Current value.</param>

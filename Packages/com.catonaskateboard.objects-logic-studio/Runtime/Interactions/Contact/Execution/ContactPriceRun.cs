@@ -1,4 +1,5 @@
 using System;
+using CatOnASkateboard.AudioStudio;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -20,6 +21,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int generation = -1;
         private bool closed;
         private bool inReceipt;
+        private Transform emitter;
+        private Vector3 position;
 
         #endregion
 
@@ -50,6 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 remaining = 0;
             }
             settings = configuration;
+            emitter = owner.transform;
+            position = emitter.position;
             if (closed || settings is not { CollectPrice: true, DeferDisplay: true })
                 return;
             if (sources.Length != settings.CompletionSources.Length)
@@ -133,6 +138,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Commits after all order listeners have resolved their overrides, including nested completion events.</summary>
         internal void Commit()
         {
+            if (emitter != null)
+                position = emitter.position;
             // Clear the active receipt before notifications can start another independent transaction.
             decimal amount = receipt;
             receipt = 0m;
@@ -186,7 +193,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Notification callbacks cannot observe or settle the same pending amount again.
             decimal amount = pending;
             pending = 0m;
-            CollectedPrice.Publish(amount);
+            Publish(amount);
         }
 
         /// <summary>Settles only this ending lifetime's remaining balance; zero and repeated closure never change the ledger.</summary>
@@ -200,7 +207,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!released && settings is { DeferDisplay: true, OnDespawn: PendingPriceOnDespawn.Discard })
                 CollectedPrice.Discard(amount);
             else
-                CollectedPrice.Publish(amount);
+                Publish(amount);
+        }
+
+        /// <summary>Announces only an actual positive payout; deferred and discarded amounts stay silent.</summary>
+        /// <param name="amount">Previously cleared balance now reaching the visible counter.</param>
+        private void Publish(decimal amount)
+        {
+            if (amount <= 0m)
+                return;
+            CollectedPrice.Publish(amount);
+            if (settings.Sound)
+                StudioAudio.PlayAt("sfx_cashcollect", emitter != null ? emitter.position : position);
         }
 
         #endregion

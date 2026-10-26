@@ -87,7 +87,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly.", draft, "Settings.LockFirstIngredient", "Settings.WaitForNextIngredient", "Settings.InteractionRules", "TargetIds"))
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    HoverControls.Field(settings, "LockFirstIngredient");
+                    if (!settings.FindPropertyRelative("ProlongedAssembly").boolValue)
+                        HoverControls.Field(settings, "LockFirstIngredient");
                     if (state.Target.Resolve().GetComponent<ObjectGrab>() != null)
                         HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
                     DrawRules(settings.FindPropertyRelative("InteractionRules"), draft.FindPropertyRelative("TargetIds"), state);
@@ -104,7 +105,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!sections.Draw("Product Interactions", "Requirements for the interactions captured when exporting this preset."))
                 return;
             using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
-            HoverControls.Field(settings, "LockFirstIngredient");
+            if (!settings.FindPropertyRelative("ProlongedAssembly").boolValue)
+                HoverControls.Field(settings, "LockFirstIngredient");
             HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
             SerializedProperty rules = settings.FindPropertyRelative("InteractionRules");
             // Structural changes require an actual destination hierarchy in the main workspace.

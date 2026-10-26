@@ -19,10 +19,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ContactDialogueGate ConsumeOn = new ContactDialogueGate();
         [Tooltip("Collect recipe prices or order price overrides, with optional deferred HUD settlement for consumed items.")]
         public ContactPriceSettings Price = new ContactPriceSettings();
+        [Header("Modification Audio")]
+        [Tooltip("Play frying audio only while a modification is actively applying its effects. Waiting, interruptions and completed effects stay silent.")]
+        public bool FryingSound;
 
         #endregion
 
         #region Properties
+
+        /// <summary>Whether a timed visual modification provides an active interval for frying audio.</summary>
+        public bool SupportsFrying => Modifications != null && Array.Exists(Modifications,
+            definition => definition != null && definition.Settings != null && definition.Settings.Duration > 0f && !definition.Settings.IdentityOnly);
 
         /// <summary>Whether any rule requests the interaction's local Button binding.</summary>
         public bool RequiresInput => Modifications != null && Array.Exists(Modifications,

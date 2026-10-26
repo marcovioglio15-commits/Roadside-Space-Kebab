@@ -114,6 +114,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Squeeze")]
         [Tooltip("Use Elastic Deformation to gently compress the source while emitting.")]
         public bool Squeeze = true;
+        [Tooltip("Play sauce-spread audio only while liquid is being emitted.")]
+        public bool FlowSound = true;
+        [Tooltip("Play the bottle-squeeze cue whenever an enabled squeeze begins compressing the source.")]
+        public bool SqueezeSound = true;
         [Tooltip("Object-local compression axis.")]
         public Vector3 SqueezeAxis = Vector3.right;
         [Tooltip("Compression fraction while the nozzle is emitting.")]

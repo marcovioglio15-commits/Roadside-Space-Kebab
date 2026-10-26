@@ -27,6 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int gateSpawn;
         private readonly ContactConsumptionRejections rejections = new ContactConsumptionRejections();
         private readonly ContactPriceRun price = new ContactPriceRun();
+        private readonly InteractionAudioLoop frying = new InteractionAudioLoop();
 
         #endregion
         #region Properties
@@ -127,13 +128,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!ready)
                 return;
             // A callback may disable this component while a preceding rule publishes an event.
+            bool audible = false;
             for (int index = 0; index < runs.Length && isActiveAndEnabled; index++)
+            {
                 runs[index].Tick();
+                audible |= runs[index].IsAudible;
+            }
+            frying.Tick(settings.FryingSound && isActiveAndEnabled && audible, "sfx_frying", transform);
         }
 
         /// <summary>Releases only this interaction's active reservations and reversible effects.</summary>
         protected override void OnDisable()
         {
+            frying.Stop();
             base.OnDisable();
             ObjectInteraction.Signaled -= ObserveDialogue;
             if (AwaitingContact)

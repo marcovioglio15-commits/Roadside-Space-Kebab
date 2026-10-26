@@ -20,15 +20,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Starts a visible dialogue's audio sequence after HUD arbitration succeeds.</summary>
         /// <param name="settings">Voice and result options.</param>
         /// <param name="source">Speaking object.</param>
-        /// <param name="arrival">Whether this opening announces a new customer.</param>
-        internal void Begin(DialogueAudioSettings settings, Transform source, bool arrival)
+        internal void Begin(DialogueAudioSettings settings, Transform source)
         {
             // Arrival cues take precedence over the first voice phrase.
             Stop();
-            if (arrival)
-                PlayCue("sfx_newcustomer", source);
             nextVoice = Time.time;
             Tick(settings, source);
+        }
+
+        /// <summary>Announces completed walk-in immediately while preventing dialogue voices from masking the cue.</summary>
+        /// <param name="source">Arrived object providing the cue position.</param>
+        internal static void AnnounceArrival(Transform source)
+        {
+            PlayCue("sfx_newcustomer", source);
         }
 
         /// <summary>Plays due phrases while no dialogue cue occupies the shared audio channel.</summary>

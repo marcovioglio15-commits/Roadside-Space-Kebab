@@ -34,6 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int initializationSession = -1;
         private static int session;
         private bool destroying;
+        private bool revising;
         private bool pendingStart;
         private bool pendingCompletion;
         private string lastWarning;
@@ -56,12 +57,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int IngredientCount => parts.Count;
         /// <summary>Changes only when composition changes, invalidating a held assembly attempt.</summary>
         internal uint IngredientRevision { get; private set; }
-        /// <summary>Standalone ingredient still recoverable before a second insertion or finalization.</summary>
-        internal ObjectAssemblyPart RetrievablePart => !settings.LockFirstIngredient && !IsFinalized && parts.Count == 1 ? parts[0] : null;
+        /// <summary>Sole ingredient recoverable before finalization when its lock is disabled or prolonged assembly is pending.</summary>
+        internal ObjectAssemblyPart RetrievablePart => !IsFinalized && parts.Count == 1
+            && (!settings.LockFirstIngredient || settings.ProlongedAssembly) ? parts[0] : null;
         /// <summary>Total logical units supplied by the attached physical ingredients.</summary>
         public long IngredientUnits { get; private set; }
-        /// <summary>Whether all mandatory quantities have been supplied and at least one ingredient is present.</summary>
-        public bool IsComplete { get; private set; }
+        /// <summary>Whether ingredients satisfy the recipe and any required prolonged assembly has completed.</summary>
+        public bool IsComplete => RecipeReady && (!settings.ProlongedAssembly || IsFinalized);
+        /// <summary>Whether attached quantities and required slots allow finalization to begin.</summary>
+        internal bool RecipeReady { get; private set; }
+        /// <summary>Whether this unconfirmed prolonged recipe may transfer its ingredients to another recipe on its table.</summary>
+        internal bool CanRevise => settings.ProlongedAssembly && !IsFinalized && Table != null && parts.Count > 0
+            && Available(InteractionChannels.Assembly) && Item != null && !Item.IsReserved && !Item.IsCarried;
         /// <summary>Whether completed presentation and product interactions have been committed.</summary>
         public bool IsFinalized { get; private set; }
         /// <summary>Recipe counts recorded independently of consumption receipts.</summary>
@@ -185,7 +192,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             IsFinalized = false;
             if (Pickup != null)
                 Pickup.Confirmed = false;
-            initialized = destroying = pendingStart = pendingCompletion = IsComplete = false;
+            initialized = destroying = revising = pendingStart = pendingCompletion = RecipeReady = false;
             recipeValidated = false;
             counts.Clear();
             IngredientUnits = 0;
@@ -242,44 +249,47 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Checks shared ownership and recipe requirements before considering an ingredient's magnet.</summary>
         /// <param name="grab">Incoming ingredient.</param>
         /// <param name="requireHeld">Whether insertion requires the player's carry slot.</param>
+        /// <param name="previous">Unfinished product supplying suspended ingredients for a recipe revision.</param>
         /// <returns>True when recipe selection can proceed without bypassing an existing transaction.</returns>
-        private bool CanReceive(ObjectGrab grab, bool requireHeld)
+        private bool CanReceive(ObjectGrab grab, bool requireHeld, ObjectAssemblyProduct previous = null)
         {
             // Refresh retained session state before reading composition or ingredient eligibility.
             RefreshSession();
             return enabled && !IsLocked && ToolAllowed && Item != null && !Item.IsConsumed && !Item.IsReserved && !Item.IsCarried
-                && !Item.IsBlocked(InteractionChannels.Assembly) && AssemblyIngredientValidation.Allows(this, grab, requireHeld)
+                && !Item.IsBlocked(InteractionChannels.Assembly) && AssemblyIngredientValidation.Allows(this, grab, requireHeld, previous)
                 && ValidateRecipe();
         }
 
         /// <summary>Tracks a later ordered ingredient while a completed product waits for a companion.</summary>
         /// <param name="grab">Contact candidate for an empty recipe.</param>
+        /// <param name="previous">Unfinished product supplying retained ingredients, or null for independent candidates.</param>
         /// <returns>True when ownership and recipe membership allow the candidate to wait.</returns>
-        internal bool CanConsider(ObjectGrab grab)
+        internal bool CanConsider(ObjectGrab grab, ObjectAssemblyProduct previous = null)
         {
             // A populated product continues through ordinary insertion checks.
-            return CanReceive(grab, false) && parts.Count == 0 && AssemblyIngredientSelection.Matches(settings, grab);
+            return CanReceive(grab, false, previous) && parts.Count == 0 && AssemblyIngredientSelection.Matches(settings, grab);
         }
 
         /// <summary>Checks a whole proposed start without committing one recipe ahead of its alternatives.</summary>
         /// <param name="ingredients">Ordered physical ingredients proposed for an empty recipe.</param>
         /// <param name="complete">Receives whether the proposal finishes this recipe.</param>
+        /// <param name="previous">Unfinished product whose retained ingredients participate in this proposal.</param>
         /// <returns>True when all objects fit in order without overlapping ownership.</returns>
-        internal bool CanAcceptSequence(IReadOnlyList<ObjectGrab> ingredients, out bool complete)
+        internal bool CanAcceptSequence(IReadOnlyList<ObjectGrab> ingredients, out bool complete, ObjectAssemblyProduct previous = null)
         {
             // Validate ownership before any scratch selection accesses recipe arrays.
             complete = false;
-            if (ingredients.Count == 0 || !CanConsider(ingredients[0]))
+            if (ingredients.Count == 0 || !CanConsider(ingredients[0], previous))
                 return false;
             selection.Begin(settings);
             for (int index = 0; index < ingredients.Count; index++)
             {
                 ObjectGrab ingredient = ingredients[index];
-                if (!CanConsider(ingredient))
+                if (!CanConsider(ingredient, previous))
                     return false;
-                for (int previous = 0; previous < index; previous++)
-                    if (ingredient.transform.IsChildOf(ingredients[previous].transform)
-                        || ingredients[previous].transform.IsChildOf(ingredient.transform))
+                for (int earlier = 0; earlier < index; earlier++)
+                    if (ingredient.transform.IsChildOf(ingredients[earlier].transform)
+                        || ingredients[earlier].transform.IsChildOf(ingredient.transform))
                         return false;
                 if (!selection.Append(settings, ingredient, index + 1, out _, out _))
                     return false;
@@ -433,6 +443,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (ObjectInteraction feature in features)
                 if (feature is ObjectOutline outline)
                     outline.RemovePart(part);
+            if (revising)
+                return;
             RefreshLocks();
             RefreshGeometry();
             // Retrieving the only ingredient frees the table and removes its now empty product shell.
@@ -525,16 +537,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Applies assembly-owned locks while preserving independent unlock rules.</summary>
         private void RefreshLocks()
         {
-            // Unlisted interactions wait for all mandatory ingredients; explicit rules may enable partial use.
+            // Ingredient readiness permits charging; prolonged recipes become complete only after confirmation.
             if (features == null)
                 return;
-            IsComplete = AssemblyIngredientSelection.Completes(settings, counts, occupied, parts.Count > 0);
-            if (!IsComplete)
+            RecipeReady = AssemblyIngredientSelection.Completes(settings, counts, occupied, parts.Count > 0);
+            if (!RecipeReady)
             {
                 Pickup.Confirmed = false;
                 pendingCompletion = false;
             }
-            bool finalized = IsComplete && (!(settings.ProlongedAssembly || settings.FinalizeOnGrab) || Pickup.Confirmed);
+            bool finalized = RecipeReady && (!(settings.ProlongedAssembly || settings.FinalizeOnGrab) || Pickup.Confirmed);
             pendingCompletion |= finalized && !IsFinalized;
             IsFinalized = finalized;
             if (completedAppearanceApplied != IsFinalized)
@@ -567,6 +579,46 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 // A partial-interaction override cannot bypass prolonged assembly's pickup boundary.
                 feature.SetLocked(this, !available || feature is ObjectGrab && (RetrievablePart != null || settings.ProlongedAssembly && !IsFinalized));
             }
+        }
+
+        #endregion
+
+        #region Recipe Revision
+
+        /// <summary>Retains the actual ingredient roots in insertion order before evaluating an extended recipe.</summary>
+        /// <param name="destination">Reusable list cleared and populated with this product's suspended original Grabs.</param>
+        internal void CollectIngredients(List<ObjectGrab> destination)
+        {
+            destination.Clear();
+            foreach (ObjectAssemblyPart part in parts)
+                if (part != null)
+                    destination.Add(part.Grab);
+        }
+
+        /// <summary>Restores all original ingredients in one inactive transaction without destroying the empty rollback shell.</summary>
+        internal void ReleaseIngredientsForRevision()
+        {
+            gameObject.SetActive(false);
+            revising = true;
+            // Parent-change callbacks restore each ingredient; expensive product caches refresh only once afterwards.
+            while (parts.Count > 0)
+                parts[parts.Count - 1].transform.SetParent(null, true);
+            revising = false;
+            pendingStart = pendingCompletion = false;
+            RefreshLocks();
+            RefreshGeometry();
+        }
+
+        /// <summary>Restores a failed recipe revision without replaying the previous product's start or completion events.</summary>
+        /// <param name="ingredients">Original ordered ingredient roots, excluding the newly offered object.</param>
+        /// <returns>True when the previous recipe regained every ingredient and became active again.</returns>
+        internal bool RestoreIngredientsAfterRevision(IReadOnlyList<ObjectGrab> ingredients)
+        {
+            if (!AcceptSequence(ingredients))
+                return false;
+            pendingStart = pendingCompletion = false;
+            gameObject.SetActive(true);
+            return true;
         }
 
         #endregion

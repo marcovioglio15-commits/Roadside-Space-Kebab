@@ -8,7 +8,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         None = 0, Grab = 1, Drop = 2, Throw = 4, Container = 8, Dispenser = 16,
         TriggerAnimation = 32, Eject = 64, ModifyByContact = 128, Slice = 256,
-        GravityGenerator = 512, SpraySauce = 1024, AssemblyProduct = 2048, All = 4095
+        GravityGenerator = 512, SpraySauce = 1024, AssemblyProduct = 2048, Radio = 4096, All = 8191
     }
 
     /// <summary>Maps input participants to priority choices without changing their ordinary dispatch order.</summary>
@@ -37,6 +37,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 ObjectSlice => DialogueActionPriority.Slice,
                 ObjectGravityGenerator => DialogueActionPriority.GravityGenerator,
                 ObjectSpraySauce => DialogueActionPriority.SpraySauce,
+                ObjectAmbient { UsesInput: true } => DialogueActionPriority.Radio,
                 ObjectAssemblyProduct product => DialogueActionPriority.AssemblyProduct
                     | (product.Pickup?.Grab != null ? DialogueActionPriority.Grab : DialogueActionPriority.None),
                 _ => DialogueActionPriority.None

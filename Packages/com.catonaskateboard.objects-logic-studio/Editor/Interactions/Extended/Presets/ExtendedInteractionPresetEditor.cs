@@ -48,7 +48,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     GravityControls.Draw(settings, sections);
                     break;
                 case AmbientPreset:
-                    AmbientControls.Draw(settings);
+                    AmbientControls.Draw(settings, sections);
                     break;
                 case SlicePreset:
                     SliceControls.Draw(settings, sections);

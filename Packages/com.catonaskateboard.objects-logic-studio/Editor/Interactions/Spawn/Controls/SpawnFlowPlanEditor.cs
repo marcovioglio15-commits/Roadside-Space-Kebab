@@ -138,8 +138,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (step.FindPropertyRelative("ArrivalDialogueEnabled").boolValue)
                     {
                         Completion(step, step.FindPropertyRelative("ArrivalDialogue"), "Dialogue", true);
-                        HoverControls.Field(step, "NewCustomerSound", "Arrival Sound");
                     }
+                    HoverControls.Field(step, "NewCustomerSound", "Arrival Sound");
                     if (weighted)
                         HoverControls.Field(step, "Weight");
                     HoverControls.Field(step, "Delay");
@@ -158,7 +158,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 added.FindPropertyRelative("RequireAll").boolValue = true;
                 added.FindPropertyRelative("ArrivalDialogueEnabled").boolValue = false;
                 added.FindPropertyRelative("ArrivalDialogue").objectReferenceValue = null;
-                added.FindPropertyRelative("NewCustomerSound").boolValue = false;
+                added.FindPropertyRelative("NewCustomerSound").boolValue = true;
                 added.FindPropertyRelative("Weight").floatValue = 1f;
                 added.FindPropertyRelative("Delay").floatValue = 0f;
                 added.FindPropertyRelative("Position").vector3Value = Vector3.zero;

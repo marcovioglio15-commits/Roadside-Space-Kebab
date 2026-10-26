@@ -9,6 +9,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Controls when a grabbable object's degradation may progress.</summary>
     public enum DegradationCarryPolicy { FromSpawn, AfterFirstGrab, OnlyWhileCarried }
 
+    /// <summary>Chooses the material cue played at final impact destruction.</summary>
+    public enum DegradationBreakSound { Glass, Ceramic }
+
     /// <summary>Defines the next appearance and identity state reached after one degradation interval.</summary>
     [Serializable]
     public sealed class DegradationStep
@@ -74,6 +77,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Final Stage")]
         [Tooltip("Destroy the object after entering its final stage and publishing completion.")]
         public bool DestroyAtEnd;
+        [Tooltip("Play a material break cue when impact degradation destroys this object at its final stage.")]
+        public bool BreakSound = true;
+        [Tooltip("Choose the glass or ceramic event emitted at final impact destruction.")]
+        public DegradationBreakSound BreakMaterial;
         [Tooltip("Optional fragment prefabs created only at final destruction. No UI is generated.")]
         public DegradationFragment[] Fragments = Array.Empty<DegradationFragment>();
 
@@ -105,6 +112,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (DestroyAtEnd)
             {
+                warning = "Choose a glass or ceramic break cue for final impact destruction.";
+                if (Mode == DegradationMode.Impacts && BreakSound && BreakMaterial is not (DegradationBreakSound.Glass or DegradationBreakSound.Ceramic))
+                    return false;
                 warning = "Choose active fragment prefab roots with finite local poses.";
                 if (Fragments == null)
                     return false;

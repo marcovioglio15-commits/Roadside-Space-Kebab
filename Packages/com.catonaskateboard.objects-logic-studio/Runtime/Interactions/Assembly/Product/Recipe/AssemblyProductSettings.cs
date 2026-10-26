@@ -79,11 +79,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Base price per consumed logical product unit. A fulfilled order's price override has priority.")]
         [Range(0f, 10000f)]
         public float Price = 5f;
-        [Tooltip("Require a separate held Button action to finalize completed appearance, flags and product interactions after the recipe is ready.")]
+        [Tooltip("Keep the product incomplete and allow compatible recipe extensions on the same table until the held assembly action finishes, then commit completed appearance, flags and product interactions.")]
         public bool ProlongedAssembly;
         [Tooltip("Independent assembly input, charging behavior and HUD appearance. Used only by Prolonged Assembly.")]
         public AssemblyChargeSettings Charge = new AssemblyChargeSettings();
-        [Tooltip("Keep the first inserted ingredient inside the product. Disable to let its original Grab retrieve it until a second physical ingredient is inserted or the product is finalized.")]
+        [Tooltip("Keep the first ingredient inside the product. With Prolonged Assembly, defer this lock until successful completion. Otherwise disable to allow retrieval while it is the sole ingredient and the product is not finalized.")]
         public bool LockFirstIngredient = true;
         [Tooltip("Apply completed appearance and release product interaction gates only when the player first requests Grab with empty hands after mandatory ingredients are present.")]
         public bool FinalizeOnGrab = true;

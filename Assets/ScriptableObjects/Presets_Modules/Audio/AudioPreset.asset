@@ -243,10 +243,10 @@ MonoBehaviour:
     EventGuid: '{00135130-0838-4b26-a0f4-d2b55c541360}'
     Volume: 1
     Pitch: 1
-    Spatialize: 0
-    OverrideDistances: 0
-    MinimumDistance: 8
-    MaximumDistance: 45
+    Spatialize: 1
+    OverrideDistances: 1
+    MinimumDistance: 1
+    MaximumDistance: 6.4
     SingleInstance: 0
     LimitRate: 0
     MaxPlays: 8
@@ -287,3 +287,115 @@ MonoBehaviour:
     - Name: Channels
       Value: 3
       Global: 0
+  - Key: sfx_bottleopen
+    DisplayName: sfx_bottleopen
+    Description: 
+    EventPath: event:/SFX/ITEMS/sfx_bottleopen
+    EventGuid: '{becd6c21-20e0-405c-8b5e-bcbfabf490c5}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_cashcollect
+    DisplayName: sfx_cashcollect
+    Description: 
+    EventPath: event:/SFX/ITEMS/sfx_cashcollect
+    EventGuid: '{f763692b-2277-48f6-9644-08245463a8a7}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_glassbreak
+    DisplayName: sfx_glassbreak
+    Description: 
+    EventPath: event:/SFX/ITEMS/sfx_glassbreak
+    EventGuid: '{ff91c305-34b9-4f18-9043-5ca01595e751}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_ceramicbreak
+    DisplayName: sfx_ceramicbreak
+    Description: 
+    EventPath: event:/SFX/ITEMS/sfx_ceramicbreak
+    EventGuid: '{7f4d01c2-23e9-4721-aad5-fa007a3f307e}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_saucespread
+    DisplayName: sfx_saucespread
+    Description: 
+    EventPath: event:/SFX/ITEMS/sfx_saucespread
+    EventGuid: '{f06759da-2ccd-427d-95df-55ba34a9377e}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_bottlesqueze
+    DisplayName: sfx_bottlesqueze
+    Description: 
+    EventPath: event:/SFX/ITEMS/sfx_bottlesqueze
+    EventGuid: '{c3b2dcb0-4d1c-4cfd-8ca3-19bc3aa8eb52}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_frying
+    DisplayName: sfx_frying
+    Description: 
+    EventPath: event:/SFX/ITEMS/sfx_frying
+    EventGuid: '{84c08055-a13e-41f5-98f4-6481c5be1bbf}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []

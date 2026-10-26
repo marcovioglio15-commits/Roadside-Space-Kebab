@@ -117,6 +117,14 @@ MonoBehaviour:
       Enabled: 0
       DialogueName: 
       Occurrence: 0
+    Price:
+      CollectPrice: 0
+      Sound: 1
+      DeferDisplay: 0
+      CompletionMode: 0
+      OnDespawn: 0
+      CompletionSources: []
+    FryingSound: 1
 --- !u!65 &1446148368216571378
 BoxCollider:
   m_ObjectHideFlags: 0

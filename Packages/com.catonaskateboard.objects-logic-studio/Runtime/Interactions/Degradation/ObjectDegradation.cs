@@ -1,3 +1,4 @@
+using CatOnASkateboard.AudioStudio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -181,6 +182,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
                 }
                 grab?.Cancel();
+                if (settings.Mode == DegradationMode.Impacts && settings.BreakSound)
+                    StudioAudio.Play(settings.BreakMaterial == DegradationBreakSound.Ceramic ? "sfx_ceramicbreak" : "sfx_glassbreak", transform);
                 Item.ConsumeSelf();
                 Destroy(gameObject);
             }

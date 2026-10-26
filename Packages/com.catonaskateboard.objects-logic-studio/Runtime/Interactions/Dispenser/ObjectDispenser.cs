@@ -168,7 +168,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (!Container.TryTake(observer, position, rotation, out grab, transform, settings.PickupDuration, carry))
                         return false;
                     if (!carry)
+                    {
+                        ObjectSpawnPhysics.Protect(grab.gameObject);
                         grab = null;
+                    }
                 }
                 else
                 {
@@ -177,6 +180,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     GameObject created = ObjectSpawnHistory.Create(settings.Prefab, position, rotation);
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
                     ObjectGrab candidate = created.GetComponent<ObjectGrab>();
+                    if (!carry)
+                        ObjectSpawnPhysics.Protect(created);
                     if (candidate == null || carry && (!candidate.Begin(observer, transform, settings.PickupDuration) || !candidate.IsHeld))
                     {
                         created.SetActive(false);

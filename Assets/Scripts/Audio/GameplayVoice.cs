@@ -20,9 +20,12 @@ namespace RoadsideSpaceKebab.Audio
         private bool stopped;
         private bool spatial;
         private bool paused;
+        private float? value;
 
         /// <summary>Key used for optional single-instance arbitration.</summary>
         internal string Key => binding.Key;
+        /// <summary>Emitter used to keep local single-instance events independent from scene-wide playback.</summary>
+        internal Transform Source => source;
         /// <summary>Queued and paused voices remain owned until stopped or naturally completed.</summary>
         public bool IsPlaying => !stopped;
 
@@ -39,7 +42,8 @@ namespace RoadsideSpaceKebab.Audio
         /// <param name="parameter">Optional local parameter name.</param>
         /// <param name="label">Parameter label.</param>
         /// <param name="radius">Optional radius override.</param>
-        internal GameplayVoice(AudioBinding binding, AudioPlayback playback, Transform source, Vector3 position, string parameter, string label, float radius)
+        /// <param name="value">Optional initial numeric parameter value.</param>
+        internal GameplayVoice(AudioBinding binding, AudioPlayback playback, Transform source, Vector3 position, string parameter, string label, float radius, float? value)
         {
             // Retain source position independently from the source object's lifetime.
             this.binding = binding;
@@ -49,6 +53,7 @@ namespace RoadsideSpaceKebab.Audio
             this.parameter = parameter;
             this.label = label;
             this.radius = radius;
+            this.value = value;
         }
 
         /// <summary>Starts a ready request and tracks its lifetime and moving emitter.</summary>
@@ -103,9 +108,10 @@ namespace RoadsideSpaceKebab.Audio
                     FMODUnity.RuntimeManager.StudioSystem.setParameterByName(value.Name, value.Value);
                 else
                     instance.setParameterByName(value.Name, value.Value);
-            if (!string.IsNullOrEmpty(parameter) && instance.setParameterByNameWithLabel(parameter, label) != FMOD.RESULT.OK)
+            if (!string.IsNullOrEmpty(parameter) && (value.HasValue ? instance.setParameterByName(parameter, value.Value)
+                : instance.setParameterByNameWithLabel(parameter, label)) != FMOD.RESULT.OK)
             {
-                owner.Warn(Key + parameter + label, "FMOD label unavailable: " + Key + " / " + parameter + " / " + label);
+                owner.Warn(Key + parameter + label, "FMOD parameter unavailable: " + Key + " / " + parameter + " / " + (value.HasValue ? value.Value.ToString() : label));
                 Stop();
                 return;
             }
@@ -145,6 +151,18 @@ namespace RoadsideSpaceKebab.Audio
                 Vector3 offset = position - new Vector3(listener.position.x, listener.position.y, listener.position.z);
                 instance.setVolume(binding.Volume * Mathf.Clamp01(1f - offset.magnitude / radius));
             }
+        }
+
+        /// <summary>Changes this voice's configured local parameter without restarting its timeline.</summary>
+        /// <param name="value">Finite parameter value to apply now or at queued startup.</param>
+        /// <returns>True when the pending or live event accepts the value.</returns>
+        public bool SetParameter(float value)
+        {
+            if (stopped || string.IsNullOrEmpty(parameter) || !float.IsFinite(value))
+                return false;
+            // Queued requests retain this value; live events update their existing timeline.
+            this.value = value;
+            return !started || instance.isValid() && instance.setParameterByName(parameter, value) == FMOD.RESULT.OK;
         }
 
         /// <summary>Releases this instance once, including requests cancelled before bank readiness.</summary>

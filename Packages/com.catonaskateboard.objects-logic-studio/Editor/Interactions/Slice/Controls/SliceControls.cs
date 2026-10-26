@@ -28,12 +28,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(settings, "Priority");
                     FlagContactControls.Draw(settings.FindPropertyRelative("Contact"));
                 }
-            if (sections.Draw("Slice Audio", "Sound and Ingredient parameter for each successful cut.", settings, "Sound", "Ingredient"))
+            if (sections.Draw("Slice Audio", "Cut or bottle-opening cue for each successful step.", settings, "Sound", "SoundEvent", "Ingredient"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     HoverControls.Field(settings, "Sound");
                     if (settings.FindPropertyRelative("Sound").boolValue)
-                        HoverControls.Field(settings, "Ingredient");
+                    {
+                        HoverControls.Field(settings, "SoundEvent");
+                        if (settings.FindPropertyRelative("SoundEvent").enumValueIndex == (int)SliceSound.IngredientSlice)
+                            HoverControls.Field(settings, "Ingredient");
+                    }
                 }
             if (!sections.Draw("Slice Sequence", "Each performed press commits the next step. The last step completes this interaction.", settings, "Interval", "Steps"))
                 return;

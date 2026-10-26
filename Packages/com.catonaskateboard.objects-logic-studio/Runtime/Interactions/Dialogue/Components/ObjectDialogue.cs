@@ -78,7 +78,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private DialogueHud hud;
         private bool arrivalOnly;
         private bool arrivalPending;
-        private bool arrivalCue;
         private readonly DialogueAudioRun audio = new DialogueAudioRun();
         internal readonly DialogueSightGeometry SightGeometry = new DialogueSightGeometry();
 
@@ -307,12 +306,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Queues arrival presentation until the shared dialogue HUD becomes available.</summary>
-        /// <param name="playCue">Whether opening the HUD should announce the new customer.</param>
-        internal void RequestArrival(bool playCue)
+        internal void RequestArrival()
         {
             // The observer retains ownership of page input and arbitration.
             arrivalPending = true;
-            arrivalCue = playCue;
         }
 
         /// <summary>Schedules voice phrases only while this interaction owns presentation.</summary>
@@ -374,8 +371,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             IsSpeaking = true;
             projectileStarted = InteractionProjectileInput.Active;
             arrivalPending = false;
-            audio.Begin(settings.Audio, transform, arrivalCue);
-            arrivalCue = false;
+            audio.Begin(settings.Audio, transform);
             hud.Show(content.Entries[entry].Lines[line]);
             if (!resumed)
                 Signal(InteractionMoment.Started);

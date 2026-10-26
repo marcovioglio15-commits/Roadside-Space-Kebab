@@ -18,6 +18,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Price Collection")]
         [Tooltip("Collect recipe prices and fulfilled Available Orders price overrides. Order overrides also price consumed items without an Assembly Product.")]
         public bool CollectPrice;
+        [Tooltip("Play the cash-collection cue when a positive amount is actually released to the HUD, including deferred settlement.")]
+        public bool Sound = true;
         [Tooltip("Accumulate this interaction's earnings without updating the HUD until the selected local interactions complete.")]
         public bool DeferDisplay;
         [Tooltip("All waits for every selected interaction; Any releases earnings after the first selected completion.")]

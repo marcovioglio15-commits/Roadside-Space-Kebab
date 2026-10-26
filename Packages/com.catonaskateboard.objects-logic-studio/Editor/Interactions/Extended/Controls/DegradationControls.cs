@@ -52,7 +52,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             HoverControls.Field(settings, "DestroyAtEnd");
             if (settings.FindPropertyRelative("DestroyAtEnd").boolValue)
+            {
                 HoverControls.Field(settings, "Fragments");
+                if (impacts)
+                {
+                    HoverControls.Field(settings, "BreakSound");
+                    if (settings.FindPropertyRelative("BreakSound").boolValue)
+                        HoverControls.Field(settings, "BreakMaterial");
+                }
+            }
         }
 
         #endregion

@@ -56,13 +56,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings, "Capacity", "Capacity (Seconds)");
                 }
             if (sections.Draw("Bottle Squeeze", "Compression during held emission or before a timed burst.", settings,
-                "Squeeze", "SqueezeAxis", "Compression", "SqueezeDuration"))
+                "Squeeze", "SqueezeAxis", "Compression", "SqueezeDuration", "SqueezeSound"))
                 using (new EditorGUI.IndentLevelScope())
                 {
                     Fields(settings, "Squeeze");
                     if (settings.FindPropertyRelative("Squeeze").boolValue)
-                        Fields(settings, "SqueezeAxis", "Compression", "SqueezeDuration");
+                        Fields(settings, "SqueezeAxis", "Compression", "SqueezeDuration", "SqueezeSound");
                 }
+            HoverControls.Field(settings, "FlowSound");
             bool deposits = settings.boxedValue is SpraySauceSettings configuration && configuration.UsesDeposits;
             if (sections.Draw("Surface Deposits", "Ordinary dirt on impact. Target rules can enable dedicated lasting deposits.", settings, "LeaveTrail", "DepositInterval"))
                 using (new EditorGUI.IndentLevelScope())
