@@ -21,6 +21,7 @@ MonoBehaviour:
   InteractOnBulletImpact: 1
   Weapon:
     Mode: 1
+    IgnoreInteractionRange: 1
     ShotsPerUse: 1
     ShotInterval: 0.08
     MuzzleEffect:
@@ -31,11 +32,11 @@ MonoBehaviour:
       Scale: 0.1
       Lifetime: 0.3
     ShotEffect:
-      Prefab: {fileID: 1830508508936448, guid: 659814323bd726a4999afb3ffef0a9d6, type: 3}
+      Prefab: {fileID: 4554150683601547122, guid: 0e325e731a40bd04d96ed3dcf88e90c1, type: 3}
       Path: 
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
-      Scale: 0.1
+      Scale: 0.7
       Lifetime: 0.3
     MuzzlePath: 
     MuzzlePosition: {x: 0.047999978, y: 0.0084, z: 0.87900007}

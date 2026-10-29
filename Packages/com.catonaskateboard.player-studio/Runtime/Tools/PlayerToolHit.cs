@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.PlayerStudio
 {
-    /// <summary>Describes a real projectile contact using the tool and action captured at firing time.</summary>
+    /// <summary>Captures a projectile or cursor contact independently of later tool changes.</summary>
     public readonly struct PlayerToolHit
     {
         #region Properties
@@ -22,10 +22,12 @@ namespace CatOnASkateboard.PlayerStudio
         public Vector3 Origin { get; }
         /// <summary>Normalized world flight direction.</summary>
         public Vector3 Direction { get; }
-        /// <summary>World flight speed captured when this projectile was fired.</summary>
+        /// <summary>Bullet travel speed or cursor impact speed captured when the shot was fired.</summary>
         public float Speed { get; }
-        /// <summary>Whether this contact came from an instant cursor request and retains normal interaction reach limits.</summary>
+        /// <summary>Whether this contact came from an instant cursor request.</summary>
         public bool IsCursorUse { get; }
+        /// <summary>Whether this shot bypasses the target interaction's reach limit.</summary>
+        public bool IgnoreInteractionRange { get; }
         /// <summary>Incoming world velocity used by interactions that derive an impulse from the shot.</summary>
         public Vector3 Velocity => Direction * Speed;
 
@@ -43,10 +45,11 @@ namespace CatOnASkateboard.PlayerStudio
         /// <param name="contact">Actual swept collision result.</param>
         /// <param name="origin">Original world muzzle position.</param>
         /// <param name="direction">Normalized flight direction.</param>
-        /// <param name="speed">Flight speed captured at emission, in metres per second.</param>
+        /// <param name="speed">Travel or impact speed captured at emission, in metres per second.</param>
         /// <param name="isCursorUse">Whether the contact represents an instant cursor interaction.</param>
+        /// <param name="ignoreInteractionRange">Whether a cursor shot bypasses the target's reach limit.</param>
         internal PlayerToolHit(PlayerTools shooter, PlayerTool tool, Guid actionId, bool triggersInteractions,
-            RaycastHit contact, Vector3 origin, Vector3 direction, float speed, bool isCursorUse = false)
+            RaycastHit contact, Vector3 origin, Vector3 direction, float speed, bool isCursorUse = false, bool ignoreInteractionRange = true)
         {
             // Value snapshots prevent a later tool switch from redirecting an in-flight interaction.
             Shooter = shooter;
@@ -58,6 +61,7 @@ namespace CatOnASkateboard.PlayerStudio
             Direction = direction;
             Speed = speed;
             IsCursorUse = isCursorUse;
+            IgnoreInteractionRange = !isCursorUse || ignoreInteractionRange;
         }
 
         #endregion

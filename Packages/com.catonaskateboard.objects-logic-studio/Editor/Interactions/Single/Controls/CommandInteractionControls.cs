@@ -154,9 +154,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(settings, "Mode");
                     if (self)
                     {
-                        HoverControls.Field(settings, "UseBulletImpulse");
+                        HoverControls.Field(settings, "UseBulletImpulse", "Use Shot Impulse");
                         if (settings.FindPropertyRelative("UseBulletImpulse").boolValue)
-                            HoverControls.Field(settings, "BulletImpulseMultiplier");
+                            HoverControls.Field(settings, "BulletImpulseMultiplier", "Shot Impulse Multiplier");
                         else
                         {
                             HoverControls.Field(settings.FindPropertyRelative("SelfImpulse"), "Impulse");

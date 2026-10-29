@@ -73,6 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int nextEntry;
         private bool armed = true;
         private bool projectileStarted;
+        private bool ignoreExitRange;
         private bool retained;
         private bool awaitingSight;
         private DialogueHud hud;
@@ -219,7 +220,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float distance = (transform.position - player.position).sqrMagnitude;
             if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
                 armed = true;
-            return !IsSpeaking && (InteractionProjectileInput.PhysicalImpact || distance <= settings.Distance * settings.Distance) && eligible.Count > 0
+            return !IsSpeaking && (InteractionProjectileInput.IgnoreRange || distance <= settings.Distance * settings.Distance) && eligible.Count > 0
                 && (armed || settings.Trigger == DialogueTrigger.InputAction && settings.ReplayOnInput
                     || settings.Trigger == DialogueTrigger.Consumption && (startedRevision != Item.ConsumptionRevision
                         || contact != null && contact.AwaitingContact && startedContactRevision != contact.ContactRevision));
@@ -232,7 +233,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // No controller, cursor or movement state is changed when range is lost.
             return Available(InteractionChannels.Dialogue) && hud != null && hud.Ready
-                && (arrivalOnly || projectileStarted || (transform.position - player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance);
+                && (arrivalOnly || ignoreExitRange || (transform.position - player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance);
         }
 
         /// <summary>Rebuilds the compact entry catalog only after consumption history changes.</summary>
@@ -293,7 +294,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanAdvance(HoverObserver observer, DialogueVisibility visibility)
         {
             if (InteractionProjectileInput.CursorUse)
-                return (transform.position - observer.Player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance
+                return (InteractionProjectileInput.IgnoreRange || (transform.position - observer.Player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance)
                     && visibility.HasSight(observer, this);
             // Blocking an advance does not interrupt presentation or change its retained page.
             return arrivalOnly || InteractionProjectileInput.Active || !settings.RequireSightToContinue || visibility.HasSight(observer, this);
@@ -375,6 +376,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 handledAwaitingRevision = contact.ContactRevision;
             IsSpeaking = true;
             projectileStarted = InteractionProjectileInput.PhysicalImpact;
+            ignoreExitRange = InteractionProjectileInput.IgnoreRange;
             arrivalPending = false;
             audio.Begin(settings.Audio, transform);
             hud.Show(content.Entries[entry].Lines[line]);

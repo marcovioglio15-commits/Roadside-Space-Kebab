@@ -24,8 +24,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Whether interaction arbitration currently processes an actual bullet contact.</summary>
         internal static bool Active => active;
-        /// <summary>Whether this pulse represents a pointer contact that retains ordinary reach limits.</summary>
+        /// <summary>Whether this pulse represents an exact pointer contact.</summary>
         internal static bool CursorUse => active && current.IsCursorUse;
+        /// <summary>Whether the captured shot bypasses the target interaction's reach limit.</summary>
+        internal static bool IgnoreRange => active && current.IgnoreInteractionRange;
         /// <summary>Whether a swept projectile establishes contact independently of interaction reach.</summary>
         internal static bool PhysicalImpact => active && !current.IsCursorUse;
         /// <summary>Exact captured pointer surface used instead of nearby screen anchors.</summary>

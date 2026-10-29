@@ -176,7 +176,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             for (int index = 0; index < buttons.Length; index++)
                 if (counts[index] < settings.Conditions[index].Count && buttons[index] is { Pending: true }
-                    && (InteractionProjectileInput.PhysicalImpact || (settings.Target.transform.position - player.position).sqrMagnitude
+                    && (InteractionProjectileInput.IgnoreRange || (settings.Target.transform.position - player.position).sqrMagnitude
                     <= settings.Conditions[index].Distance * settings.Conditions[index].Distance))
                 {
                     InteractionProjectileInput.Confirm(this);

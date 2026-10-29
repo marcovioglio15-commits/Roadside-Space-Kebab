@@ -62,9 +62,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public BlackHoleSettings BlackHole = new BlackHoleSettings();
         [Tooltip("Apply one impulse to this object's own Rigidbody instead of searching for flagged contacts.")]
         public bool SelfEject;
-        [Tooltip("Require a matching weapon bullet impact and replace Self Impulse with its incoming velocity multiplied by Bullet Impulse Multiplier. The direction is captured before any prerequisite animation.")]
+        [Tooltip("Use the matching shot's direction and speed instead of Self Impulse. Works with bullets and Cursor Interaction.")]
         public bool UseBulletImpulse;
-        [Tooltip("Multiplier applied to the bullet's world velocity at firing time. Impulse mode then respects the ejected body's mass; Velocity Change uses the result directly.")]
+        [Tooltip("Multiply the shot's direction and speed by this value. Impulse also accounts for the body's mass.")]
         [Range(0.001f, 10f)]
         public float BulletImpulseMultiplier = 0.1f;
         [Tooltip("Single impulse for Self Eject. Flags are unused in this mode.")]

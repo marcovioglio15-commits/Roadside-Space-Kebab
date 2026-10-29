@@ -222,7 +222,8 @@ namespace CatOnASkateboard.PlayerStudio
                 return;
             Vector3 direction = contact.point - position;
             PlayerTools.PublishCursorUse(new PlayerToolHit(owner, tool, owner.UseActionId, true, contact, position,
-                direction.sqrMagnitude > 0.000001f ? direction.normalized : rotation * Vector3.forward, 0f, true));
+                direction.sqrMagnitude > 0.000001f ? direction.normalized : rotation * Vector3.forward,
+                tool.Weapon.Speed, true, tool.Weapon.IgnoreInteractionRange));
         }
 
         /// <summary>Shows impact feedback only after an interaction accepts this cursor contact.</summary>

@@ -25,9 +25,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             bool projectile = weapon.FindPropertyRelative("Mode").enumValueIndex == (int)PlayerToolWeaponMode.Projectile;
             if (projectile)
                 StudioFields.Draw(data, "InteractOnBulletImpact");
+            else
+                StudioFields.Draw(weapon, "IgnoreInteractionRange");
             Muzzle(data, weapon, tool, hierarchy, root);
             if (projectile)
                 StudioFields.Draw(weapon, "Bullet", "Speed", "Radius");
+            else
+                StudioFieldGUI.PropertyField(weapon.FindPropertyRelative("Speed"), new GUIContent("Impact speed", weapon.FindPropertyRelative("Speed").tooltip));
             StudioFields.Draw(weapon, "Distance", "Layers", "HitTriggers", "Capacity");
             Effect(weapon.FindPropertyRelative("MuzzleEffect"), root, true);
             Effect(weapon.FindPropertyRelative("ShotEffect"), root, false);

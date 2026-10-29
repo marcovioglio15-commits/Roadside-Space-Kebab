@@ -38,10 +38,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 score = 0f;
                 if (!InteractionProjectileInput.Allows(root))
                     return false;
-                // Instant pointer use retains reach, clipping, solid-only rules and obstruction checks.
+                // Pointer shots keep exact geometry, clipping, solid-only rules and obstruction checks.
                 return InteractionProjectileInput.PhysicalImpact
                     || (!solidHitOnly || !InteractionProjectileInput.Contact.collider.isTrigger)
-                        && Visible(observer, root, InteractionProjectileInput.Contact.point, distance, float.PositiveInfinity, mask, out score);
+                        && Visible(observer, root, InteractionProjectileInput.Contact.point,
+                            InteractionProjectileInput.IgnoreRange ? float.PositiveInfinity : distance, float.PositiveInfinity, mask, out score);
             }
             // Target geometry may have moved since the last physics step or assembly insertion.
             Camera view = observer.View;

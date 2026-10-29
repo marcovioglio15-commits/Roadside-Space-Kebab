@@ -21,6 +21,8 @@ namespace CatOnASkateboard.PlayerStudio
         [Header("Firing")]
         [Tooltip("Fire a bullet, or use a valid interaction under the cursor. Cursor Interaction also works with the fake cursor.")]
         public PlayerToolWeaponMode Mode;
+        [Tooltip("Hit targets beyond their interaction range. The weapon's Distance still limits the shot.")]
+        public bool IgnoreInteractionRange = true;
         [Tooltip("Shots fired with one use. Stops sooner if the magazine runs out.")]
         [Range(1, 32)]
         public int ShotsPerUse = 1;
@@ -45,10 +47,10 @@ namespace CatOnASkateboard.PlayerStudio
         [Header("Bullet")]
         [Tooltip("Bullet prefab. Positive Z points forward. The tool handles its movement.")]
         public GameObject Bullet;
-        [Tooltip("Bullet speed, in units per second.")]
+        [Tooltip("Bullet speed. In Cursor Interaction, this sets the speed used by interactions that push objects.")]
         [Range(0.1f, 300f)]
         public float Speed = 40f;
-        [Tooltip("How far the shot can reach. Cursor interactions also use their own distance limits.")]
+        [Tooltip("How far the shot can reach. Turn off Ignore Interaction Range to also use each target's range.")]
         [Range(0.1f, 1000f)]
         public float Distance = 100f;
         [Tooltip("Bullet collision radius. Use zero for a very thin shot.")]
@@ -150,8 +152,8 @@ namespace CatOnASkateboard.PlayerStudio
                 || MuzzlePath == null || !Finite(MuzzlePosition) || !Finite(MuzzleRotation)
                 || !Positive(Distance) || Capacity < 1 || Capacity > 128)
                 return false;
-            warning = "Projectile mode requires a bullet prefab, positive finite speed and a non-negative finite collision radius.";
-            if (Mode == PlayerToolWeaponMode.Projectile && (Bullet == null || !Positive(Speed) || !NonNegative(Radius)))
+            warning = "Use a positive speed. Projectile mode also needs a bullet prefab and a non-negative collision radius.";
+            if (!Positive(Speed) || Mode == PlayerToolWeaponMode.Projectile && (Bullet == null || !NonNegative(Radius)))
                 return false;
             if (MuzzleEffect != null && !MuzzleEffect.TryValidate(true, out warning)
                 || ShotEffect != null && !ShotEffect.TryValidate(false, out warning))
