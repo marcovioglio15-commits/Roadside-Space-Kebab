@@ -13,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Detached volume configuration.</param>
         internal static void Deathbox(SerializedProperty settings)
         {
-            // Collider geometry is authored on the object rather than generated during gameplay.
+            // Collider geometry is configured on the object rather than generated during gameplay.
             HoverControls.Field(settings, "Layers");
             HoverControls.Field(settings, "AffectPlayer");
             HoverControls.Field(settings, "AffectStatic");
@@ -28,7 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(settings, "Maximum");
             HoverControls.Field(settings, "IncludeFixedObjects");
             HoverControls.Field(settings, "UseOwnFlags");
-            if (!settings.FindPropertyRelative("UseOwnFlags").boolValue)
+            if (!settings.FindPropertyRelative("UseOwnFlags").boolValue && ObjectGroupScope.Allows(settings.FindPropertyRelative("Flags")))
                 ObjectFlagSelector.Draw(settings.FindPropertyRelative("Flags"));
             HoverControls.Field(settings, "OffscreenDelay");
         }

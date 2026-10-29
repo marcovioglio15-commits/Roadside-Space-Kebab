@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Linked storage restores original instances and has no separate prefab stock.
             Target(settings.FindPropertyRelative("Target"), sections);
             if (sections.Draw("Dispenser Supply", "Choose prefab supply or recover the last object deposited in this object's Container.", settings, "UseContainer", "Prefab", "Unlimited", "Stock"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "UseContainer");
                     if (!settings.FindPropertyRelative("UseContainer").boolValue)
@@ -31,7 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings, "Stock");
                 }
             if (sections.Draw("Dispenser Output", "Choose carried pickup or release objects at independently placed outlets.", settings, "Mode", "Interval", "Outlets", "PickupDuration", "OutputRotation"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "Mode");
                     if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex == DispenseMode.ToHand)
@@ -46,7 +46,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         DispenserOutletControls.Draw(settings);
                     }
                 }
-            HoverControls.Field(settings, "StepCounter");
+            if (sections.Draw("Dispense counting", "Choose what advances each step.", settings, "StepCounter"))
+                using (new StudioIndentScope())
+                    HoverControls.Field(settings, "StepCounter");
             if (settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue
                 || settings.FindPropertyRelative("StepCounter").enumValueIndex == (int)DispenseStepCounter.Dispensed)
                 InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Dispense Steps");
@@ -60,7 +62,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Hidden inventory retains the same instance; only presentation controls become irrelevant.
             Target(settings.FindPropertyRelative("Target"), sections);
             if (sections.Draw("Container Storage", "Store carried objects or use accepted items to refill finite prefab supply.", settings, "AllowedFlags", "Match", "Unlimited", "Capacity", "LimitToDispenserSpace", "RefillDispenser", "KeepVisible", "Position", "Rotation", "Spacing"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Storage(settings);
             InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Container Steps");
         }
@@ -71,7 +73,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Linked capacity is independent of the Container's own maximum count.
             SerializedProperty flags = settings.FindPropertyRelative("AllowedFlags");
-            ObjectFlagSelector.Draw(flags);
+            if (ObjectGroupScope.Allows(flags))
+                ObjectFlagSelector.Draw(flags);
             if (flags.arraySize > 1)
                 HoverControls.Field(settings, "Match");
             UnityEngine.Object owner = settings.serializedObject.targetObject;
@@ -102,7 +105,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Exact cursor mode does not use a screen-centre tolerance.
             if (!sections.Draw("Action Targeting", "Configure reach, aim and solid obstruction layers.", target))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(target, "Distance");
             HoverControls.Field(target, "Mode");
             Aim(target, "Mode", "Offset");
@@ -129,6 +132,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="property">Prefab reference receiving a project asset.</param>
         internal static void Prefab(SerializedProperty property)
         {
+            if (!ObjectGroupScope.Allows(property))
+                return;
             // Scene instances cannot enter reusable interaction or spawn settings.
             EditorGUI.BeginChangeCheck();
             GameObject selected = (GameObject)StudioGUI.ObjectField(StudioFieldMenu.Value(property, new GUIContent(property.displayName, property.tooltip)),

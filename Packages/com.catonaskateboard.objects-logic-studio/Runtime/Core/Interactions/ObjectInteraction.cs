@@ -133,7 +133,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
         }
 
-        /// <summary>Combines authored component availability with temporary item restrictions.</summary>
+        /// <summary>Combines configured component availability with temporary item restrictions.</summary>
         /// <param name="channels">Interaction family currently being attempted.</param>
         /// <param name="acceptedTool">Captured tool retained by an already accepted delayed projectile request, or null for normal eligibility.</param>
         /// <returns>True when the interaction may participate.</returns>
@@ -144,7 +144,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && (Item == null || !Item.IsBlocked(channels));
         }
 
-        /// <summary>Adds or removes one rule's independent lock without changing the authored enabled state.</summary>
+        /// <summary>Adds or removes one rule's independent lock without changing the configured enabled state.</summary>
         /// <param name="owner">Unlock rule owning this restriction.</param>
         /// <param name="locked">Whether the rule is still waiting for its conditions.</param>
         internal void SetLocked(UnityEngine.Object owner, bool locked)
@@ -191,7 +191,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // A later Unlock may already have released this rule even though its conditions once completed.
             return ruleLocks != null && ruleLocks.Contains(owner);
         }
-        /// <summary>Resolves an editor-authored prefab identity to this clone's corresponding instance root.</summary>
+        /// <summary>Resolves an editor-configured prefab identity to this clone's corresponding instance root.</summary>
         /// <param name="identity">Stable component identity selected by a spawn condition.</param>
         /// <param name="root">Receives the runtime root remapped by Unity during prefab instantiation.</param>
         /// <returns>True when this interaction belongs to the requested prefab source.</returns>
@@ -212,6 +212,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="moment">Lifecycle boundary reached by this interaction.</param>
         internal void Signal(InteractionMoment moment)
         {
+            InteractionProjectileInput.Confirm(this);
             // A hit-started operation can finish after selection changes; fresh input still uses RequestToolAllowed.
             if (moment == InteractionMoment.Started)
                 projectileTool = InteractionProjectileInput.Active ? InteractionProjectileInput.Tool : null;

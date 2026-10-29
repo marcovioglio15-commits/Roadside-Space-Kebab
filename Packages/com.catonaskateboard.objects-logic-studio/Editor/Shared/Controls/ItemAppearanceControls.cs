@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             settings.isExpanded = StudioArrayGUI.Foldout(settings, new GUIContent(settings.displayName, settings.tooltip));
             if (!settings.isExpanded)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             GameObject source = HierarchyPathMenu.Source(settings, explicitSource, suggested);
             DrawList(settings.FindPropertyRelative("Meshes"), source, true);
             DrawList(settings.FindPropertyRelative("Materials"), source, false);
@@ -36,7 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             array.isExpanded = StudioArrayGUI.Foldout(array, new GUIContent("Renderer Visibility (" + array.arraySize + ")", array.tooltip));
             if (!array.isExpanded)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             for (int index = 0; index < array.arraySize; index++)
             {
                 if (StudioArrayGUI.Header(array, index, new GUIContent("Renderer " + (index + 1), "Show or hide an existing renderer.")))
@@ -44,6 +44,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty entry = array.GetArrayElementAtIndex(index);
                 if (!entry.isExpanded)
                     continue;
+                using StudioIndentScope entryContent = new StudioIndentScope();
                 HierarchyPathMenu.Draw(entry.FindPropertyRelative("Path"), source, false);
                 HoverControls.Field(entry, "Visible");
             }
@@ -60,7 +61,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             array.isExpanded = StudioArrayGUI.Foldout(array, new GUIContent(array.displayName + " (" + array.arraySize + ")", array.tooltip));
             if (!array.isExpanded)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             for (int index = 0; index < array.arraySize; index++)
             {
                 SerializedProperty entry = array.GetArrayElementAtIndex(index);

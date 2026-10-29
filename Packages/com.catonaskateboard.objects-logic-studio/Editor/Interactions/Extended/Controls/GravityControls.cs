@@ -17,7 +17,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
             if (sections.Draw("Area of Effect", "Optional spatial selection shared by objects and the player.", settings, "Area"))
-                Area(settings.FindPropertyRelative("Area"));
+                using (new StudioIndentScope())
+                    Area(settings.FindPropertyRelative("Area"));
             HoverControls.Field(settings, "AffectObjects");
             HoverControls.Field(settings, "AffectPlayer");
             SerializedProperty player = settings.FindPropertyRelative("Player");
@@ -33,12 +34,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 HoverControls.Field(settings, "FilterPlayer");
                 if (sections.Draw("Player Suspension", "Simulate an existing CharacterController as a weightless body.", settings, "Player"))
-                    Player(settings.FindPropertyRelative("Player"));
+                    using (new StudioIndentScope())
+                        Player(settings.FindPropertyRelative("Player"));
             }
             if ((settings.FindPropertyRelative("AffectObjects").boolValue
                 || settings.FindPropertyRelative("AffectPlayer").boolValue && settings.FindPropertyRelative("FilterPlayer").boolValue)
                 && sections.Draw("Affected Objects", "Combine the enabled layer, identity and interaction groups.", settings, "Filter"))
-                Filter(settings.FindPropertyRelative("Filter"));
+                using (new StudioIndentScope())
+                    Filter(settings.FindPropertyRelative("Filter"));
             RandomScalar(settings, "RandomInterval", "Interval", "IntervalRange");
             HoverControls.Field(settings, "Restore");
             GravityRestoreMode restore = (GravityRestoreMode)settings.FindPropertyRelative("Restore").enumValueIndex;
@@ -66,7 +69,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="area">Serialized sphere or oriented box configuration.</param>
         private static void Area(SerializedProperty area)
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(area, "Enabled");
             if (!area.FindPropertyRelative("Enabled").boolValue)
                 return;
@@ -89,7 +92,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Serialized virtual-body configuration.</param>
         private static void Player(SerializedProperty settings)
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(settings, "Mass");
             HoverControls.Field(settings, "ForceMultiplier");
             HoverControls.Field(settings, "InitialMomentum");
@@ -112,7 +115,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="includeSelf">Whether this effect supports including its own hierarchy.</param>
         internal static void Filter(SerializedProperty filter, bool includeSelf = true)
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             if (includeSelf)
                 HoverControls.Field(filter, "IncludeSelf");
             HoverControls.Field(filter, "RequireAllGroups");

@@ -57,11 +57,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             Animation("UseAnimation");
             StudioFields.Draw(serializedObject, "UseInterval", "IsWeapon");
             if (serializedObject.FindProperty("IsWeapon").boolValue)
-            {
-                StudioFields.Draw(serializedObject, "InteractOnBulletImpact");
-                Weapon(serializedObject.FindProperty("Weapon"));
-            }
+                PlayerToolWeaponControls.Draw(serializedObject, (PlayerTool)target, hierarchySource);
             StudioFields.Draw(serializedObject, "ReloadEnabled");
+            if (serializedObject.FindProperty("IsWeapon").boolValue)
+            {
+                StudioFields.Draw(serializedObject, "LimitedMagazine");
+                if (serializedObject.FindProperty("LimitedMagazine").boolValue)
+                    StudioFields.Draw(serializedObject, "MagazineSize");
+            }
             if (serializedObject.FindProperty("ReloadEnabled").boolValue)
                 Reload();
             // Shared tool assets retain switch clips for players that use multiple tools.
@@ -100,61 +103,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // All action clips resolve tracks relative to the same Tools root.
             PlayerToolFields.Animation(serializedObject.FindProperty(name), hierarchySource != null ? hierarchySource.transform : null);
-        }
-
-        /// <summary>Edits muzzle bindings, projectile behavior and only the active optional impact and aim settings.</summary>
-        /// <param name="weapon">Serialized weapon settings.</param>
-        private void Weapon(SerializedProperty weapon)
-        {
-            Transform root = hierarchySource != null ? hierarchySource.transform : null;
-            PlayerHierarchyMenu.DrawPath(weapon.FindPropertyRelative("MuzzlePath"), root,
-                new GUIContent("Muzzle Parent", weapon.FindPropertyRelative("MuzzlePath").tooltip), true);
-            PlayerToolFields.Vector(weapon.FindPropertyRelative("MuzzlePosition"), -5f, 5f);
-            PlayerToolFields.Vector(weapon.FindPropertyRelative("MuzzleRotation"), -180f, 180f);
-            using (new EditorGUI.DisabledScope(root == null || EditorApplication.isPlayingOrWillChangePlaymode))
-                if (StudioButton.Draw(new GUIContent("Muzzle Preview", "Position and rotate the firing point against the selected hierarchy.")))
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    PlayerToolMuzzleWindow.Open((PlayerTool)target, hierarchySource);
-                    GUIUtility.ExitGUI();
-                }
-            StudioFields.Draw(weapon, "Bullet", "Speed", "Distance", "Radius", "Layers", "HitTriggers", "Capacity", "Impact");
-            if (weapon.FindPropertyRelative("Impact").objectReferenceValue != null)
-            {
-                StudioFields.Draw(weapon, "ImpactScale", "ImpactLifetime", "AutomaticImpactPlacement");
-                bool automatic = weapon.FindPropertyRelative("AutomaticImpactPlacement").boolValue;
-                if (automatic)
-                    StudioFields.Draw(weapon, "ImpactPlacementMode", "ImpactPenetration");
-                if (!automatic
-                    || weapon.FindPropertyRelative("ImpactPlacementMode").enumValueIndex == (int)PlayerToolImpactPlacementMode.PreserveOrientation)
-                {
-                    StudioFields.Draw(weapon, "ImpactOrientation");
-                    if (weapon.FindPropertyRelative("ImpactOrientation").enumValueIndex == (int)PlayerToolImpactOrientation.SurfaceNormal)
-                        StudioFields.Draw(weapon, "ImpactSurfaceAligned");
-                    PlayerToolFields.Vector(weapon.FindPropertyRelative("ImpactRotation"), -180f, 180f);
-                }
-                if (!automatic)
-                    StudioFields.Draw(weapon, "ImpactOffset");
-                StudioFields.Draw(weapon, "ImpactAtRange");
-            }
-            StudioFields.Draw(weapon, "AutoAim");
-            if (!weapon.FindPropertyRelative("AutoAim").boolValue)
-                return;
-            PlayerHierarchyMenu.DrawPath(weapon.FindPropertyRelative("AimPath"), root,
-                new GUIContent("Aim Pivot", weapon.FindPropertyRelative("AimPath").tooltip), root != null && root.GetComponent<PlayerHost>() == null);
-            StudioFields.Draw(weapon, "AimDistance", "AimResponse");
-            StudioFields.Draw(weapon, "RepositionAim");
-            if (weapon.FindPropertyRelative("RepositionAim").boolValue)
-            {
-                StudioFields.Draw(weapon, "RepositionDistance", "RepositionRadius", "RepositionResponse");
-                if (weapon.FindPropertyRelative("AutomaticImpactPlacement").boolValue
-                    && weapon.FindPropertyRelative("Impact").objectReferenceValue != null)
-                {
-                    StudioFields.Draw(weapon, "AlignBeforeShot");
-                    if (weapon.FindPropertyRelative("AlignBeforeShot").boolValue)
-                        StudioFields.Draw(weapon, "ShotAlignmentDuration", "ShotAlignmentSamples");
-                }
-            }
         }
 
         #endregion

@@ -38,7 +38,7 @@ namespace CatOnASkateboard.StudioColors.Editor
 
         /// <summary>Edits an index through a bounded slider without changing saved data on repaint.</summary>
         /// <param name="label">Field caption and tooltip.</param>
-        /// <param name="value">Current authored index.</param>
+        /// <param name="value">Current configured index.</param>
         /// <param name="minimum">First selectable index.</param>
         /// <param name="maximum">Last selectable index.</param>
         /// <param name="options">Optional layout constraints.</param>
@@ -92,7 +92,7 @@ namespace CatOnASkateboard.StudioColors.Editor
 
         /// <summary>Draws a transient scalar with visible recommended endpoints and precise numeric entry.</summary>
         /// <param name="label">Field caption and tooltip.</param>
-        /// <param name="value">Current authored value.</param>
+        /// <param name="value">Current configured value.</param>
         /// <param name="minimum">Suggested lower endpoint.</param>
         /// <param name="maximum">Suggested upper endpoint.</param>
         /// <param name="options">Optional layout constraints.</param>
@@ -277,6 +277,8 @@ namespace CatOnASkateboard.StudioColors.Editor
         /// <returns>Unity's foldout result.</returns>
         public static bool PropertyField(SerializedProperty property, GUIContent label, bool includeChildren = false, params GUILayoutOption[] options)
         {
+            if (StudioFieldRenderScope.Draw(property, label))
+                return property.isExpanded;
             // Unity remains responsible for custom drawers and validation of native field types.
             StudioFieldMenu.TakeNext();
             if (includeChildren && property.isArray && property.propertyType == SerializedPropertyType.Generic)
@@ -329,6 +331,14 @@ namespace CatOnASkateboard.StudioColors.Editor
                 while (child.NextVisible(child.isExpanded));
             child.Dispose();
             return property.Copy();
+        }
+
+        /// <summary>Returns a cached numeric interval declared on an editor field.</summary>
+        /// <param name="property">Serialized numeric field.</param>
+        /// <returns>The declared interval, or null when none is specified.</returns>
+        public static RangeAttribute RangeFor(SerializedProperty property)
+        {
+            return StudioPropertySchema.Range(property);
         }
 
         #endregion

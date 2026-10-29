@@ -19,24 +19,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             GameObject source = HierarchyPathMenu.Source(settings);
             if (sections.Draw("Black Hole Destination", "Collector and optional approach point.", settings,
                 "ColliderPath", "ColliderIndex", "Offset", "ArrivalRadius", "GuideEntrance", "EntranceOffset"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Destination(settings, source);
             if (sections.Draw("Black Hole Effect Area", "Choose the population's admission region independently of its destination.", settings, "Area", "Radius"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Area(settings);
             if (sections.Draw("Black Hole Selection & Capacity", "Eligibility and bounded acquisition work.", settings, "Filter", "ReleaseKinematic", "Performance"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Selection(settings);
             if (sections.Draw("Black Hole Attraction", "Duration, inward motion and optional spiral.", settings, "Duration", "Acceleration", "MaximumSpeed", "Spiral", "SpiralAxis", "SpiralSpeed"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Attraction(settings);
             if (sections.Draw("Black Hole Collision & Navigation", "Stream traffic, solid obstacles and path planning.", settings,
                 "IgnoreParticipantCollisions", "PassThrough", "PassageLayers", "Obstacles"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Collisions(settings);
             if (sections.Draw("Black Hole Arrival Impulse", "Applied once at the collector, where the optional lifetime begins.", eject,
                 "Mode", "BlackHole.Impulse", "BlackHole.ImpulseSpace", "BlackHole.ReplaceVelocity"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(eject, "Mode", "Force Mode");
                     Vector(settings, "Impulse", -100f, 100f);
@@ -140,6 +140,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Vector(SerializedProperty parent, string name, float minimum, float maximum)
         {
             SerializedProperty field = parent.FindPropertyRelative(name);
+            if (!ObjectGroupScope.Allows(field))
+                return;
             Vector3 value = field.vector3Value;
             EditorGUI.BeginChangeCheck();
             value.x = StudioFieldGUI.Slider(new GUIContent(field.displayName + " X", field.tooltip), value.x, minimum, maximum);

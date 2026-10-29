@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
@@ -15,7 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             if (!sections.Draw("Preparation", "Snap the contact item, optionally confirm, then animate before applying effects.", settings))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(settings, "Snap");
             if (settings.FindPropertyRelative("Snap").boolValue)
             {

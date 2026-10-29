@@ -73,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     if (!day.isExpanded)
                         continue;
-                    using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                    using StudioIndentScope indent = new StudioIndentScope();
                     HoverControls.Field(day, "Name");
                     Scene(day.FindPropertyRelative("Scene"), "Scene");
                     SpawnFlowSceneControls.Draw(day);
@@ -130,7 +130,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     if (!step.isExpanded)
                         continue;
-                    using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                    using StudioIndentScope indent = new StudioIndentScope();
                     HoverControls.Field(step, "Name");
                     TransferInteractionControls.Prefab(step.FindPropertyRelative("Prefab"));
                     Completions(step);
@@ -243,7 +243,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             enabled.boolValue = StudioGUI.Toggle(StudioFieldMenu.Value(enabled, new GUIContent(label, enabled.tooltip)), enabled.boolValue);
             if (!enabled.boolValue)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(animation, "Space", "Key Space");
             SerializedProperty frames = animation.FindPropertyRelative("Keyframes");
             for (int index = 0; index < frames.arraySize; index++)
@@ -253,7 +253,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 if (!frame.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope entry = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope entry = new StudioIndentScope();
                 SerializedProperty pose = frame.FindPropertyRelative("Pose");
                 HoverControls.Field(pose, "Position");
                 HoverControls.Field(pose, "Rotation");

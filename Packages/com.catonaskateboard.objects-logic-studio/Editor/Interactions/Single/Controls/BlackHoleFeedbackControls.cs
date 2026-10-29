@@ -18,10 +18,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, GameObject source, ObjectStudioSections sections)
         {
             if (sections.Draw("Black Hole Camera Rumble", "Optional camera feedback within range.", settings, "Rumble"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Rumble(settings.FindPropertyRelative("Rumble"), sections);
             if (sections.Draw("Black Hole Air Suction", "Animate a particle effect prepared in the editor.", settings, "Air", "AirPath", "AirSpeed"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "Air", "Enabled");
                     if (settings.FindPropertyRelative("Air").boolValue)
@@ -45,7 +45,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (settings.FindPropertyRelative("AtStart").boolValue || settings.FindPropertyRelative("AtEnd").boolValue)
                 HoverControls.Field(settings, "PulseDuration");
             if (sections.Draw("Black Hole Rumble Motion", "Amplitude, frequency and optional waveform.", settings, "Frequency", "Position", "Rotation", "CustomWave", "Wave"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "Frequency");
                     BlackHoleControls.Vector(settings, "Position", 0f, 0.3f);

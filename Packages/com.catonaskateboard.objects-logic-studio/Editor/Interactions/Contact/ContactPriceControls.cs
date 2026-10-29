@@ -32,7 +32,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (StudioArrayGUI.Header(sources, index, new GUIContent("Wait For " + (index + 1), sources.tooltip)))
                     break;
                 if (sources.GetArrayElementAtIndex(index).isExpanded)
-                    LocalInteractionMenu.Draw(sources.GetArrayElementAtIndex(index), true);
+                    using (new StudioIndentScope())
+                        LocalInteractionMenu.Draw(sources.GetArrayElementAtIndex(index), true);
             }
             StudioArrayGUI.Add(sources, "Add Completion", () => new LocalInteractionReference());
         }

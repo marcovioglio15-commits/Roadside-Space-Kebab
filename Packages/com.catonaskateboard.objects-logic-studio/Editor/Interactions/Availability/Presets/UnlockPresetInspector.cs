@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioInput.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -119,7 +120,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty rule = rules.GetArrayElementAtIndex(index);
                 rule.isExpanded = EditorGUILayout.Foldout(rule.isExpanded, rule.FindPropertyRelative("Name").stringValue, true);
                 if (rule.isExpanded)
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioIndentScope())
                         UnlockPresetInspector.Draw(rule);
             }
             serializedObject.ApplyModifiedProperties();

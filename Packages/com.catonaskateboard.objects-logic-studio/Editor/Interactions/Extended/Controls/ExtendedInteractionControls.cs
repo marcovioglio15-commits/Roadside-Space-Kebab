@@ -25,16 +25,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Navigation remains independent of configuration changes.
             data.Update();
             SerializedProperty draft = data.FindProperty("Extended.Draft");
-            Field(draft, "Name");
-            Field(draft, "Enabled");
-            InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
+            if (state.Sections.Draw("Interaction", "Name, switch and input.", draft, "Name", "Enabled", "StartAction", "AdvanceAction"))
+            {
+                using StudioIndentScope sectionContent1 = new StudioIndentScope();
+                Field(draft, "Name");
+                Field(draft, "Enabled");
+                ObjectInteractionBindings.Draw(data, state);
+            }
+            if (state.Sections.Draw("Player tool", "Choose which tools can use this interaction.", draft, "ToolRequirement"))
+                using (new StudioIndentScope())
+                    InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
             switch (state.Extended.Kind)
             {
                 case ExtendedInteractionKind.Deathbox:
-                    LifetimeControls.Deathbox(draft.FindPropertyRelative("Deathbox"));
+                    if (state.Sections.Draw("Deathbox contacts", "Choose what this volume affects.", draft.FindPropertyRelative("Deathbox")))
+                        using (new StudioIndentScope())
+                            LifetimeControls.Deathbox(draft.FindPropertyRelative("Deathbox"));
                     break;
                 case ExtendedInteractionKind.PresenceCap:
-                    LifetimeControls.PresenceCap(draft.FindPropertyRelative("PresenceCap"));
+                    if (state.Sections.Draw("Population limit", "Limit objects that stay out of view.", draft.FindPropertyRelative("PresenceCap")))
+                        using (new StudioIndentScope())
+                            LifetimeControls.PresenceCap(draft.FindPropertyRelative("PresenceCap"));
                     break;
                 case ExtendedInteractionKind.ElasticDeformation:
                     SurfaceInteractionControls.ElasticDeformation(draft.FindPropertyRelative("ElasticDeformation"), state.Sections);
@@ -44,27 +55,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ExtendedInteractionKind.SpraySauce:
                     SurfaceInteractionControls.SpraySauce(draft.FindPropertyRelative("SpraySauce"), state.Sections);
-                    StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Spray", Button);
                     break;
                 case ExtendedInteractionKind.ObjectDegradation:
                     DegradationControls.Draw(draft.FindPropertyRelative("ObjectDegradation"), state.Sections);
                     break;
                 case ExtendedInteractionKind.GravityGenerator:
                     GravityControls.Draw(draft.FindPropertyRelative("GravityGenerator"), state.Sections);
-                    if (draft.FindPropertyRelative("GravityGenerator.Restore").enumValueIndex != (int)GravityRestoreMode.Timer)
-                        StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Gravity", Button);
                     break;
                 case ExtendedInteractionKind.AvailableOrders:
                     OrderControls.Draw(draft.FindPropertyRelative("Orders"), state.Target.Resolve(), state.Sections);
                     break;
                 case ExtendedInteractionKind.PlayAmbient:
                     AmbientControls.Draw(draft.FindPropertyRelative("Ambient"), state.Sections);
-                    if (draft.FindPropertyRelative("Ambient.Mode").enumValueIndex == (int)AmbientMode.Radio)
-                        StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Radio", Button);
                     break;
                 case ExtendedInteractionKind.Slice:
                     SliceControls.Draw(draft.FindPropertyRelative("Slice"), state.Sections);
-                    StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Slice", Button);
                     break;
                 case ExtendedInteractionKind.SpawnManagement:
                     SpawnManagementControls.Draw(draft.FindPropertyRelative("SpawnManagement"), state.Sections);
@@ -74,8 +79,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ExtendedInteractionKind.AssemblyStation:
                     AssemblyControls.DrawStation(draft.FindPropertyRelative("AssemblyStation"), state.Sections);
-                    if (draft.FindPropertyRelative("AssemblyStation.Trigger").enumValueIndex == (int)AssemblyStationTrigger.InputAction)
-                        StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Assembly", Button);
                     break;
                 case ExtendedInteractionKind.Outline:
                     DrawOutline(draft.FindPropertyRelative("Outline"), state.Sections, state.Target.Resolve()?.GetComponent<ObjectHover>() != null);
@@ -85,22 +88,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ExtendedInteractionKind.ModifyByContact:
                     DrawContact(draft.FindPropertyRelative("Contact"), state.Sections);
-                    if (state.Extended.Draft.Contact.RequiresInput)
-                        StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Contact", Button);
                     break;
                 case ExtendedInteractionKind.Dialogue:
                     DrawDialogue(draft.FindPropertyRelative("Dialogue"), state.Sections);
-                    if (state.Sections.Draw("Dialogue Input", "Bind activation and page advancement to the player's existing action maps.", draft, "StartAction", "AdvanceAction"))
-                        using (new EditorGUI.IndentLevelScope())
-                        {
-                            if (draft.FindPropertyRelative("Dialogue.Trigger").enumValueIndex == (int)DialogueTrigger.InputAction)
-                                StudioInputActionMenu.Draw(data, "Extended.Draft.StartAction", "ObjectsLogicStudio.Dialogue.Start", Button);
-                            StudioInputActionMenu.Draw(data, "Extended.Draft.AdvanceAction", "ObjectsLogicStudio.Dialogue.Advance", Button);
-                        }
                     break;
             }
             if (state.Sections.Draw("Interaction Debug", "Show selected-object contact or range guides.", draft, "DrawGizmos"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Field(draft, "DrawGizmos");
             InteractionFlagControls.Draw(draft.FindPropertyRelative("FlagChange"), state.Sections);
             InteractionVfxControls.Draw(draft.FindPropertyRelative("VisualEffect"), state.Sections, state.Extended.Draft.VfxDuration(state.Extended.Kind),
@@ -124,7 +118,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Outline
 
-        /// <summary>Edits reusable shell appearance independently of authored geometry.</summary>
+        /// <summary>Edits reusable shell appearance independently of configured geometry.</summary>
         /// <param name="settings">Serialized outline shader configuration.</param>
         /// <param name="sections">Retained foldout visibility.</param>
         /// <param name="hasHover">Whether the edited object supplies Hover targeting.</param>
@@ -132,7 +126,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // The shared render pass uses the original visible surfaces.
             if (sections.Draw("Outline Appearance", "Configure visible-edge width in pixels, color, light intensity and crease angle.", settings))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     if (hasHover)
                         Field(settings, "HoverOnly");
@@ -157,7 +151,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             if (settings.boxedValue is ContactModificationSettings { SupportsFrying: true })
                 HoverControls.Field(settings, "FryingSound");
-            ContactModificationControls.Draw(settings);
+            if (settings.boxedValue is ContactModificationSettings { ConsumesAny: true })
+            {
+                if (sections.Draw("Consumption", "Choose when contact items are consumed.", settings, "ConsumeOn"))
+                    using (new StudioIndentScope())
+                        ContactDialogueGateControls.Draw(settings.FindPropertyRelative("ConsumeOn"));
+                if (sections.Draw("Payment", "Set the payment for consumed items.", settings, "Price"))
+                    using (new StudioIndentScope())
+                        ContactPriceControls.Draw(settings.FindPropertyRelative("Price"));
+            }
+            if (sections.Draw("Contact modifications", "Choose what happens on contact.", settings, "Modifications"))
+                using (new StudioIndentScope())
+                    ContactModificationControls.Draw(settings);
             if (ContactPreparationControls.RequiresInput(settings))
                 TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
         }
@@ -170,7 +175,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Field(settings, "Name");
             // Flag selection follows the project's current catalog.
             if (sections.Draw("Contact Detection", "Require continuous contact with another flagged Object Item.", settings, "Flags", "ContactDuration", "ContactTolerance", "QueryInterval", "IncludeTriggers"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     ObjectFlagSelector.Draw(settings.FindPropertyRelative("Flags"));
                     Field(settings, "ContactDuration");
@@ -179,14 +184,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "IncludeTriggers");
                 }
             if (sections.Draw("Carried Items", "Exclude carried participants from both contact activation and ongoing modification.", settings, "AllowCarriedSelf", "AllowCarriedOther"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     ExcludeCarried(settings, "AllowCarriedSelf", "Exclude Carried Self");
                     ExcludeCarried(settings, "AllowCarriedOther", "Exclude Carried Contact Item");
                 }
             ContactPreparationControls.Draw(settings.FindPropertyRelative("Preparation"), sections);
             if (sections.Draw("Modification", "Control transition timing and interruption behavior.", settings, "Duration", "WhileContact", "RevertDelay", "CompleteAfterSeparation", "ResumeAfterInterruption", "RepeatAfterSeparation"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "Duration");
                     Field(settings, "WhileContact");
@@ -206,10 +211,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(settings, "RepeatAfterSeparation");
                 }
             if (sections.Draw("Self Effects", "Modify the item owning this component.", settings, "Self"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     DrawEffects(settings.FindPropertyRelative("Self"), false, !settings.FindPropertyRelative("WhileContact").boolValue);
             if (sections.Draw("Contact Item Effects", "Modify the other item using paths relative to its root.", settings, "Other", "ChangeContactFlag", "ContactFlagOperation", "ContactFlag"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     DrawEffects(settings.FindPropertyRelative("Other"), true, !settings.FindPropertyRelative("WhileContact").boolValue);
                     Field(settings, "ChangeContactFlag");
@@ -221,7 +226,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 }
             if (sections.Draw("Temporary Restrictions", "Suspend interaction families while effects run; pausing releases these restrictions.", settings, "BlockSelf", "BlockOther"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "BlockSelf");
                     Field(settings, "BlockOther");
@@ -268,7 +273,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Item-specific input and HUD bindings are drawn by the workspace.
             if (sections.Draw("Dialogue Activation", "Choose trigger, range and arbitration priority.", settings, "Trigger", "Consumption", "Distance", "ExitDistance", "Priority", "PreferSingleActions", "PreferredActions"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "Trigger");
                     if (settings.FindPropertyRelative("Trigger").enumValueIndex == (int)DialogueTrigger.Consumption)
@@ -285,7 +290,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival
                 && sections.Draw("Dialogue Visibility", "Use collider targeting under the centered player cursor for startup, advancement and hiding.", settings, "RequireSightToStart", "RequireSightToContinue", "HideWhenSightLost", "ObstacleMask"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "RequireSightToStart");
                     Field(settings, "RequireSightToContinue");
@@ -298,7 +303,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 }
             if (sections.Draw("Dialogue Flow", "Choose entry selection and what happens when the player returns.", settings, "Selection", "UseSpawnPresets", "SpawnPresets", "Interruption", "ReplayOnReturn", "ReplayOnInput"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "Selection");
                     DialogueSpawnPresetControls.Draw(settings);
@@ -309,10 +314,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(settings, "ReplayOnReturn");
                 }
             if (sections.Draw("Dialogue Entries", "Default shared entries used when no spawn preset overrides them.", settings, "Entries"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     DialogueEntryControls.DrawEntries(settings);
             if (sections.Draw("Dialogue Audio", "Optional character phrases and final-page result sound.", settings, "Audio"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     SerializedProperty audio = settings.FindPropertyRelative("Audio");
                     Field(audio, "Voice");
@@ -346,6 +351,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             }
             SerializedProperty property = owner.FindPropertyRelative(name);
+            if (!ObjectGroupScope.Allows(property))
+                return;
             System.Enum value = name switch
             {
                 "PreferredActions" => (DialogueActionPriority)property.intValue,

@@ -20,10 +20,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Scene links use a stable board ID because prefab assets cannot store scene component references.
             if (sections.Draw("Order Board & Reveal", "Board destination and the optional interaction that reveals the orders.", settings,
                 "Board", "WaitForCompletion", "CompletionSource"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
-                    OrderBoardBinding.Draw(settings.FindPropertyRelative("Board"));
-                    Completion(settings, owner);
+                    if (ObjectGroupScope.Allows(settings.FindPropertyRelative("Board")))
+                        OrderBoardBinding.Draw(settings.FindPropertyRelative("Board"));
+                    if (ObjectGroupScope.Allows(settings.FindPropertyRelative("WaitForCompletion")))
+                        Completion(settings, owner);
                 }
             // Hide the interaction-level mode when every reachable catalog defines its own pool policy.
             bool fallbackSelection = UsesFallbackSelection(settings);
@@ -31,7 +33,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ? new[] { "RandomDrawUnits", "DrawUnitRange", "DrawCount", "Selection" }
                 : new[] { "RandomDrawUnits", "DrawUnitRange", "DrawCount" };
             if (sections.Draw("Order Selection", "Draw budget and selection policy.", settings, selectionFields))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "RandomDrawUnits");
                     HoverControls.Field(settings, settings.FindPropertyRelative("RandomDrawUnits").boolValue ? "DrawUnitRange" : "DrawCount", "Draw Units");
@@ -39,14 +41,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings, "Selection");
                 }
             if (sections.Draw("Order Catalog", "Shared order definitions and optional per-spawn catalog overrides.", settings, "Catalog", "UseSpawnCatalogs", "SpawnCatalogs"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Catalog(settings.FindPropertyRelative("Catalog"));
                     SpawnCatalogs(settings);
                 }
             if (sections.Draw("Order Timer", "Elapsed time from order reveal until Day Flow completes the order dialogue.", settings,
                 "UseTimer", "TimerLabel", "TimerTenths", "KeepTimerResult"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "UseTimer", "Enabled");
                     if (settings.FindPropertyRelative("UseTimer").boolValue)
@@ -69,7 +71,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     if (!rule.isExpanded)
                         continue;
-                    using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                    using StudioIndentScope indent = new StudioIndentScope();
                     HoverControls.Field(rule, "Match");
                     HoverControls.Field(rule, "Spawn");
                     Catalog(rule.FindPropertyRelative("Catalog"));

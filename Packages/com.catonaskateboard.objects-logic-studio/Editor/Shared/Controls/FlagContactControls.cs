@@ -23,7 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!settings.FindPropertyRelative("Enabled").boolValue)
                 return;
             SerializedProperty flags = settings.FindPropertyRelative("Flags");
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             ObjectFlagSelector.Draw(flags, new GUIContent("Contact Flags", flags.tooltip));
             if (flags.arraySize > 1)
                 HoverControls.Field(settings, "Match");

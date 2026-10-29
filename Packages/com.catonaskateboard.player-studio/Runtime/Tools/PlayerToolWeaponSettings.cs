@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace CatOnASkateboard.PlayerStudio
 {
+    /// <summary>Selects physical projectile travel or immediate interaction with the cursor target.</summary>
+    public enum PlayerToolWeaponMode { Projectile, CursorInteraction }
+
     /// <summary>Chooses the impact prefab's forward axis relative to the struck surface or bullet travel.</summary>
     public enum PlayerToolImpactOrientation { SurfaceNormal, TravelDirection, PrefabRotation }
 
@@ -15,92 +18,108 @@ namespace CatOnASkateboard.PlayerStudio
     {
         #region Fields
 
+        [Header("Firing")]
+        [Tooltip("Fire a bullet, or use a valid interaction under the cursor. Cursor Interaction also works with the fake cursor.")]
+        public PlayerToolWeaponMode Mode;
+        [Tooltip("Shots fired with one use. Stops sooner if the magazine runs out.")]
+        [Range(1, 32)]
+        public int ShotsPerUse = 1;
+        [Tooltip("Seconds between shots in the same burst.")]
+        [Range(0f, 2f)]
+        public float ShotInterval = 0.08f;
+
+        [Header("Shot Effects")]
+        [Tooltip("Optional effect on the player's arm.")]
+        public PlayerToolEffectSettings MuzzleEffect = new PlayerToolEffectSettings();
+        [Tooltip("Optional burst at the firing point.")]
+        public PlayerToolEffectSettings ShotEffect = new PlayerToolEffectSettings();
+
         [Header("Muzzle")]
-        [Tooltip("Existing transform below Tools Hierarchy Root that carries the muzzle offset. Empty selects that root.")]
+        [Tooltip("Choose the part that holds the firing point. Leave empty to use Tools Hierarchy Root.")]
         public string MuzzlePath = string.Empty;
-        [Tooltip("Muzzle position relative to its selected transform, editable through Muzzle Preview.")]
+        [Tooltip("Offset of the firing point. Adjust it visually in Muzzle Preview.")]
         public Vector3 MuzzlePosition;
-        [Tooltip("Muzzle rotation relative to its selected transform. Positive Z is the firing direction.")]
+        [Tooltip("Rotation of the firing point. Positive Z points forward.")]
         public Vector3 MuzzleRotation;
 
         [Header("Bullet")]
-        [Tooltip("Bullet prefab facing positive Z. Use visual components and optional kinematic bodies; movement is handled by Tools.")]
+        [Tooltip("Bullet prefab. Positive Z points forward. The tool handles its movement.")]
         public GameObject Bullet;
-        [Tooltip("Straight travel speed in world units per scaled second.")]
+        [Tooltip("Bullet speed, in units per second.")]
         [Range(0.1f, 300f)]
         public float Speed = 40f;
-        [Tooltip("Maximum world distance travelled before the bullet returns to its pool.")]
+        [Tooltip("How far the shot can reach. Cursor interactions also use their own distance limits.")]
         [Range(0.1f, 1000f)]
         public float Distance = 100f;
-        [Tooltip("Swept collision radius in world units. Zero uses a ray, suitable for very small bullets.")]
+        [Tooltip("Bullet collision radius. Use zero for a very thin shot.")]
         [Range(0f, 0.5f)]
         public float Radius;
-        [Tooltip("Only colliders on these layers stop bullets. The firing player and its pooled effects are ignored.")]
+        [Tooltip("Layers the shot can hit. The player and this tool's effects are ignored.")]
         public LayerMask Layers = ~0;
-        [Tooltip("Whether trigger colliders on the selected layers also stop bullets.")]
+        [Tooltip("Let the shot hit triggers too.")]
         public bool HitTriggers;
-        [Tooltip("Maximum simultaneous bullets and impact effects per player for this tool. Objects are allocated once at initialization.")]
+        [Tooltip("Maximum bullets or effects active at once, for each effect type.")]
         [Range(1, 128)]
         public int Capacity = 16;
 
         [Header("Impact")]
-        [Tooltip("Optional impact prefab reused at collision points for the configured lifetime.")]
+        [Tooltip("Optional effect at the hit point. Cursor mode shows it only for a valid interaction.")]
         public GameObject Impact;
-        [Tooltip("Find free space for the impact along the incoming shot trajectory. Placement Mode chooses its orientation; the manual offset is unused.")]
+        [Tooltip("Move the impact effect out of nearby surfaces automatically.")]
         public bool AutomaticImpactPlacement;
-        [Tooltip("Face Camera turns the effect toward the view. Preserve Orientation keeps Impact Orientation and Impact Rotation while finding free space.")]
+        [Tooltip("Face the camera, or keep the rotation chosen below.")]
         public PlayerToolImpactPlacementMode ImpactPlacementMode;
-        [Tooltip("Allowed overlap in world units when fitting the measured effect bounds. Zero keeps full clearance. Bullet collisions remain unchanged.")]
+        [Tooltip("How far the effect can overlap a surface. Use zero to keep it fully clear.")]
         [Range(0f, 0.5f)]
         public float ImpactPenetration;
-        [Tooltip("Uniform multiplier for the pooled impact's size and particle travel. The source prefab remains unchanged.")]
+        [Tooltip("Size of the impact effect.")]
         [Range(0.01f, 5f)]
         public float ImpactScale = 1f;
-        [Tooltip("Scaled seconds before an impact effect returns to its pool.")]
+        [Tooltip("Seconds before the impact effect disappears.")]
         [Range(0.01f, 30f)]
         public float ImpactLifetime = 1f;
-        [Tooltip("Orient positive Z along the surface normal, along bullet travel, or retain the prefab rotation.")]
+        [Tooltip("Face away from the surface, follow the shot, or keep the prefab's rotation.")]
         public PlayerToolImpactOrientation ImpactOrientation;
-        [Tooltip("Align ordinary billboard particles with the impact transform, keeping surface flashes on the struck plane instead of facing the camera.")]
+        [Tooltip("Keep billboard particles flat against the hit surface.")]
         public bool ImpactSurfaceAligned;
-        [Tooltip("Additional Euler rotation applied after the selected impact orientation.")]
+        [Tooltip("Extra rotation for the impact effect, in degrees.")]
         public Vector3 ImpactRotation;
-        [Tooltip("Offset from a struck surface along its normal to avoid overlapping the surface.")]
+        [Tooltip("Move the effect this far away from the hit surface.")]
         [Range(0f, 0.5f)]
         public float ImpactOffset = 0.005f;
-        [Tooltip("Also show the impact prefab when the bullet reaches its maximum distance without hitting anything.")]
+        [Tooltip("Show the impact effect even when the bullet reaches its limit without a hit.")]
         public bool ImpactAtRange;
 
         [Header("Aim")]
-        [Tooltip("Rotate an existing visual toward the camera pointer, or screen centre while the cursor is locked.")]
+        [Tooltip("Turn the arm toward the cursor. Uses the screen center while the cursor is locked.")]
         public bool AutoAim;
-        [Tooltip("Visual pivot below Tools Hierarchy Root. It must contain the muzzle transform and must not be the player root.")]
+        [Tooltip("Arm pivot to rotate. It must contain the firing point. Choose a child of the player.")]
         public string AimPath = string.Empty;
-        [Tooltip("Maximum camera ray distance used to find the cursor target.")]
+        [Tooltip("How far to look for an aiming target.")]
         [Range(1f, 1000f)]
         public float AimDistance = 100f;
-        [Tooltip("Rotation response per scaled second. Zero aligns immediately. Bullets always travel toward the resolved cursor target.")]
+        [Tooltip("How quickly the arm turns. Use zero to turn instantly.")]
         [Range(0f, 40f)]
         public float AimResponse = 15f;
-        [Tooltip("Retract or shift the aim pivot sideways on the player's horizontal plane to clear solids while retaining cursor aim.")]
+        [Tooltip("Move the arm back or sideways to avoid walls while aiming.")]
         public bool RepositionAim;
-        [Tooltip("Maximum horizontal displacement from the authored arm pose in world units.")]
+        [Tooltip("How far the arm can move from its starting position.")]
         [Range(0.1f, 3f)]
         public float RepositionDistance = 1.5f;
-        [Tooltip("Clearance radius around the pivot-to-muzzle segment used to check solid obstacles.")]
+        [Tooltip("Room to keep clear around the arm and firing point.")]
         [Range(0.01f, 0.3f)]
         public float RepositionRadius = 0.06f;
-        [Tooltip("Response of the damped arm movement when avoiding obstacles and returning to its authored position. Lower values give slower, softer motion.")]
+        [Tooltip("How quickly the arm moves around walls. Lower values feel softer.")]
         [Range(1f, 40f)]
         public float RepositionResponse = 18f;
 
         [Header("Shot Alignment")]
-        [Tooltip("Before firing, move the arm to a visible clear pose whose predicted impact comes closest to the cursor target. Requires Auto Aim, Reposition Aim and automatic impact placement.")]
+        [Tooltip("Adjust the arm before firing to bring the impact closer to the cursor.")]
         public bool AlignBeforeShot;
-        [Tooltip("Seconds to reach the selected shooting pose before emitting the bullet. A changed target can trigger one additional smooth adjustment.")]
+        [Tooltip("Seconds to move into the firing pose.")]
         [Range(0.03f, 0.5f)]
         public float ShotAlignmentDuration = 0.12f;
-        [Tooltip("Horizontal search samples used before local refinement. More samples can find a closer impact near corners but require more physics queries.")]
+        [Tooltip("Positions checked before firing. More checks can improve aim near corners, but cost more.")]
         [Range(8, 48)]
         public int ShotAlignmentSamples = 24;
 
@@ -108,10 +127,10 @@ namespace CatOnASkateboard.PlayerStudio
 
         #region Properties
 
-        /// <summary>Whether manual or automatic placement uses the authored impact orientation and additional rotation.</summary>
+        /// <summary>Whether manual or automatic placement uses the configured impact orientation and additional rotation.</summary>
         internal bool UsesImpactOrientation => !AutomaticImpactPlacement || ImpactPlacementMode == PlayerToolImpactPlacementMode.PreserveOrientation;
         /// <summary>Whether all dependencies for the optional preparation phase are enabled.</summary>
-        internal bool UsesShotAlignment => AlignBeforeShot && AutoAim && RepositionAim && AutomaticImpactPlacement && Impact != null;
+        internal bool UsesShotAlignment => Mode == PlayerToolWeaponMode.Projectile && AlignBeforeShot && AutoAim && RepositionAim && AutomaticImpactPlacement && Impact != null;
 
         #endregion
 
@@ -119,15 +138,23 @@ namespace CatOnASkateboard.PlayerStudio
 
         #region Validation
 
-        /// <summary>Rejects unusable projectiles, muzzle coordinates and enabled optional settings.</summary>
+        /// <summary>Checks the selected firing mode, muzzle coordinates and enabled optional settings.</summary>
         /// <param name="warning">Receives the first invalid weapon setting.</param>
-        /// <returns>True when a bounded straight projectile pool can be created.</returns>
+        /// <returns>True when the selected weapon mode and its enabled effects can be prepared.</returns>
         public bool TryValidate(out string warning)
         {
             // Hidden impact and aim values are checked only when those behaviors are used.
-            warning = "Assign a bullet prefab, finite muzzle coordinates, positive speed/distance and a capacity from 1 to 128.";
-            if (Bullet == null || MuzzlePath == null || !Finite(MuzzlePosition) || !Finite(MuzzleRotation)
-                || !Positive(Speed) || !Positive(Distance) || !NonNegative(Radius) || Capacity < 1 || Capacity > 128)
+            warning = "Choose a supported weapon mode, 1 to 32 shots, a non-negative interval, finite muzzle coordinates, positive distance and a capacity from 1 to 128.";
+            if (Mode is not (PlayerToolWeaponMode.Projectile or PlayerToolWeaponMode.CursorInteraction)
+                || ShotsPerUse < 1 || ShotsPerUse > 32 || ShotsPerUse > 1 && !NonNegative(ShotInterval)
+                || MuzzlePath == null || !Finite(MuzzlePosition) || !Finite(MuzzleRotation)
+                || !Positive(Distance) || Capacity < 1 || Capacity > 128)
+                return false;
+            warning = "Projectile mode requires a bullet prefab, positive finite speed and a non-negative finite collision radius.";
+            if (Mode == PlayerToolWeaponMode.Projectile && (Bullet == null || !Positive(Speed) || !NonNegative(Radius)))
+                return false;
+            if (MuzzleEffect != null && !MuzzleEffect.TryValidate(true, out warning)
+                || ShotEffect != null && !ShotEffect.TryValidate(false, out warning))
                 return false;
             warning = "Use positive impact scale/lifetime, supported placement/orientation modes, finite rotation and non-negative enabled overlap/offset values.";
             if (Impact != null && (!Positive(ImpactScale) || !Positive(ImpactLifetime)
@@ -148,7 +175,7 @@ namespace CatOnASkateboard.PlayerStudio
             return true;
         }
 
-        /// <summary>Checks authored coordinates before they reach Unity transforms.</summary>
+        /// <summary>Checks configured coordinates before they reach Unity transforms.</summary>
         /// <param name="value">Position or Euler vector.</param>
         /// <returns>True for finite coordinates.</returns>
         public static bool Finite(Vector3 value)
@@ -158,7 +185,7 @@ namespace CatOnASkateboard.PlayerStudio
         }
 
         /// <summary>Checks positive distances and durations without changing the source.</summary>
-        /// <param name="value">Authored scalar.</param>
+        /// <param name="value">configured scalar.</param>
         /// <returns>True for finite values greater than zero.</returns>
         private static bool Positive(float value)
         {
@@ -166,7 +193,7 @@ namespace CatOnASkateboard.PlayerStudio
         }
 
         /// <summary>Checks optional radius, response and offset values.</summary>
-        /// <param name="value">Authored scalar.</param>
+        /// <param name="value">configured scalar.</param>
         /// <returns>True for finite values at least zero.</returns>
         private static bool NonNegative(float value)
         {

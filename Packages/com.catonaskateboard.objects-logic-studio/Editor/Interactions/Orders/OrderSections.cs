@@ -20,6 +20,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static bool Draw(SerializedProperty owner, string title, string tooltip, params string[] fields)
         {
             SerializedProperty state = owner.FindPropertyRelative(fields[0]);
+            if (ObjectFieldFocus.ExpandSection(owner, fields))
+                state.isExpanded = true;
             Rect rect = EditorGUILayout.GetControlRect();
             string key = StudioFieldColors.Key(state) + ".Section";
             if (Event.current.type == EventType.ContextClick && rect.Contains(Event.current.mousePosition))

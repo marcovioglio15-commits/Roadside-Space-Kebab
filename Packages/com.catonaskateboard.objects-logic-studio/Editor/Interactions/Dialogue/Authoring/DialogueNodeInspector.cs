@@ -49,7 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             break;
                         if (!branch.isExpanded)
                             continue;
-                        using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                        using StudioIndentScope indent = new StudioIndentScope();
                         HoverControls.Field(branch, "Name");
                         Connection(branch.FindPropertyRelative("Target"), tree, "Destination");
                         if (property.FindPropertyRelative("Selection").enumValueIndex == (int)DialogueSelection.WeightedRandom)

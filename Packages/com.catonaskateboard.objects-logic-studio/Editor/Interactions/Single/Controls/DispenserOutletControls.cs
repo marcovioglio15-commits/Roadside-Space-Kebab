@@ -14,6 +14,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Dispenser proposal or preset settings.</param>
         internal static void Draw(SerializedProperty settings)
         {
+            if (!ObjectGroupScope.Allows(settings.FindPropertyRelative("Outlets")))
+                return;
             if (settings.serializedObject.targetObject is ObjectWorkspace workspace
                 && StudioButton.Draw(new GUIContent("Outlet Layout", "Place output points against the dispenser preview.")))
             {
@@ -29,6 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty outlet = outlets.GetArrayElementAtIndex(index);
                 if (!outlet.isExpanded)
                     continue;
+                using StudioIndentScope outletContent = new StudioIndentScope();
                 HoverControls.Field(outlet, "Position");
                 HoverControls.Field(outlet, "Rotation");
             }

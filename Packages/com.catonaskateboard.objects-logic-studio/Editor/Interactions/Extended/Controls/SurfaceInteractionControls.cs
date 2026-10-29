@@ -16,14 +16,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void ElasticDeformation(SerializedProperty settings, ObjectStudioSections sections)
         {
             GameObject source = HierarchyPathMenu.Source(settings);
-            HierarchyPathMenu.Draw(settings.FindPropertyRelative("Path"), source, false, transforms: true);
-            Fields(settings, "Pivot", "Collisions");
-            if (settings.FindPropertyRelative("Collisions").boolValue)
-                Fields(settings, "Layers", "MinimumImpact", "FullImpact", "Compression", "Duration", "Oscillations", "Damping", "Cooldown", "StrongestWins");
-            Fields(settings, "Volume");
-            using (new EditorGUI.DisabledScope(source == null || Application.isPlaying))
-                if (StudioButton.Draw(new GUIContent("Prepare Visual Meshes", "Enable mesh reading on this object's imported visual models.")))
-                    ElasticAuthoring.Prepare(source);
+            if (sections.Draw("Deformable mesh", "Choose the part to bend.", settings, "Path", "Pivot", "Volume"))
+            {
+                using StudioIndentScope sectionContent1 = new StudioIndentScope();
+                HierarchyPathMenu.Draw(settings.FindPropertyRelative("Path"), source, false, transforms: true);
+                Fields(settings, "Pivot", "Volume");
+                using (new EditorGUI.DisabledScope(source == null || Application.isPlaying))
+                    if (StudioButton.Draw(new GUIContent("Prepare Visual Meshes", "Allow these meshes to bend.")))
+                        ElasticAuthoring.Prepare(source);
+            }
+            if (sections.Draw("Deformation response", "Choose how the mesh reacts and recovers.", settings, "Collisions", "Layers", "MinimumImpact", "FullImpact", "Compression", "Duration", "Oscillations", "Damping", "Cooldown", "StrongestWins"))
+            {
+                using StudioIndentScope sectionContent2 = new StudioIndentScope();
+                Fields(settings, "Collisions");
+                if (settings.FindPropertyRelative("Collisions").boolValue)
+                    Fields(settings, "Layers", "MinimumImpact", "FullImpact", "Compression", "Duration", "Oscillations", "Damping", "Cooldown", "StrongestWins");
+            }
         }
         #endregion
         #region Trails
@@ -32,13 +40,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained foldout state.</param>
         internal static void DirtTrail(SerializedProperty settings, ObjectStudioSections sections)
         {
-            Fields(settings, "Layers", "FilterFlags");
-            if (settings.FindPropertyRelative("FilterFlags").boolValue)
-                ObjectFlagSelector.Draw(settings.FindPropertyRelative("Flags"));
-            Fields(settings, "MinimumSpeed", "Sliding");
-            if (settings.FindPropertyRelative("Sliding").boolValue)
-                Fields(settings, "Spacing");
-            Fields(settings, "Interval");
+            if (sections.Draw("Trail detection", "Choose where and when to leave marks.", settings, "Layers", "FilterFlags", "Flags", "MinimumSpeed", "Sliding", "Spacing", "Interval"))
+            {
+                using StudioIndentScope sectionContent3 = new StudioIndentScope();
+                Fields(settings, "Layers", "FilterFlags");
+                if (settings.FindPropertyRelative("FilterFlags").boolValue && ObjectGroupScope.Allows(settings.FindPropertyRelative("Flags")))
+                    ObjectFlagSelector.Draw(settings.FindPropertyRelative("Flags"));
+                Fields(settings, "MinimumSpeed", "Sliding");
+                if (settings.FindPropertyRelative("Sliding").boolValue)
+                    Fields(settings, "Spacing");
+                Fields(settings, "Interval");
+            }
             Trail(settings.FindPropertyRelative("Trail"), sections);
         }
         /// <summary>Edits wetness, palette and finite fading without destructive array sizes.</summary>
@@ -50,7 +62,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (sections.Draw("Color And Wetness", "Shared color and shading of liquid and deposits.", settings,
                 "Liquidity", "Gloss", "DetectColors", "Colors", "ColorBlend", "Opacity"))
             {
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope indent = new StudioIndentScope();
                 Fields(settings, "Liquidity", "Gloss", "DetectColors");
                 Colors(settings);
                 if (deposits)
@@ -103,7 +115,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Group(SerializedProperty owner, ObjectStudioSections sections, string title, string tooltip, params string[] names)
         {
             if (sections.Draw(title, tooltip, owner, names))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Fields(owner, names);
         }
 

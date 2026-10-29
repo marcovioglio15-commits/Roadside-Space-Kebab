@@ -17,6 +17,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private UnityEditor.Editor inspector;
         private Vector2 scroll;
         private string warning = string.Empty;
+        private readonly ObjectFieldFocus fieldFocus = new ObjectFieldFocus();
+        private string focusPath = string.Empty;
+        private bool focusPending;
+        private bool focusConfigured;
 
         #endregion
         #region Properties
@@ -46,6 +50,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             ReleaseInspector();
             session.Select(asset, out warning);
+            focusPath = string.Empty;
+            focusPending = false;
+            focusConfigured = false;
             UpdatePending();
             minSize = new Vector2(480f, 360f);
             Show();
@@ -102,7 +109,38 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (session.Draft == null)
                 return;
             UnityEditor.Editor.CreateCachedEditor(session.Draft, null, ref inspector);
-            DrawInspector(inspector);
+            if (focusPending && !focusConfigured)
+            {
+                fieldFocus.Configure(inspector.serializedObject, focusPath);
+                focusConfigured = true;
+            }
+            fieldFocus.RevealSections = focusPending;
+            using (new StudioFieldRenderScope(ObjectFieldFocus.Draw))
+            using (new ObjectFieldFocus.Scope(fieldFocus))
+                DrawInspector(inspector);
+            if (!focusPending || !fieldFocus.Found)
+                return;
+            scroll.y = Mathf.Max(0f, fieldFocus.Rect.y - 30f);
+            GUI.FocusControl("ObjectSetting." + focusPath);
+            focusPending = false;
+            Repaint();
+        }
+
+        /// <summary>Reveals a tree-selected option in its already open asset editing session.</summary>
+        /// <param name="asset">Source asset opened by its specialized editor.</param>
+        /// <param name="path">Exact serialized option path.</param>
+        internal static void FocusSetting(ScriptableObject asset, string path)
+        {
+            foreach (StudioAssetWindow window in Resources.FindObjectsOfTypeAll<StudioAssetWindow>())
+                if (window.session.Source == asset)
+                {
+                    window.focusPath = path;
+                    window.focusPending = !string.IsNullOrEmpty(path);
+                    window.focusConfigured = false;
+                    window.Focus();
+                    window.Repaint();
+                    return;
+                }
         }
 
         /// <summary>Retains proposals before an editor reload or window close releases native references.</summary>

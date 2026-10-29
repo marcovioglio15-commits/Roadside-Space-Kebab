@@ -102,14 +102,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Writes one validated feature as part of the existing Apply Undo group.</summary>
         /// <param name="target">Object receiving the pending settings.</param>
-        internal void Apply(GameObject target)
+        /// <param name="prepare">Whether real-object dependencies should be prepared.</param>
+        /// <param name="recordUndo">Whether the real-object write belongs to an Undo operation.</param>
+        internal void Apply(GameObject target, bool prepare = true, bool recordUndo = true)
         {
             // The caller validates every workspace domain before entering this method.
             if (!HasChanges)
                 return;
             ObjectSingleInteraction feature = Resolve(target, Kind);
-            Undo.RecordObject(feature, "Apply " + Kind);
-            if (Kind == SingleInteractionKind.Eject && Draft.Eject.Behavior == EjectBehavior.Impulse && Draft.Eject.SelfEject && Draft.Eject.TemporaryPhysics && target.GetComponent<Rigidbody>() == null)
+            if (recordUndo)
+                Undo.RecordObject(feature, "Apply " + Kind);
+            if (prepare && Kind == SingleInteractionKind.Eject && Draft.Eject.Behavior == EjectBehavior.Impulse && Draft.Eject.SelfEject && Draft.Eject.TemporaryPhysics && target.GetComponent<Rigidbody>() == null)
             {
                 Rigidbody body = Undo.AddComponent<Rigidbody>(target);
                 body.isKinematic = true;

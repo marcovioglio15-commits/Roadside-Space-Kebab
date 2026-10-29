@@ -337,6 +337,7 @@ MonoBehaviour:
       Occurrence: 0
     Price:
       CollectPrice: 1
+      Sound: 1
       DeferDisplay: 1
       CompletionMode: 0
       OnDespawn: 0
@@ -345,6 +346,7 @@ MonoBehaviour:
         Kind: 6
         Name: 'FishyBusiness Delivery Correct '
         Occurrence: 0
+    FryingSound: 0
 --- !u!136 &3151776499264896803
 CapsuleCollider:
   m_ObjectHideFlags: 0

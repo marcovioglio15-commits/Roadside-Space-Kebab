@@ -24,6 +24,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public int InteractionIndex;
         [Tooltip("Name captured to reject an unrelated branch after hierarchy changes.")]
         public string ObjectName = string.Empty;
+        [Tooltip("Temporary object used only by a preset editor.")]
+        [SerializeField]
+        [HideInInspector]
+        private GameObject preview;
 
         #endregion
 
@@ -32,6 +36,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Whether the selected asset is the prefab currently open in the native workspace.</summary>
         internal bool IsOpen => PrefabStageUtility.GetCurrentPrefabStage() is PrefabStage stage
             && stage.assetPath == AssetDatabase.GUIDToAssetPath(PrefabGuid);
+        /// <summary>Whether this route is an explicitly created editor-only settings preview.</summary>
+        internal bool IsPreview => preview != null;
 
         #endregion
 
@@ -46,6 +52,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Gameplay scene objects cannot become interaction authoring targets.
             PrefabGuid = ObjectPath = Hierarchy = string.Empty;
+            preview = null;
             ObjectFileId = 0;
             InteractionIndex = index;
             ObjectName = target != null ? target.name : string.Empty;
@@ -63,12 +70,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>The same object, or null when its recorded branch is unavailable.</returns>
         internal GameObject Resolve()
         {
+            if (preview != null)
+                return preview;
             // Asset references resolve through GUIDs, preserving selection after file moves.
             if (PrefabGuid.Length > 0)
             {
                 string path = AssetDatabase.GUIDToAssetPath(PrefabGuid);
                 PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
-                GameObject root = stage != null && stage.assetPath == path ? stage.prefabContentsRoot
+                GameObject root = stage != null && stage.assetPath == path ? stage.scene.isLoaded ? stage.prefabContentsRoot : null
                     : AssetDatabase.LoadAssetAtPath<GameObject>(path);
                 if (root == null)
                     return null;
@@ -100,11 +109,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>The saved local file ID, or zero for a new unsaved object.</returns>
         internal static long FileId(UnityEngine.Object target)
         {
+            if (target == null)
+                return 0;
+            if (ObjectPreviewIdentity.TryGet(target, out long temporary))
+                return temporary;
             // Stage instances expose source and instance IDs separately; combine them to match the asset-local ID.
             if (EditorUtility.IsPersistent(target))
                 return AssetDatabase.TryGetGUIDAndLocalFileIdentifier(target, out string _, out long identifier) ? identifier : 0;
             GlobalObjectId identity = GlobalObjectId.GetGlobalObjectIdSlow(target);
             return unchecked((long)(identity.targetObjectId ^ identity.targetPrefabId));
+        }
+
+        /// <summary>Connects a temporary preset preview without making it a prefab authoring target.</summary>
+        /// <param name="target">Explicit editor-only preview object.</param>
+        internal void SetPreview(GameObject target)
+        {
+            preview = target;
+            ObjectName = target != null ? target.name : string.Empty;
         }
 
         #endregion

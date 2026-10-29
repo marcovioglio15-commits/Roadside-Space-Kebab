@@ -49,24 +49,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // This category never creates Grab, Dialogue, Contact or other source interactions.
             SerializedProperty settings = draft.FindPropertyRelative("Settings");
-            HoverControls.Field(settings, "Operation");
             InteractionAvailabilityChange operation = (InteractionAvailabilityChange)settings.FindPropertyRelative("Operation").enumValueIndex;
-            if (operation == InteractionAvailabilityChange.Unlock)
-                HoverControls.Field(settings, "InitiallyLocked");
-            HoverControls.Field(settings, "Repeat");
-            choices.Draw(draft.FindPropertyRelative("TargetId"), operation switch
+            if (sections.Draw("Availability change", "Choose the interaction to lock, unlock or replace.", draft, "Settings.Operation", "Settings.InitiallyLocked", "Settings.Repeat", "TargetId", "ReplacementId"))
             {
-                InteractionAvailabilityChange.Unlock => "Interaction To Unlock",
-                InteractionAvailabilityChange.Lock => "Interaction To Lock",
-                _ => "Outgoing Interaction"
-            });
-            long target = draft.FindPropertyRelative("TargetId").longValue;
-            long replacement = draft.FindPropertyRelative("ReplacementId").longValue;
-            if (operation == InteractionAvailabilityChange.Replace)
-                choices.Draw(draft.FindPropertyRelative("ReplacementId"), "Incoming Interaction", target, target != 0 ? target : -1);
+                using StudioIndentScope sectionContent1 = new StudioIndentScope();
+                HoverControls.Field(settings, "Operation");
+                if (operation == InteractionAvailabilityChange.Unlock)
+                    HoverControls.Field(settings, "InitiallyLocked");
+                HoverControls.Field(settings, "Repeat");
+                choices.Draw(draft.FindPropertyRelative("TargetId"), operation switch
+                {
+                    InteractionAvailabilityChange.Unlock => "Interaction To Unlock",
+                    InteractionAvailabilityChange.Lock => "Interaction To Lock",
+                    _ => "Outgoing Interaction"
+                });
+                long target = draft.FindPropertyRelative("TargetId").longValue;
+                long replacement = draft.FindPropertyRelative("ReplacementId").longValue;
+                if (operation == InteractionAvailabilityChange.Replace)
+                    choices.Draw(draft.FindPropertyRelative("ReplacementId"), "Incoming Interaction", target, target != 0 ? target : -1);
+            }
+            long selectedTarget = draft.FindPropertyRelative("TargetId").longValue;
+            long selectedReplacement = draft.FindPropertyRelative("ReplacementId").longValue;
             if (!sections.Draw("Conditions", "Apply this availability change after existing interaction events or player commands.", draft, "Settings.RequireAll", "Settings.Conditions", "SourceIds"))
                 return;
-            using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope sectionIndent = new StudioIndentScope();
             SerializedProperty conditions = settings.FindPropertyRelative("Conditions");
             SerializedProperty sources = draft.FindPropertyRelative("SourceIds");
             if (conditions.arraySize > 1)
@@ -94,8 +100,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         case UnlockTrigger.Interaction:
                             choices.Draw(sources.GetArrayElementAtIndex(index), "Source Interaction", operation switch
                             {
-                                InteractionAvailabilityChange.Unlock when settings.FindPropertyRelative("InitiallyLocked").boolValue => target,
-                                InteractionAvailabilityChange.Replace => replacement,
+                                InteractionAvailabilityChange.Unlock when settings.FindPropertyRelative("InitiallyLocked").boolValue => selectedTarget,
+                                InteractionAvailabilityChange.Replace => selectedReplacement,
                                 _ => 0
                             });
                             HoverControls.Field(condition, "Moment");

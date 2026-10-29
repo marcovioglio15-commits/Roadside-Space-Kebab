@@ -20,35 +20,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Animation(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Pose capture reads the selected target without moving the source object.
-            HoverControls.Field(settings, "Activation");
-            switch ((TriggerAnimationActivation)settings.FindPropertyRelative("Activation").enumValueIndex)
+            if (sections.Draw("Animation activation", "Choose when the animation starts.", settings, "Activation", "Target", "ProximityDistance", "ExitDistance", "Loop", "OnExit", "ResumeOnReentry", "Source", "Moment"))
             {
-                case TriggerAnimationActivation.Action:
-                    TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
-                    break;
-                case TriggerAnimationActivation.CenterCollider:
-                    HoverControls.Field(settings.FindPropertyRelative("Target"), "Distance");
-                    HoverControls.Field(settings.FindPropertyRelative("Target"), "ObstacleMask");
-                    break;
-                case TriggerAnimationActivation.Proximity:
-                    HoverControls.Field(settings, "ProximityDistance");
-                    HoverControls.Field(settings, "ExitDistance");
-                    HoverControls.Field(settings, "Loop");
-                    HoverControls.Field(settings, "OnExit");
-                    if (settings.FindPropertyRelative("OnExit").enumValueIndex == (int)TriggerAnimationExit.Pause)
-                        HoverControls.Field(settings, "ResumeOnReentry");
-                    break;
-                case TriggerAnimationActivation.Interaction:
-                    LocalInteractionMenu.Draw(settings.FindPropertyRelative("Source"));
-                    HoverControls.Field(settings, "Moment");
-                    break;
+                using StudioIndentScope sectionContent1 = new StudioIndentScope();
+                HoverControls.Field(settings, "Activation");
+                switch ((TriggerAnimationActivation)settings.FindPropertyRelative("Activation").enumValueIndex)
+                {
+                    case TriggerAnimationActivation.Action:
+                        break;
+                    case TriggerAnimationActivation.CenterCollider:
+                        HoverControls.Field(settings.FindPropertyRelative("Target"), "Distance");
+                        HoverControls.Field(settings.FindPropertyRelative("Target"), "ObstacleMask");
+                        break;
+                    case TriggerAnimationActivation.Proximity:
+                        HoverControls.Field(settings, "ProximityDistance");
+                        HoverControls.Field(settings, "ExitDistance");
+                        HoverControls.Field(settings, "Loop");
+                        HoverControls.Field(settings, "OnExit");
+                        if (settings.FindPropertyRelative("OnExit").enumValueIndex == (int)TriggerAnimationExit.Pause)
+                            HoverControls.Field(settings, "ResumeOnReentry");
+                        break;
+                    case TriggerAnimationActivation.Interaction:
+                        LocalInteractionMenu.Draw(settings.FindPropertyRelative("Source"));
+                        HoverControls.Field(settings, "Moment");
+                        break;
+                }
             }
+            if (settings.FindPropertyRelative("Activation").enumValueIndex == (int)TriggerAnimationActivation.Action)
+                TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
             if (!sections.Draw("Transform Animation", "Alternate between two local states on successive activations.", settings, "Path", "StateA", "StateB", "StartAtB", "Duration", "ForwardRotation", "ReturnRotation", "AutoReturn", "ReturnDelay", "AutoReturnDuration", "AutoReturnRotation"))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             GameObject source = HierarchyPathMenu.Source(settings);
             SerializedProperty path = settings.FindPropertyRelative("Path");
-            HierarchyPathMenu.Draw(path, source, false, transforms: true);
+            if (ObjectGroupScope.Allows(path))
+                HierarchyPathMenu.Draw(path, source, false, transforms: true);
             Transform target = source != null ? PlayerHierarchy.Resolve(source.transform, path.stringValue) : null;
             Pose(settings.FindPropertyRelative("StateA"), target, "Read State A");
             Pose(settings.FindPropertyRelative("StateB"), target, "Read State B");
@@ -75,6 +81,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="label">Endpoint-specific capture button.</param>
         private static void Pose(SerializedProperty pose, Transform target, string label)
         {
+            if (!ObjectGroupScope.Allows(pose))
+                return;
             // Numerical fields remain available when a standalone preset has no sample hierarchy yet.
             StudioGUI.PropertyField(pose, true);
             using (new EditorGUI.DisabledScope(target == null))
@@ -94,13 +102,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Only input-time contact queries use these settings; no passive scans are introduced.
             TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
             EjectAnimationControls.Draw(settings, sections);
-            HoverControls.Field(settings, "Behavior");
+            if (sections.Draw("Eject mode", "Push objects away or pull them in.", settings, "Behavior"))
+                using (new StudioIndentScope())
+                    HoverControls.Field(settings, "Behavior");
             if (settings.FindPropertyRelative("Behavior").enumValueIndex == (int)EjectBehavior.BlackHole)
                 BlackHoleControls.Draw(settings, sections);
             else
                 Impulse(settings, sections);
             if (sections.Draw("Eject Collisions", "Temporarily ignore selected collision layers on ejected bodies.", settings, "IgnoreCollisions", "IgnoredLayers", "IgnoreDuration"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "IgnoreCollisions");
                     if (settings.FindPropertyRelative("IgnoreCollisions").boolValue)
@@ -110,7 +120,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 }
             if (sections.Draw("Eject Lifetime", "Optionally destroy ejected objects after a scaled-time delay.", settings, "Despawn", "DespawnDelay"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "Despawn");
                     if (settings.FindPropertyRelative("Despawn").boolValue)
@@ -132,7 +142,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     SingleInteractionControls.DrawRelease(settings.FindPropertyRelative("Physics"), sections);
             }
             if (sections.Draw("Ejection", "Apply one physical impulse per successful activation.", settings, "IncludeTriggers", "Tolerance", "ReleaseKinematic", "Mode", "SelfImpulse", "UseBulletImpulse", "BulletImpulseMultiplier"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     if (!self)
                     {
@@ -155,7 +165,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 }
             if (!self && sections.Draw("Eject Impulses", "Rules run in list order. Each body receives the first matching impulse only.", settings, "Rules"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Rules(settings.FindPropertyRelative("Rules"));
         }
 
@@ -185,7 +195,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
                 if (!rule.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope indent = new StudioIndentScope();
                 ObjectFlagSelector.Draw(rule.FindPropertyRelative("Flags"));
                 if (rule.FindPropertyRelative("Flags").arraySize > 1)
                     HoverControls.Field(rule, "Match");

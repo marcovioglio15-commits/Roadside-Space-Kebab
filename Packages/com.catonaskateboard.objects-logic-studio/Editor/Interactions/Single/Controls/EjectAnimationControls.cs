@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!sections.Draw("Before Ejection", "Request an exact animation before applying the physical effect.", settings,
                 "AnimateBeforeEject", "ExternalAnimation", "AnimationIdentity", "WaitForAnimationReturn", "ForceAutoReturn", "AnimationOverlap", "ReturnOverlap"))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(settings, "AnimateBeforeEject", "Animate Before Trigger");
             if (!settings.FindPropertyRelative("AnimateBeforeEject").boolValue)
                 return;

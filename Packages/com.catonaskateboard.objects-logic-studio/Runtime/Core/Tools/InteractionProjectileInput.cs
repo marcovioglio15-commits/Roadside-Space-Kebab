@@ -16,6 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private static bool active;
         private static int serial;
         private static int sequence;
+        private static bool confirmed;
 
         #endregion
 
@@ -23,6 +24,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Whether interaction arbitration currently processes an actual bullet contact.</summary>
         internal static bool Active => active;
+        /// <summary>Whether this pulse represents a pointer contact that retains ordinary reach limits.</summary>
+        internal static bool CursorUse => active && current.IsCursorUse;
+        /// <summary>Whether a swept projectile establishes contact independently of interaction reach.</summary>
+        internal static bool PhysicalImpact => active && !current.IsCursorUse;
+        /// <summary>Exact captured pointer surface used instead of nearby screen anchors.</summary>
+        internal static RaycastHit Contact => current.Contact;
         /// <summary>Unique pulse identity used by each private input router's consumption state.</summary>
         internal static int Serial => serial;
         /// <summary>Tool captured when the active projectile was fired.</summary>
@@ -46,6 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             serial = sequence = 0;
             PlayerTools.ProjectileHit -= Enqueue;
             PlayerTools.ProjectileHit += Enqueue;
+            PlayerTools.CursorUsed -= Enqueue;
+            PlayerTools.CursorUsed += Enqueue;
         }
 
         /// <summary>Queues real matching contacts until the observer reaches its normal LateUpdate arbitration.</summary>
@@ -67,7 +76,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             while (pending.Count > 0)
             {
                 hit = pending.Dequeue();
-                if (hit.Shooter != null && hit.Shooter == HoverObserver.ActiveTools && hit.Contact.collider != null
+                if (Time.timeScale > 0f && hit.Shooter != null && hit.Shooter.IsReady && hit.Shooter.isActiveAndEnabled
+                    && hit.Shooter == HoverObserver.ActiveTools && hit.Contact.collider != null
                     && hit.Shooter.transform.IsChildOf(observer.Player))
                     return true;
             }
@@ -94,8 +104,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Other actions on the same physical control retain their independent action identities.
             PlayerTools tools = HoverObserver.ActiveTools;
-            return !active && action != null && tools != null
-                && tools.ActiveTool is { IsWeapon: true, InteractOnBulletImpact: true } && tools.UseActionId == action.id;
+            return !active && action != null && tools != null && tools.ActiveTool is { IsWeapon: true } tool
+                && (tool.InteractOnBulletImpact || tool.Weapon.Mode == PlayerToolWeaponMode.CursorInteraction) && tools.UseActionId == action.id;
         }
 
         /// <summary>Limits projectile selection to the exact struck hierarchy without considering range or camera aim.</summary>
@@ -114,6 +124,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return feature != null && feature.RequestToolAllowed && Allows(feature.transform);
         }
 
+        /// <summary>Confirms impact feedback once when a matching interaction reaches a successful lifecycle boundary.</summary>
+        /// <param name="feature">Interaction accepting the currently dispatched pointer contact.</param>
+        internal static void Confirm(ObjectInteraction feature)
+        {
+            // Confirmation precedes callbacks that can replace the target or disable its collider.
+            if (!CursorUse || confirmed || !Allows(feature.transform) || current.Shooter == null)
+                return;
+            confirmed = true;
+            current.Shooter.ConfirmCursorHit(current);
+        }
+
         #endregion
 
         #endregion
@@ -128,6 +149,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             private readonly PlayerToolHit previous;
             private readonly bool wasActive;
             private readonly int previousSerial;
+            private readonly bool wasConfirmed;
 
             #endregion
 
@@ -140,9 +162,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 previous = current;
                 wasActive = active;
                 previousSerial = serial;
+                wasConfirmed = confirmed;
                 current = hit;
                 active = true;
                 serial = ++sequence;
+                confirmed = false;
             }
 
             /// <summary>Restores outer routing even if a target disables itself or throws from a callback.</summary>
@@ -151,6 +175,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 current = previous;
                 active = wasActive;
                 serial = previousSerial;
+                confirmed = wasConfirmed;
             }
 
             #endregion

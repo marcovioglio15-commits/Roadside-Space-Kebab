@@ -26,15 +26,10 @@ namespace CatOnASkateboard.PlayerStudio
         private readonly PlayerTools owner;
         private readonly PlayerToolPhysics physics;
         private readonly PlayerToolVisualPool bullets;
-        private readonly PlayerToolVisualPool impacts;
+        private readonly PlayerToolImpactEffects impacts;
         private readonly Flight[] flights;
-        private readonly float[] lifetimes;
-        private readonly Quaternion impactRotation;
-        private readonly PlayerToolImpactPlacement placement;
         private readonly float lookAhead;
         private int activeBullets;
-        private int activeImpacts;
-        private int nextImpact;
         private bool disposed;
 
         #endregion
@@ -54,9 +49,9 @@ namespace CatOnASkateboard.PlayerStudio
         /// <param name="identity">Tool supplying validated projectile settings.</param>
         /// <param name="player">Owner excluded from collision queries.</param>
         /// <param name="queries">Shared non-allocating physics queries for this tool.</param>
-        /// <param name="camera">Existing camera rig used by automatic impact placement.</param>
+        /// <param name="effects">Shared impact placement and playback owned by the weapon.</param>
         /// <param name="shooter">Tools component owning the emitted shot identities.</param>
-        internal PlayerToolProjectiles(PlayerTool identity, Transform player, PlayerToolPhysics queries, PlayerCameraRig camera, PlayerTools shooter)
+        internal PlayerToolProjectiles(PlayerTool identity, Transform player, PlayerToolPhysics queries, PlayerToolImpactEffects effects, PlayerTools shooter)
         {
             tool = identity;
             owner = shooter;
@@ -64,19 +59,8 @@ namespace CatOnASkateboard.PlayerStudio
             physics = queries;
             bullets = new PlayerToolVisualPool(weapon.Bullet, weapon.Capacity, player.gameObject.scene);
             flights = new Flight[weapon.Capacity];
-            lifetimes = weapon.Impact != null ? new float[weapon.Capacity] : Array.Empty<float>();
-            // Impact orientation is converted once; the source prefab is never modified.
-            if (weapon.Impact != null)
-            {
-                bool faceCamera = weapon.AutomaticImpactPlacement && weapon.ImpactPlacementMode == PlayerToolImpactPlacementMode.FaceCamera;
-                impacts = new PlayerToolVisualPool(weapon.Impact, weapon.Capacity, player.gameObject.scene, weapon.ImpactScale,
-                    weapon.UsesImpactOrientation && weapon.ImpactSurfaceAligned && weapon.ImpactOrientation == PlayerToolImpactOrientation.SurfaceNormal,
-                    weapon.AutomaticImpactPlacement ? weapon.ImpactLifetime : 0f, faceCamera);
-                placement = weapon.AutomaticImpactPlacement ? new PlayerToolImpactPlacement(physics, camera, impacts.Envelope, faceCamera, weapon.ImpactPenetration) : null;
-                lookAhead = placement != null ? impacts.Envelope.size.magnitude : 0f;
-                impactRotation = weapon.UsesImpactOrientation ? (weapon.ImpactOrientation == PlayerToolImpactOrientation.PrefabRotation
-                    ? weapon.Impact.transform.rotation : Quaternion.identity) * Quaternion.Euler(weapon.ImpactRotation) : Quaternion.identity;
-            }
+            impacts = effects;
+            lookAhead = effects.LookAhead;
         }
 
         /// <summary>Releases every visual when the player is disabled or leaves the scene.</summary>
@@ -84,7 +68,6 @@ namespace CatOnASkateboard.PlayerStudio
         {
             disposed = true;
             bullets.Dispose();
-            impacts?.Dispose();
         }
 
         #endregion
@@ -94,21 +77,23 @@ namespace CatOnASkateboard.PlayerStudio
         /// <summary>Starts one flight from the muzzle with no inherited movement or gravity.</summary>
         /// <param name="position">World muzzle point.</param>
         /// <param name="rotation">World firing orientation, with forward along positive Z.</param>
-        internal void Fire(Vector3 position, Quaternion rotation)
+        /// <returns>True when a bullet slot was reserved and emitted.</returns>
+        internal bool Fire(Vector3 position, Quaternion rotation)
         {
             if (disposed)
-                return;
+                return false;
             int slot = bullets.Rent(position, rotation);
             if (slot < 0)
-                return;
+                return false;
             Vector3 direction = rotation * Vector3.forward;
             flights[slot] = new Flight
             {
                 Position = position, Origin = position, Direction = direction, Remaining = settings.Distance, Speed = settings.Speed,
                 ActionId = owner != null ? owner.UseActionId : Guid.Empty, TriggersInteractions = tool.InteractOnBulletImpact,
-                Prediction = placement != null ? Preview(position, direction, settings.Distance) : default
+                Prediction = impacts.Automatic ? Preview(position, direction, settings.Distance) : default
             };
             activeBullets++;
+            return true;
         }
 
         /// <summary>Sweeps each live bullet across the complete physics step and expires pooled impacts.</summary>
@@ -118,18 +103,6 @@ namespace CatOnASkateboard.PlayerStudio
             // Hit callbacks can release this pool during the preceding simulation step.
             if (disposed)
                 return;
-            // Effects spawned during this tick retain their full requested lifetime.
-            if (activeImpacts > 0)
-                for (int index = 0; index < lifetimes.Length; index++)
-                    if (lifetimes[index] > 0f)
-                    {
-                        lifetimes[index] -= delta;
-                        if (lifetimes[index] <= 0f)
-                        {
-                            impacts.Return(index);
-                            activeImpacts--;
-                        }
-                    }
             if (activeBullets == 0)
                 return;
             // Swept contacts prevent fast projectiles from passing through thin surfaces.
@@ -143,7 +116,7 @@ namespace CatOnASkateboard.PlayerStudio
                     settings.HitTriggers, out RaycastHit contact);
                 bool hit = ahead && contact.distance <= travel;
                 // Revalidate at visual arrival, after target removal or when a new surface enters the approach volume.
-                if (placement != null && (flight.Prediction.HasImpact && (flight.Prediction.Hit && flight.Prediction.Contact.collider == null
+                if (impacts.Automatic && (flight.Prediction.HasImpact && (flight.Prediction.Hit && flight.Prediction.Contact.collider == null
                     || Vector3.Dot(flight.Prediction.Position - flight.Position, flight.Direction) <= travel)
                     || ahead && (hit || !flight.Prediction.Hit || contact.collider != flight.Prediction.Contact.collider
                         || (contact.point - flight.Prediction.Contact.point).sqrMagnitude > 0.000625f)))
@@ -151,7 +124,7 @@ namespace CatOnASkateboard.PlayerStudio
                 if (flight.Prediction.HasImpact && Vector3.Dot(flight.Prediction.Position - flight.Position, flight.Direction) <= travel)
                 {
                     flight.Position = flight.Prediction.Position;
-                    EmitImpact(flight.Prediction.Position, flight.Prediction.Rotation, flight.Prediction.Scale);
+                    impacts.Emit(flight.Prediction);
                     Finish(index, flight.Prediction.Hit, flight.Prediction.Contact);
                 }
                 else
@@ -163,38 +136,14 @@ namespace CatOnASkateboard.PlayerStudio
                         bullets.Move(index, flight.Position);
                         continue;
                     }
-                    if (placement == null && (hit || settings.ImpactAtRange))
-                        Impact(hit ? contact.point : flight.Position, hit ? contact.normal : -flight.Direction, flight.Direction);
+                    if (!impacts.Automatic && (hit || settings.ImpactAtRange))
+                        impacts.Emit(flight.Origin, hit ? contact.point : flight.Position, hit ? contact.normal : -flight.Direction, flight.Direction);
                     Finish(index, hit, contact);
                 }
                 // A hit listener may disable its shooter and release these pools.
                 if (disposed)
                     return;
             }
-        }
-
-        /// <summary>Places a bounded impact visual, recycling the oldest slot when all effects are occupied.</summary>
-        /// <param name="position">Contact point or maximum-range endpoint.</param>
-        /// <param name="normal">Surface normal, or reverse travel at maximum range.</param>
-        /// <param name="direction">Bullet's world direction.</param>
-        private void Impact(Vector3 position, Vector3 normal, Vector3 direction)
-        {
-            if (impacts == null)
-                return;
-            EmitImpact(position + normal * settings.ImpactOffset, OrientImpact(normal, direction), 1f);
-        }
-
-        /// <summary>Resolves the same authored surface, travel or prefab rotation for manual and automatic placement.</summary>
-        /// <param name="normal">Confirmed contact normal, or reverse travel at maximum range.</param>
-        /// <param name="direction">Normalized incoming shot direction.</param>
-        /// <returns>World effect rotation including the authored additional Euler rotation.</returns>
-        private Quaternion OrientImpact(Vector3 normal, Vector3 direction)
-        {
-            // Prefab orientation already includes its additional rotation in the cached offset.
-            if (settings.ImpactOrientation == PlayerToolImpactOrientation.PrefabRotation)
-                return impactRotation;
-            Vector3 forward = settings.ImpactOrientation == PlayerToolImpactOrientation.SurfaceNormal ? normal : direction;
-            return Quaternion.LookRotation(forward, Mathf.Abs(Vector3.Dot(forward, Vector3.up)) > 0.99f ? Vector3.right : Vector3.up) * impactRotation;
         }
 
         /// <summary>Uses the live bullet's collision and impact fitting rules without emitting a shot or an interaction.</summary>
@@ -204,16 +153,7 @@ namespace CatOnASkateboard.PlayerStudio
         /// <returns>A value snapshot shared by shot alignment and live simulation.</returns>
         internal PlayerToolShotPrediction Preview(Vector3 position, Vector3 direction, float distance)
         {
-            // One physical sweep and the cached envelope serve both preparation and actual flight.
-            bool hit = physics.Cast(position, direction, distance, settings.Radius, settings.Layers, settings.HitTriggers, out RaycastHit contact);
-            Vector3 endpoint = position + direction * (hit ? contact.distance : distance);
-            Quaternion rotation = Quaternion.identity;
-            Vector3 impact = endpoint;
-            float scale = 1f;
-            bool fitted = placement != null && (hit || settings.ImpactAtRange) && placement.TryPlace(position, endpoint, direction,
-                settings.UsesImpactOrientation ? OrientImpact(hit ? contact.normal : -direction, direction) : Quaternion.identity,
-                out impact, out rotation, out scale);
-            return new PlayerToolShotPrediction(hit, contact, fitted, fitted ? impact : endpoint, rotation, scale);
+            return impacts.Preview(position, direction, distance);
         }
 
         /// <summary>Returns one visible bullet and publishes only a currently confirmed physical target.</summary>
@@ -230,25 +170,6 @@ namespace CatOnASkateboard.PlayerStudio
             activeBullets--;
             if (hit)
                 PlayerTools.PublishHit(result);
-        }
-
-        /// <summary>Emits the already fitted visual at the same endpoint that removes its bullet.</summary>
-        /// <param name="position">Verified world visual origin.</param>
-        /// <param name="rotation">Final effect orientation.</param>
-        /// <param name="scale">Additional fit scale relative to the pooled visual.</param>
-        private void EmitImpact(Vector3 position, Quaternion rotation, float scale)
-        {
-            // Impact capacity cannot block or allocate a bullet shot.
-            if (!impacts.HasSpace)
-            {
-                impacts.Return(nextImpact);
-                lifetimes[nextImpact] = 0f;
-                activeImpacts--;
-                nextImpact = (nextImpact + 1) % lifetimes.Length;
-            }
-            int slot = impacts.Rent(position, rotation, scale);
-            lifetimes[slot] = settings.ImpactLifetime;
-            activeImpacts++;
         }
 
         #endregion

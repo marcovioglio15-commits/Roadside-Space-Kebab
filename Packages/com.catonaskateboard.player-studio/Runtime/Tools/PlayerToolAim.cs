@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.PlayerStudio
 {
-    /// <summary>Layers cursor aiming over authored transforms and resolves the final muzzle ray after camera following.</summary>
+    /// <summary>Layers cursor aiming over configured transforms and resolves the final muzzle ray after camera following.</summary>
     internal sealed class PlayerToolAim
     {
         #region State
@@ -81,7 +80,7 @@ namespace CatOnASkateboard.PlayerStudio
             applied = false;
         }
 
-        /// <summary>Clears smoothing when a tool is parked, so its next activation starts from its authored pose.</summary>
+        /// <summary>Clears smoothing when a tool is parked, so its next activation starts from its configured pose.</summary>
         internal void Reset()
         {
             Restore();
@@ -107,13 +106,13 @@ namespace CatOnASkateboard.PlayerStudio
             if (!settings.AutoAim || pivot == null || muzzle == null || rig == null || !rig.isActiveAndEnabled
                 || rig.View == null || !rig.View.isActiveAndEnabled)
                 return true;
-            // Locked and texture-rendered views use the same centre as their preauthored fake cursor.
+            // Locked and texture-rendered views use the same centre as their prepared fake cursor.
             Camera view = rig.View;
             // Carried bodies finish following before Tools; their current render-frame colliders must be queryable.
             if (settings.RepositionAim)
                 Physics.SyncTransforms();
-            Ray ray = Cursor.lockState == CursorLockMode.Locked || view.targetTexture != null || Mouse.current == null
-                ? view.ViewportPointToRay(new Vector3(0.5f, 0.5f)) : view.ScreenPointToRay(Mouse.current.position.ReadValue());
+            if (!PlayerToolPointer.TryRay(view, out Ray ray, settings.Mode == PlayerToolWeaponMode.CursorInteraction))
+                return true;
             point = physics.Cast(ray.origin, ray.direction, settings.AimDistance, 0f, settings.Layers,
                 settings.HitTriggers, out RaycastHit contact) ? contact.point : ray.GetPoint(settings.AimDistance);
             Vector3 muzzleOffset = muzzle.TransformPoint(settings.MuzzlePosition) - pivot.position;

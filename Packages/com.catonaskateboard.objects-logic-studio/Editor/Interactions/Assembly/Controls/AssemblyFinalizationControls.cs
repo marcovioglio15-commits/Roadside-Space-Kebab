@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioInput.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -16,9 +17,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained foldout states used by the assembly tool.</param>
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
+            if (!sections.Draw("Assembly completion", "Choose how assembly finishes.", settings, "ProlongedAssembly", "FinalizeOnGrab", "FinalizeAction", "FinalizeTarget", "Charge"))
+                return;
+            using StudioIndentScope sectionContent1 = new StudioIndentScope();
             // A product with Grab can still choose a completely independent assembly action and target.
             HoverControls.Field(settings, "ProlongedAssembly");
-            GameObject source = HierarchyPathMenu.Source(settings, true);
+            GameObject source = HierarchyPathMenu.Source(settings);
             bool hasGrab = source == null || source.GetComponent<ObjectGrab>() != null;
             if (!settings.FindPropertyRelative("ProlongedAssembly").boolValue)
             {
@@ -42,7 +46,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             DrawHud(charge, sections);
         }
 
-        /// <summary>Exposes visual details only while the authored charge HUD is requested.</summary>
+        /// <summary>Exposes visual details only while the configured charge HUD is requested.</summary>
         /// <param name="charge">Active prolonged assembly configuration.</param>
         /// <param name="sections">Shared foldout state.</param>
         private static void DrawHud(SerializedProperty charge, ObjectStudioSections sections)
@@ -52,7 +56,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 || !sections.Draw("Assembly Progress", "Appearance of the observer's existing shared charge indicator.", charge,
                     "Icon", "IconColor", "RingColor", "TrackColor", "Size", "Thickness", "OffsetX", "OffsetY", "Drain", "Clockwise"))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(charge, "Icon");
             HoverControls.Field(charge, "IconColor");
             HoverControls.Field(charge, "RingColor");

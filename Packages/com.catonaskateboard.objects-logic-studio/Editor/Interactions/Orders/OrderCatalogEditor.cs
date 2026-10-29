@@ -33,7 +33,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     if (!entry.isExpanded)
                         continue;
-                    using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                    using StudioIndentScope indent = new StudioIndentScope();
                     HoverControls.Field(entry, "Name");
                     Presentation(entry, false);
                     HoverControls.Field(entry, "OverridePrice");
@@ -41,18 +41,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(entry, "Price");
                     if (OrderSections.Draw(entry, "Quantity & Extraction", "Unit quantity, probability and required draws.",
                         "Quantity", "Weight", "MaximumDraws", "RandomRequiredDraws", "RequiredDrawRange", "MinimumDraws"))
-                        using (new EditorGUI.IndentLevelScope())
+                        using (new StudioIndentScope())
                         {
                             HoverControls.Field(entry, "Quantity");
                             HoverControls.Field(entry, "Weight");
                             DrawLimits(entry);
                         }
                     if (OrderSections.Draw(entry, "Accepted Objects", "Flags required by the main order.", "Flags", "RequireAllFlags"))
-                        using (new EditorGUI.IndentLevelScope())
+                        using (new StudioIndentScope())
                             Flags(entry, false);
                     if (OrderSections.Draw(entry, "Recipe Variants & Combos", "Independent recipe candidates and their combinations.",
                         "UseRecipeModifiers", "IncludeBaseOrder", "Variants", "Combos"))
-                        using (new EditorGUI.IndentLevelScope())
+                        using (new StudioIndentScope())
                             Variants(entry);
                 }
             StudioArrayGUI.Add(entries, "Add Available Order", () => new OrderEntry { Name = "Order " + entries.arraySize });
@@ -72,7 +72,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!pools.isExpanded)
                 return;
             string[] candidateNames = System.Linq.Enumerable.ToArray(catalog.CandidateNames());
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             for (int index = 0; index < pools.arraySize; index++)
             {
                 SerializedProperty pool = pools.GetArrayElementAtIndex(index);
@@ -82,7 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (!pool.isExpanded)
                     continue;
                 using EditorGUILayout.VerticalScope box = new EditorGUILayout.VerticalScope(EditorStyles.helpBox);
-                using EditorGUI.IndentLevelScope poolIndent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope poolIndent = new StudioIndentScope();
                 HoverControls.Field(pool, "Name");
                 HoverControls.Field(pool, "Weight", "Pool Weight");
                 HoverControls.Field(pool, "Selection");
@@ -96,7 +96,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     if (!member.isExpanded)
                         continue;
-                    using EditorGUI.IndentLevelScope memberIndent = new EditorGUI.IndentLevelScope();
+                    using StudioIndentScope memberIndent = new StudioIndentScope();
                     SerializedProperty candidate = member.FindPropertyRelative("Candidate");
                     int selected = System.Array.IndexOf(candidateNames, candidate.stringValue);
                     if (candidateNames.Length > 0)
@@ -127,7 +127,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             HoverControls.Field(entry, "IncludeBaseOrder");
             SerializedProperty variants = entry.FindPropertyRelative("Variants");
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             for (int index = 0; index < variants.arraySize; index++)
             {
                 SerializedProperty variant = variants.GetArrayElementAtIndex(index);
@@ -135,12 +135,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 if (!variant.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope variantIndent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope variantIndent = new StudioIndentScope();
                 HoverControls.Field(variant, "Name");
                 Presentation(variant, true);
                 if (OrderSections.Draw(variant, "Variant Extraction", "Independent probability, quantity and draw limits.",
                     "Weight", "UseDrawLimits", "MaximumDraws", "RandomRequiredDraws", "RequiredDrawRange", "MinimumDraws", "UseQuantity", "Quantity"))
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioIndentScope())
                     {
                         HoverControls.Field(variant, "Weight");
                         HoverControls.Field(variant, "UseDrawLimits");
@@ -153,12 +153,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         }
                     }
                 if (OrderSections.Draw(variant, "Variant Ingredients", "Required and forbidden ingredient flags.", "Flags", "RequireAllFlags", "ExcludedFlags"))
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioIndentScope())
                         Flags(variant, true);
             }
             StudioArrayGUI.Add(variants, "Add Recipe Variant", () => new OrderRecipeVariant());
             if (OrderSections.Draw(entry, "Variant Combinations", "Combine independent variants while retaining each paragraph's own text style.", "Combos"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Combos(entry.FindPropertyRelative("Combos"));
         }
 
@@ -170,7 +170,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!OrderSections.Draw(entry, "Board Text", "Text and appearance used for this exact paragraph.",
                 variant ? new[] { "Text", "TextStyle", "AppendToBaseText" } : new[] { "Text", "TextStyle" }))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(entry, "Text");
             if (variant)
                 HoverControls.Field(entry, "AppendToBaseText", "Append Base Text");

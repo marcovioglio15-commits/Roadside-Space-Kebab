@@ -192,9 +192,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         continue;
                     ObjectAssemblyStation station = pair.Key;
                     float distance = (station.OutputPosition - observer.Player.position).sqrMagnitude;
-                    if (!InteractionProjectileInput.Active && distance > station.Settings.Distance * station.Settings.Distance || distance > nearest
+                    if (!InteractionProjectileInput.PhysicalImpact && distance > station.Settings.Distance * station.Settings.Distance || distance > nearest
                         || !station.CanAccept(observer.HeldObject)
-                        || !InteractionProjectileInput.Active && station.Settings.RequireSight && !physics.HasSight(observer, station.transform,
+                        || !InteractionProjectileInput.PhysicalImpact && station.Settings.RequireSight && !physics.HasSight(observer, station.transform,
                             station.OutputPosition, station.Settings.Obstacles))
                         continue;
                     if (distance == nearest && selected != null

@@ -219,7 +219,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float distance = (transform.position - player.position).sqrMagnitude;
             if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
                 armed = true;
-            return !IsSpeaking && (InteractionProjectileInput.Active || distance <= settings.Distance * settings.Distance) && eligible.Count > 0
+            return !IsSpeaking && (InteractionProjectileInput.PhysicalImpact || distance <= settings.Distance * settings.Distance) && eligible.Count > 0
                 && (armed || settings.Trigger == DialogueTrigger.InputAction && settings.ReplayOnInput
                     || settings.Trigger == DialogueTrigger.Consumption && (startedRevision != Item.ConsumptionRevision
                         || contact != null && contact.AwaitingContact && startedContactRevision != contact.ContactRevision));
@@ -274,8 +274,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the requested presentation boundary satisfies its sight policy.</returns>
         internal bool CanPresent(HoverObserver observer, DialogueVisibility visibility, bool continuing)
         {
+            if (InteractionProjectileInput.CursorUse)
+                return visibility.HasSight(observer, this);
             // After sight interrupts a running page, wait for visibility before applying its resume/restart policy.
-            if (arrivalOnly || InteractionProjectileInput.Active || continuing && projectileStarted
+            if (arrivalOnly || InteractionProjectileInput.PhysicalImpact || continuing && projectileStarted
                 || (continuing ? !settings.HideWhenSightLost : !settings.RequireSightToStart && !awaitingSight))
                 return true;
             bool visible = visibility.HasSight(observer, this);
@@ -290,6 +292,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when an advance press may change or close the current page.</returns>
         internal bool CanAdvance(HoverObserver observer, DialogueVisibility visibility)
         {
+            if (InteractionProjectileInput.CursorUse)
+                return (transform.position - observer.Player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance
+                    && visibility.HasSight(observer, this);
             // Blocking an advance does not interrupt presentation or change its retained page.
             return arrivalOnly || InteractionProjectileInput.Active || !settings.RequireSightToContinue || visibility.HasSight(observer, this);
         }
@@ -369,7 +374,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.Trigger == DialogueTrigger.Consumption && contact != null && contact.AwaitingContact)
                 handledAwaitingRevision = contact.ContactRevision;
             IsSpeaking = true;
-            projectileStarted = InteractionProjectileInput.Active;
+            projectileStarted = InteractionProjectileInput.PhysicalImpact;
             arrivalPending = false;
             audio.Begin(settings.Audio, transform);
             hud.Show(content.Entries[entry].Lines[line]);
@@ -384,7 +389,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>An eligible array index, or -1 when none match.</returns>
         private int ChooseEntry()
         {
-            // Sequence skips unmet conditions while retaining the authored ordering of eligible entries.
+            // Sequence skips unmet conditions while retaining the configured ordering of eligible entries.
             if (eligible.Count == 0)
                 return -1;
             switch (content.Selection)
@@ -418,7 +423,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
         }
 
-        /// <summary>Displays exactly one next page or finishes after the final authored page.</summary>
+        /// <summary>Displays exactly one next page or finishes after the final configured page.</summary>
         internal void Advance()
         {
             // A completed interaction waits for rearming so lower-priority eligible dialogues can run.

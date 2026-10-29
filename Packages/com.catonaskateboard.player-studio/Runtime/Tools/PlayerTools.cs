@@ -49,6 +49,8 @@ namespace CatOnASkateboard.PlayerStudio
         public bool IsUsing => ready && active >= 0 && behaviors[active].IsBusy;
         /// <summary>Whether the active tool is playing its reload combo.</summary>
         public bool IsReloading => ready && active >= 0 && behaviors[active].IsReloading;
+        /// <summary>Rounds remaining for the settled tool, or minus one for unlimited use or no active tool.</summary>
+        public int Ammunition => ActiveTool != null ? behaviors[active].Ammunition : -1;
         /// <summary>Emitted after a tool has reached its active slot and completed its incoming animation.</summary>
         public event Action<PlayerTool> Changed;
         /// <summary>Emitted when an active tool accepts a use command, before its final muzzle shot.</summary>
@@ -57,6 +59,8 @@ namespace CatOnASkateboard.PlayerStudio
         public Guid UseActionId => useActionId;
         /// <summary>Emitted once for each real bullet collision after the bullet returns to its pool.</summary>
         public static event Action<PlayerToolHit> ProjectileHit;
+        /// <summary>Emitted for a cursor weapon contact; the interaction package validates and arbitrates it before confirming impact feedback.</summary>
+        public static event Action<PlayerToolHit> CursorUsed;
 
         #endregion
 
@@ -70,6 +74,7 @@ namespace CatOnASkateboard.PlayerStudio
         {
             // Disabled domain reload must not preserve listeners from a previous gameplay session.
             ProjectileHit = null;
+            CursorUsed = null;
         }
 
         /// <summary>Publishes a physical hit without depending on any optional interaction package.</summary>
@@ -80,10 +85,29 @@ namespace CatOnASkateboard.PlayerStudio
             ProjectileHit?.Invoke(hit);
         }
 
+        /// <summary>Publishes an instant pointer contact without taking a dependency on the interaction package.</summary>
+        /// <param name="hit">Tool, action and cursor contact captured at emission.</param>
+        internal static void PublishCursorUse(PlayerToolHit hit)
+        {
+            CursorUsed?.Invoke(hit);
+        }
+
+        /// <summary>Plays cursor impact feedback after a connected interaction accepts the captured contact.</summary>
+        /// <param name="hit">Successful cursor request belonging to this player.</param>
+        public void ConfirmCursorHit(PlayerToolHit hit)
+        {
+            // A later tool switch does not redirect feedback to a different tool's effects.
+            if (!ready || !isActiveAndEnabled || !hit.IsCursorUse || hit.Shooter != this)
+                return;
+            int index = configuration.IndexOf(hit.Tool);
+            if (index >= 0)
+                behaviors[index].ConfirmCursorHit(hit);
+        }
+
         /// <summary>Initializes after PlayerInput have completed startup.</summary>
         private void Start()
         {
-            // Resolve authored modules once; weapon visual pools are prewarmed after binding succeeds.
+            // Resolve configured modules once; weapon visual pools are prewarmed after binding succeeds.
             Initialize();
         }
 
@@ -171,7 +195,7 @@ namespace CatOnASkateboard.PlayerStudio
             useRequested = reloadRequested = false;
         }
 
-        /// <summary>Applies reversible idle and aim after the camera and all authored animation poses.</summary>
+        /// <summary>Applies reversible idle and aim after the camera and all configured animation poses.</summary>
         private void LateUpdate()
         {
             if (!ready || Time.deltaTime <= 0f || ActiveTool == null)
@@ -319,7 +343,7 @@ namespace CatOnASkateboard.PlayerStudio
         public bool Reload()
         {
             if (!isActiveAndEnabled || Time.timeScale <= 0f || ActiveTool == null || requested != active
-                || IsUsing || useRequested || reloadRequested || !ActiveTool.ReloadEnabled)
+                || IsUsing || useRequested || reloadRequested || !behaviors[active].CanReload)
                 return false;
             reloadRequested = true;
             return true;

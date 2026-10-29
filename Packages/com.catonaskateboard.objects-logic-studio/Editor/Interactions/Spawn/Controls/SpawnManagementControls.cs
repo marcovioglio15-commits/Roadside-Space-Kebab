@@ -71,15 +71,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Day plans have their own focused editor while completion rules retain their independent settings.
-            HoverControls.Field(settings, "Mode");
+            if (sections.Draw("Spawn mode", "Choose completion rules or a day flow.", settings, "Mode"))
+                using (new StudioIndentScope())
+                    HoverControls.Field(settings, "Mode");
             if (settings.FindPropertyRelative("Mode").enumValueIndex == (int)SpawnManagementMode.DayFlow)
             {
-                SpawnFlowPlanEditor.Link(settings.FindPropertyRelative("Flow"));
+                if (sections.Draw("Day flow", "Choose the sequence to run.", settings, "Flow"))
+                    using (new StudioIndentScope())
+                        SpawnFlowPlanEditor.Link(settings.FindPropertyRelative("Flow"));
                 return;
             }
             // Each rule observes one source prefab; multiple rules can observe different prefabs independently.
             if (sections.Draw("Spawn Conditions", "Each instance of the linked prefab must meet its own completion quantities.", settings, "SourcePrefab", "Conditions", "RequireAll", "Repeat", "CyclesPerInstance"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     TransferInteractionControls.Prefab(settings.FindPropertyRelative("SourcePrefab"));
                     Refresh((GameObject)settings.FindPropertyRelative("SourcePrefab").objectReferenceValue);
@@ -91,7 +95,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings, "CyclesPerInstance");
                 }
             if (sections.Draw("Spawn Draw", "Choose weighted probability, equal probability or a sequence of prefab outputs.", settings, "Selection", "Choices", "Draws", "WithoutReplacement", "Chance", "FixedSeed", "Seed"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "Selection");
                     Choices(settings.FindPropertyRelative("Choices"), settings.FindPropertyRelative("Selection").enumValueIndex == (int)SpawnSelection.WeightedRandom);
@@ -105,7 +109,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             Animation(settings.FindPropertyRelative("Animation"), sections);
             if (sections.Draw("Spawn Placement", "Configure local output placement, delayed execution and surviving object capacity.", settings, "MinimumDelay", "MaximumDelay", "Position", "Rotation", "Radius", "RandomYaw", "LimitAlive", "MaximumAlive"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "MinimumDelay");
                     HoverControls.Field(settings, "MaximumDelay");
@@ -127,7 +131,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Finishing the animation restores original enabled states and leaves all independent locks in place.
             if (!sections.Draw("Spawn Animation", "Animate the generated object before any of its interactions or collisions become available.", animation))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(animation, "Enabled");
             if (!animation.FindPropertyRelative("Enabled").boolValue)
                 return;
@@ -142,6 +146,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="conditions">Serialized condition array.</param>
         private static void Conditions(SerializedProperty conditions)
         {
+            if (!ObjectGroupScope.Allows(conditions))
+                return;
             // Missing references stay visible until explicitly replaced instead of selecting a different component.
             for (int index = 0; index < conditions.arraySize; index++)
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
@@ -183,6 +189,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="weighted">Whether relative weights affect the selected mode.</param>
         private static void Choices(SerializedProperty choices, bool weighted)
         {
+            if (!ObjectGroupScope.Allows(choices))
+                return;
             // Each output is a prefab reference; scene instances never enter the saved recipe.
             for (int index = 0; index < choices.arraySize; index++)
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))

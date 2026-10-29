@@ -30,7 +30,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 if (!entry.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope indent = new StudioIndentScope();
                 Draw(entry, orders, settings.FindPropertyRelative("Trigger").enumValueIndex == (int)DialogueTrigger.Consumption,
                     settings.FindPropertyRelative("Selection").enumValueIndex == (int)DialogueSelection.WeightedRandom);
             }

@@ -126,6 +126,10 @@ namespace CatOnASkateboard.PlayerStudio
             // No per-shot destruction occurs during ordinary play.
             if (root != null)
             {
+                // Attached bursts must return under the owned root before it is destroyed.
+                for (int index = 0; index < rented.Length; index++)
+                    if (rented[index])
+                        Return(index);
                 root.SetActive(false);
                 UnityEngine.Object.Destroy(root);
             }
@@ -139,13 +143,16 @@ namespace CatOnASkateboard.PlayerStudio
         /// <param name="position">Spawn position.</param>
         /// <param name="rotation">Spawn orientation.</param>
         /// <param name="scale">Optional automatic-fit multiplier relative to the pooled prefab scale.</param>
+        /// <param name="parent">Optional existing transform followed by an attached burst.</param>
         /// <returns>Rented slot index, or minus one when the pool is full.</returns>
-        internal int Rent(Vector3 position, Quaternion rotation, float scale = 1f)
+        internal int Rent(Vector3 position, Quaternion rotation, float scale = 1f, Transform parent = null)
         {
             if (!HasSpace)
                 return -1;
             int index = free[--available];
             rented[index] = true;
+            if (parent != null)
+                instances[index].SetParent(parent, false);
             instances[index].localScale = scales[index] * scale;
             if (scaleMultipliers.Length > 0 && scaleMultipliers[index] != scale)
             {
@@ -183,7 +190,10 @@ namespace CatOnASkateboard.PlayerStudio
                 if (particle != null)
                     particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             if (instances[index] != null)
+            {
                 instances[index].gameObject.SetActive(false);
+                instances[index].SetParent(root.transform, false);
+            }
             rented[index] = false;
             free[available++] = index;
         }

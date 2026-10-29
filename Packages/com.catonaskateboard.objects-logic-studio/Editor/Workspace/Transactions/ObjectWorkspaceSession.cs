@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Selection is explicit and cannot silently discard a preset, binding or observer proposal.
             warning = string.Empty;
-            if (state.HasChanges)
+            if (state.PrefabChanged)
             {
                 warning = "Apply or Discard before changing objects or interactions.";
                 return false;
@@ -73,7 +73,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Reloads current applied sources and abandons only the workspace's proposals.</summary>
         /// <param name="state">Workspace whose source objects remain untouched.</param>
-        internal static void Discard(ObjectWorkspace state)
+        /// <param name="includeScene">Whether the common Discard also drops pending Scene Setup changes.</param>
+        internal static void Discard(ObjectWorkspace state, bool includeScene = true)
         {
             // A missing target retains its identity so reopening its prefab can recover navigation.
             Undo.RecordObject(state, "Discard object interaction draft");
@@ -87,7 +88,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (hover != null)
                 state.Draft = ObjectWorkspace.Copy(hover.Configuration);
             state.Baseline = ObjectWorkspace.Copy(state.Draft);
-            state.Observer.Discard();
+            if (includeScene)
+                state.Observer.Discard();
             state.Single.Read(state.Target.Resolve());
             state.Extended.Read(state.Target.Resolve());
             state.Persist();
@@ -176,7 +178,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 // Apply writes local snapshots; only the explicit Update buttons modify preset assets.
                 ObjectHover hover = state.HasBinding ? Resolve(state) : null;
                 if (state.InteractionChanged && hover != null)
-                    ApplyBinding(state, hover);
+                    ApplyHover(state, hover);
 
                 state.Single.Apply(target);
                 state.Extended.Apply(target);
@@ -210,10 +212,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
         }
 
-        /// <summary>Writes object-only values and updates the already authored label.</summary>
+        /// <summary>Writes object-only values and updates the already configured label.</summary>
         /// <param name="state">Validated reusable and per-object proposal.</param>
         /// <param name="hover">Unchanged component receiving the binding.</param>
-        private static void ApplyBinding(ObjectWorkspace state, ObjectHover hover)
+        /// <param name="recordUndo">Whether this is a real-object write rather than an isolated preview.</param>
+        internal static void ApplyHover(ObjectWorkspace state, ObjectHover hover, bool recordUndo = true)
         {
             // Shared preset assignment never creates another hover component.
             using (SerializedObject data = new SerializedObject(hover))
@@ -223,9 +226,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("m_Enabled").boolValue = state.Binding.Enabled;
                 data.FindProperty("drawGizmos").boolValue = state.Binding.DrawGizmos;
                 data.FindProperty("anchor").objectReferenceValue = HoverHierarchy.Resolve(hover.transform, state.Binding.AnchorPath);
-                data.ApplyModifiedProperties();
+                if (recordUndo)
+                    data.ApplyModifiedProperties();
+                else
+                    data.ApplyModifiedPropertiesWithoutUndo();
             }
-            Undo.RecordObject(hover, "Apply hover flag change");
+            if (recordUndo)
+                Undo.RecordObject(hover, "Apply hover flag change");
             JsonUtility.FromJsonOverwrite("{\"configuration\":" + JsonUtility.ToJson(state.Draft)
                 + ",\"flagChange\":" + JsonUtility.ToJson(state.Binding.FlagChange)
                 + ",\"visualEffect\":" + JsonUtility.ToJson(state.Binding.VisualEffect)

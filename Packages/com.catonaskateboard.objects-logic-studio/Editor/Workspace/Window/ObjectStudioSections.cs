@@ -31,6 +31,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>True when the group's controls should be drawn.</returns>
         internal bool Draw(string title, string tooltip, SerializedProperty parent = null, params string[] fields)
         {
+            if (ObjectGroupScope.Active)
+                return ObjectGroupScope.Section(parent, title, tooltip, fields);
             // Folding is workspace navigation, so it does not enable Apply.
             bool changed = GUI.changed;
             Rect rect = EditorGUILayout.GetControlRect();

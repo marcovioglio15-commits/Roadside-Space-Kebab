@@ -29,7 +29,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (StudioArrayGUI.Header(animations, index, new GUIContent("Reset " + (index + 1), animations.tooltip)))
                     break;
                 if (animations.GetArrayElementAtIndex(index).isExpanded)
-                    Selection(animations.GetArrayElementAtIndex(index), scene, true, "Scene Animation");
+                    using (new StudioIndentScope())
+                        Selection(animations.GetArrayElementAtIndex(index), scene, true, "Scene Animation");
             }
             StudioArrayGUI.Add(animations, "Add Animation", () => new SceneInteractionReference());
         }

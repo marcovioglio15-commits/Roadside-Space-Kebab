@@ -32,7 +32,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectAvailableOrders orders = root != null ? root.GetComponent<ObjectAvailableOrders>() : null;
             if (orders != null)
                 context = orders.Settings;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             SerializedProperty result = filter.FindPropertyRelative("Result");
             HoverControls.Field(filter, "Result");
             // Latest-delivery modes cover every open slot and have no order-name or All/Any selection.

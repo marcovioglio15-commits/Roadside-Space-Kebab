@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="observer">Active camera and flagged player.</param>
         /// <param name="root">Hierarchy excluded from its own visibility queries.</param>
         /// <param name="colliders">Cached shapes owned by the interaction.</param>
-        /// <param name="anchor">Authored world-space selection offset.</param>
+        /// <param name="anchor">configured world-space selection offset.</param>
         /// <param name="distance">Maximum reach measured from the player.</param>
         /// <param name="mode">Centre targeting or an exact unlocked cursor hit.</param>
         /// <param name="radius">Centre radius as a fraction of viewport height.</param>
@@ -28,7 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="solidHitOnly">Require an exact solid surface hit instead of trigger hits or nearby anchors.</param>
         /// <param name="score">Receives the selected surface's squared distance from the player.</param>
         /// <param name="centerCollider">Require the centre ray to hit owned geometry, including triggers, as in Hover.</param>
-        /// <returns>True when at least one owned surface or authored anchor is reachable and visible.</returns>
+        /// <returns>True when at least one owned surface or configured anchor is reachable and visible.</returns>
         internal bool Eligible(HoverObserver observer, Transform root, Collider[] colliders, Vector3 anchor,
             float distance, HoverTargetMode mode, float radius, int mask, bool solidHitOnly, out float score, bool centerCollider = false)
         {
@@ -36,7 +36,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (InteractionProjectileInput.Active)
             {
                 score = 0f;
-                return InteractionProjectileInput.Allows(root);
+                if (!InteractionProjectileInput.Allows(root))
+                    return false;
+                // Instant pointer use retains reach, clipping, solid-only rules and obstruction checks.
+                return InteractionProjectileInput.PhysicalImpact
+                    || (!solidHitOnly || !InteractionProjectileInput.Contact.collider.isTrigger)
+                        && Visible(observer, root, InteractionProjectileInput.Contact.point, distance, float.PositiveInfinity, mask, out score);
             }
             // Target geometry may have moved since the last physics step or assembly insertion.
             Camera view = observer.View;

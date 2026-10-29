@@ -155,7 +155,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 lockedTarget.SetRuleLocked(this, true);
         }
 
-        /// <summary>Resolves authored Buttons only when the registry or player action asset changes.</summary>
+        /// <summary>Resolves configured Buttons only when the registry or player action asset changes.</summary>
         /// <param name="input">Observer-owned input router.</param>
         internal void Bind(InteractionInputRouter input)
         {
@@ -176,9 +176,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             for (int index = 0; index < buttons.Length; index++)
                 if (counts[index] < settings.Conditions[index].Count && buttons[index] is { Pending: true }
-                    && (InteractionProjectileInput.Active || (settings.Target.transform.position - player.position).sqrMagnitude
+                    && (InteractionProjectileInput.PhysicalImpact || (settings.Target.transform.position - player.position).sqrMagnitude
                     <= settings.Conditions[index].Distance * settings.Conditions[index].Distance))
                 {
+                    InteractionProjectileInput.Confirm(this);
                     counts[index]++;
                     InteractionUnlockRegistry.Consume(settings.Conditions[index].Action);
                 }

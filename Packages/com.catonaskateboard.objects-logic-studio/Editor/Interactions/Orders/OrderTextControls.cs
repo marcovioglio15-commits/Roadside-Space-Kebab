@@ -17,10 +17,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(style, "Enabled", "Customize Board Text");
             if (!style.FindPropertyRelative("Enabled").boolValue)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             if (OrderSections.Draw(style, "Font & Size", "Typeface, emphasis and fixed or automatic size.",
                 "Font", "Material", "Style", "Weight", "AutoSize", "MinimumSize", "MaximumSize", "Size"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     SurfaceInteractionControls.Fields(style, "Font", "Material", "Style", "Weight", "AutoSize");
                     if (style.FindPropertyRelative("AutoSize").boolValue)
@@ -29,18 +29,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(style, "Size");
                 }
             if (OrderSections.Draw(style, "Paragraph Layout", "Alignment, wrapping and text overflow.", "Alignment", "Wrapping", "Overflow", "RichText"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     SurfaceInteractionControls.Fields(style, "Alignment", "Wrapping", "Overflow", "RichText");
             if (OrderSections.Draw(style, "Spacing & Margins", "Character and paragraph spacing, indentation and margins.",
                 "CharacterSpacing", "WordSpacing", "LineSpacing", "ParagraphSpacing", "Indent", "SpaceBefore", "SpaceAfter", "Margins"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     SurfaceInteractionControls.Fields(style, "CharacterSpacing", "WordSpacing", "LineSpacing", "ParagraphSpacing", "Indent", "SpaceBefore", "SpaceAfter");
                     Margins(style.FindPropertyRelative("Margins"));
                 }
             if (OrderSections.Draw(style, "Color & Gradient", "Text color and optional independent corner colors.",
                 "Color", "UseGradient", "TopLeft", "TopRight", "BottomLeft", "BottomRight"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     SurfaceInteractionControls.Fields(style, "Color", "UseGradient");
                     if (style.FindPropertyRelative("UseGradient").boolValue)

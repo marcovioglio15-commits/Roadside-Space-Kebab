@@ -25,18 +25,23 @@ namespace CatOnASkateboard.PlayerStudio
         public float UseInterval = 0.15f;
 
         [Header("Weapon")]
-        [Tooltip("Fire the configured bullet prefab when this tool is used.")]
+        [Tooltip("Use this tool as a weapon. Choose its firing mode below.")]
         public bool IsWeapon;
         [Tooltip("Interactions accepting this tool and bound to the player's Use Tool action receive bullet impacts instead of input presses. Their targeting distance is ignored for a hit.")]
         public bool InteractOnBulletImpact;
-        [Tooltip("Muzzle, straight projectile, impact and optional cursor aiming settings.")]
+        [Tooltip("Choose how this weapon fires, aims and shows effects.")]
         public PlayerToolWeaponSettings Weapon = new PlayerToolWeaponSettings();
 
         [Header("Reload")]
-        [Tooltip("Allow the reload command to play the ordered transform animation combo. No ammunition system is required.")]
+        [Tooltip("Allow reloading. Refill the magazine after the reload animation finishes.")]
         public bool ReloadEnabled;
-        [Tooltip("Play the reload combo automatically after each accepted use finishes. Manual reload remains available.")]
+        [Tooltip("Reload after each use. With a limited magazine, wait until it is empty.")]
         public bool AutoReload;
+        [Tooltip("Limit the shots before a reload. Each player has their own ammo.")]
+        public bool LimitedMagazine;
+        [Tooltip("Shots in a full magazine. Each shot uses one. An interrupted reload does not refill it.")]
+        [Range(1, 999)]
+        public int MagazineSize = 6;
         [Tooltip("Animation steps played in order. Tracks may target the arm or any child below Hierarchy Root.")]
         public PlayerToolAnimationPreset[] ReloadCombo = Array.Empty<PlayerToolAnimationPreset>();
 
@@ -60,6 +65,9 @@ namespace CatOnASkateboard.PlayerStudio
                 || SwitchOut != null && !SwitchOut.TryValidate(out warning))
                 || UseAnimation != null && !UseAnimation.TryValidate(out warning)
                 || IsWeapon && (Weapon == null || !Weapon.TryValidate(out warning)))
+                return false;
+            warning = "A limited weapon magazine requires Reload Enabled and a size from 1 to 999.";
+            if (IsWeapon && LimitedMagazine && (!ReloadEnabled || MagazineSize < 1 || MagazineSize > 999))
                 return false;
             if (ReloadEnabled)
             {

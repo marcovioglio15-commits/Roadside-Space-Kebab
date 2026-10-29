@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Lists authored ambient catalog keys and visualizes each emitter's listening radius.</summary>
+    /// <summary>Lists configured ambient catalog keys and visualizes each emitter's listening radius.</summary>
     internal static class AmbientControls
     {
         #region Methods
@@ -18,15 +18,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Catalog scanning happens only when the event menu is opened.
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
-            HoverControls.Field(settings, "Mode");
-            HoverControls.Field(settings, "Radius");
+            using StudioIndentScope indent = new StudioIndentScope();
+            if (sections.Draw("Audio mode", "Choose ambient sound or radio.", settings, "Mode", "Radius"))
+            {
+                using StudioIndentScope sectionContent1 = new StudioIndentScope();
+                HoverControls.Field(settings, "Mode");
+                HoverControls.Field(settings, "Radius");
+            }
             if (settings.FindPropertyRelative("Mode").enumValueIndex == (int)AmbientMode.Radio)
             {
                 Radio(settings.FindPropertyRelative("Radio"), sections);
                 return;
             }
             SerializedProperty selected = settings.FindPropertyRelative("Event");
+            if (!sections.Draw("Ambient sound", "Pick the sound to play.", settings, "Event"))
+                return;
+            using StudioIndentScope sectionContent2 = new StudioIndentScope();
             Rect rect = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), new GUIContent("Event", selected.tooltip));
             if (GUI.Button(rect, selected.stringValue, EditorStyles.popup))
                 Menu(selected, rect);
@@ -37,6 +44,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Persistent targeting foldout state.</param>
         private static void Radio(SerializedProperty settings, ObjectStudioSections sections)
         {
+            TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
+            if (!sections.Draw("Radio channels", "Choose the music channels and starting channel.", settings, "SeparateBackgroundMusic", "Parameter", "Channels", "InitialChannel"))
+                return;
+            using StudioIndentScope sectionContent3 = new StudioIndentScope();
             HoverControls.Field(settings, "SeparateBackgroundMusic");
             HoverControls.Field(settings, "Parameter");
             SerializedProperty channels = settings.FindPropertyRelative("Channels");
@@ -50,12 +61,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 if (!channel.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope indent = new StudioIndentScope();
                 HoverControls.Field(channel, "Name");
                 HoverControls.Field(channel, "Value");
             }
             StudioArrayGUI.Add(channels, "Add Radio Channel", () => new RadioChannel());
-            TransferInteractionControls.Target(settings.FindPropertyRelative("Target"), sections);
         }
 
         /// <summary>Builds a catalog of ambient keys from saved Audio Studio presets.</summary>

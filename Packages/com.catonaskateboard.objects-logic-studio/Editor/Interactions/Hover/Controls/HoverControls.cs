@@ -26,7 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Closing a section changes only navigation; hidden values remain in the draft.
             SerializedProperty settings = configuration.FindPropertyRelative("settings");
             if (sections.Draw("Detection", "Choose targeting, player range and visibility checks.", settings, "targetMode", "playerDistance", "centerRadius", "queryInterval", "releaseDelay", "obstacleMask"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "targetMode");
                     Field(settings, "playerDistance");
@@ -37,7 +37,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "obstacleMask");
                 }
             if (sections.Draw("Suspension", "Temporarily hide this hover while carried or moving.", settings, "suspendCarried", "suspendMoving", "speedThreshold"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "suspendCarried");
                     Field(settings, "suspendMoving");
@@ -45,7 +45,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Field(settings, "speedThreshold");
                 }
             if (sections.Draw("Placement", "Offset the detection anchor and final label.", settings, "anchorOffset", "fixedHud", "worldOffset", "screenOffset", "followSmoothing"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "anchorOffset");
                     Field(settings, "fixedHud", "Fixed HUD");
@@ -57,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "screenOffset");
                 }
             if (sections.Draw("Appearance", "Choose instant appearance or an animated pop-up.", settings, "appearance", "duration", "startScale", "popIn", "exitDuration"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(settings, "appearance");
                     if ((HoverAppearance)settings.FindPropertyRelative("appearance").enumValueIndex == HoverAppearance.PopUp)
@@ -79,11 +79,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Appearance has one reusable source instead of independent native-graphic edits.
             if (sections.Draw("Text", "Edit the content, font and text rendering options.", style, "content", "font", "fontSize", "fontStyle", "textColor", "alignment", "richText", "horizontalOverflow", "verticalOverflow"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     SerializedProperty content = style.FindPropertyRelative("content");
-                    EditorGUILayout.LabelField(new GUIContent("Content", content.tooltip));
-                    content.stringValue = StudioGUI.TextArea(StudioFieldMenu.Value(content, content.stringValue), GUILayout.MinHeight(42f));
+                    if (ObjectGroupScope.Allows(content))
+                    {
+                        EditorGUILayout.LabelField(new GUIContent("Content", content.tooltip));
+                        content.stringValue = StudioGUI.TextArea(StudioFieldMenu.Value(content, content.stringValue), GUILayout.MinHeight(42f));
+                    }
                     Field(style, "font");
                     Field(style, "fontSize");
                     Field(style, "fontStyle");
@@ -94,14 +97,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(style, "verticalOverflow");
                 }
             if (sections.Draw("Layout", "Size and inset the preauthored label in reference pixels.", style, "size", "textSizeOffset", "textOffset"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(style, "size");
                     Field(style, "textSizeOffset");
                     Field(style, "textOffset");
                 }
             if (sections.Draw("Background", "Enable and configure the existing background graphic.", style, "showBackground", "backgroundColor", "backgroundSprite", "backgroundType"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(style, "showBackground");
                     if (style.FindPropertyRelative("showBackground").boolValue)
@@ -121,7 +124,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Fields
 
-        /// <summary>Draws a scalar with its authored tooltip and without Header spacing inside a dropdown.</summary>
+        /// <summary>Draws a scalar with its configured tooltip and without Header spacing inside a dropdown.</summary>
         /// <param name="parent">Owning serialized block.</param>
         /// <param name="name">Serialized field name.</param>
         /// <param name="caption">Optional compact field caption.</param>
@@ -129,7 +132,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Native property fields remain available for asset references and layer masks.
             SerializedProperty property = parent.FindPropertyRelative(name);
-            GUIContent label = new GUIContent(caption ?? Label(property), property.tooltip);
+            if (!ObjectGroupScope.Allows(property))
+                return;
+            using ObjectFieldFocus.Marker focus = new ObjectFieldFocus.Marker(property);
+            GUIContent label = new GUIContent(caption ?? Label(property), ObjectFieldText.Tooltip(property));
+            if (ObjectNumericFields.Draw(property, label))
+                return;
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Boolean:

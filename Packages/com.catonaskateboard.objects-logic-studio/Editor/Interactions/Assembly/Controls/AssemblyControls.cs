@@ -42,10 +42,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Product recipes are edited on their own prefab, avoiding nested interaction menus on the table.
             if (!sections.Draw("Assembly Table", "Link one configured product prefab and place its output relative to the table.", settings))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             SerializedProperty prefab = settings.FindPropertyRelative("ProductPrefab");
-            prefab.objectReferenceValue = StudioGUI.ObjectField(StudioFieldMenu.Value(prefab, new GUIContent("Product Prefab", prefab.tooltip)),
-                prefab.objectReferenceValue, typeof(GameObject), false);
+            if (ObjectGroupScope.Allows(prefab))
+                prefab.objectReferenceValue = StudioGUI.ObjectField(StudioFieldMenu.Value(prefab, new GUIContent("Product Prefab", "Choose the product prefab.")),
+                    prefab.objectReferenceValue, typeof(GameObject), false);
             HoverControls.Field(settings, "Trigger");
             if (settings.FindPropertyRelative("Trigger").enumValueIndex == (int)AssemblyStationTrigger.InputAction)
             {
@@ -85,7 +86,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SerializedProperty settings = draft.FindPropertyRelative("Settings");
             DrawRecipe(settings, sections);
             if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly.", draft, "Settings.LockFirstIngredient", "Settings.WaitForNextIngredient", "Settings.InteractionRules", "TargetIds"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     if (!settings.FindPropertyRelative("ProlongedAssembly").boolValue)
                         HoverControls.Field(settings, "LockFirstIngredient");
@@ -104,7 +105,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             DrawRecipe(settings, sections);
             if (!sections.Draw("Product Interactions", "Requirements for the interactions captured when exporting this preset."))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             if (!settings.FindPropertyRelative("ProlongedAssembly").boolValue)
                 HoverControls.Field(settings, "LockFirstIngredient");
             HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
@@ -125,23 +126,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Common controls retain the same field routes for section transfers.
             if (sections.Draw("Recipe", "Mandatory quantities determine completion; optional quantities limit additional ingredients.", settings, "Ingredients", "PriceEnabled", "Price"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "PriceEnabled", "Price Enabled");
                     if (settings.FindPropertyRelative("PriceEnabled").boolValue)
                         HoverControls.Field(settings, "Price");
-                    FlagRequirementControls.Draw(settings.FindPropertyRelative("Ingredients"), "+ Add Ingredient", true);
+                    if (ObjectGroupScope.Allows(settings.FindPropertyRelative("Ingredients")))
+                        FlagRequirementControls.Draw(settings.FindPropertyRelative("Ingredients"), "+ Add Ingredient", true);
                 }
             if (sections.Draw("Magnets", "One placement slot per allowed ingredient; edit their positions in the dedicated preview.", settings, "Magnets"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     DrawMagnets(settings.FindPropertyRelative("Magnets"));
             RefreshIngredients(settings.FindPropertyRelative("Ingredients"));
             AssemblyFinalizationControls.Draw(settings, sections);
             SerializedProperty completed = settings.FindPropertyRelative("CompletedAppearance");
-            ItemAppearanceControls.Draw(completed);
-            if (completed.isExpanded && completed.FindPropertyRelative("Meshes").arraySize > 0)
-                using (new EditorGUI.IndentLevelScope())
-                    HoverControls.Field(settings, "HideIngredients");
+            if (sections.Draw("Completed appearance", "Change the product's look when assembly finishes.", settings, "CompletedAppearance", "HideIngredients"))
+            {
+                using StudioIndentScope sectionContent6 = new StudioIndentScope();
+                ItemAppearanceControls.Draw(completed);
+                if (completed.isExpanded && completed.FindPropertyRelative("Meshes").arraySize > 0)
+                    using (new StudioIndentScope())
+                        HoverControls.Field(settings, "HideIngredients");
+            }
         }
 
         /// <summary>Edits named generic or flag-specific slots without exposing raw array sizes.</summary>
@@ -165,7 +171,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         }
                     }
                     if (magnet.isExpanded)
-                        using (new EditorGUI.IndentLevelScope())
+                        using (new StudioIndentScope())
                             DrawMagnet(magnet);
                 }
             }

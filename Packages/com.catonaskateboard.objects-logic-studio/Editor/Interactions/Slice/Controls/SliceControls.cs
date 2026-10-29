@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Exact cursor targeting has no centre-radius setting.
             if (sections.Draw("Slice Targeting", "Choose reach, aiming and priority for the next cut.", settings, "Target", "Priority", "Contact"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     SerializedProperty target = settings.FindPropertyRelative("Target");
                     HoverControls.Field(target, "Distance");
@@ -29,7 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     FlagContactControls.Draw(settings.FindPropertyRelative("Contact"));
                 }
             if (sections.Draw("Slice Audio", "Cut or bottle-opening cue for each successful step.", settings, "Sound", "SoundEvent", "Ingredient"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "Sound");
                     if (settings.FindPropertyRelative("Sound").boolValue)
@@ -41,7 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             if (!sections.Draw("Slice Sequence", "Each performed press commits the next step. The last step completes this interaction.", settings, "Interval", "Steps"))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(settings, "Interval");
             GameObject source = HierarchyPathMenu.Source(settings);
             SerializedProperty steps = settings.FindPropertyRelative("Steps");
@@ -54,7 +54,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     if (!step.isExpanded)
                         continue;
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioIndentScope())
                     {
                         HoverControls.Field(step, "Name");
                         if (index == steps.arraySize - 1 || step.FindPropertyRelative("Consume").boolValue)
@@ -116,7 +116,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 new GUIContent("Prefab Outputs (" + spawns.arraySize + ")", spawns.tooltip), true);
             if (!spawns.isExpanded)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             for (int index = 0; index < spawns.arraySize; index++)
             {
                 SerializedProperty spawn = spawns.GetArrayElementAtIndex(index);

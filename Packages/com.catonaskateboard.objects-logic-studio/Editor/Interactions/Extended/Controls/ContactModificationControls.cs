@@ -14,27 +14,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Interaction proposal containing the modification references.</param>
         internal static void Draw(SerializedProperty settings)
         {
-            ContactModificationSettings configuration = settings.boxedValue as ContactModificationSettings;
-            if (configuration != null && configuration.ConsumesAny)
-            {
-                ContactDialogueGateControls.Draw(settings.FindPropertyRelative("ConsumeOn"));
-                ContactPriceControls.Draw(settings.FindPropertyRelative("Price"));
-            }
             SerializedProperty modifications = settings.FindPropertyRelative("Modifications");
             modifications.isExpanded = StudioArrayGUI.Foldout(modifications, new GUIContent("Modifications", modifications.tooltip));
             if (!modifications.isExpanded)
                 return;
+            using StudioIndentScope listContent = new StudioIndentScope();
             for (int index = 0; index < modifications.arraySize; index++)
             {
                 SerializedProperty entry = modifications.GetArrayElementAtIndex(index);
                 ContactModificationDefinition definition = entry.objectReferenceValue as ContactModificationDefinition;
                 string name = definition != null && definition.Settings != null ? definition.Settings.Name : "Modification " + (index + 1);
-                using (new EditorGUI.IndentLevelScope())
-                    if (StudioArrayGUI.Header(modifications, index, new GUIContent(name, "Reusable flag-filtered contact modification.")))
-                        break;
+                if (StudioArrayGUI.Header(modifications, index, new GUIContent(name, "Reusable flag-filtered contact modification.")))
+                    break;
                 if (!entry.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope indent = new StudioIndentScope();
                 StudioFieldGUI.PropertyField(entry, new GUIContent("Preset", "Shared modification asset referenced by this interaction."));
                 using StudioButton.RowScope row = new StudioButton.RowScope();
                 using (new EditorGUI.DisabledScope(definition == null))

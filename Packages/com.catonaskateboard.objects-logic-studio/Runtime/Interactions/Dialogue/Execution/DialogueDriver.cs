@@ -155,7 +155,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     // Consume a blocked dialogue press so the same action cannot unexpectedly grab or drop an item.
                     if ((!active.Settings.PreferSingleActions || !singles.TryPrioritize(observer, bindings[active].Advance, active.Settings.PreferredActions))
                         && active.CanAdvance(observer, visibility))
+                    {
+                        InteractionProjectileInput.Confirm(active);
                         active.Advance();
+                    }
                 }
             }
             else if (selected != null)

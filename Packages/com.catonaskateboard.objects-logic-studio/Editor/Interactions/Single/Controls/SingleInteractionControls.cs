@@ -23,13 +23,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // The action menu is shared with Player Studio, including map navigation and duplicate-name handling.
             data.Update();
             SerializedProperty draft = data.FindProperty("Single.Draft");
-            Field(draft, "Name");
-            Field(draft, "Enabled");
-            InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
-            if (state.Single.Kind != SingleInteractionKind.TriggerAnimation
+            if (state.Sections.Draw("Interaction", "Name, switch and input.", draft, "Name", "Enabled", "Action"))
+            {
+                using StudioIndentScope sectionContent1 = new StudioIndentScope();
+                Field(draft, "Name");
+                Field(draft, "Enabled");
+                if (state.Single.Kind != SingleInteractionKind.TriggerAnimation
                 || (TriggerAnimationActivation)draft.FindPropertyRelative("TriggerAnimation.Activation").enumValueIndex
                     is TriggerAnimationActivation.Action or TriggerAnimationActivation.CenterCollider)
-                StudioInputActionMenu.Draw(data, "Single.Draft.Action", "ObjectsLogicStudio.Button", Button);
+                    StudioInputActionMenu.Draw(data, "Single.Draft.Action", "ObjectsLogicStudio.Button", Button);
+            }
+            if (state.Sections.Draw("Player tool", "Choose which tools can use this interaction.", draft, "ToolRequirement"))
+                using (new StudioIndentScope())
+                    InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
             switch (state.Single.Kind)
             {
                 case SingleInteractionKind.TriggerAnimation:
@@ -47,7 +53,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case SingleInteractionKind.Grab:
                     DrawGrab(draft.FindPropertyRelative("Grab"), state.Sections);
                     if (state.Sections.Draw("Grab Debug", "Draw selected-object targeting and carry guides.", draft, "DrawGizmos"))
-                        using (new EditorGUI.IndentLevelScope())
+                        using (new StudioIndentScope())
                             Field(draft, "DrawGizmos");
                     break;
                 case SingleInteractionKind.Drop:
@@ -70,7 +76,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>True for a one-shot button action.</returns>
         private static bool Button(InputAction action)
         {
-            // Authored tap, hold and press interactions determine when the button performs.
+            // configured tap, hold and press interactions determine when the button performs.
             return action.type == InputActionType.Button;
         }
 
@@ -81,7 +87,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Grab targeting is independent of Hover and remains available on objects without labels.
             if (sections.Draw("Grab Detection", "Choose the object's grab range and view targeting.", grab, "Distance", "TargetMode", "SolidHitOnly", "CenterRadius", "TargetOffset", "ObstacleMask"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(grab, "Distance");
                     Field(grab, "TargetMode");
@@ -89,10 +95,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(grab, "ObstacleMask");
                 }
             if (sections.Draw("Item Value", "Configure recipe and consumption units represented by one object.", grab, "Units"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                     Field(grab, "Units");
             if (sections.Draw("Item Audio", "Pickup and collision sounds after the first grab.", grab, "PickupSound", "CollisionAudio"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(grab, "PickupSound");
                     SerializedProperty audio = grab.FindPropertyRelative("CollisionAudio");
@@ -105,7 +111,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             if (!sections.Draw("Carry", "Configure the held pose, pickup transition, world collisions and hover visibility.", grab, "Space", "Offset", "Rotation", "Instant", "TransitionDuration", "PhysicalPickup", "PickupTimeMargin", "PickupSpeed", "PickupPush", "WorldCollisions", "FollowSpeed", "RecoveryResponse", "RotationSpeed", "CollisionPadding", "ContactRotation", "ContactAngle", "ContactResponse", "ShowHover"))
                 return;
-            using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope sectionIndent = new StudioIndentScope();
             Field(grab, "Space");
             Field(grab, "Offset");
             Field(grab, "Rotation");
@@ -145,7 +151,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Overrides expose their coefficients only when they will actually affect a release.
             if (sections.Draw("Release Body", "Configure mass, air resistance, gravity, constraints and continuous collision detection.", release, "OverrideBody", "Mass", "LinearDamping", "AngularDamping", "Gravity", "Constraints", "CollisionDetection", "MaxAngularSpeed"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Field(release, "OverrideBody");
                     if (release.FindPropertyRelative("OverrideBody").boolValue)
@@ -161,7 +167,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             if (!sections.Draw("Release Surface", "Configure friction and bounce against floors and other physical objects.", release, "OverrideSurface", "StaticFriction", "DynamicFriction", "Bounciness", "FrictionCombine", "BounceCombine"))
                 return;
-            using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope sectionIndent = new StudioIndentScope();
             Field(release, "OverrideSurface");
             if (!release.FindPropertyRelative("OverrideSurface").boolValue)
                 return;
@@ -180,7 +186,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Drop never exposes a trajectory because it releases the body from rest.
             if (!sections.Draw("Trajectory", "Configure launch strength, direction and spin relative to the gameplay camera.", trajectory))
                 return;
-            using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope sectionIndent = new StudioIndentScope();
             Field(trajectory, "Mode");
             Field(trajectory, "Strength");
             Field(trajectory, "Yaw");
@@ -195,7 +201,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Field(SerializedProperty owner, string name)
         {
             // One field renderer keeps labels, tooltips and indentation consistent across cards.
-            StudioGUI.PropertyField(owner.FindPropertyRelative(name), true);
+            HoverControls.Field(owner, name);
         }
 
         #endregion

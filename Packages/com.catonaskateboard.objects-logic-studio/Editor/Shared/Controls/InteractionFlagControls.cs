@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using CatOnASkateboard.StudioIdentity;
 using UnityEditor;
@@ -20,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Flag changes stay with the item binding when reusable settings are imported.
             if (!sections.Draw("Identity Change", "Optionally change object flags when this interaction starts or completes.", settings))
                 return;
-            using EditorGUI.IndentLevelScope sectionIndent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope sectionIndent = new StudioIndentScope();
             HoverControls.Field(settings, "Enabled");
             if (!settings.FindPropertyRelative("Enabled").boolValue)
                 return;

@@ -26,7 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 SerializedProperty rule = rules.GetArrayElementAtIndex(index);
                 if (!rule.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope indent = new StudioIndentScope();
                 HoverControls.Field(rule, "Match");
                 HoverControls.Field(rule, "Spawn");
                 Tree(rule.FindPropertyRelative("Tree"));

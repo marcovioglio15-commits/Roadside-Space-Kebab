@@ -41,7 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             pages.isExpanded = StudioArrayGUI.Foldout(pages, new GUIContent("Pages (" + pages.arraySize + ")", pages.tooltip));
             if (pages.isExpanded)
             {
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope indent = new StudioIndentScope();
                 for (int index = 0; index < pages.arraySize; index++)
                 {
                     if (StudioArrayGUI.Header(pages, index, new GUIContent("Page " + (index + 1), "Speaker and complete page text.")))
@@ -49,6 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     SerializedProperty page = pages.GetArrayElementAtIndex(index);
                     if (!page.isExpanded)
                         continue;
+                    using StudioIndentScope pageContent = new StudioIndentScope();
                     HoverControls.Field(page, "Speaker");
                     HoverControls.Field(page, "Text");
                 }

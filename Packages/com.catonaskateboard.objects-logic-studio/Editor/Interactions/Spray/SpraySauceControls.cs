@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             if (sections.Draw("Activation And Burst", "Choose held flow or one-press timed emission after squeezing.", settings,
                 "Emission", "BurstDuration", "Repeat", "HeldOnly"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Fields(settings, "Emission", "HeldOnly");
                     if (settings.FindPropertyRelative("Emission").enumValueIndex == (int)SprayEmissionMode.TimedBurst)
@@ -29,7 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Nozzle(settings, sections);
             if (sections.Draw("Jet Launch", "Initial outlet speed, power and movement inherited from the source.", settings,
                 "Speed", "LaunchPower", "Spread", "InheritVelocity"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "Speed", "Speed Range (m/s)");
                     HoverControls.Field(settings, "LaunchPower", "Launch Power");
@@ -38,7 +38,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             if (sections.Draw("Jet Continuity", "Column thickness, sampling and breakup into separate drops.", settings,
                 "Radius", "Rate", "Cohesion", "BreakupTime", "StretchLimit"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     HoverControls.Field(settings, "Radius", "Radius Range (m)");
                     HoverControls.Field(settings, "Rate", "Samples / Second");
@@ -49,7 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Group(settings, sections, "Flight And Collisions", "Airborne lifetime, drag and surfaces that absorb the liquid.",
                 "Mass", "Damping", "Lifetime", "Layers", "AllowGravitySuspension");
             if (sections.Draw("Liquid Capacity", "Optional total emission time before the source becomes empty.", settings, "Limited", "Capacity"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Fields(settings, "Limited");
                     if (settings.FindPropertyRelative("Limited").boolValue)
@@ -57,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             if (sections.Draw("Bottle Squeeze", "Compression during held emission or before a timed burst.", settings,
                 "Squeeze", "SqueezeAxis", "Compression", "SqueezeDuration", "SqueezeSound"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Fields(settings, "Squeeze");
                     if (settings.FindPropertyRelative("Squeeze").boolValue)
@@ -66,7 +66,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(settings, "FlowSound");
             bool deposits = settings.boxedValue is SpraySauceSettings configuration && configuration.UsesDeposits;
             if (sections.Draw("Surface Deposits", "Ordinary dirt on impact. Target rules can enable dedicated lasting deposits.", settings, "LeaveTrail", "DepositInterval"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioIndentScope())
                 {
                     Fields(settings, "LeaveTrail");
                     if (deposits)
@@ -84,7 +84,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SerializedProperty nozzle = settings.FindPropertyRelative("Nozzle");
             if (!sections.Draw("Nozzle", "Object-local outlet position and forward direction.", nozzle))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             if (settings.serializedObject.targetObject is ObjectWorkspace workspace
                 && StudioButton.Draw(new GUIContent("Nozzle Layout", "Position and rotate the outlet against the object preview.")))
             {
@@ -102,7 +102,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             if (!sections.Draw("Target Surface Rules", "Effects after sustained contact with objects matching identity flags.", settings, "ChangeAppearance", "Rules"))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(settings, "ChangeAppearance", "Enable Rules");
             if (!settings.FindPropertyRelative("ChangeAppearance").boolValue)
                 return;
@@ -115,14 +115,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 if (!rule.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope ruleIndent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope ruleIndent = new StudioIndentScope();
                 ObjectFlagSelector.Draw(rule.FindPropertyRelative("Flags"));
                 Fields(rule, "Match", "Exposure", "ContactGap");
                 ItemAppearanceControls.Draw(rule.FindPropertyRelative("Appearance"), explicitSource: true);
                 SerializedProperty tint = rule.FindPropertyRelative("Tint");
                 tint.isExpanded = StudioArrayGUI.Foldout(tint, new GUIContent("Material Tint", tint.tooltip));
                 if (tint.isExpanded)
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioIndentScope())
                         MaterialTintControls.Draw(tint, true);
                 Fields(rule, "TrailMode");
                 if ((SprayTrailMode)rule.FindPropertyRelative("TrailMode").enumValueIndex == SprayTrailMode.Timed)

@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
@@ -19,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Every card owns its own prefab reference; this foldout never configures other interactions.
             if (!sections.Draw("Start VFX", "Optional visual effect belonging only to this interaction.", settings))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(settings, "Enabled");
             if (!settings.FindPropertyRelative("Enabled").boolValue)
                 return;

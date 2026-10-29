@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Whether an enabled button has performed since the last observer dispatch.</summary>
         internal bool Pending => InteractionProjectileInput.Active
-            ? InteractionProjectileInput.Matches(action) && consumedPulse != InteractionProjectileInput.Serial
+            ? action.enabled && InteractionProjectileInput.Matches(action) && consumedPulse != InteractionProjectileInput.Serial
             : pending && action.enabled && !InteractionProjectileInput.Blocks(action);
         /// <summary>Fresh button actuation, including actions whose performed callback waits for Hold.</summary>
         internal bool Pressed => InteractionProjectileInput.Active ? Pending : pressed && action.enabled && !InteractionProjectileInput.Blocks(action);
@@ -66,7 +66,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="context">Input System callback identifying the actual device control.</param>
         private void Started(InputAction.CallbackContext context)
         {
-            // Prolonged assembly owns its duration instead of waiting for a second authored Hold timer.
+            // Prolonged assembly owns its duration instead of waiting for a second configured Hold timer.
             pressed = true;
             control = context.control;
         }
@@ -75,7 +75,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="context">Input System callback for this button.</param>
         private void Performed(InputAction.CallbackContext context)
         {
-            // The interaction executes once on performed, respecting authored tap/hold interactions.
+            // The interaction executes once on performed, respecting configured tap/hold interactions.
             pending = true;
             pressed = true;
             control = context.control;

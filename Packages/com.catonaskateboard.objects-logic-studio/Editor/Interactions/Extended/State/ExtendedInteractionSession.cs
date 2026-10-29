@@ -110,13 +110,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Writes one validated feature inside the workspace's existing prefab transaction.</summary>
         /// <param name="target">Prefab branch that passed validation.</param>
-        internal void Apply(GameObject target)
+        /// <param name="prepare">Whether to prepare real-object dependencies.</param>
+        /// <param name="recordUndo">Whether this write belongs to a real-object Undo operation.</param>
+        internal void Apply(GameObject target, bool prepare = true, bool recordUndo = true)
         {
             // The shared transaction owns Undo, saving and rollback for every interaction category.
             if (!HasChanges)
                 return;
             ObjectExtendedInteraction feature = Resolve(target);
-            Undo.RecordObject(feature, "Apply " + Kind);
+            if (recordUndo)
+                Undo.RecordObject(feature, "Apply " + Kind);
             using (SerializedObject data = new SerializedObject(feature))
             {
                 data.FindProperty("settingsPreset").objectReferenceValue = Preset;
@@ -156,16 +159,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             JsonUtility.FromJsonOverwrite("{\"settings\":" + settings + ",\"flagChange\":" + JsonUtility.ToJson(Draft.FlagChange)
                 + ",\"visualEffect\":" + JsonUtility.ToJson(Draft.VisualEffect)
                 + ",\"toolRequirement\":" + JsonUtility.ToJson(Draft.ToolRequirement) + "}", feature);
-            if (feature is ObjectSpawnManager manager)
+            if (prepare && feature is ObjectSpawnManager manager)
             {
                 if (Draft.SpawnManagement.Mode == SpawnManagementMode.DayFlow || Draft.SpawnManagement.Animation.Enabled)
                     InteractionStagingAuthoring.Prepare(manager, "Spawn Staging");
                 if (Draft.SpawnManagement.Mode == SpawnManagementMode.DayFlow)
                     SpawnFlowAuthoring.Prepare(manager);
             }
-            if (feature is ObjectOutline outline)
+            if (prepare && feature is ObjectOutline outline)
                 OutlineAuthoring.Rebuild(outline);
-            if (feature is ObjectElasticDeformation or ObjectSpraySauce)
+            if (prepare && feature is ObjectElasticDeformation or ObjectSpraySauce)
                 ElasticAuthoring.Prepare(target);
             EditorUtility.SetDirty(feature);
             if (!EditorUtility.IsPersistent(feature))

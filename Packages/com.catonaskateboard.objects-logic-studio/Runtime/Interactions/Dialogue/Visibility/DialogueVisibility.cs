@@ -28,6 +28,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Callers skip this method when their particular visibility requirement is disabled.
             if (context == null || context.View == null || context.Player == null || dialogue == null)
                 return false;
+            // Pointer pulses already identify exact geometry and must not be replaced by a centered sight query.
+            if (InteractionProjectileInput.CursorUse)
+                return InteractionProjectileInput.Allows(dialogue) && physics.HasSight(context, dialogue.transform,
+                    InteractionProjectileInput.Contact.point, dialogue.Settings.ObstacleMask);
             if (frame != Time.frameCount || observer != context)
             {
                 results.Clear();

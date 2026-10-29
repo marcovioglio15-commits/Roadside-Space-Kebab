@@ -33,6 +33,17 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 float size = HandleUtility.GetHandleSize(position) * 0.4f;
                 Handles.ArrowHandleCap(0, position, rotation, size, EventType.Repaint);
                 Handles.DrawWireDisc(position, rotation * Vector3.forward, size * 0.06f);
+                if (weapon.Mode == PlayerToolWeaponMode.CursorInteraction)
+                    Handles.Label(position, new GUIContent("Cursor interaction", "The gameplay pointer selects the target; this muzzle supplies shot effects and impact direction."));
+                // The optional arm burst has its own attachment and may sit away from the firing point.
+                if (weapon.MuzzleEffect?.Prefab == null)
+                    continue;
+                Transform attachment = PlayerHierarchy.Resolve(root, weapon.MuzzleEffect.Path);
+                if (attachment == null || !PlayerToolWeaponSettings.Finite(weapon.MuzzleEffect.Position))
+                    continue;
+                Vector3 effect = attachment.TransformPoint(weapon.MuzzleEffect.Position);
+                Handles.DrawDottedLine(position, effect, 4f);
+                Handles.SphereHandleCap(0, effect, Quaternion.identity, size * 0.08f, EventType.Repaint);
             }
         }
 

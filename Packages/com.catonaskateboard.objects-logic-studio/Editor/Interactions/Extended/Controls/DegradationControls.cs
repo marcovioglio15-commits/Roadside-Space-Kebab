@@ -16,19 +16,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Persistent foldout state.</param>
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
-            HoverControls.Field(settings, "Mode");
             GameObject source = HierarchyPathMenu.Source(settings);
-            // Presets can retain a carry policy before being assigned to a grabbable object.
-            if (source == null || source.GetComponent<ObjectGrab>() != null || settings.FindPropertyRelative("Carry").enumValueIndex != 0)
-                HoverControls.Field(settings, "Carry");
             bool impacts = settings.FindPropertyRelative("Mode").enumValueIndex == (int)DegradationMode.Impacts;
-            if (impacts)
+            if (sections.Draw("Degradation trigger", "Advance with time or impacts.", settings, "Mode", "Carry", "MinimumImpulse", "ImpactInterval"))
             {
-                HoverControls.Field(settings, "MinimumImpulse");
-                HoverControls.Field(settings, "ImpactInterval");
+                using StudioIndentScope sectionContent1 = new StudioIndentScope();
+                HoverControls.Field(settings, "Mode");
+                if (source == null || source.GetComponent<ObjectGrab>() != null || settings.FindPropertyRelative("Carry").enumValueIndex != 0)
+                    HoverControls.Field(settings, "Carry");
+                if (impacts)
+                {
+                    HoverControls.Field(settings, "MinimumImpulse");
+                    HoverControls.Field(settings, "ImpactInterval");
+                }
             }
             if (sections.Draw("Degradation Steps", "Enter each stage after its configured time or impact count.", settings, "Steps"))
             {
+                using StudioIndentScope sectionContent2 = new StudioIndentScope();
                 SerializedProperty steps = settings.FindPropertyRelative("Steps");
                 StudioArrayGUI.Add(steps, "Add Degradation Step", () => new DegradationStep());
                 for (int index = 0; index < steps.arraySize; index++)
@@ -38,7 +42,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     if (!step.isExpanded)
                         continue;
-                    using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                    using StudioIndentScope indent = new StudioIndentScope();
                     HoverControls.Field(step, "Name");
                     HoverControls.Field(step, impacts ? "Impacts" : "Duration");
                     ItemAppearanceControls.Draw(step.FindPropertyRelative("Appearance"), suggested: source);
@@ -50,9 +54,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         ExtendedInteractionControls.Flag(step.FindPropertyRelative("Flag"));
                 }
             }
-            HoverControls.Field(settings, "DestroyAtEnd");
-            if (settings.FindPropertyRelative("DestroyAtEnd").boolValue)
+            if (sections.Draw("Degradation ending", "Choose what happens after the last stage.", settings, "DestroyAtEnd", "Fragments", "BreakSound", "BreakMaterial"))
             {
+                using StudioIndentScope sectionContent3 = new StudioIndentScope();
+                HoverControls.Field(settings, "DestroyAtEnd");
+                if (!settings.FindPropertyRelative("DestroyAtEnd").boolValue)
+                    return;
                 HoverControls.Field(settings, "Fragments");
                 if (impacts)
                 {

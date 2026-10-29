@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Thresholds work in both directions; explicit counts avoid percentage-rounding ambiguities.
             if (!sections.Draw(title, steps.tooltip, steps))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioIndentScope indent = new StudioIndentScope();
             for (int index = 0; index < steps.arraySize; index++)
             {
                 SerializedProperty step = steps.GetArrayElementAtIndex(index);
@@ -36,7 +36,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
                 if (!step.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope rowIndent = new EditorGUI.IndentLevelScope();
+                using StudioIndentScope rowIndent = new StudioIndentScope();
                 HoverControls.Field(step, "Count");
                 ItemAppearanceControls.Draw(step.FindPropertyRelative("Appearance"));
             }
