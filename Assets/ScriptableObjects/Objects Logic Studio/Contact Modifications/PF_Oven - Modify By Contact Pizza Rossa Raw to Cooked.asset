@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PF_Oven - Modify By Contact Pizza Rossa Raw to Cooked
   m_EditorClassIdentifier: 
   Settings:
-    Name: Modify By Contact Pizza Margherita Raw to Cooked
+    Name: Modify By Contact Pizza Rossa Raw to Cooked
     Preparation:
       Snap: 0
       SnapSpace: 0
@@ -40,7 +40,7 @@ MonoBehaviour:
       ReturnDuration: 0.35
       ReturnRotation: 0
     Flags:
-    - {fileID: 11400000, guid: c002ebc4f280efe4d9e1c2c4c33e5c71, type: 2}
+    - {fileID: 11400000, guid: c57d81d06e9bf5a4e8738ebe4f6e6647, type: 2}
     ContactDuration: 0.2
     ContactTolerance: 0.02
     QueryInterval: 0.02
@@ -70,7 +70,7 @@ MonoBehaviour:
       Meshes: []
       Consume: 0
     ChangeContactFlag: 1
-    ContactFlag: {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+    ContactFlag: {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     ContactFlagOperation: 0
     BlockSelf: 1
     BlockOther: 1
