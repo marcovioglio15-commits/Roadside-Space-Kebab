@@ -90,7 +90,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             window.sourceKey = state.DraftKey;
             window.group = ObjectWorkspace.Copy(settings);
             window.document = CreateInstance<ObjectWorkspace>();
-            window.document.hideFlags = HideFlags.HideAndDontSave;
             ObjectWorkspaceDraft.Capture(state).Restore(window.document);
             window.baseline = ObjectGroupPresetStore.Stamp(state, settings);
             window.preset = ObjectGroupPresetStore.Assignment(state, settings)?.Preset;

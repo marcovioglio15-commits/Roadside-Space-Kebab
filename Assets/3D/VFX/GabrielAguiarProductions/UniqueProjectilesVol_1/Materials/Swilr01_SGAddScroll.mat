@@ -168,6 +168,7 @@ Material:
     - _DistortionVSpeed: 0
     - _DoubleSided: 1
     - _DstBlend: 1
+    - _DstBlendAlpha: 1
     - _EdgeSoftness: 0
     - _FaceSignClamp: 0.2
     - _Frame: 1
@@ -193,6 +194,7 @@ Material:
     - _Softness: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 5
+    - _SrcBlendAlpha: 1
     - _Surface: 1
     - _UVSec: 0
     - _X: 1

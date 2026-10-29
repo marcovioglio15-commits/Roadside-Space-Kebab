@@ -32,7 +32,7 @@ MonoBehaviour:
       Scale: 0.1
       Lifetime: 0.3
     ShotEffect:
-      Prefab: {fileID: 4554150683601547122, guid: 0e325e731a40bd04d96ed3dcf88e90c1, type: 3}
+      Prefab: {fileID: 1707102027251842, guid: 18776a98654da834ca6d32c0064b3709, type: 3}
       Path: 
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}

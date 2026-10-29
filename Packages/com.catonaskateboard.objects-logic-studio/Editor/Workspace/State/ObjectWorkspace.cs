@@ -10,6 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
     {
         #region State
 
+        internal const HideFlags DraftFlags = HideFlags.HideInHierarchy | HideFlags.DontSave;
         private static ObjectWorkspace current;
 
         #endregion
@@ -111,7 +112,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (current == null)
                     current = CreateInstance<ObjectWorkspace>();
                 current.workspaceOwner = true;
-                current.hideFlags = HideFlags.HideAndDontSave;
                 return current;
             }
         }
@@ -149,6 +149,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #endregion
 
         #region Methods
+
+        #region Lifetime
+
+        /// <summary>Keeps every new or restored document hidden without locking its native property controls.</summary>
+        private void OnEnable()
+        {
+            // HideAndDontSave also includes NotEditable, which disables native flag and asset pickers.
+            hideFlags = DraftFlags;
+        }
+
+        #endregion
 
         #region Persistence
 
