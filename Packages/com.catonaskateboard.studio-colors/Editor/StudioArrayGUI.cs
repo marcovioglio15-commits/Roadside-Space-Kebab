@@ -16,8 +16,9 @@ namespace CatOnASkateboard.StudioColors.Editor
         /// <returns>The expanded state requested by the control.</returns>
         public static bool Foldout(SerializedProperty property, GUIContent label)
         {
-            Rect rect = EditorGUILayout.GetControlRect();
+            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
             StudioFieldMenu.Context(rect, property);
+            StudioFoldoutGUI.Background(rect);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
             return EditorGUI.Foldout(rect, property.isExpanded, label, true);
         }
@@ -32,8 +33,9 @@ namespace CatOnASkateboard.StudioColors.Editor
             // End the caller's loop after a structural edit so stale properties are never reused.
             SerializedProperty element = array.GetArrayElementAtIndex(index);
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
-            Rect rect = EditorGUILayout.GetControlRect();
+            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
             StudioFieldMenu.Context(rect, element);
+            StudioFoldoutGUI.Background(rect);
             using (new StudioFieldColors(rect, StudioFieldColors.Key(element)))
                 element.isExpanded = EditorGUI.Foldout(rect, element.isExpanded, label, true);
             using (new EditorGUI.DisabledScope(index == 0))
@@ -82,8 +84,9 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static bool Draw(SerializedProperty array, GUIContent label)
         {
             // The array header also represents the complete array for Copy, Paste and batch updates.
-            Rect rect = EditorGUILayout.GetControlRect();
+            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
             StudioFieldMenu.Context(rect, array);
+            StudioFoldoutGUI.Background(rect);
             using (new StudioFieldColors(rect, StudioFieldColors.Key(array)))
                 array.isExpanded = EditorGUI.Foldout(rect, array.isExpanded, label, true);
             if (!array.isExpanded)

@@ -33,7 +33,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="source">Object supplying the available renderers.</param>
         private static void DrawVisibility(SerializedProperty array, GameObject source)
         {
-            array.isExpanded = StudioArrayGUI.Foldout(array, new GUIContent("Renderer Visibility (" + array.arraySize + ")", array.tooltip));
+            array.isExpanded = StudioArrayGUI.Foldout(array, new GUIContent("Renderer Visibility", array.tooltip));
             if (!array.isExpanded)
                 return;
             using StudioIndentScope indent = new StudioIndentScope();
@@ -58,7 +58,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void DrawList(SerializedProperty array, GameObject source, bool mesh)
         {
             // Structural edits restart the next GUI pass before using invalidated array element handles.
-            array.isExpanded = StudioArrayGUI.Foldout(array, new GUIContent(array.displayName + " (" + array.arraySize + ")", array.tooltip));
+            array.isExpanded = StudioArrayGUI.Foldout(array, new GUIContent(array.displayName, array.tooltip));
             if (!array.isExpanded)
                 return;
             using StudioIndentScope indent = new StudioIndentScope();

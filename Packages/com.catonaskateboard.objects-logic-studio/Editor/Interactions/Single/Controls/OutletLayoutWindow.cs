@@ -156,9 +156,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new StudioButton.RowScope())
             using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
             {
-                if (StudioButton.Draw(new GUIContent("Apply", "Save only these outlet poses."), expandWidth: true, minimumHeight: 26f))
+                if (StudioButton.Draw(new GUIContent("Apply to draft", "Copy these poses into the settings group."), expandWidth: true, minimumHeight: 26f))
                     SaveChanges();
-                if (StudioButton.Draw(new GUIContent("Discard", "Reload the applied outlet poses."), expandWidth: true, minimumHeight: 26f))
+                if (StudioButton.Draw(new GUIContent("Discard", "Reload poses from the settings group."), expandWidth: true, minimumHeight: 26f))
                     DiscardChanges();
             }
         }

@@ -522,32 +522,31 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             menu.ShowAsContext();
         }
 
-        /// <summary>Offers compact object transaction actions without filling the full window width.</summary>
+        /// <summary>Places equal-width Apply and Discard actions across the bottom of the workspace.</summary>
         /// <param name="locked">Whether Play suspends editing.</param>
         private void DrawFooter(bool locked)
         {
             if (!string.IsNullOrEmpty(status))
                 EditorGUILayout.LabelField(status, EditorStyles.wordWrappedMiniLabel);
             int count = ObjectWorkspaceDrafts.Count(state) + ObjectStructureChanges.Count(state);
-            using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope(EditorStyles.toolbar);
+            EditorGUILayout.LabelField(count > 0 ? count + " pending changes" : "Up to date", EditorStyles.miniLabel);
+            using StudioButton.RowScope row = new StudioButton.RowScope();
             using (new EditorGUI.DisabledScope(locked || count == 0 && !state.Observer.HasChanges))
             {
-                if (GUILayout.Button(new GUIContent("Apply object", "Save pending changes."), EditorStyles.toolbarButton, GUILayout.Width(95f)))
+                if (StudioButton.Draw(new GUIContent("Apply", "Save pending changes."), expandWidth: true, minimumHeight: 26f))
                 {
                     RestoreEditing();
                     if (ObjectWorkspaceDrafts.Apply(state, out status))
                         status = "Object saved. Save the scene if Scene Setup changed.";
                     Refresh();
                 }
-                if (GUILayout.Button(new GUIContent("Discard object", "Drop pending changes."), EditorStyles.toolbarButton, GUILayout.Width(100f)))
+                if (StudioButton.Draw(new GUIContent("Discard", "Drop pending changes."), expandWidth: true, minimumHeight: 26f))
                 {
                     ObjectWorkspaceDrafts.Discard(state);
                     status = string.Empty;
                     Refresh();
                 }
             }
-            GUILayout.FlexibleSpace();
-            GUILayout.Label(count > 0 ? count + " pending changes" : "Up to date", EditorStyles.miniLabel);
         }
 
         #endregion

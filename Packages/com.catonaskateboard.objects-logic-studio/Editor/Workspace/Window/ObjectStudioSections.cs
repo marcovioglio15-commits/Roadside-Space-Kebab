@@ -35,11 +35,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return ObjectGroupScope.Section(parent, title, tooltip, fields);
             // Folding is workspace navigation, so it does not enable Apply.
             bool changed = GUI.changed;
-            Rect rect = EditorGUILayout.GetControlRect();
+            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
             string key = "ObjectsLogicStudio.Section." + title;
             if (Event.current.type == EventType.ContextClick && rect.Contains(Event.current.mousePosition))
                 StudioFieldGroup.Context(rect, parent == null ? Array.Empty<SerializedProperty>() : fields.Length == 0
                     ? new[] { parent } : Array.ConvertAll(fields, parent.FindPropertyRelative), key);
+            StudioFoldoutGUI.Background(rect);
             using StudioFieldColors colors = new StudioFieldColors(rect, key);
             bool open = EditorGUI.Foldout(rect, !closed.Contains(title), new GUIContent(title, tooltip), true, EditorStyles.foldoutHeader);
             GUI.changed = changed;

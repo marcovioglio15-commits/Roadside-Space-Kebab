@@ -20,6 +20,23 @@ MonoBehaviour:
   IsWeapon: 1
   InteractOnBulletImpact: 1
   Weapon:
+    Mode: 1
+    ShotsPerUse: 1
+    ShotInterval: 0.08
+    MuzzleEffect:
+      Prefab: {fileID: 2501701147455061194, guid: 0c0b67c34585b17478d2fdaee1ad5535, type: 3}
+      Path: 
+      Position: {x: 0, y: 0, z: 0.725}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: 0.1
+      Lifetime: 0.3
+    ShotEffect:
+      Prefab: {fileID: 1830508508936448, guid: 659814323bd726a4999afb3ffef0a9d6, type: 3}
+      Path: 
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: 0.1
+      Lifetime: 0.3
     MuzzlePath: 
     MuzzlePosition: {x: 0.047999978, y: 0.0084, z: 0.87900007}
     MuzzleRotation: {x: 0, y: 0, z: 0}
@@ -48,7 +65,7 @@ MonoBehaviour:
     AimDistance: 70
     AimResponse: 10
     RepositionAim: 1
-    RepositionDistance: 1.5
+    RepositionDistance: 0.5
     RepositionRadius: 0.06
     RepositionResponse: 18
     AlignBeforeShot: 0
@@ -56,6 +73,8 @@ MonoBehaviour:
     ShotAlignmentSamples: 24
   ReloadEnabled: 1
   AutoReload: 1
+  LimitedMagazine: 1
+  MagazineSize: 6
   ReloadCombo:
   - {fileID: 11400000, guid: 66bdce2abbb0a3c42bcd9559b4b594d4, type: 2}
   - {fileID: 11400000, guid: 09618b02ba3918440aad6b3682018d25, type: 2}

@@ -80,7 +80,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             foreach (Bucket bucket in buckets)
             {
-                if (!ObjectWorkspaceGUI.Foldout(state, "List." + state.Navigation.Sort + "." + bucket.Name, bucket.Name + " (" + bucket.Entries.Count + ")", "Show interactions in this group."))
+                if (!ObjectWorkspaceGUI.Foldout(state, "List." + state.Navigation.Sort + "." + bucket.Name, bucket.Name, "Show interactions in this group."))
                     continue;
                 using StudioIndentScope indent = new StudioIndentScope();
                 foreach (ObjectInteraction feature in bucket.Entries)

@@ -155,7 +155,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             GameObject root = session.Target.Resolve();
             if (root == null || EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                EditorGUILayout.LabelField("Open this product's Assembly Product card in Object Assemble to resume its preview.", EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField("Reopen Magnet Layout from the product's Assembly settings.", EditorStyles.wordWrappedLabel);
                 return;
             }
             AssemblyProductSettings settings = session.Draft.Settings;
@@ -198,9 +198,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new StudioButton.RowScope())
             using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
             {
-                if (StudioButton.Draw(new GUIContent("Apply", "Validate and save only this window's magnet layout."), expandWidth: true, minimumHeight: 26f))
+                if (StudioButton.Draw(new GUIContent("Apply to draft", "Copy these placements into the settings group."), expandWidth: true, minimumHeight: 26f))
                     SaveChanges();
-                if (StudioButton.Draw(new GUIContent("Discard", "Abandon this layout proposal and reload the product."), expandWidth: true, minimumHeight: 26f))
+                if (StudioButton.Draw(new GUIContent("Discard", "Reload placements from the settings group."), expandWidth: true, minimumHeight: 26f))
                     DiscardChanges();
             }
             GUILayout.EndArea();
@@ -213,7 +213,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Slots are created in the product card; this panel focuses on placement and guide selection.
             if (settings.Magnets.Length == 0)
             {
-                EditorGUILayout.LabelField("Add magnets in the product card to begin arranging ingredients.", EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField("Add magnets in the Assembly settings to arrange ingredients here.", EditorStyles.wordWrappedLabel);
                 return;
             }
             selected = Mathf.Clamp(selected, 0, settings.Magnets.Length - 1);

@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -19,7 +20,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static bool Foldout(ObjectWorkspace state, string key, string title, string tooltip)
         {
             bool previous = !state.Navigation.Collapsed.Contains(key);
-            bool open = EditorGUILayout.Foldout(previous, new GUIContent(title, tooltip), true, EditorStyles.foldoutHeader);
+            bool changed = GUI.changed;
+            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
+            StudioFoldoutGUI.Background(rect, key.StartsWith("View.", System.StringComparison.Ordinal));
+            bool open = EditorGUI.Foldout(rect, previous, new GUIContent(title, tooltip), true, EditorStyles.foldoutHeader);
+            GUI.changed = changed;
             if (open != previous)
             {
                 if (open)

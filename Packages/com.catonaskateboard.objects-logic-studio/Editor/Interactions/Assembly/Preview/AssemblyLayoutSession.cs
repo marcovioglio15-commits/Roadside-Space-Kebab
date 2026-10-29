@@ -4,146 +4,109 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Retains an independent magnet proposal and merges only its layout into the product.</summary>
+    /// <summary>Edits product magnets independently before merging them into the group that opened the preview.</summary>
     [Serializable]
     internal sealed class AssemblyLayoutSession
     {
         #region Fields
 
-        [Header("Layout Session")]
-        [Tooltip("Product branch retained independently of the main window selection.")]
-        public ObjectWorkspaceTarget Target = new ObjectWorkspaceTarget();
-        [Tooltip("Independent product snapshot used to preview the pending magnets.")]
+        [Header("Layout")]
+        [Tooltip("Settings group that opened this preview.")]
+        [SerializeField]
+        private ObjectLayoutSource source = new ObjectLayoutSource();
+        [Tooltip("Ingredient placements shown in the preview.")]
         public AssemblyProductDraft Draft = new AssemblyProductDraft();
-        [Tooltip("Applied magnet state used to reject outside layout edits.")]
-        public AssemblyProductSettings Baseline;
-        [Tooltip("Initial main-window layout used to protect its pending edits.")]
-        public AssemblyProductSettings WorkspaceBaseline;
-        [Tooltip("Layout at the beginning of this window's current transaction.")]
-        public AssemblyProductSettings Initial;
+        [Tooltip("Placements copied when this preview was opened or last applied.")]
+        [SerializeField]
+        private AssemblyProductSettings baseline;
 
         #endregion
+
         #region Properties
 
-        /// <summary>Whether this window has changed its independent layout.</summary>
-        internal bool HasChanges => Initial != null && Capture(Draft.Settings) != Capture(Initial);
+        /// <summary>Object used for geometry and ingredient guides.</summary>
+        internal ObjectWorkspaceTarget Target => source.Target;
+
+        /// <summary>Whether the preview contains changes beyond its opening draft.</summary>
+        internal bool HasChanges => baseline != null && Capture(Draft.Settings) != Capture(baseline);
 
         #endregion
+
         #region Methods
-        #region Transaction
-        /// <summary>Follows source layout updates only while this preview has no pending handle edits.</summary>
+
+        #region Transactions
+
+        /// <summary>Follows source draft changes while no local handle edits are pending.</summary>
         internal void Refresh()
         {
-            GameObject root = Target.Resolve();
-            if (HasChanges || root == null || !root.TryGetComponent(out ObjectAssemblyProduct product)
-                || Capture(product.Settings) == Capture(Baseline))
-                return;
-            Draft = AssemblyProductDraft.Capture(product.Settings);
-            Initial = Baseline = Snapshot(product.Settings);
-            // Preserve conflicts with independently edited magnets in the main workspace.
-            ObjectWorkspace workspace = ObjectWorkspace.instance;
-            if (workspace.Target.Resolve() == root && workspace.Extended.Kind == ExtendedInteractionKind.AssemblyProduct
-                && Capture(workspace.Extended.Draft.AssemblyProduct.Settings) == Capture(Baseline))
-                WorkspaceBaseline = Baseline;
+            if (!HasChanges)
+                Discard();
         }
 
-
-        /// <summary>Starts an independent proposal from the product card's visible configuration.</summary>
-        /// <param name="workspace">Main window containing the current product proposal.</param>
-        /// <param name="product">Applied product component.</param>
+        /// <summary>Copies pending placements without changing the original group or prefab.</summary>
+        /// <param name="workspace">Draft that opened the preview.</param>
+        /// <param name="product">Product represented by the draft.</param>
         internal void Read(ObjectWorkspace workspace, ObjectAssemblyProduct product)
         {
-            // Pending values are copied, so preview handles never mutate the main window directly.
-            Target.Capture(product.gameObject, 0);
-            Draft = ObjectWorkspace.Copy(workspace.Extended.Draft.AssemblyProduct);
-            Baseline = Snapshot(product.Settings);
-            Initial = Baseline;
-            WorkspaceBaseline = Snapshot(Draft.Settings);
+            // Reject mismatched callers before retaining their transaction.
+            if (ObjectWorkspaceDrafts.Selected(workspace) != product)
+                throw new InvalidOperationException("Open this preview from the product's settings.");
+            source.Capture(workspace);
+            ReadDraft(workspace);
         }
 
-        /// <summary>Reloads the applied layout while preserving the preview's product identity.</summary>
+        /// <summary>Reloads placements from the original group, including its pending settings.</summary>
         internal void Discard()
         {
-            // A missing prefab retains its proposal until the source becomes available again.
-            GameObject root = Target.Resolve();
-            if (root == null || !root.TryGetComponent(out ObjectAssemblyProduct product))
-                return;
-            Draft = AssemblyProductDraft.Capture(product.Settings);
-            Initial = Baseline = Snapshot(product.Settings);
-            ObjectWorkspace workspace = ObjectWorkspace.instance;
-            if (workspace.Target.Resolve() == root && workspace.Extended.Kind == ExtendedInteractionKind.AssemblyProduct)
-                WorkspaceBaseline = Snapshot(workspace.Extended.Draft.AssemblyProduct.Settings);
+            source.Edit(ReadDraft, out _);
         }
 
-        /// <summary>Saves only magnets after checking source and main-window conflicts.</summary>
-        /// <param name="warning">Receives invalid layout or concurrent-edit details.</param>
-        /// <returns>True when the product layout was committed.</returns>
+        /// <summary>Merges only magnets into the source draft after checking for concurrent layout edits.</summary>
+        /// <param name="warning">Receives missing source, invalid placement or conflict details.</param>
+        /// <returns>True when the original group received the preview's placements.</returns>
         internal bool Apply(out string warning)
         {
-            // Current non-layout configuration remains authoritative for validation and persistence.
-            GameObject root = Target.Resolve();
-            warning = "Open the original product prefab before applying this layout.";
-            if (!Target.IsOpen || root == null || !root.TryGetComponent(out ObjectAssemblyProduct product)
-                || !ObjectAuthoringSave.TryValidate(root, out warning))
-                return false;
-            ObjectWorkspace workspace = ObjectWorkspace.instance;
-            bool selected = workspace.Target.Resolve() == root && workspace.Extended.Kind == ExtendedInteractionKind.AssemblyProduct;
-            if (Capture(product.Settings) != Capture(Baseline) || selected && Capture(workspace.Extended.Draft.AssemblyProduct.Settings) != Capture(WorkspaceBaseline))
+            bool applied = source.Edit(workspace =>
             {
-                warning = "The layout changed in another editor. Discard to reload it.";
-                return false;
-            }
-            AssemblyProductSettings proposal = ObjectWorkspace.Copy(product.Settings);
-            proposal.Magnets = ObjectWorkspace.Copy(Draft).Settings.Magnets;
-            if (!AssemblyValidation.TryValidate(root, proposal, out warning))
-                return false;
-            Undo.IncrementCurrentGroup();
-            int group = Undo.GetCurrentGroup();
-            try
-            {
-                Undo.RecordObject(product, "Apply Magnet Layout");
-                product.Settings.Magnets = proposal.Magnets;
-                EditorUtility.SetDirty(product);
-                PrefabUtility.RecordPrefabInstancePropertyModifications(product);
-                ObjectAuthoringSave.Save(root);
-                if (selected)
-                {
-                    // Rebase only magnets, preserving every unrelated pending interaction field.
-                    Undo.RecordObject(workspace, "Refresh Applied Magnet Layout");
-                    workspace.Extended.Draft.AssemblyProduct.Settings.Magnets = ObjectWorkspace.Copy(Draft).Settings.Magnets;
-                    workspace.Extended.Baseline.AssemblyProduct.Settings.Magnets = ObjectWorkspace.Copy(Draft).Settings.Magnets;
-                    workspace.Persist();
-                }
-                Discard();
-                Undo.CollapseUndoOperations(group);
-                return true;
-            }
-            catch (Exception exception)
-            {
-                Undo.RevertAllDownToGroup(group);
-                warning = "Layout Apply failed: " + exception.Message;
-                return false;
-            }
+                // Compare only placements so unrelated group edits remain independent.
+                AssemblyProductSettings current = workspace.Extended.Draft.AssemblyProduct.Settings;
+                if (Capture(current) != Capture(baseline))
+                    throw new InvalidOperationException("The layout changed in another window. Discard to reload it.");
+                AssemblyProductSettings proposal = ObjectWorkspace.Copy(current);
+                proposal.Magnets = ObjectWorkspace.Copy(Draft).Settings.Magnets;
+                if (!AssemblyValidation.TryValidate(Target.Resolve(), proposal, out string detail))
+                    throw new InvalidOperationException(detail);
+                Undo.RecordObject(workspace, "Apply Magnet Layout to Draft");
+                current.Magnets = proposal.Magnets;
+                ReadDraft(workspace);
+            }, out warning);
+            if (applied)
+                source.Notify();
+            return applied;
         }
 
-        /// <summary>Retains native asset references so layout comparisons remain valid after restarting Unity.</summary>
-        /// <param name="settings">Layout whose magnets become an independent baseline.</param>
-        /// <returns>A detached magnet snapshot serialized with the preview window.</returns>
-        private static AssemblyProductSettings Snapshot(AssemblyProductSettings settings)
+        #endregion
+
+        #region Snapshots
+
+        /// <summary>Refreshes the independent proposal and its comparison baseline from the caller.</summary>
+        /// <param name="workspace">Exact product draft retained by the preview.</param>
+        private void ReadDraft(ObjectWorkspace workspace)
         {
-            // Strings containing temporary instance identifiers cannot serve as durable reference baselines.
-            return ObjectWorkspace.Copy(new AssemblyProductSettings { Magnets = settings.Magnets });
+            Draft = ObjectWorkspace.Copy(workspace.Extended.Draft.AssemblyProduct);
+            baseline = ObjectWorkspace.Copy(new AssemblyProductSettings { Magnets = Draft.Settings.Magnets });
         }
 
-        /// <summary>Captures only magnets so unrelated product edits do not cause false conflicts.</summary>
-        /// <param name="settings">Product configuration containing the layout.</param>
-        /// <returns>A stable serialized layout snapshot.</returns>
+        /// <summary>Compares only layout values so recipe and feedback changes do not cause conflicts.</summary>
+        /// <param name="settings">Configuration containing the placements.</param>
+        /// <returns>Serialized placement values, or empty when no layout exists.</returns>
         private static string Capture(AssemblyProductSettings settings)
         {
             return settings != null ? JsonUtility.ToJson(new AssemblyProductSettings { Magnets = settings.Magnets }) : string.Empty;
         }
 
         #endregion
+
         #endregion
     }
 }

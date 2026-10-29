@@ -38,7 +38,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (consumption)
                 DialogueConsumptionControls.Draw(serializedObject.FindProperty("Consumption"), "Filter Entry", catalog, context);
             SerializedProperty pages = serializedObject.FindProperty("Lines");
-            pages.isExpanded = StudioArrayGUI.Foldout(pages, new GUIContent("Pages (" + pages.arraySize + ")", pages.tooltip));
+            pages.isExpanded = StudioArrayGUI.Foldout(pages, new GUIContent("Pages", pages.tooltip));
             if (pages.isExpanded)
             {
                 using StudioIndentScope indent = new StudioIndentScope();

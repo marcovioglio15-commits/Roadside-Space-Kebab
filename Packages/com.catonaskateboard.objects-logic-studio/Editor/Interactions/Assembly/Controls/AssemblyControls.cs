@@ -136,7 +136,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
             if (sections.Draw("Magnets", "One placement slot per allowed ingredient; edit their positions in the dedicated preview.", settings, "Magnets"))
                 using (new StudioIndentScope())
+                {
+                    if (settings.serializedObject.targetObject is ObjectWorkspace workspace
+                        && ObjectWorkspaceDrafts.Selected(workspace) is ObjectAssemblyProduct product
+                        && StudioButton.Draw(new GUIContent("Magnet Layout", "Place ingredients in the product preview.")))
+                    {
+                        settings.serializedObject.ApplyModifiedProperties();
+                        AssemblyPreviewWindow.Open(workspace, product);
+                    }
                     DrawMagnets(settings.FindPropertyRelative("Magnets"));
+                }
             RefreshIngredients(settings.FindPropertyRelative("Ingredients"));
             AssemblyFinalizationControls.Draw(settings, sections);
             SerializedProperty completed = settings.FindPropertyRelative("CompletedAppearance");

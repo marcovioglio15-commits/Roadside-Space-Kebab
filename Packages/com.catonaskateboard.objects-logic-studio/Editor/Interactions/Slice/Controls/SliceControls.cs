@@ -93,8 +93,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Stop the current loop after a structural change to avoid drawing stale property handles.
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
-            step.isExpanded = EditorGUILayout.Foldout(step.isExpanded,
-                new GUIContent((index + 1) + ". " + step.FindPropertyRelative("Name").stringValue, "Edit this cut's appearance and outputs."), true);
+            step.isExpanded = StudioArrayGUI.Foldout(step,
+                new GUIContent((index + 1) + ". " + step.FindPropertyRelative("Name").stringValue, "Edit this cut's appearance and outputs."));
             using (new EditorGUI.DisabledScope(index == 0))
                 if (GUILayout.Button(new GUIContent("↑", "Move this step earlier."), GUILayout.Width(26f)))
                     return steps.MoveArrayElement(index, index - 1);
@@ -112,8 +112,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void DrawSpawns(SerializedProperty spawns)
         {
             // Scene instances cannot become persistent spawn dependencies.
-            spawns.isExpanded = EditorGUILayout.Foldout(spawns.isExpanded,
-                new GUIContent("Prefab Outputs (" + spawns.arraySize + ")", spawns.tooltip), true);
+            spawns.isExpanded = StudioArrayGUI.Foldout(spawns, new GUIContent("Prefab Outputs", spawns.tooltip));
             if (!spawns.isExpanded)
                 return;
             using StudioIndentScope indent = new StudioIndentScope();

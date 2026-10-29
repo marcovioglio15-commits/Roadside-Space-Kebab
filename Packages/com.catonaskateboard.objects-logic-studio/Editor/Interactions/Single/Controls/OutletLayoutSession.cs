@@ -4,178 +4,136 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Wraps one nozzle or several dispenser points for independent pose-only transactions.</summary>
+    /// <summary>Wraps one nozzle or several dispenser points for independent pose editing.</summary>
     [Serializable]
     internal sealed class OutletLayout
     {
         #region Fields
 
-        [Tooltip("Independent local output poses shown in the layout preview.")]
+        [Tooltip("Local output positions and directions shown in the preview.")]
         public DispenserOutlet[] Points = { new DispenserOutlet() };
 
         #endregion
     }
 
-    /// <summary>Commits only outlet poses while preserving unrelated main-window proposals.</summary>
+    /// <summary>Merges preview poses into the draft that opened it while preserving other settings.</summary>
     [Serializable]
     internal sealed class OutletLayoutSession
     {
         #region Fields
 
-        [Header("Layout Session")]
-        [Tooltip("Source retained independently of main-window navigation.")]
-        public ObjectWorkspaceTarget Target = new ObjectWorkspaceTarget();
-        [Tooltip("Whether this transaction edits dispenser outlets instead of one spray nozzle.")]
+        [Header("Layout")]
+        [Tooltip("Settings group that opened this preview.")]
+        [SerializeField]
+        private ObjectLayoutSource source = new ObjectLayoutSource();
+        [Tooltip("Edit dispenser outlets instead of a spray nozzle.")]
         public bool Dispenser;
-        [Tooltip("Detached output poses edited by this preview.")]
+        [Tooltip("Output positions and directions edited by this preview.")]
         public OutletLayout Draft = new OutletLayout();
-        [Tooltip("Applied layout snapshot used to detect outside edits.")]
-        public string Baseline = string.Empty;
-        [Tooltip("Main-window layout snapshot used to detect conflicting proposals.")]
-        public string WorkspaceBaseline = string.Empty;
+        [Tooltip("Poses copied when the preview was opened or last applied.")]
+        [SerializeField]
+        private string baseline = string.Empty;
 
         #endregion
 
         #region Properties
 
-        /// <summary>Whether the independent proposal differs from its applied layout.</summary>
-        internal bool HasChanges => Baseline.Length > 0 && JsonUtility.ToJson(Draft) != Baseline;
+        /// <summary>Object used for the preview geometry.</summary>
+        internal ObjectWorkspaceTarget Target => source.Target;
+
+        /// <summary>Whether the preview contains pose changes beyond its opening draft.</summary>
+        internal bool HasChanges => baseline.Length > 0 && JsonUtility.ToJson(Draft) != baseline;
 
         #endregion
 
         #region Methods
-        #region Transaction
 
-        /// <summary>Copies the selected card's current proposal while retaining the source conflict baseline.</summary>
-        /// <param name="workspace">Main tool containing the pending layout settings.</param>
-        /// <param name="dispenser">Whether to edit the dispenser's output array.</param>
+        #region Transactions
+
+        /// <summary>Copies the caller's current poses without changing the original group or prefab.</summary>
+        /// <param name="workspace">Draft that opened the preview.</param>
+        /// <param name="dispenser">Whether to edit multiple outlets instead of one nozzle.</param>
         internal void Read(ObjectWorkspace workspace, bool dispenser)
         {
             Dispenser = dispenser;
-            Target.Capture(workspace.Target.Resolve(), 0);
-            Draft = ReadLayout(workspace);
-            Baseline = JsonUtility.ToJson(ReadLayout(null));
-            WorkspaceBaseline = JsonUtility.ToJson(Draft);
+            source.Capture(workspace);
+            ReadDraft(workspace);
         }
 
-        /// <summary>Refreshes an unedited layout after external source changes without losing conflict detection.</summary>
+        /// <summary>Follows changes in the source group while no local handle edits are pending.</summary>
         internal void Refresh()
         {
-            if (HasChanges || Target.Resolve() == null)
-                return;
-            OutletLayout applied = ReadLayout(null);
-            if (applied == null || JsonUtility.ToJson(applied) == Baseline)
-                return;
-            Draft = applied;
-            Baseline = JsonUtility.ToJson(applied);
-            if (Selected(ObjectWorkspace.instance) && JsonUtility.ToJson(ReadLayout(ObjectWorkspace.instance)) == Baseline)
-                WorkspaceBaseline = Baseline;
+            if (!HasChanges)
+                Discard();
         }
 
-        /// <summary>Reloads the applied layout without changing other card proposals.</summary>
+        /// <summary>Reloads poses from the original group, including its pending settings.</summary>
         internal void Discard()
         {
-            OutletLayout applied = ReadLayout(null);
-            if (applied == null)
-                return;
-            Draft = applied;
-            Baseline = JsonUtility.ToJson(applied);
-            if (Selected(ObjectWorkspace.instance))
-                WorkspaceBaseline = JsonUtility.ToJson(ReadLayout(ObjectWorkspace.instance));
+            source.Edit(ReadDraft, out _);
         }
 
-        /// <summary>Validates source and main-window baselines before saving only this layout.</summary>
-        /// <param name="warning">Receives missing source, invalid poses or conflicting edits.</param>
-        /// <returns>True after the output poses were saved.</returns>
+        /// <summary>Copies only output poses into the source draft after validating them and checking conflicts.</summary>
+        /// <param name="warning">Receives missing source, invalid pose or conflict details.</param>
+        /// <returns>True when the original group received the preview's poses.</returns>
         internal bool Apply(out string warning)
         {
-            GameObject root = Target.Resolve();
-            warning = "Open the source prefab before applying its outlet layout.";
-            if (!Target.IsOpen || root == null || ReadLayout(null) == null || !ObjectAuthoringSave.TryValidate(root, out warning))
-                return false;
-            ObjectWorkspace workspace = ObjectWorkspace.instance;
-            bool selected = Selected(workspace);
-            warning = "The layout changed in another editor. Discard to reload it.";
-            if (JsonUtility.ToJson(ReadLayout(null)) != Baseline
-                || selected && JsonUtility.ToJson(ReadLayout(workspace)) != WorkspaceBaseline)
-                return false;
-            warning = "Add at least one outlet with finite position and rotation values.";
-            if (Draft?.Points == null || Draft.Points.Length == 0 || !Dispenser && Draft.Points.Length != 1)
-                return false;
-            foreach (DispenserOutlet point in Draft.Points)
-                if (point is not { IsValid: true })
-                    return false;
-            ObjectInteraction feature = Dispenser ? root.GetComponent<ObjectDispenser>() : root.GetComponent<ObjectSpraySauce>();
-            Undo.RecordObject(feature, "Apply Outlet Layout");
-            Write(null, false);
-            EditorUtility.SetDirty(feature);
-            PrefabUtility.RecordPrefabInstancePropertyModifications(feature);
-            ObjectAuthoringSave.Save(root);
-            if (selected)
+            bool applied = source.Edit(workspace =>
             {
-                Undo.RecordObject(workspace, "Refresh Applied Outlets");
-                Write(workspace, false);
-                Write(workspace, true);
-                workspace.Persist();
-            }
-            Discard();
-            warning = string.Empty;
-            return true;
+                // Reject invalid poses without replacing the proposal or changing the source.
+                if (JsonUtility.ToJson(ReadLayout(workspace)) != baseline)
+                    throw new InvalidOperationException("The layout changed in another window. Discard to reload it.");
+                if (Draft?.Points == null || Draft.Points.Length == 0 || !Dispenser && Draft.Points.Length != 1)
+                    throw new InvalidOperationException("Add at least one outlet. Spray Sauce uses one nozzle.");
+                foreach (DispenserOutlet point in Draft.Points)
+                    if (point is not { IsValid: true })
+                        throw new InvalidOperationException("Use finite values for each outlet's position and rotation.");
+                Undo.RecordObject(workspace, "Apply Outlet Layout to Draft");
+                if (Dispenser)
+                    workspace.Single.Draft.Dispenser.Outlets = ObjectWorkspace.Copy(Draft).Points;
+                else
+                    workspace.Extended.Draft.SpraySauce.Nozzle = new SprayNozzle
+                    {
+                        Position = Draft.Points[0].Position,
+                        Rotation = Draft.Points[0].Rotation
+                    };
+                ReadDraft(workspace);
+            }, out warning);
+            if (applied)
+                source.Notify();
+            return applied;
         }
 
         #endregion
-        #region Source Access
 
-        /// <summary>Checks that a main-window card still refers to this layout's source and interaction.</summary>
-        /// <param name="workspace">Current main-window transaction.</param>
-        /// <returns>True for this exact card on the retained source.</returns>
-        private bool Selected(ObjectWorkspace workspace)
+        #region Snapshots
+
+        /// <summary>Reloads independent pose values and resets the preview's change baseline.</summary>
+        /// <param name="workspace">Exact draft retained by the preview.</param>
+        private void ReadDraft(ObjectWorkspace workspace)
         {
-            return workspace.Target.Resolve() == Target.Resolve() && (Dispenser
-                ? workspace.Single.Kind == SingleInteractionKind.Dispenser
-                : workspace.Extended.Kind == ExtendedInteractionKind.SpraySauce);
+            Draft = ReadLayout(workspace);
+            baseline = JsonUtility.ToJson(Draft);
         }
 
-        /// <summary>Copies a layout from the applied component or one exact workspace snapshot.</summary>
-        /// <param name="workspace">Null for the applied component; otherwise the current main-window transaction.</param>
-        /// <returns>An independent layout, or null if its component was removed.</returns>
+        /// <summary>Copies the relevant pose fields from the caller's current proposal.</summary>
+        /// <param name="workspace">Draft containing dispenser or spray settings.</param>
+        /// <returns>Independent poses with their original array order.</returns>
         private OutletLayout ReadLayout(ObjectWorkspace workspace)
         {
-            GameObject root = Target.Resolve();
-            if (root == null)
-                return null;
-            if (Dispenser)
+            return new OutletLayout
             {
-                DispenserSettings settings = workspace != null ? workspace.Single.Draft.Dispenser
-                    : root.GetComponent<ObjectDispenser>()?.Settings;
-                return settings != null ? new OutletLayout { Points = ObjectWorkspace.Copy(new OutletLayout { Points = settings.Outlets }).Points } : null;
-            }
-            SprayNozzle nozzle = workspace != null ? workspace.Extended.Draft.SpraySauce.Nozzle
-                : root.GetComponent<ObjectSpraySauce>()?.Settings.Nozzle;
-            return nozzle != null ? new OutletLayout { Points = new[] { new DispenserOutlet { Position = nozzle.Position, Rotation = nozzle.Rotation } } } : null;
-        }
-
-        /// <summary>Writes only the selected outlet fields, preserving every unrelated configuration value.</summary>
-        /// <param name="workspace">Null for the component, otherwise the selected main-window transaction.</param>
-        /// <param name="baseline">Whether to update the main-window applied snapshot.</param>
-        private void Write(ObjectWorkspace workspace, bool baseline)
-        {
-            GameObject root = Target.Resolve();
-            if (Dispenser)
-            {
-                DispenserSettings settings = workspace != null ? (baseline ? workspace.Single.Baseline : workspace.Single.Draft).Dispenser
-                    : root.GetComponent<ObjectDispenser>().Settings;
-                settings.Outlets = ObjectWorkspace.Copy(Draft).Points;
-            }
-            else
-            {
-                SpraySauceSettings settings = workspace != null ? (baseline ? workspace.Extended.Baseline : workspace.Extended.Draft).SpraySauce
-                    : root.GetComponent<ObjectSpraySauce>().Settings;
-                settings.Nozzle = new SprayNozzle { Position = Draft.Points[0].Position, Rotation = Draft.Points[0].Rotation };
-            }
+                Points = Dispenser ? ObjectWorkspace.Copy(workspace.Single.Draft.Dispenser).Outlets
+                    : new[] { new DispenserOutlet
+                    {
+                        Position = workspace.Extended.Draft.SpraySauce.Nozzle.Position,
+                        Rotation = workspace.Extended.Draft.SpraySauce.Nozzle.Rotation
+                    } }
+            };
         }
 
         #endregion
+
         #endregion
     }
 }

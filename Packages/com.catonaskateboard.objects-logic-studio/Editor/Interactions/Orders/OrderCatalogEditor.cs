@@ -65,10 +65,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="pools">Serialized custom extraction pools.</param>
         private static void DrawPools(OrderCatalog catalog, SerializedProperty pools)
         {
-            Rect rect = EditorGUILayout.GetControlRect();
-            StudioFieldMenu.Context(rect, pools);
-            pools.isExpanded = EditorGUI.Foldout(rect, pools.isExpanded,
-                new GUIContent("Extraction Pools", "Choose a pool first, then draw one of its named candidates."), true);
+            pools.isExpanded = StudioArrayGUI.Foldout(pools,
+                new GUIContent("Extraction Pools", "Choose a pool first, then draw one of its named candidates."));
             if (!pools.isExpanded)
                 return;
             string[] candidateNames = System.Linq.Enumerable.ToArray(catalog.CandidateNames());

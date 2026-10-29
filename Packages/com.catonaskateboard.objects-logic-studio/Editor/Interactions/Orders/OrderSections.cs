@@ -22,11 +22,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             SerializedProperty state = owner.FindPropertyRelative(fields[0]);
             if (ObjectFieldFocus.ExpandSection(owner, fields))
                 state.isExpanded = true;
-            Rect rect = EditorGUILayout.GetControlRect();
+            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
             string key = StudioFieldColors.Key(state) + ".Section";
             if (Event.current.type == EventType.ContextClick && rect.Contains(Event.current.mousePosition))
                 StudioFieldGroup.Context(rect, Array.ConvertAll(fields, owner.FindPropertyRelative), key);
             bool changed = GUI.changed;
+            StudioFoldoutGUI.Background(rect);
             using StudioFieldColors colors = new StudioFieldColors(rect, key);
             state.isExpanded = EditorGUI.Foldout(rect, state.isExpanded, new GUIContent(title, tooltip), true);
             GUI.changed = changed;

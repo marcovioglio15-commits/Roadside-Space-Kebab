@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>The requested foldout state.</returns>
         internal static bool Draw(ObjectWorkspace state, SerializedObject data, ObjectInteraction feature, bool expanded, GUIContent label)
         {
-            Rect rect = EditorGUILayout.GetControlRect();
+            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
             string key = "ObjectsLogicStudio.Interaction." + feature.GetType().Name;
             if (GUI.enabled && Event.current.type == EventType.ContextClick && rect.Contains(Event.current.mousePosition))
             {
@@ -43,6 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
                 StudioFieldGroup.Context(rect, Fields(data, feature), key);
             }
+            StudioFoldoutGUI.Background(rect, true);
             using StudioFieldColors colors = new StudioFieldColors(rect, key);
             return EditorGUI.Foldout(rect, expanded, label, true, EditorStyles.foldoutHeader);
         }

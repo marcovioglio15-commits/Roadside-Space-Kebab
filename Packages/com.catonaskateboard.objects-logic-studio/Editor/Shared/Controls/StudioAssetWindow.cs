@@ -89,7 +89,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     using (new EditorGUI.DisabledScope(!session.HasChanges))
                         if (StudioButton.Draw(new GUIContent("Apply", "Validate and save this shared asset to its project file."), expandWidth: true, minimumHeight: 26f))
                             SaveChanges();
-                    using (new EditorGUI.DisabledScope(session.Source == null))
+                    using (new EditorGUI.DisabledScope(session.Source == null || !session.HasChanges))
                         if (StudioButton.Draw(new GUIContent("Discard", "Abandon the retained proposal and reload the latest source."), expandWidth: true, minimumHeight: 26f))
                             DiscardChanges();
                 }

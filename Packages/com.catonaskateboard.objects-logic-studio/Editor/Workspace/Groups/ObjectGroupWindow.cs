@@ -23,6 +23,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Group values before this window was opened.")]
         [SerializeField]
         private string baseline;
+        [Tooltip("Preset linked to this group before editing.")]
+        [SerializeField]
+        private ObjectGroupPreset originalPreset;
         [Tooltip("Preset selected for this group.")]
         [SerializeField]
         private ObjectGroupPreset preset;
@@ -56,6 +59,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private string status = string.Empty;
         private readonly ObjectFieldFocus fieldFocus = new ObjectFieldFocus();
         private bool focusPending;
+        private bool pendingChanges;
 
         #endregion
 
@@ -63,6 +67,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Whether the detached proposal still belongs to an existing interaction or preset preview.</summary>
         internal bool CanEdit => document != null && ObjectWorkspaceDrafts.Selected(document) != null;
+
+        /// <summary>Whether group values or its preset link differ from the last Apply or Discard.</summary>
+        internal bool HasChanges => pendingChanges;
 
         #endregion
 
@@ -87,6 +94,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectWorkspaceDraft.Capture(state).Restore(window.document);
             window.baseline = ObjectGroupPresetStore.Stamp(state, settings);
             window.preset = ObjectGroupPresetStore.Assignment(state, settings)?.Preset;
+            window.originalPreset = window.preset;
             window.presetBaseline = window.preset != null ? ObjectGroupPresetStore.AssetStamp(window.preset) : string.Empty;
             window.data = new SerializedObject(window.document);
             window.titleContent = new GUIContent(ObjectInteractionCatalog.Name(ObjectWorkspaceDrafts.Selected(state)) + " · " + settings.Title);
@@ -103,16 +111,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Reconnects the serialized wrapper after a script reload.</summary>
         private void OnEnable()
         {
+            Undo.undoRedoPerformed += RefreshChanges;
+            StudioFieldMenu.Changed += FieldChanged;
             if (document != null)
             {
                 data = new SerializedObject(document);
                 fieldFocus.Configure(data, focusPath);
+                RefreshChanges();
             }
         }
 
         /// <summary>Releases only the temporary wrapper during a window or script reload.</summary>
         private void OnDisable()
         {
+            Undo.undoRedoPerformed -= RefreshChanges;
+            StudioFieldMenu.Changed -= FieldChanged;
             data?.Dispose();
             data = null;
         }
@@ -160,6 +173,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 window.canSavePreset = false;
                 window.status = exception.Message + " Open this group from a matching object to edit its links.";
             }
+            window.baseline = ObjectGroupPresetStore.Stamp(window.document, window.group);
             window.titleContent = new GUIContent(preset.name);
             window.minSize = new Vector2(370f, 260f);
             window.Show();
@@ -174,6 +188,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             if (document == null || group == null)
                 return;
+            EditorGUI.BeginChangeCheck();
             data ??= new SerializedObject(document);
             using ObjectStudioFieldLayout layout = new ObjectStudioFieldLayout(180f);
             using StudioFieldRenderScope render = new StudioFieldRenderScope(ObjectFieldFocus.Draw);
@@ -220,10 +235,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             if (!string.IsNullOrEmpty(status))
                 EditorGUILayout.LabelField(status, EditorStyles.wordWrappedMiniLabel);
-            using (new EditorGUI.DisabledScope(locked))
+            if (EditorGUI.EndChangeCheck())
+                RefreshChanges();
+            using (new EditorGUI.DisabledScope(locked || !CanEdit || !HasChanges))
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button(new GUIContent(assetOnly ? "Save preset" : "Apply to draft", assetOnly ? "Save this settings group." : "Keep this group's changes. Apply object saves the prefab.")))
+                if (GUILayout.Button(new GUIContent(assetOnly ? "Save preset" : "Apply to draft", assetOnly ? "Save this settings group." : "Keep this group's changes. Apply in the main window saves the object.")))
                 {
                     if (assetOnly)
                         Run(UpdatePreset);
@@ -261,6 +278,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     preset = saved;
                     presetBaseline = ObjectGroupPresetStore.AssetStamp(preset);
                     status = "Group preset saved.";
+                    RefreshChanges();
                 }
             }
         }
@@ -268,6 +286,36 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #endregion
 
         #region Transactions
+
+        /// <summary>Updates buttons after fields, Undo or an independent layout preview change this document.</summary>
+        internal void RefreshChanges()
+        {
+            // Compare values only after an edit; repaint and navigation do not allocate snapshots.
+            pendingChanges = document != null && group != null
+                && (ObjectGroupPresetStore.Stamp(document, group) != baseline || !assetOnly && preset != originalPreset);
+            Repaint();
+        }
+
+        /// <summary>Refreshes a group changed through a delayed field context menu.</summary>
+        /// <param name="edited">Document receiving the edit.</param>
+        private void FieldChanged(UnityEngine.Object edited)
+        {
+            if (edited == document)
+                RefreshChanges();
+        }
+
+        /// <summary>Reconnects group controls after a layout preview writes into their detached document.</summary>
+        /// <param name="changed">Document updated by a layout preview.</param>
+        internal static void RefreshDocument(ObjectWorkspace changed)
+        {
+            foreach (ObjectGroupWindow window in Resources.FindObjectsOfTypeAll<ObjectGroupWindow>())
+                if (window.document == changed)
+                {
+                    window.data?.Update();
+                    window.RefreshChanges();
+                }
+            ObjectsLogicStudioWindow.RefreshOpen();
+        }
 
         /// <summary>Reuses a live proposal or closes a stale window restored without its working copy.</summary>
         /// <param name="field">Optional setting selected from the tree.</param>
@@ -315,6 +363,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     destination.ApplyModifiedProperties();
                     ObjectGroupPresetStore.Assign(state, group, preset);
                     baseline = ObjectGroupPresetStore.Stamp(state, group);
+                    originalPreset = preset;
                     applied = true;
                 }) || !applied)
                     throw new InvalidOperationException("The interaction is no longer available. Reopen it from the object.");
@@ -328,7 +377,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             if (assetOnly)
             {
-                Run(() => { ObjectPresetContext.Apply(preset, document); ObjectGroupPresetStore.Import(preset, document, group); });
+                Run(() =>
+                {
+                    ObjectPresetContext.Apply(preset, document);
+                    ObjectGroupPresetStore.Import(preset, document, group);
+                    baseline = ObjectGroupPresetStore.Stamp(document, group);
+                });
                 return;
             }
             Run(() =>
@@ -343,6 +397,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         new StudioPropertyValue(source.FindProperty(path)).Apply(data.FindProperty(path));
                     data.ApplyModifiedProperties();
                     baseline = ObjectGroupPresetStore.Stamp(state, group);
+                    preset = originalPreset = ObjectGroupPresetStore.Assignment(state, group)?.Preset;
                 }))
                     throw new InvalidOperationException("The interaction is no longer available.");
                 status = string.Empty;
@@ -364,6 +419,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorUtility.SetDirty(preset);
             AssetDatabase.SaveAssetIfDirty(preset);
             presetBaseline = ObjectGroupPresetStore.AssetStamp(preset);
+            if (assetOnly)
+                baseline = ObjectGroupPresetStore.Stamp(document, group);
             status = "Group preset updated.";
         }
 
@@ -391,6 +448,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             canSavePreset = false;
             ObjectPresetContext.Apply(preset, document);
             ObjectGroupPresetStore.Import(preset, document, group);
+            baseline = ObjectGroupPresetStore.Stamp(document, group);
             canSavePreset = true;
             status = string.Empty;
         }
@@ -406,6 +464,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             catch (Exception exception)
             {
                 status = exception.Message;
+            }
+            finally
+            {
+                data?.Update();
+                RefreshChanges();
             }
         }
 

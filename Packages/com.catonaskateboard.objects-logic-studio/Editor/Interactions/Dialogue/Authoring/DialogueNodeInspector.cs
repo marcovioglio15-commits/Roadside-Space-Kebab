@@ -55,9 +55,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         if (property.FindPropertyRelative("Selection").enumValueIndex == (int)DialogueSelection.WeightedRandom)
                             HoverControls.Field(branch, "Weight");
                         SerializedProperty condition = branch.FindPropertyRelative("Condition");
-                        condition.isExpanded = EditorGUILayout.Foldout(condition.isExpanded, new GUIContent("Conditions", condition.tooltip), true);
+                        condition.isExpanded = StudioArrayGUI.Foldout(condition, new GUIContent("Conditions", condition.tooltip));
                         if (condition.isExpanded)
-                            Condition(condition, orders);
+                            using (new StudioIndentScope())
+                                Condition(condition, orders);
                     }
                     StudioArrayGUI.Add(branches, "Add Branch", () => new DialogueBranch());
                     Connection(property.FindPropertyRelative("Otherwise"), tree, "Fallback");

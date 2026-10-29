@@ -118,7 +118,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             for (int index = 0; index < rules.arraySize; index++)
             {
                 SerializedProperty rule = rules.GetArrayElementAtIndex(index);
-                rule.isExpanded = EditorGUILayout.Foldout(rule.isExpanded, rule.FindPropertyRelative("Name").stringValue, true);
+                rule.isExpanded = StudioArrayGUI.Foldout(rule, new GUIContent(rule.FindPropertyRelative("Name").stringValue, rule.tooltip));
                 if (rule.isExpanded)
                     using (new StudioIndentScope())
                         UnlockPresetInspector.Draw(rule);
