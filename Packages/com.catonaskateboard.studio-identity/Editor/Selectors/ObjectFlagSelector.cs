@@ -160,7 +160,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                     property.DeleteArrayElementAtIndex(index);
                 }
             if (data.ApplyModifiedProperties())
-                SelectionChanged?.Invoke(owner);
+                Notify(owner);
         }
 
         /// <summary>Applies a popup choice with native Undo to an existing serialized field.</summary>
@@ -191,7 +191,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                         property.GetArrayElementAtIndex(index).objectReferenceValue = null;
                         property.DeleteArrayElementAtIndex(index);
                         if (data.ApplyModifiedProperties())
-                            SelectionChanged?.Invoke(owner);
+                            Notify(owner);
                         return;
                     }
                 if (selected)
@@ -201,7 +201,16 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                 }
             }
             if (data.ApplyModifiedProperties())
-                SelectionChanged?.Invoke(owner);
+                Notify(owner);
+        }
+
+        /// <summary>Refreshes draft buttons and recovery data after a popup changes a serialized flag selection.</summary>
+        /// <param name="owner">Document, component or asset receiving the completed selection.</param>
+        private static void Notify(UnityEngine.Object owner)
+        {
+            // Flag popups finish outside the source window's normal change check.
+            StudioFieldMenu.Notify(owner);
+            SelectionChanged?.Invoke(owner);
         }
 
         #endregion

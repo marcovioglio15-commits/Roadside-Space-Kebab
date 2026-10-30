@@ -35,7 +35,7 @@ Transform:
   m_LocalPosition: {x: -0.484, y: 1.329, z: -3.399}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &2337249136205381008
@@ -111,6 +111,7 @@ MonoBehaviour:
     Modifications:
     - {fileID: 11400000, guid: e7c78d2a700142718e559cead496d816, type: 2}
     - {fileID: 11400000, guid: 7e3f727cfc4f4179a5a520801735af44, type: 2}
+    - {fileID: 11400000, guid: 0272116bbe70a614faf37a36a0493289, type: 2}
     - {fileID: 11400000, guid: 58de2772da244ebe8573c26f9e10bcac, type: 2}
     Target:
       Distance: 3
@@ -122,6 +123,18 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    ConsumeOn:
+      Enabled: 0
+      DialogueName: 
+      Occurrence: 0
+    Price:
+      CollectPrice: 0
+      Sound: 1
+      DeferDisplay: 0
+      CompletionMode: 0
+      OnDespawn: 0
+      CompletionSources: []
+    FryingSound: 0
 --- !u!114 &8784326929505579525
 MonoBehaviour:
   m_ObjectHideFlags: 0

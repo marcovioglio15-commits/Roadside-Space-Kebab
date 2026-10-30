@@ -21,7 +21,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Ordinary scene and asset fields keep Unity's native serialization behavior.
             StudioFieldMenu.Changed += Persist;
             StudioFieldMenu.CollectGuards += CaptureGuard;
-            ObjectFlagSelector.SelectionChanged += Persist;
             ObjectFlagSelector.CollectSelectionGuards += CaptureGuard;
         }
 

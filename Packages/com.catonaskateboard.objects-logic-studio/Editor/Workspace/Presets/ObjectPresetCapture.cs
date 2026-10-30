@@ -39,7 +39,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static ObjectWorkspace Document(ObjectInteraction feature)
         {
             ObjectWorkspace document = ScriptableObject.CreateInstance<ObjectWorkspace>();
-            document.hideFlags = HideFlags.HideAndDontSave;
             document.Target.SetPreview(feature.gameObject);
             document.Navigation.SelectedId = ObjectWorkspaceTarget.FileId(feature);
             switch (feature)
@@ -75,14 +74,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>An inactive hidden root owned by the caller.</returns>
         internal static GameObject Preview(GameObject source)
         {
-            GameObject staging = new GameObject("Object preset preview") { hideFlags = HideFlags.HideAndDontSave };
+            GameObject staging = new GameObject("Object preset preview") { hideFlags = ObjectWorkspace.DraftFlags };
             staging.SetActive(false);
             if (source == null)
                 return staging;
             GameObject preview = UnityEngine.Object.Instantiate(source, staging.transform, false);
             preview.name = source.name;
             preview.SetActive(false);
-            preview.hideFlags = HideFlags.HideAndDontSave;
+            preview.hideFlags = ObjectWorkspace.DraftFlags;
             preview.transform.SetParent(null, false);
             UnityEngine.Object.DestroyImmediate(staging);
             ObjectPreviewIdentity.Register(preview);
