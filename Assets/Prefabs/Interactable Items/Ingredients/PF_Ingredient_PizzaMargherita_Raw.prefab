@@ -174,7 +174,7 @@ MonoBehaviour:
       popIn: 0
       exitDuration: 0.16
     style:
-      content: Inspect
+      content: Pizza Margherita
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0
