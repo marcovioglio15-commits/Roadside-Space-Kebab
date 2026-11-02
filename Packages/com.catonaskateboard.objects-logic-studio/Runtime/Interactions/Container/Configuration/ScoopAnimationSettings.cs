@@ -24,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Scoop";
         [Tooltip("Reference used in Reference Poses mode.")]
         public ScoopPoseSpace Space;
-        [Tooltip("Target offset. Relative Chain uses the dispenser for the first frame and the preceding target for subsequent frames.")]
+        [Tooltip("Target offset from its reference. Chain keyframes use the preceding target; the automatic approach uses the dispenser pivot.")]
         public Vector3 Position;
         [Tooltip("Interpolate rotation during this segment. Disabled preserves the preceding orientation.")]
         public bool Rotate;
@@ -41,6 +41,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Vector3 Scale = Vector3.one;
 
         #endregion
+
+        #region Methods
+
+        #region Validation
+
+        /// <summary>Checks a segment before targets or gizmos are built.</summary>
+        /// <param name="referencePose">Whether the segment uses an independent pose reference.</param>
+        /// <returns>True for a complete finite segment.</returns>
+        internal bool IsValid(bool referencePose)
+        {
+            // Inactive rotation and scale values do not affect this segment.
+            return !string.IsNullOrEmpty(Id) && !string.IsNullOrWhiteSpace(Name) && InteractionValues.Positive(Duration)
+                && InteractionValues.Finite(Position) && (!Rotate || InteractionValues.Finite(Rotation))
+                && (!Resize || InteractionValues.Finite(Scale) && Scale.x > 0f && Scale.y > 0f && Scale.z > 0f)
+                && Easing is ScoopEasing.Linear or ScoopEasing.Smooth
+                && (!referencePose || Space is ScoopPoseSpace.Dispenser or ScoopPoseSpace.Initial or ScoopPoseSpace.Carry);
+        }
+
+        #endregion
+
+        #endregion
     }
 
     /// <summary>Stores optional scoop movement and the exact fill commit boundary.</summary>
@@ -54,6 +75,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool Enabled;
         [Tooltip("Use independent pose references or start at the dispenser offset and chain subsequent offsets.")]
         public ScoopAnimationMode Mode;
+        [Tooltip("Automatic first target for Relative Chain. Position and optional rotation are offsets from the dispenser pivot.")]
+        public ScoopKeyframe Approach = new ScoopKeyframe { Id = "dispenser-approach", Name = "Dispenser Approach" };
         [Tooltip("Consecutive target poses. Durations are measured from the preceding step.")]
         public ScoopKeyframe[] Keyframes = Array.Empty<ScoopKeyframe>();
         [Tooltip("Keyframe after which supply and fill change. Empty commits after the final keyframe, before any return segment.")]
@@ -86,19 +109,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!Enabled)
                 return true;
             warning = "Scoop animation needs keyframes, a supported mode and positive finite durations.";
-            if (Keyframes == null || Keyframes.Length == 0 || Mode is not (ScoopAnimationMode.ReferencePoses or ScoopAnimationMode.RelativeChain)
+            if (Keyframes == null || Mode is not (ScoopAnimationMode.ReferencePoses or ScoopAnimationMode.RelativeChain)
+                || Mode == ScoopAnimationMode.ReferencePoses && Keyframes.Length == 0
+                || Mode == ScoopAnimationMode.RelativeChain && (Approach == null || !Approach.IsValid(false))
                 || !InteractionValues.Positive(ObstacleMargin) || ReturnToStart && !InteractionValues.Positive(ReturnDuration))
                 return false;
-            bool found = string.IsNullOrEmpty(FillAfter);
+            bool found = string.IsNullOrEmpty(FillAfter) || Mode == ScoopAnimationMode.RelativeChain && FillAfter == Approach.Id;
             for (int index = 0; index < Keyframes.Length; index++)
             {
                 ScoopKeyframe frame = Keyframes[index];
-                if (frame == null || string.IsNullOrEmpty(frame.Id) || string.IsNullOrWhiteSpace(frame.Name)
-                    || !InteractionValues.Positive(frame.Duration) || !InteractionValues.Finite(frame.Position)
-                    || frame.Rotate && !InteractionValues.Finite(frame.Rotation)
-                    || frame.Resize && (!InteractionValues.Finite(frame.Scale) || frame.Scale.x <= 0f || frame.Scale.y <= 0f || frame.Scale.z <= 0f)
-                    || frame.Easing is not (ScoopEasing.Linear or ScoopEasing.Smooth)
-                    || Mode == ScoopAnimationMode.ReferencePoses && frame.Space is not (ScoopPoseSpace.Dispenser or ScoopPoseSpace.Initial or ScoopPoseSpace.Carry))
+                if (frame == null || !frame.IsValid(Mode == ScoopAnimationMode.ReferencePoses)
+                    || Mode == ScoopAnimationMode.RelativeChain && frame.Id == Approach.Id)
                     return false;
                 found |= frame.Id == FillAfter;
                 for (int previous = 0; previous < index; previous++)

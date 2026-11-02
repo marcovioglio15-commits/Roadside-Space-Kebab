@@ -41,7 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             float depth = view.WorldToViewportPoint(point).z;
             return depth >= view.nearClipPlane && depth <= view.farClipPlane
-                && physics.HasSight(observer, dialogue.transform, point, dialogue.Settings.ObstacleMask);
+                && physics.HasSight(observer, dialogue.transform, point, dialogue.Presentation.ObstacleMask);
         }
 
         #endregion

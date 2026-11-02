@@ -8,6 +8,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
     /// <summary>Edits a selected block and its subordinate entry without exposing connection keys.</summary>
     internal static class DialogueNodeInspector
     {
+        #region State
+
+        private static readonly ObjectStudioSections policySections = new ObjectStudioSections();
+
+        #endregion
+
         #region Methods
 
         #region Drawing
@@ -23,6 +29,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(property, "End");
             if (property.FindPropertyRelative("End").boolValue)
                 return;
+            HoverControls.Field(property, "Routing", "Routing Block");
+            if (!property.FindPropertyRelative("Routing").boolValue)
+            {
+                HoverControls.Field(property, "OverridePolicy", "Override Presentation");
+                if (property.FindPropertyRelative("OverridePolicy").boolValue)
+                    ExtendedInteractionControls.DrawDialogue(property.FindPropertyRelative("Policy"), policySections, false);
+            }
             HoverControls.Field(property, "Selection");
             SerializedProperty entries = property.FindPropertyRelative("Entries");
             EditorGUILayout.LabelField("Entries", EditorStyles.boldLabel);
@@ -39,7 +52,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     continue;
                 using StudioIndentScope rowIndent = new StudioIndentScope();
                 HoverControls.Field(row, "Name");
-                DialogueEntryControls.Draw(row.FindPropertyRelative("Entry"));
+                if (!property.FindPropertyRelative("Routing").boolValue)
+                    DialogueEntryControls.Draw(row.FindPropertyRelative("Entry"));
                 Trigger(row.FindPropertyRelative("Trigger"), orders);
                 if (property.FindPropertyRelative("Selection").enumValueIndex == (int)DialogueSelection.WeightedRandom)
                     HoverControls.Field(row, "Weight");

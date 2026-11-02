@@ -14,6 +14,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal readonly DialogueTree Tree;
         internal DialogueNode Block;
         internal DialogueRow Row;
+        internal DialogueNode Route;
+        internal DialogueRow RouteRow;
+        internal DialogueTriggerPreset ActivationTrigger;
+        internal string ActivationId;
         internal int Page;
         internal float PageTime;
         internal int ConsumptionRevision;
@@ -27,7 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Whether the current cursor reached the explicit End block.</summary>
         internal bool Completed => Block.End;
         /// <summary>Block considered for a new request, including replay from Start.</summary>
-        internal DialogueNode RequestBlock => Completed ? nodes[Tree.Start] : Block;
+        internal DialogueNode RequestBlock => Route ?? (Completed ? nodes[Tree.Start] : Block);
         /// <summary>Current explicit page.</summary>
         internal DialogueLine Line => Row?.Entry.Lines[Page];
 
@@ -93,9 +97,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="index">Previously selected request row.</param>
         internal void Begin(int index)
         {
+            DialogueNode request = RequestBlock;
+            DialogueRow activation = RouteRow ?? request.Entries[index];
             if (Completed)
                 Restart(true);
+            Block = request;
             Row = Block.Entries[index];
+            ActivationTrigger = activation.Trigger;
+            ActivationId = activation.Id;
+            Route = null;
+            RouteRow = null;
             Page = 0;
             PageTime = 0f;
             cursors[Block.Id] = (index + 1) % Block.Entries.Length;
@@ -123,12 +134,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Restart(bool newRequest)
         {
             Block = nodes[Tree.Start];
+            Route = null;
+            RouteRow = null;
+            ActivationTrigger = null;
+            ActivationId = string.Empty;
             Row = null;
             Page = 0;
             PageTime = 0f;
             ProximityUsed.Clear();
             if (newRequest)
                 Started = false;
+        }
+
+        /// <summary>Resolves a validated branch destination without searching the node array.</summary>
+        /// <param name="id">Stable destination key.</param>
+        /// <returns>The indexed conversation block.</returns>
+        internal DialogueNode Find(string id)
+        {
+            return nodes[id];
         }
 
         #endregion

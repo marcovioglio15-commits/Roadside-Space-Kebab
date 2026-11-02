@@ -28,9 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using StudioIndentScope sectionContent1 = new StudioIndentScope();
                 Field(draft, "Name");
                 Field(draft, "Enabled");
-                if (state.Single.Kind != SingleInteractionKind.TriggerAnimation
-                || (TriggerAnimationActivation)draft.FindPropertyRelative("TriggerAnimation.Activation").enumValueIndex
-                    is TriggerAnimationActivation.Action or TriggerAnimationActivation.CenterCollider)
+                if (state.Single.Draft.UsesInput(state.Single.Kind))
                     StudioInputActionMenu.Draw(data, "Single.Draft.Action", "ObjectsLogicStudio.Button", Button);
             }
             if (state.Sections.Draw("Player tool", "Choose which tools can use this interaction.", draft, "ToolRequirement"))
@@ -187,7 +185,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!sections.Draw("Trajectory", "Configure launch strength, direction and spin relative to the gameplay camera.", trajectory))
                 return;
             using StudioIndentScope sectionIndent = new StudioIndentScope();
-            Field(trajectory, "Mode");
+            HoverControls.Field(trajectory, "Mode", "Trajectory Mode");
             Field(trajectory, "Strength");
             Field(trajectory, "Yaw");
             Field(trajectory, "Elevation");

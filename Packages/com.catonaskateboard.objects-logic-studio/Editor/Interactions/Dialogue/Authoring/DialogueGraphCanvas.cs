@@ -91,7 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 current.Use();
                 repaint();
             }
-            else if (current.type == EventType.MouseDrag && (current.button == 1 || current.button == 2 || current.alt))
+            else if (current.type == EventType.MouseDrag && (current.button == 2 || current.alt))
             {
                 viewport.Pan(current.delta);
                 current.Use();
@@ -127,7 +127,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void HandleBlocks(DialogueTree tree, Action changed, Action repaint)
         {
             Event current = Event.current;
-            if (current.type == EventType.ContextClick)
+            // Claim right presses before child buttons can capture them. Middle drag remains dedicated to pan.
+            if (current.type == EventType.ContextClick || current.type == EventType.MouseDown && current.button == 1)
             {
                 Vector2 point = viewport.ToTree(current.mousePosition);
                 DialogueNode hovered = Array.Find(tree.Nodes, block => layout.Blocks.TryGetValue(block.Id, out Rect rect) && rect.Contains(point));

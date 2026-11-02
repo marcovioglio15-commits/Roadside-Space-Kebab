@@ -51,31 +51,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
         }
 
-        /// <summary>Keeps whole-interaction preset commands in the adjacent Presets column.</summary>
-        /// <param name="state">Selected interaction draft.</param>
-        /// <param name="feature">Existing component.</param>
-        internal static void DrawPreset(ObjectWorkspace state, ObjectInteraction feature)
-        {
-            if (!ObjectWorkspaceGUI.Foldout(state, "Presets.Main", "Main preset", "Import or save this interaction's full settings."))
-                return;
-            using StudioIndentScope sectionContent1 = new StudioIndentScope();
-            switch (feature)
-            {
-                case ObjectHover:
-                    HoverPresetView.Draw(state);
-                    break;
-                case ObjectSingleInteraction:
-                    SingleInteractionPresetView.Draw(state);
-                    break;
-                case ObjectInteractionUnlock:
-                    UnlockPresetView.DrawRule(state, feature.gameObject);
-                    break;
-                default:
-                    ExtendedInteractionPresetView.Draw(state);
-                    break;
-            }
-        }
-
         #endregion
 
         #endregion

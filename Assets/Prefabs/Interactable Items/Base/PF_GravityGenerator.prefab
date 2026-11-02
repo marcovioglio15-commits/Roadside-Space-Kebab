@@ -175,7 +175,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: a7cc42d54e9fdc84085abc3c0717bd37, type: 2}
   drawGizmos: 1
   action: {fileID: 0}
   settings:
@@ -282,7 +281,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Maximum: 20

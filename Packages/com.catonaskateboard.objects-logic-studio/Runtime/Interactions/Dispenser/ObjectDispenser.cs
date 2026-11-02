@@ -25,6 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectContainer scoopOwner;
         private ObjectItem scoopOutput;
         private bool scoopStored;
+        private bool destructionPending;
 
         #endregion
 
@@ -36,15 +37,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int DispensedCount => dispensed;
         /// <summary>Counter supplied to the authored appearance thresholds.</summary>
         internal int StepCount => settings.StepCounter == DispenseStepCounter.Remaining ? RemainingCount
-            : settings.UseContainer || settings.Unlimited ? withdrawals : Mathf.Max(0, settings.Stock - RemainingCount);
+            : settings.StoredSupply || settings.Unlimited ? withdrawals : Mathf.Max(0, settings.Stock - RemainingCount);
         /// <summary>Actual recoverable instances plus unused prefab stock; minus one represents unbounded prefab supply.</summary>
-        public int RemainingCount => !settings.UseContainer && settings.Unlimited ? -1
-            : (settings.UseContainer ? 0 : Mathf.Max(0, settings.Stock - dispensed))
+        public int RemainingCount => !settings.StoredSupply && settings.Unlimited ? -1
+            : (settings.StoredSupply ? 0 : Mathf.Max(0, settings.Stock - dispensed))
                 + (UsesStored && Container != null ? Container.StoredCount : 0);
         /// <summary>Whether originals are supplied from a linked Container before creating a prefab.</summary>
-        private bool UsesStored => settings.UseContainer || Container != null && Container.Settings.LimitToDispenserSpace && !Container.Settings.RefillDispenser;
+        private bool UsesStored => !settings.ScoopOnly && (settings.UseContainer || Container != null && Container.Settings.LimitToDispenserSpace && !Container.Settings.RefillDispenser);
         /// <summary>Identifies this single interaction card.</summary>
         public override SingleInteractionKind Kind => SingleInteractionKind.Dispenser;
+        /// <summary>Scoop Only uses the held container's input rather than its own binding.</summary>
+        public override bool UsesInput => !settings.ScoopOnly;
         /// <summary>Range and aiming configuration.</summary>
         public override TransferTargetSettings Target => settings.Target;
 
@@ -67,6 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 dispenser.scoopOwner = null;
                 dispenser.scoopOutput = null;
                 dispenser.scoopStored = false;
+                dispenser.destructionPending = false;
             }
         }
 
@@ -93,12 +97,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Dispenser settings are missing.";
             if (configuration == null || !configuration.TryValidate(out warning))
                 return false;
-            if (configuration.UseContainer && GetComponent<ObjectContainer>() == null)
+            if (configuration.StoredSupply && GetComponent<ObjectContainer>() == null)
                 warning = "Add Container to this same object before linking its stored items.";
             else if (GetComponent<ObjectContainer>() is ObjectContainer refill && refill.Settings.RefillDispenser
-                && (configuration.UseContainer || configuration.Unlimited))
+                && (configuration.StoredSupply || configuration.Unlimited))
                 warning = "A refill Container requires finite prefab supply, not stored-only or unlimited supply.";
-            else if (configuration.Unlimited && GetComponent<ObjectContainer>() is ObjectContainer container
+            else if (!configuration.ScoopOnly && configuration.Unlimited && GetComponent<ObjectContainer>() is ObjectContainer container
                 && container.Settings.LimitToDispenserSpace)
                 warning = "This Container limits storage to Dispenser spaces. Keep finite Stock or remove that link first.";
             else if (configuration.SupportsSteps && !InventoryFillStep.CanBind(configuration.FillSteps, Item, out warning))
@@ -115,7 +119,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when every deposited unit fits without discarding a remainder.</returns>
         internal bool CanRefill(int units)
         {
-            return !transferring && !settings.UseContainer && !settings.Unlimited && units > 0 && units <= dispensed;
+            return !transferring && !settings.StoredSupply && !settings.Unlimited && units > 0 && units <= dispensed;
         }
 
         /// <summary>Restores stock after the Container successfully consumes its reserved refill item.</summary>
@@ -134,7 +138,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Empty linked storage remains unavailable until a deposit succeeds.
             return !transferring && Available(InteractionChannels.Transfer) && !Item.IsReserved
                 && (UsesStored && Container != null && Container.HasStoredItem()
-                    || !settings.UseContainer && (settings.Unlimited || dispensed < settings.Stock));
+                    || !settings.StoredSupply && (settings.Unlimited || dispensed < settings.Stock));
         }
 
         /// <summary>Checks unoccupied spaces without treating a previously returned object as a second free slot.</summary>
@@ -154,6 +158,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A second button event cannot re-enter this transaction through lifecycle events.
             grab = null;
+            if (settings.Mode == DispenseMode.ScoopOnly)
+                return false;
             bool carry = settings.Mode == DispenseMode.ToHand;
             if (carry && (observer == null || observer.HeldObject != null) || !CanTake())
                 return false;
@@ -197,8 +203,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     grab = carry ? candidate : null;
                     dispensed++;
                 }
-                withdrawals++;
-                RefreshFill();
+                CompleteWithdrawal();
                 Signal(InteractionMoment.Started);
                 Signal(InteractionMoment.Completed);
                 return true;
@@ -206,6 +211,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             finally
             {
                 transferring = false;
+                DestroyIfExhausted();
             }
         }
 
@@ -218,6 +224,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True for a compatible next output; empty stored supply remains a handled scoop target.</returns>
         internal bool MatchesScoop(ObjectContainer receiver)
         {
+            // A single logical flag cannot satisfy an All filter containing several different flags.
+            if (settings.ScoopOnly)
+                return settings.ScoopFlag != null && System.Array.IndexOf(receiver.Settings.AllowedFlags, settings.ScoopFlag) >= 0
+                    && (receiver.Settings.Match == CatOnASkateboard.StudioIdentity.ObjectFlagMatch.Any || receiver.Settings.AllowedFlags.Length == 1);
             // Exhausted supply must not turn the same press into a Drop.
             ObjectItem stored = UsesStored && Container != null ? Container.PeekStored() : null;
             CatOnASkateboard.StudioIdentity.ObjectIdentity identity = stored != null ? stored.Identity
@@ -263,8 +273,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             else
                 dispensed++;
-            withdrawals++;
-            RefreshFill();
+            CompleteWithdrawal();
             return true;
         }
 
@@ -281,6 +290,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             scoopStored = false;
             scoopOwner = null;
             transferring = false;
+            DestroyIfExhausted();
+        }
+
+        /// <summary>Updates appearance and queues optional destruction only after a successful withdrawal.</summary>
+        private void CompleteWithdrawal()
+        {
+            // Supply and fill steps change before completion listeners inspect the dispenser.
+            withdrawals++;
+            RefreshFill();
+            destructionPending = settings.DestroyWhenEmpty && !settings.Unlimited && RemainingCount == 0;
+        }
+
+        /// <summary>Removes exhausted finite supply after movement and reservations release it.</summary>
+        private void DestroyIfExhausted()
+        {
+            // A refill during completion callbacks can make this dispenser usable again.
+            if (!destructionPending || transferring || RemainingCount != 0)
+                return;
+            destructionPending = false;
+            gameObject.SetActive(false);
+            Destroy(gameObject);
         }
 
         #endregion

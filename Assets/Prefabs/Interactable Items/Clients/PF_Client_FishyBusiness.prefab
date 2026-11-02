@@ -105,16 +105,13 @@ GameObject:
   - component: {fileID: 4488316828472950241}
   - component: {fileID: 1741706001150086087}
   - component: {fileID: 3151776499264896803}
-  - component: {fileID: 5254269728490429368}
   - component: {fileID: 962167144239944056}
-  - component: {fileID: 1048780206782002216}
   - component: {fileID: 4817618802008152814}
   - component: {fileID: 6388289395759616639}
   - component: {fileID: 4783263057593612631}
   - component: {fileID: 5527052003444599054}
   - component: {fileID: 6912887087282466169}
   - component: {fileID: 7313425721650699864}
-  - component: {fileID: 7616977171432140151}
   m_Layer: 13
   m_Name: PF_Client_FishyBusiness
   m_TagString: Untagged
@@ -219,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: FishyBushiness Order
+  interactionName: Dialogue
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -242,12 +239,8 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Tree: {fileID: 11400000, guid: ab903ed82809a8140b9ab8eb9aa8e1c7, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
     Distance: 3
     ExitDistance: 4
     Priority: 0
@@ -266,6 +259,12 @@ MonoBehaviour:
       Voice: 3
       Interval: 0.1
       Completion: 0
+    Box:
+      FadeIn: 0
+      FadeOut: 0
+    Tree: {fileID: 11400000, guid: 03c7634e6b32b8d4ca97768140d89adb, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
   startAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   advanceAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!114 &1741706001150086087
@@ -301,7 +300,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   action: {fileID: 0}
   settings:
@@ -319,8 +317,11 @@ MonoBehaviour:
       DrawGizmos: 1
     ConsumeOn:
       Enabled: 1
-      DialogueName: FishyBushiness Order
+      DialogueName: Dialogue
       Occurrence: 0
+      Step:
+        Block: order
+        Entry: 
     Price:
       CollectPrice: 1
       Sound: 1
@@ -330,8 +331,11 @@ MonoBehaviour:
       CompletionSources:
       - Assigned: 1
         Kind: 6
-        Name: 'FishyBusiness Delivery Correct '
+        Name: Dialogue
         Occurrence: 0
+        Step:
+          Block: correct
+          Entry: 
     FryingSound: 0
 --- !u!136 &3151776499264896803
 CapsuleCollider:
@@ -356,67 +360,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5254269728490429368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3097014450015891093}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: FishyBusiness Delivery Wrong
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools:
-    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
-    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 0}
-  drawGizmos: 1
-  settings:
-    Tree: {fileID: 11400000, guid: 58c62e498a3b56242aa1afbc2ddd4194, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
-    Distance: 15
-    ExitDistance: 20
-    Priority: 1
-    PreferSingleActions: 1
-    PreferredActions: 69
-    RequireSightToStart: 1
-    RequireSightToContinue: 0
-    HideWhenSightLost: 0
-    ObstacleMask:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    Interruption: 0
-    ReplayOnReturn: 1
-    ReplayOnInput: 0
-    Audio:
-      Voice: 3
-      Interval: 1
-      Completion: 2
-  startAction: {fileID: -729590602338348294, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
-  advanceAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!114 &962167144239944056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -431,67 +374,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flags:
   - {fileID: 11400000, guid: a8d2f6a0e2ede7c4081920761f976521, type: 2}
---- !u!114 &1048780206782002216
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3097014450015891093}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: 'FishyBusiness Delivery Correct '
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools:
-    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
-    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 2334ce1700f4c4744af4bcc44439e0c6, type: 2}
-  drawGizmos: 1
-  settings:
-    Tree: {fileID: 11400000, guid: a9b969d5d60b55a468d5bd10eeb643fc, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
-    Distance: 15
-    ExitDistance: 20
-    Priority: 1
-    PreferSingleActions: 1
-    PreferredActions: 69
-    RequireSightToStart: 1
-    RequireSightToContinue: 0
-    HideWhenSightLost: 0
-    ObstacleMask:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    Interruption: 0
-    ReplayOnReturn: 1
-    ReplayOnInput: 0
-    Audio:
-      Voice: 3
-      Interval: 1
-      Completion: 1
-  startAction: {fileID: 0}
-  advanceAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!114 &4817618802008152814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -525,7 +407,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Board: Orders
@@ -538,6 +419,9 @@ MonoBehaviour:
     SpawnCatalogs: []
     WaitForCompletion: 1
     CompletionSource: {fileID: 4488316828472950241}
+    CompletionStep:
+      Block: order
+      Entry: 
     UseTimer: 1
     TimerLabel: Order
     TimerTenths: 1
@@ -575,7 +459,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
   drawGizmos: 1
   settings:
     Thickness: 6
@@ -620,7 +503,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -695,7 +577,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Maximum: 20
@@ -736,7 +617,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   settings:
     Target:
@@ -920,62 +800,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &7616977171432140151
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3097014450015891093}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: Awaiting Order
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  settingsPreset: {fileID: 0}
-  drawGizmos: 1
-  settings:
-    Tree: {fileID: 11400000, guid: f17deb3be4f04b8a8a1a8583f8a2cdda, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
-    Distance: 15
-    ExitDistance: 20
-    Priority: 0
-    PreferSingleActions: 1
-    PreferredActions: 69
-    RequireSightToStart: 1
-    RequireSightToContinue: 1
-    HideWhenSightLost: 1
-    ObstacleMask:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    Interruption: 0
-    ReplayOnReturn: 1
-    ReplayOnInput: 0
-    Audio:
-      Voice: 3
-      Interval: 3
-      Completion: 0
-  startAction: {fileID: 0}
-  advanceAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}

@@ -20,26 +20,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Linked storage restores original instances and has no separate prefab stock.
             Target(settings.FindPropertyRelative("Target"), sections);
-            if (sections.Draw("Dispenser Supply", "Choose prefab supply or recover the last object deposited in this object's Container.", settings, "UseContainer", "Prefab", "Unlimited", "Stock"))
+            bool scoopOnly = settings.FindPropertyRelative("Mode").enumValueIndex == (int)DispenseMode.ScoopOnly;
+            if (sections.Draw("Dispenser Supply", "Choose a supply flag, prefab or linked storage.", settings, "UseContainer", "Prefab", "ScoopFlag", "Unlimited", "Stock", "DestroyWhenEmpty"))
                 using (new StudioIndentScope())
                 {
-                    HoverControls.Field(settings, "UseContainer");
-                    if (!settings.FindPropertyRelative("UseContainer").boolValue)
-                        Prefab(settings.FindPropertyRelative("Prefab"));
+                    if (scoopOnly)
+                        HoverControls.Field(settings, "ScoopFlag");
+                    else
+                    {
+                        HoverControls.Field(settings, "UseContainer");
+                        if (!settings.FindPropertyRelative("UseContainer").boolValue)
+                            Prefab(settings.FindPropertyRelative("Prefab"));
+                    }
                     HoverControls.Field(settings, "Unlimited");
                     if (!settings.FindPropertyRelative("Unlimited").boolValue)
+                    {
                         HoverControls.Field(settings, "Stock");
+                        HoverControls.Field(settings, "DestroyWhenEmpty");
+                    }
                 }
             if (sections.Draw("Dispenser Output", "Choose carried pickup or release objects at independently placed outlets.", settings, "Mode", "Interval", "Outlets", "PickupDuration", "OutputRotation"))
                 using (new StudioIndentScope())
                 {
-                    HoverControls.Field(settings, "Mode");
+                    HoverControls.Field(settings, "Mode", "Output Mode");
                     if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex == DispenseMode.ToHand)
                     {
                         HoverControls.Field(settings, "PickupDuration");
                         HoverControls.Field(settings, "OutputRotation");
                     }
-                    else
+                    else if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex != DispenseMode.ScoopOnly)
                     {
                         if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex == DispenseMode.ContinuousOutput)
                             HoverControls.Field(settings, "Interval");
@@ -49,7 +58,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (sections.Draw("Dispense counting", "Choose what advances each step.", settings, "StepCounter"))
                 using (new StudioIndentScope())
                     HoverControls.Field(settings, "StepCounter");
-            if (settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue
+            if (!scoopOnly && settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue
                 || settings.FindPropertyRelative("StepCounter").enumValueIndex == (int)DispenseStepCounter.Dispensed)
                 InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Dispense Steps");
         }
@@ -60,7 +69,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Container(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Hidden inventory retains the same instance; only presentation controls become irrelevant.
-            HoverControls.Field(settings, "Mode");
+            HoverControls.Field(settings, "Mode", "Container Mode");
             if (settings.FindPropertyRelative("Mode").enumValueIndex != (int)ContainerMode.ScoopFromDispenser)
                 Target(settings.FindPropertyRelative("Target"), sections);
             if (sections.Draw("Container Storage", "Choose accepted flags and storage or scoop settings.", settings, "AllowedFlags", "Match", "Unlimited", "Capacity", "LimitToDispenserSpace", "KeepVisible", "Position", "Rotation", "Spacing", "InitialFill", "ScoopAnimation"))
@@ -112,7 +121,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(target, "Distance");
-            HoverControls.Field(target, "Mode");
+            HoverControls.Field(target, "Mode", "Targeting Mode");
             Aim(target, "Mode", "Offset");
             HoverControls.Field(target, "ObstacleMask");
             HoverControls.Field(target, "DrawGizmos");

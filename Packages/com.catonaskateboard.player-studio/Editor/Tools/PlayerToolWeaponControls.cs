@@ -19,7 +19,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             SerializedProperty weapon = data.FindProperty("Weapon");
             Transform root = hierarchy != null ? hierarchy.transform : null;
-            StudioFields.Draw(weapon, "Mode", "ShotsPerUse");
+            StudioFieldGUI.PropertyField(weapon.FindPropertyRelative("Mode"), new GUIContent("Weapon Mode", weapon.FindPropertyRelative("Mode").tooltip));
+            StudioFields.Draw(weapon, "ShotsPerUse");
             if (weapon.FindPropertyRelative("ShotsPerUse").intValue > 1)
                 StudioFields.Draw(weapon, "ShotInterval");
             bool projectile = weapon.FindPropertyRelative("Mode").enumValueIndex == (int)PlayerToolWeaponMode.Projectile;

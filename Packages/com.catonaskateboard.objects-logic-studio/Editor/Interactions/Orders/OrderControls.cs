@@ -131,13 +131,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!settings.FindPropertyRelative("WaitForCompletion").boolValue)
                 return;
             ObjectWorkspace workspace = settings.serializedObject.targetObject as ObjectWorkspace;
-            AvailableOrdersPreset preset = settings.serializedObject.targetObject as AvailableOrdersPreset;
             owner = owner != null ? owner : HierarchyPathMenu.Source(settings, true);
             SerializedProperty selection = workspace != null ? settings.serializedObject.FindProperty("Extended.Draft.OrdersCompletionId")
-                : preset != null ? settings.serializedObject.FindProperty("Completion") : settings.FindPropertyRelative("CompletionSource");
+                : settings.FindPropertyRelative("CompletionSource");
             ObjectInteraction current = workspace != null ? workspace.Extended.Draft.ResolveOrders(owner).CompletionSource
-                : preset == null ? (ObjectInteraction)selection.objectReferenceValue : null;
-            string label = current != null ? current.InteractionName : preset is { Completion: { Assigned: true } } ? preset.Completion.Name : "Select Interaction";
+                : (ObjectInteraction)selection.objectReferenceValue;
+            string label = current != null ? current.InteractionName : "Select Interaction";
             Rect rect = EditorGUILayout.GetControlRect();
             StudioFieldMenu.Context(rect, selection);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(selection));
@@ -157,7 +156,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (candidate is ObjectAvailableOrders or ObjectInteractionUnlock)
                     continue;
                 long identity = ObjectWorkspaceTarget.FileId(candidate);
-                InteractionTemplateReference mapping = preset != null ? UnlockPresetMapping.Capture(owner.transform, candidate) : null;
                 menu.AddItem(new GUIContent(candidate.InteractionName), candidate == current, () =>
                 {
                     if (!guard())
@@ -166,8 +164,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     SerializedProperty field = data.FindProperty(path);
                     if (workspace != null)
                         field.longValue = identity;
-                    else if (preset != null)
-                        field.boxedValue = mapping;
                     else
                         field.objectReferenceValue = candidate;
                     data.ApplyModifiedProperties();

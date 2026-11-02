@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Spawn";
         [Tooltip("Active prefab root created for this step.")]
         public GameObject Prefab;
-        [Tooltip("Interactions on this prefab that can complete the visit. A dialogue counts only after its final page; interruption does not count.")]
+        [Tooltip("Interactions that can complete the visit. The same dialogue may select several different checkpoints. Interruption does not count.")]
         public ObjectInteraction[] Completions = Array.Empty<ObjectInteraction>();
         [Tooltip("Optional entry checkpoint for each selected completion source. Empty entries wait for the whole interaction.")]
         [HideInInspector]
@@ -51,6 +51,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Methods
         #region Validation
 
+        /// <summary>Reads one optional checkpoint without expanding or changing the saved selection.</summary>
+        /// <param name="index">Index parallel to the completion source array.</param>
+        /// <returns>The selected checkpoint, or null for whole-interaction completion.</returns>
+        internal DialogueStepReference CompletionAt(int index)
+        {
+            return CompletionSteps != null && index >= 0 && index < CompletionSteps.Length ? CompletionSteps[index] : null;
+        }
+
         /// <summary>Checks the exact prefab interaction and both transform paths.</summary>
         /// <param name="warning">Receives a missing source or invalid pose/timing.</param>
         /// <returns>True when the step can wait for its own instance's completion.</returns>
@@ -65,8 +73,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 ObjectInteraction completion = Completions[index];
                 if (completion == null || !completion.enabled || !completion.transform.IsChildOf(Prefab.transform)
-                    || completion is ObjectSpawnManager || Array.IndexOf(Completions, completion) != index)
+                    || completion is ObjectSpawnManager)
                     return false;
+                // Separate branches of one dialogue remain independent completion requirements.
+                for (int previous = 0; previous < index; previous++)
+                    if (Completions[previous] == completion
+                        && (CompletionAt(previous)?.Block ?? string.Empty) == (CompletionAt(index)?.Block ?? string.Empty)
+                        && (CompletionAt(previous)?.Entry ?? string.Empty) == (CompletionAt(index)?.Entry ?? string.Empty))
+                    {
+                        warning = "Choose distinct interaction or Dialogue checkpoint requirements.";
+                        return false;
+                    }
                 if (CompletionSteps != null && index < CompletionSteps.Length && CompletionSteps[index] != null
                     && !CompletionSteps[index].TryValidate(completion, out warning))
                     return false;

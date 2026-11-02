@@ -72,6 +72,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Assignments
 
+        /// <summary>Finds group assignments for an exact interaction across saved workspace selections.</summary>
+        /// <param name="feature">Prefab component or its open-stage counterpart.</param>
+        /// <returns>The assignment-key prefix for this component.</returns>
+        internal static string InteractionKey(ObjectInteraction feature)
+        {
+            ObjectInteraction persistent = ObjectFieldClipboard.Persistent(feature);
+            ObjectWorkspaceTarget target = new ObjectWorkspaceTarget();
+            target.Capture(persistent.gameObject, 0);
+            return target.PrefabGuid + ":" + target.ObjectPath + ":" + ObjectWorkspaceTarget.FileId(persistent) + "|";
+        }
+
         /// <summary>Finds the selected interaction's imported preset for this group.</summary>
         /// <param name="state">Persistent workspace.</param>
         /// <param name="group">Selected settings group.</param>

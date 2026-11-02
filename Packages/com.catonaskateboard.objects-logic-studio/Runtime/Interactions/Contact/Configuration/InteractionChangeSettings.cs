@@ -19,6 +19,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool Assigned;
         [Tooltip("Interaction family used by this selection.")]
         public InteractionRuntimeKind Kind;
+        [Tooltip("Remove every card of this type. A missing type has no effect.")]
+        public bool AllOfType;
         [Tooltip("Selected card name. Set by the interaction menu.")]
         [HideInInspector]
         public string Name = string.Empty;
@@ -66,8 +68,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Interaction";
         [Tooltip("Existing card selected from the affected object's interaction menu.")]
         public RuntimeInteractionReference Target = new RuntimeInteractionReference();
-        [Tooltip("Required matching preset for Add and Apply Preset. Imported values belong only to this runtime instance.")]
-        public ScriptableObject Preset;
+#if UNITY_EDITOR
+        [Tooltip("Settings-group presets applied in order. The same assets are used by the interaction's group windows.")]
+        public ScriptableObject[] GroupPresets = Array.Empty<ScriptableObject>();
+        [Tooltip("Whether the prepared groups require a start Button for an added interaction.")]
+        [HideInInspector]
+        public bool RequiresAction = true;
+        [Tooltip("Last group compilation issue. Runtime data remains unchanged until the selection is valid.")]
+        [HideInInspector]
+        public string GroupWarning = string.Empty;
+        [Tooltip("Interaction family used by the last group compilation.")]
+        [HideInInspector]
+        public InteractionRuntimeKind CompiledKind;
+#endif
+        [Tooltip("Prepared group values used by runtime contact imports. Updated in editor from the selected groups.")]
+        [HideInInspector]
+        public InteractionGroupPatch[] Groups = Array.Empty<InteractionGroupPatch>();
         [Tooltip("Existing Button identifier for newly added input interactions. Existing bindings are preserved during preset import.")]
         public UnityEngine.InputSystem.InputActionReference Action;
         [Tooltip("Page advance Button for a newly added Dialogue.")]
@@ -96,9 +112,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || Target == null || Kind is < InteractionRuntimeKind.Hover or > InteractionRuntimeKind.Unlock
                 || Operation != InteractionChangeOperation.Add && !Target.Assigned)
                 return false;
-            warning = "Assign a matching interaction preset.";
+            if (Operation == InteractionChangeOperation.ApplyPreset && Target.AllOfType)
+            {
+                warning = "Choose an exact interaction for Apply Preset.";
+                return false;
+            }
+            warning = "Assign matching settings-group presets.";
             if (Operation != InteractionChangeOperation.Remove
-                && !InteractionRuntimeCatalog.Accepts(Kind, Preset))
+                && (Groups == null || Groups.Length == 0 || Array.Exists(Groups, group => group == null || !group.Accepts(Kind))))
                 return false;
             warning = string.Empty;
             return true;

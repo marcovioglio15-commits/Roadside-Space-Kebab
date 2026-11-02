@@ -151,7 +151,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                     if (!self || !settings.FindPropertyRelative("TemporaryPhysics").boolValue)
                         HoverControls.Field(settings, "ReleaseKinematic");
-                    HoverControls.Field(settings, "Mode");
+                    HoverControls.Field(settings, "Mode", "Force Mode");
                     if (self)
                     {
                         HoverControls.Field(settings, "UseBulletImpulse", "Use Shot Impulse");

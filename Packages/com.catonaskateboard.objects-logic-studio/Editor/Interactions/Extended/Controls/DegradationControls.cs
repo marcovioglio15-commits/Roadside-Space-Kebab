@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (sections.Draw("Degradation trigger", "Advance with time or impacts.", settings, "Mode", "Carry", "MinimumImpulse", "ImpactInterval"))
             {
                 using StudioIndentScope sectionContent1 = new StudioIndentScope();
-                HoverControls.Field(settings, "Mode");
+                HoverControls.Field(settings, "Mode", "Degradation Mode");
                 if (source == null || source.GetComponent<ObjectGrab>() != null || settings.FindPropertyRelative("Carry").enumValueIndex != 0)
                     HoverControls.Field(settings, "Carry");
                 if (impacts)

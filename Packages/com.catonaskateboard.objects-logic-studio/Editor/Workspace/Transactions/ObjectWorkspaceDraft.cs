@@ -20,10 +20,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public bool Changed;
         [Tooltip("Selected control family.")]
         public ObjectInteractionCategory Category;
-        [Tooltip("Selected hover preset.")]
-        public HoverPreset Source;
-        [Tooltip("Hover preset before editing.")]
-        public HoverPreset OriginalPreset;
         [Tooltip("Preset state before editing.")]
         public string SourceBaseline;
         [Tooltip("Pending hover settings.")]
@@ -57,8 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return new ObjectWorkspaceDraft
             {
                 Key = state.DraftKey, Target = ObjectWorkspace.Copy(state.Target), SelectedId = state.Navigation.SelectedId,
-                Changed = state.PrefabChanged, Category = state.Category, Source = state.Source, OriginalPreset = state.OriginalPreset,
-                SourceBaseline = state.SourceBaseline, Hover = ObjectWorkspace.Copy(state.Draft), HoverBaseline = ObjectWorkspace.Copy(state.Baseline),
+                Changed = state.PrefabChanged, Category = state.Category,
+                Hover = ObjectWorkspace.Copy(state.Draft), HoverBaseline = ObjectWorkspace.Copy(state.Baseline),
                 Binding = ObjectWorkspace.Copy(state.Binding), OriginalBinding = ObjectWorkspace.Copy(state.OriginalBinding),
                 Hierarchy = state.Hierarchy, HasBinding = state.HasBinding,
                 Single = ObjectWorkspace.Copy(state.Single), Extended = ObjectWorkspace.Copy(state.Extended)
@@ -74,9 +70,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Navigation.SelectedId = SelectedId;
             state.Category = Category;
             state.Prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(UnityEditor.AssetDatabase.GUIDToAssetPath(Target.PrefabGuid));
-            state.Source = Source;
-            state.OriginalPreset = OriginalPreset;
-            state.SourceBaseline = SourceBaseline;
             state.Draft = ObjectWorkspace.Copy(Hover);
             state.Baseline = ObjectWorkspace.Copy(HoverBaseline);
             state.Binding = ObjectWorkspace.Copy(Binding);

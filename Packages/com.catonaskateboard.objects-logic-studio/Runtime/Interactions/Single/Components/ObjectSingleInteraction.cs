@@ -11,11 +11,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region Serialized Fields
 
-        [Header("Settings Preset")]
-        [Tooltip("Reusable settings asset selected in Objects Logic Studio. Import copies settings locally; only Update overwrites this asset.")]
-        [SerializeField]
-        private SingleInteractionPreset settingsPreset;
-
         [Header("Input")]
         [Tooltip("Button action resolved by its stable ID in the Observer player's PlayerInput. Its map must already be enabled.")]
         [SerializeField]
@@ -24,9 +19,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
 
         #region Properties
-
-        /// <summary>Reusable preset assigned by the editor; runtime behavior uses the local settings snapshot.</summary>
-        public SingleInteractionPreset SettingsPreset => settingsPreset;
 
         /// <summary>Imported button reference selected through the tool's map/action menu.</summary>
         public InputActionReference Action => action;

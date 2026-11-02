@@ -15,10 +15,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="property">Serialized Vector3.</param>
         /// <param name="minimum">Slider's lower guide.</param>
         /// <param name="maximum">Slider's upper guide.</param>
-        internal static void Vector(SerializedProperty property, float minimum = -5f, float maximum = 5f)
+        /// <param name="caption">Optional caption describing this vector's reference.</param>
+        internal static void Vector(SerializedProperty property, float minimum = -5f, float maximum = 5f, string caption = null)
         {
             // Keep native values outside the slider guide until the user edits them.
-            EditorGUILayout.LabelField(new GUIContent(property.displayName, property.tooltip));
+            EditorGUILayout.LabelField(new GUIContent(caption ?? property.displayName, property.tooltip));
             using StudioIndentScope indent = new StudioIndentScope();
             foreach (string axis in new[] { "x", "y", "z" })
             {

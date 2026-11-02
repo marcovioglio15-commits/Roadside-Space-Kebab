@@ -36,9 +36,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>The equivalent component path, or empty for editor-only identities.</returns>
         private static string Component(string path, ObjectInteraction feature)
         {
+            return Component(path, InteractionRuntimeCatalog.KindOf(feature).Value);
+        }
+
+        /// <summary>Maps a group field to its runtime component without creating a preview instance.</summary>
+        /// <param name="path">Absolute group field path.</param>
+        /// <param name="kind">Destination interaction family.</param>
+        /// <returns>The corresponding serialized component path.</returns>
+        internal static string Component(string path, InteractionRuntimeKind kind)
+        {
             if (path.StartsWith("Draft.", StringComparison.Ordinal))
                 return "configuration." + path.Substring(6);
-            string prefix = feature is ObjectHover ? "Binding." : feature is ObjectSingleInteraction ? "Single.Draft." : "Extended.Draft.";
+            string prefix = kind == InteractionRuntimeKind.Hover ? "Binding." : kind is InteractionRuntimeKind.Grab or InteractionRuntimeKind.Drop
+                or InteractionRuntimeKind.Throw or InteractionRuntimeKind.Dispenser or InteractionRuntimeKind.Container
+                or InteractionRuntimeKind.TriggerAnimation or InteractionRuntimeKind.Eject ? "Single.Draft." : "Extended.Draft.";
             if (!path.StartsWith(prefix, StringComparison.Ordinal))
                 return string.Empty;
             string field = path.Substring(prefix.Length);
@@ -51,7 +62,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 "Enabled" => "m_Enabled",
                 "DrawGizmos" => "drawGizmos",
                 "Action" => "action",
-                "StartAction" => feature is ObjectDialogue ? "startAction" : "action",
+                "StartAction" => kind == InteractionRuntimeKind.Dialogue ? "startAction" : "action",
                 "AdvanceAction" => "advanceAction",
                 "ToolRequirement" => "toolRequirement",
                 "FlagChange" => "flagChange",

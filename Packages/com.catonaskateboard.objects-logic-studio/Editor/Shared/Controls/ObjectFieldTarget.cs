@@ -88,27 +88,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (property.serializedObject.targetObject is ObjectWorkspace workspace)
                 return FromWorkspace(workspace, property);
             if (property.serializedObject.targetObject is ObjectInteraction interaction)
-                return new ObjectFieldTarget(interaction.GetType(), PresetOf(interaction), interaction,
+                return new ObjectFieldTarget(interaction.GetType(), PresetOf(interaction, property.propertyPath), interaction,
                     property.propertyPath, new StudioPropertyValue(property));
-            Type type = property.serializedObject.targetObject switch
-            {
-                HoverPreset => typeof(ObjectHover),
-                SingleInteractionPreset single => SingleType(single.Kind),
-                ExtendedInteractionPreset extended => ExtendedType(extended.Kind),
-                _ => null
-            };
-            if (type == null)
-                return null;
-            string path = property.propertyPath;
-            if (path.StartsWith("Settings", StringComparison.Ordinal))
-                path = (type == typeof(ObjectDrop) || type == typeof(ObjectThrow) ? "physics" : "settings") + path.Substring(8);
-            else if (path.StartsWith("Trajectory", StringComparison.Ordinal))
-                path = "trajectory" + path.Substring(10);
-            else if (path.StartsWith("ToolRequirement", StringComparison.Ordinal))
-                path = "toolRequirement" + path.Substring(15);
-            else if (!path.StartsWith("configuration", StringComparison.Ordinal))
-                return null;
-            return new ObjectFieldTarget(type, property.serializedObject.targetObject, null, path, new StudioPropertyValue(property));
+            return null;
         }
 
         /// <summary>Resolves editor-only IDs before capturing values for a component on another prefab.</summary>
@@ -126,14 +108,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (path.StartsWith("Single.Draft.", StringComparison.Ordinal))
             {
                 source = SingleInteractionSession.Resolve(workspace.Target.Resolve(), workspace.Single.Kind);
-                preset = workspace.Single.Preset;
+                preset = GroupSource(workspace, property.propertyPath);
                 snapshotPath = "Single." + path.Substring(13);
                 runtimePath = RuntimePath(path.Substring(13), source);
             }
             else if (path.StartsWith("Extended.Draft.", StringComparison.Ordinal))
             {
                 source = workspace.Extended.Resolve(workspace.Target.Resolve());
-                preset = workspace.Extended.Preset;
+                preset = GroupSource(workspace, property.propertyPath);
                 snapshotPath = "Extended." + path.Substring(15);
                 snapshotPath = ResolveIds(snapshotPath);
                 runtimePath = RuntimePath(snapshotPath.Substring(9), source);
@@ -141,7 +123,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             else if (path == "Draft" || path.StartsWith("Draft.", StringComparison.Ordinal) || path.StartsWith("Binding.", StringComparison.Ordinal))
             {
                 source = ObjectWorkspaceSession.Resolve(workspace);
-                preset = workspace.Source;
+                preset = GroupSource(workspace, property.propertyPath);
                 snapshotPath = path == "Draft" ? "Hover" : path.StartsWith("Draft.", StringComparison.Ordinal) ? "Hover." + path.Substring(6) : path;
                 runtimePath = path == "Draft" ? "configuration" : path.StartsWith("Draft.", StringComparison.Ordinal) ? "configuration." + path.Substring(6) : RuntimePath(path.Substring(8), source);
                 if (path == "Binding.AnchorPath")
@@ -222,69 +204,42 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return mapped + tail;
         }
 
-        /// <summary>Reads the preset assigned to a component without runtime reflection.</summary>
-        /// <param name="interaction">Feature being compared.</param>
-        /// <returns>Its currently assigned preset, or null.</returns>
-        internal static UnityEngine.Object PresetOf(ObjectInteraction interaction)
+        /// <summary>Finds a saved group source in the active object workspaces.</summary>
+        /// <param name="interaction">Feature whose group assignment is requested.</param>
+        /// <param name="path">Optional component field used to choose its specific settings group.</param>
+        /// <param name="expected">Optional group identity to find among all assignments.</param>
+        /// <returns>A matching group asset, or null for local settings.</returns>
+        internal static UnityEngine.Object PresetOf(ObjectInteraction interaction, string path = null, UnityEngine.Object expected = null)
         {
-            // Hover keeps its own preset field; other categories share their base-class binding.
-            return interaction switch
-            {
-                ObjectHover hover => hover.Preset,
-                ObjectSingleInteraction single => single.SettingsPreset,
-                ObjectExtendedInteraction extended => extended.SettingsPreset,
-                _ => null
-            };
+            // Group assignments belong to editor workspaces, not to runtime component fields.
+            if (InteractionRuntimeCatalog.KindOf(interaction) is not InteractionRuntimeKind kind)
+                return null;
+            string key = ObjectGroupPresetStore.InteractionKey(interaction);
+            foreach (ObjectWorkspace workspace in Resources.FindObjectsOfTypeAll<ObjectWorkspace>())
+                foreach (ObjectGroupAssignment assignment in workspace.GroupPresets)
+                    if (assignment.Key.StartsWith(key, StringComparison.Ordinal) && assignment.Preset?.Group != null
+                        && assignment.Preset.Group.TypeName == interaction.GetType().FullName && (expected == null || assignment.Preset == expected))
+                        foreach (string field in assignment.Preset.Group.Paths)
+                        {
+                            string mapped = ObjectPresetPaths.Component(field, kind);
+                            if (path == null || path == mapped || path.StartsWith(mapped + ".", StringComparison.Ordinal))
+                                return assignment.Preset;
+                        }
+            return null;
         }
 
-        /// <summary>Resolves a reusable Single preset's exact component type.</summary>
-        /// <param name="kind">Preset category.</param>
-        /// <returns>The matching component type.</returns>
-        private static Type SingleType(SingleInteractionKind kind)
+        /// <summary>Finds the specific group that owns a clicked workspace field.</summary>
+        /// <param name="workspace">Current component proposal.</param>
+        /// <param name="path">Clicked serialized field.</param>
+        /// <returns>The group's source asset, or null for local settings.</returns>
+        private static UnityEngine.Object GroupSource(ObjectWorkspace workspace, string path)
         {
-            // Derived release types remain distinct during mass updates.
-            return kind switch
-            {
-                SingleInteractionKind.Grab => typeof(ObjectGrab),
-                SingleInteractionKind.Drop => typeof(ObjectDrop),
-                SingleInteractionKind.Throw => typeof(ObjectThrow),
-                SingleInteractionKind.Container => typeof(ObjectContainer),
-                SingleInteractionKind.Dispenser => typeof(ObjectDispenser),
-                SingleInteractionKind.Eject => typeof(ObjectEject),
-                SingleInteractionKind.TriggerAnimation => typeof(ObjectTriggerAnimation),
-                _ => null
-            };
+            foreach (ObjectGroupAssignment assignment in workspace.GroupPresets)
+                if (assignment.Key.StartsWith(workspace.DraftKey + "|", StringComparison.Ordinal) && assignment.Preset?.Group != null
+                    && assignment.Preset.Group.Contains(path))
+                    return assignment.Preset;
+            return null;
         }
-
-        /// <summary>Resolves a reusable extended preset's component type.</summary>
-        /// <param name="kind">Preset category.</param>
-        /// <returns>The matching component type.</returns>
-        private static Type ExtendedType(ExtendedInteractionKind kind)
-        {
-            // No name-based type discovery is required by the editor mapping.
-            return kind switch
-            {
-                ExtendedInteractionKind.ModifyByContact => typeof(ObjectContactModifier),
-                ExtendedInteractionKind.Dialogue => typeof(ObjectDialogue),
-                ExtendedInteractionKind.Outline => typeof(ObjectOutline),
-                ExtendedInteractionKind.Unlock => typeof(ObjectInteractionUnlock),
-                ExtendedInteractionKind.AssemblyStation => typeof(ObjectAssemblyStation),
-                ExtendedInteractionKind.AssemblyProduct => typeof(ObjectAssemblyProduct),
-                ExtendedInteractionKind.SpawnManagement => typeof(ObjectSpawnManager),
-                ExtendedInteractionKind.Slice => typeof(ObjectSlice),
-                ExtendedInteractionKind.PlayAmbient => typeof(ObjectAmbient),
-                ExtendedInteractionKind.AvailableOrders => typeof(ObjectAvailableOrders),
-                ExtendedInteractionKind.ObjectDegradation => typeof(ObjectDegradation),
-                ExtendedInteractionKind.GravityGenerator => typeof(ObjectGravityGenerator),
-                ExtendedInteractionKind.ElasticDeformation => typeof(ObjectElasticDeformation),
-                ExtendedInteractionKind.DirtTrail => typeof(ObjectDirtTrail),
-                ExtendedInteractionKind.Deathbox => typeof(ObjectDeathbox),
-                ExtendedInteractionKind.PresenceCap => typeof(ObjectPresenceCap),
-                ExtendedInteractionKind.SpraySauce => typeof(ObjectSpraySauce),
-                _ => null
-            };
-        }
-
         #endregion
         #endregion
     }

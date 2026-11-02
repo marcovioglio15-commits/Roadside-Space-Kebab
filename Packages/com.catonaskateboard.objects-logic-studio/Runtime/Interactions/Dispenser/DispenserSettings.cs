@@ -6,8 +6,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Selects the counter driving dispenser appearance thresholds.</summary>
     public enum DispenseStepCounter { Remaining, Dispensed }
 
-    /// <summary>Chooses carried withdrawal, a single world output, or repeated world outputs while the action is held.</summary>
-    public enum DispenseMode { ToHand, SingleOutput, ContinuousOutput }
+    /// <summary>Chooses carried, world or container-only output.</summary>
+    public enum DispenseMode { ToHand, SingleOutput, ContinuousOutput, ScoopOnly }
 
     /// <summary>Configures either new prefab supply or recovery from this object's Container.</summary>
     [Serializable]
@@ -21,14 +21,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Supply")]
         [Tooltip("Take existing items from the Container on this object. Empty storage disables dispensing; no prefab is spawned.")]
         public bool UseContainer;
-        [Tooltip("Prefab root containing an enabled Grab and a valid physical body.")]
+        [Tooltip("Physical supply prefab. Requires Grab and a valid body. Hidden in Scoop Only.")]
         public GameObject Prefab;
-        [Tooltip("Allow unlimited prefab supply. Disable to define finite supply and the spaces available to a linked Container.")]
+        [Tooltip("Flag supplied to compatible scoop containers. Scoop Only does not create or consume a prefab.")]
+        public CatOnASkateboard.StudioIdentity.ObjectFlag ScoopFlag;
+        [Tooltip("Allow unlimited portions. Disable to define finite supply and the spaces available to a linked Container.")]
         public bool Unlimited = true;
         [Tooltip("Initial prefab stock, or total spaces for stored-only supply. Returned originals refill vacancies when Container limits storage to this Dispenser.")]
         public int Stock = 1;
+        [Tooltip("Destroy this object after its final finite portion. Animated scoops finish before the dispenser disappears.")]
+        public bool DestroyWhenEmpty;
         [Header("Output")]
-        [Tooltip("To Hand carries one item. Single Output releases one at an outlet. Continuous Output repeats while the bound button stays held and the dispenser remains targeted.")]
+        [Tooltip("To Hand carries an item. Single and Continuous Output release physical items. Scoop Only fills compatible held containers without physical output.")]
         public DispenseMode Mode;
         [Tooltip("Scaled seconds between continuous outputs. The initial press dispenses immediately; paused time produces no items.")]
         [Range(0.02f, 30f)]
@@ -46,7 +50,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Appearance selected by the configured counter. Refills reverse finite-supply thresholds. Unlimited prefab supply supports the dispensed counter only.")]
         public InventoryFillStep[] FillSteps = Array.Empty<InventoryFillStep>();
         /// <summary>Whether the selected supply counter has a meaningful finite value.</summary>
-        public bool SupportsSteps => UseContainer || !Unlimited || StepCounter == DispenseStepCounter.Dispensed;
+        public bool SupportsSteps => StoredSupply || !Unlimited || StepCounter == DispenseStepCounter.Dispensed;
+        /// <summary>Whether supply is represented by a flag rather than physical output.</summary>
+        public bool ScoopOnly => Mode == DispenseMode.ScoopOnly;
+        /// <summary>Whether the active mode restores stored originals.</summary>
+        public bool StoredSupply => !ScoopOnly && UseContainer;
 
         #endregion
 
@@ -71,9 +79,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             }
             warning = "Select a supported dispenser output mode.";
-            if (Mode is not (DispenseMode.ToHand or DispenseMode.SingleOutput or DispenseMode.ContinuousOutput))
+            if (Mode is not (DispenseMode.ToHand or DispenseMode.SingleOutput or DispenseMode.ContinuousOutput or DispenseMode.ScoopOnly))
                 return false;
-            if (Mode != DispenseMode.ToHand)
+            if (Mode is DispenseMode.SingleOutput or DispenseMode.ContinuousOutput)
             {
                 warning = "World output requires at least one finite outlet pose and a positive continuous interval.";
                 if (Outlets == null || Outlets.Length == 0 || Mode == DispenseMode.ContinuousOutput && !InteractionValues.Positive(Interval))
@@ -87,10 +95,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Dispenser pickup duration must be positive and finite, with a finite output rotation.";
             else if (!Unlimited && Stock <= 0)
                 warning = "Dispenser Stock must be a positive whole number.";
-            else if (!UseContainer && (Prefab == null || Prefab.scene.IsValid() || Prefab.transform.parent != null
-                || !Prefab.activeSelf || !Prefab.TryGetComponent(out ObjectGrab grab) || !grab.enabled))
+            else if (ScoopOnly && ScoopFlag == null)
+                warning = "Choose a supply flag for Scoop Only.";
+            else if (!StoredSupply && !ScoopOnly && (Prefab == null || Prefab.scene.IsValid() || Prefab.transform.parent != null || !Prefab.activeSelf))
+                warning = "Choose an active prefab root for supply.";
+            else if (!StoredSupply && !ScoopOnly && (!Prefab.TryGetComponent(out ObjectGrab grab) || !grab.enabled))
                 warning = "Choose an active prefab root with an enabled Grab.";
-            else if (!UseContainer)
+            else if (!StoredSupply && !ScoopOnly)
                 return Prefab.GetComponent<ObjectGrab>().TryValidate(out warning);
             return warning.Length == 0;
         }

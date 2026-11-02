@@ -23,7 +23,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (sections.Draw("Camera.View", "View"))
                 using (new EditorGUI.IndentLevelScope())
                 {
-                    Field(settings, "mode");
+                    PlayerPresetField.Draw(settings, "mode", "Camera Mode");
                     mode = (PlayerCameraMode)settings.FindPropertyRelative("mode").enumValueIndex;
                     if (mode != PlayerCameraMode.Fixed || settings.FindPropertyRelative("fixedTrackTarget").boolValue)
                         Field(settings, "targetOffset");

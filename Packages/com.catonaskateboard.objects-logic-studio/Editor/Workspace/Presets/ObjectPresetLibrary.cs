@@ -38,12 +38,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             dirty = false;
             presets.Clear();
             HashSet<UnityEngine.Object> found = new HashSet<UnityEngine.Object>();
-            string[] types = { "ObjectMasterPreset", "ObjectInteractionPreset", "ObjectGroupPreset", "HoverPreset", "SingleInteractionPreset", "ExtendedInteractionPreset", "DialogueEntry", "OrderCatalog", "UnlockRuleSetPreset" };
+            string[] types = { "ObjectMasterPreset", "ObjectGroupPreset", "DialogueEntry", "DialogueTree", "DialogueTriggerPreset", "OrderCatalog" };
             foreach (string type in types)
                 foreach (string guid in AssetDatabase.FindAssets("t:" + type))
                     foreach (UnityEngine.Object asset in AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GUIDToAssetPath(guid)))
-                        if (asset is ScriptableObject preset && preset is ObjectMasterPreset or ObjectInteractionPreset or ObjectGroupPreset
-                            or HoverPreset or SingleInteractionPreset or ExtendedInteractionPreset or DialogueEntry or OrderCatalog or UnlockRuleSetPreset && found.Add(asset))
+                        if (asset is ScriptableObject preset && preset is ObjectMasterPreset or ObjectGroupPreset
+                            or DialogueEntry or DialogueTree or DialogueTriggerPreset or OrderCatalog && found.Add(asset))
                             presets.Add(preset);
             presets.Sort((left, right) => string.Compare(left.name, right.name, StringComparison.OrdinalIgnoreCase));
         }

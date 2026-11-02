@@ -126,10 +126,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ObjectDialogue selected = null;
             // Observe ranges while another page is visible, but choose at most one waiting tree.
             foreach (KeyValuePair<ObjectDialogue, Buttons> pair in bindings)
-                if (pair.Key != null && InteractionProjectileInput.Allows(pair.Key) && pair.Key.CanStart(player, pair.Value.Starts)
+                if (pair.Key != null && InteractionProjectileInput.Allows(pair.Key) && pair.Key.CanStart(player, pair.Value.Starts, observer, visibility)
                     && active == null && pair.Value.Advance.Enabled
-                    && (selected == null || pair.Key.Settings.Priority > selected.Settings.Priority
-                        || pair.Key.Settings.Priority == selected.Settings.Priority
+                    && (selected == null || pair.Key.Presentation.Priority > selected.Presentation.Priority
+                        || pair.Key.Presentation.Priority == selected.Presentation.Priority
                         && EntityId.ToULong(pair.Key.GetEntityId()) < EntityId.ToULong(selected.GetEntityId()))
                     && pair.Key.CanPresent(observer, visibility, false))
                     selected = pair.Key;
@@ -137,7 +137,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (active != null && bindings[active].Advance.Pending)
             {
                 consumed = active.AdvanceAction;
-                if ((!active.Settings.PreferSingleActions || !singles.TryPrioritize(observer, bindings[active].Advance, active.Settings.PreferredActions))
+                if ((!active.Presentation.PreferSingleActions || !singles.TryPrioritize(observer, bindings[active].Advance, active.Presentation.PreferredActions))
                     && active.CanAdvance(observer, visibility))
                 {
                     InteractionProjectileInput.Confirm(active);
@@ -148,9 +148,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 selected.PrepareRequest();
                 InputActionReference requested = selected.RequestedAction;
-                bool preferred = requested != null && selected.Settings.PreferSingleActions
+                bool preferred = requested != null && selected.Presentation.PreferSingleActions
                     && bindings[selected].Starts.TryGetValue(requested, out InteractionButton start)
-                    && singles.TryPrioritize(observer, start, selected.Settings.PreferredActions);
+                    && singles.TryPrioritize(observer, start, selected.Presentation.PreferredActions);
                 if (preferred)
                     consumed = requested;
                 else

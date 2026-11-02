@@ -81,13 +81,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectInteractionPreset preset = ScriptableObject.CreateInstance<ObjectInteractionPreset>();
             preset.name = feature.InteractionName;
             preset.Configuration = ObjectPresetCapture.Component(feature, root);
-            preset.SourcePreset = feature switch
-            {
-                ObjectHover hover => hover.Preset,
-                ObjectSingleInteraction single => single.SettingsPreset,
-                ObjectExtendedInteraction extended => extended.SettingsPreset,
-                _ => null
-            };
             AssetDatabase.AddObjectToAsset(preset, master);
             ObjectWorkspace document = ObjectPresetCapture.Document(feature);
             try

@@ -261,7 +261,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Tree: {fileID: 11400000, guid: e8d83633f87191747968c1fea425aaa5, type: 2}
@@ -320,7 +319,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   action: {fileID: 0}
   settings:
@@ -394,7 +392,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Tree: {fileID: 11400000, guid: f88b8aa306ac72d45a107b8974839847, type: 2}
@@ -469,7 +466,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 2334ce1700f4c4744af4bcc44439e0c6, type: 2}
   drawGizmos: 1
   settings:
     Tree: {fileID: 11400000, guid: 65032e360555b194cae8bf20aab7bea8, type: 2}
@@ -528,7 +524,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Board: Orders
@@ -578,7 +573,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
   drawGizmos: 1
   settings:
     Thickness: 6
@@ -698,7 +692,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Maximum: 20

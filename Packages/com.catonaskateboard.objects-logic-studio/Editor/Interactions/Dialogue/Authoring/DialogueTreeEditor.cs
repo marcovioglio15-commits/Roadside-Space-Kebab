@@ -16,6 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private string warning = string.Empty;
         private string externalWarning = string.Empty;
         private DialogueTree template;
+        private float inspectorWidth = 310f;
+        private bool resizing;
 
         #endregion
 
@@ -26,6 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Checks the initial sheet and follows external draft or preset edits.</summary>
         private void OnEnable()
         {
+            inspectorWidth = SessionState.GetFloat("ObjectsLogicStudio.Dialogue.InspectorWidth", 310f);
             Undo.undoRedoPerformed += Changed;
             EditorApplication.projectChanged += Changed;
             Changed();
@@ -73,8 +76,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal void Draw(float height, OrderSettings orders)
         {
             DialogueTree tree = (DialogueTree)target;
-            float leftWidth = Mathf.Max(280f, EditorGUIUtility.currentViewWidth - 340f);
+            float rightWidth = Mathf.Clamp(inspectorWidth, 260f, Mathf.Max(260f, EditorGUIUtility.currentViewWidth - 310f));
+            float leftWidth = Mathf.Max(280f, EditorGUIUtility.currentViewWidth - rightWidth - 36f);
             Rect graph;
+            Rect divider;
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 if (GUILayout.Button(new GUIContent("Fit Tree", "Frame every block. Wheel zooms. Middle drag pans. Right click opens block actions."), EditorStyles.toolbarButton))
@@ -86,13 +91,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new EditorGUILayout.HorizontalScope())
             {
                 graph = GUILayoutUtility.GetRect(leftWidth, height - 26f, GUILayout.Width(leftWidth), GUILayout.Height(height - 26f));
-                using (new EditorGUILayout.VerticalScope(GUILayout.Width(310f)))
+                divider = GUILayoutUtility.GetRect(6f, height - 26f, GUILayout.Width(6f), GUILayout.Height(height - 26f));
+                using (new EditorGUILayout.VerticalScope(GUILayout.Width(rightWidth)))
                 using (EditorGUILayout.ScrollViewScope view = new EditorGUILayout.ScrollViewScope(scroll, GUILayout.Height(height - 26f)))
                 {
                     scroll = view.scrollPosition;
                     DrawInspector(tree, orders);
                 }
             }
+            Resize(divider);
             canvas.Draw(graph, tree, null, Changed, Repaint);
             string issue = string.IsNullOrEmpty(externalWarning) ? warning : externalWarning;
             if (!string.IsNullOrEmpty(issue))
@@ -101,6 +108,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 GUI.color = new Color(1f, 0.82f, 0.25f);
                 GUI.Label(new Rect(graph.x + 10f, graph.yMax - 42f, graph.width - 20f, 36f), issue, EditorStyles.wordWrappedMiniLabel);
                 GUI.color = previous;
+            }
+        }
+
+        /// <summary>Resizes the canvas and its inspector through a dedicated horizontal divider.</summary>
+        /// <param name="divider">Handle between the graph and entry fields.</param>
+        private void Resize(Rect divider)
+        {
+            // Layout preference belongs to the editor session, independently of the tree draft.
+            EditorGUIUtility.AddCursorRect(divider, MouseCursor.ResizeHorizontal);
+            EditorGUI.DrawRect(new Rect(divider.center.x - 1f, divider.y, 2f, divider.height), new Color(0.35f, 0.35f, 0.35f));
+            Event current = Event.current;
+            switch (current.type)
+            {
+                case EventType.MouseDown when current.button == 0 && divider.Contains(current.mousePosition):
+                    resizing = true;
+                    GUIUtility.hotControl = GUIUtility.GetControlID(FocusType.Passive);
+                    current.Use();
+                    break;
+                case EventType.MouseDrag when resizing:
+                    inspectorWidth = Mathf.Clamp(inspectorWidth - current.delta.x, 260f, Mathf.Max(260f, EditorGUIUtility.currentViewWidth - 310f));
+                    current.Use();
+                    Repaint();
+                    break;
+                case EventType.MouseUp when resizing:
+                    resizing = false;
+                    GUIUtility.hotControl = 0;
+                    SessionState.SetFloat("ObjectsLogicStudio.Dialogue.InspectorWidth", inspectorWidth);
+                    current.Use();
+                    break;
             }
         }
 
@@ -116,6 +152,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     Undo.RecordObject(tree, "Import dialogue sheet");
                     tree.Start = template.Start;
+                    tree.ArrivalBlock = template.ArrivalBlock;
                     tree.StartPosition = template.StartPosition;
                     tree.HasStartPosition = template.HasStartPosition;
                     tree.Nodes = Array.ConvertAll(template.Nodes, block => ObjectWorkspace.Copy(block));
@@ -124,6 +161,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Changed();
                 }
             DialogueNodeInspector.Connection(serializedObject.FindProperty("Start"), tree, "Start Block");
+            if (Array.Exists(tree.Nodes, block => block.Routing))
+                DialogueNodeInspector.Connection(serializedObject.FindProperty("ArrivalBlock"), tree, "Arrival Block");
             int index = Array.FindIndex(tree.Nodes, block => block.Id == canvas.Selected);
             if (index >= 0)
             {

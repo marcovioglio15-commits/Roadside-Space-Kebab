@@ -1,5 +1,8 @@
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
+    /// <summary>Identifies local interaction families used by completion selectors.</summary>
+    public enum InteractionTemplateKind { Hover, Grab, Drop, Throw, Dispenser, Container, Dialogue, Slice, Contact, Outline, Spawn, AssemblyStation, AssemblyProduct, Ambient, AvailableOrders, TriggerAnimation, Eject, ObjectDegradation, GravityGenerator, ElasticDeformation, DirtTrail, SpraySauce, Deathbox, PresenceCap }
+
     /// <summary>Shares explicit interaction type mappings between local runtime bindings and preset authoring.</summary>
     public static class InteractionTemplateKinds
     {

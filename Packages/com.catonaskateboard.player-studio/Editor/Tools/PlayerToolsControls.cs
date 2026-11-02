@@ -170,7 +170,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (!switching)
                 return;
             SerializedProperty mode = settings.FindPropertyRelative("Mode");
-            mode.enumValueIndex = (int)(PlayerToolInputMode)StudioGUI.EnumPopup(StudioFieldMenu.Value(mode, new GUIContent("Mode", mode.tooltip)),
+            mode.enumValueIndex = (int)(PlayerToolInputMode)StudioGUI.EnumPopup(StudioFieldMenu.Value(mode, new GUIContent("Tool Input Mode", mode.tooltip)),
                 (PlayerToolInputMode)mode.enumValueIndex);
             if (settings.FindPropertyRelative("Mode").enumValueIndex == (int)PlayerToolInputMode.SharedCycle)
                 StudioInputActionMenu.Draw(data, "tools.UseTool", "PlayerStudio.UseTool", IsButton);

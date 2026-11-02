@@ -19,10 +19,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using ObjectStudioFieldLayout layout = new ObjectStudioFieldLayout(205f);
             // The component inspector does not bypass the tool's Apply/Discard contract.
             ObjectHover hover = (ObjectHover)target;
-            using (new EditorGUI.DisabledScope(true))
-            {
-                StudioGUI.ObjectField(new GUIContent("Preset", "Applied reusable hover configuration."), hover.Preset, typeof(HoverPreset), false);
-            }
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode
                 || !ObjectAuthoringSave.TryValidate(hover.gameObject, out _)))
                 if (StudioButton.Draw(new GUIContent("Open Objects Logic Studio", "Edit this interaction in a persistent Apply/Discard session.")))

@@ -372,7 +372,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             state.Navigation.PresetsScroll = scroll.scrollPosition;
                             ObjectInteraction feature = ObjectWorkspaceDrafts.Selected(state);
                             if (feature != null && ObjectSettingsSearch.Matches(state, feature))
-                                ObjectInteractionActions.DrawPreset(state, feature);
                             library.Draw(state, catalog.Visible);
                         }
             }

@@ -22,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (sections.Draw("Audio mode", "Choose ambient sound or radio.", settings, "Mode", "Radius"))
             {
                 using StudioIndentScope sectionContent1 = new StudioIndentScope();
-                HoverControls.Field(settings, "Mode");
+                HoverControls.Field(settings, "Mode", "Audio Mode");
                 HoverControls.Field(settings, "Radius");
             }
             if (settings.FindPropertyRelative("Mode").enumValueIndex == (int)AmbientMode.Radio)

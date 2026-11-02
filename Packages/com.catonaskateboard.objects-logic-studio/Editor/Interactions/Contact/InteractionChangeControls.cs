@@ -35,28 +35,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using StudioIndentScope row = new StudioIndentScope();
                 HoverControls.Field(change, "Operation");
                 bool add = change.FindPropertyRelative("Operation").enumValueIndex == (int)InteractionChangeOperation.Add;
+                bool remove = change.FindPropertyRelative("Operation").enumValueIndex == (int)InteractionChangeOperation.Remove;
                 if (add)
                 {
                     HoverControls.Field(change, "AddKind", "Interaction Type");
                     HoverControls.Field(change, "Name");
                 }
                 else
-                    Target(change.FindPropertyRelative("Target"), source);
+                    Target(change.FindPropertyRelative("Target"), source, remove);
                 InteractionRuntimeKind kind = add ? (InteractionRuntimeKind)change.FindPropertyRelative("AddKind").enumValueIndex
                     : (InteractionRuntimeKind)change.FindPropertyRelative("Target.Kind").enumValueIndex;
-                if (change.FindPropertyRelative("Operation").enumValueIndex == (int)InteractionChangeOperation.Remove)
+                if (remove)
                     continue;
-                SerializedProperty preset = change.FindPropertyRelative("Preset");
-                EditorGUI.BeginChangeCheck();
-                ScriptableObject selected = (ScriptableObject)EditorGUILayout.ObjectField(new GUIContent("Preset", preset.tooltip),
-                    preset.objectReferenceValue, InteractionRuntimeCatalog.PresetType(kind), false);
-                if (EditorGUI.EndChangeCheck())
-                    preset.objectReferenceValue = selected;
+                InteractionGroupControls.Draw(change, kind);
                 if (add)
-                    Actions(change, kind, selected);
-                using (new EditorGUI.DisabledScope(selected == null))
-                    if (StudioButton.Draw(new GUIContent("Select Preset", "Open the source preset in the Inspector. Runtime imports never overwrite it.")))
-                        Selection.activeObject = selected;
+                    Actions(change, kind);
             }
             StudioArrayGUI.Add(changes, "Add Interaction Change", () => new InteractionChangeSettings());
         }
@@ -64,24 +57,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Offers only the actions actually used by a newly added preset.</summary>
         /// <param name="change">Addition block receiving local action references.</param>
         /// <param name="kind">New card family.</param>
-        /// <param name="preset">Selected preset used to resolve conditional input requirements.</param>
-        private static void Actions(SerializedProperty change, InteractionRuntimeKind kind, ScriptableObject preset)
+        private static void Actions(SerializedProperty change, InteractionRuntimeKind kind)
         {
-            bool input = kind switch
-            {
-                InteractionRuntimeKind.Hover or InteractionRuntimeKind.Outline or InteractionRuntimeKind.ObjectDegradation
-                    or InteractionRuntimeKind.ElasticDeformation or InteractionRuntimeKind.DirtTrail or InteractionRuntimeKind.Deathbox
-                    or InteractionRuntimeKind.PresenceCap or InteractionRuntimeKind.AvailableOrders or InteractionRuntimeKind.Spawn
-                    or InteractionRuntimeKind.AssemblyProduct or InteractionRuntimeKind.Unlock => false,
-                InteractionRuntimeKind.Dialogue => preset is DialoguePreset dialogue && dialogue.Settings.NeedsStartAction,
-                InteractionRuntimeKind.Container => preset is ContainerPreset container && !container.Settings.ScoopFromDispenser,
-                InteractionRuntimeKind.Contact => preset is ContactModificationPreset contact && contact.Settings.RequiresInput,
-                InteractionRuntimeKind.GravityGenerator => preset is GravityGeneratorPreset gravity && gravity.Settings.Restore != GravityRestoreMode.Timer,
-                InteractionRuntimeKind.Ambient => preset is AmbientPreset ambient && ambient.Settings.Mode == AmbientMode.Radio,
-                InteractionRuntimeKind.AssemblyStation => preset is AssemblyStationPreset station && station.Settings.Trigger == AssemblyStationTrigger.InputAction,
-                _ => true
-            };
-            if (input)
+            // Prepared group settings determine which local input bindings are relevant.
+            if (change.FindPropertyRelative("RequiresAction").boolValue)
                 StudioInputActionMenu.Draw(change.serializedObject, change.FindPropertyRelative("Action").propertyPath,
                     "ObjectsLogicStudio.Contact.Add", ExtendedInteractionControls.Button);
             if (kind == InteractionRuntimeKind.Dialogue)
@@ -92,21 +71,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Selects an existing exact card without asking for a type or field name as text.</summary>
         /// <param name="property">Portable interaction descriptor.</param>
         /// <param name="source">Sample object supplying selectable cards.</param>
-        private static void Target(SerializedProperty property, GameObject source)
+        /// <param name="allowTypes">Whether removal can select a type without a sample object.</param>
+        private static void Target(SerializedProperty property, GameObject source, bool allowTypes)
         {
             RuntimeInteractionReference selected = (RuntimeInteractionReference)property.boxedValue;
-            string label = selected.Assigned ? selected.Kind + " / " + selected.Name : "Choose Interaction";
+            string label = !selected.Assigned ? "Choose Interaction" : selected.AllOfType ? selected.Kind + " (all)" : selected.Kind + " / " + selected.Name;
             Rect rect = EditorGUILayout.GetControlRect();
             rect = EditorGUI.PrefixLabel(rect, new GUIContent("Interaction", property.tooltip));
-            using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(source == null);
-            if (!GUI.Button(rect, new GUIContent(label, source == null ? "Choose a hierarchy source first." : property.tooltip), EditorStyles.popup))
+            using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(source == null && !allowTypes);
+            if (!GUI.Button(rect, new GUIContent(label, allowTypes ? "Remove a type from any contact item. Missing types are ignored." : property.tooltip), EditorStyles.popup))
                 return;
             UnityEngine.Object owner = property.serializedObject.targetObject;
             string path = property.propertyPath;
             Func<bool> guard = StudioFieldMenu.Guard(owner, path);
             Dictionary<(InteractionRuntimeKind, string), int> occurrences = new Dictionary<(InteractionRuntimeKind, string), int>();
             GenericMenu menu = new GenericMenu { allowDuplicateNames = true };
-            foreach (ObjectInteraction feature in source.GetComponents<ObjectInteraction>())
+            if (allowTypes)
+                foreach (InteractionRuntimeKind kind in Enum.GetValues(typeof(InteractionRuntimeKind)))
+                    AddTarget(menu, "All of Type/" + ObjectNames.NicifyVariableName(kind.ToString()), selected,
+                        new RuntimeInteractionReference { Assigned = true, AllOfType = true, Kind = kind }, owner, path, guard);
+            foreach (ObjectInteraction feature in source != null ? source.GetComponents<ObjectInteraction>() : Array.Empty<ObjectInteraction>())
             {
                 if (InteractionRuntimeCatalog.KindOf(feature) is not InteractionRuntimeKind kind)
                     continue;
@@ -114,20 +98,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 occurrences[(kind, feature.InteractionName)] = occurrence + 1;
                 RuntimeInteractionReference reference = new RuntimeInteractionReference
                     { Assigned = true, Kind = kind, Name = feature.InteractionName, Occurrence = occurrence };
-                menu.AddItem(new GUIContent(kind + "/" + feature.InteractionName + " [" + (occurrence + 1) + "]"),
-                    selected.Assigned && selected.Kind == kind && selected.Name == reference.Name && selected.Occurrence == occurrence, () =>
-                    {
-                        if (!guard())
-                            return;
-                        using SerializedObject data = new SerializedObject(owner);
-                        data.FindProperty(path).boxedValue = reference;
-                        data.ApplyModifiedProperties();
-                        StudioFieldMenu.Notify(owner);
-                    });
+                AddTarget(menu, kind + "/" + feature.InteractionName + " [" + (occurrence + 1) + "]", selected, reference, owner, path, guard);
             }
             if (menu.GetItemCount() == 0)
                 menu.AddDisabledItem(new GUIContent("No interactions on this object"));
             menu.DropDown(rect);
+        }
+
+        /// <summary>Shares guarded menu writes for exact cards and portable type removals.</summary>
+        /// <param name="menu">Interaction selection menu.</param>
+        /// <param name="label">Visible menu path.</param>
+        /// <param name="selected">Current selection.</param>
+        /// <param name="reference">Selection committed by this item.</param>
+        /// <param name="owner">Detached preset or workspace holding the field.</param>
+        /// <param name="path">Serialized selection path.</param>
+        /// <param name="guard">Checks that the original field is still editable.</param>
+        private static void AddTarget(GenericMenu menu, string label, RuntimeInteractionReference selected,
+            RuntimeInteractionReference reference, UnityEngine.Object owner, string path, Func<bool> guard)
+        {
+            menu.AddItem(new GUIContent(label), selected.Assigned && selected.Kind == reference.Kind && selected.AllOfType == reference.AllOfType
+                && (reference.AllOfType || selected.Name == reference.Name && selected.Occurrence == reference.Occurrence), () =>
+            {
+                // Menus may outlive their original inspector or draft.
+                if (!guard())
+                    return;
+                using SerializedObject data = new SerializedObject(owner);
+                data.FindProperty(path).boxedValue = reference;
+                data.ApplyModifiedProperties();
+                StudioFieldMenu.Notify(owner);
+            });
         }
 
         #endregion

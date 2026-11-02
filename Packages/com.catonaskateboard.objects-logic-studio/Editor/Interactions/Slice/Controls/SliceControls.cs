@@ -22,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     SerializedProperty target = settings.FindPropertyRelative("Target");
                     HoverControls.Field(target, "Distance");
-                    HoverControls.Field(target, "Mode");
+                    HoverControls.Field(target, "Mode", "Targeting Mode");
                     TransferInteractionControls.Aim(target, "Mode", "Offset");
                     HoverControls.Field(target, "ObstacleMask");
                     HoverControls.Field(settings, "Priority");

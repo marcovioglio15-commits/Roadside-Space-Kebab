@@ -30,12 +30,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public ObjectWorkspaceTarget Target = new ObjectWorkspaceTarget();
         [Tooltip("Object shown in the interaction list. Child selections keep this list open.")]
         public ObjectWorkspaceTarget BrowseTarget = new ObjectWorkspaceTarget();
-        [Tooltip("Preset whose saved values the current draft may update.")]
-        public HoverPreset Source;
-        [Tooltip("Preset assigned to the object when this binding session began.")]
-        public HoverPreset OriginalPreset;
-        [Tooltip("Selected asset state used only by the explicit Update action.")]
-        public string SourceBaseline = string.Empty;
 
         [Header("Draft")]
         [Tooltip("Detached detection and style proposal. Apply saves the object; Update saves the preset.")]
@@ -54,12 +48,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public SingleInteractionSession Single = new SingleInteractionSession();
         [Tooltip("Retained contact or dialogue proposal sharing the common Apply and Discard transaction.")]
         public ExtendedInteractionSession Extended = new ExtendedInteractionSession();
-
-        [Header("Availability Presets")]
-        [Tooltip("Reusable set of availability rules selected for explicit Import, Export or Update.")]
-        public UnlockRuleSetPreset RuleSet;
-        [Tooltip("Selected rule-set asset state used to detect outside edits before Update.")]
-        public string RuleSetBaseline = string.Empty;
 
         [Header("Workspace")]
         [Tooltip("Choose views, filters and quick access.")]
@@ -139,8 +127,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Changes to reusable configuration, independent of object bindings.</summary>
         internal bool PresetChanged => JsonUtility.ToJson(Draft) != JsonUtility.ToJson(Baseline);
         /// <summary>Pending data survives a missing source or temporarily closed prefab stage.</summary>
-        internal bool InteractionChanged => PresetChanged || HasBinding && (Source != OriginalPreset
-            || JsonUtility.ToJson(Binding) != JsonUtility.ToJson(OriginalBinding));
+        internal bool InteractionChanged => PresetChanged || HasBinding && JsonUtility.ToJson(Binding) != JsonUtility.ToJson(OriginalBinding);
         /// <summary>Pending object settings requiring the retained prefab to be open before Apply.</summary>
         internal bool PrefabChanged => InteractionChanged || Single.HasChanges || Extended.HasChanges;
         /// <summary>Whether any domain requires the common Apply action.</summary>

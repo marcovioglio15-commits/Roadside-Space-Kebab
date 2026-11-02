@@ -176,7 +176,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Extended = new ExtendedInteractionSession();
             state.Draft = new HoverConfiguration();
             state.Baseline = ObjectWorkspace.Copy(state.Draft);
-            state.Source = state.OriginalPreset = null;
         }
 
         #endregion

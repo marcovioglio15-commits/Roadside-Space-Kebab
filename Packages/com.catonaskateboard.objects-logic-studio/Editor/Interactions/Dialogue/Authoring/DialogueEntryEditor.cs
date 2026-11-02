@@ -8,6 +8,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
     [CustomEditor(typeof(DialogueEntry))]
     internal sealed class DialogueEntryEditor : UnityEditor.Editor
     {
+        #region State
+
+        private readonly DialogueTextSelection selection = new DialogueTextSelection();
+
+        #endregion
+
         #region Methods
 
         #region Drawing
@@ -34,8 +40,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     continue;
                 using StudioIndentScope indent = new StudioIndentScope();
                 HoverControls.Field(page, "Speaker");
-                HoverControls.Field(page, "Text");
-                DialogueTextControls.Tokens(page.FindPropertyRelative("Text"));
+                selection.Draw(page.FindPropertyRelative("Text"));
+                DialogueTextControls.Tokens(page.FindPropertyRelative("Text"), selection);
             }
             StudioArrayGUI.Add(pages, "Add Page", () => new DialogueLine());
             serializedObject.ApplyModifiedProperties();

@@ -13,6 +13,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("First block. Selected by name in the tree editor.")]
         [HideInInspector]
         public string Start = string.Empty;
+        [Tooltip("Optional conversation branch selected by a spawn-arrival request. Empty uses the normal starting block.")]
+        [HideInInspector]
+        public string ArrivalBlock = string.Empty;
         [Tooltip("Canvas position of the Start marker. Set by dragging it in the tree draft.")]
         [HideInInspector]
         public Vector2 StartPosition;

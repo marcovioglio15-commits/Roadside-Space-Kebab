@@ -1,0 +1,271 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: Fishy-Dialogue
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: flow
+  ArrivalBlock: order
+  StartPosition: {x: 0, y: 0}
+  HasStartPosition: 0
+  Nodes:
+  - Id: flow
+    Name: Conversation
+    Position: {x: 0, y: 0}
+    HasPosition: 0
+    End: 0
+    Routing: 1
+    OverridePolicy: 0
+    Policy:
+      Distance: 3
+      ExitDistance: 4
+      Priority: 0
+      PreferSingleActions: 1
+      PreferredActions: 4
+      RequireSightToStart: 0
+      RequireSightToContinue: 0
+      HideWhenSightLost: 0
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Interruption: 0
+      ReplayOnReturn: 1
+      ReplayOnInput: 0
+      Audio:
+        Voice: 0
+        Interval: 3
+        Completion: 0
+      Box:
+        FadeIn: 0
+        FadeOut: 0
+    Selection: 3
+    Entries:
+    - Id: route-order
+      Name: Order
+      Entry: {fileID: 0}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: order
+      Weight: 1
+    - Id: route-wrong
+      Name: Wrong Delivery
+      Entry: {fileID: 0}
+      Trigger: {fileID: 11400000, guid: cfbf2b3122d6b5e3207d3ef01e68b596, type: 2}
+      Next: wrong
+      Weight: 1
+    - Id: route-correct
+      Name: Correct Delivery
+      Entry: {fileID: 0}
+      Trigger: {fileID: 11400000, guid: b7f4cf57a622a40f8722d626c03597b4, type: 2}
+      Next: correct
+      Weight: 1
+    - Id: route-ask-order
+      Name: Ask Order First
+      Entry: {fileID: 0}
+      Trigger: {fileID: 11400000, guid: 999f6183061f35103d35870bfe8c643d, type: 2}
+      Next: ask-order
+      Weight: 1
+  - Id: order
+    Name: Order
+    Position: {x: 0, y: 0}
+    HasPosition: 0
+    End: 0
+    Routing: 0
+    OverridePolicy: 1
+    Policy:
+      Distance: 3
+      ExitDistance: 4
+      Priority: 0
+      PreferSingleActions: 1
+      PreferredActions: 69
+      RequireSightToStart: 1
+      RequireSightToContinue: 0
+      HideWhenSightLost: 0
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Interruption: 2
+      ReplayOnReturn: 1
+      ReplayOnInput: 1
+      Audio:
+        Voice: 3
+        Interval: 0.1
+        Completion: 0
+      Box:
+        FadeIn: 0
+        FadeOut: 0
+    Selection: 1
+    Entries:
+    - Id: 2a863bcee6f170a57b17b70dbdce5826
+      Name: Fishy Business Random Intro 1
+      Entry: {fileID: 11400000, guid: 6e8704ca69cf405dbab7bd9b1b08a87d, type: 2}
+      Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
+      Next: end
+      Weight: 1
+    - Id: a258067e3e7bdd522797e74a186109b2
+      Name: Fishy Business Random Intro 2
+      Entry: {fileID: 11400000, guid: 8f7cc85398b441f4b41af4ab3ef3c50e, type: 2}
+      Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
+      Next: end
+      Weight: 1
+    - Id: 48a14f17597435c91f14c23109a0a9f8
+      Name: Fishy Business Random Intro 3
+      Entry: {fileID: 11400000, guid: fa54d2787dc0482bad381321f4f8dd8b, type: 2}
+      Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
+      Next: end
+      Weight: 1
+  - Id: wrong
+    Name: Wrong Delivery
+    Position: {x: 0, y: 0}
+    HasPosition: 0
+    End: 0
+    Routing: 0
+    OverridePolicy: 1
+    Policy:
+      Distance: 15
+      ExitDistance: 20
+      Priority: 1
+      PreferSingleActions: 1
+      PreferredActions: 69
+      RequireSightToStart: 1
+      RequireSightToContinue: 0
+      HideWhenSightLost: 0
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Interruption: 0
+      ReplayOnReturn: 1
+      ReplayOnInput: 0
+      Audio:
+        Voice: 3
+        Interval: 1
+        Completion: 2
+      Box:
+        FadeIn: 0
+        FadeOut: 0
+    Selection: 1
+    Entries:
+    - Id: 0b2845a563e8b283d3805348d410d7d2
+      Name: Fishy Business Order Wrong 1 - D
+      Entry: {fileID: 11400000, guid: b0968e64499a48919bdc20417d50a334, type: 2}
+      Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
+      Next: end
+      Weight: 1
+  - Id: correct
+    Name: Correct Delivery
+    Position: {x: 0, y: 0}
+    HasPosition: 0
+    End: 0
+    Routing: 0
+    OverridePolicy: 1
+    Policy:
+      Distance: 15
+      ExitDistance: 20
+      Priority: 1
+      PreferSingleActions: 1
+      PreferredActions: 69
+      RequireSightToStart: 1
+      RequireSightToContinue: 0
+      HideWhenSightLost: 0
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Interruption: 0
+      ReplayOnReturn: 1
+      ReplayOnInput: 0
+      Audio:
+        Voice: 3
+        Interval: 1
+        Completion: 1
+      Box:
+        FadeIn: 0
+        FadeOut: 0
+    Selection: 0
+    Entries:
+    - Id: 8ce438ec4e5bd8ccaa71fd907812d53a
+      Name: Fishy Business Order Correct 1 - D
+      Entry: {fileID: 11400000, guid: 58bcf53fd716480cb39592907c1ae19b, type: 2}
+      Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
+      Next: end
+      Weight: 1
+    - Id: b6943ad8da8e34947a8f3dfb5b54599f
+      Name: Fishy Business Order Correct 2 - D
+      Entry: {fileID: 11400000, guid: 6788827458644968bd68081154330229, type: 2}
+      Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
+      Next: end
+      Weight: 1
+  - Id: ask-order
+    Name: Ask Order First
+    Position: {x: 166.52953, y: 31.3759}
+    HasPosition: 0
+    End: 0
+    Routing: 0
+    OverridePolicy: 1
+    Policy:
+      Distance: 15
+      ExitDistance: 20
+      Priority: 0
+      PreferSingleActions: 1
+      PreferredActions: 69
+      RequireSightToStart: 1
+      RequireSightToContinue: 1
+      HideWhenSightLost: 1
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Interruption: 0
+      ReplayOnReturn: 1
+      ReplayOnInput: 0
+      Audio:
+        Voice: 3
+        Interval: 3
+        Completion: 0
+      Box:
+        FadeIn: 0.2
+        FadeOut: 0.2
+    Selection: 0
+    Entries:
+    - Id: b269df7ab431221943a299f643320db0
+      Name: FoshyBusiness_AwaitingToOrder
+      Entry: {fileID: 11400000, guid: 6db2d56831f1593498c339ce1104944b, type: 2}
+      Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
+      Next: end
+      Weight: 1
+  - Id: end
+    Name: End
+    Position: {x: 0, y: 0}
+    HasPosition: 0
+    End: 1
+    Routing: 0
+    OverridePolicy: 0
+    Policy:
+      Distance: 3
+      ExitDistance: 4
+      Priority: 0
+      PreferSingleActions: 1
+      PreferredActions: 4
+      RequireSightToStart: 0
+      RequireSightToContinue: 0
+      HideWhenSightLost: 0
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Interruption: 0
+      ReplayOnReturn: 1
+      ReplayOnInput: 0
+      Audio:
+        Voice: 0
+        Interval: 3
+        Completion: 0
+      Box:
+        FadeIn: 0
+        FadeOut: 0
+    Selection: 3
+    Entries: []

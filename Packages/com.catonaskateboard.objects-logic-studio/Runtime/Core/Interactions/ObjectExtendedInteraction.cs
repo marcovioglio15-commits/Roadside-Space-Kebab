@@ -29,11 +29,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region Serialized Fields
 
-        [Header("Settings Preset")]
-        [Tooltip("Reusable settings asset selected in Objects Logic Studio. Import copies settings locally; only Update overwrites this asset.")]
-        [SerializeField]
-        private ExtendedInteractionPreset settingsPreset;
-
         [Header("Debug")]
         [Tooltip("Draw the interaction's range or contact bounds when the object is selected.")]
         [SerializeField]
@@ -42,9 +37,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
 
         #region Properties
-
-        /// <summary>Reusable preset assigned by the editor; runtime behavior uses the local settings snapshot.</summary>
-        public ExtendedInteractionPreset SettingsPreset => settingsPreset;
 
         /// <summary>Feature represented by this component.</summary>
         public abstract ExtendedInteractionKind Kind { get; }

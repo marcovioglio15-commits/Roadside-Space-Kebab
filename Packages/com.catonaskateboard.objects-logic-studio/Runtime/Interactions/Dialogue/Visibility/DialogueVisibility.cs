@@ -9,7 +9,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly HoverPhysics physics = new HoverPhysics();
-        private readonly Dictionary<ObjectDialogue, bool> results = new Dictionary<ObjectDialogue, bool>();
+        private readonly Dictionary<(ObjectDialogue, int), bool> results = new Dictionary<(ObjectDialogue, int), bool>();
         private HoverObserver observer;
         private int frame = -1;
 
@@ -31,7 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Pointer pulses already identify exact geometry and must not be replaced by a centered sight query.
             if (InteractionProjectileInput.CursorUse)
                 return InteractionProjectileInput.Allows(dialogue) && physics.HasSight(context, dialogue.transform,
-                    InteractionProjectileInput.Contact.point, dialogue.Settings.ObstacleMask);
+                    InteractionProjectileInput.Contact.point, dialogue.Presentation.ObstacleMask);
             if (frame != Time.frameCount || observer != context)
             {
                 results.Clear();
@@ -39,10 +39,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 observer = context;
                 Physics.SyncTransforms();
             }
-            if (!results.TryGetValue(dialogue, out bool visible))
+            if (!results.TryGetValue((dialogue, dialogue.Presentation.ObstacleMask.value), out bool visible))
             {
                 visible = dialogue.SightGeometry.Visible(context, dialogue, physics);
-                results.Add(dialogue, visible);
+                results.Add((dialogue, dialogue.Presentation.ObstacleMask.value), visible);
             }
             return visible;
         }

@@ -36,27 +36,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Extended.Read(target);
             ObjectHover hover = Resolve(state);
             state.HasBinding = hover != null;
-            state.OriginalPreset = hover != null ? hover.Preset : null;
             state.Binding = HoverBindingDraft.Capture(hover);
             state.OriginalBinding = ObjectWorkspace.Copy(state.Binding);
             state.Hierarchy = hover != null ? HoverHierarchy.Signature(hover.transform) : string.Empty;
-            LoadPreset(state, state.OriginalPreset);
             if (hover != null)
                 state.Draft = ObjectWorkspace.Copy(hover.Configuration);
             state.Baseline = ObjectWorkspace.Copy(state.Draft);
             state.Persist();
             return true;
-        }
-
-        /// <summary>Opens saved preset values while retaining the original component assignment until Apply.</summary>
-        /// <param name="state">Workspace receiving the detached configuration.</param>
-        /// <param name="preset">Saved configuration selected or created by the user.</param>
-        internal static void LoadPreset(ObjectWorkspace state, HoverPreset preset)
-        {
-            // The caller guards pending changes before redirecting the source.
-            state.Source = preset;
-            state.Draft = preset != null ? ObjectWorkspace.Copy(preset.Configuration) : new HoverConfiguration();
-            state.SourceBaseline = InteractionPresetWrites.Capture(preset);
         }
 
         /// <summary>Resolves the selected component against the currently available object.</summary>
@@ -79,12 +66,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // A missing target retains its identity so reopening its prefab can recover navigation.
             Undo.RecordObject(state, "Discard object interaction draft");
             ObjectHover hover = Resolve(state);
-            state.OriginalPreset = hover != null ? hover.Preset : null;
             state.Binding = HoverBindingDraft.Capture(hover);
             state.OriginalBinding = ObjectWorkspace.Copy(state.Binding);
             state.Hierarchy = hover != null ? HoverHierarchy.Signature(hover.transform) : string.Empty;
             state.HasBinding = hover != null;
-            LoadPreset(state, state.HasBinding ? state.OriginalPreset : state.Source);
             if (hover != null)
                 state.Draft = ObjectWorkspace.Copy(hover.Configuration);
             state.Baseline = ObjectWorkspace.Copy(state.Draft);
@@ -137,7 +122,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (state.HasBinding)
             {
                 // Binding and hierarchy checks protect changes made by another inspector or prefab stage.
-                if (hover == null || hover.Preset != state.OriginalPreset
+                if (hover == null
                     || JsonUtility.ToJson(hover.Configuration) != JsonUtility.ToJson(state.Baseline)
                     || JsonUtility.ToJson(HoverBindingDraft.Capture(hover)) != JsonUtility.ToJson(state.OriginalBinding)
                     || HoverHierarchy.Signature(hover.transform) != state.Hierarchy)
@@ -221,7 +206,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Shared preset assignment never creates another hover component.
             using (SerializedObject data = new SerializedObject(hover))
             {
-                data.FindProperty("preset").objectReferenceValue = state.Source;
                 data.FindProperty("interactionName").stringValue = state.Binding.Name;
                 data.FindProperty("m_Enabled").boolValue = state.Binding.Enabled;
                 data.FindProperty("drawGizmos").boolValue = state.Binding.DrawGizmos;

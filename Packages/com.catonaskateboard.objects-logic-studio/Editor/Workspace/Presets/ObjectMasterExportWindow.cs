@@ -88,8 +88,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (entry.Preset == null)
                     continue;
                 roots.Add(AssetDatabase.GetAssetPath(entry.Preset));
-                if (entry.Preset.SourcePreset != null)
-                    roots.Add(AssetDatabase.GetAssetPath(entry.Preset.SourcePreset));
                 foreach (ObjectPresetValue field in entry.Preset.Configuration.Fields)
                     field.CollectLinks(links);
                 foreach (ObjectGroupPreset group in entry.Preset.Groups)

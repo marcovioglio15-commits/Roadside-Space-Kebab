@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: FoshyBusiness_AwaitingToOrder
   Lines:
   - Speaker: FishyBusiness
-    Text: 'Hey, what''s the big idea, [rainbow][shake]chump[/shake][/rainbow]? Throwing random food at me?! '
+    Text: 'Hey, what''s the big idea, [rainbow][speed=25][wave]CHUM[/wave][/speed][/rainbow]? [shake]Throwing[/shake] random food at me?! '
   TextEffects:
     Typewriter: 1
     LettersPerSecond: 35

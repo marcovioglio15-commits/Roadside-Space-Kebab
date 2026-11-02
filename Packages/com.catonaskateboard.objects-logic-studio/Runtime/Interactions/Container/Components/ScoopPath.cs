@@ -8,6 +8,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         internal readonly Pose[] Targets;
+        internal readonly ScoopKeyframe[] Frames;
         internal readonly Vector3[] Scales;
         internal readonly int CommitStep;
 
@@ -25,15 +26,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="initialScale">Visual branch's original local scale.</param>
         internal ScoopPath(ScoopAnimationSettings settings, Pose initial, Pose dispenser, Pose carry, Vector3 initialScale)
         {
-            CommitStep = settings.Enabled ? settings.Keyframes.Length - 1 : -1;
-            Targets = new Pose[settings.Enabled ? settings.Keyframes.Length + (settings.ReturnToStart ? 1 : 0) : 0];
+            int approach = settings.Mode == ScoopAnimationMode.RelativeChain ? 1 : 0;
+            Frames = new ScoopKeyframe[settings.Enabled ? settings.Keyframes.Length + approach : 0];
+            if (settings.Enabled)
+            {
+                // The automatic approach precedes every optional relative keyframe.
+                if (approach > 0)
+                    Frames[0] = settings.Approach;
+                System.Array.Copy(settings.Keyframes, 0, Frames, approach, settings.Keyframes.Length);
+            }
+            CommitStep = Frames.Length - 1;
+            Targets = new Pose[settings.Enabled ? Frames.Length + (settings.ReturnToStart ? 1 : 0) : 0];
             Scales = new Vector3[Targets.Length];
             Pose previous = initial;
             Vector3 scale = initialScale;
             // Later chain offsets follow the complete preceding target, including its optional rotation.
-            for (int index = 0; settings.Enabled && index < settings.Keyframes.Length; index++)
+            for (int index = 0; index < Frames.Length; index++)
             {
-                ScoopKeyframe frame = settings.Keyframes[index];
+                ScoopKeyframe frame = Frames[index];
                 Pose reference = settings.Mode == ScoopAnimationMode.RelativeChain ? index == 0 ? dispenser : previous
                     : frame.Space switch { ScoopPoseSpace.Initial => initial, ScoopPoseSpace.Carry => carry, _ => dispenser };
                 previous = new Pose(reference.position + reference.rotation * frame.Position,

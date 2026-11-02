@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 2244171048883904474}
   - component: {fileID: 6596059187093015574}
   - component: {fileID: 137684229106906017}
+  - component: {fileID: 2973733086031630578}
   m_Layer: 6
   m_Name: PF_Base_FriedFoodBox
   m_TagString: Untagged
@@ -149,7 +150,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 89c1a93676c300c42982e5a69c037457, type: 2}
   action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   settings:
     Distance: 3
@@ -218,7 +218,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 1a3a4341edee7e24b9471a3f1832cacd, type: 2}
   action: {fileID: 3214988103402303364, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   physics:
     OverrideBody: 1
@@ -268,7 +267,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: b4b468f036492c04c8a71ce8dd450312, type: 2}
   action: {fileID: -1996764827017877772, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
   physics:
     OverrideBody: 1
@@ -326,7 +324,7 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 11400000, guid: 43f220aa71cf7144cb5c32d44417af6b, type: 2}
+  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -401,7 +399,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 7b39d6a5c60833945a97b4d0cf3ad67e, type: 2}
   drawGizmos: 1
   settings:
     Thickness: 6
@@ -444,7 +441,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Maximum: 20
@@ -453,6 +449,106 @@ MonoBehaviour:
     Flags:
     - {fileID: 11400000, guid: f3810201d1372f14a8eb7eda092ab735, type: 2}
     OffscreenDelay: 0.25
+--- !u!114 &2973733086031630578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926761037992945242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89758c4d4eb24359b9fa12c3ef130a73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContainer
+  interactionName: Container
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    Mode: 2
+    AllowedFlags:
+    - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    Match: 0
+    Unlimited: 1
+    Capacity: 10
+    LimitToDispenserSpace: 0
+    KeepVisible: 0
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Spacing: {x: 0, y: 0.2, z: 0}
+    InitialFill: 0
+    ScoopAnimation:
+      Enabled: 1
+      Mode: 1
+      Approach:
+        Id: f9729603eeb24e58a46f06c9e3e2d079
+        Name: Slide
+        Space: 0
+        Position: {x: 0, y: 0, z: 2}
+        Rotate: 1
+        Rotation: {x: 90, y: 0, z: 0}
+        Duration: 0.3
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      Keyframes:
+      - Id: 78b16ca508db418f9c78f993c2161793
+        Name: Rotate
+        Space: 0
+        Position: {x: 0, y: 0, z: 0}
+        Rotate: 1
+        Rotation: {x: -90, y: 0, z: 0}
+        Duration: 0.1
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      FillAfter: 78b16ca508db418f9c78f993c2161793
+      ReturnToStart: 1
+      ReturnDuration: 0.3
+      ObstacleMargin: 1
+      VisualPath: 
+    FillSteps:
+    - Count: 0
+      Appearance:
+        Meshes: []
+        Materials:
+        - Path: SM_Base_FriedFoodBox
+          Materials:
+          - {fileID: 2100000, guid: a44a1c40d81ab284691c63b83a4fa5c8, type: 2}
+        Visibility: []
+      Flags:
+        Mode: 0
+        Flags: []
+        Remove: []
 --- !u!1001 &7292593632194129662
 PrefabInstance:
   m_ObjectHideFlags: 0

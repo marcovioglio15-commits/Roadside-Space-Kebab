@@ -12,6 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly ObjectGrab grab;
         private readonly ObjectItem output;
         private readonly ScoopAnimationSettings settings;
+        private readonly ScoopKeyframe[] frames;
         private readonly Pose[] targets;
         private readonly Vector3[] scales;
         private readonly Transform visual;
@@ -56,6 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ScoopPath path = new ScoopPath(settings, from, new Pose(source.transform.position, source.transform.rotation),
                 grab.CarryPose, initialScale);
             targets = path.Targets;
+            frames = path.Frames;
             scales = path.Scales;
             commitStep = path.CommitStep;
         }
@@ -68,7 +70,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal static bool ValidateVisual(Transform root, ScoopAnimationSettings settings, out string warning)
         {
             warning = string.Empty;
-            if (settings == null || !settings.Enabled || !System.Array.Exists(settings.Keyframes, frame => frame.Resize))
+            if (settings == null || !settings.Enabled || !(settings.Mode == ScoopAnimationMode.RelativeChain && settings.Approach is { Resize: true })
+                && !System.Array.Exists(settings.Keyframes, frame => frame.Resize))
                 return true;
             Transform visual = string.IsNullOrEmpty(settings.VisualPath) ? null : root.Find(settings.VisualPath);
             warning = "Choose a visual child without colliders or rigidbodies for scoop scaling.";
@@ -137,7 +140,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             }
             float progress = Mathf.Clamp01((Time.time - started) / duration);
-            if (step >= settings.Keyframes.Length || settings.Keyframes[step].Easing == ScoopEasing.Smooth)
+            if (step >= frames.Length || frames[step].Easing == ScoopEasing.Smooth)
                 progress = Mathf.SmoothStep(0f, 1f, progress);
             pose = new Pose(Vector3.Lerp(from.position, targets[step].position, progress),
                 Quaternion.Slerp(from.rotation, targets[step].rotation, progress));
@@ -169,7 +172,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>Positive scaled duration.</returns>
         private float Duration()
         {
-            return step < settings.Keyframes.Length ? settings.Keyframes[step].Duration : settings.ReturnDuration;
+            return step < frames.Length ? frames[step].Duration : settings.ReturnDuration;
         }
 
         #endregion

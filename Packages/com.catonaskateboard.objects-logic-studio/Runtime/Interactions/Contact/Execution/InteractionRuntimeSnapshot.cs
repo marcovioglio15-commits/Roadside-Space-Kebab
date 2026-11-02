@@ -3,26 +3,6 @@ using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Copies serialized settings through Unity's native serializer without overwriting a component.</summary>
-    internal static class InteractionRuntimeCopy
-    {
-        #region Methods
-
-        #region Settings
-
-        /// <summary>Copies mutable settings while retaining referenced assets as read-only inputs.</summary>
-        /// <param name="source">Serializable settings object.</param>
-        /// <param name="destination">Existing instance-owned settings object.</param>
-        internal static void Into(object source, object destination)
-        {
-            JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(source), destination);
-        }
-
-        #endregion
-
-        #endregion
-    }
-
     /// <summary>Restores one card's serialized configuration independently of its gameplay progress.</summary>
     internal sealed class InteractionRuntimeSnapshot
     {

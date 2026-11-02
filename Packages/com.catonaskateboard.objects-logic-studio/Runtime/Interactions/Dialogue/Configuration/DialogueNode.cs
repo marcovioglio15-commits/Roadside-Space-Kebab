@@ -49,6 +49,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool HasPosition;
         [Tooltip("Finish this tree when the flow reaches this block.")]
         public bool End;
+        [Tooltip("Choose a conversation branch using triggers without showing a page in this block.")]
+        public bool Routing;
+        [Tooltip("Use this branch's range, priority, replay, audio and box settings instead of the interaction defaults.")]
+        public bool OverridePolicy;
+        [Tooltip("Presentation and input policy used while this branch is requested or speaking.")]
+        public DialoguePolicy Policy = new DialoguePolicy();
         [Tooltip("Choose the first matching row, cycle eligible rows, or select randomly.")]
         public DialogueSelection Selection = DialogueSelection.FirstMatching;
         [Tooltip("Alternative entries owned by this block. Each row has its own trigger and output.")]

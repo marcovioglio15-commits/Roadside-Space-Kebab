@@ -385,7 +385,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 ObjectCommandInteraction command => command.CanExecute(),
                 ObjectRequestedInteraction process => process.CanRequest(),
-                ObjectDispenser dispenser => dispenser.Settings.Mode != DispenseMode.ToHand && dispenser.CanTake(),
+                ObjectDispenser dispenser => dispenser.Settings.Mode is DispenseMode.SingleOutput or DispenseMode.ContinuousOutput && dispenser.CanTake(),
                 _ => false
             };
         }

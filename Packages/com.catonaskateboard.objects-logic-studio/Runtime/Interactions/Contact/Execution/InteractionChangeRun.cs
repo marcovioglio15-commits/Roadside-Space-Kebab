@@ -77,6 +77,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     if (!change.TryValidate(out warning))
                         return proposed.Reject(out run);
+                    // Missing removal targets are optional; other edits still validate as a complete batch.
+                    if (change.Operation == InteractionChangeOperation.Remove)
+                    {
+                        proposed.PrepareRemoval(change);
+                        continue;
+                    }
                     ObjectInteraction feature;
                     bool added = false;
                     if (change.Operation == InteractionChangeOperation.Add)
@@ -120,6 +126,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = exception.Message;
                 return proposed.Reject(out run);
             }
+        }
+
+        /// <summary>Collects exact or type-wide removals without rejecting contact items that lack the card.</summary>
+        /// <param name="change">Removal selection from the reusable contact preset.</param>
+        private void PrepareRemoval(InteractionChangeSettings change)
+        {
+            // Exact selections retain their occurrence; type selections include every matching local card.
+            if (!change.Target.AllOfType)
+            {
+                ObjectInteraction feature = change.Target.Resolve(item.gameObject);
+                if (feature != null)
+                    operations.Add(new Operation(change, feature, false));
+                return;
+            }
+            foreach (ObjectInteraction feature in item.GetComponents<ObjectInteraction>())
+                if (InteractionRuntimeCatalog.KindOf(feature) == change.Kind && !InteractionRuntimeState.IsRemoved(feature))
+                    operations.Add(new Operation(change, feature, false));
         }
 
         /// <summary>Checks uniqueness and required physics before invoking Unity's component factory.</summary>
@@ -177,20 +200,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     operation.Feature.SetRuntimeName(settings.Name);
                     InteractionRuntimeCatalog.BindActions(operation.Feature, settings.Action, settings.AdvanceAction);
                 }
-                if (settings.Preset != null && !InteractionRuntimeCatalog.Import(operation.Feature, settings.Preset, out warning))
+                if (!InteractionRuntimeCatalog.Import(operation.Feature, settings.Groups, out warning))
                     return false;
             }
             foreach (ObjectInteraction feature in snapshots.Keys)
                 if (!removed.Contains(feature) && !InteractionRuntimeCatalog.Validate(feature, out warning))
                     return false;
-            ObjectGrab grab = item.GetComponent<ObjectGrab>();
-            if (grab != null && removed.Contains(grab))
-                foreach (ObjectInteraction feature in item.GetComponents<ObjectInteraction>())
-                    if (feature is ObjectRelease && !removed.Contains(feature))
-                    {
-                        warning = "Remove Drop and Throw together with their required Grab interaction.";
-                        return false;
-                    }
             warning = string.Empty;
             return true;
         }

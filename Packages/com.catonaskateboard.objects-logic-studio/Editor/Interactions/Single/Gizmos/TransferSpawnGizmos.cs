@@ -29,7 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case ObjectDispenser dispenser when dispenser.Settings.TryValidate(out _):
                     if (dispenser.Settings.Mode == DispenseMode.ToHand)
                         Pose(dispenser.transform, Vector3.zero, dispenser.Settings.OutputRotation, "Dispenser pickup origin");
-                    else
+                    else if (dispenser.Settings.Mode != DispenseMode.ScoopOnly)
                         for (int index = 0; index < dispenser.Settings.Outlets.Length; index++)
                         {
                             DispenserOutlet outlet = dispenser.Settings.Outlets[index];

@@ -46,7 +46,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 menu.AddItem(new GUIContent("Update Same Preset", "Copy only this field to matching interactions using the selected preset."), false,
                     () => Run(target, true, guard));
             else
-                menu.AddDisabledItem(new GUIContent("Update Same Preset", "Assign an interaction preset first."));
+                menu.AddDisabledItem(new GUIContent("Update Same Preset", "Import a settings-group preset for this field first."));
             if (writable)
                 menu.AddItem(new GUIContent("Update All", "Copy only this field to every compatible prefab interaction of this type."), false,
                     () => Run(target, false, guard));
@@ -100,7 +100,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     bool dirty = false;
                     foreach (ObjectInteraction feature in root.GetComponentsInChildren<ObjectInteraction>(true))
                     {
-                        if (feature.GetType() != target.Type || samePreset && ObjectFieldTarget.PresetOf(feature) != target.Preset)
+                        if (feature.GetType() != target.Type || samePreset && ObjectFieldTarget.PresetOf(feature, expected: target.Preset) != target.Preset)
                             continue;
                         if (!AssetDatabase.IsOpenForEdit(path))
                         {
@@ -272,7 +272,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (stage == null || stage.assetPath != path)
                 return;
             foreach (ObjectInteraction feature in stage.prefabContentsRoot.GetComponentsInChildren<ObjectInteraction>(true))
-                if (feature.GetType() == target.Type && (!samePreset || ObjectFieldTarget.PresetOf(feature) == target.Preset)
+                if (feature.GetType() == target.Type && (!samePreset || ObjectFieldTarget.PresetOf(feature, expected: target.Preset) == target.Preset)
                     && !TryApply(target, feature, out bool changed, out string warning))
                     skipped.Add(path + " (open stage): " + warning);
             ObjectFieldWorkspace.Rebase(ObjectWorkspace.instance, target);

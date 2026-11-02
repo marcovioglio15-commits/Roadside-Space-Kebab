@@ -40,12 +40,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectInteractionPreset main => main.Configuration != null && !string.IsNullOrEmpty(main.Configuration.TypeName)
                     && Type.GetType(main.Configuration.TypeName, false) == feature.GetType(),
                 ObjectGroupPreset group => group.Group != null && group.Group.TypeName == feature.GetType().FullName,
-                HoverPreset => feature is ObjectHover,
-                SingleInteractionPreset single => feature is ObjectSingleInteraction target && single.Kind == target.Kind,
-                ExtendedInteractionPreset extended => feature is ObjectExtendedInteraction target && extended.Kind == target.Kind,
-                DialogueEntry => feature is ObjectDialogue,
+                DialogueEntry or DialogueTree or DialogueTriggerPreset => feature is ObjectDialogue,
                 OrderCatalog => feature is ObjectAvailableOrders,
-                UnlockRuleSetPreset => feature is ObjectInteractionUnlock,
                 _ => false
             };
         }

@@ -22,11 +22,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>Uses native field controls and the tooltip defined beside the serialized data.</summary>
         /// <param name="parent">Settings block containing the field.</param>
         /// <param name="name">Serialized field to edit.</param>
-        internal static void Draw(SerializedProperty parent, string name)
+        /// <param name="caption">Optional context-specific field caption.</param>
+        internal static void Draw(SerializedProperty parent, string name, string caption = null)
         {
             // Known scalar controls omit only decorators, preserving serialized values and tooltips.
             using SerializedProperty property = parent.FindPropertyRelative(name);
-            GUIContent label = new GUIContent(property.displayName, property.tooltip);
+            GUIContent label = new GUIContent(caption ?? property.displayName, property.tooltip);
             switch (property.propertyType)
             {
                 case SerializedPropertyType.Boolean:

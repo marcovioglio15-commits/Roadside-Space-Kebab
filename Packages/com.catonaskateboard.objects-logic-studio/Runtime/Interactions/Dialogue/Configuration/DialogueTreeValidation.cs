@@ -34,10 +34,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Choose an existing Start block and include an End block.";
             if (!hasEnd || string.IsNullOrEmpty(tree.Start) || !nodes.ContainsKey(tree.Start))
                 return false;
+            if (!string.IsNullOrEmpty(tree.ArrivalBlock) && (!nodes.ContainsKey(tree.ArrivalBlock) || nodes[tree.ArrivalBlock].End || nodes[tree.ArrivalBlock].Routing))
+            {
+                warning = "Choose a conversation block for spawn arrival.";
+                return false;
+            }
             foreach (DialogueNode node in tree.Nodes)
             {
                 if (node.End)
                     continue;
+                if (node.OverridePolicy && (node.Policy == null || !node.Policy.TryValidatePolicy(out warning)))
+                    return false;
                 warning = node.Name + ": add at least one entry and choose a supported selection mode.";
                 if (node.Entries == null || node.Entries.Length == 0
                     || node.Selection is not (DialogueSelection.FirstMatching or DialogueSelection.Sequence or DialogueSelection.Random or DialogueSelection.WeightedRandom))
@@ -45,10 +52,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 foreach (DialogueRow row in node.Entries)
                 {
                     warning = node.Name + ": each row needs unique identity, text, trigger and a destination.";
-                    if (row == null || string.IsNullOrEmpty(row.Id) || !rows.Add(row.Id) || row.Entry == null || row.Trigger == null
+                    if (row == null || string.IsNullOrEmpty(row.Id) || !rows.Add(row.Id) || !node.Routing && row.Entry == null || row.Trigger == null
                         || string.IsNullOrEmpty(row.Next) || !nodes.ContainsKey(row.Next))
                         return false;
-                    if (!row.Entry.TryValidate(out warning) || !row.Trigger.TryValidate(orders, bound, out warning))
+                    if (node.Routing && (nodes[row.Next].End || nodes[row.Next].Routing))
+                    {
+                        warning = node.Name + ": routing entries must lead to conversation blocks.";
+                        return false;
+                    }
+                    if (!node.Routing && !row.Entry.TryValidate(out warning) || !row.Trigger.TryValidate(orders, bound, out warning))
                     {
                         warning = node.Name + " / " + row.Name + ": " + warning;
                         return false;

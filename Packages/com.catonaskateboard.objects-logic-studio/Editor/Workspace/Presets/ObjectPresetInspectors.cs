@@ -26,7 +26,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         ObjectGroupWindow.OpenPreset(group);
                     break;
                 case ObjectInteractionPreset interaction:
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("SourcePreset"), new GUIContent("Main preset", "Choose the original interaction preset, if needed."));
                     for (int index = 0; index < interaction.Groups.Length; index++)
                         Group(interaction, index);
                     break;

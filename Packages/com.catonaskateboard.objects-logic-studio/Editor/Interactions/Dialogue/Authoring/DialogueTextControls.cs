@@ -48,28 +48,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(settings, "RainbowRate");
         }
 
-        /// <summary>Inserts a complete editable token example into the selected page.</summary>
+        /// <summary>Wraps the selected text or inserts a token example at the retained caret.</summary>
         /// <param name="text">Page text receiving the selected example.</param>
-        internal static void Tokens(SerializedProperty text)
+        /// <param name="selection">Native text selection retained while the menu opens.</param>
+        internal static void Tokens(SerializedProperty text, DialogueTextSelection selection)
         {
             Rect rect = EditorGUILayout.GetControlRect();
-            if (!GUI.Button(rect, new GUIContent("Insert Text Token", "Wrap words with matching effect tokens. Use [[ for a literal opening bracket."), EditorStyles.popup))
+            if (!GUI.Button(rect, new GUIContent("Insert Text Token", "Wrap selected text. Without a selection, insert at the caret. Use [[ for a literal opening bracket."), EditorStyles.popup))
                 return;
             UnityEngine.Object owner = text.serializedObject.targetObject;
             string path = text.propertyPath;
             Func<bool> guard = StudioFieldMenu.Guard(owner, path);
+            DialogueTextSelection.Range range = selection.Capture(text);
             GenericMenu menu = new GenericMenu();
-            foreach ((string label, string token) in new[]
-                { ("Shake", "[shake]word[/shake]"), ("Wave", "[wave]word[/wave]"), ("Slam", "[slam]word[/slam]"),
-                    ("Color", "[color=#ffcc00]word[/color]"), ("Rainbow", "[rainbow]word[/rainbow]"),
-                    ("Speed", "[speed=25]words[/speed]"), ("Pause", "[pause=0.3]"), ("Literal [", "[[") })
+            foreach ((string label, string opening, string closing, string example) in new[]
+                { ("Shake", "[shake]", "[/shake]", "word"), ("Wave", "[wave]", "[/wave]", "word"), ("Slam", "[slam]", "[/slam]", "word"),
+                    ("Color", "[color=#ffcc00]", "[/color]", "word"), ("Rainbow", "[rainbow]", "[/rainbow]", "word"),
+                    ("Speed", "[speed=25]", "[/speed]", "words"), ("Pause", "[pause=0.3]", "", ""), ("Literal [", "[[", "", "") })
                 menu.AddItem(new GUIContent(label), false, () =>
                 {
                     if (!guard())
                         return;
                     using SerializedObject data = new SerializedObject(owner);
                     SerializedProperty destination = data.FindProperty(path);
-                    destination.stringValue += (string.IsNullOrEmpty(destination.stringValue) ? string.Empty : " ") + token;
+                    selection.Insert(destination, range, opening, closing, example);
                     data.ApplyModifiedProperties();
                     StudioFieldMenu.Notify(owner);
                 });

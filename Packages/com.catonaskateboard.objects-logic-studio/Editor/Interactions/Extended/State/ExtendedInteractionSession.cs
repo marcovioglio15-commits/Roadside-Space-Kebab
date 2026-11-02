@@ -19,12 +19,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public bool HasBinding;
         [Tooltip("Whether the selected feature card is expanded.")]
         public bool Expanded = true;
-        [Tooltip("Reusable configuration selected for explicit Import or Export.")]
-        public ExtendedInteractionPreset Preset;
-        [Tooltip("Preset assigned to the component when this proposal was opened.")]
-        public ExtendedInteractionPreset OriginalPreset;
-        [Tooltip("Selected preset state used to protect against outside edits.")]
-        public string PresetBaseline = string.Empty;
         [Tooltip("Hierarchy structure captured before path-based mesh or renderer edits.")]
         public string Hierarchy = string.Empty;
         [Header("Draft")]
@@ -38,7 +32,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Properties
 
         /// <summary>Whether the selected feature has pending data changes.</summary>
-        internal bool HasChanges => HasBinding && (Preset != OriginalPreset || JsonUtility.ToJson(Draft) != JsonUtility.ToJson(Baseline));
+        internal bool HasChanges => HasBinding && JsonUtility.ToJson(Draft) != JsonUtility.ToJson(Baseline);
 
         #endregion
 
@@ -79,8 +73,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Kind = feature.Kind;
                 ComponentId = ObjectWorkspaceTarget.FileId(feature);
             }
-            Preset = OriginalPreset = feature != null ? feature.SettingsPreset : null;
-            PresetBaseline = InteractionPresetWrites.Capture(Preset);
             Draft = ExtendedInteractionDraft.Capture(feature);
             Baseline = ObjectWorkspace.Copy(Draft);
             Hierarchy = feature != null ? HoverHierarchy.Signature(feature.transform) : string.Empty;
@@ -102,7 +94,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return true;
 
             ObjectExtendedInteraction feature = Resolve(target);
-            if (feature == null || feature.SettingsPreset != OriginalPreset || JsonUtility.ToJson(ExtendedInteractionDraft.Capture(feature)) != JsonUtility.ToJson(Baseline)
+            if (feature == null || JsonUtility.ToJson(ExtendedInteractionDraft.Capture(feature)) != JsonUtility.ToJson(Baseline)
                 || HoverHierarchy.Signature(feature.transform) != Hierarchy)
                 warning = "The selected interaction or its hierarchy changed elsewhere. Discard to reload its current values.";
             return warning.Length == 0 && Draft.TryValidate(feature, out warning);
@@ -122,7 +114,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Undo.RecordObject(feature, "Apply " + Kind);
             using (SerializedObject data = new SerializedObject(feature))
             {
-                data.FindProperty("settingsPreset").objectReferenceValue = Preset;
                 data.FindProperty("interactionName").stringValue = Draft.Name;
                 data.FindProperty("m_Enabled").boolValue = Draft.Enabled;
                 data.FindProperty("drawGizmos").boolValue = Draft.DrawGizmos;

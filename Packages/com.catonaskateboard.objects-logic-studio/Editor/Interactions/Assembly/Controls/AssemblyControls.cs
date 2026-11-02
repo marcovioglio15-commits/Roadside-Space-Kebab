@@ -96,29 +96,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 }
         }
 
-        /// <summary>Edits reusable product values while preserving the captured interaction mappings.</summary>
-        /// <param name="settings">Portable recipe settings.</param>
-        /// <param name="targets">Captured descriptors aligned with interaction rules.</param>
-        /// <param name="sections">Retained foldout visibility.</param>
-        internal static void DrawProductPreset(SerializedProperty settings, SerializedProperty targets, ObjectStudioSections sections)
-        {
-            DrawRecipe(settings, sections);
-            if (!sections.Draw("Product Interactions", "Requirements for the interactions captured when exporting this preset."))
-                return;
-            using StudioIndentScope indent = new StudioIndentScope();
-            if (!settings.FindPropertyRelative("ProlongedAssembly").boolValue)
-                HoverControls.Field(settings, "LockFirstIngredient");
-            HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
-            SerializedProperty rules = settings.FindPropertyRelative("InteractionRules");
-            // Structural changes require an actual destination hierarchy in the main workspace.
-            for (int index = 0; index < rules.arraySize; index++)
-            {
-                if (index < targets.arraySize)
-                    UnlockPresetInspector.Mapping("Interaction " + (index + 1), targets.GetArrayElementAtIndex(index));
-                DrawRuleRequirements(rules.GetArrayElementAtIndex(index));
-            }
-        }
-
         /// <summary>Draws recipe, placement and completion controls shared by presets and live proposals.</summary>
         /// <param name="settings">Product settings edited without committing the owning interaction.</param>
         /// <param name="sections">Retained foldout visibility.</param>

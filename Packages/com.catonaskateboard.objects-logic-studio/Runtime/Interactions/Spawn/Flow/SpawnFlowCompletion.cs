@@ -8,8 +8,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region State
 
-        private readonly HashSet<ObjectInteraction> pending = new HashSet<ObjectInteraction>();
-        private readonly Dictionary<ObjectInteraction, DialogueStepReference> checkpoints = new Dictionary<ObjectInteraction, DialogueStepReference>();
+        private readonly List<(ObjectInteraction Source, DialogueStepReference Step)> pending = new List<(ObjectInteraction, DialogueStepReference)>();
         private bool requireAll;
 
         #endregion
@@ -22,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="step">Authored sources and any/all policy.</param>
         /// <param name="original">Prefab components in hierarchy order.</param>
         /// <param name="generated">Corresponding components on the inactive clone.</param>
-        /// <returns>True when every selected interaction maps to a distinct clone component.</returns>
+        /// <returns>True when every selected interaction maps to its clone component.</returns>
         internal bool Bind(SpawnFlowStep step, ObjectInteraction[] original, ObjectInteraction[] generated)
         {
             // No progress or component reference survives a visitor change.
@@ -32,23 +31,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 ObjectInteraction source = step.Completions[selected];
                 int index = Array.IndexOf(original, source);
-                if (index < 0 || index >= generated.Length || !pending.Add(generated[index]))
+                if (index < 0 || index >= generated.Length || generated[index] == null)
                     return false;
-                if (step.CompletionSteps != null && selected < step.CompletionSteps.Length && step.CompletionSteps[selected] != null)
-                    checkpoints.Add(generated[index], step.CompletionSteps[selected]);
+                pending.Add((generated[index], step.CompletionAt(selected)));
             }
             return pending.Count > 0;
         }
 
-        /// <summary>Counts each selected component once, regardless of repeated dialogue completions.</summary>
+        /// <summary>Counts each selected checkpoint once, including several branches on one dialogue.</summary>
         /// <param name="source">Component that completed on the current visitor.</param>
         /// <param name="moment">Whole interaction or entry checkpoint boundary.</param>
         /// <returns>True when this completion satisfies the visit's any/all policy.</returns>
         internal bool Observe(ObjectInteraction source, InteractionMoment moment)
         {
             // Other visitors and repeated notifications cannot satisfy outstanding conditions.
-            return (checkpoints.TryGetValue(source, out DialogueStepReference step) ? step.Matches(source, moment) : moment == InteractionMoment.Completed)
-                && pending.Remove(source) && (!requireAll || pending.Count == 0);
+            bool matched = false;
+            // One boundary can satisfy overlapping block and entry selections without counting either twice.
+            for (int index = pending.Count - 1; index >= 0; index--)
+                if (pending[index].Source == source && (pending[index].Step?.Matches(source, moment) ?? moment == InteractionMoment.Completed))
+                {
+                    pending.RemoveAt(index);
+                    matched = true;
+                }
+            return matched && (!requireAll || pending.Count == 0);
         }
 
         /// <summary>Releases component references when the visitor leaves or the run stops.</summary>
@@ -56,7 +61,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Keep collection capacity for the next spawn.
             pending.Clear();
-            checkpoints.Clear();
         }
 
         #endregion

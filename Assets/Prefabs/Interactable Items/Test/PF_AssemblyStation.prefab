@@ -166,7 +166,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 8185305472320031931, guid: cb5b9e2b1ebd6f8499423dbc9781807a, type: 3}
@@ -221,7 +220,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 5ac46ec16f119ee4696b9d9a5961457b, type: 2}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 3500573369959323781, guid: 1ce0407b79e592b458738e6cb31546c4, type: 3}
@@ -276,7 +274,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: c45be141bdfc377408c0dc37af3c24b5, type: 2}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 5984455871580098207, guid: f67dd383e0afd174e8de4fbf06303230, type: 3}
@@ -331,7 +328,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 5ac46ec16f119ee4696b9d9a5961457b, type: 2}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 7089714603075415954, guid: d71dde6a1e1cf694cbc9433961684f69, type: 3}
@@ -386,7 +382,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: c45be141bdfc377408c0dc37af3c24b5, type: 2}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 3748823794255209065, guid: c738ca2eed644e8438a6423721739c2a, type: 3}
@@ -441,7 +436,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 5ac46ec16f119ee4696b9d9a5961457b, type: 2}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 2305683179381614155, guid: 80eb965e7bc36f245aa9a5c40952f8c5, type: 3}
@@ -496,7 +490,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 5ac46ec16f119ee4696b9d9a5961457b, type: 2}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 6185445663845738765, guid: 451b69dcaadfb3a4aa2642b4616777f4, type: 3}
@@ -551,7 +544,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 224706048140884364, guid: 93f264b92da22d14998edcc0969a41f2, type: 3}
@@ -606,7 +598,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 633a5e57a8f14874ba6bb96470b9b616, type: 2}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 7759833384075562368, guid: 84bdd427fa97c9040b22320f5adcdc4a, type: 3}
@@ -661,7 +652,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 11400000, guid: 633a5e57a8f14874ba6bb96470b9b616, type: 2}
   drawGizmos: 1
   settings:
     ProductPrefab: {fileID: 7371184249265839609, guid: 6045ed5dc564c16468e5ddd4a935560b, type: 3}
@@ -716,7 +706,6 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
-  settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
     Maximum: 20

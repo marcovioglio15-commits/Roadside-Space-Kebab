@@ -35,7 +35,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Handles.color = index == path.CommitStep ? new Color(0.95f, 0.72f, 0.25f) : new Color(0.35f, 0.75f, 0.9f);
                     Handles.SphereHandleCap(0, target.position, Quaternion.identity, size, EventType.Repaint);
                     Handles.ArrowHandleCap(0, target.position, target.rotation, size * 3f, EventType.Repaint);
-                    Handles.Label(target.position + Vector3.up * size, (index < settings.Keyframes.Length ? settings.Keyframes[index].Name : "Return")
+                    Handles.Label(target.position + Vector3.up * size, (index < path.Frames.Length ? path.Frames[index].Name : "Return")
                         + (index == path.CommitStep ? " · Fill" : string.Empty));
                     previous = target.position;
                 }

@@ -73,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Day plans have their own focused editor while completion rules retain their independent settings.
             if (sections.Draw("Spawn mode", "Choose completion rules or a day flow.", settings, "Mode"))
                 using (new StudioIndentScope())
-                    HoverControls.Field(settings, "Mode");
+                    HoverControls.Field(settings, "Mode", "Spawn Mode");
             if (settings.FindPropertyRelative("Mode").enumValueIndex == (int)SpawnManagementMode.DayFlow)
             {
                 if (sections.Draw("Day flow", "Choose the sequence to run.", settings, "Flow"))

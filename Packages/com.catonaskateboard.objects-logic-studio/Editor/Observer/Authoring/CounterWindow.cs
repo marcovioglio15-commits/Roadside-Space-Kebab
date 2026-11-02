@@ -59,7 +59,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Window
 
         /// <summary>Opens the small scene counter setup window.</summary>
-        [MenuItem("Tools/Objects Logic Studio Counters")]
+        //[MenuItem("Tools/Objects Logic Studio Counters")]
         private static void Open()
         {
             // This window edits saved scene objects only.

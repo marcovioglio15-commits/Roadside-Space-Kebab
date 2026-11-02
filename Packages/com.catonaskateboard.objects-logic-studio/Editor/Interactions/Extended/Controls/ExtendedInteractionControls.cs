@@ -271,10 +271,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Edits dialogue ordering, interruption and explicit page sequences.</summary>
         /// <param name="settings">Serialized dialogue settings.</param>
         /// <param name="sections">Retained foldout visibility.</param>
-        internal static void DrawDialogue(SerializedProperty settings, ObjectStudioSections sections)
+        /// <param name="includeTree">Whether to include the interaction's tree and spawn selection.</param>
+        internal static void DrawDialogue(SerializedProperty settings, ObjectStudioSections sections, bool includeTree = true)
         {
             // The full sheet owns entry triggers; local fields control presentation and arbitration.
-            if (sections.Draw("Dialogue Tree", "Complete conversation sheet and spawn variants.", settings, "Tree", "UseSpawnTrees", "SpawnTrees"))
+            if (includeTree && sections.Draw("Dialogue Tree", "Complete conversation sheet and spawn variants.", settings, "Tree", "UseSpawnTrees", "SpawnTrees"))
                 using (new StudioIndentScope())
                     DialogueTreeControls.Draw(settings);
             if (sections.Draw("Dialogue Range", "Default range and shared-input priority.", settings, "Distance", "ExitDistance", "Priority", "PreferSingleActions", "PreferredActions"))

@@ -11,8 +11,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Header("Interaction")]
         [Tooltip("What this interaction preset is for.")]
         public string Description = string.Empty;
-        [Tooltip("Original main preset, when one was assigned.")]
-        public ScriptableObject SourcePreset;
         [Tooltip("Presets for this interaction's settings groups.")]
         public ObjectGroupPreset[] Groups = Array.Empty<ObjectGroupPreset>();
         [Tooltip("Complete settings captured from the interaction.")]

@@ -50,7 +50,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     document.Baseline = ObjectWorkspace.Copy(document.Draft);
                     document.Binding = HoverBindingDraft.Capture(hover);
                     document.OriginalBinding = ObjectWorkspace.Copy(document.Binding);
-                    document.Source = document.OriginalPreset = hover.Preset;
                     break;
                 case ObjectSingleInteraction single:
                     document.Category = ObjectInteractionCategory.SingleInteraction;

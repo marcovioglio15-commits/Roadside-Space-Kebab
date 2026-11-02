@@ -41,7 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(step, "Count");
                 ItemAppearanceControls.Draw(step.FindPropertyRelative("Appearance"));
                 SerializedProperty flags = step.FindPropertyRelative("Flags");
-                HoverControls.Field(flags, "Mode");
+                HoverControls.Field(flags, "Mode", "Flag Update Mode");
                 if (flags.FindPropertyRelative("Mode").enumValueIndex == (int)InventoryFlagMode.KeepBase)
                     continue;
                 ObjectFlagSelector.Draw(flags.FindPropertyRelative("Flags"));

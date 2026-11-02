@@ -13,10 +13,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private Transform anchor;
 
-        [Tooltip("Optional reusable source. Import copies detection, animation and label appearance into this interaction.")]
-        [SerializeField]
-        private HoverPreset preset;
-
         [Tooltip("Local Hover snapshot. Import copies a preset here; later preset edits do not change this interaction.")]
         [SerializeField]
         private HoverConfiguration configuration = new HoverConfiguration();
@@ -54,8 +50,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Current settings, reread after an explicit Refresh call during Play.</summary>
         public HoverSettings Settings => Application.isPlaying && settings != null ? settings
             : configuration != null ? configuration.Settings : null;
-        /// <summary>Saved configuration currently assigned to this interaction.</summary>
-        public HoverPreset Preset => preset;
         /// <summary>Local settings snapshot, independent of the last selected reusable preset.</summary>
         public HoverConfiguration Configuration => configuration;
         /// <summary>Optional local hierarchy anchor retained independently of shared presets.</summary>

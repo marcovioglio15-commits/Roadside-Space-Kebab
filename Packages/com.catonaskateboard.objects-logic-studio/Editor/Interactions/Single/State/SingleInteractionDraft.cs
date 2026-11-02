@@ -51,6 +51,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Snapshot
 
+        /// <summary>Uses the proposed mode when deciding whether to show and validate an input binding.</summary>
+        /// <param name="kind">Selected interaction family.</param>
+        /// <returns>True when this proposal requires its own Button action.</returns>
+        internal bool UsesInput(SingleInteractionKind kind)
+        {
+            return kind switch
+            {
+                SingleInteractionKind.Dispenser => Dispenser == null || !Dispenser.ScoopOnly,
+                SingleInteractionKind.TriggerAnimation => TriggerAnimation == null || TriggerAnimation.UsesInput,
+                _ => true
+            };
+        }
+
         /// <summary>Copies the applied feature into a proposal without retaining mutable configuration objects.</summary>
         /// <param name="feature">Selected component, or null for an empty card selection.</param>
         /// <returns>A detached snapshot with native asset references retained.</returns>
@@ -133,7 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!ToolRequirement.TryValidate(out warning) || !VisualEffect.TryValidate(VfxDuration(feature.Kind) > 0f, out warning)
                 || !FlagChange.TryValidate(feature.gameObject, out warning))
                 return false;
-            if (!(feature is ObjectTriggerAnimation && TriggerAnimation != null && !TriggerAnimation.UsesInput)
+            if (UsesInput(feature.Kind)
                 && (Action == null || Action.action == null || Action.action.type != InputActionType.Button))
             {
                 warning = "Choose a Button action from the player's Input Actions asset.";

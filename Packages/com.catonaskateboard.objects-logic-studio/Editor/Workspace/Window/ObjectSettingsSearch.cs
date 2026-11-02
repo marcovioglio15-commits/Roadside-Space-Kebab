@@ -78,12 +78,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             actions.Add(action.action?.name ?? action.name);
                             break;
                     }
-                    if (field.name is "settingsPreset" or "preset")
-                    {
-                        entry.Preset += " " + reference.name;
-                        presets.Add(reference.name);
-                    }
                 }
+                // Preset filtering follows group assignments even after another interaction is selected.
+                string key = ObjectGroupPresetStore.InteractionKey(feature);
+                foreach (ObjectGroupAssignment assignment in state.GroupPresets)
+                    if (assignment.Key.StartsWith(key, StringComparison.Ordinal) && assignment.Preset != null)
+                    {
+                        entry.Preset += " " + assignment.Preset.name;
+                        text.Append(' ').Append(assignment.Preset.name);
+                        presets.Add(assignment.Preset.name);
+                    }
                 if (ObjectWorkspaceTarget.FileId(feature) == state.Navigation.SelectedId)
                     foreach (ObjectGroupInfo group in groups)
                         text.Append(' ').Append(Describe(group, null));

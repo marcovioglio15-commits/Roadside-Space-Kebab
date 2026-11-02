@@ -15,7 +15,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>True for supported settings presets.</returns>
         internal static bool Supports(ScriptableObject asset)
         {
-            return asset is SingleInteractionPreset or ExtendedInteractionPreset or HoverPreset or DialogueEntry
+            return asset is ObjectGroupPreset or DialogueEntry
                 or DialogueTree or DialogueTriggerPreset or OrderCatalog or ContactModificationDefinition or SpawnFlowPlan;
         }
 
