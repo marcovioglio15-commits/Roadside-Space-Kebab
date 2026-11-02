@@ -34,7 +34,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(gate));
             rect = EditorGUI.PrefixLabel(rect, new GUIContent("After Dialogue", "Enable consuming modifications after this local dialogue completes."));
             string name = gate.FindPropertyRelative("DialogueName").stringValue;
-            if (!GUI.Button(rect, string.IsNullOrEmpty(name) ? "Select Dialogue" : name, EditorStyles.popup))
+            bool open = GUI.Button(rect, string.IsNullOrEmpty(name) ? "Select Dialogue" : name, EditorStyles.popup);
+            DialogueStepControls.Draw(gate.FindPropertyRelative("Step"), ((ContactDialogueGate)gate.boxedValue).Resolve(root));
+            if (!open)
                 return;
             UnityEngine.Object target = gate.serializedObject.targetObject;
             string path = gate.propertyPath;

@@ -17,13 +17,9 @@ MonoBehaviour:
     Tool: {fileID: 0}
     Tools: []
   Settings:
-    Trigger: 0
-    Consumption:
-      Enabled: 0
-      RequiredFlags: []
-      Orders: []
-      RequireAll: 1
-      Result: 0
+    Tree: {fileID: 11400000, guid: 58ac397662624f54baff27fc44beb2ee, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Distance: 3
     ExitDistance: 4
     Priority: 0
@@ -36,14 +32,6 @@ MonoBehaviour:
       m_Bits: 4294967295
     Interruption: 0
     ReplayOnReturn: 1
-    Selection: 0
-    Entries:
-    - {fileID: 11400000, guid: 9ab8dee7389349e2946b0eb9d8a763a6, type: 2}
-    UseSpawnPresets: 0
-    SpawnPresets: []
-    Tree: {fileID: 11400000, guid: 58ac397662624f54baff27fc44beb2ee, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
     Audio:
       Voice: 0
       Interval: 3

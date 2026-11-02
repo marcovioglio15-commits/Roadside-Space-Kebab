@@ -16,6 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string DialogueName = string.Empty;
         [Tooltip("Zero-based occurrence among local dialogues with the same name; selected automatically by the dialogue menu.")]
         public int Occurrence;
+        [Tooltip("Optional entry checkpoint enabling consumption before the whole tree ends.")]
+        public DialogueStepReference Step = new DialogueStepReference();
 
         #endregion
         #region Methods

@@ -4,52 +4,42 @@ using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Retains per-interaction dialogue progress while the observer arbitrates a single visible HUD.</summary>
+    /// <summary>Runs one spawn-selected conversation sheet through the observer's shared dialogue channel.</summary>
     [AddComponentMenu("Objects Logic Studio/Dialogue")]
     public sealed class ObjectDialogue : ObjectExtendedInteraction
     {
         #region Serialized Fields
 
         [Header("Dialogue")]
-        [Tooltip("Range, trigger, priority, entry selection and interruption behavior.")]
+        [Tooltip("Complete tree presets, visibility, priority, replay and audio.")]
         [SerializeField]
         private DialogueSettings settings = new DialogueSettings();
-        [Header("Bindings")]
-        [Tooltip("Button used to request dialogue when Trigger is Input Action. Resolved in the player's private PlayerInput asset.")]
+        [Header("Input")]
+        [Tooltip("Default Button used by Input Action trigger presets without an override.")]
         [SerializeField]
         private InputActionReference startAction;
-        [Tooltip("Button used to display the next explicit dialogue page and close after the final page.")]
+        [Tooltip("Button advancing explicit pages and closing the final page.")]
         [SerializeField]
         private InputActionReference advanceAction;
+
         #endregion
 
         #region Stored Progress
 
-        /// <summary>Keeps the current page and selection cursor while inventory temporarily suspends this component.</summary>
+        /// <summary>Retains graph progress while a Container suspends this item's components.</summary>
         internal readonly struct StoredProgress
         {
-            internal readonly int Entry;
-            internal readonly int Line;
-            internal readonly int NextEntry;
-            internal readonly int StartedRevision;
-            internal readonly int StartedContactRevision;
+            internal readonly DialogueSession Session;
             internal readonly bool Armed;
             internal readonly bool Retained;
-            internal readonly bool AwaitingSight;
 
-            /// <summary>Captures progress after applying the configured dialogue interruption policy.</summary>
-            /// <param name="dialogue">Dialogue entering temporary inventory storage.</param>
+            /// <summary>Captures the cursor after the interruption policy has been applied.</summary>
+            /// <param name="dialogue">Dialogue entering storage.</param>
             internal StoredProgress(ObjectDialogue dialogue)
             {
-                // Presentation is hidden; only future selection and page progress are retained.
-                Entry = dialogue.entry;
-                Line = dialogue.line;
-                NextEntry = dialogue.nextEntry;
-                StartedRevision = dialogue.startedRevision;
-                StartedContactRevision = dialogue.startedContactRevision;
+                Session = dialogue.session;
                 Armed = dialogue.armed;
                 Retained = dialogue.retained;
-                AwaitingSight = dialogue.awaitingSight;
             }
         }
 
@@ -58,49 +48,58 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private readonly List<int> eligible = new List<int>();
-        private int consumptionRevision = -1;
-        private int orderRevision = -1;
-        private ObjectAvailableOrders orders;
-        private ObjectContactModifier contact;
-        private int contactRevision = -1;
-        private int startedContactRevision = -1;
-        private int handledAwaitingRevision = -1;
-        private DialogueSettings content;
-        private int generation = -1;
-        private int startedRevision = -1;
-        private int entry = -1;
-        private int line;
-        private int nextEntry;
-        private bool armed = true;
-        private bool projectileStarted;
-        private bool ignoreExitRange;
-        private bool retained;
-        private bool awaitingSight;
-        private DialogueHud hud;
-        private bool arrivalOnly;
-        private bool arrivalPending;
+        private readonly HashSet<DialogueTriggerPreset> consumptionMatches = new HashSet<DialogueTriggerPreset>();
         private readonly DialogueAudioRun audio = new DialogueAudioRun();
         internal readonly DialogueSightGeometry SightGeometry = new DialogueSightGeometry();
+        private ObjectAvailableOrders orders;
+        private ObjectContactModifier contact;
+        private DialogueSession session;
+        private DialogueTree content;
+        private DialogueHud hud;
+        private int generation = -1;
+        private int pending = -1;
+        private int receiptRevision = -1;
+        private int contactRevision = -1;
+        private int orderRevision = -1;
+        private bool armed = true;
+        private bool retained;
+        private bool awaitingSight;
+        private bool arrivalOnly;
+        private bool arrivalPending;
+        private bool arrivalSession;
+        private bool projectileStarted;
+        private bool ignoreExitRange;
 
         #endregion
 
         #region Properties
 
-        /// <summary>Saved trigger and dialogue content.</summary>
+        /// <summary>Local presentation policy and full tree preset references.</summary>
         public DialogueSettings Settings => settings;
-        /// <summary>Imported action used by input-triggered activation.</summary>
+        /// <summary>Default Input Action trigger binding.</summary>
         public InputActionReference StartAction => startAction;
-        /// <summary>Imported action used for page advancement.</summary>
+        /// <summary>Page advance binding.</summary>
         public InputActionReference AdvanceAction => advanceAction;
-        /// <summary>Whether this interaction currently owns the visible dialogue.</summary>
+        /// <summary>Whether this component currently owns a visible page.</summary>
         public bool IsSpeaking { get; private set; }
-        /// <summary>One-based occurrence shared with the object's Available Orders.</summary>
+        /// <summary>One-based occurrence shared with Available Orders.</summary>
         public int SpawnIndex { get; private set; }
-        /// <summary>Whether the latest activation validation passed.</summary>
+        /// <summary>Current block key for tree diagnostics.</summary>
+        public string CurrentBlock => session?.Block.Id;
+        /// <summary>Current entry row key for tree diagnostics.</summary>
+        public string CurrentEntry => session?.Row?.Id;
+        /// <summary>Block published only during a step completion signal.</summary>
+        public string CompletedBlock { get; private set; }
+        /// <summary>Entry published only during a step completion signal.</summary>
+        public string CompletedEntry { get; private set; }
+        /// <summary>Whether activation validation passed.</summary>
         internal bool Ready { get; private set; }
-        /// <summary>Whether Day Flow exclusively requests this clone dialogue.</summary>
+        /// <summary>Whether Day Flow requests the first block for this clone.</summary>
         internal bool ArrivalOnly => arrivalOnly;
-        /// <summary>Identifies this multiple-interaction feature.</summary>
+        /// <summary>Input selected for the pending row, or null for an automatic trigger.</summary>
+        internal InputActionReference RequestedAction => pending >= 0 && session.RequestBlock.Entries[pending].Trigger.Type == DialogueTrigger.InputAction
+            && !arrivalPending ? ActionFor(session.RequestBlock.Entries[pending].Trigger) : null;
+        /// <summary>Identifies the dialogue feature card.</summary>
         public override ExtendedInteractionKind Kind => ExtendedInteractionKind.Dialogue;
 
         #endregion
@@ -109,176 +108,277 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Lifecycle
 
-        /// <summary>Initializes local progress and registers an independently prioritized dialogue component.</summary>
+        /// <summary>Validates independent progress before registering for observer arbitration.</summary>
         private void OnEnable()
         {
-            // Multiple components on one item retain separate entry cursors and interrupted pages.
+            if (InteractionRuntimeState.IsStaging)
+                return;
             Initialize();
             DialogueRegistry.Register(this);
         }
 
-        /// <summary>Hides presentation and invalidates observer input bindings when this feature disappears.</summary>
+        /// <summary>Withdraws visible presentation before removing input bindings.</summary>
         private void OnDisable()
         {
-            // Consuming the item cannot leave its HUD visible or keep its advance action subscribed.
+            if (InteractionRuntimeState.IsStaging)
+                return;
             Interrupt();
             DialogueRegistry.Unregister(this);
         }
 
-        /// <summary>Resets runtime progress at activation and Play entry without changing saved settings.</summary>
+        /// <summary>Resets transient state for activation and retained-scene Play entry.</summary>
         internal void Initialize()
         {
-            // Explicit initialization also covers projects with disabled domain and scene reload.
             if (IsSpeaking && hud != null)
                 hud.Hide();
-            IsSpeaking = false;
             hud = null;
-            retained = false;
-            awaitingSight = false;
+            IsSpeaking = retained = awaitingSight = false;
             armed = true;
-            entry = consumptionRevision = startedRevision = -1;
-            line = nextEntry = 0;
-            eligible.Clear();
+            pending = -1;
+            receiptRevision = contactRevision = orderRevision = -1;
             orders = GetComponent<ObjectAvailableOrders>();
             contact = GetComponent<ObjectContactModifier>();
-            contactRevision = startedContactRevision = -1;
-            orderRevision = -1;
             audio.Stop();
             SightGeometry.Bind(transform);
             PrepareSpawn();
             Ready = TryValidate(out string warning);
+            session = Ready ? new DialogueSession(content, Item.ConsumptionRevision, contact != null ? contact.ContactRevision : -1) : null;
             if (!Ready)
-                Debug.LogWarning($"Dialogue '{InteractionName}' on '{name}': {warning}", this);
+                Debug.LogWarning("Dialogue '" + InteractionName + "': " + warning, this);
         }
 
-        /// <summary>Freezes this lifetime's entry preset before activation or inactive Day Flow staging.</summary>
+        /// <summary>Selects the complete tree once for the current prefab occurrence.</summary>
         internal void PrepareSpawn()
         {
-            // One item occurrence is shared across sibling dialogues and the order catalog.
-            ObjectItem item = GetComponent<ObjectItem>();
-            item.PrepareSpawn(ObjectSpawnHistory.Source, ObjectSpawnHistory.Occurrence);
-            if (generation == ObjectSpawnHistory.Generation && SpawnIndex == item.Spawn.Index)
+            if (Item == null)
+                return;
+            Item.PrepareSpawn(ObjectSpawnHistory.Source, ObjectSpawnHistory.Occurrence);
+            if (generation == ObjectSpawnHistory.Generation && SpawnIndex == Item.Spawn.Index && content != null)
                 return;
             generation = ObjectSpawnHistory.Generation;
-            handledAwaitingRevision = -1;
-            SpawnIndex = item.Spawn.Index;
-            content = settings?.ResolveEntries(SpawnIndex);
+            SpawnIndex = Item.Spawn.Index;
+            content = settings?.ResolveTree(SpawnIndex);
+        }
+
+        /// <summary>Ticks voice intervals only while this dialogue presents a page.</summary>
+        private void Update()
+        {
+            if (IsSpeaking && Time.timeScale > 0f)
+                audio.Tick(settings.Audio, transform);
         }
 
         #endregion
 
-        #region Validation
+        #region Validation And Input
 
-        /// <summary>Checks pages, project flags and input references independently of the shared presentation.</summary>
+        /// <summary>Configures local action identifiers before a new runtime dialogue is enabled.</summary>
+        /// <param name="start">Default activation Button.</param>
+        /// <param name="advance">Page advance Button.</param>
+        internal void BindActions(InputActionReference start, InputActionReference advance)
+        {
+            startAction = start;
+            advanceAction = advance;
+        }
+
+        /// <summary>Revalidates changed settings, preserving pages when the selected tree is unchanged.</summary>
+        internal void RefreshRuntime()
+        {
+            DialogueTree next = settings.ResolveTree(SpawnIndex);
+            if (next != content)
+            {
+                Interrupt();
+                content = next;
+                session = new DialogueSession(content, Item.ConsumptionRevision, contact != null ? contact.ContactRevision : -1);
+                retained = false;
+                armed = true;
+            }
+            Ready = TryValidate(out string warning);
+            if (!Ready)
+                Debug.LogWarning(warning, this);
+            receiptRevision = -1;
+            DialogueRegistry.Invalidate();
+        }
+
+        /// <summary>Checks the saved component and all reachable tree presets.</summary>
         /// <param name="warning">Receives the first missing dependency.</param>
-        /// <returns>True when the observer can run this dialogue without creating runtime UI.</returns>
+        /// <returns>True when the observer can run this dialogue.</returns>
         public override bool TryValidate(out string warning)
         {
-            // Runtime and editor drafts use identical dependency and flag checks.
             return TryValidate(settings, startAction, advanceAction, out warning);
         }
 
-        /// <summary>Checks a detached dialogue proposal before the observer supplies shared presentation.</summary>
-        /// <param name="configuration">Proposed range, conditions and dialogue pages.</param>
-        /// <param name="start">Proposed optional activation Button.</param>
-        /// <param name="advance">Proposed page-advance Button.</param>
-        /// <param name="warning">Receives missing input or flag dependencies.</param>
-        /// <returns>True when the proposal can run on this object.</returns>
+        /// <summary>Checks a detached configuration before Apply or runtime replacement.</summary>
+        /// <param name="configuration">Proposed tree and presentation settings.</param>
+        /// <param name="start">Default trigger action.</param>
+        /// <param name="advance">Page advance action.</param>
+        /// <param name="warning">Receives an invalid tree or binding.</param>
+        /// <returns>True for a complete proposal.</returns>
         public bool TryValidate(DialogueSettings configuration, InputActionReference start, InputActionReference advance, out string warning)
         {
-            // Input references identify actions; the observer binds their private runtime counterparts.
-            warning = "Dialogue requires an Object Item and complete settings.";
+            warning = "Dialogue needs Object Item, a complete tree and an advance Button.";
             if (GetComponent<ObjectItem>() == null || configuration == null
                 || !configuration.TryValidate(out warning, GetComponent<ObjectAvailableOrders>()?.Settings, true))
                 return false;
-            if (advance == null || advance.action is not { type: InputActionType.Button }
-                || !arrivalOnly && configuration.Trigger == DialogueTrigger.InputAction && (start == null || start.action is not { type: InputActionType.Button }))
-                warning = "Assign an advance Button action and, for input activation, a start Button action.";
-            return warning.Length == 0;
+            if (advance == null || advance.action is not { type: InputActionType.Button })
+            {
+                warning = "Assign an advance Button action.";
+                return false;
+            }
+            foreach (DialogueTree tree in Trees(configuration))
+                foreach (DialogueNode block in tree.Nodes)
+                    foreach (DialogueRow row in block.Entries)
+                        if ((!arrivalOnly || block.Id != tree.Start) && row.Trigger.Type == DialogueTrigger.InputAction && row.Trigger.Action == null
+                            && (start == null || start.action is not { type: InputActionType.Button }))
+                        {
+                            warning = "Assign a default start Button or an action on every Input Action trigger.";
+                            return false;
+                        }
+            warning = string.Empty;
+            return true;
+        }
+
+        /// <summary>Enumerates all configured sheets for destination-aware validation.</summary>
+        /// <param name="configuration">Default and spawn-specific sheet selection.</param>
+        /// <returns>Each sheet that can be selected at spawn.</returns>
+        private static IEnumerable<DialogueTree> Trees(DialogueSettings configuration)
+        {
+            yield return configuration.Tree;
+            if (configuration.UseSpawnTrees)
+                foreach (DialogueSpawnTree rule in configuration.SpawnTrees)
+                    yield return rule.Tree;
+        }
+
+        /// <summary>Binds actions once when the observer's registry or private input asset changes.</summary>
+        /// <param name="router">Observer-owned action router.</param>
+        /// <param name="buttons">Per-dialogue action lookup filled by this call.</param>
+        internal void BindStarts(InteractionInputRouter router, Dictionary<InputActionReference, InteractionButton> buttons)
+        {
+            foreach (DialogueNode block in content.Nodes)
+                foreach (DialogueRow row in block.Entries)
+                    if (row.Trigger.Type == DialogueTrigger.InputAction)
+                    {
+                        InputActionReference action = ActionFor(row.Trigger);
+                        if (action != null && !buttons.ContainsKey(action) && router.Bind(action) is InteractionButton button)
+                            buttons.Add(action, button);
+                    }
+        }
+
+        /// <summary>Resolves a trigger override against this object's local default action.</summary>
+        /// <param name="trigger">Input Action trigger.</param>
+        /// <returns>The selected project action identifier.</returns>
+        private InputActionReference ActionFor(DialogueTriggerPreset trigger)
+        {
+            return trigger.Action != null ? trigger.Action : startAction;
         }
 
         #endregion
 
         #region Eligibility
 
-        /// <summary>Updates range rearming and consumption eligibility without drawing random entries.</summary>
-        /// <param name="player">Observed player root.</param>
-        /// <returns>True when this component may request the idle dialogue channel.</returns>
-        internal bool CanStart(Transform player)
+        /// <summary>Collects matching rows only in the active block, without advancing random or sequence state.</summary>
+        /// <param name="player">Current player root.</param>
+        /// <param name="buttons">Already resolved input buttons.</param>
+        /// <returns>True when this component may claim the idle dialogue channel.</returns>
+        internal bool CanStart(Transform player, Dictionary<InputActionReference, InteractionButton> buttons)
         {
-            // Conditions are recomputed only when receipts change, while distance remains responsive each frame.
-            if (!Ready || !Available(InteractionChannels.Dialogue) || Item == null
-                || settings.Trigger == DialogueTrigger.SpawnArrival && !arrivalOnly)
+            if (!Ready || session == null || IsSpeaking || !Available(InteractionChannels.Dialogue))
                 return false;
-            RefreshEntries();
-            if (arrivalOnly)
-                return arrivalPending && !IsSpeaking && eligible.Count > 0;
-            // Re-entry, Replay On Return and component reactivation cannot replay the same rejected offering.
-            if (!retained && settings.Trigger == DialogueTrigger.Consumption && contact != null && contact.AwaitingContact
-                && handledAwaitingRevision == contact.ContactRevision)
+            if (arrivalOnly && !arrivalSession && !arrivalPending)
                 return false;
             float distance = (transform.position - player.position).sqrMagnitude;
-            if (settings.ReplayOnReturn && distance > settings.ExitDistance * settings.ExitDistance)
-                armed = true;
-            return !IsSpeaking && (InteractionProjectileInput.IgnoreRange || distance <= settings.Distance * settings.Distance) && eligible.Count > 0
-                && (armed || settings.Trigger == DialogueTrigger.InputAction && settings.ReplayOnInput
-                    || settings.Trigger == DialogueTrigger.Consumption && (startedRevision != Item.ConsumptionRevision
-                        || contact != null && contact.AwaitingContact && startedContactRevision != contact.ContactRevision));
+            if (distance > settings.ExitDistance * settings.ExitDistance)
+            {
+                session.ProximityUsed.Clear();
+                if (settings.ReplayOnReturn)
+                    armed = true;
+            }
+            eligible.Clear();
+            RefreshConsumption();
+            DialogueNode block = session.RequestBlock;
+            // Retained pages keep their chosen entry even if a later delivery changes the filters.
+            for (int index = 0; index < block.Entries.Length; index++)
+            {
+                DialogueRow row = block.Entries[index];
+                DialogueTriggerPreset trigger = row.Trigger;
+                if (InteractionProjectileInput.Active && trigger.Type != DialogueTrigger.InputAction)
+                    continue;
+                if (retained && session.Row != null && row != session.Row || block.Selection == DialogueSelection.WeightedRandom && row.Weight <= 0f)
+                    continue;
+                float range = trigger.OverrideRange ? trigger.Distance : settings.Distance;
+                float exit = trigger.OverrideRange ? trigger.ExitDistance : settings.ExitDistance;
+                if (distance > exit * exit)
+                    session.ProximityUsed.Remove(row.Id);
+                if (!arrivalPending && !arrivalSession && !InteractionProjectileInput.IgnoreRange && distance > range * range)
+                    continue;
+                bool matches = retained && row == session.Row || arrivalPending || (trigger.Type switch
+                {
+                    DialogueTrigger.InputAction => ActionFor(trigger) is InputActionReference action && buttons.TryGetValue(action, out InteractionButton button) && button.Pending,
+                    DialogueTrigger.Proximity => !session.ProximityUsed.Contains(row.Id),
+                    DialogueTrigger.Consumption => consumptionMatches.Contains(trigger) && (AwaitsContact(trigger)
+                        ? contact != null && session.ContactRevision != contact.ContactRevision : session.ConsumptionRevision != Item.ConsumptionRevision
+                            || session.Completed && armed && settings.ReplayOnReturn),
+                    DialogueTrigger.SpawnArrival => false,
+                    DialogueTrigger.OnEnter => true,
+                    _ => false
+                });
+                if (matches && (!session.Completed || armed || trigger.Type == DialogueTrigger.Consumption
+                    || settings.ReplayOnInput && trigger.Type == DialogueTrigger.InputAction))
+                    eligible.Add(index);
+            }
+            return eligible.Count > 0;
         }
 
-        /// <summary>Checks whether a visible dialogue still has its item, HUD and exit range.</summary>
-        /// <param name="player">Observed player root.</param>
-        /// <returns>True while presentation may continue.</returns>
-        internal bool CanContinue(Transform player)
+        /// <summary>Evaluates order and receipt filters only after their revisions change.</summary>
+        private void RefreshConsumption()
         {
-            // No controller, cursor or movement state is changed when range is lost.
-            return Available(InteractionChannels.Dialogue) && hud != null && hud.Ready
-                && (arrivalOnly || ignoreExitRange || (transform.position - player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance);
-        }
-
-        /// <summary>Rebuilds the compact entry catalog only after consumption history changes.</summary>
-        private void RefreshEntries()
-        {
-            // Zero-weight entries are excluded only in weighted mode.
-            if (consumptionRevision == Item.ConsumptionRevision && orderRevision == (orders != null ? orders.Revision : -1)
-                && contactRevision == (contact != null ? contact.ContactRevision : -1))
+            if (receiptRevision == Item.ConsumptionRevision && contactRevision == (contact != null ? contact.ContactRevision : -1)
+                && orderRevision == (orders != null ? orders.Revision : -1))
                 return;
-            consumptionRevision = Item.ConsumptionRevision;
+            receiptRevision = Item.ConsumptionRevision;
             contactRevision = contact != null ? contact.ContactRevision : -1;
             orderRevision = orders != null ? orders.Revision : -1;
-            eligible.Clear();
-            if (settings.Trigger == DialogueTrigger.Consumption
-                && (!Item.HasConsumption && !(contact != null && contact.AwaitingContact) || !settings.Consumption.Matches(Item, orders)))
-                return;
-            for (int index = 0; index < content.Entries.Length; index++)
-                if ((settings.Trigger != DialogueTrigger.Consumption || MatchesConsumption(content.Entries[index].Consumption))
-                    && (content.Selection != DialogueSelection.WeightedRandom || content.Entries[index].Weight > 0f))
-                    eligible.Add(index);
+            consumptionMatches.Clear();
+            foreach (DialogueNode block in content.Nodes)
+                foreach (DialogueRow row in block.Entries)
+                    if (row.Trigger.Type == DialogueTrigger.Consumption)
+                    {
+                        DialogueConsumptionFilter filter = row.Trigger.Consumption;
+                        bool awaiting = AwaitsContact(row.Trigger);
+                        if ((awaiting ? contact != null && contact.AwaitingContact : Item.HasConsumption) && filter.Matches(Item, orders)
+                            && row.Trigger.AdditionalConsumption.Matches(Item, orders))
+                            consumptionMatches.Add(row.Trigger);
+                    }
         }
 
-        /// <summary>Keeps gated contact attempts separate from actual consumption receipts.</summary>
-        /// <param name="filter">Candidate entry's consumption condition.</param>
-        /// <returns>True when both the event kind and selected entry filter match.</returns>
-        private bool MatchesConsumption(DialogueConsumptionFilter filter)
+        /// <summary>Distinguishes rejected contacts from real consumption receipts.</summary>
+        /// <param name="trigger">Consumption trigger and its optional additional filter.</param>
+        /// <returns>True when either active filter requests Awaiting Orders.</returns>
+        private static bool AwaitsContact(DialogueTriggerPreset trigger)
         {
-            // Unfiltered entries must not start merely because an item touched a still-closed consumption gate.
-            bool awaiting = contact != null && contact.AwaitingContact;
-            bool requestsAwaiting = filter.Enabled && filter.Result == DialogueOrderResult.AwaitingOrders
-                || settings.Consumption.Enabled && settings.Consumption.Result == DialogueOrderResult.AwaitingOrders;
-            return awaiting == requestsAwaiting && filter.Matches(Item, orders);
+            return trigger.Consumption.Enabled && trigger.Consumption.Result == DialogueOrderResult.AwaitingOrders
+                || trigger.AdditionalConsumption.Enabled && trigger.AdditionalConsumption.Result == DialogueOrderResult.AwaitingOrders;
         }
 
-        /// <summary>Checks startup or HUD visibility without repeatedly reopening an interrupted dialogue behind a wall.</summary>
-        /// <param name="observer">Current camera and player context.</param>
-        /// <param name="visibility">Observer-owned query cache shared by eligible dialogues.</param>
-        /// <param name="continuing">Whether this dialogue already owns the HUD.</param>
-        /// <returns>True when the requested presentation boundary satisfies its sight policy.</returns>
+        /// <summary>Checks range and availability while this component presents a page.</summary>
+        /// <param name="player">Observed player root.</param>
+        /// <returns>True when presentation can continue.</returns>
+        internal bool CanContinue(Transform player)
+        {
+            float range = session.Row.Trigger.OverrideRange ? session.Row.Trigger.ExitDistance : settings.ExitDistance;
+            return Available(InteractionChannels.Dialogue) && hud != null && hud.Ready
+                && (arrivalSession || ignoreExitRange || (transform.position - player.position).sqrMagnitude <= range * range);
+        }
+
+        /// <summary>Applies the shared free-cursor policy at presentation boundaries.</summary>
+        /// <param name="observer">Current player and camera context.</param>
+        /// <param name="visibility">Observer-owned sight cache.</param>
+        /// <param name="continuing">Whether a page is already visible.</param>
+        /// <returns>True when this page may be shown.</returns>
         internal bool CanPresent(HoverObserver observer, DialogueVisibility visibility, bool continuing)
         {
             if (InteractionProjectileInput.CursorUse)
                 return visibility.HasSight(observer, this);
-            // After sight interrupts a running page, wait for visibility before applying its resume/restart policy.
-            if (arrivalOnly || InteractionProjectileInput.PhysicalImpact || continuing && projectileStarted
+            if (arrivalPending || arrivalSession || InteractionProjectileInput.PhysicalImpact || continuing && projectileStarted
                 || (continuing ? !settings.HideWhenSightLost : !settings.RequireSightToStart && !awaitingSight))
                 return true;
             bool visible = visibility.HasSight(observer, this);
@@ -287,182 +387,148 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return visible;
         }
 
-        /// <summary>Checks page advancement independently of whether the current page remains visible in the HUD.</summary>
-        /// <param name="observer">Camera and player currently owning the dialogue.</param>
-        /// <param name="visibility">Shared cache for this observer frame.</param>
-        /// <returns>True when an advance press may change or close the current page.</returns>
+        /// <summary>Checks the cursor before one page advance without changing graph progress.</summary>
+        /// <param name="observer">Current player and camera.</param>
+        /// <param name="visibility">Shared sight query cache.</param>
+        /// <returns>True when the advance press is accepted.</returns>
         internal bool CanAdvance(HoverObserver observer, DialogueVisibility visibility)
         {
-            if (InteractionProjectileInput.CursorUse)
-                return (InteractionProjectileInput.IgnoreRange || (transform.position - observer.Player.position).sqrMagnitude <= settings.ExitDistance * settings.ExitDistance)
-                    && visibility.HasSight(observer, this);
-            // Blocking an advance does not interrupt presentation or change its retained page.
-            return arrivalOnly || InteractionProjectileInput.Active || !settings.RequireSightToContinue || visibility.HasSight(observer, this);
+            return arrivalSession || InteractionProjectileInput.Active || !settings.RequireSightToContinue || visibility.HasSight(observer, this);
         }
 
         #endregion
 
         #region Flow
 
-        /// <summary>Reserves this clone dialogue for the flow's automatic arrival request before activation.</summary>
+        /// <summary>Reserves this clone's first request for Day Flow arrival.</summary>
         internal void ConfigureArrival()
         {
-            // Only the selected clone bypasses its ordinary trigger and visibility settings.
             arrivalOnly = true;
         }
 
-        /// <summary>Queues arrival presentation until the shared dialogue HUD becomes available.</summary>
+        /// <summary>Queues one arrival request until this component wins the shared HUD.</summary>
         internal void RequestArrival()
         {
-            // The observer retains ownership of page input and arbitration.
             arrivalPending = true;
         }
 
-        /// <summary>Schedules voice phrases only while this interaction owns presentation.</summary>
-        private void Update()
+        /// <summary>Chooses one matching row after winning arbitration.</summary>
+        internal void PrepareRequest()
         {
-            // Pausing freezes intervals and the backend pauses active voices.
-            if (IsSpeaking && Time.timeScale > 0f)
-                audio.Tick(settings.Audio, transform);
+            pending = retained && session.Row != null ? System.Array.IndexOf(session.Block.Entries, session.Row) : session.Choose(eligible);
         }
 
-        /// <summary>Interrupts presentation and captures progress before temporary inventory deactivation.</summary>
-        /// <returns>The page and selection state to restore after retrieval.</returns>
-        internal StoredProgress CaptureStoredProgress()
+        /// <summary>Resumes a frozen page or starts the selected row without changing player controls.</summary>
+        /// <param name="presentation">Already saved and owned dialogue panel.</param>
+        /// <returns>True when the request accepted its activation input.</returns>
+        internal bool Begin(DialogueHud presentation)
         {
-            // Resume, restart and next-entry behavior follow the existing interruption setting.
-            Interrupt();
-            return new StoredProgress(this);
-        }
-
-        /// <summary>Restores saved dialogue flow after reactivation without opening a HUD or emitting events.</summary>
-        /// <param name="progress">Snapshot captured before storage.</param>
-        internal void RestoreStoredProgress(StoredProgress progress)
-        {
-            // Eligibility is recomputed from current receipts before the next dialogue starts.
-            entry = progress.Entry;
-            line = progress.Line;
-            nextEntry = progress.NextEntry;
-            startedRevision = progress.StartedRevision;
-            startedContactRevision = progress.StartedContactRevision;
-            armed = progress.Armed;
-            retained = progress.Retained;
-            awaitingSight = progress.AwaitingSight;
-            consumptionRevision = -1;
-        }
-
-        /// <summary>Resumes retained progress or selects an eligible entry when this component wins arbitration.</summary>
-        /// <param name="presentation">Observer-owned overlay already bound and ready to display.</param>
-        internal void Begin(DialogueHud presentation)
-        {
-            // Random selection occurs once per new dialogue, never during eligibility polling.
-            if (presentation == null || !presentation.Ready)
-                return;
+            if (pending < 0 || presentation == null || !presentation.Ready)
+                return false;
             hud = presentation;
-            RefreshEntries();
-            if (!retained || !eligible.Contains(entry))
-            {
-                entry = ChooseEntry();
-                line = 0;
-            }
-            if (entry < 0)
-                return;
-            bool resumed = retained;
+            if (!retained || session.Row == null)
+                session.Begin(pending);
             retained = false;
             armed = false;
-            startedRevision = Item.ConsumptionRevision;
-            startedContactRevision = contact != null ? contact.ContactRevision : -1;
-            if (settings.Trigger == DialogueTrigger.Consumption && contact != null && contact.AwaitingContact)
-                handledAwaitingRevision = contact.ContactRevision;
-            IsSpeaking = true;
+            arrivalSession |= arrivalPending;
+            arrivalPending = false;
+            session.ConsumptionRevision = Item.ConsumptionRevision;
+            session.ContactRevision = contact != null ? contact.ContactRevision : -1;
+            if (session.Row.Trigger.Type == DialogueTrigger.Proximity)
+                session.ProximityUsed.Add(session.Row.Id);
             projectileStarted = InteractionProjectileInput.PhysicalImpact;
             ignoreExitRange = InteractionProjectileInput.IgnoreRange;
-            arrivalPending = false;
+            IsSpeaking = true;
             audio.Begin(settings.Audio, transform);
-            hud.Show(content.Entries[entry].Lines[line]);
-            if (!resumed)
+            hud.Show(session.Line, session.Row.Entry.TextEffects, settings.Box, session.PageTime);
+            if (!session.Started)
+            {
+                session.Started = true;
                 Signal(InteractionMoment.Started);
-            // A start-triggered replacement can withdraw this dialogue before arbitration returns.
+            }
             if (!Available(InteractionChannels.Dialogue))
                 Interrupt();
+            return true;
         }
 
-        /// <summary>Selects the next eligible entry according to the configured ordering policy.</summary>
-        /// <returns>An eligible array index, or -1 when none match.</returns>
-        private int ChooseEntry()
-        {
-            // Sequence skips unmet conditions while retaining the configured ordering of eligible entries.
-            if (eligible.Count == 0)
-                return -1;
-            switch (content.Selection)
-            {
-                case DialogueSelection.Sequence:
-                    for (int offset = 0; offset < content.Entries.Length; offset++)
-                    {
-                        int candidate = (nextEntry + offset) % content.Entries.Length;
-                        if (!eligible.Contains(candidate))
-                            continue;
-                        nextEntry = (candidate + 1) % content.Entries.Length;
-                        return candidate;
-                    }
-                    return -1;
-                case DialogueSelection.Random:
-                    return eligible[Random.Range(0, eligible.Count)];
-                case DialogueSelection.WeightedRandom:
-                    double total = 0d;
-                    foreach (int candidate in eligible)
-                        total += content.Entries[candidate].Weight;
-                    double choice = Random.value * total;
-                    foreach (int candidate in eligible)
-                    {
-                        choice -= content.Entries[candidate].Weight;
-                        if (choice < 0d)
-                            return candidate;
-                    }
-                    return eligible[eligible.Count - 1];
-                default:
-                    return -1;
-            }
-        }
-
-        /// <summary>Displays exactly one next page or finishes after the final configured page.</summary>
+        /// <summary>Advances one page or publishes a completed row before following its connection.</summary>
         internal void Advance()
         {
-            // A completed interaction waits for rearming so lower-priority eligible dialogues can run.
             if (!IsSpeaking)
                 return;
-            line++;
-            if (line < content.Entries[entry].Lines.Length)
-                hud.Show(content.Entries[entry].Lines[line]);
-            else
+            if (hud.RevealPage())
+                return;
+            if (!session.Advance())
             {
-                hud.Hide();
-                IsSpeaking = false;
-                retained = false;
-                entry = -1;
-                line = 0;
+                hud.Show(session.Line, session.Row.Entry.TextEffects, settings.Box, 0f);
+                return;
+            }
+            CompletedBlock = session.Block.Id;
+            CompletedEntry = session.Row.Id;
+            DialogueSession completed = session;
+            session.Follow();
+            // A new block observes future receipts. A self-loop also retains deliveries received during its page.
+            if (session.Block.Id != CompletedBlock)
+            {
+                session.ConsumptionRevision = Item.ConsumptionRevision;
+                session.ContactRevision = contact != null ? contact.ContactRevision : -1;
+            }
+            hud.Hide();
+            IsSpeaking = false;
+            retained = false;
+            audio.Stop();
+            // Step listeners see the new graph cursor but cannot mistake a checkpoint for tree completion.
+            Signal(InteractionMoment.Progressed);
+            CompletedBlock = CompletedEntry = string.Empty;
+            if (session == completed && session.Completed)
+            {
                 audio.Finish(settings.Audio, transform);
                 Signal(InteractionMoment.Completed);
             }
         }
 
-        /// <summary>Hides the HUD and records the configured behavior for the next eligible return.</summary>
+        /// <summary>Applies interruption policy while leaving completed gameplay effects intact.</summary>
         internal void Interrupt()
         {
-            // Preserve a page only when this feature actually owned the visible dialogue.
             if (!IsSpeaking)
                 return;
+            session.PageTime = hud != null ? hud.PageTime : session.PageTime;
             if (hud != null)
                 hud.Hide();
             IsSpeaking = false;
             audio.Stop();
-            arrivalPending = arrivalOnly;
-            armed = true;
-            retained = settings.Interruption != DialogueInterruption.SelectNext;
-            if (settings.Interruption != DialogueInterruption.Resume)
-                line = 0;
-            if (!retained)
-                entry = -1;
+            retained = settings.Interruption != DialogueInterruption.RestartTree;
+            if (settings.Interruption == DialogueInterruption.Restart)
+            {
+                session.Page = 0;
+                session.PageTime = 0f;
+            }
+            else if (!retained)
+            {
+                session.Restart(false);
+                session.ConsumptionRevision = session.ContactRevision = -1;
+            }
+        }
+
+        /// <summary>Captures existing progress after interruption. New spawn clones keep their first activation state.</summary>
+        /// <returns>Progress to restore, or null before a dialogue session exists.</returns>
+        internal StoredProgress? CaptureStoredProgress()
+        {
+            // Walk-in staging can suspend a clone before its first OnEnable creates a cursor.
+            if (session == null)
+                return null;
+            Interrupt();
+            return new StoredProgress(this);
+        }
+
+        /// <summary>Restores a saved cursor without reopening presentation or emitting signals.</summary>
+        /// <param name="progress">Snapshot captured before inventory storage.</param>
+        internal void RestoreStoredProgress(StoredProgress progress)
+        {
+            session = progress.Session;
+            armed = progress.Armed;
+            retained = progress.Retained;
+            receiptRevision = -1;
         }
 
         #endregion

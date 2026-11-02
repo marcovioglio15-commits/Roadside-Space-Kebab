@@ -52,6 +52,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Registers this feature once when its component becomes available.</summary>
         protected virtual void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // An observer binds input later, after PlayerInput has initialized its private action copy.
             if (UsesInput)
                 SingleInteractionRegistry.Register(this);
@@ -60,6 +62,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Removes this feature before disabled objects can consume input.</summary>
         protected virtual void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // The registry revision invalidates cached bindings at the next observer update.
             SingleInteractionRegistry.Unregister(this);
         }

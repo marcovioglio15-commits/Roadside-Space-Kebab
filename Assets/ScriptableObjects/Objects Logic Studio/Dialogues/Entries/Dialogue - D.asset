@@ -13,14 +13,6 @@ MonoBehaviour:
   m_Name: Dialogue - D
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Dialogue - D
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Panino gnam gnam
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Gino
     Text: GnamGnamGnam

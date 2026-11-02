@@ -13,15 +13,6 @@ MonoBehaviour:
   m_Name: Fishy Business Order Correct 2 - B
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Fishy Business Order Correct 2 - B
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Panino Falafel
-    - French Fries
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Fishy Business
     Text: "Don\u2019t expect a tip from me ahhahahahahhahahahahahahhahahahahahahhahahahhahahahahahahhahahahahhahaha.\n"

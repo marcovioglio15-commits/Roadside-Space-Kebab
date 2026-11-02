@@ -63,6 +63,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Registers this sequence without replaying already committed appearance changes.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Refresh geometry at an ownership boundary, including retrieval from visible storage.
             Initialize();
             SliceRegistry.Register(this);
@@ -71,6 +73,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Removes input eligibility while preserving the instance's completed steps.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // No HUD or controller state belongs to a slice sequence.
             SliceRegistry.Unregister(this);
         }

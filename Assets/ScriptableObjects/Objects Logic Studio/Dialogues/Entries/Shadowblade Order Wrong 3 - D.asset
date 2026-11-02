@@ -13,14 +13,6 @@ MonoBehaviour:
   m_Name: Shadowblade Order Wrong 3 - D
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Shadowblade Order Wrong 3 - D
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Pizza Margherita
-    RequireAll: 1
-    Result: 1
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: The Elder Gods are not pleased.

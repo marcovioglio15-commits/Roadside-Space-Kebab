@@ -15,7 +15,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Lists only supported interactions on the animation's exact object or the preset's sample source.</summary>
         /// <param name="property">Detached source descriptor receiving a menu selection.</param>
         /// <param name="includeAnimations">Whether animation completions can also be selected.</param>
-        internal static void Draw(SerializedProperty property, bool includeAnimations = false)
+        /// <param name="includeSteps">Whether Dialogue entry checkpoints are accepted by this consumer.</param>
+        internal static void Draw(SerializedProperty property, bool includeAnimations = false, bool includeSteps = false)
         {
             // Component inspectors use the component's own object, even when its ObjectItem belongs to a parent.
             GameObject owner = property.serializedObject.targetObject is Component component
@@ -32,6 +33,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new EditorGUI.DisabledScope(owner == null))
                 if (GUI.Button(rect, new GUIContent(label, property.tooltip), EditorStyles.popup))
                     Show(property, owner, selected, rect, includeAnimations);
+            if (includeSteps)
+                DialogueStepControls.Draw(property.FindPropertyRelative("Step"), selected);
         }
 
         /// <summary>Builds the component list on demand and guards delayed choices against workspace changes.</summary>

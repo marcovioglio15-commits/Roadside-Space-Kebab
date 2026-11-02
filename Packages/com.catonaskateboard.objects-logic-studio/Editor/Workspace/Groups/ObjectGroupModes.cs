@@ -37,9 +37,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         preview.Extended.Draft.GravityGenerator.AffectPlayer = true;
                         preview.Extended.Draft.GravityGenerator.AffectObjects = true;
                         break;
-                    case ObjectDialogue:
-                        preview.Extended.Draft.Dialogue.Trigger = DialogueTrigger.InputAction;
-                        break;
                     case ObjectDispenser:
                         preview.Single.Draft.Dispenser.Unlimited = false;
                         break;

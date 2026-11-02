@@ -13,14 +13,6 @@ MonoBehaviour:
   m_Name: Shadowblade Order Wrong 4 - D
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Shadowblade Order Wrong 4 - D
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Pizza Margherita
-    RequireAll: 1
-    Result: 1
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: Pathetic.

@@ -36,6 +36,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool WaitForCompletion;
         [Tooltip("Existing interaction on this same object whose completion reveals the drawn orders until despawn.")]
         public ObjectInteraction CompletionSource;
+        [Tooltip("Optional Dialogue entry checkpoint that reveals tickets before the whole tree ends.")]
+        public DialogueStepReference CompletionStep = new DialogueStepReference();
 
         [Header("Order Timer")]
         [Tooltip("Show the HUD stopwatch when this customer's first order actually appears on its board. Day Flow completion stops it.")]
@@ -78,6 +80,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (WaitForCompletion && (CompletionSource == null || CompletionSource.gameObject != owner
                 || !CompletionSource.enabled || CompletionSource is ObjectAvailableOrders or ObjectInteractionUnlock))
                 warning = "Choose an enabled interaction on this object to reveal orders after completion; Available Orders and availability rules cannot be their own prerequisite.";
+            else if (WaitForCompletion && !CompletionStep.TryValidate(CompletionSource, out warning))
+                return false;
             return warning.Length == 0;
         }
 

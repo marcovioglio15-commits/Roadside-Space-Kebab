@@ -28,6 +28,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly CarryCollisions collisions = new CarryCollisions();
         private readonly CarryCollisions sourceCollisions = new CarryCollisions();
+        private readonly CarryCollisions scoopCollisions = new CarryCollisions();
+        private ScoopRun scoop;
+        private bool customCarry;
+        private Vector3 carryOffset;
+        private Quaternion carryRotation;
         private readonly CarryMotion motion = new CarryMotion();
         private readonly PhysicalPickup physical = new PhysicalPickup();
         private Rigidbody body;
@@ -85,6 +90,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal Collider[] Colliders => colliders;
         /// <summary>Temporary magnet placement shared by undecided recipes on one assembly table.</summary>
         internal AssemblyIngredientDock Dock { get; set; }
+        /// <summary>Container cached at activation for direct held scoops.</summary>
+        internal ObjectContainer CarryContainer { get; private set; }
+        /// <summary>Whether ordinary pickup has finished and can accept a scoop pose.</summary>
+        internal bool CanScoop => IsHeld && pickupCompleted && !physical.Active;
+        /// <summary>Current desired carry pose, including a retained scoop offset.</summary>
+        internal Pose CarryPose => new Pose(CarryPosition(), CarryRotation());
 
         #endregion
 
@@ -132,8 +143,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Caches the authored body, colliders and hover labels at activation.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Compound colliders belonging to another rigidbody must never inherit these overrides.
             body = GetComponent<Rigidbody>();
+            CarryContainer = GetComponent<ObjectContainer>();
             drop = GetComponent<ObjectDrop>();
             throwing = GetComponent<ObjectThrow>();
             degradation = GetComponent<ObjectDegradation>();
@@ -160,11 +174,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases temporary physics and visibility ownership before pooling or teardown.</summary>
         protected override void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Disabling a carried component must not leave a kinematic or collision-free object behind.
             Cancel();
             Dock?.Release();
             collisions.Restore(true);
             sourceCollisions.Restore(true);
+            scoopCollisions.Restore(true);
             RestoreSurface(null);
             base.OnDisable();
         }
@@ -181,6 +198,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 collisions.Restore(false);
             if (sourceCollisions.Pending)
                 sourceCollisions.Restore(false);
+            if (scoopCollisions.Pending)
+                scoopCollisions.Restore(false);
         }
 
         /// <summary>Follows after the player camera has produced its final pose for this render frame.</summary>
@@ -196,6 +215,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             collisions.Maintain();
+            if (scoop != null && scoop.Active)
+                scoopCollisions.Maintain();
+            else if (scoopCollisions.Pending)
+                scoopCollisions.Restore(false);
             if (!pickupCompleted)
                 sourceCollisions.Maintain();
             else if (sourceCollisions.Pending)
@@ -349,12 +372,47 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector3 CarryPosition()
         {
             // Carry offsets are metres, even when the player or camera hierarchy has authored scale.
-            return carryFrame.position + carryFrame.rotation * settings.Offset;
+            return carryFrame.position + carryFrame.rotation * (customCarry ? carryOffset : settings.Offset);
+        }
+
+        /// <summary>Resolves the ordinary or retained carry rotation in the current view frame.</summary>
+        /// <returns>Desired world rotation.</returns>
+        private Quaternion CarryRotation()
+        {
+            return carryFrame.rotation * (customCarry ? carryRotation : Quaternion.Euler(settings.Rotation));
+        }
+
+        /// <summary>Hands one temporary movement to the existing carry pose writer.</summary>
+        /// <param name="operation">Prepared scoop owning the current source reservation.</param>
+        /// <param name="source">Dispenser surfaces temporarily excluded from carry collisions.</param>
+        internal void BeginScoop(ScoopRun operation, Transform source)
+        {
+            scoop = operation;
+            scoopCollisions.Restore(true);
+            scoopCollisions.Ignore(colliders, source);
+        }
+
+        /// <summary>Retains the final pose relative to the carry frame without a closing snap.</summary>
+        internal void EndScoop()
+        {
+            scoop = null;
+            if (IsHeld && carryFrame != null)
+            {
+                customCarry = true;
+                carryOffset = Quaternion.Inverse(carryFrame.rotation) * (transform.position - carryFrame.position);
+                carryRotation = Quaternion.Inverse(carryFrame.rotation) * transform.rotation;
+            }
+            scoopCollisions.Restore(false);
         }
 
         /// <summary>Refreshes pickup geometry after assembly or mesh replacement, including while the object rests on a table.</summary>
         internal void RefreshCarryGeometry()
         {
+            drop = GetComponent<ObjectDrop>();
+            throwing = GetComponent<ObjectThrow>();
+            degradation = GetComponent<ObjectDegradation>();
+            CarryContainer = GetComponent<ObjectContainer>();
+            hovers = GetComponentsInChildren<ObjectHover>(true);
             // Contact effects invoke this only after committing geometry, never during ordinary following.
             CacheGeometry();
             if (!IsHeld || carryPlayer == null)
@@ -363,6 +421,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!pickupCompleted && pickupSource != null)
                 sourceCollisions.Ignore(colliders, pickupSource);
             motion.Bind(body, colliders, carryPlayer, false);
+            body.detectCollisions = settings.WorldCollisions;
+            SetHoverSuppression(!settings.ShowHover);
         }
 
         /// <summary>Applies pickup easing and constrained motion on the same frame as the camera.</summary>
@@ -371,14 +431,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Queries constrain the kinematic pose before committing it; release restores dynamic simulation.
             float progress = pickupDuration <= 0f ? 1f : Mathf.SmoothStep(0f, 1f, (Time.time - started) / pickupDuration);
             Vector3 position = Vector3.Lerp(startPosition, CarryPosition(), progress);
-            Quaternion rotation = Quaternion.Slerp(startRotation, carryFrame.rotation * Quaternion.Euler(settings.Rotation), progress);
+            Quaternion rotation = Quaternion.Slerp(startRotation, CarryRotation(), progress);
             Pose pose = new Pose(position, rotation);
+            ScoopRun movement = scoop;
+            if (movement != null)
+                pose = movement.Target(out Pose requested) ? requested : new Pose(body.position, body.rotation);
             if (settings.WorldCollisions)
                 pose = motion.Resolve(pose, settings, Time.deltaTime, firstFollow && pickupDuration <= 0f);
             body.position = pose.position;
             body.rotation = pose.rotation;
             // Rigidbody setters update the physics pose first; commit the visible Transform in this same render frame.
             transform.SetPositionAndRotation(pose.position, pose.rotation);
+            movement?.Reached(pose);
             firstFollow = false;
             if (!pickupCompleted && progress >= 1f)
             {
@@ -402,7 +466,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             collisions.Maintain();
             sourceCollisions.Maintain();
             float elapsed = Time.time - started;
-            Pose target = new Pose(CarryPosition(), carryFrame.rotation * Quaternion.Euler(settings.Rotation));
+            Pose target = new Pose(CarryPosition(), CarryRotation());
             // Do not complete based on the animation clock while a wall still blocks the actual body.
             if (elapsed >= pickupDuration && (body.position - target.position).sqrMagnitude <= 0.0004f
                 && Quaternion.Angle(body.rotation, target.rotation) <= 2f)
@@ -435,6 +499,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Cancellation preserves the pre-grab kinematic policy rather than inventing a release profile.
             if (!IsHeld)
                 return;
+            scoop?.Cancel();
+            customCarry = false;
             IsHeld = false;
             physical.Stop();
             // Early release inside the dispenser restores contact only after safe separation.
@@ -457,6 +523,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Drop starts from rest; Throw adds its deliberate launch after this common transition.
             if (!IsHeld || body == null)
                 return;
+            scoop?.Cancel();
+            customCarry = false;
             RequiresAssemblyPlacement = false;
             ReleaseRevision++;
             IsHeld = false;

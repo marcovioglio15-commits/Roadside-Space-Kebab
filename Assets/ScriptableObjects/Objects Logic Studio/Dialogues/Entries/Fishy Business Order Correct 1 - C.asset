@@ -13,14 +13,6 @@ MonoBehaviour:
   m_Name: Fishy Business Order Correct 1 - C
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Fishy Business Order Correct 1 - C
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Pizza Kebab
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Fishy Business
     Text: 'Congratulations PAL, you just cost me 15 TRILLION dollars!

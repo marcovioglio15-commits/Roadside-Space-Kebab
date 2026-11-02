@@ -54,11 +54,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 LocalInteractionReference source = CompletionSources[index];
                 if (source == null || !source.IsValid || owner != null && source.Resolve(owner) == null)
                     return false;
+                if (owner != null && !source.Step.TryValidate(source.Resolve(owner), out warning))
+                    return false;
                 for (int previous = 0; previous < index; previous++)
                     if (CompletionSources[previous].Kind == source.Kind && CompletionSources[previous].Name == source.Name
-                        && CompletionSources[previous].Occurrence == source.Occurrence)
+                        && CompletionSources[previous].Occurrence == source.Occurrence
+                        && CompletionSources[previous].Step.Block == source.Step.Block && CompletionSources[previous].Step.Entry == source.Step.Entry)
                     {
-                        warning = "Select each price completion interaction only once.";
+                        warning = "Select each price completion step only once.";
                         return false;
                     }
             }

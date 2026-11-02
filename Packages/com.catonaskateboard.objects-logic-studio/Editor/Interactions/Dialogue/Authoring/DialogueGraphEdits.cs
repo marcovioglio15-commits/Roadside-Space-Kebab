@@ -1,4 +1,3 @@
-#if OBJECTS_LOGIC_STUDIO_DIALOGUE_GRAPH
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -6,94 +5,87 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Groups structural graph changes into native Undo operations without modifying shared entries.</summary>
+    /// <summary>Applies explicit tree edits with stable keys and native Undo.</summary>
     internal static class DialogueGraphEdits
     {
         #region Methods
+
         #region Mutation
-        /// <summary>Adds a newly identified operation at the requested canvas point.</summary>
-        /// <param name="tree">Detached graph proposal.</param>
-        /// <param name="kind">Operation to create.</param>
-        /// <param name="position">Unscaled graph coordinate.</param>
-        /// <returns>The new node for selection.</returns>
-        internal static DialogueNode Add(DialogueTree tree, DialogueNodeKind kind, Vector2 position)
+
+        /// <summary>Creates a minimal Start block and explicit End block for a new sheet.</summary>
+        /// <param name="tree">New unsaved tree.</param>
+        internal static void Initialize(DialogueTree tree)
         {
-            Undo.RecordObject(tree, "Add Dialogue Node");
-            DialogueNode node = new DialogueNode { Id = Guid.NewGuid().ToString("N"), Name = kind.ToString(), Kind = kind, Position = position };
-            ArrayUtility.Add(ref tree.Nodes, node);
-            if (tree.Nodes.Length == 1)
-                tree.Start = node.Id;
-            EditorUtility.SetDirty(tree);
-            return node;
+            DialogueNode start = new DialogueNode { Id = Guid.NewGuid().ToString("N"), Name = "Dialogue" };
+            DialogueNode end = new DialogueNode { Id = Guid.NewGuid().ToString("N"), Name = "End", End = true };
+            tree.Nodes = new[] { start, end };
+            tree.Start = start.Id;
         }
 
-        /// <summary>Duplicates node configuration while keeping entry and subtree references shared.</summary>
-        /// <param name="tree">Detached graph receiving the duplicate.</param>
-        /// <param name="node">Node to duplicate.</param>
-        /// <returns>The independent node with a new key.</returns>
-        internal static DialogueNode Duplicate(DialogueTree tree, DialogueNode node)
+        /// <summary>Adds one block without disturbing existing links or selection history.</summary>
+        /// <param name="tree">Detached sheet.</param>
+        /// <param name="position">Optional pointer position in canvas coordinates.</param>
+        /// <returns>The newly added block.</returns>
+        internal static DialogueNode Add(DialogueTree tree, Vector2? position = null)
         {
-            Undo.RecordObject(tree, "Duplicate Dialogue Node");
-            DialogueNode copy = ObjectWorkspace.Copy(node);
-            copy.Id = Guid.NewGuid().ToString("N");
-            copy.Position += new Vector2(35f, 45f);
-            copy.Name += " Copy";
-            ArrayUtility.Add(ref tree.Nodes, copy);
-            EditorUtility.SetDirty(tree);
-            return copy;
-        }
-
-        /// <summary>Removes one node and clears its incoming links without deleting referenced assets.</summary>
-        /// <param name="tree">Detached graph proposal.</param>
-        /// <param name="node">Node selected for removal.</param>
-        internal static void Remove(DialogueTree tree, DialogueNode node)
-        {
-            Undo.RecordObject(tree, "Remove Dialogue Node");
-            List<DialogueNode> nodes = new List<DialogueNode>(tree.Nodes);
-            nodes.Remove(node);
-            foreach (DialogueNode other in nodes)
+            Undo.RecordObject(tree, "Add dialogue block");
+            DialogueNode block = new DialogueNode { Id = Guid.NewGuid().ToString("N"), Name = "New Block" };
+            if (position.HasValue)
             {
-                if (other.Next == node.Id)
-                    other.Next = string.Empty;
-                if (other.Otherwise == node.Id)
-                    other.Otherwise = string.Empty;
-                foreach (DialogueBranch branch in other.Branches)
-                    if (branch.Target == node.Id)
-                        branch.Target = string.Empty;
+                block.Position = position.Value;
+                block.HasPosition = true;
             }
+            List<DialogueNode> nodes = new List<DialogueNode>(tree.Nodes) { block };
             tree.Nodes = nodes.ToArray();
-            if (tree.Start == node.Id)
-                tree.Start = string.Empty;
+            EditorUtility.SetDirty(tree);
+            return block;
+        }
+
+        /// <summary>Adds an entry directly beneath its containing block.</summary>
+        /// <param name="tree">Detached sheet.</param>
+        /// <param name="block">Block receiving the row.</param>
+        /// <returns>The new row ready for asset and trigger selection.</returns>
+        internal static DialogueRow AddEntry(DialogueTree tree, DialogueNode block)
+        {
+            Undo.RecordObject(tree, "Add dialogue entry");
+            DialogueNode end = Array.Find(tree.Nodes, candidate => candidate.End);
+            DialogueRow row = new DialogueRow { Id = Guid.NewGuid().ToString("N"), Name = "New Entry", Next = end?.Id ?? string.Empty };
+            List<DialogueRow> entries = new List<DialogueRow>(block.Entries) { row };
+            block.Entries = entries.ToArray();
+            EditorUtility.SetDirty(tree);
+            return row;
+        }
+
+        /// <summary>Connects a row by internal keys, keeping displayed names freely editable.</summary>
+        /// <param name="tree">Detached sheet.</param>
+        /// <param name="row">Source entry.</param>
+        /// <param name="destination">Target block key.</param>
+        internal static void Connect(DialogueTree tree, DialogueRow row, string destination)
+        {
+            Undo.RecordObject(tree, "Connect dialogue entry");
+            row.Next = destination;
             EditorUtility.SetDirty(tree);
         }
 
-        /// <summary>Commits one output connection after its destination is selected.</summary>
-        /// <param name="tree">Detached graph proposal.</param>
-        /// <param name="node">Source node.</param>
-        /// <param name="port">Minus one for Next, minus two for Otherwise, or a branch index.</param>
-        /// <param name="target">Destination key, or empty to disconnect.</param>
-        internal static void Connect(DialogueTree tree, DialogueNode node, int port, string target)
+        /// <summary>Removes the selected row or block while preserving dangling links for explicit correction.</summary>
+        /// <param name="tree">Detached sheet.</param>
+        /// <param name="blockId">Selected block key.</param>
+        /// <param name="rowId">Optional selected row key.</param>
+        internal static void Remove(DialogueTree tree, string blockId, string rowId)
         {
-            // Undo may remove a source or branch while a connection menu is still open.
-            if (node == null || port < -2 || port >= node.Branches.Length)
+            DialogueNode block = Array.Find(tree.Nodes, candidate => candidate.Id == blockId);
+            if (block == null)
                 return;
-            Undo.RecordObject(tree, "Connect Dialogue Nodes");
-            switch (port)
-            {
-                case -1:
-                    node.Next = target;
-                    break;
-                case -2:
-                    node.Otherwise = target;
-                    break;
-                default:
-                    node.Branches[port].Target = target;
-                    break;
-            }
+            Undo.RecordObject(tree, "Remove dialogue selection");
+            if (!string.IsNullOrEmpty(rowId))
+                block.Entries = Array.FindAll(block.Entries, row => row.Id != rowId);
+            else
+                tree.Nodes = Array.FindAll(tree.Nodes, node => node != block);
             EditorUtility.SetDirty(tree);
         }
+
         #endregion
+
         #endregion
     }
 }
-#endif

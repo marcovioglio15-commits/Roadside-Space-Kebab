@@ -397,6 +397,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || !ContactEffectRun.TryPrepare(Item, settings.Self, out selfEffect, out warning)
                 || !ContactEffectRun.TryPrepare(candidate, settings.Other, out otherEffect, out warning))
             {
+                selfEffect?.Cancel();
+                otherEffect?.Cancel();
                 Item.Release(this);
                 candidate.Release(this);
                 Report(warning);

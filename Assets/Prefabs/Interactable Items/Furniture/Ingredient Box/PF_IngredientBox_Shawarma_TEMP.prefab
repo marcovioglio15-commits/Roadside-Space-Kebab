@@ -377,7 +377,7 @@ MonoBehaviour:
     Unlimited: 0
     Capacity: 10
     LimitToDispenserSpace: 1
-    RefillDispenser: 1
+    Mode: 1
     KeepVisible: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}

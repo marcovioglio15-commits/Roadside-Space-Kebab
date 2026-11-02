@@ -22,6 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool performed;
         private ObjectSpraySauce spraying;
         private ObjectDispenser dispensing;
+        private ObjectContainer scoopReceiver;
         private float nextDispense;
         private readonly AssemblyChargeRun assembly = new AssemblyChargeRun();
         private readonly AssemblyIngredientRetrieval retrieval = new AssemblyIngredientRetrieval();
@@ -71,6 +72,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 spraying.StopEmission();
             spraying = null;
             dispensing = null;
+            scoopReceiver = null;
             // Context loss cannot strand a body in its held physics state.
             if (held != null)
                 held.Cancel();
@@ -256,8 +258,37 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool Execute(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed = DialogueActionPriority.All)
         {
             // Filtering changes eligibility, never the established command, slice and carry precedence.
-            return Command(observer, requested, allowed) || Slice(observer, requested, allowed)
+            return Scoop(observer, requested, allowed) || Command(observer, requested, allowed) || Slice(observer, requested, allowed)
                 || (held != null ? Release(observer, requested, allowed) : Grab(observer, requested, allowed));
+        }
+
+        /// <summary>Lets a compatible held container claim the dispenser press before release or physical output.</summary>
+        /// <param name="observer">Current targeting context.</param>
+        /// <param name="requested">Optional dialogue-owned button.</param>
+        /// <param name="allowed">Interaction families eligible for this press.</param>
+        /// <returns>True when a compatible scoop target owns the press, including a full or busy receiver.</returns>
+        private bool Scoop(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed)
+        {
+            ObjectContainer receiver = held != null ? held.CarryContainer : null;
+            if (receiver == null || !receiver.isActiveAndEnabled || !receiver.Settings.ScoopFromDispenser)
+                return false;
+            ObjectDispenser selected = null;
+            float distance = float.PositiveInfinity;
+            foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
+                if (Pending(pair, requested, allowed) && pair.Key is ObjectDispenser source && source.gameObject != receiver.gameObject
+                    && source.RequestToolAllowed && !source.IsLocked && source.MatchesScoop(receiver)
+                    && Eligible(observer, source, out float score) && Nearer(source, selected, score, distance))
+                {
+                    selected = source;
+                    distance = score;
+                }
+            if (selected == null)
+                return false;
+            receiver.TryScoop(selected, held);
+            scoopReceiver = selected.Settings.Mode == DispenseMode.ContinuousOutput ? receiver : null;
+            dispensing = scoopReceiver != null ? selected : null;
+            nextDispense = Time.time + selected.Settings.Interval;
+            return true;
         }
 
         /// <summary>Shares pending-press and priority filtering across each input dispatch family.</summary>
@@ -415,17 +446,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (InteractionProjectileInput.Active || dispensing == null)
                 return;
             // A fresh press returns to selection even when release occurred between observer passes.
-            if (!input.Usable || Time.timeScale <= 0f || dispensing.Settings.Mode != DispenseMode.ContinuousOutput || !dispensing.CanTake()
+            if (!input.Usable || Time.timeScale <= 0f || dispensing.Settings.Mode != DispenseMode.ContinuousOutput
                 || !bindings.TryGetValue(dispensing, out InteractionButton button) || !button.Held || button.Pending
                 || consumed != null && input.Find(consumed) == button || !Eligible(observer, dispensing, out _))
             {
                 dispensing = null;
+                scoopReceiver = null;
                 return;
             }
+            if (scoopReceiver != null && scoopReceiver.IsScooping)
+                return;
             // At most one output per observation pass keeps long frames from allocating a burst of missed intervals.
             if (performed || Time.time < nextDispense)
                 return;
-            performed = dispensing.TryTake(observer, out _);
+            performed = scoopReceiver != null ? held != null && held.CarryContainer == scoopReceiver && scoopReceiver.TryScoop(dispensing, held)
+                : dispensing.TryTake(observer, out _);
             nextDispense = Time.time + dispensing.Settings.Interval;
             if (!performed)
                 dispensing = null;

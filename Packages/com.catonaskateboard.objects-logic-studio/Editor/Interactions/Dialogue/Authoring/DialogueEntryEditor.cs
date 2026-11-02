@@ -4,61 +4,45 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Keeps shared dialogue content inside an independent editing session.</summary>
+    /// <summary>Edits only speaker and text pages; event conditions belong to trigger presets.</summary>
     [CustomEditor(typeof(DialogueEntry))]
     internal sealed class DialogueEntryEditor : UnityEditor.Editor
     {
         #region Methods
-        #region Controls
 
-        /// <summary>Opens saved assets in their dedicated window instead of editing them implicitly.</summary>
+        #region Drawing
+
+        /// <summary>Opens saved assets or draws their detached page proposal.</summary>
         public override void OnInspectorGUI()
         {
             if (EditorUtility.IsPersistent(target))
             {
-                if (StudioButton.Draw(new GUIContent("Edit Dialogue Entry", "Open this shared preset in an independent Apply/Discard session.")))
+                if (StudioButton.Draw(new GUIContent("Open Entry", "Edit these pages in an independent Apply/Discard window.")))
                     DialogueEntryWindow.Open((DialogueEntry)target);
                 return;
             }
-            Draw(null, true, true);
-        }
-
-        /// <summary>Draws the detached entry using the requesting interaction's meaningful settings.</summary>
-        /// <param name="catalog">Catalog supplying named order choices, or null for consumed flags.</param>
-        /// <param name="consumption">Whether consumption filters are relevant in this context.</param>
-        /// <param name="weighted">Whether relative selection weight is relevant.</param>
-        /// <param name="context">Optional union of default and spawn-specific catalogs.</param>
-        internal void Draw(OrderCatalog catalog, bool consumption, bool weighted, OrderSettings context = null)
-        {
-            using ObjectStudioFieldLayout layout = new ObjectStudioFieldLayout(205f);
             serializedObject.Update();
             StudioFieldGUI.PropertyField(serializedObject.FindProperty("Name"));
-            if (weighted)
-                StudioFieldGUI.PropertyField(serializedObject.FindProperty("Weight"));
-            if (consumption)
-                DialogueConsumptionControls.Draw(serializedObject.FindProperty("Consumption"), "Filter Entry", catalog, context);
+            DialogueTextControls.Draw(serializedObject.FindProperty("TextEffects"), ((DialogueEntry)target).Lines);
             SerializedProperty pages = serializedObject.FindProperty("Lines");
-            pages.isExpanded = StudioArrayGUI.Foldout(pages, new GUIContent("Pages", pages.tooltip));
-            if (pages.isExpanded)
+            for (int index = 0; index < pages.arraySize; index++)
             {
+                if (StudioArrayGUI.Header(pages, index, new GUIContent("Page " + (index + 1), pages.tooltip)))
+                    break;
+                SerializedProperty page = pages.GetArrayElementAtIndex(index);
+                if (!page.isExpanded)
+                    continue;
                 using StudioIndentScope indent = new StudioIndentScope();
-                for (int index = 0; index < pages.arraySize; index++)
-                {
-                    if (StudioArrayGUI.Header(pages, index, new GUIContent("Page " + (index + 1), "Speaker and complete page text.")))
-                        break;
-                    SerializedProperty page = pages.GetArrayElementAtIndex(index);
-                    if (!page.isExpanded)
-                        continue;
-                    using StudioIndentScope pageContent = new StudioIndentScope();
-                    HoverControls.Field(page, "Speaker");
-                    HoverControls.Field(page, "Text");
-                }
-                StudioArrayGUI.Add(pages, "Add Page", () => new DialogueLine());
+                HoverControls.Field(page, "Speaker");
+                HoverControls.Field(page, "Text");
+                DialogueTextControls.Tokens(page.FindPropertyRelative("Text"));
             }
+            StudioArrayGUI.Add(pages, "Add Page", () => new DialogueLine());
             serializedObject.ApplyModifiedProperties();
         }
 
         #endregion
+
         #endregion
     }
 }

@@ -91,6 +91,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Validates once and schedules the first pulse when activated.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             if (!Application.isPlaying)
                 return;
             ready = TryValidate(out string warning);
@@ -106,6 +108,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores all owned bodies when disabled, destroyed or stored.</summary>
         protected override void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             Restore(false);
             ready = false;
             base.OnDisable();

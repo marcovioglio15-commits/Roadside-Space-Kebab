@@ -1,4 +1,5 @@
 using System.Globalization;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +7,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Displays released session earnings on an existing green HUD text without creating UI during gameplay.</summary>
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(Text))]
     public sealed class CollectedPriceHud : MonoBehaviour
     {
         #region Fields
@@ -15,6 +15,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Existing Text displaying the released total followed by a dollar sign. Runtime updates retain the authored layout and font.")]
         [SerializeField]
         private Text text;
+
+        [Tooltip("Optional existing TMP mesh text or world-space Canvas text showing the same released balance.")]
+        [SerializeField]
+        private TMP_Text spatialText;
+
+        [Tooltip("Color used for the released balance. Font and layout remain on the selected text.")]
+        [SerializeField]
+        private Color color = Color.green;
 
         #endregion
 
@@ -50,7 +58,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Initialize()
         {
             // The required Text already exists; resolve it once if a manually added component has no explicit binding.
-            if (text == null)
+            if (text == null && spatialText == null)
                 text = GetComponent<Text>();
             CollectedPrice.Changed -= Refresh;
             CollectedPrice.Changed += Refresh;
@@ -64,10 +72,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Changes text only on activation or when a completed collection batch becomes visible.</summary>
         private void Refresh()
         {
-            if (text == null)
-                return;
-            text.color = Color.green;
-            text.text = CollectedPrice.DisplayedTotal.ToString("0.##", CultureInfo.InvariantCulture) + "$";
+            // Pending receipts remain hidden until their collector releases them.
+            CounterText.Write(text, spatialText, CollectedPrice.DisplayedTotal.ToString("0.##", CultureInfo.InvariantCulture) + "$", color);
         }
 
         #endregion

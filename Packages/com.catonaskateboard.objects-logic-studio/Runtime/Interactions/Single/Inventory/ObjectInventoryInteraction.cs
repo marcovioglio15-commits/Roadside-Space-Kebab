@@ -23,6 +23,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Finds the optional counterpart once and prepares initial fill geometry.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Storage and supply never discover each other in the per-frame input loop.
             Container = GetComponent<ObjectContainer>();
             Dispenser = GetComponent<ObjectDispenser>();
@@ -66,6 +68,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Appearance
 
+        /// <summary>Rebinds thresholds after a committed runtime edit while retaining inventory counts.</summary>
+        internal void RefreshRuntimeFill()
+        {
+            ObjectInventoryInteraction owner = Container != null ? Container : this;
+            owner.fill?.Restore();
+            owner.fill = null;
+            owner.fillChecked = false;
+            RefreshFill();
+        }
+
         /// <summary>Refreshes both fill layers after an atomic stock change, with Dispenser taking precedence on shared targets.</summary>
         internal void RefreshFill()
         {
@@ -79,7 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     Debug.LogWarning(warning, this);
             }
             owner.fill?.Update(Container != null ? Container.Settings.RefillDispenser && Dispenser != null
-                ? Dispenser.RemainingCount : Container.StoredCount : -1, Dispenser != null ? Dispenser.StepCount : -1);
+                ? Dispenser.RemainingCount : Container.FillCount : -1, Dispenser != null ? Dispenser.StepCount : -1);
         }
 
         #endregion

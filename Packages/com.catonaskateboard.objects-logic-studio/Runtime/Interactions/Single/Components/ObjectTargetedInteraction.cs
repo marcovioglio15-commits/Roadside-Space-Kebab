@@ -22,6 +22,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Caches authored target geometry before registering its input.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Inventory children stay collision-free and never become selectable storage targets.
             Colliders = GetComponentsInChildren<Collider>(true);
             base.OnEnable();

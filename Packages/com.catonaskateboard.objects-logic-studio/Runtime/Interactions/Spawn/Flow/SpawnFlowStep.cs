@@ -20,6 +20,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public GameObject Prefab;
         [Tooltip("Interactions on this prefab that can complete the visit. A dialogue counts only after its final page; interruption does not count.")]
         public ObjectInteraction[] Completions = Array.Empty<ObjectInteraction>();
+        [Tooltip("Optional entry checkpoint for each selected completion source. Empty entries wait for the whole interaction.")]
+        [HideInInspector]
+        public DialogueStepReference[] CompletionSteps = Array.Empty<DialogueStepReference>();
         [Tooltip("Wait for every selected interaction to complete. Disable to depart after any one completes.")]
         public bool RequireAll = true;
         [Tooltip("Request a separate dialogue after arrival, without a start action, distance or sight requirement.")]
@@ -63,6 +66,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 ObjectInteraction completion = Completions[index];
                 if (completion == null || !completion.enabled || !completion.transform.IsChildOf(Prefab.transform)
                     || completion is ObjectSpawnManager || Array.IndexOf(Completions, completion) != index)
+                    return false;
+                if (CompletionSteps != null && index < CompletionSteps.Length && CompletionSteps[index] != null
+                    && !CompletionSteps[index].TryValidate(completion, out warning))
                     return false;
                 for (Transform branch = completion.transform; branch != null; branch = branch.parent)
                     if (!branch.gameObject.activeSelf)

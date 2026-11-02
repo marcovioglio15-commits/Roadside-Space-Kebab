@@ -1,55 +1,77 @@
-#if OBJECTS_LOGIC_STUDIO_DIALOGUE_GRAPH
+using System;
 using UnityEditor;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Owns one graph proposal with independent Apply/Discard and context-aware entry editing.</summary>
+    /// <summary>Owns a complete tree proposal with independent shared-preset transactions.</summary>
     public sealed class DialogueTreeWindow : StudioAssetWindow
     {
-        #region Fields
-        [Header("Authoring Context")]
-        [Tooltip("Optional consuming object's order catalogs, copied for authoring only.")]
+        #region Serialized Fields
+
+        [Header("Context")]
+        [Tooltip("Optional destination order settings used only by the tree editor.")]
         [SerializeReference]
         private OrderSettings orders;
+
         #endregion
+
+        #region State
+
+        private DialogueTreeEditor treeEditor;
+
+        #endregion
+
         #region Properties
-        /// <summary>Shared graph asset accepted by this window.</summary>
-        protected override System.Type AssetType => typeof(DialogueTree);
-        /// <summary>Canvas and inspector have independent navigation inside a fixed viewport.</summary>
+
+        protected override Type AssetType => typeof(DialogueTree);
         protected override bool ScrollInspector => false;
+
         #endregion
+
         #region Methods
+
         #region Window
-        /// <summary>Opens a tree without applying the parent's pending interaction changes.</summary>
-        /// <param name="tree">Shared graph to edit.</param>
-        /// <param name="context">Optional order catalogs from the selected object.</param>
+
+        /// <summary>Opens the sheet without applying changes in the parent interaction.</summary>
+        /// <param name="tree">Complete tree preset.</param>
+        /// <param name="context">Optional order choices for this destination.</param>
         public static void Open(DialogueTree tree, OrderSettings context = null)
         {
             DialogueTreeWindow window = GetWindow<DialogueTreeWindow>("Dialogue Tree");
             if (!window.hasUnsavedChanges)
                 window.orders = context != null ? ObjectWorkspace.Copy(context) : null;
             window.Select(tree);
-            window.minSize = new Vector2(950f, 650f);
+            window.minSize = new Vector2(940f, 680f);
         }
 
-        /// <summary>Gives the graph a fixed viewport above the shared Apply/Discard footer.</summary>
-        /// <param name="editor">Cached editor for the detached graph.</param>
+        /// <summary>Gives the main and preview trees their own clipped navigation areas.</summary>
+        /// <param name="editor">Cached editor for the detached sheet.</param>
         protected override void DrawInspector(UnityEditor.Editor editor)
         {
-            ((DialogueTreeEditor)editor).Draw(Mathf.Max(480f, position.height - 98f), orders);
+            treeEditor = (DialogueTreeEditor)editor;
+            treeEditor.Draw(Mathf.Max(470f, position.height - 100f), orders);
         }
 
-        /// <summary>Rejects broken links, cycles and unresolved graph data before saving.</summary>
+        /// <summary>Shares transaction conflicts with the canvas's bottom-left yellow warning.</summary>
+        /// <param name="message">Current Apply, recovery or outside-edit issue.</param>
+        protected override void DrawWarning(string message)
+        {
+            if (treeEditor != null && treeEditor.SetExternalWarning(message))
+                Repaint();
+        }
+
+        /// <summary>Rejects incomplete entries or connections without changing their values.</summary>
         /// <param name="proposal">Detached tree.</param>
-        /// <param name="issue">Receives an invalid operation or dependency.</param>
-        /// <returns>True when the graph can replace its shared source.</returns>
+        /// <param name="issue">Receives the first graph problem.</param>
+        /// <returns>True when the complete sheet can be saved.</returns>
         protected override bool Validate(ScriptableObject proposal, out string issue)
         {
             return ((DialogueTree)proposal).TryValidate(out issue, orders);
         }
+
         #endregion
+
         #endregion
     }
 }
-#endif

@@ -13,15 +13,19 @@ MonoBehaviour:
   m_Name: Fishy Business Order Correct 2 - D
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Fishy Business Order Correct 2 - D
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Pizza Margherita
-    - Beer
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Fishy Business
     Text: "Don\u2019t expect a tip from me ahhahahahahhahahahahahahhahahahahahahhahahahhahahahahahahhahahahahhahaha.\n"
+  TextEffects:
+    Typewriter: 1
+    LettersPerSecond: 35
+    PunctuationPause: 0.12
+    Slam: 1
+    SlamScale: 2.5
+    SlamHeight: 0.75
+    SlamDuration: 0.15
+    ShakeAmount: 0.07
+    ShakeRate: 20
+    WaveAmount: 0.1
+    WaveRate: 2
+    RainbowRate: 0.4

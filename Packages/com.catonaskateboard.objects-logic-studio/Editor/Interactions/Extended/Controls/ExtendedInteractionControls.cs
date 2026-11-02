@@ -245,6 +245,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ItemAppearanceControls.DrawList(effects.FindPropertyRelative("Meshes"), source, true);
             if (consumption || effects.FindPropertyRelative("Consume").boolValue)
                 Field(effects, "Consume");
+            if (!effects.FindPropertyRelative("Consume").boolValue)
+                InteractionChangeControls.Draw(effects.FindPropertyRelative("Interactions"), source);
         }
 
         /// <summary>Displays existing carry eligibility as an explicit exclusion without changing saved defaults.</summary>
@@ -271,52 +273,44 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained foldout visibility.</param>
         internal static void DrawDialogue(SerializedProperty settings, ObjectStudioSections sections)
         {
-            // Item-specific input and HUD bindings are drawn by the workspace.
-            if (sections.Draw("Dialogue Activation", "Choose trigger, range and arbitration priority.", settings, "Trigger", "Consumption", "Distance", "ExitDistance", "Priority", "PreferSingleActions", "PreferredActions"))
+            // The full sheet owns entry triggers; local fields control presentation and arbitration.
+            if (sections.Draw("Dialogue Tree", "Complete conversation sheet and spawn variants.", settings, "Tree", "UseSpawnTrees", "SpawnTrees"))
+                using (new StudioIndentScope())
+                    DialogueTreeControls.Draw(settings);
+            if (sections.Draw("Dialogue Range", "Default range and shared-input priority.", settings, "Distance", "ExitDistance", "Priority", "PreferSingleActions", "PreferredActions"))
                 using (new StudioIndentScope())
                 {
-                    Field(settings, "Trigger");
-                    if (settings.FindPropertyRelative("Trigger").enumValueIndex == (int)DialogueTrigger.Consumption)
-                        DialogueConsumptionControls.Draw(settings.FindPropertyRelative("Consumption"), "Filter Interaction");
-                    if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival)
-                    {
-                        Field(settings, "Distance");
-                        Field(settings, "ExitDistance");
-                    }
+                    Field(settings, "Distance");
+                    Field(settings, "ExitDistance");
                     Field(settings, "Priority");
                     Field(settings, "PreferSingleActions");
                     if (settings.FindPropertyRelative("PreferSingleActions").boolValue)
                         Field(settings, "PreferredActions");
                 }
-            if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival
-                && sections.Draw("Dialogue Visibility", "Use collider targeting under the centered player cursor for startup, advancement and hiding.", settings, "RequireSightToStart", "RequireSightToContinue", "HideWhenSightLost", "ObstacleMask"))
+            if (sections.Draw("Dialogue Cursor", "Free-cursor requirements for showing and advancing pages.", settings, "RequireSightToStart", "RequireSightToContinue", "HideWhenSightLost", "ObstacleMask"))
                 using (new StudioIndentScope())
                 {
                     Field(settings, "RequireSightToStart");
                     Field(settings, "RequireSightToContinue");
                     Field(settings, "HideWhenSightLost");
-                    if (settings.FindPropertyRelative("RequireSightToStart").boolValue
-                        || settings.FindPropertyRelative("RequireSightToContinue").boolValue
+                    if (settings.FindPropertyRelative("RequireSightToStart").boolValue || settings.FindPropertyRelative("RequireSightToContinue").boolValue
                         || settings.FindPropertyRelative("HideWhenSightLost").boolValue)
-                    {
                         Field(settings, "ObstacleMask");
-                    }
                 }
-            if (sections.Draw("Dialogue Flow", "Choose entry selection and what happens when the player returns.", settings, "Selection", "UseSpawnPresets", "SpawnPresets", "Interruption", "ReplayOnReturn", "ReplayOnInput"))
+            if (sections.Draw("Dialogue Replay", "Progress retained after interruption or completion.", settings, "Interruption", "ReplayOnReturn", "ReplayOnInput"))
                 using (new StudioIndentScope())
                 {
-                    Field(settings, "Selection");
-                    DialogueSpawnPresetControls.Draw(settings);
                     Field(settings, "Interruption");
-                    if (settings.FindPropertyRelative("Trigger").enumValueIndex == (int)DialogueTrigger.InputAction)
-                        Field(settings, "ReplayOnInput");
-                    if (settings.FindPropertyRelative("Trigger").enumValueIndex != (int)DialogueTrigger.SpawnArrival)
-                        Field(settings, "ReplayOnReturn");
+                    Field(settings, "ReplayOnReturn");
+                    Field(settings, "ReplayOnInput");
                 }
-            if (sections.Draw("Dialogue Entries", "Default shared entries used when no spawn preset overrides them.", settings, "Entries"))
+            if (sections.Draw("Dialogue Box", "Box transitions shared by every entry in this dialogue.", settings, "Box"))
                 using (new StudioIndentScope())
-                    DialogueEntryControls.DrawEntries(settings);
-            if (sections.Draw("Dialogue Audio", "Optional character phrases and final-page result sound.", settings, "Audio"))
+                {
+                    Field(settings.FindPropertyRelative("Box"), "FadeIn");
+                    Field(settings.FindPropertyRelative("Box"), "FadeOut");
+                }
+            if (sections.Draw("Dialogue Audio", "Optional voice and completion sound.", settings, "Audio"))
                 using (new StudioIndentScope())
                 {
                     SerializedProperty audio = settings.FindPropertyRelative("Audio");

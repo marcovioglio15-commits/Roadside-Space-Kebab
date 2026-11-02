@@ -13,17 +13,6 @@ MonoBehaviour:
   m_Name: Shadowblade Order Wrong 5 - A
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Shadowblade Order Wrong 5 - A
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Falafel Wrap
-    - Kebab Wrap
-    - Fried Crab Claws
-    - Pizza Rossa
-    RequireAll: 1
-    Result: 1
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: I knew you were a FAKER.

@@ -36,6 +36,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Caches owned geometry once when the volume becomes active.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             shapes = GetComponentsInChildren<Collider>(true);
             ready = TryValidate(out string warning);
             nextQuery = 0f;

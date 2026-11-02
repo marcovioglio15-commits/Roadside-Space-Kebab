@@ -33,7 +33,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 if (sources.GetArrayElementAtIndex(index).isExpanded)
                     using (new StudioIndentScope())
-                        LocalInteractionMenu.Draw(sources.GetArrayElementAtIndex(index), true);
+                        LocalInteractionMenu.Draw(sources.GetArrayElementAtIndex(index), true, true);
             }
             StudioArrayGUI.Add(sources, "Add Completion", () => new LocalInteractionReference());
         }

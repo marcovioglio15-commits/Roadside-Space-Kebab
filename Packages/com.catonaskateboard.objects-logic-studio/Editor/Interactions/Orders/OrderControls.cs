@@ -143,7 +143,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(selection));
             rect = EditorGUI.PrefixLabel(rect, new GUIContent("After Completion", "Reveal the drawn orders after this local interaction completes."));
             using EditorGUI.DisabledScope unavailable = new EditorGUI.DisabledScope(owner == null);
-            if (!GUI.Button(rect, label, EditorStyles.popup))
+            bool open = GUI.Button(rect, label, EditorStyles.popup);
+            DialogueStepControls.Draw(settings.FindPropertyRelative("CompletionStep"), current);
+            if (!open)
                 return;
             // Only build the candidate list when its menu is opened.
             UnityEngine.Object target = selection.serializedObject.targetObject;

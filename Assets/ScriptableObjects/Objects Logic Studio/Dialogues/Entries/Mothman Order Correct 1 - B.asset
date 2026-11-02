@@ -13,15 +13,6 @@ MonoBehaviour:
   m_Name: Mothman Order Correct 1 - B
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Mothman Order Correct 1 - B
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Nuggets
-    - Water
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Mothman
     Text: 'Beautiful. Really.

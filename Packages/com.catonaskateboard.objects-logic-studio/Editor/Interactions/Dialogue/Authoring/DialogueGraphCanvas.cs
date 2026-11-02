@@ -1,354 +1,425 @@
-#if OBJECTS_LOGIC_STUDIO_DIALOGUE_GRAPH
 using System;
 using UnityEditor;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Draws and edits a bounded graph canvas with native Undo, links, pan and zoom.</summary>
-    [Serializable]
+    /// <summary>Draws indented entry cards and directed links using the main tool's pan and zoom model.</summary>
     internal sealed class DialogueGraphCanvas
     {
-        #region Fields
-        [Header("View")]
-        [Tooltip("Selected node key retained independently of its title.")]
-        public string Selected = string.Empty;
-        [Tooltip("Canvas pan in screen pixels.")]
-        public Vector2 Pan = new Vector2(30f, 30f);
-        [Tooltip("Canvas scale used only by the editor viewport.")]
-        public float Zoom = 0.8f;
-        private string moving;
-        private string linking;
-        private int port;
-        private bool panning;
-        private int dragGroup;
-        private const float Width = 210f;
-        private const float Height = 112f;
+        #region State
+
+        private readonly ObjectSettingsTreeViewport viewport = new ObjectSettingsTreeViewport();
+        private readonly DialogueGraphLayout layout = new DialogueGraphLayout();
+        private string linking = string.Empty;
+        private bool draggingLink;
+        private bool framed;
+        private DialogueNode dragged;
+        private bool draggingStart;
+        private Vector2 dragOrigin;
+        private Vector2 pointerOrigin;
+        private bool moved;
+        private Rect inputBounds;
+        private GUIStyle titleStyle;
+        private GUIStyle captionStyle;
+        private float styleZoom = -1f;
+        private bool darkSkin;
+        internal string Selected = string.Empty;
+        internal string SelectedRow = string.Empty;
+
         #endregion
+
         #region Methods
-        #region View
-        /// <summary>Draws links behind stable-size nodes and processes only viewport-local pointer events.</summary>
-        /// <param name="rect">Available editor viewport.</param>
-        /// <param name="tree">Detached graph proposal.</param>
-        /// <param name="active">Optional active preview node in this tree.</param>
-        /// <param name="repaint">Requests another frame after navigation or editing.</param>
-        /// <param name="changed">Invalidates simulations after a graph edit.</param>
-        internal void Draw(Rect rect, DialogueTree tree, string active, Action repaint, Action changed)
+
+        #region Navigation
+
+        /// <summary>Fits this view without changing the other main or preview canvas.</summary>
+        /// <param name="tree">Current sheet.</param>
+        /// <param name="size">Available viewport size.</param>
+        internal void Frame(DialogueTree tree, Vector2 size)
         {
-            EditorGUI.DrawRect(rect, new Color(0.12f, 0.125f, 0.13f));
-            GUI.BeginGroup(rect);
-            Rect local = new Rect(Vector2.zero, rect.size);
-            Grid(local);
-            // Draw connections first so node labels stay readable above crossing wires.
-            foreach (DialogueNode node in tree.Nodes)
+            layout.Build(tree);
+            viewport.Fit(layout.Bounds.size + Vector2.one * 32f, size);
+            viewport.Offset -= (layout.Bounds.min - Vector2.one * 16f) * viewport.Zoom;
+            framed = true;
+        }
+
+        /// <summary>Draws the same ordered tree in editable and preview views.</summary>
+        /// <param name="area">Clipped viewport in window coordinates.</param>
+        /// <param name="tree">Current detached sheet.</param>
+        /// <param name="active">Optional block highlighted by playback.</param>
+        /// <param name="changed">Callback invalidating selection and preview data.</param>
+        /// <param name="repaint">Window repaint request.</param>
+        /// <param name="readOnly">Whether connection and entry edits are disabled.</param>
+        internal void Draw(Rect area, DialogueTree tree, string active, Action changed, Action repaint, bool readOnly = false)
+        {
+            layout.Build(tree);
+            if (!framed && Event.current.type == EventType.Repaint)
+                Frame(tree, area.size);
+            PrepareStyles();
+            EditorGUI.DrawRect(area, EditorGUIUtility.isProSkin ? new Color(0.12f, 0.12f, 0.12f) : new Color(0.78f, 0.78f, 0.78f));
+            GUI.BeginGroup(area);
+            inputBounds = new Rect(Vector2.zero, area.size);
+            HandleNavigation(area, repaint);
+            if (!readOnly && GUI.enabled)
             {
-                if (node.Kind is DialogueNodeKind.Entry or DialogueNodeKind.Wait or DialogueNodeKind.Subtree or DialogueNodeKind.Condition)
-                    Link(tree, node, node.Next, -1);
-                if (node.Kind is DialogueNodeKind.Condition or DialogueNodeKind.Select)
-                    Link(tree, node, node.Otherwise, -2);
-                if (node.Kind == DialogueNodeKind.Select)
-                    foreach (DialogueBranch branch in node.Branches)
-                        Link(tree, node, branch.Target, 0);
+                HandleConnection(tree, changed, repaint);
+                if (dragged != null || draggingStart || inputBounds.Contains(Event.current.mousePosition))
+                    HandleBlocks(tree, changed, repaint);
             }
-            foreach (DialogueNode node in tree.Nodes)
-                Node(node, tree.Start == node.Id, node.Id == active);
-            if (!string.IsNullOrEmpty(linking))
-            {
-                DialogueNode source = Array.Find(tree.Nodes, candidate => candidate.Id == linking);
-                if (source != null)
-                    Wire(Output(source, port), Event.current.mousePosition, Color.yellow);
-            }
-            Handle(local, tree, repaint, changed);
+            DrawConnections(tree);
+            // Block titles remain visually stronger than their inset child entries.
+            foreach (DialogueNode block in tree.Nodes)
+                if (block != null && layout.Blocks.TryGetValue(block.Id, out Rect rect))
+                    DrawBlock(tree, block, rect, active, changed, readOnly);
+            DrawStart(tree);
             GUI.EndGroup();
         }
 
-        /// <summary>Frames all nodes or the current selection without changing any authored coordinates.</summary>
-        /// <param name="tree">Graph to frame.</param>
-        /// <param name="size">Viewport dimensions.</param>
-        /// <param name="selection">Whether to focus only the selected node.</param>
-        internal void Frame(DialogueTree tree, Vector2 size, bool selection = false)
-        {
-            if (tree.Nodes.Length == 0)
-                return;
-            Vector2 minimum = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
-            Vector2 maximum = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
-            foreach (DialogueNode node in tree.Nodes)
-                if (!selection || node.Id == Selected)
-                {
-                    minimum = Vector2.Min(minimum, node.Position);
-                    maximum = Vector2.Max(maximum, node.Position + new Vector2(Width, Height));
-                }
-            if (!float.IsFinite(minimum.x))
-                return;
-            Zoom = Mathf.Clamp(Mathf.Min((size.x - 60f) / (maximum.x - minimum.x), (size.y - 60f) / (maximum.y - minimum.y)), 0.12f, 1.25f);
-            Pan = size * 0.5f - (minimum + maximum) * 0.5f * Zoom;
-        }
-
-        /// <summary>Offers supported node types at a chosen graph position.</summary>
-        /// <param name="tree">Proposal receiving the new node.</param>
-        /// <param name="point">Unscaled insertion position.</param>
-        /// <param name="repaint">Refresh after the menu action.</param>
-        internal void AddMenu(DialogueTree tree, Vector2 point, Action repaint)
-        {
-            GenericMenu menu = new GenericMenu();
-            foreach (DialogueNodeKind kind in Enum.GetValues(typeof(DialogueNodeKind)))
-                menu.AddItem(new GUIContent(kind.ToString()), false, () =>
-                {
-                    Selected = DialogueGraphEdits.Add(tree, kind, point).Id;
-                    repaint();
-                });
-            menu.ShowAsContext();
-        }
-        #endregion
-        #region Drawing
-        /// <summary>Draws a restrained coordinate grid independent of authored scene geometry.</summary>
-        /// <param name="rect">Viewport-local bounds.</param>
-        private void Grid(Rect rect)
-        {
-            float step = Mathf.Max(16f, 40f * Zoom);
-            Color color = new Color(1f, 1f, 1f, 0.035f);
-            for (float x = Pan.x % step; x < rect.width; x += step)
-                EditorGUI.DrawRect(new Rect(x, 0f, 1f, rect.height), color);
-            for (float y = Pan.y % step; y < rect.height; y += step)
-                EditorGUI.DrawRect(new Rect(0f, y, rect.width, 1f), color);
-        }
-
-        /// <summary>Draws a compact operation using clipped labels and distinct entry/exit handles.</summary>
-        /// <param name="node">Operation to display.</param>
-        /// <param name="start">Whether this is the tree's entry point.</param>
-        /// <param name="active">Whether the preview is executing this node.</param>
-        private void Node(DialogueNode node, bool start, bool active)
-        {
-            Rect rect = Bounds(node);
-            EditorGUI.DrawRect(new Rect(rect.x - 2f, rect.y - 2f, rect.width + 4f, rect.height + 4f),
-                active ? new Color(0.35f, 0.8f, 0.45f) : node.Id == Selected ? new Color(0.3f, 0.65f, 0.85f) : Color.black);
-            EditorGUI.DrawRect(rect, new Color(0.23f, 0.24f, 0.25f));
-            if (Zoom >= 0.45f)
-            {
-                GUI.Label(new Rect(rect.x + 9f, rect.y + 5f, rect.width - 18f, 20f),
-                    new GUIContent((start ? "> " : string.Empty) + node.Name, node.Name), EditorStyles.boldLabel);
-                string detail = node.Kind switch
-                {
-                    DialogueNodeKind.Entry => node.Entry != null ? node.Entry.Name : "No Entry",
-                    DialogueNodeKind.Select => node.Branches.Length + " branches / " + node.Selection,
-                    DialogueNodeKind.Subtree => node.Subtree != null ? node.Subtree.name : "No Subtree",
-                    DialogueNodeKind.Wait => node.Duration + " s",
-                    _ => node.Kind.ToString()
-                };
-                GUI.Label(new Rect(rect.x + 9f, rect.y + 25f, rect.width - 18f, 20f), new GUIContent(detail, detail), EditorStyles.miniLabel);
-            }
-            Port(new Vector2(rect.x, rect.center.y), "Connect an output to this input.");
-            if (node.Kind is DialogueNodeKind.Entry or DialogueNodeKind.Wait or DialogueNodeKind.Subtree or DialogueNodeKind.Condition)
-                Port(Output(node, -1), node.Kind == DialogueNodeKind.Condition ? "True" : "Next");
-            if (node.Kind is DialogueNodeKind.Select or DialogueNodeKind.Condition)
-                Port(Output(node, -2), node.Kind == DialogueNodeKind.Condition ? "False" : "Fallback");
-            if (node.Kind == DialogueNodeKind.Select)
-                Port(Output(node, 0), "Choose a branch to connect.");
-        }
-
-        /// <summary>Draws one tooltip-bearing connection handle.</summary>
-        /// <param name="point">Port centre.</param>
-        /// <param name="tooltip">Meaning of the port.</param>
-        private static void Port(Vector2 point, string tooltip)
-        {
-            Rect rect = new Rect(point.x - 5f, point.y - 5f, 10f, 10f);
-            EditorGUI.DrawRect(rect, new Color(0.75f, 0.8f, 0.84f));
-            GUI.Label(rect, new GUIContent(string.Empty, tooltip));
-        }
-
-        /// <summary>Draws a resolved connection while leaving missing outputs visible only as ports.</summary>
-        /// <param name="tree">Graph resolving the target key.</param>
-        /// <param name="source">Output owner.</param>
-        /// <param name="target">Destination key.</param>
-        /// <param name="output">Output slot.</param>
-        private void Link(DialogueTree tree, DialogueNode source, string target, int output)
-        {
-            DialogueNode destination = Array.Find(tree.Nodes, candidate => candidate.Id == target);
-            if (destination == null)
-                return;
-            Rect rect = Bounds(destination);
-            Wire(Output(source, output), new Vector2(rect.x, rect.center.y), new Color(0.48f, 0.62f, 0.7f));
-        }
-
-        /// <summary>Draws a flow wire without editing either endpoint.</summary>
-        /// <param name="start">Output centre.</param>
-        /// <param name="end">Input centre.</param>
-        /// <param name="color">Connection tint.</param>
-        private static void Wire(Vector2 start, Vector2 end, Color color)
-        {
-            Handles.DrawBezier(start, end, start + Vector2.right * 65f, end - Vector2.right * 65f, color, null, 2f);
-        }
-
-        /// <summary>Maps an operation to stable viewport bounds.</summary>
-        /// <param name="node">Authored node.</param>
-        /// <returns>Screen-space node rectangle.</returns>
-        private Rect Bounds(DialogueNode node) => new Rect(Pan + node.Position * Zoom, new Vector2(Width, Height) * Zoom);
-
-        /// <summary>Places compact branch/fallback ports without resizing Select nodes for large catalogs.</summary>
-        /// <param name="node">Output owner.</param>
-        /// <param name="output">Output slot.</param>
-        /// <returns>The port centre in viewport coordinates.</returns>
-        private Vector2 Output(DialogueNode node, int output)
-        {
-            Rect rect = Bounds(node);
-            return new Vector2(rect.xMax, rect.y + rect.height * (output == -2 ? 0.82f : 0.55f));
-        }
-        #endregion
-        #region Input
-        /// <summary>Handles graph navigation, node drag, output linking and contextual edits.</summary>
-        /// <param name="rect">Viewport-local hit region.</param>
-        /// <param name="tree">Detached graph proposal.</param>
-        /// <param name="repaint">Refresh callback.</param>
-        /// <param name="changed">Invalidates simulations after topology or position changes.</param>
-        private void Handle(Rect rect, DialogueTree tree, Action repaint, Action changed)
+        /// <summary>Zooms under the pointer and pans without moving or disordering blocks.</summary>
+        /// <param name="area">Canvas viewport.</param>
+        /// <param name="repaint">Window repaint callback.</param>
+        private void HandleNavigation(Rect area, Action repaint)
         {
             Event current = Event.current;
-            Vector2 mouse = current.mousePosition;
-            if (current.type == EventType.MouseUp)
-            {
-                if (!string.IsNullOrEmpty(moving))
-                    Undo.CollapseUndoOperations(dragGroup);
-                moving = null;
-                panning = false;
-            }
-            if (current.type == EventType.KeyDown && current.keyCode == KeyCode.Escape)
-            {
-                linking = null;
-                current.Use();
-            }
-            if (!rect.Contains(mouse))
+            Rect local = new Rect(Vector2.zero, area.size);
+            if (!local.Contains(current.mousePosition))
                 return;
             if (current.type == EventType.ScrollWheel)
             {
-                float previous = Zoom;
-                Zoom = Mathf.Clamp(Zoom * Mathf.Exp(-current.delta.y * 0.07f), 0.12f, 1.5f);
-                Pan = mouse - (mouse - Pan) * (Zoom / previous);
+                viewport.ZoomAt(current.mousePosition, viewport.Zoom * Mathf.Exp(-current.delta.y * 0.08f));
                 current.Use();
+                repaint();
             }
-            if (current.type == EventType.MouseDown && current.button == 2)
+            else if (current.type == EventType.MouseDrag && (current.button == 1 || current.button == 2 || current.alt))
             {
-                panning = true;
+                viewport.Pan(current.delta);
                 current.Use();
+                repaint();
             }
-            if (current.type == EventType.MouseDrag && panning)
+        }
+
+        #endregion
+
+        #region Rendering
+
+        /// <summary>Reuses text styles until zoom or editor skin changes.</summary>
+        private void PrepareStyles()
+        {
+            if (titleStyle == null || darkSkin != EditorGUIUtility.isProSkin)
             {
-                Pan += current.delta;
-                current.Use();
+                titleStyle = new GUIStyle(EditorStyles.boldLabel);
+                captionStyle = new GUIStyle(EditorStyles.miniLabel) { clipping = TextClipping.Clip };
+                darkSkin = EditorGUIUtility.isProSkin;
+                styleZoom = -1f;
             }
-            DialogueNode hit = Array.FindLast(tree.Nodes, candidate => Expanded(Bounds(candidate)).Contains(mouse));
+            if (Mathf.Approximately(styleZoom, viewport.Zoom))
+                return;
+            styleZoom = viewport.Zoom;
+            titleStyle.fontSize = Mathf.Max(8, Mathf.RoundToInt(15f * styleZoom));
+            captionStyle.fontSize = Mathf.Max(7, Mathf.RoundToInt(11f * styleZoom));
+        }
+
+        /// <summary>Moves block headers and opens contextual creation or deletion at the pointer.</summary>
+        /// <param name="tree">Detached sheet receiving layout edits.</param>
+        /// <param name="changed">Draft change callback.</param>
+        /// <param name="repaint">Window repaint request.</param>
+        private void HandleBlocks(DialogueTree tree, Action changed, Action repaint)
+        {
+            Event current = Event.current;
             if (current.type == EventType.ContextClick)
             {
-                if (hit == null)
-                    AddMenu(tree, (mouse - Pan) / Zoom, changed);
-                else
-                    Menu(tree, hit, changed);
-                current.Use();
-            }
-            if (current.type == EventType.MouseDown && current.button == 0)
-            {
-                if (hit != null)
+                Vector2 point = viewport.ToTree(current.mousePosition);
+                DialogueNode hovered = Array.Find(tree.Nodes, block => layout.Blocks.TryGetValue(block.Id, out Rect rect) && rect.Contains(point));
+                GenericMenu menu = new GenericMenu();
+                menu.AddItem(new GUIContent("Add Block"), false, () =>
                 {
-                    Selected = hit.Id;
-                    if (!string.IsNullOrEmpty(linking) && mouse.x <= Bounds(hit).x + 16f)
+                    if (tree == null)
+                        return;
+                    Selected = DialogueGraphEdits.Add(tree, point).Id;
+                    SelectedRow = string.Empty;
+                    changed();
+                });
+                if (hovered != null)
+                    menu.AddItem(new GUIContent("Delete Block"), false, () =>
                     {
-                        DialogueGraphEdits.Connect(tree, Array.Find(tree.Nodes, candidate => candidate.Id == linking), port, hit.Id);
-                        linking = null;
+                        if (tree == null)
+                            return;
+                        DialogueGraphEdits.Remove(tree, hovered.Id, string.Empty);
+                        Selected = SelectedRow = string.Empty;
                         changed();
+                    });
+                else
+                    menu.AddDisabledItem(new GUIContent("Delete Block"));
+                menu.ShowAsContext();
+                current.Use();
+                return;
+            }
+            if (dragged != null || draggingStart)
+            {
+                if (current.type == EventType.MouseDrag && current.button == 0)
+                {
+                    if (!moved)
+                        Undo.RecordObject(tree, "Move dialogue block");
+                    moved = true;
+                    Vector2 position = dragOrigin + (current.mousePosition - pointerOrigin) / viewport.Zoom;
+                    if (draggingStart)
+                    {
+                        tree.StartPosition = position;
+                        tree.HasStartPosition = true;
                     }
-                    else if (mouse.x >= Bounds(hit).xMax - 10f && hit.Kind != DialogueNodeKind.End)
-                        LinkMenu(tree, hit, mouse, repaint);
                     else
                     {
-                        Undo.IncrementCurrentGroup();
-                        dragGroup = Undo.GetCurrentGroup();
-                        moving = hit.Id;
+                        dragged.Position = position;
+                        dragged.HasPosition = true;
                     }
-                }
-                else
-                    Selected = string.Empty;
-                GUI.FocusControl(null);
-                current.Use();
-            }
-            if (current.type == EventType.MouseDrag && !string.IsNullOrEmpty(moving))
-            {
-                DialogueNode node = Array.Find(tree.Nodes, candidate => candidate.Id == moving);
-                if (node != null)
-                {
-                    Undo.RecordObject(tree, "Move Dialogue Node");
-                    node.Position += current.delta / Zoom;
-                }
-                EditorUtility.SetDirty(tree);
-                changed();
-                current.Use();
-            }
-            if (current.type == EventType.Used || !string.IsNullOrEmpty(linking))
-                repaint();
-        }
-
-        /// <summary>Includes connection handles in node hit testing.</summary>
-        /// <param name="rect">Node bounds.</param>
-        /// <returns>Expanded pointer bounds.</returns>
-        private static Rect Expanded(Rect rect) => new Rect(rect.x - 7f, rect.y, rect.width + 14f, rect.height);
-
-        /// <summary>Selects an output, offering named branches when their compact port is used.</summary>
-        /// <param name="tree">Graph proposal.</param>
-        /// <param name="node">Source node.</param>
-        /// <param name="mouse">Pointer position.</param>
-        /// <param name="repaint">Refresh after selection.</param>
-        private void LinkMenu(DialogueTree tree, DialogueNode node, Vector2 mouse, Action repaint)
-        {
-            linking = node.Id;
-            port = node.Kind is DialogueNodeKind.Condition or DialogueNodeKind.Select
-                && mouse.y > Bounds(node).y + Bounds(node).height * 0.7f ? -2 : -1;
-            if (node.Kind != DialogueNodeKind.Select || port == -2)
-                return;
-            linking = null;
-            GenericMenu menu = new GenericMenu();
-            for (int index = 0; index < node.Branches.Length; index++)
-            {
-                int branch = index;
-                menu.AddItem(new GUIContent((index + 1) + ". " + node.Branches[index].Name), false, () =>
-                {
-                    linking = node.Id;
-                    port = branch;
+                    EditorUtility.SetDirty(tree);
+                    current.Use();
                     repaint();
-                });
+                }
+                else if (current.type == EventType.MouseUp && current.button == 0)
+                {
+                    dragged = null;
+                    draggingStart = false;
+                    GUIUtility.hotControl = 0;
+                    if (moved)
+                        changed();
+                    current.Use();
+                }
+                return;
             }
-            if (node.Branches.Length == 0)
-                menu.AddDisabledItem(new GUIContent("No Branches"));
-            menu.ShowAsContext();
+            if (current.type != EventType.MouseDown || current.button != 0 || current.alt || !string.IsNullOrEmpty(linking))
+                return;
+            if (viewport.ToScreen(layout.StartRect).Contains(current.mousePosition))
+            {
+                BeginDrag(null, layout.StartRect.position, repaint);
+                return;
+            }
+            foreach (DialogueNode block in tree.Nodes)
+                if (layout.Blocks.TryGetValue(block.Id, out Rect rect)
+                    && viewport.ToScreen(new Rect(rect.x, rect.y, rect.width, block.End ? rect.height : 44f)).Contains(current.mousePosition))
+                {
+                    BeginDrag(block, rect.position, repaint);
+                    break;
+                }
         }
 
-        /// <summary>Offers explicit node operations without mutating entry or subtree assets.</summary>
-        /// <param name="tree">Detached graph.</param>
-        /// <param name="node">Selected operation.</param>
-        /// <param name="repaint">Refresh after mutation.</param>
-        private void Menu(DialogueTree tree, DialogueNode node, Action repaint)
+        /// <summary>Captures the same drag ownership for Start, End and conversation block headers.</summary>
+        /// <param name="block">Conversation or End block. Null selects the Start marker.</param>
+        /// <param name="position">Current unscaled canvas position.</param>
+        /// <param name="repaint">Window repaint request.</param>
+        private void BeginDrag(DialogueNode block, Vector2 position, Action repaint)
         {
-            Selected = node.Id;
-            GenericMenu menu = new GenericMenu();
-            menu.AddItem(new GUIContent("Set Start"), tree.Start == node.Id, () =>
-            {
-                Undo.RecordObject(tree, "Set Dialogue Start");
-                tree.Start = node.Id;
-                EditorUtility.SetDirty(tree);
-                repaint();
-            });
-            menu.AddItem(new GUIContent("Duplicate"), false, () =>
-            {
-                Selected = DialogueGraphEdits.Duplicate(tree, node).Id;
-                repaint();
-            });
-            menu.AddItem(new GUIContent("Remove"), false, () =>
-            {
-                DialogueGraphEdits.Remove(tree, node);
-                Selected = string.Empty;
-                repaint();
-            });
-            menu.ShowAsContext();
+            // Share drag capture while retaining a separate saved position for the Start marker.
+            dragged = block;
+            draggingStart = block == null;
+            dragOrigin = position;
+            pointerOrigin = Event.current.mousePosition;
+            moved = false;
+            Selected = block?.Id ?? string.Empty;
+            SelectedRow = string.Empty;
+            GUIUtility.hotControl = GUIUtility.GetControlID(FocusType.Passive);
+            Event.current.Use();
+            repaint();
         }
+
+        /// <summary>Completes a dragged arrow on a block header and supports cancelling an unfinished link.</summary>
+        /// <param name="tree">Current sheet.</param>
+        /// <param name="changed">Connection edit callback.</param>
+        /// <param name="repaint">Canvas repaint request.</param>
+        private void HandleConnection(DialogueTree tree, Action changed, Action repaint)
+        {
+            if (string.IsNullOrEmpty(linking))
+                return;
+            Event current = Event.current;
+            if (current.type == EventType.KeyDown && current.keyCode == KeyCode.Escape)
+            {
+                linking = string.Empty;
+                current.Use();
+            }
+            else if (current.type == EventType.MouseDrag && current.button == 0)
+            {
+                draggingLink = true;
+                current.Use();
+            }
+            else if (current.type == EventType.MouseUp && current.button == 0 && draggingLink)
+            {
+                bool connected = false;
+                foreach (DialogueNode block in tree.Nodes)
+                    if (layout.Blocks.TryGetValue(block.Id, out Rect rect)
+                        && viewport.ToScreen(new Rect(rect.x, rect.y, rect.width, 44f)).Contains(current.mousePosition))
+                    {
+                        DialogueRow row = FindRow(tree, linking);
+                        if (row != null)
+                        {
+                            DialogueGraphEdits.Connect(tree, row, block.Id);
+                            changed();
+                            connected = true;
+                        }
+                        break;
+                    }
+                if (!connected && inputBounds.Contains(current.mousePosition))
+                {
+                    DialogueRow row = FindRow(tree, linking);
+                    Vector2 point = viewport.ToTree(current.mousePosition);
+                    GenericMenu menu = new GenericMenu();
+                    menu.AddItem(new GUIContent("Create Block"), false, () =>
+                    {
+                        if (row == null)
+                            return;
+                        DialogueNode block = DialogueGraphEdits.Add(tree, point);
+                        DialogueGraphEdits.Connect(tree, row, block.Id);
+                        Selected = block.Id;
+                        SelectedRow = string.Empty;
+                        changed();
+                    });
+                    menu.AddItem(new GUIContent("Cancel"), false, () => { });
+                    menu.ShowAsContext();
+                }
+                linking = string.Empty;
+                draggingLink = false;
+                current.Use();
+            }
+            repaint();
+        }
+
+        /// <summary>Draws a clear block header and smaller indented entry cards.</summary>
+        /// <param name="tree">Detached sheet.</param>
+        /// <param name="block">Block to draw.</param>
+        /// <param name="rect">Unscaled block rectangle.</param>
+        /// <param name="active">Playback highlight key.</param>
+        /// <param name="changed">Edit callback.</param>
+        /// <param name="readOnly">Whether mutation is disabled.</param>
+        private void DrawBlock(DialogueTree tree, DialogueNode block, Rect rect, string active, Action changed, bool readOnly)
+        {
+            Rect screen = viewport.ToScreen(rect);
+            GUI.Box(screen, GUIContent.none, EditorStyles.helpBox);
+            if (block.Id == active || block.Id == Selected)
+                Handles.DrawSolidRectangleWithOutline(screen, Color.clear, block.Id == active ? new Color(0.45f, 0.72f, 0.48f) : new Color(0.35f, 0.63f, 0.86f));
+            Rect header = viewport.ToScreen(new Rect(rect.x + 10f, rect.y + 8f, rect.width - 20f, 30f));
+            if (GUI.Button(header, new GUIContent(block.Name, "Select or drag this block. During connection, choose it as the destination."), titleStyle))
+            {
+                if (!readOnly && !string.IsNullOrEmpty(linking))
+                {
+                    DialogueRow row = FindRow(tree, linking);
+                    if (row != null)
+                        DialogueGraphEdits.Connect(tree, row, block.Id);
+                    linking = string.Empty;
+                    changed();
+                }
+                Selected = block.Id;
+                SelectedRow = string.Empty;
+            }
+            if (block.End)
+                return;
+            for (int index = 0; index < block.Entries.Length; index++)
+            {
+                DialogueRow row = block.Entries[index];
+                Rect rowRect = DialogueGraphLayout.Row(rect, index);
+                Rect child = viewport.ToScreen(rowRect);
+                Color previous = GUI.backgroundColor;
+                if (SelectedRow == row.Id)
+                    GUI.backgroundColor = new Color(0.45f, 0.68f, 0.9f);
+                if (GUI.Button(child, GUIContent.none, EditorStyles.helpBox))
+                {
+                    Selected = block.Id;
+                    SelectedRow = row.Id;
+                }
+                GUI.backgroundColor = previous;
+                GUI.Label(viewport.ToScreen(new Rect(rowRect.x + 9f, rowRect.y + 5f, rowRect.width - 20f, 22f)), row.Name, captionStyle);
+                GUI.Label(viewport.ToScreen(new Rect(rowRect.x + 9f, rowRect.y + 28f, rowRect.width - 20f, 22f)), TriggerLabel(row), captionStyle);
+                // A thin parent connector makes each row's ownership clear without extra labels.
+                Vector3 parent = viewport.ToScreen(new Rect(rect.x + 14f, rect.y + 36f, 0f, 0f)).position;
+                Vector3 corner = viewport.ToScreen(new Rect(rect.x + 14f, rowRect.center.y, 0f, 0f)).position;
+                Handles.color = new Color(0.5f, 0.5f, 0.5f);
+                Handles.DrawAAPolyLine(parent, corner, new Vector3(child.x, child.center.y));
+                Rect port = viewport.ToScreen(new Rect(rect.xMax - 8f, rowRect.center.y - 8f, 16f, 16f));
+                GUI.Box(port, new GUIContent("●", "Drag to a block header, or click this output and then the destination header."), EditorStyles.miniButton);
+                if (!readOnly && Event.current.type == EventType.MouseDown && Event.current.button == 0 && port.Contains(Event.current.mousePosition))
+                {
+                    linking = row.Id;
+                    draggingLink = false;
+                    Event.current.Use();
+                }
+            }
+            if (!readOnly && GUI.Button(viewport.ToScreen(new Rect(rect.x + 24f, rect.yMax - 30f, rect.width - 36f, 24f)), new GUIContent("+ Add Entry", "Add another entry directly inside this block."), EditorStyles.miniButton))
+            {
+                Selected = block.Id;
+                SelectedRow = DialogueGraphEdits.AddEntry(tree, block).Id;
+                changed();
+            }
+        }
+
+        /// <summary>Draws all links behind the block cards, routing returns outside their columns.</summary>
+        /// <param name="tree">Current sheet.</param>
+        private void DrawConnections(DialogueTree tree)
+        {
+            foreach (DialogueNode block in tree.Nodes)
+                if (block != null && !block.End && layout.Blocks.TryGetValue(block.Id, out Rect origin))
+                    for (int index = 0; index < block.Entries.Length; index++)
+                    {
+                        DialogueRow row = block.Entries[index];
+                        if (row.Id == linking)
+                        {
+                            Vector3 port = viewport.ToScreen(new Rect(origin.xMax, DialogueGraphLayout.Row(origin, index).center.y, 0f, 0f)).position;
+                            Handles.DrawBezier(port, Event.current.mousePosition, port + Vector3.right * 60f,
+                                (Vector3)Event.current.mousePosition - Vector3.right * 60f, new Color(0.4f, 0.7f, 0.95f), null, 2f);
+                        }
+                        if (row.Next == block.Id || !layout.Blocks.TryGetValue(row.Next, out Rect destination))
+                            continue;
+                        Vector3 from = viewport.ToScreen(new Rect(origin.xMax, DialogueGraphLayout.Row(origin, index).center.y, 0f, 0f)).position;
+                        Vector3 to = viewport.ToScreen(new Rect(destination.x, destination.y + 22f, 0f, 0f)).position;
+                        float bend = Mathf.Max(30f, Mathf.Abs(to.x - from.x) * 0.45f);
+                        Color color = row.Id == SelectedRow ? new Color(0.4f, 0.7f, 0.95f) : new Color(0.5f, 0.5f, 0.5f);
+                        if (destination.x <= origin.x)
+                            to = viewport.ToScreen(new Rect(destination.xMax, destination.y + 20f, 0f, 0f)).position;
+                        Vector3 endTangent = destination.x <= origin.x ? to + Vector3.right * bend : to - Vector3.right * bend;
+                        Handles.DrawBezier(from, to, from + Vector3.right * bend, endTangent, color, null, 2f);
+                        Vector3 direction = (to - endTangent).normalized;
+                        Vector3 side = new Vector3(-direction.y, direction.x) * 4f;
+                        Handles.color = color;
+                        Handles.DrawAAConvexPolygon(to, to - direction * 9f + side, to - direction * 9f - side);
+                    }
+        }
+
+        /// <summary>Draws the sheet entry point independently of conversation block contents.</summary>
+        /// <param name="tree">Current sheet.</param>
+        private void DrawStart(DialogueTree tree)
+        {
+            Rect start = viewport.ToScreen(layout.StartRect);
+            GUI.Box(start, new GUIContent("Start", "Conversation entry point. Drag to move it."), EditorStyles.helpBox);
+            if (!layout.Blocks.TryGetValue(tree.Start, out Rect block))
+                return;
+            Vector3 to = viewport.ToScreen(new Rect(block.x, block.y + 22f, 0f, 0f)).position;
+            Handles.color = new Color(0.5f, 0.5f, 0.5f);
+            Handles.DrawAAPolyLine(new Vector3(start.xMax, start.center.y), to);
+        }
+
+        /// <summary>Finds a row only during a deliberate connection edit.</summary>
+        /// <param name="tree">Current sheet.</param>
+        /// <param name="id">Stable row key.</param>
+        /// <returns>The source row, or null after deletion.</returns>
+        private static DialogueRow FindRow(DialogueTree tree, string id)
+        {
+            foreach (DialogueNode block in tree.Nodes)
+                foreach (DialogueRow row in block.Entries)
+                    if (row.Id == id)
+                        return row;
+            return null;
+        }
+
+        /// <summary>Builds a short condition label for an entry card.</summary>
+        /// <param name="row">Entry whose trigger is displayed.</param>
+        /// <returns>A compact label or an explicit missing-trigger prompt.</returns>
+        internal static string TriggerLabel(DialogueRow row)
+        {
+            return row.Trigger == null ? "Choose Trigger" : row.Trigger.Type == DialogueTrigger.Consumption
+                ? "Consumption / " + ObjectNames.NicifyVariableName(row.Trigger.Consumption.Result.ToString())
+                : ObjectNames.NicifyVariableName(row.Trigger.Type.ToString());
+        }
+
         #endregion
+
         #endregion
     }
 }
-#endif

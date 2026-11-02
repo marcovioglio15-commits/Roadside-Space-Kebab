@@ -13,14 +13,6 @@ MonoBehaviour:
   m_Name: Mothman Order Wrong 2 - C
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Mothman Order Wrong 2 - C
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Water
-    RequireAll: 1
-    Result: 1
   Lines:
   - Speaker: Mothman
     Text: 'No, no, no, no, no, no, no, no, no, no.

@@ -51,6 +51,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Subscribes before consuming interactions can publish their completion.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Animation suspension may reactivate the same instance without creating new tickets.
             Initialize();
         }
@@ -164,6 +166,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases slots on pooling or deactivation, except during explicit flow suspension.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Destroy always releases below, even when a walk path is interrupted.
             if (!presentationHeld)
                 Release();
@@ -207,7 +211,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
             // Presentation is independent of extraction and may complete before a late-loaded board exists.
-            if (moment == InteractionMoment.Completed && settings.WaitForCompletion && source == settings.CompletionSource)
+            if (settings.WaitForCompletion && source == settings.CompletionSource && settings.CompletionStep.Matches(source, moment))
             {
                 presentationCompleted = true;
                 Publish();

@@ -1,115 +1,105 @@
-#if OBJECTS_LOGIC_STUDIO_DIALOGUE_GRAPH
 using System;
 using CatOnASkateboard.StudioColors.Editor;
-using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Shows only the selected graph operation's active settings and named connections.</summary>
+    /// <summary>Edits a selected block and its subordinate entry without exposing connection keys.</summary>
     internal static class DialogueNodeInspector
     {
         #region Methods
+
         #region Drawing
-        /// <summary>Edits one serialized node without exposing technical connection keys.</summary>
-        /// <param name="property">Detached node configuration.</param>
-        /// <param name="tree">Proposal used for destination choices.</param>
-        /// <param name="orders">Optional consumption authoring context.</param>
-        internal static void Draw(SerializedProperty property, DialogueTree tree, OrderSettings orders)
+
+        /// <summary>Draws block settings and the selected entry row.</summary>
+        /// <param name="property">Selected block's serialized data.</param>
+        /// <param name="tree">Containing sheet.</param>
+        /// <param name="rowId">Optional selected entry key.</param>
+        /// <param name="orders">Optional order context.</param>
+        internal static void Draw(SerializedProperty property, DialogueTree tree, string rowId, OrderSettings orders)
         {
             HoverControls.Field(property, "Name");
-            HoverControls.Field(property, "Kind");
-            switch ((DialogueNodeKind)property.FindPropertyRelative("Kind").enumValueIndex)
+            HoverControls.Field(property, "End");
+            if (property.FindPropertyRelative("End").boolValue)
+                return;
+            HoverControls.Field(property, "Selection");
+            SerializedProperty entries = property.FindPropertyRelative("Entries");
+            EditorGUILayout.LabelField("Entries", EditorStyles.boldLabel);
+            using StudioIndentScope indent = new StudioIndentScope();
+            // Every row stays inside its block, with explicit add/remove/reorder actions.
+            for (int index = 0; index < entries.arraySize; index++)
             {
-                case DialogueNodeKind.Entry:
-                    DialogueEntryControls.Draw(property.FindPropertyRelative("Entry"), orders);
-                    Connection(property.FindPropertyRelative("Next"), tree, "Next");
+                SerializedProperty row = entries.GetArrayElementAtIndex(index);
+                if (row.FindPropertyRelative("Id").stringValue == rowId)
+                    row.isExpanded = true;
+                if (StudioArrayGUI.Header(entries, index, new GUIContent(row.FindPropertyRelative("Name").stringValue, entries.tooltip)))
                     break;
-                case DialogueNodeKind.Condition:
-                    Condition(property.FindPropertyRelative("Condition"), orders);
-                    Connection(property.FindPropertyRelative("Next"), tree, "True");
-                    Connection(property.FindPropertyRelative("Otherwise"), tree, "False");
-                    break;
-                case DialogueNodeKind.Wait:
-                    HoverControls.Field(property, "Duration");
-                    Connection(property.FindPropertyRelative("Next"), tree, "Next");
-                    break;
-                case DialogueNodeKind.Subtree:
-                    DialogueTreeControls.Tree(property.FindPropertyRelative("Subtree"), orders);
-                    Connection(property.FindPropertyRelative("Next"), tree, "On Return");
-                    break;
-                case DialogueNodeKind.Select:
-                    HoverControls.Field(property, "Selection");
-                    SerializedProperty branches = property.FindPropertyRelative("Branches");
-                    for (int index = 0; index < branches.arraySize; index++)
-                    {
-                        SerializedProperty branch = branches.GetArrayElementAtIndex(index);
-                        if (StudioArrayGUI.Header(branches, index, new GUIContent(branch.FindPropertyRelative("Name").stringValue, branches.tooltip)))
-                            break;
-                        if (!branch.isExpanded)
-                            continue;
-                        using StudioIndentScope indent = new StudioIndentScope();
-                        HoverControls.Field(branch, "Name");
-                        Connection(branch.FindPropertyRelative("Target"), tree, "Destination");
-                        if (property.FindPropertyRelative("Selection").enumValueIndex == (int)DialogueSelection.WeightedRandom)
-                            HoverControls.Field(branch, "Weight");
-                        SerializedProperty condition = branch.FindPropertyRelative("Condition");
-                        condition.isExpanded = StudioArrayGUI.Foldout(condition, new GUIContent("Conditions", condition.tooltip));
-                        if (condition.isExpanded)
-                            using (new StudioIndentScope())
-                                Condition(condition, orders);
-                    }
-                    StudioArrayGUI.Add(branches, "Add Branch", () => new DialogueBranch());
-                    Connection(property.FindPropertyRelative("Otherwise"), tree, "Fallback");
-                    break;
+                if (!row.isExpanded)
+                    continue;
+                using StudioIndentScope rowIndent = new StudioIndentScope();
+                HoverControls.Field(row, "Name");
+                DialogueEntryControls.Draw(row.FindPropertyRelative("Entry"));
+                Trigger(row.FindPropertyRelative("Trigger"), orders);
+                if (property.FindPropertyRelative("Selection").enumValueIndex == (int)DialogueSelection.WeightedRandom)
+                    HoverControls.Field(row, "Weight");
+                Connection(row.FindPropertyRelative("Next"), tree, "After Final Page");
             }
         }
 
-        /// <summary>Offers node titles while storing only stable internal destination keys.</summary>
-        /// <param name="property">Serialized destination key.</param>
-        /// <param name="tree">Graph containing valid targets.</param>
-        /// <param name="label">Port name.</param>
+        /// <summary>Chooses a destination by block title rather than by a typed key.</summary>
+        /// <param name="property">Stable destination key.</param>
+        /// <param name="tree">Sheet supplying block choices.</param>
+        /// <param name="label">Contextual caption.</param>
         internal static void Connection(SerializedProperty property, DialogueTree tree, string label)
         {
-            GUIContent[] names = new GUIContent[tree.Nodes.Length + 1];
-            names[0] = new GUIContent("None");
+            string[] names = new string[tree.Nodes.Length + 1];
+            names[0] = "Choose Block";
+            int selected = 0;
             for (int index = 0; index < tree.Nodes.Length; index++)
-                names[index + 1] = new GUIContent((index + 1) + ". " + tree.Nodes[index].Name);
-            int selected = Array.FindIndex(tree.Nodes, node => node.Id == property.stringValue) + 1;
-            Rect rect = EditorGUILayout.GetControlRect();
-            StudioFieldMenu.Context(rect, property);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
+            {
+                names[index + 1] = tree.Nodes[index].Name;
+                if (tree.Nodes[index].Id == property.stringValue)
+                    selected = index + 1;
+            }
             EditorGUI.BeginChangeCheck();
-            int choice = EditorGUI.Popup(rect, new GUIContent(label, property.tooltip), selected, names);
+            selected = EditorGUILayout.Popup(new GUIContent(label, property.tooltip), selected, names);
             if (EditorGUI.EndChangeCheck())
-                property.stringValue = choice > 0 ? tree.Nodes[choice - 1].Id : string.Empty;
+                property.stringValue = selected == 0 ? string.Empty : tree.Nodes[selected - 1].Id;
         }
 
-        /// <summary>Draws the shared predicate form with context-aware order or flag selectors.</summary>
-        /// <param name="property">Serialized predicate.</param>
-        /// <param name="orders">Optional destination catalogs.</param>
-        private static void Condition(SerializedProperty property, OrderSettings orders)
+        /// <summary>Assigns and independently edits a reusable trigger preset.</summary>
+        /// <param name="property">Row's trigger reference.</param>
+        /// <param name="orders">Optional destination order context.</param>
+        private static void Trigger(SerializedProperty property, OrderSettings orders)
         {
-            HoverControls.Field(property, "RequireAll");
-            HoverControls.Field(property, "Invert");
-            HoverControls.Field(property, "CheckFlags");
-            if (property.FindPropertyRelative("CheckFlags").boolValue)
+            StudioFieldGUI.PropertyField(property);
+            using StudioButton.RowScope buttons = new StudioButton.RowScope();
+            using (new EditorGUI.DisabledScope(property.objectReferenceValue == null))
             {
-                ObjectFlagSelector.Draw(property.FindPropertyRelative("Flags"));
-                if (property.FindPropertyRelative("Flags").arraySize > 1)
-                    HoverControls.Field(property, "AllFlags");
+                if (StudioButton.Draw(new GUIContent("Open Trigger", "Edit this shared trigger independently of the tree.")))
+                    DialogueTriggerWindow.Open((DialogueTriggerPreset)property.objectReferenceValue, orders);
+                if (StudioButton.Draw(new GUIContent("Make Copy", "Create and select a separate trigger preset.")))
+                {
+                    DialogueTriggerPreset copy = ObjectPresetCopy.Save((DialogueTriggerPreset)property.objectReferenceValue);
+                    if (copy != null)
+                        property.objectReferenceValue = copy;
+                }
             }
-            HoverControls.Field(property, "CheckSpawn");
-            if (property.FindPropertyRelative("CheckSpawn").boolValue)
-            {
-                HoverControls.Field(property, "FirstSpawn");
-                HoverControls.Field(property, "LastSpawn");
-            }
-            DialogueConsumptionControls.Draw(property.FindPropertyRelative("Consumption"), "Consumption", context: orders);
+            if (!StudioButton.Draw(new GUIContent("New Trigger", "Create a reusable trigger for this entry.")))
+                return;
+            string path = EditorUtility.SaveFilePanelInProject("New Trigger", "Dialogue Trigger", "asset", "Save the trigger preset.");
+            if (string.IsNullOrEmpty(path))
+                return;
+            DialogueTriggerPreset trigger = ScriptableObject.CreateInstance<DialogueTriggerPreset>();
+            AssetDatabase.CreateAsset(trigger, AssetDatabase.GenerateUniqueAssetPath(path));
+            Undo.RegisterCreatedObjectUndo(trigger, "Create Dialogue Trigger");
+            property.objectReferenceValue = trigger;
+            DialogueTriggerWindow.Open(trigger, orders);
         }
+
         #endregion
+
         #endregion
     }
 }
-#endif

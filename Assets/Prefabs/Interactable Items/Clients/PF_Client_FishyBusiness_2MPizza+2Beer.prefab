@@ -242,13 +242,9 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Trigger: 1
-    Consumption:
-      Enabled: 0
-      RequiredFlags: []
-      Orders: []
-      RequireAll: 1
-      Result: 0
+    Tree: {fileID: 11400000, guid: ab903ed82809a8140b9ab8eb9aa8e1c7, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Distance: 3
     ExitDistance: 4
     Priority: 0
@@ -263,16 +259,6 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     ReplayOnInput: 0
-    Selection: 1
-    Entries:
-    - {fileID: 11400000, guid: 6e8704ca69cf405dbab7bd9b1b08a87d, type: 2}
-    - {fileID: 11400000, guid: 8f7cc85398b441f4b41af4ab3ef3c50e, type: 2}
-    - {fileID: 11400000, guid: fa54d2787dc0482bad381321f4f8dd8b, type: 2}
-    UseSpawnPresets: 0
-    SpawnPresets: []
-    Tree: {fileID: 11400000, guid: ab903ed82809a8140b9ab8eb9aa8e1c7, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
     Audio:
       Voice: 3
       Interval: 0.1
@@ -389,13 +375,9 @@ MonoBehaviour:
   settingsPreset: {fileID: 0}
   drawGizmos: 1
   settings:
-    Trigger: 2
-    Consumption:
-      Enabled: 0
-      RequiredFlags: []
-      Orders: []
-      RequireAll: 1
-      Result: 0
+    Tree: {fileID: 11400000, guid: 127c0c653472c42670808cd14a155539, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -410,14 +392,6 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     ReplayOnInput: 0
-    Selection: 1
-    Entries:
-    - {fileID: 11400000, guid: b0968e64499a48919bdc20417d50a334, type: 2}
-    UseSpawnPresets: 0
-    SpawnPresets: []
-    Tree: {fileID: 11400000, guid: 58c62e498a3b56242aa1afbc2ddd4194, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
     Audio:
       Voice: 3
       Interval: 1
@@ -476,13 +450,9 @@ MonoBehaviour:
   settingsPreset: {fileID: 11400000, guid: 2334ce1700f4c4744af4bcc44439e0c6, type: 2}
   drawGizmos: 1
   settings:
-    Trigger: 2
-    Consumption:
-      Enabled: 0
-      RequiredFlags: []
-      Orders: []
-      RequireAll: 1
-      Result: 0
+    Tree: {fileID: 11400000, guid: 741e42821a8fdb9393fd90cd055b9dac, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
     Distance: 15
     ExitDistance: 20
     Priority: 1
@@ -497,15 +467,6 @@ MonoBehaviour:
     Interruption: 0
     ReplayOnReturn: 1
     ReplayOnInput: 0
-    Selection: 0
-    Entries:
-    - {fileID: 11400000, guid: 58bcf53fd716480cb39592907c1ae19b, type: 2}
-    - {fileID: 11400000, guid: 6788827458644968bd68081154330229, type: 2}
-    UseSpawnPresets: 0
-    SpawnPresets: []
-    Tree: {fileID: 11400000, guid: a9b969d5d60b55a468d5bd10eeb643fc, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
     Audio:
       Voice: 3
       Interval: 1

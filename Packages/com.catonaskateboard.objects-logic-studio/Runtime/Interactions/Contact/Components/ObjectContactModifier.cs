@@ -66,6 +66,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Starts reusable rule state only when an object enters gameplay.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             if (Application.isPlaying)
                 Initialize();
         }
@@ -135,11 +137,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 audible |= runs[index].IsAudible;
             }
             frying.Tick(settings.FryingSound && isActiveAndEnabled && audible, "sfx_frying", transform);
+            // Self-removal and preset replacement run only after this rule iteration has completed.
+            InteractionRuntimeState.Flush();
         }
 
         /// <summary>Releases only this interaction's active reservations and reversible effects.</summary>
         protected override void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             frying.Stop();
             base.OnDisable();
             ObjectInteraction.Signaled -= ObserveDialogue;
@@ -231,6 +237,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (configuration.ConsumesAny && !configuration.Price.TryValidate(gameObject, out warning))
                 return false;
+            if (configuration.ConsumesAny && configuration.ConsumeOn.Enabled
+                && !configuration.ConsumeOn.Step.TryValidate(configuration.ConsumeOn.Resolve(gameObject), out warning))
+                return false;
             if (configuration.ConsumesAny && configuration.ConsumeOn.Enabled && configuration.ConsumeOn.Resolve(gameObject) == null)
             {
                 warning = "Consume On must select an existing Dialogue on this same object.";
@@ -318,7 +327,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="moment">Successful start or completion.</param>
         private void ObserveDialogue(ObjectInteraction source, InteractionMoment moment)
         {
-            if (source != consumeDialogue || moment != InteractionMoment.Completed || consumeEnabled)
+            if (source != consumeDialogue || !settings.ConsumeOn.Step.Matches(source, moment) || consumeEnabled)
                 return;
             consumeEnabled = true;
             AwaitingContact = false;

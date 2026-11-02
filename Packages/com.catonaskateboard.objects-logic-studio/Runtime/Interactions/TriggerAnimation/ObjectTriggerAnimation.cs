@@ -81,6 +81,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Registers input and initializes one validated target before its first interaction.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Runtime initialization never changes a prefab while its edit workspace is open.
             base.OnEnable();
             if (Application.isPlaying && reset == null)
@@ -90,6 +92,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Cancels ownership and restores the activation pose when the component leaves play.</summary>
         protected override void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // A cancelled transition emits no completion event.
             Release();
             base.OnDisable();

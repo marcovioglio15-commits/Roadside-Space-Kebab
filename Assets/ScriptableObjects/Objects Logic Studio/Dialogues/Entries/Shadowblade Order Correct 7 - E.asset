@@ -13,14 +13,6 @@ MonoBehaviour:
   m_Name: Shadowblade Order Correct 7 - E
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Shadowblade Order Correct 7 - E
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Pizza Margherita
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: "\u2026I\u2019ll be back."

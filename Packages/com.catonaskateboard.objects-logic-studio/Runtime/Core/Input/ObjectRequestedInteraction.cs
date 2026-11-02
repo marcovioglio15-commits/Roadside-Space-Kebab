@@ -33,11 +33,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
         #region Methods
+
+        /// <summary>Assigns an existing project Button before a runtime interaction is activated.</summary>
+        /// <param name="binding">Action resolved later against the player's private input asset.</param>
+        internal void BindAction(InputActionReference binding)
+        {
+            action = binding;
+        }
         #region Lifecycle
 
         /// <summary>Caches target geometry and registers once at activation.</summary>
         protected virtual void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             if (!UsesInput)
                 return;
             Colliders = GetComponentsInChildren<Collider>(true);
@@ -51,6 +60,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Withdraws disabled processes from button arbitration.</summary>
         protected virtual void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             if (registered.Remove(this))
                 Revision++;
         }

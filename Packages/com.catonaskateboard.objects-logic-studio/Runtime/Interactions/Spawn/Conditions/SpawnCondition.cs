@@ -16,6 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Stable prefab component identity prepared by the editor when this rule is applied.")]
         [HideInInspector]
         public string SourceId = string.Empty;
+        [Tooltip("Optional Dialogue entry checkpoint counted instead of whole-tree completion.")]
+        public DialogueStepReference Step = new DialogueStepReference();
 
         #endregion
     }

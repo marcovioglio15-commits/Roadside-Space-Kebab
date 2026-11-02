@@ -25,6 +25,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Registration
 
+        /// <summary>Rebinds trigger actions after a committed runtime settings edit.</summary>
+        internal static void Invalidate()
+        {
+            Revision++;
+        }
+
         /// <summary>Restores registration and progress at Play entry when reload options preserve scene objects.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Rebuild()

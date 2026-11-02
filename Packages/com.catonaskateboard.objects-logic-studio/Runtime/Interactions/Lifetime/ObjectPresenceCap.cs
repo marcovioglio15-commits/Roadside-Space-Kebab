@@ -40,6 +40,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Caches presentation bounds and joins the shared cleanup schedule.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             renderers = GetComponentsInChildren<Renderer>(true);
             colliders = GetComponentsInChildren<Collider>(true);
             grab = GetComponent<ObjectGrab>();

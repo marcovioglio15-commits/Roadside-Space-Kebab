@@ -71,12 +71,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Returns the latest displayed customer in the HUD's scene.</summary>
         /// <param name="scene">Scene owning the authored HUD.</param>
+        /// <param name="customer">Optional exact customer binding.</param>
         /// <returns>Most recently started live session, or null when no timer is visible.</returns>
-        internal static OrderTimerSession Current(Scene scene)
+        internal static OrderTimerSession Current(Scene scene, ObjectAvailableOrders customer = null)
         {
             // Registration order supplies deterministic ownership without scanning scene objects.
             for (int index = visible.Count - 1; index >= 0; index--)
-                if (visible[index].owner != null && visible[index].owner.gameObject.scene == scene)
+                if (visible[index].owner != null && visible[index].owner.gameObject.scene == scene
+                    && (customer == null || visible[index].owner == customer))
                     return visible[index];
             return null;
         }

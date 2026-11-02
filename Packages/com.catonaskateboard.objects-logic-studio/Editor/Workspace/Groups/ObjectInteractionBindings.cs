@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             bool start = state.Extended.Kind switch
             {
-                ExtendedInteractionKind.Dialogue => state.Extended.Draft.Dialogue.Trigger == DialogueTrigger.InputAction,
+                ExtendedInteractionKind.Dialogue => state.Extended.Draft.Dialogue.NeedsStartAction,
                 ExtendedInteractionKind.SpraySauce or ExtendedInteractionKind.Slice => true,
                 ExtendedInteractionKind.GravityGenerator => state.Extended.Draft.GravityGenerator.Restore != GravityRestoreMode.Timer,
                 ExtendedInteractionKind.PlayAmbient => state.Extended.Draft.Ambient.Mode == AmbientMode.Radio,

@@ -82,8 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     DrawContent();
                 UpdatePending();
                 string message = session.RecoveryWarning.Length > 0 ? session.RecoveryWarning : warning;
-                if (message.Length > 0)
-                    EditorGUILayout.LabelField(message, EditorStyles.wordWrappedMiniLabel);
+                DrawWarning(message);
                 using (new StudioButton.RowScope())
                 {
                     using (new EditorGUI.DisabledScope(!session.HasChanges))
@@ -101,6 +100,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         protected virtual void DrawInspector(UnityEditor.Editor editor)
         {
             editor.OnInspectorGUI();
+        }
+
+        /// <summary>Places validation or conflict messages in the current window's presentation.</summary>
+        /// <param name="message">Current issue, or empty after it has been resolved.</param>
+        protected virtual void DrawWarning(string message)
+        {
+            if (message.Length > 0)
+                EditorGUILayout.LabelField(message, EditorStyles.wordWrappedMiniLabel);
         }
 
         /// <summary>Shares cached inspector ownership between scrollable forms and fixed graph viewports.</summary>

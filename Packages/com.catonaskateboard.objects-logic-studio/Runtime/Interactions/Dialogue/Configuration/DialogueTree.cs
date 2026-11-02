@@ -3,32 +3,43 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Shares a connected conversation without storing progress on the asset.</summary>
-#if OBJECTS_LOGIC_STUDIO_DIALOGUE_GRAPH
+    /// <summary>Stores a complete reusable conversation sheet with blocks, entries and connections.</summary>
     [CreateAssetMenu(menuName = "Objects Logic Studio/Dialogue Tree Preset")]
-#endif
     public sealed class DialogueTree : ScriptableObject
     {
         #region Fields
+
         [Header("Dialogue Tree")]
-        [Tooltip("Stable key of the first node; selected by name in the graph editor.")]
+        [Tooltip("First block. Selected by name in the tree editor.")]
+        [HideInInspector]
         public string Start = string.Empty;
-        [Tooltip("Connected flow nodes. Shared entries retain their own independent editing sessions.")]
+        [Tooltip("Canvas position of the Start marker. Set by dragging it in the tree draft.")]
+        [HideInInspector]
+        public Vector2 StartPosition;
+        [Tooltip("Whether the Start marker has a saved position instead of its initial layout position.")]
+        [HideInInspector]
+        public bool HasStartPosition;
+        [Tooltip("Conversation blocks. Each block owns its alternative entry rows.")]
         public DialogueNode[] Nodes = Array.Empty<DialogueNode>();
+
         #endregion
+
         #region Methods
+
         #region Validation
-        /// <summary>Checks nodes, links and subtree dependencies before authoring or activation.</summary>
-        /// <param name="warning">Receives the first invalid node or connection.</param>
-        /// <param name="orders">Optional destination's order catalogs.</param>
-        /// <param name="bound">Whether local order names must resolve on the destination.</param>
-        /// <param name="consumption">Whether entry consumption filters are active.</param>
-        /// <returns>True for a connected, executable tree with no immediate loops or recursive subtree calls.</returns>
-        public bool TryValidate(out string warning, OrderSettings orders = null, bool bound = false, bool consumption = true)
+
+        /// <summary>Checks this complete sheet before saving or creating a runtime session.</summary>
+        /// <param name="warning">Receives the first invalid block, row or connection.</param>
+        /// <param name="orders">Optional destination order sources.</param>
+        /// <param name="bound">Whether local references must resolve on a known destination.</param>
+        /// <returns>True for a complete connected conversation.</returns>
+        public bool TryValidate(out string warning, OrderSettings orders = null, bool bound = false)
         {
-            return DialogueTreeValidation.Validate(this, orders, bound, consumption, out warning);
+            return DialogueTreeValidation.Validate(this, orders, bound, out warning);
         }
+
         #endregion
+
         #endregion
     }
 }

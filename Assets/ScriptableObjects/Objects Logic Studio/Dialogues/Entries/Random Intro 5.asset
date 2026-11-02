@@ -13,13 +13,6 @@ MonoBehaviour:
   m_Name: Random Intro 5
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Random Intro 5
-  Weight: 1
-  Consumption:
-    Enabled: 0
-    RequiredFlags: []
-    Orders: []
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: Food. Now.

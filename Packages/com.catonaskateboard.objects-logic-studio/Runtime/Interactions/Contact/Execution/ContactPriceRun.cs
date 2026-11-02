@@ -176,13 +176,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
             // Completed state belongs to this spawn; repeated completion events cannot pay it twice.
-            if (closed && !inReceipt || released || moment != InteractionMoment.Completed)
+            if (closed && !inReceipt || released)
                 return;
-            int index = Array.IndexOf(sources, source);
-            if (index < 0)
-                return;
-            completed[index] = true;
-            released = settings.CompletionMode == PriceCompletionMode.Any || Array.TrueForAll(completed, value => value);
+            bool matched = false;
+            for (int index = 0; index < sources.Length; index++)
+                if (sources[index] == source && settings.CompletionSources[index].Step.Matches(source, moment))
+                {
+                    completed[index] = true;
+                    matched = true;
+                }
+            released = matched && (settings.CompletionMode == PriceCompletionMode.Any || Array.TrueForAll(completed, value => value));
             if (released && !inReceipt)
                 Flush();
         }

@@ -12,6 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Exact wins for its single occurrence; From uses the highest applicable threshold.")]
         public OrderSpawnMatch Match;
         [Tooltip("One-based prefab spawn occurrence shared with Available Orders.")]
+        [Range(1, 10000)]
         public int Spawn = 1;
         [Tooltip("Conversation used when this spawn rule wins.")]
         public DialogueTree Tree;

@@ -50,6 +50,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Prepares source registration without creating meshes, renderers or materials.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Explicit refresh also handles settings changed while the component was disabled.
             Refresh();
         }
@@ -67,6 +69,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases only this interaction's rendering membership.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Original surface rendering remains enabled.
             SetVisible(false);
         }

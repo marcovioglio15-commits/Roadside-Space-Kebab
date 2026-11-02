@@ -10,147 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
-  m_Name: PF_Client_Mothman_Nuggets+Fries+Water - Mothman Delivery Correct Tree
+  m_Name: "PF_Client_Mothman_Nuggets+Fries+Water - Mothman Delivery Correct Tree"
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
-  Start: f0e60261647e4e5b8e017f4bca947421
+  Start: root
   Nodes:
-  - Id: f0e60261647e4e5b8e017f4bca947421
-    Name: Select Entry
-    Position: {x: 30, y: 100}
-    Kind: 1
-    Entry: {fileID: 0}
-    Next: 
-    Otherwise: 
+  - Id: root
+    Name: "Mothman Delivery Correct "
+    Position: {x: 0, y: 0}
+    End: 0
     Selection: 0
-    Branches:
-    - Name: Mothman Order Correct 1 - A
-      Target: 968a87dc0be44ce5891783ed563396aa
+    Entries:
+    - Id: cba505f7bad8a1fa93dd58851e45400f
+      Name: "Mothman Order Correct 1 - A"
+      Entry: {fileID: 11400000, guid: 149b88b7e6d14c0d9f9005812a782712, type: 2}
+      Trigger: {fileID: 11400000, guid: 8f36ff5911ebb5bdd3eecbcf20c2c66a, type: 2}
+      Next: end
       Weight: 1
-      Condition:
-        RequireAll: 1
-        Invert: 0
-        CheckFlags: 0
-        Flags: []
-        AllFlags: 1
-        CheckSpawn: 0
-        FirstSpawn: 1
-        LastSpawn: 0
-        Consumption:
-          Enabled: 0
-          RequiredFlags: []
-          Orders: []
-          RequireAll: 1
-          Result: 0
-    - Name: Mothman Order Correct 2 - A
-      Target: 91a2cd1f0ccf4dfbbd890d0b15ea65e6
+    - Id: 3da3c2c23a4d7be590bb793c36c65fae
+      Name: "Mothman Order Correct 2 - A"
+      Entry: {fileID: 11400000, guid: 672393815ac94815990e125168574b72, type: 2}
+      Trigger: {fileID: 11400000, guid: 8f36ff5911ebb5bdd3eecbcf20c2c66a, type: 2}
+      Next: end
       Weight: 1
-      Condition:
-        RequireAll: 1
-        Invert: 0
-        CheckFlags: 0
-        Flags: []
-        AllFlags: 1
-        CheckSpawn: 0
-        FirstSpawn: 1
-        LastSpawn: 0
-        Consumption:
-          Enabled: 0
-          RequiredFlags: []
-          Orders: []
-          RequireAll: 1
-          Result: 0
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
-  - Id: 968a87dc0be44ce5891783ed563396aa
-    Name: Mothman Order Correct 1 - A
-    Position: {x: 350, y: 100}
-    Kind: 0
-    Entry: {fileID: 11400000, guid: 149b88b7e6d14c0d9f9005812a782712, type: 2}
-    Next: ad2224aa29b54eadb0d87a9a096f3c53
-    Otherwise: 
-    Selection: 0
-    Branches: []
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
-  - Id: 91a2cd1f0ccf4dfbbd890d0b15ea65e6
-    Name: Mothman Order Correct 2 - A
-    Position: {x: 350, y: 255}
-    Kind: 0
-    Entry: {fileID: 11400000, guid: 672393815ac94815990e125168574b72, type: 2}
-    Next: ad2224aa29b54eadb0d87a9a096f3c53
-    Otherwise: 
-    Selection: 0
-    Branches: []
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
-  - Id: ad2224aa29b54eadb0d87a9a096f3c53
+  - Id: end
     Name: End
-    Position: {x: 640, y: 100}
-    Kind: 5
-    Entry: {fileID: 0}
-    Next: 
-    Otherwise: 
-    Selection: 0
-    Branches: []
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
+    Position: {x: 410, y: 0}
+    End: 1
+    Selection: 3
+    Entries: []

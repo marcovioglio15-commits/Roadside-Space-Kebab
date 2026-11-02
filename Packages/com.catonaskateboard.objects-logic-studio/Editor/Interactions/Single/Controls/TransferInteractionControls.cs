@@ -60,8 +60,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Container(SerializedProperty settings, ObjectStudioSections sections)
         {
             // Hidden inventory retains the same instance; only presentation controls become irrelevant.
-            Target(settings.FindPropertyRelative("Target"), sections);
-            if (sections.Draw("Container Storage", "Store carried objects or use accepted items to refill finite prefab supply.", settings, "AllowedFlags", "Match", "Unlimited", "Capacity", "LimitToDispenserSpace", "RefillDispenser", "KeepVisible", "Position", "Rotation", "Spacing"))
+            HoverControls.Field(settings, "Mode");
+            if (settings.FindPropertyRelative("Mode").enumValueIndex != (int)ContainerMode.ScoopFromDispenser)
+                Target(settings.FindPropertyRelative("Target"), sections);
+            if (sections.Draw("Container Storage", "Choose accepted flags and storage or scoop settings.", settings, "AllowedFlags", "Match", "Unlimited", "Capacity", "LimitToDispenserSpace", "KeepVisible", "Position", "Rotation", "Spacing", "InitialFill", "ScoopAnimation"))
                 using (new StudioIndentScope())
                     Storage(settings);
             InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Container Steps");
@@ -77,13 +79,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectFlagSelector.Draw(flags);
             if (flags.arraySize > 1)
                 HoverControls.Field(settings, "Match");
-            UnityEngine.Object owner = settings.serializedObject.targetObject;
-            GameObject root = owner is ObjectWorkspace workspace ? workspace.Target.Resolve() : owner is Component component ? component.gameObject : null;
-            if (root == null || root.GetComponent<ObjectDispenser>() is ObjectDispenser dispenser && !dispenser.Settings.Unlimited && !dispenser.Settings.UseContainer
-                || settings.FindPropertyRelative("RefillDispenser").boolValue)
-                HoverControls.Field(settings, "RefillDispenser");
-            if (settings.FindPropertyRelative("RefillDispenser").boolValue)
+            ContainerMode mode = (ContainerMode)settings.FindPropertyRelative("Mode").enumValueIndex;
+            if (mode == ContainerMode.RefillDispenser)
                 return;
+            if (mode == ContainerMode.ScoopFromDispenser)
+            {
+                HoverControls.Field(settings, "Capacity");
+                HoverControls.Field(settings, "InitialFill");
+                ScoopAnimationControls.Draw(settings.FindPropertyRelative("ScoopAnimation"));
+                return;
+            }
             HoverControls.Field(settings, "Unlimited");
             if (!settings.FindPropertyRelative("Unlimited").boolValue)
                 HoverControls.Field(settings, "Capacity");

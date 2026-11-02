@@ -13,16 +13,6 @@ MonoBehaviour:
   m_Name: Mothman Order Correct 2 - A
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Mothman Order Correct 2 - A
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Nuggets
-    - French Fries
-    - Water
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Mothman
     Text: 'This reminds me of the dancing Cicada.

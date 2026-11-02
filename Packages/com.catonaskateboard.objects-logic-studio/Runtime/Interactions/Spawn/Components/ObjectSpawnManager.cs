@@ -92,6 +92,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Validates once and subscribes to committed interaction events.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Disabled rules miss completions deliberately; their already queued work resumes on reactivation.
             Signaled -= Observe;
             if (flow != null && observedSession == session)
@@ -129,6 +131,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Stops receiving events without resetting per-instance progress or live capacity.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Re-enabling cannot duplicate an already consumed condition cycle.
             Signaled -= Observe;
             flow?.Stop();
@@ -192,12 +196,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
             // Starts, cancelled effects and completions while locked never satisfy this rule.
-            if (!ready || moment != InteractionMoment.Completed || !Available(InteractionChannels.Spawn)
+            if (!ready || !Available(InteractionChannels.Spawn)
                 || source == null)
                 return;
             for (int index = 0; index < settings.Conditions.Length; index++)
             {
-                if (!source.TryResolveCompletionRoot(settings.Conditions[index].SourceId, out Transform sourceRoot))
+                if (!settings.Conditions[index].Step.Matches(source, moment)
+                    || !source.TryResolveCompletionRoot(settings.Conditions[index].SourceId, out Transform sourceRoot))
                     continue;
                 Prune();
                 if (!progress.TryGetValue(sourceRoot, out SpawnProgress state))

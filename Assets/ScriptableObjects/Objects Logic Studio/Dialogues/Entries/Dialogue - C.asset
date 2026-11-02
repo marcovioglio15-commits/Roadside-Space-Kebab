@@ -13,13 +13,6 @@ MonoBehaviour:
   m_Name: Dialogue - C
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Dialogue - C
-  Weight: 1
-  Consumption:
-    Enabled: 0
-    RequiredFlags: []
-    Orders: []
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Gino
     Text: I'm on a roll... got it? Like a kebab!

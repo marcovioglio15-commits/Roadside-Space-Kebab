@@ -13,13 +13,6 @@ MonoBehaviour:
   m_Name: Tutorial 1 - A
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Tutorial 1 - A
-  Weight: 1
-  Consumption:
-    Enabled: 0
-    RequiredFlags: []
-    Orders: []
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Grandpa's Pic
     Text: 'Child, it is I, Grandpa.

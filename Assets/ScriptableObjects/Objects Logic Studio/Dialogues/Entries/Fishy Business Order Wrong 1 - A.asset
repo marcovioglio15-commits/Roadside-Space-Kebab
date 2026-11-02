@@ -13,15 +13,6 @@ MonoBehaviour:
   m_Name: Fishy Business Order Wrong 1 - A
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Fishy Business Order Wrong 1 - A
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Kebab Wrap
-    - Soda
-    RequireAll: 1
-    Result: 1
   Lines:
   - Speaker: Fishy Business
     Text: "Hey, CHUM, guess what? You\u2019ve got the WRONG order."

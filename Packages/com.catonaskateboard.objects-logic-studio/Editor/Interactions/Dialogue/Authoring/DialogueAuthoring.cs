@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
@@ -26,6 +27,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Image background = panel.gameObject.AddComponent<Image>();
             background.color = new Color(0.035f, 0.045f, 0.06f, 0.94f);
             background.raycastTarget = false;
+            CanvasGroup box = panel.gameObject.AddComponent<CanvasGroup>();
+            box.interactable = false;
+            box.blocksRaycasts = false;
 
             // Explicit pages keep their authored line breaks; the tool never splits text automatically.
             Text speaker = CreateText("Speaker", panel, new Vector2(24f, -52f), new Vector2(-24f, -16f), 26);
@@ -33,7 +37,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             speaker.rectTransform.offsetMin = new Vector2(24f, -52f);
             speaker.rectTransform.offsetMax = new Vector2(-24f, -16f);
             speaker.fontStyle = FontStyle.Bold;
-            Text body = CreateText("Page", panel, new Vector2(24f, 18f), new Vector2(-24f, -58f), 25);
+            RectTransform page = ObjectUiAuthoring.CreateRect("Page", panel);
+            ObjectUiAuthoring.Stretch(page);
+            page.offsetMin = new Vector2(24f, 18f);
+            page.offsetMax = new Vector2(-24f, -58f);
+            TextMeshProUGUI body = page.gameObject.AddComponent<TextMeshProUGUI>();
+            body.font = TMP_Settings.defaultFontAsset;
+            body.fontSize = 25f;
+            body.color = Color.white;
+            body.alignment = TextAlignmentOptions.TopLeft;
+            body.raycastTarget = false;
+            body.overflowMode = TextOverflowModes.Overflow;
             DialogueHud hud = root.gameObject.AddComponent<DialogueHud>();
             using (SerializedObject data = new SerializedObject(hud))
             {
@@ -41,6 +55,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("panel").objectReferenceValue = panel;
                 data.FindProperty("body").objectReferenceValue = body;
                 data.FindProperty("speaker").objectReferenceValue = speaker;
+                data.FindProperty("box").objectReferenceValue = box;
                 data.ApplyModifiedPropertiesWithoutUndo();
             }
             panel.gameObject.SetActive(false);

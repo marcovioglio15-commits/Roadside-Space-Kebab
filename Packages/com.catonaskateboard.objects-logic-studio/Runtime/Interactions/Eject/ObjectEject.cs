@@ -58,6 +58,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores temporary launch overrides before a pooled object can be reused.</summary>
         protected override void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // An interrupted prerequisite must never launch a reused or re-enabled object later.
             CancelAnimation();
             attraction.Cancel();

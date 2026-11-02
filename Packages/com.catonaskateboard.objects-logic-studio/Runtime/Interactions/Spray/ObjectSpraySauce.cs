@@ -82,6 +82,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Registers valid flow once without resetting partially used capacity.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             if (!Application.isPlaying)
                 return;
             ready = TryValidate(out string warning);
@@ -98,6 +100,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Stops emission and withdraws input when disabled or stored.</summary>
         protected override void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             StopEmission();
             ready = false;
             base.OnDisable();

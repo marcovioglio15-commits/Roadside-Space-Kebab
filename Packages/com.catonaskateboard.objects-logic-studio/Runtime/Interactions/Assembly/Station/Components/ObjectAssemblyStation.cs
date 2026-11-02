@@ -67,6 +67,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Registers this table without searching for players or binding input in every frame.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // The shared observer resolves the current PlayerInput for all tables.
             AssemblyInteractionRegistry.Register(this);
             InitializeContact();
@@ -96,6 +98,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Removes input ownership while leaving any real assembled product in the world.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // A table never destroys a completed or partially built product when disabled.
             AssemblyInteractionRegistry.Unregister(this);
             contact?.Reset();

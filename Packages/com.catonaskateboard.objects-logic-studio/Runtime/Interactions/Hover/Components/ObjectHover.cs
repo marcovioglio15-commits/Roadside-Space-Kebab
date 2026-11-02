@@ -80,6 +80,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Captures owned colliders once when an interaction becomes active.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Components registered before the observer starts need no scene searches.
             Refresh();
             HoverRegistry.Register(this);
@@ -88,6 +90,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Removes the interaction and its visible text immediately.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Unregistration also supports pooled or destroyed prefab instances.
             Hide();
             HoverRegistry.Unregister(this);

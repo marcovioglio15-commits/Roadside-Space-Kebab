@@ -37,6 +37,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Caches the same-object Grab required by this feature.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // No dependency lookup occurs during normal input or carry updates.
             grab = GetComponent<ObjectGrab>();
             base.OnEnable();
@@ -45,6 +47,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores collider assets before disposing the one cached runtime material.</summary>
         protected override void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Deleting a release component must not leave its material assigned to the object.
             if (surface != null)
             {

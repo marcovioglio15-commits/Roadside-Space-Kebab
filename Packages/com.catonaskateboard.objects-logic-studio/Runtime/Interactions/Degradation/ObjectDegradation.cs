@@ -41,6 +41,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Prepares appearance bindings once and resumes retained progress on reactivation.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             if (!Application.isPlaying)
                 return;
             ObjectInteraction.Signaled += Observe;
@@ -67,6 +69,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Stops listening while disabled without losing stage progress through storage.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             ObjectInteraction.Signaled -= Observe;
         }
 

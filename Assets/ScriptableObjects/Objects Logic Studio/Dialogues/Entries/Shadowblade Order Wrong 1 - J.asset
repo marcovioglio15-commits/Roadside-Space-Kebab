@@ -13,14 +13,6 @@ MonoBehaviour:
   m_Name: Shadowblade Order Wrong 1 - J
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Shadowblade Order Wrong 1 - J
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Pizza Rossa
-    RequireAll: 1
-    Result: 1
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: Ugh, toxins for my delicate system.

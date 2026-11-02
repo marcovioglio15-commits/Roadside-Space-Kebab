@@ -16,7 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static bool Supports(ScriptableObject asset)
         {
             return asset is SingleInteractionPreset or ExtendedInteractionPreset or HoverPreset or DialogueEntry
-                or DialogueTree or OrderCatalog or ContactModificationDefinition or SpawnFlowPlan;
+                or DialogueTree or DialogueTriggerPreset or OrderCatalog or ContactModificationDefinition or SpawnFlowPlan;
         }
 
         /// <summary>Navigates to an existing editor without editing any value from the canvas.</summary>
@@ -35,11 +35,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case DialogueEntry entry:
                     DialogueEntryWindow.Open(entry);
                     break;
-#if OBJECTS_LOGIC_STUDIO_DIALOGUE_GRAPH
+                case DialogueTriggerPreset trigger:
+                    DialogueTriggerWindow.Open(trigger);
+                    break;
                 case DialogueTree tree:
                     DialogueTreeWindow.Open(tree);
                     break;
-#endif
                 case OrderCatalog orders:
                     OrderCatalogWindow.Open(orders);
                     break;

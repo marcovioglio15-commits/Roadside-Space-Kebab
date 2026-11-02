@@ -10,147 +10,31 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
-  m_Name: PF_Client_FishyBusiness - FishyBusiness Delivery Correct Tree
+  m_Name: "PF_Client_FishyBusiness - FishyBusiness Delivery Correct Tree"
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
-  Start: 1eee287513b54aedb3105a48d29d7dec
+  Start: root
   Nodes:
-  - Id: 1eee287513b54aedb3105a48d29d7dec
-    Name: Select Entry
-    Position: {x: 30, y: 100}
-    Kind: 1
-    Entry: {fileID: 0}
-    Next: 
-    Otherwise: 
+  - Id: root
+    Name: "FishyBusiness Delivery Correct "
+    Position: {x: 0, y: 0}
+    End: 0
     Selection: 0
-    Branches:
-    - Name: Fishy Business Order Correct 1 - D
-      Target: 138e28a0c10542989ca6c573878f2c75
+    Entries:
+    - Id: 8ce438ec4e5bd8ccaa71fd907812d53a
+      Name: "Fishy Business Order Correct 1 - D"
+      Entry: {fileID: 11400000, guid: 58bcf53fd716480cb39592907c1ae19b, type: 2}
+      Trigger: {fileID: 11400000, guid: b7f4cf57a622a40f8722d626c03597b4, type: 2}
+      Next: end
       Weight: 1
-      Condition:
-        RequireAll: 1
-        Invert: 0
-        CheckFlags: 0
-        Flags: []
-        AllFlags: 1
-        CheckSpawn: 0
-        FirstSpawn: 1
-        LastSpawn: 0
-        Consumption:
-          Enabled: 0
-          RequiredFlags: []
-          Orders: []
-          RequireAll: 1
-          Result: 0
-    - Name: Fishy Business Order Correct 2 - D
-      Target: a6e297a2084a441aa7b96e1f595d9b31
+    - Id: b6943ad8da8e34947a8f3dfb5b54599f
+      Name: "Fishy Business Order Correct 2 - D"
+      Entry: {fileID: 11400000, guid: 6788827458644968bd68081154330229, type: 2}
+      Trigger: {fileID: 11400000, guid: b7f4cf57a622a40f8722d626c03597b4, type: 2}
+      Next: end
       Weight: 1
-      Condition:
-        RequireAll: 1
-        Invert: 0
-        CheckFlags: 0
-        Flags: []
-        AllFlags: 1
-        CheckSpawn: 0
-        FirstSpawn: 1
-        LastSpawn: 0
-        Consumption:
-          Enabled: 0
-          RequiredFlags: []
-          Orders: []
-          RequireAll: 1
-          Result: 0
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
-  - Id: 138e28a0c10542989ca6c573878f2c75
-    Name: Fishy Business Order Correct 1 - D
-    Position: {x: 350, y: 100}
-    Kind: 0
-    Entry: {fileID: 11400000, guid: 58bcf53fd716480cb39592907c1ae19b, type: 2}
-    Next: a21d70bac6b247f4bdc683cc717f06a4
-    Otherwise: 
-    Selection: 0
-    Branches: []
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
-  - Id: a6e297a2084a441aa7b96e1f595d9b31
-    Name: Fishy Business Order Correct 2 - D
-    Position: {x: 350, y: 255}
-    Kind: 0
-    Entry: {fileID: 11400000, guid: 6788827458644968bd68081154330229, type: 2}
-    Next: a21d70bac6b247f4bdc683cc717f06a4
-    Otherwise: 
-    Selection: 0
-    Branches: []
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
-  - Id: a21d70bac6b247f4bdc683cc717f06a4
+  - Id: end
     Name: End
-    Position: {x: 640, y: 100}
-    Kind: 5
-    Entry: {fileID: 0}
-    Next: 
-    Otherwise: 
-    Selection: 0
-    Branches: []
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
+    Position: {x: 410, y: 0}
+    End: 1
+    Selection: 3
+    Entries: []

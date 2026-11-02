@@ -39,6 +39,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Validates once when the ambient interaction becomes active.</summary>
         protected override void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Re-enabling uses the current settings without retaining stale emitter ownership.
             Configure();
         }
@@ -78,6 +80,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases this emitter's audio when its object is suspended or destroyed.</summary>
         protected override void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Other ambient emitters retain their own instances.
             Stop();
             base.OnDisable();

@@ -4,25 +4,24 @@ using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Arbitrates a single HUD across eligible dialogues while preserving all player movement controls.</summary>
+    /// <summary>Arbitrates visible pages while waiting tree cursors leave the shared HUD free.</summary>
     internal sealed class DialogueDriver
     {
-        #region Bindings
+        #region Types
 
-        /// <summary>Holds independently buffered activation and page-advance actions for one dialogue.</summary>
-        private readonly struct Buttons
+        /// <summary>Retains already resolved buttons for one complete conversation sheet.</summary>
+        private sealed class Buttons
         {
-            internal readonly InteractionButton Start;
+            internal readonly Dictionary<InputActionReference, InteractionButton> Starts = new Dictionary<InputActionReference, InteractionButton>();
             internal readonly InteractionButton Advance;
 
-            /// <summary>Captures buttons already resolved against the player's private action asset.</summary>
-            /// <param name="start">Optional input-activation button.</param>
-            /// <param name="advance">Required page-advance button.</param>
-            internal Buttons(InteractionButton start, InteractionButton advance)
+            /// <summary>Binds the selected spawn tree once against private player input.</summary>
+            /// <param name="dialogue">Dialogue containing row trigger references.</param>
+            /// <param name="input">Observer-owned input router.</param>
+            internal Buttons(ObjectDialogue dialogue, InteractionInputRouter input)
             {
-                // These references are shared within the driver's input router.
-                Start = start;
-                Advance = advance;
+                Advance = input.Bind(dialogue.AdvanceAction);
+                dialogue.BindStarts(input, Starts);
             }
         }
 
@@ -45,10 +44,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Binding
 
-        /// <summary>Interrupts presentation and detaches input when observer context disappears.</summary>
+        /// <summary>Releases presentation and player-specific subscriptions when observer context ends.</summary>
         internal void Reset()
         {
-            // Interrupt retains each component's configured resume/restart policy.
             if (active != null)
                 active.Interrupt();
             active = null;
@@ -60,11 +58,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             missingHudReported = false;
         }
 
-        /// <summary>Rebuilds button associations only when the feature catalog or player asset changes.</summary>
-        /// <param name="observer">Player context shared with single interactions and hover.</param>
+        /// <summary>Rebuilds action associations only at registry or player-input changes.</summary>
+        /// <param name="observer">Current player and view context.</param>
         private void Bind(HoverObserver observer)
         {
-            // Replacement players do not inherit presentation or buffered presses from the previous owner.
             if (player != observer.Player)
             {
                 Reset();
@@ -78,52 +75,44 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             revision = DialogueRegistry.Revision;
             inputRevision = input.Revision;
             foreach (ObjectDialogue dialogue in DialogueRegistry.Items)
-            {
-                if (dialogue == null || !dialogue.Ready)
-                    continue;
-                InteractionButton advance = input.Bind(dialogue.AdvanceAction);
-                InteractionButton start = !dialogue.ArrivalOnly && dialogue.Settings.Trigger == DialogueTrigger.InputAction ? input.Bind(dialogue.StartAction) : null;
-                if (advance == null || !dialogue.ArrivalOnly && dialogue.Settings.Trigger == DialogueTrigger.InputAction && start == null)
+                if (dialogue != null && dialogue.Ready)
                 {
-                    Debug.LogWarning("Dialogue needs its Button actions in the Observer player's active PlayerInput asset.", dialogue);
-                    continue;
+                    Buttons buttons = new Buttons(dialogue, input);
+                    if (buttons.Advance != null)
+                        bindings.Add(dialogue, buttons);
+                    else
+                        Debug.LogWarning("Dialogue advance must be a Button in the Observer player's Input Actions asset.", dialogue);
                 }
-                bindings.Add(dialogue, new Buttons(start, advance));
-            }
         }
 
         #endregion
 
         #region Arbitration
 
-        /// <summary>Advances the active dialogue or selects the highest-priority eligible request.</summary>
-        /// <param name="observer">Current player and view context.</param>
-        /// <param name="singles">Single-action driver prepared for this observation pass.</param>
-        /// <returns>The shared action consumed this frame, or null for proximity-only work.</returns>
+        /// <summary>Advances the current page or starts one matching row from the highest-priority tree.</summary>
+        /// <param name="observer">Current camera, player and shared HUD.</param>
+        /// <param name="singles">Single-action driver sharing physical input presses.</param>
+        /// <returns>The action consumed this frame, or null for automatic work.</returns>
         internal InputActionReference Tick(HoverObserver observer, SingleInteractionDriver singles)
         {
-            // The router never enables maps, changes cursor state or locks the controller.
             Bind(observer);
-            // A hit on another object cannot interrupt or advance the dialogue currently owning the HUD.
             if (InteractionProjectileInput.Active && active != null && !InteractionProjectileInput.Allows(active))
                 return null;
             input.Consume(singles.AssemblyButton);
             input.Consume(AssemblyInteractionRegistry.Consumed);
             foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
                 input.Consume(action);
-            bool presentationReady = observer.DialogueHud != null && observer.DialogueHud.IsOwnedBy(observer);
-            if (!presentationReady && bindings.Count > 0 && !missingHudReported)
+            bool ready = observer.DialogueHud != null && observer.DialogueHud.IsOwnedBy(observer);
+            if (!ready && bindings.Count > 0 && !missingHudReported)
             {
-                Debug.LogWarning(observer.DialogueHud == null
-                    ? "Create the shared Dialogue HUD in Objects Logic Studio > Scene Observer."
-                    : "The assigned Dialogue HUD is unavailable. Check that its hierarchy is active, its UI references are valid, and another observer is not using it.", observer);
+                Debug.LogWarning("Assign an active saved Dialogue HUD in Objects Logic Studio > Scene Observer.", observer);
                 missingHudReported = true;
             }
-            if (presentationReady)
+            if (ready)
                 missingHudReported = false;
-            if (!input.Usable || !presentationReady || Time.timeScale <= 0f)
+            if (!input.Usable || !ready || Time.timeScale <= 0f)
             {
-                if (active != null && (!input.Usable || !presentationReady))
+                if (active != null && (!input.Usable || !ready))
                     active.Interrupt();
                 input.ClearSignals();
                 return null;
@@ -134,46 +123,42 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 active.Interrupt();
                 active = null;
             }
-            InputActionReference consumed = null;
             ObjectDialogue selected = null;
-            // Observe all ranges even while another dialogue is speaking, so completed entries rearm on departure.
+            // Observe ranges while another page is visible, but choose at most one waiting tree.
             foreach (KeyValuePair<ObjectDialogue, Buttons> pair in bindings)
-                if (pair.Key != null && InteractionProjectileInput.Allows(pair.Key)
-                    && (!InteractionProjectileInput.Active || !pair.Key.ArrivalOnly && pair.Key.Settings.Trigger == DialogueTrigger.InputAction)
-                    && pair.Key.CanStart(player) && active == null && pair.Value.Advance.Enabled
-                    && (pair.Key.ArrivalOnly || pair.Key.Settings.Trigger != DialogueTrigger.InputAction || pair.Value.Start.Pending)
+                if (pair.Key != null && InteractionProjectileInput.Allows(pair.Key) && pair.Key.CanStart(player, pair.Value.Starts)
+                    && active == null && pair.Value.Advance.Enabled
                     && (selected == null || pair.Key.Settings.Priority > selected.Settings.Priority
                         || pair.Key.Settings.Priority == selected.Settings.Priority
                         && EntityId.ToULong(pair.Key.GetEntityId()) < EntityId.ToULong(selected.GetEntityId()))
                     && pair.Key.CanPresent(observer, visibility, false))
                     selected = pair.Key;
-            if (active != null)
+            InputActionReference consumed = null;
+            if (active != null && bindings[active].Advance.Pending)
             {
-                if (bindings[active].Advance.Pending)
+                consumed = active.AdvanceAction;
+                if ((!active.Settings.PreferSingleActions || !singles.TryPrioritize(observer, bindings[active].Advance, active.Settings.PreferredActions))
+                    && active.CanAdvance(observer, visibility))
                 {
-                    consumed = active.AdvanceAction;
-                    // Consume a blocked dialogue press so the same action cannot unexpectedly grab or drop an item.
-                    if ((!active.Settings.PreferSingleActions || !singles.TryPrioritize(observer, bindings[active].Advance, active.Settings.PreferredActions))
-                        && active.CanAdvance(observer, visibility))
-                    {
-                        InteractionProjectileInput.Confirm(active);
-                        active.Advance();
-                    }
+                    InteractionProjectileInput.Confirm(active);
+                    active.Advance();
                 }
             }
-            else if (selected != null)
+            else if (active == null && selected != null)
             {
-                InputActionReference requested = !selected.ArrivalOnly && selected.Settings.Trigger == DialogueTrigger.InputAction
-                    ? selected.StartAction : null;
-                if (requested != null && selected.Settings.PreferSingleActions
-                    && singles.TryPrioritize(observer, bindings[selected].Start, selected.Settings.PreferredActions))
+                selected.PrepareRequest();
+                InputActionReference requested = selected.RequestedAction;
+                bool preferred = requested != null && selected.Settings.PreferSingleActions
+                    && bindings[selected].Starts.TryGetValue(requested, out InteractionButton start)
+                    && singles.TryPrioritize(observer, start, selected.Settings.PreferredActions);
+                if (preferred)
                     consumed = requested;
                 else
-                    selected.Begin(observer.DialogueHud);
-                if (selected.IsSpeaking)
                 {
-                    active = selected;
-                    consumed = !selected.ArrivalOnly && selected.Settings.Trigger == DialogueTrigger.InputAction ? selected.StartAction : null;
+                    if (selected.Begin(observer.DialogueHud))
+                        consumed = requested;
+                    if (selected.IsSpeaking)
+                        active = selected;
                 }
             }
             if (consumed != null)

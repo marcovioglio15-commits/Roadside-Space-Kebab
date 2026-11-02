@@ -1,4 +1,5 @@
 using CatOnASkateboard.StudioColors.Editor;
+using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -39,6 +40,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using StudioIndentScope rowIndent = new StudioIndentScope();
                 HoverControls.Field(step, "Count");
                 ItemAppearanceControls.Draw(step.FindPropertyRelative("Appearance"));
+                SerializedProperty flags = step.FindPropertyRelative("Flags");
+                HoverControls.Field(flags, "Mode");
+                if (flags.FindPropertyRelative("Mode").enumValueIndex == (int)InventoryFlagMode.KeepBase)
+                    continue;
+                ObjectFlagSelector.Draw(flags.FindPropertyRelative("Flags"));
+                if (flags.FindPropertyRelative("Mode").enumValueIndex == (int)InventoryFlagMode.AddRemove)
+                    ObjectFlagSelector.Draw(flags.FindPropertyRelative("Remove"));
             }
             if (StudioButton.Draw(new GUIContent("+ Add Fill Step", "Add an item-count threshold with mesh or material changes.")))
             {

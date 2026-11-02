@@ -1,3 +1,6 @@
+using CatOnASkateboard.StudioIdentity;
+using UnityEngine;
+
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Shares one original appearance across both inventory features and changes it only at count boundaries.</summary>
@@ -8,6 +11,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly InventoryFillStep[][] steps;
         private readonly ItemAppearanceChanges[][] changes;
         private readonly int[] selected = { -1, -1 };
+        private readonly ObjectIdentity identity;
+        private readonly ObjectInteraction[] owners;
 
         #endregion
 
@@ -18,11 +23,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Retains two prepared step lists whose snapshots all precede the first visual change.</summary>
         /// <param name="configuration">Container and dispenser thresholds.</param>
         /// <param name="prepared">Bound appearance operations for each threshold.</param>
-        private InventoryFillRun(InventoryFillStep[][] configuration, ItemAppearanceChanges[][] prepared)
+        /// <param name="item">Root supplying independent fill layer owners.</param>
+        private InventoryFillRun(InventoryFillStep[][] configuration, ItemAppearanceChanges[][] prepared, ObjectItem item)
         {
             // A shared baseline avoids one feature capturing the other's already modified mesh.
             steps = configuration;
             changes = prepared;
+            identity = item.Identity;
+            owners = new ObjectInteraction[] { item.GetComponent<ObjectContainer>(), item.GetComponent<ObjectDispenser>() };
         }
 
         /// <summary>Prepares both features atomically before either can alter the object's geometry.</summary>
@@ -50,7 +58,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (!ItemAppearanceChanges.TryPrepare(item, configuration[group][index].Appearance, out prepared[group][index], out warning))
                         return false;
             }
-            run = new InventoryFillRun(configuration, prepared);
+            run = new InventoryFillRun(configuration, prepared, item);
             warning = string.Empty;
             return true;
         }
@@ -69,22 +77,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             int dispenser = Select(steps[1], remaining);
             if (container == selected[0] && dispenser == selected[1])
                 return;
+            using ObjectIdentityChangeScope scope = identity.GroupChanges();
             Restore();
             selected[0] = container;
             selected[1] = dispenser;
             for (int group = 0; group < selected.Length; group++)
                 if (selected[group] >= 0)
+                {
                     changes[group][selected[group]].Commit();
+                    InventoryFlagSettings flags = steps[group][selected[group]].Flags;
+                    if (flags.Mode != InventoryFlagMode.KeepBase)
+                        identity.SetState(owners[group], flags.Mode == InventoryFlagMode.Replace, flags.Flags,
+                            flags.Mode == InventoryFlagMode.AddRemove ? flags.Remove : System.Array.Empty<ObjectFlag>(), group);
+                }
         }
 
         /// <summary>Restores original geometry when changing steps or starting a fresh retained-scene session.</summary>
         internal void Restore()
         {
+            using ObjectIdentityChangeScope scope = identity.GroupChanges();
             // Reverse feature order mirrors commit order if both intentionally target the same component.
             for (int group = selected.Length - 1; group >= 0; group--)
             {
                 if (selected[group] >= 0)
                     changes[group][selected[group]].Restore();
+                if (owners[group] != null)
+                    identity.RemoveState(owners[group]);
                 selected[group] = -1;
             }
         }

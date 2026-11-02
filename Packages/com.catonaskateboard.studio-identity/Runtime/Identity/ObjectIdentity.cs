@@ -22,6 +22,9 @@ namespace CatOnASkateboard.StudioIdentity
 
         private readonly HashSet<ObjectFlag> current = new HashSet<ObjectFlag>();
         private readonly HashSet<ObjectFlag> effective = new HashSet<ObjectFlag>();
+        private readonly List<ObjectFlagState> states = new List<ObjectFlagState>();
+        private int changeDepth;
+        private bool changed;
         private readonly List<(UnityEngine.Object Owner, ObjectFlag Flag, ObjectFlagOperation Operation)> temporary
             = new List<(UnityEngine.Object, ObjectFlag, ObjectFlagOperation)>();
         private int initializationSession = -1;
@@ -43,7 +46,7 @@ namespace CatOnASkateboard.StudioIdentity
             {
                 // The set is initialized on demand for inactive staging objects.
                 Initialize();
-                return temporary.Count > 0 ? effective : current;
+                return temporary.Count > 0 || states.Count > 0 ? effective : current;
             }
         }
 
@@ -75,7 +78,7 @@ namespace CatOnASkateboard.StudioIdentity
             // Permanent membership survives pooling; temporary contact membership ends with activation.
             ObjectIdentityRegistry.Unregister(this);
             temporary.Clear();
-            effective.Clear();
+            RefreshTemporary();
         }
 
         /// <summary>Invalidates retained membership before scene callbacks start a new Play session.</summary>
@@ -96,6 +99,9 @@ namespace CatOnASkateboard.StudioIdentity
             initializationSession = session;
             current.Clear();
             temporary.Clear();
+            states.Clear();
+            changeDepth = 0;
+            changed = false;
             effective.Clear();
             if (flags != null)
                 foreach (ObjectFlag flag in flags)
@@ -118,7 +124,7 @@ namespace CatOnASkateboard.StudioIdentity
             if (!Application.isPlaying)
                 return flags != null && Array.IndexOf(flags, flag) >= 0;
             Initialize();
-            return temporary.Count > 0 ? effective.Contains(flag) : current.Contains(flag);
+            return temporary.Count > 0 || states.Count > 0 ? effective.Contains(flag) : current.Contains(flag);
         }
 
         /// <summary>Checks a combination of flags using the requested any/all rule.</summary>
@@ -212,19 +218,88 @@ namespace CatOnASkateboard.StudioIdentity
                 RefreshTemporary();
         }
 
+        /// <summary>Groups synchronous changes so listeners see only the final flag set.</summary>
+        /// <returns>A value scope to dispose at the end of the transaction.</returns>
+        public ObjectIdentityChangeScope GroupChanges()
+        {
+            Initialize();
+            return new ObjectIdentityChangeScope(this);
+        }
+
+        /// <summary>Begins a nested change group without allocating a notification object.</summary>
+        internal void BeginChangeScope()
+        {
+            changeDepth++;
+        }
+
+        /// <summary>Releases the group and notifies once if membership was recomputed.</summary>
+        internal void EndChangeScope()
+        {
+            changeDepth--;
+            if (changeDepth == 0 && changed)
+            {
+                changed = false;
+                Changed?.Invoke(this);
+            }
+        }
+
+        /// <summary>Replaces only this owner's reversible state, ordered below contact flags.</summary>
+        /// <param name="owner">Component responsible for removing this state.</param>
+        /// <param name="replace">Whether underlying membership is replaced.</param>
+        /// <param name="add">Validated flags included by this state.</param>
+        /// <param name="remove">Validated flags excluded by this state.</param>
+        /// <param name="priority">Stable state precedence; larger values apply later.</param>
+        public void SetState(UnityEngine.Object owner, bool replace, ObjectFlag[] add, ObjectFlag[] remove, int priority)
+        {
+            // Preserve independent permanent changes and other owners' layers.
+            Initialize();
+            RemoveState(owner, false);
+            ObjectFlagState state = new ObjectFlagState(owner, replace, add, remove, priority);
+            int index = 0;
+            while (index < states.Count && states[index].Priority <= priority)
+                index++;
+            states.Insert(index, state);
+            RefreshTemporary();
+        }
+
+        /// <summary>Withdraws one reversible state without restoring an outdated global snapshot.</summary>
+        /// <param name="owner">Component whose layer ends.</param>
+        /// <param name="notify">Whether to recompute membership immediately.</param>
+        public void RemoveState(UnityEngine.Object owner, bool notify = true)
+        {
+            Initialize();
+            for (int index = states.Count - 1; index >= 0; index--)
+                if (states[index].Owner == owner)
+                    states.RemoveAt(index);
+            if (notify)
+                RefreshTemporary();
+        }
+
         /// <summary>Rebuilds effective membership only when a permanent or temporary operation changes.</summary>
         private void RefreshTemporary()
         {
             // Ordinary membership queries read the cached set without allocations or owner searches.
             effective.Clear();
-            if (temporary.Count > 0)
+            if (temporary.Count > 0 || states.Count > 0)
             {
                 effective.UnionWith(current);
+                foreach (ObjectFlagState state in states)
+                {
+                    if (state.Owner == null)
+                        continue;
+                    if (state.Replace)
+                        effective.Clear();
+                    effective.ExceptWith(state.Remove);
+                    effective.UnionWith(state.Add);
+                }
                 foreach ((UnityEngine.Object Owner, ObjectFlag Flag, ObjectFlagOperation Operation) entry in temporary)
                     if (entry.Owner != null)
                         Apply(effective, entry.Flag, entry.Operation);
             }
-            Changed?.Invoke(this);
+            if (changeDepth > 0)
+                changed = true;
+            else
+                Changed?.Invoke(this);
         }
 
         /// <summary>Applies a validated operation to either base or temporary membership.</summary>

@@ -120,6 +120,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     warning = "Choose existing source interactions with positive completion quantities; spawn rules cannot trigger one another.";
                     return false;
                 }
+                if (!condition.Step.TryValidate(condition.Source, out warning))
+                    return false;
                 for (int previous = 0; previous < index; previous++)
                     if (Conditions[previous].Source == condition.Source)
                     {

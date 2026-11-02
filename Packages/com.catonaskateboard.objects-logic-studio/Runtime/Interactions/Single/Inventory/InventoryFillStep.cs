@@ -12,9 +12,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Header("Fill Step")]
         [Tooltip("Minimum item count for this appearance. The highest reached threshold wins, including while the count decreases.")]
+        [Range(0, 1000)]
         public int Count;
         [Tooltip("Mesh and material changes relative to the original object. Below all thresholds the original appearance is restored.")]
         public ItemAppearanceSettings Appearance = new ItemAppearanceSettings();
+        [Tooltip("Optional reversible flag state selected by this threshold.")]
+        public InventoryFlagSettings Flags = new InventoryFlagSettings();
 
         #endregion
 
@@ -37,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 if (step == null || step.Count < 0 || !counts.Add(step.Count) || step.Appearance == null)
                     return false;
-                if (!step.Appearance.TryValidate(out warning))
+                if (!step.Appearance.TryValidate(out warning) || step.Flags == null || !step.Flags.TryValidate(out warning))
                     return false;
             }
             warning = string.Empty;

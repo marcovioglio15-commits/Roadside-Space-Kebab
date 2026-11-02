@@ -93,6 +93,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Initializes locks before any other product feature becomes active.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Re-enabling a pooled product retains its real ingredient hierarchy and counts.
             Initialize();
             if (initialized)
@@ -110,6 +112,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases temporary magnet placement before pooling or transferring ingredient ownership.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             Pickup?.Unregister();
             // Completed recipe progress remains intact when the product is reenabled.
             if (TryGetComponent(out ObjectGrab grab))

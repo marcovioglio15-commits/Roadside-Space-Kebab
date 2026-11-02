@@ -106,6 +106,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             });
                             HoverControls.Field(condition, "Moment");
                             ObjectInteraction source = choices.Resolve(sources.GetArrayElementAtIndex(index).longValue);
+                            if (condition.FindPropertyRelative("Moment").enumValueIndex == (int)InteractionMoment.Completed)
+                                DialogueStepControls.Draw(condition.FindPropertyRelative("Step"), source);
                             if (source is ObjectContactModifier contact && contact.Settings.ConsumesAny)
                                 Consumption(condition);
                             else if (condition.FindPropertyRelative("FilterConsumed").boolValue)

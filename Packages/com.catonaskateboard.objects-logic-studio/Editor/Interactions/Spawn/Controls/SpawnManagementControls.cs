@@ -171,6 +171,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         }
                     }
                     HoverControls.Field(row, "Count");
+                    DialogueStepControls.Draw(row.FindPropertyRelative("Step"), source.objectReferenceValue as ObjectInteraction);
                     if (source.objectReferenceValue != null && Array.IndexOf(sources, source.objectReferenceValue as ObjectInteraction) < 0)
                         EditorGUILayout.LabelField("Choose an interaction from the current source prefab.", EditorStyles.miniLabel);
                 }

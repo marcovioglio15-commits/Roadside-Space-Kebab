@@ -54,6 +54,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Validates once and retains the optional mass source for collision feedback.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             if (!Application.isPlaying)
                 return;
             ready = TryValidate(out string warning);
@@ -65,6 +67,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores visual references when stored, assembled into another product or disabled.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             RestoreGeometry();
             amplitude = squeeze = squeezeTarget = 0f;
             ready = false;

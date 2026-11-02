@@ -13,14 +13,6 @@ MonoBehaviour:
   m_Name: Shadowblade Order Correct 8 - F
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Shadowblade Order Correct 8 - F
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Pizza Rossa
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: Hmph.

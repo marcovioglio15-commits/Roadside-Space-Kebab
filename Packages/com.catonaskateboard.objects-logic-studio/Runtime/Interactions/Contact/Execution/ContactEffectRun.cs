@@ -41,6 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly List<TintBinding> tints = new List<TintBinding>();
         private ItemMeshChanges meshes;
+        private InteractionChangeRun interactions;
         private readonly Color multiplier;
         private readonly int property;
 
@@ -87,7 +88,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     warning = "No owned renderer/material slot exposes the selected tint color property.";
             }
             if (warning.Length == 0)
-                return ItemMeshChanges.TryPrepare(item, effects.Meshes, out run.meshes, out warning);
+                return ItemMeshChanges.TryPrepare(item, effects.Meshes, out run.meshes, out warning)
+                    && InteractionChangeRun.TryPrepare(item, effects.Interactions, out run.interactions, out warning);
             return false;
         }
 
@@ -116,13 +118,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Reuse authored components; no renderer, collider or UI object is instantiated at runtime.
             meshes.Commit();
+            interactions?.Commit();
         }
 
         /// <summary>Restores the pre-transition appearance when continuous contact is interrupted.</summary>
         internal void Cancel()
         {
             // The same snapshot restores unfinished transitions and completed temporary effects.
-            meshes.Restore();
+            meshes?.Restore();
+            interactions?.Cancel();
             foreach (TintBinding tint in tints)
                 if (tint.Renderer != null)
                     tint.Renderer.SetPropertyBlock(tint.Original.isEmpty ? null : tint.Original, tint.Slot);

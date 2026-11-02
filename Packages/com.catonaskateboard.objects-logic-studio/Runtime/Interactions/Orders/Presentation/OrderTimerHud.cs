@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -13,6 +14,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Existing HUD text. Font, alignment, size and layout remain editable on this component's Text.")]
         [SerializeField]
         private Text text;
+        [Tooltip("Optional existing TMP mesh text or text on a world-space Canvas.")]
+        [SerializeField]
+        private TMP_Text spatialText;
+        [Tooltip("Optional customer whose timer this text follows. Empty follows the latest visible customer in this scene.")]
+        [SerializeField]
+        private ObjectAvailableOrders customer;
         [Tooltip("Text tint while the customer's orders are being timed.")]
         [SerializeField]
         private Color runningColor = Color.white;
@@ -31,8 +38,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Update()
         {
             // Hidden HUDs allocate no strings and never create replacement graphics.
-            OrderTimerSession next = OrderTimerSession.Current(gameObject.scene);
-            if (!PresentationReady || next == null || next.Completed && !next.Settings.KeepTimerResult)
+            OrderTimerSession next = OrderTimerSession.Current(gameObject.scene, customer);
+            if (!(spatialText != null ? isActiveAndEnabled : PresentationReady) || next == null || next.Completed && !next.Settings.KeepTimerResult)
             {
                 Hide();
                 return;
@@ -44,11 +51,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 displayed = ticks;
                 finished = next.Completed;
                 long seconds = next.Settings.TimerTenths ? ticks / 10 : ticks;
-                text.text = next.Settings.TimerLabel + " " + (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00")
-                    + (next.Settings.TimerTenths ? "." + (ticks % 10) : string.Empty);
-                text.color = finished ? completedColor : runningColor;
+                CounterText.Write(text, spatialText, next.Settings.TimerLabel + " " + (seconds / 60).ToString("00") + ":" + (seconds % 60).ToString("00")
+                    + (next.Settings.TimerTenths ? "." + (ticks % 10) : string.Empty), finished ? completedColor : runningColor);
             }
-            ShowPanel();
+            if (Panel != null)
+                ShowPanel();
+            if (spatialText != null)
+                spatialText.enabled = true;
         }
 
         /// <summary>Clears presentation state without changing the customer's clock.</summary>
@@ -56,6 +65,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             current = null;
             displayed = -1;
+            if (spatialText != null)
+                spatialText.enabled = false;
             base.Hide();
         }
 
@@ -63,7 +74,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the saved text can be displayed without runtime UI creation.</returns>
         public override bool IsValid()
         {
-            return base.IsValid() && text != null && text.transform.IsChildOf(Panel) && !text.raycastTarget;
+            return spatialText != null ? CounterText.IsSpatial(spatialText)
+                : base.IsValid() && text != null && text.transform.IsChildOf(Panel) && !text.raycastTarget;
         }
 
         #endregion

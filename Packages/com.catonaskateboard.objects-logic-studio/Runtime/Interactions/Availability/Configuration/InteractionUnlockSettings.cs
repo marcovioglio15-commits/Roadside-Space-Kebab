@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Distinguishes a successful activation from its committed result.</summary>
-    public enum InteractionMoment { Started, Completed }
+    public enum InteractionMoment { Started, Completed, Progressed }
     /// <summary>Chooses an existing interaction event or a dedicated player Button.</summary>
     public enum UnlockTrigger { Interaction, InputAction }
     /// <summary>Chooses whether conditions release an initial lock, add a lock, or replace one feature with another.</summary>
@@ -25,6 +25,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ObjectInteraction Source;
         [Tooltip("Completed waits for the final committed result, including timed contact effects and dialogue pages.")]
         public InteractionMoment Moment = InteractionMoment.Completed;
+        [Tooltip("Optional Dialogue entry checkpoint when waiting for completion.")]
+        public DialogueStepReference Step = new DialogueStepReference();
         [Tooltip("Dedicated Button resolved in the observer player's private PlayerInput action asset.")]
         public InputActionReference Action;
         [Tooltip("Maximum player distance in metres for this condition Button. Interaction-event conditions have no range requirement.")]
@@ -110,6 +112,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                                 else if (condition.FilterConsumed && (!condition.SupportsConsumption
                                     || !ObjectFlagRules.TryValidate(condition.ConsumedFlags, false, out warning)))
                                     warning = "Consumed Flags requires a completed Modify By Contact with Consume and at least one valid flag.";
+                                else if (condition.Moment == InteractionMoment.Completed && !condition.Step.TryValidate(condition.Source, out warning))
+                                    return false;
                                 break;
                             case UnlockTrigger.InputAction:
                                 if (condition.FilterConsumed || condition.Action == null || condition.Action.action is not { type: InputActionType.Button }

@@ -117,6 +117,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Availability
 
+        /// <summary>Assigns a runtime card label without changing its prefab or preset.</summary>
+        /// <param name="value">Label used by local interaction selectors.</param>
+        internal void SetRuntimeName(string value)
+        {
+            interactionName = value;
+        }
+
         /// <summary>Invalidates cached item ownership when Play retains managed component fields.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetItemCache()

@@ -13,16 +13,6 @@ MonoBehaviour:
   m_Name: Shadowblade Order Wrong 2 - B
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Shadowblade Order Wrong 2 - B
-  Weight: 1
-  Consumption:
-    Enabled: 1
-    RequiredFlags: []
-    Orders:
-    - Panino Kebab
-    - French Fries
-    - Soda
-    RequireAll: 1
-    Result: 1
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: I knew you were a FAKER.

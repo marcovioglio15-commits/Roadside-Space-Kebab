@@ -41,6 +41,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Validates contact emission and captures material sources once at activation.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             if (!Application.isPlaying)
                 return;
             ready = TryValidate(out string warning);

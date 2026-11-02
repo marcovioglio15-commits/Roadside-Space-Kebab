@@ -22,6 +22,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int dispensed;
         private int withdrawals;
         private bool transferring;
+        private ObjectContainer scoopOwner;
+        private ObjectItem scoopOutput;
+        private bool scoopStored;
 
         #endregion
 
@@ -61,6 +64,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 dispenser.dispensed = 0;
                 dispenser.withdrawals = 0;
                 dispenser.transferring = false;
+                dispenser.scoopOwner = null;
+                dispenser.scoopOutput = null;
+                dispenser.scoopStored = false;
             }
         }
 
@@ -201,6 +207,80 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 transferring = false;
             }
+        }
+
+        #endregion
+
+        #region Scoop
+
+        /// <summary>Checks output identity without creating a prefab or revealing stored supply.</summary>
+        /// <param name="receiver">Held container whose accepted flags are checked.</param>
+        /// <returns>True for a compatible next output; empty stored supply remains a handled scoop target.</returns>
+        internal bool MatchesScoop(ObjectContainer receiver)
+        {
+            // Exhausted supply must not turn the same press into a Drop.
+            ObjectItem stored = UsesStored && Container != null ? Container.PeekStored() : null;
+            CatOnASkateboard.StudioIdentity.ObjectIdentity identity = stored != null ? stored.Identity
+                : settings.UseContainer ? null : settings.Prefab != null ? settings.Prefab.GetComponent<CatOnASkateboard.StudioIdentity.ObjectIdentity>() : null;
+            return identity != null ? identity.Matches(receiver.Settings.AllowedFlags, receiver.Settings.Match) : settings.UseContainer;
+        }
+
+        /// <summary>Claims one output until the scoop reaches its fill keyframe.</summary>
+        /// <param name="receiver">Container owning the reservation.</param>
+        /// <param name="output">Receives the stored original, or null for prefab supply.</param>
+        /// <returns>True when supply is reserved without instantiation.</returns>
+        internal bool TryReserveScoop(ObjectContainer receiver, out ObjectItem output)
+        {
+            output = null;
+            if (!CanTake() || !Item.Acquire(receiver, InteractionChannels.Transfer))
+                return false;
+            output = UsesStored && Container != null ? Container.PeekStored() : null;
+            if (output != null && !output.Acquire(receiver, InteractionChannels.None))
+            {
+                Item.Release(receiver);
+                return false;
+            }
+            scoopOutput = output;
+            scoopStored = output != null;
+            scoopOwner = receiver;
+            transferring = true;
+            return true;
+        }
+
+        /// <summary>Commits reserved supply exactly once.</summary>
+        /// <param name="receiver">Current reservation owner.</param>
+        /// <param name="output">Stored original captured at reservation, or null.</param>
+        /// <returns>True when stock and appearance were updated.</returns>
+        internal bool CommitScoop(ObjectContainer receiver, ObjectItem output)
+        {
+            // Keep ordinary withdrawals blocked until movement releases the transaction.
+            if (scoopOwner != receiver || !isActiveAndEnabled || IsLocked || !Item.IsOwnedBy(receiver))
+                return false;
+            if (scoopStored)
+            {
+                if (output == null || output != scoopOutput || Container == null || !Container.ConsumeStored(output))
+                    return false;
+            }
+            else
+                dispensed++;
+            withdrawals++;
+            RefreshFill();
+            return true;
+        }
+
+        /// <summary>Releases this scoop's source and original reservations.</summary>
+        /// <param name="receiver">Owner ending its request.</param>
+        internal void ReleaseScoop(ObjectContainer receiver)
+        {
+            if (scoopOwner != receiver)
+                return;
+            if (scoopOutput != null)
+                scoopOutput.Release(receiver);
+            Item.Release(receiver);
+            scoopOutput = null;
+            scoopStored = false;
+            scoopOwner = null;
+            transferring = false;
         }
 
         #endregion

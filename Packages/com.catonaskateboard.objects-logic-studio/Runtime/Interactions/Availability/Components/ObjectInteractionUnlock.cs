@@ -47,6 +47,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Applies initial availability before ordinary interactions run and subscribes to their events.</summary>
         private void OnEnable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Each rule has independent ownership even when several rules refer to the same target.
             Initialize();
             InteractionUnlockRegistry.Register(this);
@@ -55,6 +57,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Removes only this rule's subscriptions and lock when it is disabled or destroyed.</summary>
         private void OnDisable()
         {
+            if (InteractionRuntimeState.IsStaging)
+                return;
             // Other unlock rules or passive restrictions remain active.
             ObjectInteraction.Signaled -= Observe;
             InteractionUnlockRegistry.Unregister(this);
@@ -196,7 +200,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             for (int index = 0; index < counts.Length; index++)
                 if (counts[index] < settings.Conditions[index].Count && settings.Conditions[index].Trigger == UnlockTrigger.Interaction
-                    && settings.Conditions[index].Source == source && settings.Conditions[index].Moment == moment
+                    && settings.Conditions[index].Source == source
+                    && (settings.Conditions[index].Moment == InteractionMoment.Completed
+                        ? settings.Conditions[index].Step.Matches(source, moment) : settings.Conditions[index].Moment == moment)
                     && (!settings.Conditions[index].FilterConsumed
                         || source is ObjectContactModifier contact && contact.ConsumedAny(settings.Conditions[index].ConsumedFlags)))
                     counts[index]++;

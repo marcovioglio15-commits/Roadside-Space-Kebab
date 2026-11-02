@@ -43,6 +43,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Consumption")]
         [Tooltip("Deactivate this item at completion. The other participant records its flag once. Only one participant can be consumed.")]
         public bool Consume;
+        [Header("Interactions")]
+        [Tooltip("Ordered runtime-only card additions, removals and preset imports at completion.")]
+        public InteractionChangeSettings[] Interactions = Array.Empty<InteractionChangeSettings>();
 
         #endregion
 
@@ -69,6 +72,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Tint needs a shader color property, finite multiplier and a material slot of -1 or greater.";
             else if (Meshes == null)
                 warning = "Mesh replacements are missing.";
+            else if (Interactions == null || Consume && Interactions.Length > 0)
+                warning = "Interaction edits require a surviving participant and a complete operation list.";
             else
                 foreach (ContactMeshReplacement replacement in Meshes)
                     if (replacement == null || replacement.Mesh == null)
@@ -76,7 +81,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         warning = "Assign a mesh to each replacement or remove its unused entry.";
                         break;
                     }
-            return warning.Length == 0;
+            if (warning.Length > 0)
+                return false;
+            foreach (InteractionChangeSettings change in Interactions)
+                if (change == null || !change.TryValidate(out warning))
+                    return false;
+            return true;
         }
 
         #endregion
@@ -150,7 +160,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Whether independent contacts can run without exclusive appearance snapshots.</summary>
-        public bool IdentityOnly => WhileContact && Self != null && Other != null && !Self.HasAppearance && !Other.HasAppearance;
+        public bool IdentityOnly => WhileContact && Self != null && Other != null && !Self.HasAppearance && !Other.HasAppearance
+            && Self.Interactions.Length == 0 && Other.Interactions.Length == 0;
 
         #endregion
 
@@ -190,12 +201,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Consume only one participant so the other can retain its receipt.";
             else if (WhileContact && (Self.Consume || Other.Consume || !float.IsFinite(RevertDelay) || RevertDelay < 0f))
                 warning = "While Contact requires reversible effects without consumption and a finite non-negative Revert Delay.";
+            else if (WhileContact && Array.Exists(Self.Interactions, change => change.Operation != InteractionChangeOperation.Add && change.Kind == InteractionRuntimeKind.Contact))
+                warning = "While Contact must keep its own contact interaction available to detect separation and restore the effects.";
             else if (!ValidChannels(BlockSelf) || !ValidChannels(BlockOther))
                 warning = "Choose supported interaction families for temporary restrictions.";
             else if (ChangeContactFlag && (!ObjectFlagRules.IsValidOperation(ContactFlagOperation)
                 || ContactFlagOperation != ObjectFlagOperation.Clear && ContactFlag == null))
                 warning = "Choose a project flag for the contacted item.";
-            else if (!ChangeContactFlag && !Self.Tint && Self.Meshes.Length == 0 && !Self.Consume && !Other.Tint && Other.Meshes.Length == 0 && !Other.Consume)
+            else if (!ChangeContactFlag && !Self.Tint && Self.Meshes.Length == 0 && !Self.Consume && !Other.Tint && Other.Meshes.Length == 0 && !Other.Consume
+                && Self.Interactions.Length == 0 && Other.Interactions.Length == 0)
                 warning = "Enable at least one modification effect.";
             return warning.Length == 0;
         }

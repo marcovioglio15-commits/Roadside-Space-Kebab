@@ -336,7 +336,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (phase == Phase.AwaitingStart && source == startInteraction && moment == InteractionMoment.Completed)
                 signaled = true;
             // Dialogue starts, page advances, interruptions and completions from other clones do not advance the day.
-            if (phase == Phase.Waiting && moment == InteractionMoment.Completed && completion.Observe(source))
+            if (phase == Phase.Waiting && completion.Observe(source, moment))
             {
                 signaled = true;
                 OrderTimerSession.Complete(instance);

@@ -13,13 +13,6 @@ MonoBehaviour:
   m_Name: Shadowblade Order Wrong 3 - F
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueEntry
   Name: Shadowblade Order Wrong 3 - F
-  Weight: 1
-  Consumption:
-    Enabled: 0
-    RequiredFlags: []
-    Orders: []
-    RequireAll: 1
-    Result: 0
   Lines:
   - Speaker: Shadowblade Hellfury
     Text: Pathetic.

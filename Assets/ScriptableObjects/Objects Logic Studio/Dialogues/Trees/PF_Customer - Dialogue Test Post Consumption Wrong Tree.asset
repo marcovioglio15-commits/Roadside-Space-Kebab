@@ -10,103 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
-  m_Name: PF_Customer - Dialogue Test Post Consumption Wrong Tree
+  m_Name: "PF_Customer - Dialogue Test Post Consumption Wrong Tree"
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
-  Start: 8e996c29df004a5b9e75c63ff7b6fe24
+  Start: root
   Nodes:
-  - Id: 8e996c29df004a5b9e75c63ff7b6fe24
-    Name: Select Entry
-    Position: {x: 30, y: 100}
-    Kind: 1
-    Entry: {fileID: 0}
-    Next: 
-    Otherwise: 
+  - Id: root
+    Name: "Dialogue Test Post Consumption Wrong"
+    Position: {x: 0, y: 0}
+    End: 0
     Selection: 1
-    Branches:
-    - Name: Dialogue - B
-      Target: 07d60eb52eb549e496cedd945c92e315
+    Entries:
+    - Id: 3d91cbc116a9c0f0d34af6eb81a8f7c9
+      Name: "Dialogue - B"
+      Entry: {fileID: 11400000, guid: 6eadeb0920f143cd8f7bb4e58f1d103a, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
       Weight: 1
-      Condition:
-        RequireAll: 1
-        Invert: 0
-        CheckFlags: 0
-        Flags: []
-        AllFlags: 1
-        CheckSpawn: 0
-        FirstSpawn: 1
-        LastSpawn: 0
-        Consumption:
-          Enabled: 0
-          RequiredFlags: []
-          Orders: []
-          RequireAll: 1
-          Result: 0
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
-  - Id: 07d60eb52eb549e496cedd945c92e315
-    Name: Dialogue - B
-    Position: {x: 350, y: 100}
-    Kind: 0
-    Entry: {fileID: 11400000, guid: 6eadeb0920f143cd8f7bb4e58f1d103a, type: 2}
-    Next: fa252894bf6741e185e76a7dde9178e0
-    Otherwise: 
-    Selection: 0
-    Branches: []
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
-  - Id: fa252894bf6741e185e76a7dde9178e0
+  - Id: end
     Name: End
-    Position: {x: 640, y: 100}
-    Kind: 5
-    Entry: {fileID: 0}
-    Next: 
-    Otherwise: 
-    Selection: 0
-    Branches: []
-    Condition:
-      RequireAll: 1
-      Invert: 0
-      CheckFlags: 0
-      Flags: []
-      AllFlags: 1
-      CheckSpawn: 0
-      FirstSpawn: 1
-      LastSpawn: 0
-      Consumption:
-        Enabled: 0
-        RequiredFlags: []
-        Orders: []
-        RequireAll: 1
-        Result: 0
-    Duration: 1
-    Subtree: {fileID: 0}
+    Position: {x: 410, y: 0}
+    End: 1
+    Selection: 3
+    Entries: []

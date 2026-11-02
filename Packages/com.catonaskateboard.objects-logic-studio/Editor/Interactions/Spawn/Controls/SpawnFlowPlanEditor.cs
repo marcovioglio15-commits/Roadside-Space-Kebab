@@ -179,9 +179,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // A single selection retains the same departure behavior as an ordinary completion event.
             SerializedProperty sources = step.FindPropertyRelative("Completions");
+            SerializedProperty checkpoints = step.FindPropertyRelative("CompletionSteps");
             if (sources.arraySize > 1)
                 UnlockInteractionControls.ConditionLogic(step.FindPropertyRelative("RequireAll"));
             for (int index = 0; index < sources.arraySize; index++)
+            {
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     Completion(step, sources.GetArrayElementAtIndex(index), "Complete On " + (index + 1));
@@ -189,9 +191,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     {
                         sources.GetArrayElementAtIndex(index).objectReferenceValue = null;
                         sources.DeleteArrayElementAtIndex(index);
+                        if (index < checkpoints.arraySize)
+                            checkpoints.DeleteArrayElementAtIndex(index);
                         break;
                     }
                 }
+                DialogueStepControls.DrawArray(checkpoints, index, sources.GetArrayElementAtIndex(index).objectReferenceValue as ObjectInteraction);
+            }
             if (StudioButton.Draw(new GUIContent("+ Completion", "Select another interaction whose final completion can finish this visit.")))
             {
                 sources.arraySize++;

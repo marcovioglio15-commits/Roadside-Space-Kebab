@@ -22,6 +22,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly List<StoredObject> stored = new List<StoredObject>();
         private bool transferring;
+        private int fillCount;
+        private bool fillInitialized;
+        private ScoopRun scoop;
 
         #endregion
 
@@ -31,6 +34,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ContainerSettings Settings => settings;
         /// <summary>Number of retained inventory entries.</summary>
         public int StoredCount => stored.Count;
+        /// <summary>Logical portions in Scoop mode, or retained original count in storage mode.</summary>
+        public int FillCount => settings.ScoopFromDispenser ? fillInitialized ? fillCount : settings.InitialFill : stored.Count;
+        /// <summary>Whether a scoop currently owns this held object's movement.</summary>
+        internal bool IsScooping => scoop != null && scoop.Active;
+        /// <summary>Scoop mode receives the dispenser's input instead of binding another Button.</summary>
+        public override bool UsesInput => !settings.ScoopFromDispenser;
         /// <summary>Identifies this single interaction card.</summary>
         public override SingleInteractionKind Kind => SingleInteractionKind.Container;
         /// <summary>Selection settings shared by deposits and normal object targeting.</summary>
@@ -51,6 +60,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 container.stored.Clear();
                 container.transferring = false;
+                container.scoop?.Cancel();
+                container.scoop = null;
+                container.fillInitialized = false;
             }
         }
 
@@ -78,6 +90,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (configuration == null || !configuration.TryValidate(out warning)
                 || !InventoryFillStep.CanBind(configuration.FillSteps, Item, out warning))
                 return false;
+            if (configuration.ScoopFromDispenser)
+            {
+                warning = "Scoop From Dispenser requires Grab on this object and cannot supply stored originals to a local Dispenser.";
+                if (GetComponent<ObjectGrab>() == null || GetComponent<ObjectDispenser>() is ObjectDispenser local && local.Settings.UseContainer)
+                    return false;
+                return ScoopRun.ValidateVisual(transform, configuration.ScoopAnimation, out warning);
+            }
             if (configuration.LimitToDispenserSpace && (GetComponent<ObjectDispenser>() is not ObjectDispenser dispenser
                 || dispenser.Settings.Unlimited || dispenser.Settings.Stock <= 0))
                 warning = "Limit to Dispenser Space requires a finite Dispenser on this object with positive Stock.";
@@ -110,7 +129,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Reserved objects must finish contact changes before their interaction hierarchy is suspended.
             Prune();
-            if (transferring || !Available(InteractionChannels.Transfer) || Item.IsReserved || grab == null || !grab.IsHeld
+            if (settings.ScoopFromDispenser || transferring || !Available(InteractionChannels.Transfer) || Item.IsReserved || grab == null || !grab.IsHeld
                 || transform.IsChildOf(grab.transform) || grab.transform.IsChildOf(transform)
                 || !settings.RefillDispenser && (!settings.Unlimited && stored.Count >= settings.Capacity
                     || settings.LimitToDispenserSpace && (Dispenser == null || !Dispenser.HasStorageSpace(stored.Count)))
@@ -238,6 +257,93 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
             if (changed)
                 RefreshFill();
+        }
+
+        #endregion
+
+        #region Scoop
+
+        /// <summary>Returns the next original without activating or removing it.</summary>
+        /// <returns>The last retained item, or null when empty.</returns>
+        internal ObjectItem PeekStored()
+        {
+            Prune();
+            return stored.Count > 0 ? stored[stored.Count - 1].Grab.Item : null;
+        }
+
+        /// <summary>Consumes one reserved stored output without making it visible.</summary>
+        /// <param name="expected">Exact original selected when the dispenser reserved supply.</param>
+        /// <returns>True when the same original was removed.</returns>
+        internal bool ConsumeStored(ObjectItem expected)
+        {
+            // Keep consumed bodies outside the dispenser hierarchy so future compound grabs remain valid.
+            if (stored.Count == 0 || stored[stored.Count - 1].Grab.Item != expected)
+                return false;
+            stored.RemoveAt(stored.Count - 1);
+            expected.transform.SetParent(null, true);
+            expected.ConsumeSelf();
+            RefreshFill();
+            return true;
+        }
+
+        /// <summary>Reserves one compatible dispenser output while preserving the occupied carry slot.</summary>
+        /// <param name="source">Targeted dispenser supplying one logical portion.</param>
+        /// <param name="grab">Grab currently carrying this container.</param>
+        /// <returns>True when the transfer started or committed immediately.</returns>
+        internal bool TryScoop(ObjectDispenser source, ObjectGrab grab)
+        {
+            // Capacity and ownership precede any flag or pose change.
+            if (!settings.ScoopFromDispenser || IsScooping || grab == null || !grab.CanScoop || grab.gameObject != gameObject
+                || !Available(InteractionChannels.Transfer) || Item.IsReserved || FillCount >= settings.Capacity
+                || source == null || source.transform.IsChildOf(transform) || transform.IsChildOf(source.transform)
+                || !source.MatchesScoop(this) || !source.TryReserveScoop(this, out ObjectItem output))
+                return false;
+            if (!Item.Acquire(this, InteractionChannels.Release | InteractionChannels.Transfer))
+            {
+                source.ReleaseScoop(this);
+                return false;
+            }
+            if (!ScoopRun.TryCreate(this, source, grab, output, out scoop, out string warning))
+            {
+                Item.Release(this);
+                source.ReleaseScoop(this);
+                Debug.LogWarning(warning, this);
+                return false;
+            }
+            if (!fillInitialized)
+            {
+                fillCount = settings.InitialFill;
+                fillInitialized = true;
+            }
+            ScoopRun operation = scoop;
+            grab.BeginScoop(scoop, source.transform);
+            source.Signal(InteractionMoment.Started);
+            Signal(InteractionMoment.Started);
+            operation.Start();
+            return true;
+        }
+
+        /// <summary>Advances logical fill after the source commits its reserved withdrawal.</summary>
+        internal void CommitScoop()
+        {
+            fillCount++;
+            RefreshFill();
+        }
+
+        /// <summary>Releases only this scoop's temporary restrictions.</summary>
+        internal void EndScoop()
+        {
+            Item.Release(this);
+            scoop = null;
+        }
+
+        /// <summary>Stops an unfinished movement before this interaction unregisters.</summary>
+        protected override void OnDisable()
+        {
+            if (InteractionRuntimeState.IsStaging)
+                return;
+            scoop?.Cancel();
+            base.OnDisable();
         }
 
         #endregion

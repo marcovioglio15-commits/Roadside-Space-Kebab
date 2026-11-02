@@ -18,6 +18,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Position among cards with this type and name, captured by the selection menu.")]
         [Range(0, 100)]
         public int Occurrence;
+        [Tooltip("Optional Dialogue entry checkpoint. Empty waits for the complete interaction.")]
+        public DialogueStepReference Step = new DialogueStepReference();
 
         #endregion
 
