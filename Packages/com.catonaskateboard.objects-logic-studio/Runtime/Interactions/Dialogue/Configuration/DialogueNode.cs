@@ -51,7 +51,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool End;
         [Tooltip("Choose a conversation branch using triggers without showing a page in this block.")]
         public bool Routing;
-        [Tooltip("Use this branch's range, priority, replay, audio and box settings instead of the interaction defaults.")]
+        [Tooltip("Optional override. Disabled blocks inherit the dialogue interaction's settings. New blocks start disabled.")]
         public bool OverridePolicy;
         [Tooltip("Presentation and input policy used while this branch is requested or speaking.")]
         public DialoguePolicy Policy = new DialoguePolicy();

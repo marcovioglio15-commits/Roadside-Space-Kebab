@@ -18,7 +18,7 @@ namespace RoadsideSpaceKebab.Editor
         #region Properties
 
         /// <summary>Shared gameplay event catalog edited in Audio Studio.</summary>
-        public static AudioPreset Preset => AssetDatabase.LoadAssetAtPath<AudioPreset>("Assets/ScriptableObjects/Presets_Modules/Audio/AudioPreset.asset");
+        public static AudioPreset Preset => AssetDatabase.LoadAssetAtPath<AudioPreset>("Assets/ScriptableObjects/Presets_Modules/Audio/SO_AudioPreset.asset");
 
         #endregion
 

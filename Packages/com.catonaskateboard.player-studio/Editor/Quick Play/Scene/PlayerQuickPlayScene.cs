@@ -48,7 +48,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 Position(state, player.transform, spawn.transform);
                 ConfigureCamera(state, player.GetComponent<PlayerCameraRig>(), master);
                 // Preview scenes cannot be saved; the isolated prefab is inserted when the copied environment loads.
-                if (PrefabUtility.SaveAsPrefabAsset(player, folder + "/Player.prefab") == null)
+                if (PrefabUtility.SaveAsPrefabAsset(player, folder + "/PF_Player.prefab") == null)
                     throw new IOException("Unity could not save the temporary test player.");
             }
             finally

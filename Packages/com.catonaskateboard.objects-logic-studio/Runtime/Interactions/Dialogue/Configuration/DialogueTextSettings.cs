@@ -46,6 +46,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Rainbow cycles per scaled second. Used by rainbow tokens.")]
         [Range(0.1f, 5f)]
         public float RainbowRate = 0.4f;
+        [Tooltip("Degrees used by rotate tokens without an explicit angle. Positive angles turn counterclockwise.")]
+        [Range(-180f, 180f)]
+        public float RotationDegrees = 15f;
+        [Header("Text Colors")]
+        [Tooltip("Named colors shared by this entry's pages. Color tokens use these names.")]
+        public DialogueNamedColor[] Colors = Array.Empty<DialogueNamedColor>();
 
         #endregion
 
@@ -65,8 +71,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || !InteractionValues.Positive(ShakeRate) || !float.IsFinite(WaveAmount) || WaveAmount < 0f
                 || !InteractionValues.Positive(WaveRate) || !InteractionValues.Positive(RainbowRate))
                 return false;
-            warning = string.Empty;
-            return true;
+            if (!float.IsFinite(RotationDegrees) || RotationDegrees < -180f || RotationDegrees > 180f)
+            {
+                warning = "Rotation Degrees must be finite and between -180 and 180.";
+                return false;
+            }
+            return DialogueNamedColors.TryValidate(Colors, out warning);
         }
 
         #endregion
@@ -87,6 +97,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Scaled seconds for hiding the text box. Zero hides it immediately.")]
         [Range(0f, 2f)]
         public float FadeOut;
+        [Tooltip("Horizontal speaker position above the box. Zero aligns left, one aligns right, and 0.5 centers it.")]
+        [Range(0f, 1f)]
+        public float SpeakerPosition = 0.5f;
 
         #endregion
 
@@ -102,6 +115,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Dialogue box fade times must be finite and nonnegative.";
             if (!float.IsFinite(FadeIn) || FadeIn < 0f || !float.IsFinite(FadeOut) || FadeOut < 0f)
                 return false;
+            if (!float.IsFinite(SpeakerPosition) || SpeakerPosition < 0f || SpeakerPosition > 1f)
+            {
+                warning = "Speaker Position must be between zero and one.";
+                return false;
+            }
             warning = string.Empty;
             return true;
         }

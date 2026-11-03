@@ -17,7 +17,7 @@ namespace RoadsideSpaceKebab.Editor
         #region Properties
 
         /// <summary>Shared source of the single gameplay entry scene.</summary>
-        public static MenuPreset Menu => AssetDatabase.LoadAssetAtPath<MenuPreset>("Assets/ScriptableObjects/Presets_Modules/Menu/MenuPreset.asset");
+        public static MenuPreset Menu => AssetDatabase.LoadAssetAtPath<MenuPreset>("Assets/ScriptableObjects/Presets_Modules/Menu/SO_MenuPreset.asset");
 
         #endregion
 

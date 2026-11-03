@@ -40,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectInteractionPreset main => main.Configuration != null && !string.IsNullOrEmpty(main.Configuration.TypeName)
                     && Type.GetType(main.Configuration.TypeName, false) == feature.GetType(),
                 ObjectGroupPreset group => group.Group != null && group.Group.TypeName == feature.GetType().FullName,
-                DialogueEntry or DialogueTree or DialogueTriggerPreset => feature is ObjectDialogue,
+                DialogueEntry or DialogueTree or DialogueTriggerPreset or DialoguePalettePreset => feature is ObjectDialogue,
                 OrderCatalog => feature is ObjectAvailableOrders,
                 _ => false
             };

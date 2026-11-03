@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: SO_Shadow_Intro_Tree
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: root
+  Nodes:
+  - Id: root
+    Name: "Dialogue Shadowblade Introduction Preset"
+    Position: {x: 0, y: 0}
+    End: 0
+    Selection: 1
+    Entries:
+    - Id: b122716aa5f49547863ba2a5b4320693
+      Name: "Random Intro 1"
+      Entry: {fileID: 11400000, guid: daad1068651446228805a35fe392d6f7, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
+      Weight: 1
+    - Id: 12c2b0017b61737b414b3a044fd0508b
+      Name: "Random Intro 2"
+      Entry: {fileID: 11400000, guid: 080647217cc449aeae0af2d5f88f46b4, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
+      Weight: 1
+    - Id: e5d7a8898012db37d74646f162443353
+      Name: "Random Intro 3"
+      Entry: {fileID: 11400000, guid: 059cc597f0254205a2a5070a605559f5, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
+      Weight: 1
+    - Id: e243295106fdc61dec1f1777b35e800f
+      Name: "Random Intro 4"
+      Entry: {fileID: 11400000, guid: 6fc509cf0e764a799ca0ab0218f48d26, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
+      Weight: 1
+    - Id: fc50d76699877494c99dcafb15a9cd0d
+      Name: "Random Intro 5"
+      Entry: {fileID: 11400000, guid: d000ae2b43034bf2b552eaa986cf28f0, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
+      Weight: 1
+  - Id: end
+    Name: End
+    Position: {x: 410, y: 0}
+    End: 1
+    Selection: 3
+    Entries: []

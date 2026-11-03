@@ -96,7 +96,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Input, locomotion and camera are assigned after the user selects their action roles.
             PlayerMasterPreset master = Preset<PlayerMasterPreset>(folder, "Master",
                 value => PlayerCreationUtility.SetReferences(value, ("bodyPreset", body), ("toolsPreset", tools)));
-            string prefabPath = folder + "/Player/Player.prefab";
+            string prefabPath = folder + "/Player/PF_Player.prefab";
             if (!File.Exists(prefabPath))
             {
                 Scene preview = EditorSceneManager.NewPreviewScene();
@@ -140,7 +140,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private static T Preset<T>(string folder, string name, Action<T> configure) where T : ScriptableObject
         {
             // A conflicting file is an error, never permission to replace it.
-            string path = folder + "/Presets/" + name + ".asset";
+            string path = folder + "/Presets/SO_" + name + ".asset";
             T existing = AssetDatabase.LoadAssetAtPath<T>(path);
             if (existing != null)
                 return existing;

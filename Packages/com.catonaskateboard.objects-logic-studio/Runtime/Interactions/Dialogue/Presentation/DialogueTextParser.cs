@@ -52,6 +52,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Stack<Scope> scopes = new Stack<Scope>();
             DialogueGlyphStyle current = new DialogueGlyphStyle { Speed = settings.LettersPerSecond, Slam = settings.Slam };
             float pause = 0f;
+            int rotationGroup = 0;
             // Tokens alter later characters only; no preset or shared string is changed.
             for (int index = 0; index < source.Length; index++)
             {
@@ -67,7 +68,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         return false;
                     }
                     string token = source.Substring(index + 1, end - index - 1);
-                    if (!Apply(token, scopes, ref current, ref pause, out warning))
+                    if (!Apply(token, settings, scopes, ref current, ref pause, ref rotationGroup, out warning))
                         return false;
                     index = end;
                     continue;
@@ -86,12 +87,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Applies one explicit token or restores a matching nested style.</summary>
         /// <param name="token">Contents between brackets.</param>
+        /// <param name="settings">Palette and default rotation of this entry.</param>
         /// <param name="scopes">Open effect scopes.</param>
         /// <param name="current">Current style inherited by following characters.</param>
         /// <param name="pause">Additional delay for the next character.</param>
+        /// <param name="rotationGroup">Unique identity of each rotated span.</param>
         /// <param name="warning">Receives an invalid name, argument or closing order.</param>
         /// <returns>True when this token is complete and supported.</returns>
-        private static bool Apply(string token, Stack<Scope> scopes, ref DialogueGlyphStyle current, ref float pause, out string warning)
+        private static bool Apply(string token, DialogueTextSettings settings, Stack<Scope> scopes, ref DialogueGlyphStyle current,
+            ref float pause, ref int rotationGroup, out string warning)
         {
             warning = "Unknown text token [" + token + "].";
             if (token.StartsWith("/", StringComparison.Ordinal))
@@ -123,12 +127,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     next.Rainbow = true;
                     break;
                 case "color":
-                    if (!ColorUtility.TryParseHtmlString(argument, out next.Color))
+                    if (!DialogueNamedColors.TryFind(settings.Colors, argument, out next.Color))
                     {
-                        warning = "Use [color=#rrggbb]text[/color].";
+                        warning = "Choose a named color from Text Colors: " + argument;
                         return false;
                     }
                     next.Colored = true;
+                    break;
+                case "rotate":
+                    float degrees = settings.RotationDegrees;
+                    if (separator >= 0 && (!float.TryParse(argument, NumberStyles.Float, CultureInfo.InvariantCulture, out degrees)
+                        || !float.IsFinite(degrees) || degrees < -180f || degrees > 180f))
+                    {
+                        warning = "Rotation needs degrees between -180 and 180. Use a decimal point.";
+                        return false;
+                    }
+                    next.Rotation += degrees;
+                    next.RotationGroup = ++rotationGroup;
                     break;
                 case "speed":
                 case "pause":
@@ -148,7 +163,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 default:
                     return false;
             }
-            if (separator >= 0 && name is not ("color" or "speed"))
+            if (separator >= 0 && name is not ("color" or "speed" or "rotate"))
                 return false;
             scopes.Push(new Scope(name, current));
             current = next;

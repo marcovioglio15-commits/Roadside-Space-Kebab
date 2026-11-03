@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 746817314116535194}
   - component: {fileID: 8013964568907177101}
   m_Layer: 0
-  m_Name: PF_IngredientBox_Shawarma_TEMP
+  m_Name: PF_IngredientBox_Shawarma_Temp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

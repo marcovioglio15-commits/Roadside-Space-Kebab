@@ -25,6 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private TMP_Text text;
+        private readonly DialogueRotationLayout rotation = new DialogueRotationLayout();
         private DialogueTextDocument document;
         private DialogueTextSettings settings;
         private Glyph[] glyphs = Array.Empty<Glyph>();
@@ -145,6 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Array.Copy(mesh.colors32, colors[material], mesh.colors32.Length);
             }
             float time = 0f;
+            rotation.Apply(info, document, vertices);
             int previousSource = 0;
             motion = false;
             revealEnd = arrivalEnd = 0f;

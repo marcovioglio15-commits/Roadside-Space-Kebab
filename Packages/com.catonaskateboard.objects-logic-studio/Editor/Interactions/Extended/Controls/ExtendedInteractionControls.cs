@@ -310,6 +310,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     Field(settings.FindPropertyRelative("Box"), "FadeIn");
                     Field(settings.FindPropertyRelative("Box"), "FadeOut");
+                    Field(settings.FindPropertyRelative("Box"), "SpeakerPosition");
                 }
             if (sections.Draw("Dialogue Audio", "Optional voice and completion sound.", settings, "Audio"))
                 using (new StudioIndentScope())

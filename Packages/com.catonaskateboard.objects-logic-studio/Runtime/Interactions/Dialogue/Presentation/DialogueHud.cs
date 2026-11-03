@@ -34,6 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float fadeDuration;
         private bool fading;
         private bool visible;
+        private float speakerPosition = 0.5f;
 
         #endregion
 
@@ -56,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && box != null && box.transform == Panel && (speaker == null || speaker.transform.IsChildOf(Panel));
         }
 
-        /// <summary>Updates one authored page without altering sibling panels or input ownership.</summary>
+        /// <summary>Updates one saved page without altering sibling panels or input ownership.</summary>
         /// <param name="line">Current dialogue page and speaker.</param>
         /// <param name="effects">Entry-wide letter and word settings.</param>
         /// <param name="transition">Box transition settings shared by this dialogue.</param>
@@ -76,7 +77,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 speaker.text = line.Speaker;
                 speaker.enabled = !string.IsNullOrEmpty(line.Speaker);
+                speakerPosition = transition.SpeakerPosition;
+                if (speaker.enabled)
+                    DialogueSpeakerLayout.Apply(speaker, Panel, speakerPosition);
             }
+        }
+
+        /// <summary>Keeps the saved speaker aligned when the existing HUD changes size.</summary>
+        private void OnRectTransformDimensionsChange()
+        {
+            if (visible && speaker != null && speaker.enabled && Panel != null)
+                DialogueSpeakerLayout.Apply(speaker, Panel, speakerPosition);
         }
 
         /// <summary>Uses an advance press to reveal pending letters before the owner changes pages.</summary>

@@ -1,0 +1,6160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9f19798e19646fdbc813423fa216800, type: 3}
+  m_Name: SO_Dispenser_ScoopFries
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Editor::CatOnASkateboard.ObjectsLogicStudio.Editor.ObjectGroupPreset
+  Description: 
+  Group:
+    Title: Dispenser
+    Tooltip: Edit dispenser settings.
+    Parent: 
+    Section: Settings
+    Paths:
+    - Single.Draft.Dispenser.UseContainer
+    - Single.Draft.Dispenser.Prefab
+    - Single.Draft.Dispenser.Unlimited
+    - Single.Draft.Dispenser.Stock
+    - Single.Draft.Dispenser.Mode
+    - Single.Draft.Dispenser.Interval
+    - Single.Draft.Dispenser.PickupDuration
+    - Single.Draft.Dispenser.Outlets
+    - Single.Draft.Dispenser.OutputRotation
+    - Single.Draft.Dispenser.StepCounter
+    - Single.Draft.Dispenser.FillSteps
+    - Single.Draft.Dispenser.ScoopFlag
+    - Single.Draft.Dispenser.DestroyWhenEmpty
+    TypeName: CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+    Segments:
+    - rid: 5751637748505116672
+    - rid: 5751637748505116673
+    - rid: 5751637748505116674
+    - rid: 5751637748505116675
+    - rid: 5751637748505116676
+    - rid: 5751637748505116677
+  Values:
+  - Name: UseContainer
+    Kind: 1
+    TypeName: bool
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Prefab
+    Kind: 5
+    TypeName: PPtr<$GameObject>
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Unlimited
+    Kind: 1
+    TypeName: bool
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Stock
+    Kind: 0
+    TypeName: int
+    Array: 0
+    Integer: 3
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Mode
+    Kind: 7
+    TypeName: Enum
+    Array: 0
+    Integer: 3
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Interval
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0.25
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: PickupDuration
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0.3499999940395355
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Outlets
+    Kind: -1
+    TypeName: DispenserOutlet
+    Array: 1
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children:
+    - rid: 1044
+  - Name: OutputRotation
+    Kind: 9
+    TypeName: Vector3
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: StepCounter
+    Kind: 7
+    TypeName: Enum
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: FillSteps
+    Kind: -1
+    TypeName: InventoryFillStep
+    Array: 1
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children:
+    - rid: 1045
+    - rid: 1046
+    - rid: 1047
+  - Name: ScoopFlag
+    Kind: 5
+    TypeName: PPtr<$ObjectFlag>
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: CatOnASkateboard.StudioIdentity.ObjectFlag, CatOnASkateboard.StudioIdentity.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      Index: 0
+      Count: 0
+      SourceGuid: 684aac8719ad7e34e9baa1ae40845bc0
+      FileId: 11400000
+      Label: 
+    Children: []
+  - Name: DestroyWhenEmpty
+    Kind: 1
+    TypeName: bool
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  Context: {fileID: 2999633868167853769}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1044
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: -1
+        TypeName: DispenserOutlet
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1048
+        - rid: 1049
+    - rid: 1045
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: -1
+        TypeName: InventoryFillStep
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1050
+        - rid: 1051
+        - rid: 1052
+    - rid: 1046
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: -1
+        TypeName: InventoryFillStep
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1053
+        - rid: 1054
+        - rid: 1055
+    - rid: 1047
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: -1
+        TypeName: InventoryFillStep
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1056
+        - rid: 1057
+        - rid: 1058
+    - rid: 1048
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Position
+        Kind: 9
+        TypeName: Vector3
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1049
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Rotation
+        Kind: 9
+        TypeName: Vector3
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1050
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Count
+        Kind: 0
+        TypeName: int
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1051
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Appearance
+        Kind: -1
+        TypeName: ItemAppearanceSettings
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1059
+        - rid: 1060
+        - rid: 1061
+    - rid: 1052
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Flags
+        Kind: -1
+        TypeName: InventoryFlagSettings
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1062
+        - rid: 1063
+        - rid: 1064
+    - rid: 1053
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Count
+        Kind: 0
+        TypeName: int
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1054
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Appearance
+        Kind: -1
+        TypeName: ItemAppearanceSettings
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1065
+        - rid: 1066
+        - rid: 1067
+    - rid: 1055
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Flags
+        Kind: -1
+        TypeName: InventoryFlagSettings
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1068
+        - rid: 1069
+        - rid: 1070
+    - rid: 1056
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Count
+        Kind: 0
+        TypeName: int
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1057
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Appearance
+        Kind: -1
+        TypeName: ItemAppearanceSettings
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1071
+        - rid: 1072
+        - rid: 1073
+    - rid: 1058
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Flags
+        Kind: -1
+        TypeName: InventoryFlagSettings
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1074
+        - rid: 1075
+        - rid: 1076
+    - rid: 1059
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Meshes
+        Kind: -1
+        TypeName: ContactMeshReplacement
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1060
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Materials
+        Kind: -1
+        TypeName: ItemMaterialReplacement
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1077
+    - rid: 1061
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Visibility
+        Kind: -1
+        TypeName: ItemVisibilitySettings
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1062
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Mode
+        Kind: 7
+        TypeName: Enum
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1063
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Flags
+        Kind: -1
+        TypeName: vector
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1064
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Remove
+        Kind: -1
+        TypeName: vector
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1065
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Meshes
+        Kind: -1
+        TypeName: ContactMeshReplacement
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1066
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Materials
+        Kind: -1
+        TypeName: ItemMaterialReplacement
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1078
+    - rid: 1067
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Visibility
+        Kind: -1
+        TypeName: ItemVisibilitySettings
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1068
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Mode
+        Kind: 7
+        TypeName: Enum
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1069
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Flags
+        Kind: -1
+        TypeName: vector
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1070
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Remove
+        Kind: -1
+        TypeName: vector
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1071
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Meshes
+        Kind: -1
+        TypeName: ContactMeshReplacement
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1072
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Materials
+        Kind: -1
+        TypeName: ItemMaterialReplacement
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1073
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Visibility
+        Kind: -1
+        TypeName: ItemVisibilitySettings
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1079
+    - rid: 1074
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Mode
+        Kind: 7
+        TypeName: Enum
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1075
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Flags
+        Kind: -1
+        TypeName: vector
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1076
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Remove
+        Kind: -1
+        TypeName: vector
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1077
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: -1
+        TypeName: ItemMaterialReplacement
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1080
+        - rid: 1081
+    - rid: 1078
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: -1
+        TypeName: ItemMaterialReplacement
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1082
+        - rid: 1083
+    - rid: 1079
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: -1
+        TypeName: ItemVisibilitySettings
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1084
+        - rid: 1085
+    - rid: 1080
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Path
+        Kind: 3
+        TypeName: string
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: SM_Ingredient_FrenchFries_Cooked
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1081
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Materials
+        Kind: -1
+        TypeName: vector
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1086
+    - rid: 1082
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Path
+        Kind: 3
+        TypeName: string
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: SM_Ingredient_FrenchFries_Cooked
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1083
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Materials
+        Kind: -1
+        TypeName: vector
+        Array: 1
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children:
+        - rid: 1087
+    - rid: 1084
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Path
+        Kind: 3
+        TypeName: string
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: SM_Ingredient_FrenchFries_Cooked
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1085
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: Visible
+        Kind: 1
+        TypeName: bool
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 0}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: 
+          Index: 0
+          Count: 0
+          SourceGuid: 
+          FileId: 0
+          Label: 
+        Children: []
+    - rid: 1086
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: 5
+        TypeName: PPtr<$Material>
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 2100000, guid: b4c54499bfa63404e83ec53945686245, type: 2}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          Index: 0
+          Count: 0
+          SourceGuid: b4c54499bfa63404e83ec53945686245
+          FileId: 2100000
+          Label: 
+        Children: []
+    - rid: 1087
+      type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Name: data
+        Kind: 5
+        TypeName: PPtr<$Material>
+        Array: 0
+        Integer: 0
+        Number: 0
+        Text: 
+        Vector: {x: 0, y: 0, z: 0, w: 0}
+        IntegerVector: {x: 0, y: 0, z: 0}
+        Color: {r: 0, g: 0, b: 0, a: 0}
+        Rectangle:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        IntegerRectangle:
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        Bounds:
+          m_Center: {x: 0, y: 0, z: 0}
+          m_Extent: {x: 0, y: 0, z: 0}
+        IntegerBounds:
+          m_Position: {x: 0, y: 0, z: 0}
+          m_Size: {x: 0, y: 0, z: 0}
+        Curve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        Gradient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        Link:
+          Asset: {fileID: 2100000, guid: 0b210acd4c99f714d9cd93d3181609b9, type: 2}
+          Local: 0
+          External: 0
+          Path: 
+          TypeName: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+          Index: 0
+          Count: 0
+          SourceGuid: 0b210acd4c99f714d9cd93d3181609b9
+          FileId: 2100000
+          Label: 
+        Children: []
+    - rid: 5751637748505116672
+      type: {class: ObjectGroupInfo, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Title: Supply source
+        Tooltip: Where the dispensed items come from.
+        Parent: Single.Draft.Dispenser
+        Section: Dispenser Supply
+        Paths:
+        - Single.Draft.Dispenser.UseContainer
+        - Single.Draft.Dispenser.Prefab
+        TypeName: CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+        Segments: []
+    - rid: 5751637748505116673
+      type: {class: ObjectGroupInfo, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Title: Stock
+        Tooltip: How many items are available.
+        Parent: Single.Draft.Dispenser
+        Section: Dispenser Supply
+        Paths:
+        - Single.Draft.Dispenser.Unlimited
+        - Single.Draft.Dispenser.Stock
+        TypeName: CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+        Segments: []
+    - rid: 5751637748505116674
+      type: {class: ObjectGroupInfo, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Title: Output mode
+        Tooltip: How and when items leave the dispenser.
+        Parent: Single.Draft.Dispenser
+        Section: Dispenser Output
+        Paths:
+        - Single.Draft.Dispenser.Mode
+        - Single.Draft.Dispenser.Interval
+        - Single.Draft.Dispenser.PickupDuration
+        TypeName: CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+        Segments: []
+    - rid: 5751637748505116675
+      type: {class: ObjectGroupInfo, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Title: Outlet layout
+        Tooltip: Where dispensed items appear.
+        Parent: Single.Draft.Dispenser
+        Section: Dispenser Output
+        Paths:
+        - Single.Draft.Dispenser.Outlets
+        - Single.Draft.Dispenser.OutputRotation
+        TypeName: CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+        Segments: []
+    - rid: 5751637748505116676
+      type: {class: ObjectGroupInfo, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Title: Dispense counting
+        Tooltip: Choose what advances each step.
+        Parent: Single.Draft.Dispenser
+        Section: Dispense counting
+        Paths:
+        - Single.Draft.Dispenser.StepCounter
+        TypeName: CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+        Segments: []
+    - rid: 5751637748505116677
+      type: {class: ObjectGroupInfo, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
+      data:
+        Title: Dispense Steps
+        Tooltip: Appearance selected by the configured counter. Refills reverse finite-supply thresholds. Unlimited prefab supply supports the dispensed counter only.
+        Parent: Single.Draft.Dispenser.FillSteps
+        Section: Dispense Steps
+        Paths:
+        - Single.Draft.Dispenser.FillSteps
+        TypeName: CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+        Segments: []
+--- !u!114 &2999633868167853769
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d77bbf856f842698755f6ed41b676f3, type: 3}
+  m_Name: SO_Dispenser_ScoopFries_Preview_Settings
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Editor::CatOnASkateboard.ObjectsLogicStudio.Editor.ObjectGroupContext
+  Values:
+  - Name: Single.Draft.Dispenser.Target.Distance
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 3
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Target.Mode
+    Kind: 7
+    TypeName: Enum
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Target.SolidHitOnly
+    Kind: 1
+    TypeName: bool
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Target.CenterRadius
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0.15000000596046448
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Target.Offset.x
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Target.Offset.y
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Target.Offset.z
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Target.ObstacleMask.m_Bits
+    Kind: 0
+    TypeName: uint
+    Array: 0
+    Integer: 4294967295
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Target.DrawGizmos
+    Kind: 1
+    TypeName: bool
+    Array: 0
+    Integer: 1
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.UseContainer
+    Kind: 1
+    TypeName: bool
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Prefab.m_FileID
+    Kind: 0
+    TypeName: int
+    Array: 0
+    Integer: 30548
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Prefab.m_PathID
+    Kind: 0
+    TypeName: long
+    Array: 0
+    Integer: 256
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Unlimited
+    Kind: 1
+    TypeName: bool
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Stock
+    Kind: 0
+    TypeName: int
+    Array: 0
+    Integer: 3
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Mode
+    Kind: 7
+    TypeName: Enum
+    Array: 0
+    Integer: 3
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.Interval
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0.25
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.PickupDuration
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0.3499999940395355
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.OutputRotation.x
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.OutputRotation.y
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.OutputRotation.z
+    Kind: 2
+    TypeName: float
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.StepCounter
+    Kind: 7
+    TypeName: Enum
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  references:
+    version: 2
+    RefIds: []

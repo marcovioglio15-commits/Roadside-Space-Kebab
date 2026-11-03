@@ -11,6 +11,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region State
 
         private readonly DialogueTextSelection selection = new DialogueTextSelection();
+        private DialoguePalettePreset palette;
 
         #endregion
 
@@ -30,6 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             serializedObject.Update();
             StudioFieldGUI.PropertyField(serializedObject.FindProperty("Name"));
             DialogueTextControls.Draw(serializedObject.FindProperty("TextEffects"), ((DialogueEntry)target).Lines);
+            DialoguePaletteControls.Draw(serializedObject.FindProperty("TextEffects.Colors"), ref palette);
             SerializedProperty pages = serializedObject.FindProperty("Lines");
             for (int index = 0; index < pages.arraySize; index++)
             {
@@ -41,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using StudioIndentScope indent = new StudioIndentScope();
                 HoverControls.Field(page, "Speaker");
                 selection.Draw(page.FindPropertyRelative("Text"));
-                DialogueTextControls.Tokens(page.FindPropertyRelative("Text"), selection);
+                DialogueTextControls.Tokens(page.FindPropertyRelative("Text"), selection, ((DialogueEntry)target).TextEffects.Colors);
             }
             StudioArrayGUI.Add(pages, "Add Page", () => new DialogueLine());
             serializedObject.ApplyModifiedProperties();

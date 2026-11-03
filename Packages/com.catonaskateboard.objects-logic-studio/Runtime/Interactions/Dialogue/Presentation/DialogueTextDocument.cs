@@ -13,6 +13,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal Color Color;
         internal float Speed;
         internal float Pause;
+        internal float Rotation;
+        internal int RotationGroup;
     }
 
     /// <summary>Retains a parsed page and per-source-character styling without changing the entry preset.</summary>

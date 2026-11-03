@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: SO_Fishy_Order_Tree
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: root
+  Nodes:
+  - Id: root
+    Name: "FishyBushiness Order"
+    Position: {x: 0, y: 0}
+    End: 0
+    Selection: 1
+    Entries:
+    - Id: 2a863bcee6f170a57b17b70dbdce5826
+      Name: "Fishy Business Random Intro 1"
+      Entry: {fileID: 11400000, guid: 6e8704ca69cf405dbab7bd9b1b08a87d, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
+      Weight: 1
+    - Id: a258067e3e7bdd522797e74a186109b2
+      Name: "Fishy Business Random Intro 2"
+      Entry: {fileID: 11400000, guid: 8f7cc85398b441f4b41af4ab3ef3c50e, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
+      Weight: 1
+    - Id: 48a14f17597435c91f14c23109a0a9f8
+      Name: "Fishy Business Random Intro 3"
+      Entry: {fileID: 11400000, guid: fa54d2787dc0482bad381321f4f8dd8b, type: 2}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: end
+      Weight: 1
+  - Id: end
+    Name: End
+    Position: {x: 410, y: 0}
+    End: 1
+    Selection: 3
+    Entries: []

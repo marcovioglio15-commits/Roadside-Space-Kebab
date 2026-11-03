@@ -1,0 +1,869 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b77670925e4c3e4fa61bf42efd92efd, type: 3}
+  m_Name: SO_DayFlowPlan
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.SpawnFlowPlan
+  Days:
+  - Name: Day 1
+    Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_DaysTesting.unity
+    WaitBeforeFirstSpawn: 0
+    StartInteraction:
+      Path: 
+      Interaction:
+        Assigned: 0
+        Kind: 0
+        Name: 
+        Occurrence: 0
+    ResetAnimations: 0
+    AnimationsToReset: []
+    RandomCount: 0
+    LengthMode: 0
+    DayDuration: 300
+    Count: 3
+    Minimum: 5
+    Maximum: 10
+    Selection: 1
+    Steps:
+    - Name: Spawn 1
+      Prefab: {fileID: 3097014450015891093, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      - {fileID: 1048780206782002216, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 2
+      Prefab: {fileID: 3097014450015891093, guid: 429619ea9c3662e4ab526627b9af45c5, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 429619ea9c3662e4ab526627b9af45c5, type: 3}
+      - {fileID: 1048780206782002216, guid: 429619ea9c3662e4ab526627b9af45c5, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 3
+      Prefab: {fileID: 3097014450015891093, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      - {fileID: 1048780206782002216, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 4
+      Prefab: {fileID: 3097014450015891093, guid: ef493ce8516645f4cbcb5a465a4e339c, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: ef493ce8516645f4cbcb5a465a4e339c, type: 3}
+      - {fileID: 1048780206782002216, guid: ef493ce8516645f4cbcb5a465a4e339c, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 5
+      Prefab: {fileID: 3097014450015891093, guid: 5368320037eb29847b26cbac5226d9d7, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 5368320037eb29847b26cbac5226d9d7, type: 3}
+      - {fileID: 1048780206782002216, guid: 5368320037eb29847b26cbac5226d9d7, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 6
+      Prefab: {fileID: 3097014450015891093, guid: 9db2b9f54efe3b849b5db64a778a875b, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 9db2b9f54efe3b849b5db64a778a875b, type: 3}
+      - {fileID: 1048780206782002216, guid: 9db2b9f54efe3b849b5db64a778a875b, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 7
+      Prefab: {fileID: 3097014450015891093, guid: 081417ebd348fe248aeddf58c6673002, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 081417ebd348fe248aeddf58c6673002, type: 3}
+      - {fileID: 1048780206782002216, guid: 081417ebd348fe248aeddf58c6673002, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 8
+      Prefab: {fileID: 3097014450015891093, guid: 84808339446ba984286b71a753dfeeff, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 84808339446ba984286b71a753dfeeff, type: 3}
+      - {fileID: 5254269728490429368, guid: 84808339446ba984286b71a753dfeeff, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 9
+      Prefab: {fileID: 3097014450015891093, guid: d1546ac68ff948c4dbcdc21650cfa833, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: d1546ac68ff948c4dbcdc21650cfa833, type: 3}
+      - {fileID: 5254269728490429368, guid: d1546ac68ff948c4dbcdc21650cfa833, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 10
+      Prefab: {fileID: 3097014450015891093, guid: a7007fcf256b2e24a94d7f4feedb2e43, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: a7007fcf256b2e24a94d7f4feedb2e43, type: 3}
+      - {fileID: 5254269728490429368, guid: a7007fcf256b2e24a94d7f4feedb2e43, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 11
+      Prefab: {fileID: 3097014450015891093, guid: 828e276eaa3c8a64589e35f926611f62, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 828e276eaa3c8a64589e35f926611f62, type: 3}
+      - {fileID: 5254269728490429368, guid: 828e276eaa3c8a64589e35f926611f62, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 12
+      Prefab: {fileID: 3097014450015891093, guid: 19d9de81f2927974eba8f6c39ac6cedf, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 19d9de81f2927974eba8f6c39ac6cedf, type: 3}
+      - {fileID: 5254269728490429368, guid: 19d9de81f2927974eba8f6c39ac6cedf, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 13
+      Prefab: {fileID: 3097014450015891093, guid: eee847ff49e2a664e85f6772d33ed586, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: eee847ff49e2a664e85f6772d33ed586, type: 3}
+      - {fileID: 5254269728490429368, guid: eee847ff49e2a664e85f6772d33ed586, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+  - Name: Day 2
+    Scene: Assets/Scenes/Tool Testing Scenes/Test/Design/SCN_DaysTesting.unity
+    WaitBeforeFirstSpawn: 0
+    StartInteraction:
+      Path: 
+      Interaction:
+        Assigned: 0
+        Kind: 0
+        Name: 
+        Occurrence: 0
+    ResetAnimations: 0
+    AnimationsToReset: []
+    RandomCount: 0
+    LengthMode: 0
+    DayDuration: 300
+    Count: 3
+    Minimum: 1
+    Maximum: 3
+    Selection: 1
+    Steps:
+    - Name: Spawn 1
+      Prefab: {fileID: 3097014450015891093, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      - {fileID: 1048780206782002216, guid: 10287d27a2d37a047a90c3dafc0b78a6, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 4488316828472950241, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 2
+      Prefab: {fileID: 3097014450015891093, guid: 429619ea9c3662e4ab526627b9af45c5, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 429619ea9c3662e4ab526627b9af45c5, type: 3}
+      - {fileID: 1048780206782002216, guid: 429619ea9c3662e4ab526627b9af45c5, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 3
+      Prefab: {fileID: 3097014450015891093, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      - {fileID: 1048780206782002216, guid: 0da31bb51078c444eb3a83ee8d39004b, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 4
+      Prefab: {fileID: 3097014450015891093, guid: ef493ce8516645f4cbcb5a465a4e339c, type: 3}
+      Completions:
+      - {fileID: 5254269728490429368, guid: ef493ce8516645f4cbcb5a465a4e339c, type: 3}
+      - {fileID: 1048780206782002216, guid: ef493ce8516645f4cbcb5a465a4e339c, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 5
+      Prefab: {fileID: 3097014450015891093, guid: 84808339446ba984286b71a753dfeeff, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 84808339446ba984286b71a753dfeeff, type: 3}
+      - {fileID: 5254269728490429368, guid: 84808339446ba984286b71a753dfeeff, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 6
+      Prefab: {fileID: 3097014450015891093, guid: d1546ac68ff948c4dbcdc21650cfa833, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: d1546ac68ff948c4dbcdc21650cfa833, type: 3}
+      - {fileID: 5254269728490429368, guid: d1546ac68ff948c4dbcdc21650cfa833, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 7
+      Prefab: {fileID: 3097014450015891093, guid: a7007fcf256b2e24a94d7f4feedb2e43, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: a7007fcf256b2e24a94d7f4feedb2e43, type: 3}
+      - {fileID: 5254269728490429368, guid: a7007fcf256b2e24a94d7f4feedb2e43, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 8
+      Prefab: {fileID: 3097014450015891093, guid: 828e276eaa3c8a64589e35f926611f62, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 828e276eaa3c8a64589e35f926611f62, type: 3}
+      - {fileID: 5254269728490429368, guid: 828e276eaa3c8a64589e35f926611f62, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 9
+      Prefab: {fileID: 3097014450015891093, guid: 19d9de81f2927974eba8f6c39ac6cedf, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: 19d9de81f2927974eba8f6c39ac6cedf, type: 3}
+      - {fileID: 5254269728490429368, guid: 19d9de81f2927974eba8f6c39ac6cedf, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+    - Name: Spawn 10
+      Prefab: {fileID: 3097014450015891093, guid: eee847ff49e2a664e85f6772d33ed586, type: 3}
+      Completions:
+      - {fileID: 1048780206782002216, guid: eee847ff49e2a664e85f6772d33ed586, type: 3}
+      - {fileID: 5254269728490429368, guid: eee847ff49e2a664e85f6772d33ed586, type: 3}
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 90, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Keyframes:
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1
+          Direction: 1
+  Loop: 1
+  PreserveScene: 1
+  MainMenu: 
+  PauseScene: Assets/Scenes/Tool Testing Scenes/Test/Programming/UI/SCN_PauseMenu.unity
+  FadeOut: 0.5
+  BlackDelay: 0.2
+  FadeIn: 0.5
+  FixedSeed: 0
+  Seed: 1

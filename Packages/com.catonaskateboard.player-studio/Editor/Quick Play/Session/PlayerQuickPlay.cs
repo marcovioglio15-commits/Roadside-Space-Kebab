@@ -143,7 +143,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 foreach (AudioListener listener in root.GetComponentsInChildren<AudioListener>(true))
                     listener.enabled = false;
             }
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(Path.GetDirectoryName(scenePath) + "/Player.prefab");
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(Path.GetDirectoryName(scenePath) + "/PF_Player.prefab");
             if (prefab == null)
             {
                 Debug.LogWarning("Quick Play could not load its prepared player prefab.");

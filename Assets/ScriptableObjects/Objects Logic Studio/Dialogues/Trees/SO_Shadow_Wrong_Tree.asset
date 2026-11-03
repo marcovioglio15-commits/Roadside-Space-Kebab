@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: SO_Shadow_Wrong_Tree
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: root
+  Nodes:
+  - Id: root
+    Name: "Dialogue Shadowblade Delivery Wrong Preset 1"
+    Position: {x: 0, y: 0}
+    End: 0
+    Selection: 1
+    Entries:
+    - Id: 0a82215ddabcb7cf23bfc7441e48e64b
+      Name: "Shadowblade Order Wrong 1 - E"
+      Entry: {fileID: 11400000, guid: 191a711a070847bb82f79503cb5da2dc, type: 2}
+      Trigger: {fileID: 11400000, guid: a638903bca606d5ba0c059496d757d0b, type: 2}
+      Next: end
+      Weight: 1
+    - Id: 929816947c099be341ce67476d25922c
+      Name: "Shadowblade Order Wrong 1 - F"
+      Entry: {fileID: 11400000, guid: 373ca916699f417785fa271ef75b0eb3, type: 2}
+      Trigger: {fileID: 11400000, guid: a638903bca606d5ba0c059496d757d0b, type: 2}
+      Next: end
+      Weight: 1
+    - Id: dfaedc638d729adbd74fdaca46816cc5
+      Name: "Shadowblade Order Wrong 1 - G"
+      Entry: {fileID: 11400000, guid: 40539d599329422ea3a169093f87c5da, type: 2}
+      Trigger: {fileID: 11400000, guid: a638903bca606d5ba0c059496d757d0b, type: 2}
+      Next: end
+      Weight: 1
+    - Id: dd93f871659d771f5a93daff3f1865e7
+      Name: "Shadowblade Order Wrong 1 - H"
+      Entry: {fileID: 11400000, guid: b28bd508757e4826b17b61eb240f60cf, type: 2}
+      Trigger: {fileID: 11400000, guid: a638903bca606d5ba0c059496d757d0b, type: 2}
+      Next: end
+      Weight: 1
+    - Id: 2c9ab90dfebeb1eaa51a10f82a02dc76
+      Name: "Shadowblade Order Wrong 1 - D"
+      Entry: {fileID: 11400000, guid: 8ead9e505901404ebc476cac9e04770e, type: 2}
+      Trigger: {fileID: 11400000, guid: a638903bca606d5ba0c059496d757d0b, type: 2}
+      Next: end
+      Weight: 1
+  - Id: end
+    Name: End
+    Position: {x: 410, y: 0}
+    End: 1
+    Selection: 3
+    Entries: []

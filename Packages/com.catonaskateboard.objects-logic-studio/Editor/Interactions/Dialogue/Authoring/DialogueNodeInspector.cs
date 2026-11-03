@@ -32,7 +32,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(property, "Routing", "Routing Block");
             if (!property.FindPropertyRelative("Routing").boolValue)
             {
-                HoverControls.Field(property, "OverridePolicy", "Override Presentation");
+                HoverControls.Field(property, "OverridePolicy", "Override Dialogue Settings");
                 if (property.FindPropertyRelative("OverridePolicy").boolValue)
                     ExtendedInteractionControls.DrawDialogue(property.FindPropertyRelative("Policy"), policySections, false);
             }

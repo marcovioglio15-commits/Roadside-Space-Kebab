@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57700fc7b449af4abbcc3000d7a7b2e, type: 3}
+  m_Name: SO_Fishy_Correct_Tree_1
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.DialogueTree
+  Start: root
+  Nodes:
+  - Id: root
+    Name: "FishyBusiness Delivery Correct "
+    Position: {x: 0, y: 0}
+    End: 0
+    Selection: 0
+    Entries:
+    - Id: 8ce438ec4e5bd8ccaa71fd907812d53a
+      Name: "Fishy Business Order Correct 1 - D"
+      Entry: {fileID: 11400000, guid: 58bcf53fd716480cb39592907c1ae19b, type: 2}
+      Trigger: {fileID: 11400000, guid: b7f4cf57a622a40f8722d626c03597b4, type: 2}
+      Next: end
+      Weight: 1
+    - Id: b6943ad8da8e34947a8f3dfb5b54599f
+      Name: "Fishy Business Order Correct 2 - D"
+      Entry: {fileID: 11400000, guid: 6788827458644968bd68081154330229, type: 2}
+      Trigger: {fileID: 11400000, guid: b7f4cf57a622a40f8722d626c03597b4, type: 2}
+      Next: end
+      Weight: 1
+  - Id: end
+    Name: End
+    Position: {x: 410, y: 0}
+    End: 1
+    Selection: 3
+    Entries: []
