@@ -128,14 +128,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="parent">Owning serialized block.</param>
         /// <param name="name">Serialized field name.</param>
         /// <param name="caption">Optional compact field caption.</param>
-        internal static void Field(SerializedProperty parent, string name, string caption = null)
+        /// <param name="tooltip">Optional instructions specific to the current field context.</param>
+        internal static void Field(SerializedProperty parent, string name, string caption = null, string tooltip = null)
         {
             // Native property fields remain available for asset references and layer masks.
             SerializedProperty property = parent.FindPropertyRelative(name);
             if (!ObjectGroupScope.Allows(property))
                 return;
             using ObjectFieldFocus.Marker focus = new ObjectFieldFocus.Marker(property);
-            GUIContent label = new GUIContent(caption ?? Label(property), ObjectFieldText.Tooltip(property));
+            GUIContent label = new GUIContent(caption ?? Label(property), tooltip ?? ObjectFieldText.Tooltip(property));
             if (ObjectNumericFields.Draw(property, label))
                 return;
             switch (property.propertyType)

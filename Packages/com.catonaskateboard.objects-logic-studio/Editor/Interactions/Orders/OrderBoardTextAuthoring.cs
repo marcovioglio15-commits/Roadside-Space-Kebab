@@ -50,13 +50,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             for (int index = 0; index < paragraphs.arraySize; index++)
             {
-                if (paragraphs.GetArrayElementAtIndex(index).objectReferenceValue != null)
+                if (paragraphs.GetArrayElementAtIndex(index).objectReferenceValue is TMP_Text existing)
+                {
+                    Repair(existing);
                     continue;
+                }
                 GameObject child = new GameObject("Order Paragraph " + (index + 1), typeof(RectTransform));
                 Undo.RegisterCreatedObjectUndo(child, "Prepare Order Text");
                 child.transform.SetParent(slot.transform, false);
                 TMP_Text text = (TMP_Text)Undo.AddComponent(child, slot is TextMeshProUGUI ? typeof(TextMeshProUGUI) : typeof(TextMeshPro));
                 EditorUtility.CopySerialized(slot, text);
+                Repair(text);
                 text.text = string.Empty;
                 text.enabled = true;
                 text.raycastTarget = false;
@@ -69,6 +73,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             data.ApplyModifiedProperties();
             EditorUtility.SetDirty(presenter);
+        }
+
+        /// <summary>Retains each paragraph's own renderer and a material matching its selected font.</summary>
+        /// <param name="text">Existing or newly copied board paragraph.</param>
+        internal static void Repair(TMP_Text text)
+        {
+            // Serialized TMP copies must never retain the source object's renderer reference.
+            using SerializedObject data = new SerializedObject(text);
+            SerializedProperty renderer = data.FindProperty("m_renderer");
+            if (renderer != null)
+                renderer.objectReferenceValue = text.GetComponent<Renderer>();
+            data.ApplyModifiedProperties();
+            if (text.font == null || text.fontSharedMaterial != null && text.fontSharedMaterial.mainTexture == text.font.atlasTexture)
+                return;
+            // Match TMP's activation behavior before another customer can capture this baseline.
+            Undo.RecordObject(text, "Repair Order Font Material");
+            text.fontSharedMaterial = text.font.material;
+            EditorUtility.SetDirty(text);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(text);
         }
 
         #endregion

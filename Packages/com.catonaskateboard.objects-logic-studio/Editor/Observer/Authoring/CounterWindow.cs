@@ -51,6 +51,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Optional exact customer for a spatial timer. Empty follows the latest visible customer in this scene.")]
         [SerializeField]
         private ObjectAvailableOrders customer;
+        private Vector2 scroll;
 
         #endregion
 
@@ -70,6 +71,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnGUI()
         {
             // Serialized controls retain native Undo and tooltips.
+            using EditorGUILayout.ScrollViewScope view = new EditorGUILayout.ScrollViewScope(scroll);
+            scroll = view.scrollPosition;
             using SerializedObject data = new SerializedObject(this);
             foreach (string name in new[] { "kind", "display", "existing" })
                 StudioFieldGUI.PropertyField(data.FindProperty(name));
@@ -104,8 +107,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void Create()
         {
             // Reject invalid input without silently changing the requested pose or size.
-            if (!InteractionValues.Finite(offset) || !InteractionValues.Finite(rotation) || !InteractionValues.Positive(fontSize)
-                || parent != null && EditorUtility.IsPersistent(parent))
+            if (display == CounterDisplay.World && (!InteractionValues.Finite(offset) || !InteractionValues.Finite(rotation)
+                || !InteractionValues.Positive(fontSize) || parent != null && EditorUtility.IsPersistent(parent)))
             {
                 Debug.LogWarning("Use a scene parent, finite offset and rotation, and a positive text size.");
                 return;

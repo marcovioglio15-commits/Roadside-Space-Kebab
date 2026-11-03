@@ -641,7 +641,7 @@ MonoBehaviour:
       FileId: 0
       Label: 
     Children:
-    - rid: 1044
+    - rid: 1000
   - Name: OutputRotation
     Kind: 9
     TypeName: Vector3
@@ -867,9 +867,9 @@ MonoBehaviour:
       FileId: 0
       Label: 
     Children:
-    - rid: 1045
-    - rid: 1046
-    - rid: 1047
+    - rid: 1001
+    - rid: 1002
+    - rid: 1003
   - Name: ScoopFlag
     Kind: 5
     TypeName: PPtr<$ObjectFlag>
@@ -1024,7 +1024,7 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 1044
+    - rid: 1000
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -1102,9 +1102,9 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1048
-        - rid: 1049
-    - rid: 1045
+        - rid: 1004
+        - rid: 1005
+    - rid: 1001
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -1182,10 +1182,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1050
-        - rid: 1051
-        - rid: 1052
-    - rid: 1046
+        - rid: 1006
+        - rid: 1007
+        - rid: 1008
+    - rid: 1002
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -1263,10 +1263,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1053
-        - rid: 1054
-        - rid: 1055
-    - rid: 1047
+        - rid: 1009
+        - rid: 1010
+        - rid: 1011
+    - rid: 1003
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -1344,10 +1344,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1056
-        - rid: 1057
-        - rid: 1058
-    - rid: 1048
+        - rid: 1012
+        - rid: 1013
+        - rid: 1014
+    - rid: 1004
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Position
@@ -1425,7 +1425,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1049
+    - rid: 1005
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Rotation
@@ -1503,7 +1503,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1050
+    - rid: 1006
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Count
@@ -1581,7 +1581,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1051
+    - rid: 1007
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Appearance
@@ -1659,10 +1659,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1059
-        - rid: 1060
-        - rid: 1061
-    - rid: 1052
+        - rid: 1015
+        - rid: 1016
+        - rid: 1017
+    - rid: 1008
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Flags
@@ -1740,10 +1740,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1062
-        - rid: 1063
-        - rid: 1064
-    - rid: 1053
+        - rid: 1018
+        - rid: 1019
+        - rid: 1020
+    - rid: 1009
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Count
@@ -1821,7 +1821,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1054
+    - rid: 1010
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Appearance
@@ -1899,10 +1899,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1065
-        - rid: 1066
-        - rid: 1067
-    - rid: 1055
+        - rid: 1021
+        - rid: 1022
+        - rid: 1023
+    - rid: 1011
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Flags
@@ -1980,10 +1980,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1068
-        - rid: 1069
-        - rid: 1070
-    - rid: 1056
+        - rid: 1024
+        - rid: 1025
+        - rid: 1026
+    - rid: 1012
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Count
@@ -2061,7 +2061,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1057
+    - rid: 1013
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Appearance
@@ -2139,10 +2139,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1071
-        - rid: 1072
-        - rid: 1073
-    - rid: 1058
+        - rid: 1027
+        - rid: 1028
+        - rid: 1029
+    - rid: 1014
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Flags
@@ -2220,10 +2220,10 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1074
-        - rid: 1075
-        - rid: 1076
-    - rid: 1059
+        - rid: 1030
+        - rid: 1031
+        - rid: 1032
+    - rid: 1015
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Meshes
@@ -2301,7 +2301,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1060
+    - rid: 1016
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Materials
@@ -2379,8 +2379,8 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1077
-    - rid: 1061
+        - rid: 1033
+    - rid: 1017
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Visibility
@@ -2458,7 +2458,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1062
+    - rid: 1018
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Mode
@@ -2536,7 +2536,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1063
+    - rid: 1019
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Flags
@@ -2614,7 +2614,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1064
+    - rid: 1020
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Remove
@@ -2692,7 +2692,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1065
+    - rid: 1021
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Meshes
@@ -2770,7 +2770,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1066
+    - rid: 1022
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Materials
@@ -2848,8 +2848,8 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1078
-    - rid: 1067
+        - rid: 1034
+    - rid: 1023
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Visibility
@@ -2927,7 +2927,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1068
+    - rid: 1024
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Mode
@@ -3005,7 +3005,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1069
+    - rid: 1025
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Flags
@@ -3083,7 +3083,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1070
+    - rid: 1026
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Remove
@@ -3161,7 +3161,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1071
+    - rid: 1027
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Meshes
@@ -3239,7 +3239,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1072
+    - rid: 1028
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Materials
@@ -3317,7 +3317,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1073
+    - rid: 1029
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Visibility
@@ -3395,8 +3395,8 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1079
-    - rid: 1074
+        - rid: 1035
+    - rid: 1030
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Mode
@@ -3474,7 +3474,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1075
+    - rid: 1031
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Flags
@@ -3552,7 +3552,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1076
+    - rid: 1032
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Remove
@@ -3630,7 +3630,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1077
+    - rid: 1033
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -3708,9 +3708,9 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1080
-        - rid: 1081
-    - rid: 1078
+        - rid: 1036
+        - rid: 1037
+    - rid: 1034
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -3788,9 +3788,9 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1082
-        - rid: 1083
-    - rid: 1079
+        - rid: 1038
+        - rid: 1039
+    - rid: 1035
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -3868,9 +3868,9 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1084
-        - rid: 1085
-    - rid: 1080
+        - rid: 1040
+        - rid: 1041
+    - rid: 1036
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Path
@@ -3948,7 +3948,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1081
+    - rid: 1037
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Materials
@@ -4026,8 +4026,8 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1086
-    - rid: 1082
+        - rid: 1042
+    - rid: 1038
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Path
@@ -4105,7 +4105,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1083
+    - rid: 1039
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Materials
@@ -4183,8 +4183,8 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children:
-        - rid: 1087
-    - rid: 1084
+        - rid: 1043
+    - rid: 1040
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Path
@@ -4262,7 +4262,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1085
+    - rid: 1041
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: Visible
@@ -4340,7 +4340,7 @@ MonoBehaviour:
           FileId: 0
           Label: 
         Children: []
-    - rid: 1086
+    - rid: 1042
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -4418,7 +4418,7 @@ MonoBehaviour:
           FileId: 2100000
           Label: 
         Children: []
-    - rid: 1087
+    - rid: 1043
       type: {class: ObjectPresetValue, ns: CatOnASkateboard.ObjectsLogicStudio.Editor, asm: CatOnASkateboard.ObjectsLogicStudio.Editor}
       data:
         Name: data
@@ -5109,7 +5109,7 @@ MonoBehaviour:
     Kind: 0
     TypeName: uint
     Array: 0
-    Integer: 4294967295
+    Integer: 0
     Number: 0
     Text: 
     Vector: {x: 0, y: 0, z: 0, w: 0}
@@ -5334,7 +5334,7 @@ MonoBehaviour:
     Kind: 0
     TypeName: int
     Array: 0
-    Integer: 30548
+    Integer: 0
     Number: 0
     Text: 
     Vector: {x: 0, y: 0, z: 0, w: 0}
@@ -5406,6 +5406,156 @@ MonoBehaviour:
       Label: 
     Children: []
   - Name: Single.Draft.Dispenser.Prefab.m_PathID
+    Kind: 0
+    TypeName: long
+    Array: 0
+    Integer: 0
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.ScoopFlag.m_FileID
+    Kind: 0
+    TypeName: int
+    Array: 0
+    Integer: 26922
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.ScoopFlag.m_PathID
     Kind: 0
     TypeName: long
     Array: 0
@@ -5560,6 +5710,81 @@ MonoBehaviour:
     TypeName: int
     Array: 0
     Integer: 3
+    Number: 0
+    Text: 
+    Vector: {x: 0, y: 0, z: 0, w: 0}
+    IntegerVector: {x: 0, y: 0, z: 0}
+    Color: {r: 0, g: 0, b: 0, a: 0}
+    Rectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    IntegerRectangle:
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
+    IntegerBounds:
+      m_Position: {x: 0, y: 0, z: 0}
+      m_Size: {x: 0, y: 0, z: 0}
+    Curve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    Gradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: -1
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    Link:
+      Asset: {fileID: 0}
+      Local: 0
+      External: 0
+      Path: 
+      TypeName: 
+      Index: 0
+      Count: 0
+      SourceGuid: 
+      FileId: 0
+      Label: 
+    Children: []
+  - Name: Single.Draft.Dispenser.DestroyWhenEmpty
+    Kind: 1
+    TypeName: bool
+    Array: 0
+    Integer: 0
     Number: 0
     Text: 
     Vector: {x: 0, y: 0, z: 0, w: 0}

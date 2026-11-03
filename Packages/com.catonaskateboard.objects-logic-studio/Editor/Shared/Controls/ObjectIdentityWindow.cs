@@ -16,6 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Object identity opened from Object Logic Studio. Edits affect this object only.")]
         [SerializeField]
         private ObjectIdentity identity;
+        private Vector2 scroll;
 
         #endregion
 
@@ -64,6 +65,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnGUI()
         {
             // Deleted objects leave a harmless empty editor instead of a stale serialized target.
+            using EditorGUILayout.ScrollViewScope view = new EditorGUILayout.ScrollViewScope(scroll);
+            scroll = view.scrollPosition;
             if (identity == null)
             {
                 EditorGUILayout.LabelField("Select an object in Object Logic Studio.");

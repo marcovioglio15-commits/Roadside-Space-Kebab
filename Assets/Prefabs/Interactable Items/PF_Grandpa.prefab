@@ -37,6 +37,212 @@ Transform:
   - {fileID: 5734914258560488655}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3531357097745856228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1986238341834929637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
+  flags: []
+--- !u!114 &1559001020667944093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1986238341834929637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
+--- !u!114 &5977255243003975663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1986238341834929637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 938429a5d51206345b01b27c9fb3a6a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
+  interactionName: First Person Hover
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  anchor: {fileID: 0}
+  configuration:
+    settings:
+      targetMode: 2
+      playerDistance: 2
+      centerRadius: 0.25
+      queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
+      obstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967227
+      fixedHud: 1
+      anchorOffset: {x: 0, y: 0, z: 0}
+      worldOffset: {x: 0, y: 0.7, z: 0}
+      screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
+      appearance: 1
+      duration: 0.18
+      startScale: 0.2
+      popIn: 1
+      exitDuration: 0.16
+    style:
+      content: 
+      font: {fileID: 0}
+      fontSize: 24
+      fontStyle: 0
+      textColor: {r: 1, g: 1, b: 1, a: 1}
+      alignment: 4
+      richText: 0
+      horizontalOverflow: 0
+      verticalOverflow: 0
+      size: {x: 280, y: 64}
+      textSizeOffset: {x: -24, y: -12}
+      textOffset: {x: 0, y: 0}
+      showBackground: 0
+      backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
+      backgroundSprite: {fileID: 0}
+      backgroundType: 0
+  drawGizmos: 1
+--- !u!114 &7877880204264900558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1986238341834929637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Thickness: 6
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 6907869812400975776}
+--- !u!114 &1416134460184230605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1986238341834929637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
+  interactionName: Dialogue
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools:
+    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
+    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Distance: 2
+    ExitDistance: 4
+    Priority: 0
+    PreferSingleActions: 1
+    PreferredActions: 68
+    RequireSightToStart: 1
+    RequireSightToContinue: 0
+    HideWhenSightLost: 0
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    Interruption: 1
+    ReplayOnReturn: 1
+    ReplayOnInput: 0
+    Audio:
+      Voice: 0
+      Interval: 1
+      Completion: 0
+    Box:
+      FadeIn: 0
+      FadeOut: 0
+      SpeakerPosition: 0.5
+    Tree: {fileID: 11400000, guid: 5ce048c0c98848a4db8653b917c48c78, type: 2}
+    UseSpawnTrees: 0
+    SpawnTrees: []
+  startAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  advanceAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!1 &3998560244551495056
 GameObject:
   m_ObjectHideFlags: 0
@@ -158,214 +364,6 @@ PrefabInstance:
       addedObject: {fileID: 3886050175042030551}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fca36088f677f8b44b881d2e4d6ada8c, type: 3}
---- !u!1 &4962213136492023413 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: fca36088f677f8b44b881d2e4d6ada8c, type: 3}
-  m_PrefabInstance: {fileID: 5196093350904558372}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &3531357097745856228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1986238341834929637}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
-  flags: []
---- !u!114 &1559001020667944093
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1986238341834929637}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
---- !u!114 &5977255243003975663
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1986238341834929637}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 938429a5d51206345b01b27c9fb3a6a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
-  interactionName: First Person Hover
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  anchor: {fileID: 0}
-  preset: {fileID: 0}
-  configuration:
-    settings:
-      targetMode: 2
-      playerDistance: 2
-      centerRadius: 0.25
-      queryInterval: 0.05
-      releaseDelay: 0.08
-      suspendCarried: 0
-      suspendMoving: 0
-      speedThreshold: 0.5
-      obstacleMask:
-        serializedVersion: 2
-        m_Bits: 4294967227
-      fixedHud: 1
-      anchorOffset: {x: 0, y: 0, z: 0}
-      worldOffset: {x: 0, y: 0.7, z: 0}
-      screenOffset: {x: 0, y: 35}
-      followSmoothing: 0.035
-      appearance: 1
-      duration: 0.18
-      startScale: 0.2
-      popIn: 1
-      exitDuration: 0.16
-    style:
-      content: 
-      font: {fileID: 0}
-      fontSize: 24
-      fontStyle: 0
-      textColor: {r: 1, g: 1, b: 1, a: 1}
-      alignment: 4
-      richText: 0
-      horizontalOverflow: 0
-      verticalOverflow: 0
-      size: {x: 280, y: 64}
-      textSizeOffset: {x: -24, y: -12}
-      textOffset: {x: 0, y: 0}
-      showBackground: 0
-      backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
-      backgroundSprite: {fileID: 0}
-      backgroundType: 0
-  drawGizmos: 1
---- !u!114 &7877880204264900558
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1986238341834929637}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
-  interactionName: Outline
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  drawGizmos: 1
-  settings:
-    Thickness: 6
-    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
-    Intensity: 5
-    EdgeAngle: 30
-    HoverOnly: 1
-  renderers:
-  - {fileID: 6907869812400975776}
---- !u!114 &1416134460184230605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1986238341834929637}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aaff6767c95b452ca067fb90d814948e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDialogue
-  interactionName: Dialogue
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools:
-    - {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
-    - {fileID: 11400000, guid: 5fb3e5b8336fae04cb1da342224fb46a, type: 2}
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  drawGizmos: 1
-  settings:
-    Tree: {fileID: 11400000, guid: 815c1958489d23c4a976d033df0f0792, type: 2}
-    UseSpawnTrees: 0
-    SpawnTrees: []
-    Distance: 2
-    ExitDistance: 4
-    Priority: 0
-    PreferSingleActions: 1
-    PreferredActions: 68
-    RequireSightToStart: 1
-    RequireSightToContinue: 0
-    HideWhenSightLost: 0
-    ObstacleMask:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    Interruption: 1
-    ReplayOnReturn: 1
-    ReplayOnInput: 0
-    Audio:
-      Voice: 0
-      Interval: 1
-      Completion: 0
-  startAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
-  advanceAction: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!4 &5734914258560488655 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: fca36088f677f8b44b881d2e4d6ada8c, type: 3}

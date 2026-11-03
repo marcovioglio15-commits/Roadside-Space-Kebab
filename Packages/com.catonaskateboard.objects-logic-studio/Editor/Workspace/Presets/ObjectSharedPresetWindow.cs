@@ -27,6 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region State
 
         private string warning = string.Empty;
+        private Vector2 scroll;
 
         #endregion
 
@@ -81,7 +82,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (preset == null || preview == null)
                 return;
             EditorGUILayout.LabelField("Shared settings", EditorStyles.boldLabel);
-            using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+            using EditorGUI.DisabledScope locked = new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode);
+            using (EditorGUILayout.ScrollViewScope view = new EditorGUILayout.ScrollViewScope(scroll))
+            {
+                scroll = view.scrollPosition;
                 foreach (ObjectComponentPreset component in preset.Components)
                 {
                     Type type = Type.GetType(component.TypeName, true);
@@ -96,6 +100,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                     data.ApplyModifiedProperties();
                 }
+            }
             if (!string.IsNullOrEmpty(warning))
                 EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();

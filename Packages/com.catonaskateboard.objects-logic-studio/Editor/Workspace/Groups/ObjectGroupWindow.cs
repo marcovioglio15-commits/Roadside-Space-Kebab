@@ -412,11 +412,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 throw new InvalidOperationException("Choose a preset for this group.");
             if (ObjectGroupPresetStore.AssetStamp(preset) != presetBaseline)
                 throw new InvalidOperationException("This preset changed elsewhere. Select it again before updating.");
-            Undo.RecordObject(preset, "Update group preset");
-            preset.Values = ObjectGroupPresetStore.Capture(document, group);
-            ObjectPresetContext.Update(preset, document);
-            EditorUtility.SetDirty(preset);
-            AssetDatabase.SaveAssetIfDirty(preset);
+            // Save matching field metadata and values together; failed writes retain the proposal.
+            ObjectPresetValue[] values = ObjectGroupPresetStore.Capture(document, group);
+            StudioAssetWrites.Save(preset, "Update group preset", () =>
+            {
+                preset.Group = ObjectWorkspace.Copy(group);
+                preset.Values = values;
+                ObjectPresetContext.Update(preset, document);
+            });
             presetBaseline = ObjectGroupPresetStore.AssetStamp(preset);
             if (assetOnly)
                 baseline = ObjectGroupPresetStore.Stamp(document, group);
@@ -458,6 +461,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             try
             {
+                // Finish pending serialized edits before commands capture or replace this proposal.
+                data?.ApplyModifiedProperties();
                 operation();
             }
             catch (Exception exception)

@@ -89,10 +89,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (type == DialogueTrigger.InputAction)
                 StudioFieldGUI.PropertyField(serializedObject.FindProperty("Action"));
             if (type == DialogueTrigger.Consumption)
-            {
                 DialogueConsumptionControls.Draw(serializedObject.FindProperty("Consumption"), "Filter Consumption", orders?.Catalog, orders);
-                DialogueConsumptionControls.Draw(serializedObject.FindProperty("AdditionalConsumption"), "Additional Condition", orders?.Catalog, orders);
-            }
             if (type is DialogueTrigger.Proximity or DialogueTrigger.InputAction)
             {
                 StudioFieldGUI.PropertyField(serializedObject.FindProperty("OverrideRange"));

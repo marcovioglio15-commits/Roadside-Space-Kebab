@@ -101,7 +101,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void Write(ObjectPresetValue value)
         {
             // Portable links can also represent local interaction IDs and hover anchor paths.
-            if (value.Link != null && (value.Link.Local || value.Link.External || value.Link.Asset != null))
+            if (value.Link is { IsSet: true })
             {
                 fragments.Add(text.ToString());
                 text.Clear();

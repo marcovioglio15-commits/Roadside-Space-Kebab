@@ -416,19 +416,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     {
                         DialogueConsumptionFilter filter = row.Trigger.Consumption;
                         bool awaiting = AwaitsContact(row.Trigger);
-                        if ((awaiting ? contact != null && contact.AwaitingContact : Item.HasConsumption) && filter.Matches(Item, orders)
-                            && row.Trigger.AdditionalConsumption.Matches(Item, orders))
+                        if ((awaiting ? contact != null && contact.AwaitingContact : Item.HasConsumption) && filter.Matches(Item, orders))
                             consumptionMatches.Add(row.Trigger);
                     }
         }
 
         /// <summary>Distinguishes rejected contacts from real consumption receipts.</summary>
-        /// <param name="trigger">Consumption trigger and its optional additional filter.</param>
-        /// <returns>True when either active filter requests Awaiting Orders.</returns>
+        /// <param name="trigger">Consumption trigger evaluated for this entry.</param>
+        /// <returns>True when the enabled filter requests Awaiting Orders.</returns>
         private static bool AwaitsContact(DialogueTriggerPreset trigger)
         {
-            return trigger.Consumption.Enabled && trigger.Consumption.Result == DialogueOrderResult.AwaitingOrders
-                || trigger.AdditionalConsumption.Enabled && trigger.AdditionalConsumption.Result == DialogueOrderResult.AwaitingOrders;
+            return trigger.Consumption.Enabled && trigger.Consumption.Result == DialogueOrderResult.AwaitingOrders;
         }
 
         /// <summary>Checks range and availability while this component presents a page.</summary>

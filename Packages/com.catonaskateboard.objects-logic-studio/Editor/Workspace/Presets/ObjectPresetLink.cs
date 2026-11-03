@@ -36,6 +36,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Properties
 
+        /// <summary>Distinguishes an actual binding from the empty inline record restored by Unity.</summary>
+        internal bool IsSet => Local || External || Asset != null;
+
         /// <summary>Stable key shared by repeated references to the same source slot.</summary>
         internal string Key => SourceGuid + ":" + FileId + ":" + Path + ":" + TypeName + ":" + Index;
 

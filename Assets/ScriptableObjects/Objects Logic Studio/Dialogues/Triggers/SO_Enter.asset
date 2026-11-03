@@ -20,12 +20,6 @@ MonoBehaviour:
     Orders: []
     RequireAll: 1
     Result: 0
-  AdditionalConsumption:
-    Enabled: 0
-    RequiredFlags: []
-    Orders: []
-    RequireAll: 1
-    Result: 0
   OverrideRange: 0
   Distance: 3
   ExitDistance: 4

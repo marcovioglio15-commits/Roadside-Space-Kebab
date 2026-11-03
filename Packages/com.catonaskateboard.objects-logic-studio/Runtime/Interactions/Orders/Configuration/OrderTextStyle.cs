@@ -11,7 +11,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Board Text")]
-        [Tooltip("Use this paragraph's typography and layout. Disabled keeps the authored board appearance.")]
+        [Tooltip("Use this paragraph's typography and layout. Disabled keeps the saved board appearance.")]
         public bool Enabled;
         [Tooltip("Optional TMP font asset. Empty keeps the board's font.")]
         public TMP_FontAsset Font;
@@ -83,7 +83,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Presentation
 
         /// <summary>Applies an enabled paragraph override to existing TMP graphics.</summary>
-        /// <param name="text">Preauthored paragraph, already restored to the board's baseline.</param>
+        /// <param name="text">Existing paragraph, already restored to the board's baseline.</param>
         internal void Apply(TMP_Text text)
         {
             // Font materials are shared assets; changing typography never clones UI objects.
@@ -121,7 +121,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Capture once at board activation, never during an individual render frame.
             return new OrderTextStyle
             {
-                Enabled = true, Font = text.font, Material = text.fontSharedMaterial, Color = text.color,
+                Enabled = true, Font = text.font, Material = BaselineMaterial(text), Color = text.color,
                 Style = text.fontStyle, Weight = text.fontWeight, Size = text.fontSize, AutoSize = text.enableAutoSizing,
                 MinimumSize = text.fontSizeMin, MaximumSize = text.fontSizeMax, Alignment = text.alignment,
                 Wrapping = text.textWrappingMode, Overflow = text.overflowMode, RichText = text.richText,
@@ -131,6 +131,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 TopRight = text.colorGradient.topRight, BottomLeft = text.colorGradient.bottomLeft,
                 BottomRight = text.colorGradient.bottomRight
             };
+        }
+
+        /// <summary>Captures the material TMP will use when an inactive paragraph first activates.</summary>
+        /// <param name="text">Paragraph whose saved material may belong to an earlier font.</param>
+        /// <returns>The matching custom material, or the current font's default material.</returns>
+        private static Material BaselineMaterial(TMP_Text text)
+        {
+            // Inactive children may not have run TMP's font/material initialization yet.
+            Material material = text.fontSharedMaterial;
+            return text.font != null && (material == null || material.mainTexture != text.font.atlasTexture)
+                ? text.font.material : material;
         }
 
         #endregion

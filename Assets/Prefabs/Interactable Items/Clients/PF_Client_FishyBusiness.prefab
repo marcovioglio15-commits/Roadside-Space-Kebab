@@ -262,6 +262,7 @@ MonoBehaviour:
     Box:
       FadeIn: 0
       FadeOut: 0
+      SpeakerPosition: 0.5
     Tree: {fileID: 11400000, guid: 03c7634e6b32b8d4ca97768140d89adb, type: 2}
     UseSpawnTrees: 0
     SpawnTrees: []

@@ -13,15 +13,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Consumption Filter")]
-        [Tooltip("Restrict this dialogue or entry using consumption history.")]
+        [Tooltip("Require this consumption condition before the dialogue can start. Disabled leaves this condition unrestricted.")]
         public bool Enabled;
-        [Tooltip("Consumed flag quantities used only on objects without Available Orders.")]
+        [Tooltip("Consumption totals required on objects without Available Orders. Each row accepts any of its flags; one consumed item is counted once per row.")]
         public ItemFlagRequirement[] RequiredFlags = Array.Empty<ItemFlagRequirement>();
-        [Tooltip("Available order names used on this object. Only orders drawn for the current spawn participate.")]
+        [Tooltip("Order names used by Unexpected Delivery. Only names drawn for this spawn participate. Completed always checks all drawn orders.")]
         public string[] Orders = Array.Empty<string>();
-        [Tooltip("Require every selected active order or flag requirement. Otherwise any one match is sufficient.")]
+        [Tooltip("Without Available Orders: require every flag row, or any one row when disabled. Completed with Available Orders always requires all drawn units.")]
         public bool RequireAll = true;
-        [Tooltip("Completed waits for all drawn slots. Pending/Not Pending Order classify deliveries against open slots. Unexpected Delivery checks surplus units. Awaiting Orders accepts a valid contact while consumption waits for its selected Dialogue, without consuming the item.")]
+        [Tooltip("Completed checks all drawn order units, or consumed flag quantities without Available Orders. Other results classify deliveries or contact while waiting to order.")]
         public DialogueOrderResult Result;
 
         /// <summary>Whether this filter classifies the latest receipt against all open slots instead of named orders.</summary>

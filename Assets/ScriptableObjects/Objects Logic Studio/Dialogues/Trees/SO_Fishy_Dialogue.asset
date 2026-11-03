@@ -18,9 +18,9 @@ MonoBehaviour:
   HasStartPosition: 0
   Nodes:
   - Id: flow
-    Name: Conversation
-    Position: {x: 0, y: 0}
-    HasPosition: 0
+    Name: Conversation Begin
+    Position: {x: 148.82692, y: 40}
+    HasPosition: 1
     End: 0
     Routing: 1
     OverridePolicy: 0
@@ -55,18 +55,6 @@ MonoBehaviour:
       Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
       Next: order
       Weight: 1
-    - Id: route-wrong
-      Name: Wrong Delivery
-      Entry: {fileID: 0}
-      Trigger: {fileID: 11400000, guid: cfbf2b3122d6b5e3207d3ef01e68b596, type: 2}
-      Next: wrong
-      Weight: 1
-    - Id: route-correct
-      Name: Correct Delivery
-      Entry: {fileID: 0}
-      Trigger: {fileID: 11400000, guid: b7f4cf57a622a40f8722d626c03597b4, type: 2}
-      Next: correct
-      Weight: 1
     - Id: route-ask-order
       Name: Ask Order First
       Entry: {fileID: 0}
@@ -75,8 +63,8 @@ MonoBehaviour:
       Weight: 1
   - Id: order
     Name: Order
-    Position: {x: 0, y: 0}
-    HasPosition: 0
+    Position: {x: 562.0525, y: -189.8809}
+    HasPosition: 1
     End: 0
     Routing: 0
     OverridePolicy: 0
@@ -109,24 +97,24 @@ MonoBehaviour:
       Name: Fishy Business Random Intro 1
       Entry: {fileID: 11400000, guid: 6e8704ca69cf405dbab7bd9b1b08a87d, type: 2}
       Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
-      Next: end
+      Next: 25b2590e96eb433c834a89a547fe8e46
       Weight: 1
     - Id: a258067e3e7bdd522797e74a186109b2
       Name: Fishy Business Random Intro 2
       Entry: {fileID: 11400000, guid: 8f7cc85398b441f4b41af4ab3ef3c50e, type: 2}
       Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
-      Next: end
+      Next: 25b2590e96eb433c834a89a547fe8e46
       Weight: 1
     - Id: 48a14f17597435c91f14c23109a0a9f8
       Name: Fishy Business Random Intro 3
       Entry: {fileID: 11400000, guid: fa54d2787dc0482bad381321f4f8dd8b, type: 2}
       Trigger: {fileID: 11400000, guid: f918906422542da429c64f990c9c3ef1, type: 2}
-      Next: end
+      Next: 25b2590e96eb433c834a89a547fe8e46
       Weight: 1
   - Id: wrong
     Name: Wrong Delivery
-    Position: {x: 0, y: 0}
-    HasPosition: 0
+    Position: {x: 1401.5087, y: 116.21857}
+    HasPosition: 1
     End: 0
     Routing: 0
     OverridePolicy: 0
@@ -163,8 +151,8 @@ MonoBehaviour:
       Weight: 1
   - Id: correct
     Name: Correct Delivery
-    Position: {x: 0, y: 0}
-    HasPosition: 0
+    Position: {x: 1402.5631, y: -225.3787}
+    HasPosition: 1
     End: 0
     Routing: 0
     OverridePolicy: 0
@@ -207,8 +195,8 @@ MonoBehaviour:
       Weight: 1
   - Id: ask-order
     Name: Ask Order First
-    Position: {x: 166.52953, y: 31.3759}
-    HasPosition: 0
+    Position: {x: 557.4599, y: 397.48926}
+    HasPosition: 1
     End: 0
     Routing: 0
     OverridePolicy: 0
@@ -245,8 +233,8 @@ MonoBehaviour:
       Weight: 1
   - Id: end
     Name: End
-    Position: {x: 0, y: 0}
-    HasPosition: 0
+    Position: {x: 1959.1829, y: 438.6948}
+    HasPosition: 1
     End: 1
     Routing: 0
     OverridePolicy: 0
@@ -275,3 +263,47 @@ MonoBehaviour:
         SpeakerPosition: 0.5
     Selection: 3
     Entries: []
+  - Id: 25b2590e96eb433c834a89a547fe8e46
+    Name: Awaiting Consumtion
+    Position: {x: 968.60736, y: -73.366554}
+    HasPosition: 1
+    End: 0
+    Routing: 1
+    OverridePolicy: 0
+    Policy:
+      Distance: 3
+      ExitDistance: 4
+      Priority: 0
+      PreferSingleActions: 1
+      PreferredActions: 4
+      RequireSightToStart: 0
+      RequireSightToContinue: 0
+      HideWhenSightLost: 0
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Interruption: 0
+      ReplayOnReturn: 1
+      ReplayOnInput: 0
+      Audio:
+        Voice: 0
+        Interval: 3
+        Completion: 0
+      Box:
+        FadeIn: 0
+        FadeOut: 0
+        SpeakerPosition: 0.5
+    Selection: 3
+    Entries:
+    - Id: f23a301f5be04e3999cda334360a8ea1
+      Name: Correct Delivery
+      Entry: {fileID: 0}
+      Trigger: {fileID: 11400000, guid: b7f4cf57a622a40f8722d626c03597b4, type: 2}
+      Next: correct
+      Weight: 1
+    - Id: ce3ff94555444837a98341ed1e9aa3d1
+      Name: Wrong Delivery
+      Entry: {fileID: 0}
+      Trigger: {fileID: 11400000, guid: ab85c4e63b5a67b6403066964faad6e3, type: 2}
+      Next: wrong
+      Weight: 1

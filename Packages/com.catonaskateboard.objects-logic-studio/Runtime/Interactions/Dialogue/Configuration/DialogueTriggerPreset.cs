@@ -10,20 +10,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Trigger")]
-        [Tooltip("Event selecting this entry while its containing block is active.")]
+        [Tooltip("Event that can start this entry while its block is active. Consumption evaluates contact receipts; On Enter runs when the block is entered.")]
         public DialogueTrigger Type;
-        [Tooltip("Optional Button override for Input Action. Empty uses this Dialogue's Start Action.")]
+        [Tooltip("Button action that starts this entry in Input Action mode. Empty uses the dialogue interaction's Start Action.")]
         public InputActionReference Action;
-        [Tooltip("Order result or consumed flags used by Consumption.")]
+        [Tooltip("Optional consumption filter. With Available Orders, evaluates this spawn's tickets; otherwise evaluates consumed flag quantities.")]
         public DialogueConsumptionFilter Consumption = new DialogueConsumptionFilter();
-        [Tooltip("Optional additional consumption condition. Both filters must match the same event.")]
-        public DialogueConsumptionFilter AdditionalConsumption = new DialogueConsumptionFilter();
-        [Tooltip("Use this preset's range instead of the interaction's range.")]
+        [Tooltip("Replace the dialogue interaction's start and exit distances for Proximity or Input Action. Other trigger types do not use these distances.")]
         public bool OverrideRange;
-        [Tooltip("Player distance in metres required to select this entry.")]
+        [Tooltip("Maximum player distance in metres for this Proximity or Input Action entry to start when Override Range is enabled.")]
         [Range(0.1f, 20f)]
         public float Distance = 3f;
-        [Tooltip("Distance in metres that interrupts this entry. Must be at least Distance.")]
+        [Tooltip("Player distance in metres beyond which this entry is interrupted when Override Range is enabled. Must be at least Distance.")]
         [Range(0.1f, 25f)]
         public float ExitDistance = 4f;
 
@@ -51,8 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (Type == DialogueTrigger.InputAction && Action != null && Action.action is not { type: InputActionType.Button })
                 return false;
             warning = "Configure the Consumption trigger.";
-            if (Type == DialogueTrigger.Consumption && (Consumption == null || AdditionalConsumption == null
-                || !Consumption.TryValidate(orders, out warning, !bound) || !AdditionalConsumption.TryValidate(orders, out warning, !bound)))
+            if (Type == DialogueTrigger.Consumption && (Consumption == null || !Consumption.TryValidate(orders, out warning, !bound)))
                 return false;
             warning = string.Empty;
             return true;

@@ -573,7 +573,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 775959756855780156}
   m_maskType: 0
 --- !u!1 &176990911383909502
 GameObject:
@@ -935,7 +935,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 369058030388519055}
+  m_renderer: {fileID: 8989277944774399716}
   m_maskType: 0
 --- !u!1 &1228040900174668014
 GameObject:
@@ -1384,7 +1384,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 369058030388519055}
+  m_renderer: {fileID: 7870816061758263013}
   m_maskType: 0
 --- !u!1 &2055433201539496148
 GameObject:
@@ -1565,7 +1565,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 510725793507337929}
   m_maskType: 0
 --- !u!1 &2300458538316187534
 GameObject:
@@ -1746,7 +1746,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 369058030388519055}
+  m_renderer: {fileID: 5916885252166100915}
   m_maskType: 0
 --- !u!1 &2432182684711861096
 GameObject:
@@ -1927,7 +1927,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 7342992335384947504}
   m_maskType: 0
 --- !u!1 &2502579049091776800
 GameObject:
@@ -2108,7 +2108,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 8559309042749793153}
   m_maskType: 0
 --- !u!1 &2974584598479164651
 GameObject:
@@ -2289,7 +2289,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 3168728920364157490}
   m_maskType: 0
 --- !u!1 &3029247222466294320
 GameObject:
@@ -2470,7 +2470,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 5445275569999530679}
   m_maskType: 0
 --- !u!1 &3186256873724368820
 GameObject:
@@ -2651,7 +2651,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 369058030388519055}
+  m_renderer: {fileID: 4618088699718009333}
   m_maskType: 0
 --- !u!1 &3662366620604548846
 GameObject:
@@ -2832,7 +2832,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 369058030388519055}
+  m_renderer: {fileID: 1067113779231578069}
   m_maskType: 0
 --- !u!1 &3744607719143899658
 GameObject:
@@ -3013,7 +3013,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 3957146810238241419}
   m_maskType: 0
 --- !u!1 &4322065475096571412
 GameObject:
@@ -3194,7 +3194,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 369058030388519055}
+  m_renderer: {fileID: 5638699609018864761}
   m_maskType: 0
 --- !u!1 &4426358723425496052
 GameObject:
@@ -3375,7 +3375,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 911367229957565441}
   m_maskType: 0
 --- !u!1 &4721753914155741178
 GameObject:
@@ -3556,7 +3556,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 4953576317012552696}
   m_maskType: 0
 --- !u!1 &4835157409707847610
 GameObject:
@@ -3737,7 +3737,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 369058030388519055}
+  m_renderer: {fileID: 6627248418152469928}
   m_maskType: 0
 --- !u!1 &5154779534982621191
 GameObject:
@@ -4099,7 +4099,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 369058030388519055}
+  m_renderer: {fileID: 4373921315765068044}
   m_maskType: 0
 --- !u!1 &5555003270710992677
 GameObject:
@@ -4461,7 +4461,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 6429754399598894490}
   m_maskType: 0
 --- !u!1 &5930545173365494957
 GameObject:
@@ -4642,7 +4642,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 4562148866582677378}
   m_maskType: 0
 --- !u!1 &6327557658270425419
 GameObject:
@@ -4823,7 +4823,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 1175873740347222295}
   m_maskType: 0
 --- !u!1 &6340024817096354172
 GameObject:
@@ -5185,7 +5185,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 4543437119289535961}
   m_maskType: 0
 --- !u!1 &6775147547197794785
 GameObject:
@@ -5547,7 +5547,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 2990700408163779518}
   m_maskType: 0
 --- !u!1 &7400457547187059254
 GameObject:
@@ -6090,7 +6090,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 7706217794959900448}
   m_maskType: 0
 --- !u!1 &7679624172745785594
 GameObject:
@@ -6878,7 +6878,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 6874027628222925790}
+  m_renderer: {fileID: 5581659446705928472}
   m_maskType: 0
 --- !u!1 &8550200425013452072
 GameObject:
@@ -7240,7 +7240,7 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 8926224872634871248}
   m_maskType: 0
 --- !u!1 &9210574751310954218
 GameObject:
@@ -7421,5 +7421,5 @@ MonoBehaviour:
   _SortingLayerID: 0
   _SortingOrder: 0
   m_hasFontAssetChanged: 0
-  m_renderer: {fileID: 5483786271017598851}
+  m_renderer: {fileID: 3982241896254824075}
   m_maskType: 0

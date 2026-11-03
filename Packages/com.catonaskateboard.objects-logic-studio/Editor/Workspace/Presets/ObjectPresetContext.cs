@@ -98,7 +98,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return context;
         }
 
-        /// <summary>Updates a group's preview context without changing dependencies shared by other presets.</summary>
+        /// <summary>Updates preview dependencies inside the owning group's save transaction.</summary>
         /// <param name="preset">Group being explicitly updated.</param>
         /// <param name="state">Document supplying the latest mode choices.</param>
         internal static void Update(ObjectGroupPreset preset, ObjectWorkspace state)
@@ -116,7 +116,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 preset.Context.Values = Capture(state);
                 EditorUtility.SetDirty(preset.Context);
             }
-            AssetDatabase.SaveAssets();
         }
 
         #endregion

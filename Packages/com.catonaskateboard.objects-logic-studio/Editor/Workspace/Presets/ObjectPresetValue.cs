@@ -225,7 +225,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     property.boolValue = Integer != 0;
                     break;
                 case SerializedPropertyType.Integer:
-                    property.longValue = Link != null ? ObjectWorkspaceTarget.FileId(Resolve(root, resolve, allowMissing)) : Integer;
+                    // Unity restores null inline records as empty links; ordinary integers keep their saved number.
+                    property.longValue = Link is { IsSet: true }
+                        ? ObjectWorkspaceTarget.FileId(Resolve(root, resolve, allowMissing)) : Integer;
                     break;
                 case SerializedPropertyType.Character:
                 case SerializedPropertyType.Enum:

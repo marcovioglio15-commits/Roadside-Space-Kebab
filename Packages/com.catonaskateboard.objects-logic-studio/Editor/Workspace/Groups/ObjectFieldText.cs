@@ -15,6 +15,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>A short English tooltip.</returns>
         internal static string Tooltip(SerializedProperty property)
         {
+            // Specific field instructions take precedence over generic captions in every window.
+            if (!string.IsNullOrWhiteSpace(property.tooltip))
+                return property.tooltip;
             return property.name.ToLowerInvariant() switch
             {
                 "enabled" => "Turn this on or off.",

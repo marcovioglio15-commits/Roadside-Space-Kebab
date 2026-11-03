@@ -1,0 +1,137 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a439b7286b394b02ae0ea92882a14ea2, type: 3}
+  m_Name: SO_Contact_FriesCook
+  m_EditorClassIdentifier: 
+  Settings:
+    Name: ModifyByContact Fries Cook
+    Preparation:
+      Snap: 1
+      SnapSpace: 0
+      Position: {x: -0.15, y: 0.3, z: 0.279}
+      Rotation: {x: 0, y: 0, z: 0}
+      Instant: 0
+      Duration: 0.5
+      RequireInput: 0
+      Animate: 1
+      AnimateOther: 1
+      Path: 
+      AnimationSpace: 0
+      StateA:
+        Position: {x: -0.15, y: 0.3, z: 0.279}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      StateB:
+        Position: {x: -0.15, y: 0.25, z: 0.279}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      AnimationDuration: 1
+      ForwardRotation: 0
+      Return: 1
+      ReturnDuration: 1
+      ReturnRotation: 0
+    Flags:
+    - {fileID: 11400000, guid: f3810201d1372f14a8eb7eda092ab735, type: 2}
+    ContactDuration: 0
+    ContactTolerance: 0.02
+    QueryInterval: 0.02
+    IncludeTriggers: 0
+    AllowCarriedSelf: 1
+    AllowCarriedOther: 0
+    Duration: 10
+    CompleteAfterSeparation: 0
+    ResumeAfterInterruption: 0
+    RepeatAfterSeparation: 1
+    WhileContact: 0
+    RevertDelay: 0.25
+    Self:
+      Tint: 0
+      Multiplier: {r: 0, g: 0, b: 0, a: 1}
+      ColorProperty: _BaseColor
+      RendererPath: 
+      MaterialSlot: -1
+      Meshes: []
+      Consume: 0
+      Interactions: []
+    Other:
+      Tint: 1
+      Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 0.3019608}
+      ColorProperty: _BaseColor
+      RendererPath: 
+      MaterialSlot: -1
+      Meshes: []
+      Consume: 0
+      Interactions:
+      - Operation: 1
+        AddKind: 0
+        Name: Interaction
+        Target:
+          Assigned: 1
+          Kind: 1
+          AllOfType: 1
+          Name: 
+          Occurrence: 0
+        GroupPresets: []
+        RequiresAction: 1
+        GroupWarning: 
+        CompiledKind: 1
+        Groups: []
+        Action: {fileID: 0}
+        AdvanceAction: {fileID: 0}
+      - Operation: 0
+        AddKind: 4
+        Name: Scoop
+        Target:
+          Assigned: 0
+          Kind: 0
+          AllOfType: 0
+          Name: 
+          Occurrence: 0
+        GroupPresets:
+        - {fileID: 11400000, guid: c9e22c7a8a8da1d47b806000ed739e1a, type: 2}
+        RequiresAction: 0
+        GroupWarning: 
+        CompiledKind: 4
+        Groups:
+        - Kind: 4
+          Name: SO_Dispenser_ScoopFries
+          Fragments:
+          - '{"settings":{"UseContainer":false,"Prefab":{"instanceID":0},"Unlimited":false,"Stock":3,"Mode":3,"Interval":0.25,"PickupDuration":0.34999999403953552,"Outlets":[{"Position":{"x":0.0,"y":0.0,"z":0.0,"w":0.0},"Rotation":{"x":0.0,"y":0.0,"z":0.0,"w":0.0}}],"OutputRotation":{"x":0.0,"y":0.0,"z":0.0,"w":0.0},"StepCounter":0,"FillSteps":[{"Count":0,"Appearance":{"Meshes":[],"Materials":[{"Path":"SM_Ingredient_FrenchFries_Cooked","Materials":['
+          - ']}],"Visibility":[]},"Flags":{"Mode":0,"Flags":[],"Remove":[]}},{"Count":0,"Appearance":{"Meshes":[],"Materials":[{"Path":"SM_Ingredient_FrenchFries_Cooked","Materials":['
+          - ']}],"Visibility":[]},"Flags":{"Mode":0,"Flags":[],"Remove":[]}},{"Count":0,"Appearance":{"Meshes":[],"Materials":[],"Visibility":[{"Path":"SM_Ingredient_FrenchFries_Cooked","Visible":false}]},"Flags":{"Mode":0,"Flags":[],"Remove":[]}}],"ScoopFlag":'
+          - ',"DestroyWhenEmpty":false}}'
+          References:
+          - Asset: {fileID: 2100000, guid: b4c54499bfa63404e83ec53945686245, type: 2}
+            Kind: 0
+            Interaction: 0
+            Path: 
+            Index: 0
+            Count: 0
+          - Asset: {fileID: 2100000, guid: 0b210acd4c99f714d9cd93d3181609b9, type: 2}
+            Kind: 0
+            Interaction: 0
+            Path: 
+            Index: 0
+            Count: 0
+          - Asset: {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+            Kind: 0
+            Interaction: 0
+            Path: 
+            Index: 0
+            Count: 0
+        Action: {fileID: 0}
+        AdvanceAction: {fileID: 0}
+    ChangeContactFlag: 1
+    ContactFlag: {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+    ContactFlagOperation: 0
+    BlockSelf: 1
+    BlockOther: 1

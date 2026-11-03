@@ -17,6 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [SerializeField]
         private OrderBoard board;
         private UnityEditor.Editor inspector;
+        private Vector2 scroll;
 
         #endregion
         #region Methods
@@ -38,6 +39,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // The prefab stage cannot own a shared scene destination.
             board = (OrderBoard)StudioGUI.ObjectField(new GUIContent("Board", "Shared board in the gameplay scene."), board, typeof(OrderBoard), true);
+            using EditorGUILayout.ScrollViewScope view = new EditorGUILayout.ScrollViewScope(scroll);
+            scroll = view.scrollPosition;
             using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode);
             if (OrderBoardBinding.IsSceneBoard(board))
             {
