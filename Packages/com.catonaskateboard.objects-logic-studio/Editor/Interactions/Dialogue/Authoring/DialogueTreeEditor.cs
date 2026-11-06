@@ -146,7 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void DrawInspector(DialogueTree tree, OrderSettings orders)
         {
             serializedObject.Update();
-            template = (DialogueTree)EditorGUILayout.ObjectField(new GUIContent("Preset", "Optional whole-sheet preset to import into this draft."), template, typeof(DialogueTree), false);
+            template = (DialogueTree)StudioFieldGUI.ObjectField(new GUIContent("Preset", "Optional whole-sheet preset to import into this draft."), template, typeof(DialogueTree), false);
             using (new EditorGUI.DisabledScope(template == null || template == tree))
                 if (StudioButton.Draw(new GUIContent("Import Sheet", "Replace this draft's blocks and links. Apply saves; Undo or Discard restores the previous draft.")))
                 {

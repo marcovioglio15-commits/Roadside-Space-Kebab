@@ -39,12 +39,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Use rect-based fields so nested arrays remain compatible with native inspectors.
             EditorGUI.BeginProperty(position, label, property);
-            position.height = EditorGUIUtility.singleLineHeight;
-            DrawField(position, property.FindPropertyRelative("Mode"), label);
+            float height = DrawField(position, property.FindPropertyRelative("Mode"), label);
             SerializedProperty selected = Selected(property);
             if (selected != null)
             {
-                position.y += position.height + EditorGUIUtility.standardVerticalSpacing;
+                position.y += height + EditorGUIUtility.standardVerticalSpacing;
                 if (selected.isArray)
                     DrawTools(position, selected);
                 else
@@ -61,19 +60,48 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Every array row owns a remove command; no size field can truncate the selection.
             SerializedProperty selected = Selected(property);
-            return EditorGUIUtility.singleLineHeight + (selected != null
-                ? (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * (selected.isArray ? selected.arraySize + 1 : 1) : 0f);
+            float height = FieldHeight(label);
+            if (selected == null)
+                return height;
+            float spacing = EditorGUIUtility.standardVerticalSpacing;
+            if (!selected.isArray)
+                return height + spacing + FieldHeight(new GUIContent(selected.displayName, selected.tooltip));
+            for (int index = 0; index < selected.arraySize; index++)
+                height += spacing + FieldHeight(ToolLabel(selected, index));
+            return height + spacing + EditorGUIUtility.singleLineHeight;
         }
 
         /// <summary>Draws a native field with the same transfer menu and color as window controls.</summary>
         /// <param name="position">One field row.</param>
         /// <param name="property">Mode or tool reference.</param>
         /// <param name="label">Field label and tooltip.</param>
-        private static void DrawField(Rect position, SerializedProperty property, GUIContent label)
+        /// <returns>The height of the field and its caption.</returns>
+        private static float DrawField(Rect position, SerializedProperty property, GUIContent label)
         {
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            position.height = layout.Height(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(position, property);
             using StudioFieldColors colors = new StudioFieldColors(position, StudioFieldColors.Key(property));
-            EditorGUI.PropertyField(position, property, label);
+            EditorGUI.PropertyField(layout.Control(position), property, layout.InlineLabel);
+            return position.height;
+        }
+
+        /// <summary>Measures the same caption used by the native row.</summary>
+        /// <param name="label">Visible field caption.</param>
+        /// <returns>The total height of the label and value control.</returns>
+        private static float FieldHeight(GUIContent label)
+        {
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            return layout.Height(EditorGUIUtility.singleLineHeight);
+        }
+
+        /// <summary>Builds the label for a tool reference in the selection.</summary>
+        /// <param name="tools">Serialized array of tool definitions.</param>
+        /// <param name="index">Zero-based index of this row.</param>
+        /// <returns>The visible row caption and tooltip.</returns>
+        private static GUIContent ToolLabel(SerializedProperty tools, int index)
+        {
+            return new GUIContent("Tool " + (index + 1), tools.tooltip);
         }
 
         /// <summary>Edits a native inspector selection one reference at a time.</summary>
@@ -84,17 +112,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Keep stable row heights when an individual selection is removed.
             for (int index = 0; index < tools.arraySize; index++)
             {
-                Rect remove = new Rect(position.xMax - 24f, position.y, 24f, position.height);
-                DrawField(new Rect(position.x, position.y, position.width - 28f, position.height), tools.GetArrayElementAtIndex(index),
-                    new GUIContent("Tool " + (index + 1), tools.tooltip));
+                float height = DrawField(new Rect(position.x, position.y, position.width - 28f, position.height),
+                    tools.GetArrayElementAtIndex(index), ToolLabel(tools, index));
+                Rect remove = new Rect(position.xMax - 24f, position.y + height - EditorGUIUtility.singleLineHeight, 24f, EditorGUIUtility.singleLineHeight);
                 if (GUI.Button(remove, new GUIContent("-", "Remove this tool from the selection.")))
                 {
                     tools.GetArrayElementAtIndex(index).objectReferenceValue = null;
                     tools.DeleteArrayElementAtIndex(index);
                     return;
                 }
-                position.y += position.height + EditorGUIUtility.standardVerticalSpacing;
+                position.y += height + EditorGUIUtility.standardVerticalSpacing;
             }
+            position.height = EditorGUIUtility.singleLineHeight;
             StudioFieldMenu.Context(position, tools);
             using StudioFieldColors colors = new StudioFieldColors(position, StudioFieldColors.Key(tools));
             if (GUI.Button(position, new GUIContent("+ Add Tool", "Append one empty tool reference without changing existing selections.")))

@@ -8,7 +8,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Provides a common component family for independently enabled interactions on one prefab.</summary>
     [RequireComponent(typeof(ObjectIdentity))]
-    public abstract class ObjectInteraction : MonoBehaviour
+    public abstract class ObjectInteraction : MonoBehaviour, IPlayerToolImpactTarget
     {
         #region Serialized Fields
 
@@ -55,6 +55,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Identifies this component in the prefab workspace.</summary>
         public string InteractionName => interactionName;
+
+        /// <summary>Exposes the enabled card to Player Studio's shot filter.</summary>
+        PlayerToolImpactInteraction IPlayerToolImpactTarget.ImpactInteraction => isActiveAndEnabled
+            ? InteractionImpactCategories.Get(this) : PlayerToolImpactInteraction.None;
 
         /// <summary>Tool identities accepted by this interaction.</summary>
         public InteractionToolRequirement ToolRequirement => toolRequirement;

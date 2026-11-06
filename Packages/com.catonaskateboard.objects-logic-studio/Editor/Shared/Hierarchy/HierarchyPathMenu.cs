@@ -73,10 +73,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     : target.GetComponent<Renderer>() == null)
                     label += mesh ? " (no mesh component)" : " (no renderer)";
             }
-            Rect rect = EditorGUILayout.GetControlRect();
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent(transforms ? "Transform" : mesh ? "Mesh Target" : "Renderer Target", property.tooltip));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(rect, property);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent(transforms ? "Transform" : mesh ? "Mesh Target" : "Renderer Target", property.tooltip));
+            rect = field.ValueRect(rect);
             using (new EditorGUI.DisabledScope(source == null))
                 if (GUI.Button(rect, new GUIContent(label, source == null ? "Choose a hierarchy source first." : property.tooltip), EditorStyles.popup))
                     Show(property, source, mesh, all, transforms);

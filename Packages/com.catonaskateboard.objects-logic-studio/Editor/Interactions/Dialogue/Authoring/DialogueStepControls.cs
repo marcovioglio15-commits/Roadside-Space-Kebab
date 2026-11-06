@@ -43,8 +43,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void DrawChoice(SerializedProperty property, ObjectDialogue dialogue, DialogueStepReference selected, int index)
         {
             string label = Label(dialogue.Settings.Tree, selected);
-            Rect rect = EditorGUILayout.GetControlRect();
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("Dialogue Step", property.tooltip));
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Dialogue Step", property.tooltip));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
+            rect = field.ValueRect(rect);
             if (!GUI.Button(rect, new GUIContent(label, "Choose the full tree or an entry checkpoint."), EditorStyles.popup))
                 return;
             UnityEngine.Object owner = property.serializedObject.targetObject;

@@ -54,14 +54,19 @@ namespace CatOnASkateboard.StudioColors.Editor
             float lowerWidth = EditorStyles.miniLabel.CalcSize(new GUIContent(lower)).x + 6f;
             float upperWidth = EditorStyles.miniLabel.CalcSize(new GUIContent(upper)).x + 6f;
 
-            // Compact windows retain both endpoints and precise entry, omitting only the slider track.
-            if (interval.width < lowerWidth + upperWidth + 70f)
-                EditorGUI.LabelField(interval, new GUIContent(lower + " ... " + upper, label.tooltip), EditorStyles.miniLabel);
-            else
+            // Compact rows keep the slider. Endpoint labels return when there is enough room.
+            Rect track = interval;
+            if (interval.width >= lowerWidth + upperWidth + 70f)
             {
                 EditorGUI.LabelField(new Rect(interval.x, interval.y, lowerWidth, interval.height), lower, EditorStyles.miniLabel);
                 EditorGUI.LabelField(new Rect(interval.xMax - upperWidth, interval.y, upperWidth, interval.height), upper, EditorStyles.miniLabel);
-                Rect track = new Rect(interval.x + lowerWidth, interval.y, interval.width - lowerWidth - upperWidth, interval.height);
+                track.xMin += lowerWidth;
+                track.xMax -= upperWidth;
+            }
+            if (track.width < 28f)
+                EditorGUI.LabelField(interval, new GUIContent(lower + " ... " + upper, label.tooltip), EditorStyles.miniLabel);
+            else
+            {
                 EditorGUI.BeginChangeCheck();
                 float selected = GUI.HorizontalSlider(track, float.IsFinite(value) ? Mathf.Clamp(value, minimum, maximum) : minimum, minimum, maximum);
                 if (EditorGUI.EndChangeCheck())

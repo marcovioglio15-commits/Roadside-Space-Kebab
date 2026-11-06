@@ -4,6 +4,8 @@
   "references": [
     "CatOnASkateboard.StudioInput.Editor",
     "CatOnASkateboard.PlayerStudio.Runtime",
+    "CatOnASkateboard.StudioIdentity.Runtime",
+    "CatOnASkateboard.StudioIdentity.Editor",
     "Unity.InputSystem",
     "CatOnASkateboard.StudioColors.Editor"
   ],

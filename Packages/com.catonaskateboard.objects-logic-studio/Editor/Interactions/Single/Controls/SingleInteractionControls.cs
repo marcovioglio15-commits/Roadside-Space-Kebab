@@ -23,6 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // The action menu is shared with Player Studio, including map navigation and duplicate-name handling.
             data.Update();
             SerializedProperty draft = data.FindProperty("Single.Draft");
+            SerializedProperty requirement = draft.FindPropertyRelative("ToolRequirement");
             if (state.Sections.Draw("Interaction", "Name, switch and input.", draft, "Name", "Enabled", "Action"))
             {
                 using StudioIndentScope sectionContent1 = new StudioIndentScope();
@@ -33,7 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             if (state.Sections.Draw("Player tool", "Choose which tools can use this interaction.", draft, "ToolRequirement"))
                 using (new StudioIndentScope())
-                    InteractionToolControls.Draw(draft.FindPropertyRelative("ToolRequirement"));
+                    InteractionToolControls.Draw(requirement);
             switch (state.Single.Kind)
             {
                 case SingleInteractionKind.TriggerAnimation:
@@ -43,7 +44,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     CommandInteractionControls.Eject(draft.FindPropertyRelative("Eject"), state.Sections);
                     break;
                 case SingleInteractionKind.Dispenser:
-                    TransferInteractionControls.Dispenser(draft.FindPropertyRelative("Dispenser"), state.Sections);
+                    TransferInteractionControls.Dispenser(draft.FindPropertyRelative("Dispenser"), requirement,
+                        draft.FindPropertyRelative("Action").objectReferenceValue as InputActionReference, state.Sections);
                     break;
                 case SingleInteractionKind.Container:
                     TransferInteractionControls.Container(draft.FindPropertyRelative("Container"), state.Sections);

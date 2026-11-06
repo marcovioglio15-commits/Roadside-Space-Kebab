@@ -31,7 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Pointer pulses already identify exact geometry and must not be replaced by a centered sight query.
             if (InteractionProjectileInput.CursorUse)
                 return InteractionProjectileInput.Allows(dialogue) && physics.HasSight(context, dialogue.transform,
-                    InteractionProjectileInput.Contact.point, dialogue.Presentation.ObstacleMask);
+                    InteractionProjectileInput.TargetPoint, dialogue.Presentation.ObstacleMask);
             if (frame != Time.frameCount || observer != context)
             {
                 results.Clear();

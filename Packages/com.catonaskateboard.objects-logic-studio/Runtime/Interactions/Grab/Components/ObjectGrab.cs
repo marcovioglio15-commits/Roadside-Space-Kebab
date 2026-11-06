@@ -1,4 +1,5 @@
 using CatOnASkateboard.AudioStudio;
+using CatOnASkateboard.PlayerStudio;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     [DefaultExecutionOrder(100)]
     [RequireComponent(typeof(Rigidbody))]
     [AddComponentMenu("Objects Logic Studio/Object Grab")]
-    public sealed class ObjectGrab : ObjectSingleInteraction
+    public sealed class ObjectGrab : ObjectSingleInteraction, IPlayerToolShotOwner
     {
         #region Serialized Fields
 
@@ -72,6 +73,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public override SingleInteractionKind Kind => SingleInteractionKind.Grab;
         /// <summary>Whether this object currently belongs to the observer's carry slot.</summary>
         public bool IsHeld { get; private set; }
+        /// <summary>Reports Grab ownership to optional weapon force filters.</summary>
+        bool IPlayerToolShotOwner.IsCarried => IsHeld;
         /// <summary>Changes once for an explicit Drop or Throw; interrupted carry and passive movement do not count.</summary>
         internal uint ReleaseRevision { get; private set; }
         /// <summary>Changes only after a successful player pickup, rearming rejected-contact dialogue.</summary>

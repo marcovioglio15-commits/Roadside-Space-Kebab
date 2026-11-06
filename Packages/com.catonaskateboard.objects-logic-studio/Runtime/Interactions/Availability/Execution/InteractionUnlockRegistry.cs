@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using Guid = System.Guid;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -10,7 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private static readonly List<ObjectInteractionUnlock> items = new List<ObjectInteractionUnlock>();
-        private static readonly List<InputActionReference> consumed = new List<InputActionReference>();
+        private static readonly List<Guid> consumed = new List<Guid>();
         private static readonly InteractionInputRouter input = new InteractionInputRouter();
         private static bool dirty = true;
         private static int revision = -1;
@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Commands consumed by unlock rules during the current observer pass.</summary>
-        internal static IReadOnlyList<InputActionReference> Consumed => consumed;
+        internal static IReadOnlyList<Guid> Consumed => consumed;
 
         #endregion
 
@@ -94,16 +94,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 dirty = false;
                 revision = input.Revision;
             }
+            input.PrepareToolAction();
             if (input.Usable && Time.timeScale > 0f)
                 foreach (ObjectInteractionUnlock rule in items)
                     if (rule != null && InteractionProjectileInput.Allows(rule))
-                        rule.Tick(observer.Player);
+                        rule.Tick(observer.Player, input);
             input.ClearSignals();
         }
 
         /// <summary>Marks an unlock press so it cannot also trigger another interaction on this frame.</summary>
-        /// <param name="action">Authored action used by a satisfied input condition.</param>
-        internal static void Consume(InputActionReference action)
+        /// <param name="action">Actual action used by a satisfied input condition.</param>
+        internal static void Consume(Guid action)
         {
             // Several rules may intentionally share a command; other interaction drivers suppress it afterward.
             if (!consumed.Contains(action))

@@ -27,7 +27,7 @@ namespace CatOnASkateboard.PlayerStudio
         [Header("Weapon")]
         [Tooltip("Use this tool as a weapon. Choose its firing mode below.")]
         public bool IsWeapon;
-        [Tooltip("Interactions accepting this tool and bound to the player's Use Tool action receive bullet impacts instead of input presses. Their targeting distance is ignored for a hit.")]
+        [Tooltip("Route Use Tool to bullet impacts. An interaction on the struck object can receive the hit if it accepts this action and tool. Hits ignore its targeting distance.")]
         public bool InteractOnBulletImpact;
         [Tooltip("Choose how this weapon fires, aims and shows effects.")]
         public PlayerToolWeaponSettings Weapon = new PlayerToolWeaponSettings();
@@ -44,6 +44,13 @@ namespace CatOnASkateboard.PlayerStudio
         public int MagazineSize = 6;
         [Tooltip("Animation steps played in order. Tracks may target the arm or any child below Hierarchy Root.")]
         public PlayerToolAnimationPreset[] ReloadCombo = Array.Empty<PlayerToolAnimationPreset>();
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Whether Use Tool reaches object interactions through a confirmed weapon contact.</summary>
+        public bool UsesImpactInteractions => IsWeapon && (InteractOnBulletImpact || Weapon?.Mode == PlayerToolWeaponMode.CursorInteraction);
 
         #endregion
 

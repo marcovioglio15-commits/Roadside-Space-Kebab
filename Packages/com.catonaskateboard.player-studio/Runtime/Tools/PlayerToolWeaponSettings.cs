@@ -65,8 +65,10 @@ namespace CatOnASkateboard.PlayerStudio
         public int Capacity = 16;
 
         [Header("Impact")]
-        [Tooltip("Optional effect at the hit point. Cursor mode shows it only for a valid interaction.")]
+        [Tooltip("Optional effect at the hit point.")]
         public GameObject Impact;
+        [Tooltip("Show the effect on any surface hit by the cursor shot. Leave off to wait for a successful interaction.")]
+        public bool ImpactOnCursorContact;
         [Tooltip("Move the impact effect out of nearby surfaces automatically.")]
         public bool AutomaticImpactPlacement;
         [Tooltip("Face the camera, or keep the rotation chosen below.")]
@@ -77,9 +79,11 @@ namespace CatOnASkateboard.PlayerStudio
         [Tooltip("Size of the impact effect.")]
         [Range(0.01f, 5f)]
         public float ImpactScale = 1f;
-        [Tooltip("Seconds before the impact effect disappears.")]
+        [Tooltip("Game seconds before the impact is cleared. Enable Fit Particle Playback to stretch or compress its particle timing.")]
         [Range(0.01f, 30f)]
         public float ImpactLifetime = 1f;
+        [Tooltip("Optional particle and trail timing for the impact.")]
+        public PlayerToolEffectPlayback ImpactPlayback = new PlayerToolEffectPlayback();
         [Tooltip("Face away from the surface, follow the shot, or keep the prefab's rotation.")]
         public PlayerToolImpactOrientation ImpactOrientation;
         [Tooltip("Keep billboard particles flat against the hit surface.")]
@@ -91,6 +95,13 @@ namespace CatOnASkateboard.PlayerStudio
         public float ImpactOffset = 0.005f;
         [Tooltip("Show the impact effect even when the bullet reaches its limit without a hit.")]
         public bool ImpactAtRange;
+        [Tooltip("A confirmed impact also applies weapon interactions and simulated force to nearby targets.")]
+        public bool ImpactAreaEnabled;
+        [Tooltip("Maximum distance from the impact point to a nearby collider. Solid geometry can shield targets.")]
+        [Range(0.1f, 8f)]
+        public float ImpactAreaRadius = 0.9f;
+        [Tooltip("Optional physical force on a confirmed shot contact. Works without an impact prefab or a visible projectile.")]
+        public PlayerToolImpactForceSettings SimulatedImpactForce = new PlayerToolImpactForceSettings();
 
         [Header("Aim")]
         [Tooltip("Turn the arm toward the cursor. Uses the screen center while the cursor is locked.")]
@@ -145,6 +156,12 @@ namespace CatOnASkateboard.PlayerStudio
         /// <returns>True when the selected weapon mode and its enabled effects can be prepared.</returns>
         public bool TryValidate(out string warning)
         {
+            // Force is independent of the optional impact visuals.
+            if (SimulatedImpactForce != null && !SimulatedImpactForce.TryValidate(out warning))
+                return false;
+            warning = "Impact Area needs a radius from 0.1 to 8 metres.";
+            if (ImpactAreaEnabled && (!float.IsFinite(ImpactAreaRadius) || ImpactAreaRadius is < 0.1f or > 8f))
+                return false;
             // Hidden impact and aim values are checked only when those behaviors are used.
             warning = "Choose a supported weapon mode, 1 to 32 shots, a non-negative interval, finite muzzle coordinates, positive distance and a capacity from 1 to 128.";
             if (Mode is not (PlayerToolWeaponMode.Projectile or PlayerToolWeaponMode.CursorInteraction)
@@ -166,6 +183,11 @@ namespace CatOnASkateboard.PlayerStudio
                     or PlayerToolImpactOrientation.TravelDirection or PlayerToolImpactOrientation.PrefabRotation))
                 || !AutomaticImpactPlacement && !NonNegative(ImpactOffset)))
                 return false;
+            if (Impact != null && ImpactPlayback != null && !ImpactPlayback.TryValidate(ImpactLifetime))
+            {
+                warning = "Fit Particle Playback on Impact requires a positive finite reference duration.";
+                return false;
+            }
             warning = "Auto Aim needs a hierarchy pivot, positive distance and non-negative response. Enabled repositioning needs positive distance, radius and response. All values must be finite.";
             if (AutoAim && (AimPath == null || !Positive(AimDistance) || !NonNegative(AimResponse)
                 || RepositionAim && (!Positive(RepositionDistance) || !Positive(RepositionRadius) || !Positive(RepositionResponse))))

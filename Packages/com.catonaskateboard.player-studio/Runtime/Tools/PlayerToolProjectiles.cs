@@ -169,7 +169,7 @@ namespace CatOnASkateboard.PlayerStudio
             bullets.Return(index);
             activeBullets--;
             if (hit)
-                PlayerTools.PublishHit(result);
+                physics.DispatchImpact(settings, result, settings.Layers);
         }
 
         #endregion

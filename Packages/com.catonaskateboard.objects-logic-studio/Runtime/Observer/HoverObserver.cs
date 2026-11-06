@@ -81,11 +81,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Lifecycle
 
+        /// <summary>Exposes cached held shapes only when ordinary world queries cannot reach them.</summary>
+        /// <param name="root">Player root owning the cursor query.</param>
+        /// <returns>Borrowed collider array for the current non-colliding carry item, or null.</returns>
+        internal static Collider[] CarriedTargetShapes(Transform root)
+        {
+            ObjectGrab held = active != null && active.player == root ? active.HeldObject : null;
+            return held != null && held.IsHeld && held.Body != null && !held.Body.detectCollisions ? held.Colliders : null;
+        }
+
         /// <summary>Clears singleton ownership at every Play entry, including disabled domain reload.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetOwnership()
         {
             // An enabled observer claims the role again from its first LateUpdate.
+            ShotBurstCollisions.Restore(true);
             active = null;
         }
 
@@ -109,6 +119,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (active != this)
                 return;
             active = null;
+            ShotBurstCollisions.Restore(true);
             InteractionUnlockRegistry.Reset();
             AssemblyInteractionRegistry.Reset();
             HoverRegistry.HideAll();
@@ -124,6 +135,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             active = this;
+            ShotBurstCollisions.Restore();
             if (Time.unscaledTime >= nextResolve)
             {
                 nextResolve = Time.unscaledTime + 1f;
@@ -140,7 +152,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (available)
             {
                 // Contact pulses use the normal drivers, but never advance a continuous process twice in one frame.
-                while (InteractionProjectileInput.TryTake(this, out CatOnASkateboard.PlayerStudio.PlayerToolHit hit))
+                while (InteractionProjectileInput.TryTake(this, out InteractionProjectileInput.Pulse hit))
                 {
                     using InteractionProjectileInput.Scope scope = new InteractionProjectileInput.Scope(hit);
                     InteractionUnlockRegistry.Tick(this);
@@ -148,6 +160,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     singles.Prepare(this, false);
                     singles.Tick(this, dialogues.Tick(this, singles));
                 }
+                ShotBurstCollisions.EndImpacts();
                 InteractionUnlockRegistry.Tick(this);
                 AssemblyInteractionRegistry.Tick(this);
                 HoverRegistry.Tick(this);

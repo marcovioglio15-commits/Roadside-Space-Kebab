@@ -31,7 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!automatic.boolValue)
                 HoverControls.Field(settings, "Duration");
             else if (duration > 0f)
-                EditorGUILayout.LabelField("Effect Duration", duration.ToString("0.###") + " s", EditorStyles.miniLabel);
+                StudioFieldGUI.ReadOnly("Effect Duration", duration.ToString("0.###") + " s", EditorStyles.miniLabel);
             else
                 EditorGUILayout.LabelField("Choose manual timing: this interaction has no predefined duration.", EditorStyles.miniLabel);
             if (contact)

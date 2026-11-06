@@ -137,10 +137,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectInteraction current = workspace != null ? workspace.Extended.Draft.ResolveOrders(owner).CompletionSource
                 : (ObjectInteraction)selection.objectReferenceValue;
             string label = current != null ? current.InteractionName : "Select Interaction";
-            Rect rect = EditorGUILayout.GetControlRect();
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("After Completion", "Reveal the drawn orders after this local interaction completes."));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(rect, selection);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(selection));
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("After Completion", "Reveal the drawn orders after this local interaction completes."));
+            rect = field.ValueRect(rect);
             using EditorGUI.DisabledScope unavailable = new EditorGUI.DisabledScope(owner == null);
             bool open = GUI.Button(rect, label, EditorStyles.popup);
             DialogueStepControls.Draw(settings.FindPropertyRelative("CompletionStep"), current);

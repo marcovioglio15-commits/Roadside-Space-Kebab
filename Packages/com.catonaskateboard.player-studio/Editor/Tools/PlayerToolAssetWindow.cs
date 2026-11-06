@@ -60,7 +60,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (root != null)
                 window.hierarchy = root;
             window.switching = allowSwitching;
-            window.ReleaseInspector();
+            window.BindInspector();
             window.titleContent = new GUIContent(title, source.name);
             window.Show();
             window.Focus();
@@ -108,7 +108,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         #region Drawing
 
-        /// <summary>Rebuilds the Inspector after Apply, Discard or source refresh replaces the draft.</summary>
+        /// <summary>Draws the same Inspector through Apply and only rebuilds it for a different draft.</summary>
         /// <param name="data">Detached serialized preset owned by the shared window.</param>
         protected override void DrawTab(SerializedObject data)
         {
@@ -117,17 +117,23 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             {
                 ReleaseInspector();
                 inspector = UnityEditor.Editor.CreateEditor(data.targetObject);
-                switch (inspector)
-                {
-                    case PlayerToolEditor tool:
-                        tool.Bind(hierarchy, switching);
-                        break;
-                    case PlayerToolAnimationPresetEditor animation:
-                        animation.Bind(hierarchy);
-                        break;
-                }
+                BindInspector();
             }
             inspector.OnInspectorGUI();
+        }
+
+        /// <summary>Updates the preview context without resetting the Inspector's open sections.</summary>
+        private void BindInspector()
+        {
+            switch (inspector)
+            {
+                case PlayerToolEditor tool:
+                    tool.Bind(hierarchy, switching);
+                    break;
+                case PlayerToolAnimationPresetEditor animation:
+                    animation.Bind(hierarchy);
+                    break;
+            }
         }
 
         #endregion

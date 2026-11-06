@@ -18,6 +18,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Properties
 
+        /// <summary>Stable identity used to recover this exact input after bindings are rebuilt.</summary>
+        internal Guid Id => action.id;
         /// <summary>Whether an enabled button has performed since the last observer dispatch.</summary>
         internal bool Pending => InteractionProjectileInput.Active
             ? action.enabled && InteractionProjectileInput.Matches(action) && consumedPulse != InteractionProjectileInput.Serial
@@ -86,9 +88,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True for the same action or the same device control in this dispatch pass.</returns>
         internal bool SharesPress(InteractionButton other)
         {
-            // Pending state is checked by dispatch; control identity keeps keyboard and gamepad presses separate.
+            // An impact carries an action identity, so a previous physical control cannot claim it.
             return other != null && (ReferenceEquals(action, other.action)
-                || (action.activeControl ?? control) != null
+                || !InteractionProjectileInput.Active && (action.activeControl ?? control) != null
                     && ReferenceEquals(action.activeControl ?? control, other.action.activeControl ?? other.control));
         }
 

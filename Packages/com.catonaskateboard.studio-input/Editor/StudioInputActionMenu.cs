@@ -67,7 +67,7 @@ namespace CatOnASkateboard.StudioInput.Editor
             if (EditorGUI.EndChangeCheck() && requested >= 0)
                 property.objectReferenceValue = choices.References[requested];
             if (selected < 0)
-                EditorGUILayout.LabelField("Current action", current != null && current.action != null
+                StudioGUI.ReadOnly("Current action", current != null && current.action != null
                     ? current.action.actionMap.name + "_" + current.action.name + " (incompatible)" : "Missing action");
         }
 

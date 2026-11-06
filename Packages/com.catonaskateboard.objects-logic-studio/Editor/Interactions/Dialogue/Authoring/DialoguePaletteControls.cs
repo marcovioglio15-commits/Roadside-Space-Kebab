@@ -22,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             using StudioIndentScope indent = new StudioIndentScope();
             Rows(colors);
-            preset = (DialoguePalettePreset)EditorGUILayout.ObjectField(new GUIContent("Palette Preset", "Optional source for replacing this entry's colors."),
+            preset = (DialoguePalettePreset)StudioFieldGUI.ObjectField(new GUIContent("Palette Preset", "Optional source for replacing this entry's colors."),
                 preset, typeof(DialoguePalettePreset), false);
             using StudioButton.RowScope buttons = new StudioButton.RowScope();
             using (new EditorGUI.DisabledScope(preset == null))

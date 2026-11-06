@@ -215,8 +215,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Build the menu only on demand; normal repaints allocate no hierarchy catalog.
             GameObject prefab = step.FindPropertyRelative("Prefab").objectReferenceValue as GameObject;
             ObjectInteraction current = property.objectReferenceValue as ObjectInteraction;
-            Rect rect = EditorGUILayout.GetControlRect();
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent(title, property.tooltip));
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent(title, property.tooltip));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
+            rect = field.ValueRect(rect);
             if (!GUI.Button(rect, current != null ? current.InteractionName : "Select Interaction", EditorStyles.popup))
                 return;
             GenericMenu menu = new GenericMenu { allowDuplicateNames = true };

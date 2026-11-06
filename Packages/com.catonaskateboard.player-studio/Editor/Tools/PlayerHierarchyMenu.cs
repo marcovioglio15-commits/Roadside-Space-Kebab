@@ -26,11 +26,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             SerializedObject data = property.serializedObject;
             string key = property.propertyPath;
             string current = property.stringValue;
-            Rect rect = EditorGUILayout.GetControlRect();
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect rect = layout.GetRect(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(rect, property);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
             using EditorGUI.PropertyScope scope = new EditorGUI.PropertyScope(rect, label, property);
-            rect = EditorGUI.PrefixLabel(rect, label);
+            rect = layout.ValueRect(rect);
             using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(root == null);
             if (!EditorGUI.DropdownButton(rect, new GUIContent(current.Length == 0 ? allowRoot ? "Root" : "Select Child" : current,
                 root == null ? "Choose a hierarchy source to browse its children." : current), FocusType.Keyboard))
@@ -65,7 +66,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             UnityEngine.Object owner, Action<Transform> assign)
         {
             // Null is explicit for optional camera roles.
-            Rect rect = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), label);
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect rect = layout.ValueRect(layout.GetRect(EditorGUIUtility.singleLineHeight));
             using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(root == null);
             if (EditorGUI.DropdownButton(rect, new GUIContent(current != null ? current.name : "None"), FocusType.Keyboard))
                 Show(rect, root, current, allowRoot, true, selected =>

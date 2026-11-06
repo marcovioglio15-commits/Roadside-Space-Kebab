@@ -1,4 +1,5 @@
 using CatOnASkateboard.AudioStudio;
+using CatOnASkateboard.PlayerStudio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Commits degradation only at stage boundaries while respecting carry and reservation policies.</summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Object Degradation")]
-    public sealed class ObjectDegradation : ObjectExtendedInteraction
+    public sealed class ObjectDegradation : ObjectExtendedInteraction, IPlayerToolImpactReceiver
     {
         #region Fields
 
@@ -141,8 +142,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             RegisterImpact(collision.impulse.magnitude);
         }
 
-        /// <summary>Shares impact thresholds between physical collisions and the existing kinematic carry sweeps.</summary>
-        /// <param name="impulse">Solver impulse, or mass times the normal speed stopped by a carry obstacle.</param>
+        /// <summary>Routes the simulated impulse through the same thresholds as a solver collision.</summary>
+        /// <param name="impulse">Equivalent impulse supplied by the weapon.</param>
+        void IPlayerToolImpactReceiver.ReceiveToolImpact(float impulse) => RegisterImpact(impulse);
+
+        /// <summary>Shares impact thresholds between physical collisions, carry sweeps and weapon impulses.</summary>
+        /// <param name="impulse">Solver impulse, or the equivalent impulse from a simulated hit.</param>
         internal void RegisterImpact(float impulse)
         {
             // Compound contacts at the same time count once; sustained pressure is not a fresh carry impact.

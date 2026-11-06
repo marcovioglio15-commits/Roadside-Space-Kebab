@@ -99,12 +99,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     int selected = System.Array.IndexOf(candidateNames, candidate.stringValue);
                     if (candidateNames.Length > 0)
                     {
-                        int next = EditorGUILayout.Popup(new GUIContent("Candidate", candidate.tooltip), selected, candidateNames);
+                        int next = StudioFieldGUI.Popup(new GUIContent("Candidate", candidate.tooltip), selected, candidateNames);
                         if (next >= 0)
                             candidate.stringValue = candidateNames[next];
                     }
                     else
-                        EditorGUILayout.LabelField("Candidate", "Add an order or variant first.");
+                        StudioFieldGUI.ReadOnly("Candidate", "Add an order or variant first.");
                     if (pool.FindPropertyRelative("Selection").enumValueIndex == (int)OrderSelection.WeightedRandom)
                         HoverControls.Field(member, "Weight", "Candidate Weight");
                 }

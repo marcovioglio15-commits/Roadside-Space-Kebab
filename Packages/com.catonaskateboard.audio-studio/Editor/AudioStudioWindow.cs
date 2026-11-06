@@ -160,7 +160,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
             if (selected == null)
                 return;
             EditorGUILayout.SelectableLabel(selected.Path, GUILayout.Height(18f));
-            EditorGUILayout.LabelField("Banks", string.Join(", ", selected.Banks));
+            StudioGUI.ReadOnly("Banks", string.Join(", ", selected.Banks));
             EditorGUILayout.SelectableLabel(selected.Guid, GUILayout.Height(18f));
             if (selected.Source != null)
                 EditorGUILayout.LabelField(selected.Spatial ? "3D" : "2D", selected.OneShot ? "One-shot" : "Sustained");

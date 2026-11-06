@@ -24,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     SerializedProperty field = groups.GetArrayElementAtIndex(index);
-                    field.objectReferenceValue = EditorGUILayout.ObjectField(new GUIContent("Group " + (index + 1), groups.tooltip),
+                    field.objectReferenceValue = StudioFieldGUI.ObjectField(new GUIContent("Group " + (index + 1), groups.tooltip),
                         field.objectReferenceValue, typeof(ObjectGroupPreset), false);
                     using (new EditorGUI.DisabledScope(field.objectReferenceValue == null))
                         if (GUILayout.Button(new GUIContent("Open", "Edit this same group in its dedicated window."), GUILayout.Width(48f)))

@@ -56,7 +56,7 @@ namespace CatOnASkateboard.PlayerStudio
         private static PlayerToolEffectPool Prepare(PlayerToolEffectSettings effect, int capacity, Transform player)
         {
             return effect?.Prefab != null ? new PlayerToolEffectPool(new PlayerToolVisualPool(effect.Prefab, capacity,
-                player.gameObject.scene, effect.Scale), capacity, effect.Lifetime) : null;
+                player.gameObject.scene, effect.Scale, playbackSpeed: effect.Playback?.Speed(effect.Lifetime) ?? 0f), capacity, effect.Lifetime) : null;
         }
 
         /// <summary>Releases every optional effect without modifying the source prefabs.</summary>
@@ -84,12 +84,13 @@ namespace CatOnASkateboard.PlayerStudio
         }
 
         /// <summary>Expires all visible bursts, including effects from parked tools.</summary>
-        /// <param name="delta">Scaled physics interval.</param>
-        internal void Advance(float delta)
+        /// <param name="now">Scaled frame time.</param>
+        internal void Advance(double now)
         {
-            armEffects?.Advance(delta);
-            shotEffects?.Advance(delta);
-            Impacts.Advance(delta);
+            // Every burst uses the same frame clock, regardless of which tool is selected.
+            armEffects?.Advance(now);
+            shotEffects?.Advance(now);
+            Impacts.Advance(now);
         }
 
         #endregion

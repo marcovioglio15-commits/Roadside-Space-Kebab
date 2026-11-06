@@ -77,7 +77,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     selected = index + 1;
             }
             EditorGUI.BeginChangeCheck();
-            selected = EditorGUILayout.Popup(new GUIContent(label, property.tooltip), selected, names);
+            selected = StudioFieldGUI.Popup(new GUIContent(label, property.tooltip), selected, names);
             if (EditorGUI.EndChangeCheck())
                 property.stringValue = selected == 0 ? string.Empty : tree.Nodes[selected - 1].Id;
         }

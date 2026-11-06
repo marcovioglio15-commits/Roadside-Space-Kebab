@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7606ca6142c12d34d973bc21ea52b7de, type: 3}
   m_Name: SO_Player_Tool_A
   m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerTool
-  DisplayName: Plasma Blaster
+  DisplayName: Shotgun
   SwitchIn: {fileID: 0}
   SwitchOut: {fileID: 0}
-  UseAnimation: {fileID: 11400000, guid: 6825bcfb0ed086744ba0c14e49484c4e, type: 2}
-  UseInterval: 0.22
+  UseAnimation: {fileID: 11400000, guid: 8a7c025bfba701d49bfe78b30a7252b4, type: 2}
+  UseInterval: 0.29
   IsWeapon: 1
   InteractOnBulletImpact: 1
   Weapon:
@@ -25,23 +25,29 @@ MonoBehaviour:
     ShotsPerUse: 1
     ShotInterval: 0.08
     MuzzleEffect:
-      Prefab: {fileID: 2501701147455061194, guid: 0c0b67c34585b17478d2fdaee1ad5535, type: 3}
-      Path: 
-      Position: {x: 0, y: 0, z: 0.725}
-      Rotation: {x: 0, y: 0, z: 0}
-      Scale: 0.1
-      Lifetime: 0.3
-    ShotEffect:
-      Prefab: {fileID: 1707102027251842, guid: 18776a98654da834ca6d32c0064b3709, type: 3}
+      Prefab: {fileID: 0}
       Path: 
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
-      Scale: 0.7
+      Scale: 1
       Lifetime: 0.3
+      Playback:
+        FitParticlePlayback: 0
+        ReferenceDuration: 1
+    ShotEffect:
+      Prefab: {fileID: 8985284517045018021, guid: 8bb0580fb3318ab449a13902cf0acb62, type: 3}
+      Path: 
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: 1.2
+      Lifetime: 1.5
+      Playback:
+        FitParticlePlayback: 1
+        ReferenceDuration: 1.028
     MuzzlePath: 
-    MuzzlePosition: {x: 0.047999978, y: 0.0084, z: 0.87900007}
+    MuzzlePosition: {x: 0, y: 0.088, z: 0.704}
     MuzzleRotation: {x: 0, y: 0, z: 0}
-    Bullet: {fileID: 1004704275401146556, guid: 2d99985baae67e447a2b4292781b8464, type: 3}
+    Bullet: {fileID: 0}
     Speed: 15
     Distance: 70
     Radius: 0
@@ -50,17 +56,42 @@ MonoBehaviour:
       m_Bits: 16193
     HitTriggers: 0
     Capacity: 12
-    Impact: {fileID: 8532630750271246076, guid: 949c50cb6e0bf6d46814c9cb3089a06a, type: 3}
-    AutomaticImpactPlacement: 1
+    Impact: {fileID: 4656462536224877461, guid: f2cd64b106931dc468014e58e1fc740f, type: 3}
+    ImpactOnCursorContact: 1
+    AutomaticImpactPlacement: 0
     ImpactPlacementMode: 0
     ImpactPenetration: 0.25
-    ImpactScale: 0.15
-    ImpactLifetime: 1.2
-    ImpactOrientation: 1
-    ImpactSurfaceAligned: 1
+    ImpactScale: 2
+    ImpactLifetime: 2
+    ImpactPlayback:
+      FitParticlePlayback: 1
+      ReferenceDuration: 1.525
+    ImpactOrientation: 0
+    ImpactSurfaceAligned: 0
     ImpactRotation: {x: 0, y: 0, z: 0}
-    ImpactOffset: 0.01
+    ImpactOffset: 0.018
     ImpactAtRange: 0
+    ImpactAreaEnabled: 1
+    ImpactAreaRadius: 0.1
+    SimulatedImpactForce:
+      Enabled: 1
+      ExplosiveResponse: 1
+      Impulse: 3
+      BurstSpeed: 4.8
+      BurstLift: 2.5
+      BurstSpin: 12
+      AffectImpactDegradation: 1
+      SliceShattering: 1
+      SliceDistanceMultiplier: 0.1
+      IgnoreCarriedObjects: 1
+      FilterLayers: 0
+      Layers:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      Interactions: 1
+      FilterFlags: 0
+      Flags: []
+      FlagMatch: 0
     AutoAim: 1
     AimPath: 
     AimDistance: 70
@@ -75,8 +106,6 @@ MonoBehaviour:
   ReloadEnabled: 1
   AutoReload: 1
   LimitedMagazine: 1
-  MagazineSize: 6
+  MagazineSize: 2
   ReloadCombo:
-  - {fileID: 11400000, guid: 66bdce2abbb0a3c42bcd9559b4b594d4, type: 2}
-  - {fileID: 11400000, guid: 09618b02ba3918440aad6b3682018d25, type: 2}
-  - {fileID: 11400000, guid: 887e64c6a022a2045b84e9863ee12364, type: 2}
+  - {fileID: 11400000, guid: 4ca6731ab6cbab941a80c334841f8992, type: 2}

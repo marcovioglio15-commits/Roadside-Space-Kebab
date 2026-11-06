@@ -108,13 +108,16 @@ namespace CatOnASkateboard.PlayerStudio
                 return true;
             // Locked and texture-rendered views use the same centre as their prepared fake cursor.
             Camera view = rig.View;
+            bool cursor = settings.Mode == PlayerToolWeaponMode.CursorInteraction;
             // Carried bodies finish following before Tools; their current render-frame colliders must be queryable.
-            if (settings.RepositionAim)
+            if (settings.RepositionAim || cursor)
                 Physics.SyncTransforms();
-            if (!PlayerToolPointer.TryRay(view, out Ray ray, settings.Mode == PlayerToolWeaponMode.CursorInteraction))
+            if (!PlayerToolPointer.TryRay(view, out Ray ray, cursor))
                 return true;
-            point = physics.Cast(ray.origin, ray.direction, settings.AimDistance, 0f, settings.Layers,
-                settings.HitTriggers, out RaycastHit contact) ? contact.point : ray.GetPoint(settings.AimDistance);
+            float distance = cursor ? Mathf.Min(settings.AimDistance, view.farClipPlane - view.nearClipPlane) : settings.AimDistance;
+            bool hit = cursor ? physics.CastPointer(ray, distance, settings.Layers.value & view.cullingMask, settings.HitTriggers, out RaycastHit contact)
+                : physics.Cast(ray.origin, ray.direction, distance, 0f, settings.Layers, settings.HitTriggers, out contact);
+            point = hit ? contact.point : ray.GetPoint(distance);
             Vector3 muzzleOffset = muzzle.TransformPoint(settings.MuzzlePosition) - pivot.position;
             Vector3 forward = muzzle.rotation * muzzleRotation * Vector3.forward;
             originalPosition = pivot.localPosition;
@@ -181,7 +184,7 @@ namespace CatOnASkateboard.PlayerStudio
             position = muzzle.TransformPoint(settings.MuzzlePosition);
             rotation = muzzle.rotation * muzzleRotation;
             // Cursor correction is computed once per shot; smoothing affects only presentation.
-            if (hasPoint && (point - position).sqrMagnitude > 0.000001f)
+            if (settings.Mode == PlayerToolWeaponMode.Projectile && hasPoint && (point - position).sqrMagnitude > 0.000001f)
                 rotation = Quaternion.FromToRotation(rotation * Vector3.forward, point - position) * rotation;
             return true;
         }

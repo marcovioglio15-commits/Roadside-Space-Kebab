@@ -28,10 +28,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             using StudioIndentScope sectionContent1 = new StudioIndentScope();
             EditorGUI.BeginChangeCheck();
-            state.Master = (ObjectMasterPreset)EditorGUILayout.ObjectField(new GUIContent("Master preset", "Choose a complete object configuration."), state.Master, typeof(ObjectMasterPreset), false);
+            state.Master = (ObjectMasterPreset)StudioFieldGUI.ObjectField(new GUIContent("Master preset", "Choose a complete object configuration."), state.Master, typeof(ObjectMasterPreset), false);
             if (EditorGUI.EndChangeCheck())
                 state.Persist();
-            includeChildren = EditorGUILayout.Toggle(new GUIContent("Include children", "Capture the interactions on child objects too."), includeChildren);
+            includeChildren = StudioFieldGUI.Toggle(new GUIContent("Include children", "Capture the interactions on child objects too."), includeChildren);
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
             if (StudioButton.Draw(new GUIContent("Save object as master", "Save this object's configuration and its group presets."), EditorStyles.miniButton))
                 Save(state, target);

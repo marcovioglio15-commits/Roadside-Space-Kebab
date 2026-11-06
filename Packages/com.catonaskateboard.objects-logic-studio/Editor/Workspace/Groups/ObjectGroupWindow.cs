@@ -197,7 +197,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (assetOnly)
             {
                 EditorGUI.BeginChangeCheck();
-                sample = (ObjectInteraction)EditorGUILayout.ObjectField(new GUIContent("Sample interaction", "Choose a matching interaction to preview object links."), sample,
+                sample = (ObjectInteraction)StudioFieldGUI.ObjectField(new GUIContent("Sample interaction", "Choose a matching interaction to preview object links."), sample,
                     ObjectStructureChanges.ResolveType(group.TypeName) ?? typeof(ObjectInteraction), true);
                 if (EditorGUI.EndChangeCheck() && sample != null)
                     Run(LoadSample);
@@ -255,7 +255,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void DrawPreset()
         {
             EditorGUI.BeginChangeCheck();
-            preset = (ObjectGroupPreset)EditorGUILayout.ObjectField(new GUIContent("Preset", "Choose a preset for this group."), preset, typeof(ObjectGroupPreset), false);
+            preset = (ObjectGroupPreset)StudioFieldGUI.ObjectField(new GUIContent("Preset", "Choose a preset for this group."), preset, typeof(ObjectGroupPreset), false);
             if (EditorGUI.EndChangeCheck())
                 presetBaseline = preset != null ? ObjectGroupPresetStore.AssetStamp(preset) : string.Empty;
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();

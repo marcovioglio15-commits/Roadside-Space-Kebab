@@ -22,18 +22,27 @@ namespace CatOnASkateboard.PlayerStudio
             float duration = 0.01f;
             foreach (ParticleSystem system in particles)
             {
-                capacity = Mathf.Max(capacity, system.main.maxParticles);
-                duration = Mathf.Max(duration, system.main.duration + system.main.startLifetime.constantMax + system.main.startDelay.constantMax);
+                if (!system.gameObject.activeInHierarchy)
+                    continue;
+                ParticleSystem.MainModule main = system.main;
+                capacity = Mathf.Max(capacity, main.maxParticles);
+                duration = Mathf.Max(duration, SampleDuration(main, lifetime));
                 system.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
             ParticleSystem.Particle[] samples = new ParticleSystem.Particle[capacity];
             Quaternion inverse = Quaternion.Inverse(root.rotation);
-            float step = Mathf.Min(duration, lifetime) / 16f;
-            // Sampling retains bursts, moving sparks and ordinary billboard sizes in the same envelope.
-            for (int frame = 0; frame < 16; frame++)
+            float previous = 0f;
+            // Sample more densely at the start to include brief sparks alongside a long dust tail.
+            const int frames = 24;
+            for (int frame = 1; frame <= frames; frame++)
+            {
+                float progress = (float)frame / frames;
+                float time = Mathf.Min(duration, lifetime) * progress * progress;
                 foreach (ParticleSystem system in particles)
                 {
-                    system.Simulate(step, false, frame == 0, false);
+                    if (!system.gameObject.activeInHierarchy)
+                        continue;
+                    system.Simulate(time - previous, false, frame == 1, false);
                     ParticleSystem.MainModule main = system.main;
                     ParticleSystemRenderer renderer = system.GetComponent<ParticleSystemRenderer>();
                     float scale = main.scalingMode == ParticleSystemScalingMode.Hierarchy ? Maximum(system.transform.lossyScale)
@@ -56,11 +65,14 @@ namespace CatOnASkateboard.PlayerStudio
                         bounds.Encapsulate(centre + Vector3.one * radius);
                     }
                 }
+                previous = time;
+            }
             // Reset simulation before this instance becomes available to its first real shot.
             foreach (ParticleSystem system in particles)
                 system.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>(true))
-                if (renderer is not ParticleSystemRenderer && renderer.bounds.size.sqrMagnitude > 0f)
+                if (renderer is not ParticleSystemRenderer && renderer.enabled && renderer.gameObject.activeInHierarchy
+                    && renderer.bounds.size.sqrMagnitude > 0f)
                 {
                     Vector3 centre = inverse * (renderer.bounds.center - root.position);
                     float radius = renderer.bounds.extents.magnitude;
@@ -69,6 +81,20 @@ namespace CatOnASkateboard.PlayerStudio
                 }
             bounds.Expand(bounds.size * 0.15f + Vector3.one * 0.005f);
             return bounds;
+        }
+
+        /// <summary>Finds a conservative real playback span for a finite particle system.</summary>
+        /// <param name="main">Particle module with its effective playback speed.</param>
+        /// <param name="lifetime">Pool lifetime limiting the visible interval.</param>
+        /// <returns>Sampling span in scaled game seconds.</returns>
+        private static float SampleDuration(ParticleSystem.MainModule main, float lifetime)
+        {
+            // Loops and arbitrary lifetime curves may stay active until the pool cuts them off.
+            if (main.loop || main.simulationSpeed <= 0f
+                || main.startLifetime.mode is ParticleSystemCurveMode.Curve or ParticleSystemCurveMode.TwoCurves
+                || main.startDelay.mode is ParticleSystemCurveMode.Curve or ParticleSystemCurveMode.TwoCurves)
+                return lifetime;
+            return Mathf.Min(lifetime, (main.duration + main.startLifetime.constantMax + main.startDelay.constantMax) / main.simulationSpeed);
         }
 
         /// <summary>Reads the largest absolute coordinate used by uniform clearance estimates.</summary>

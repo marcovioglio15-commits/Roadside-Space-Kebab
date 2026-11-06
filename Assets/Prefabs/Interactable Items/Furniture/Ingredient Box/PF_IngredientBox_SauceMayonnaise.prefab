@@ -101,8 +101,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
   interactionName: Dispenser
   toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
+    Mode: 2
+    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
     Tools: []
   flagChange:
     Enabled: 0
@@ -134,8 +134,20 @@ MonoBehaviour:
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 9139414163634031187, guid: 10e1add81ddf609478bef83be337d608, type: 3}
+    ScoopFlag: {fileID: 0}
     Unlimited: 1
     Stock: 1
+    DestroyWhenEmpty: 0
+    Mode: 0
+    SeparateToolOutput: 1
+    ToolMode: 2
+    Interval: 0.25
+    OutputsPerShot: 5
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 0.2
+    Outlets:
+    - Position: {x: 0.38, y: 0.045, z: 0.046}
+      Rotation: {x: 0, y: 0, z: 0}
     PickupDuration: 0.35
     OutputRotation: {x: 0, y: 0, z: 0}
     StepCounter: 0
@@ -174,7 +186,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2

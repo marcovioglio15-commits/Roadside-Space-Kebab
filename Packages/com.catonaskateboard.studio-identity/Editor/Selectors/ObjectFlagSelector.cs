@@ -28,7 +28,9 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         public static void Draw(SerializedProperty property, GUIContent label = null)
         {
             // Explicit rectangles respect the caller's category indentation without duplicate headers.
-            Draw(EditorGUILayout.GetControlRect(), property, label ?? new GUIContent(property.displayName, property.tooltip));
+            label ??= new GUIContent(property.displayName, property.tooltip);
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Draw(layout.GetRect(EditorGUIUtility.singleLineHeight), property, label, layout);
         }
 
         /// <summary>Draws a selector inside a native Inspector property rectangle.</summary>
@@ -37,11 +39,22 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         /// <param name="label">Field label and tooltip.</param>
         public static void Draw(Rect rect, SerializedProperty property, GUIContent label)
         {
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Draw(rect, property, label, layout);
+        }
+
+        /// <summary>Uses the same measured caption for a tool row and a property drawer.</summary>
+        /// <param name="rect">Complete field rectangle.</param>
+        /// <param name="property">Serialized flag or combination.</param>
+        /// <param name="label">Field label and tooltip.</param>
+        /// <param name="layout">Caption layout already used to reserve the row.</param>
+        private static void Draw(Rect rect, SerializedProperty property, GUIContent label, StudioFieldLayout layout)
+        {
             // The delayed popup retains only the owner and property path, never a stale serialized handle.
             StudioFieldMenu.Context(rect, property);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
             EditorGUI.BeginProperty(rect, label, property);
-            Rect field = EditorGUI.PrefixLabel(rect, label);
+            Rect field = layout.ValueRect(rect);
             Rect create = new Rect(field.xMax - 26f, field.y, 26f, field.height);
             field.width -= 30f;
             UnityEngine.Object owner = property.serializedObject.targetObject;
@@ -234,6 +247,16 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         {
             // Reuse the same control in dedicated tools and ordinary component inspectors.
             ObjectFlagSelector.Draw(position, property, label);
+        }
+
+        /// <summary>Reserves space when a narrow Inspector wraps the flag label above the picker.</summary>
+        /// <param name="property">Serialized flag reference.</param>
+        /// <param name="label">Inspector label.</param>
+        /// <returns>Height of the flag selector and its caption.</returns>
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            return layout.Height(EditorGUIUtility.singleLineHeight);
         }
 
         #endregion

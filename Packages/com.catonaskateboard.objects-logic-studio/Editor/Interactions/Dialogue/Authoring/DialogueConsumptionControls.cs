@@ -97,10 +97,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             List<string> selected = new List<string>();
             for (int index = 0; index < property.arraySize; index++)
                 selected.Add(property.GetArrayElementAtIndex(index).stringValue);
-            Rect rect = EditorGUILayout.GetControlRect();
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Orders", property.tooltip));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(rect, property);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("Orders", property.tooltip));
+            rect = field.ValueRect(rect);
             if (!GUI.Button(rect, selected.Count == 0 ? "Select Orders" : string.Join(", ", selected), EditorStyles.popup))
                 return;
             GenericMenu menu = new GenericMenu();

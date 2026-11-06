@@ -176,8 +176,20 @@ MonoBehaviour:
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 9017165495754910650, guid: eb773dd05cd83df4aa5ef91eb4a1abac, type: 3}
+    ScoopFlag: {fileID: 0}
     Unlimited: 1
     Stock: 1
+    DestroyWhenEmpty: 0
+    Mode: 0
+    SeparateToolOutput: 0
+    ToolMode: 2
+    Interval: 0.25
+    OutputsPerShot: 1
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 0.2
+    Outlets:
+    - Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
     PickupDuration: 0.35
     OutputRotation: {x: 0, y: 0, z: 0}
     StepCounter: 0
@@ -227,17 +239,38 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    Mode: 0
     AllowedFlags:
     - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
     Match: 0
     Unlimited: 1
     Capacity: 10
     LimitToDispenserSpace: 0
-    Mode: 0
     KeepVisible: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
     Spacing: {x: 0, y: 0.2, z: 0}
+    InitialFill: 0
+    ScoopAnimation:
+      Enabled: 0
+      Mode: 0
+      Approach:
+        Id: dispenser-approach
+        Name: Dispenser Approach
+        Space: 0
+        Position: {x: 0, y: 0, z: 0}
+        Rotate: 0
+        Rotation: {x: 0, y: 0, z: 0}
+        Duration: 0.3
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      Keyframes: []
+      FillAfter: 
+      ReturnToStart: 1
+      ReturnDuration: 0.3
+      ObstacleMargin: 1
+      VisualPath: 
     FillSteps: []
 --- !u!114 &573242413944535872
 MonoBehaviour:
@@ -290,5 +323,6 @@ MonoBehaviour:
   settings:
     Maximum: 20
     UseOwnFlags: 1
+    IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25

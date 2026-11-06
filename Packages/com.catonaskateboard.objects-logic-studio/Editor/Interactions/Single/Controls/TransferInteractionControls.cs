@@ -1,22 +1,32 @@
 using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
+using CatOnASkateboard.PlayerStudio;
 using CatOnASkateboard.StudioColors.Editor;
 using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
     /// <summary>Shares conditional inventory controls between interaction cards and dedicated presets.</summary>
     internal static class TransferInteractionControls
     {
+        #region State
+
+        private static readonly string[] toolOutputs = { "To Hand", "Single Output", "Continuous Output" };
+
+        #endregion
+
         #region Methods
 
         #region Settings
 
         /// <summary>Draws supply controls with mutually exclusive prefab and linked-storage modes.</summary>
         /// <param name="settings">Detached or preset Dispenser settings.</param>
+        /// <param name="requirement">Draft tool restriction that determines whether weapon batching is available.</param>
+        /// <param name="action">Targeting button assigned in this draft.</param>
         /// <param name="sections">Persistent foldout state.</param>
-        internal static void Dispenser(SerializedProperty settings, ObjectStudioSections sections)
+        internal static void Dispenser(SerializedProperty settings, SerializedProperty requirement, InputActionReference action, ObjectStudioSections sections)
         {
             // Linked storage restores original instances and has no separate prefab stock.
             Target(settings.FindPropertyRelative("Target"), sections);
@@ -39,28 +49,59 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         HoverControls.Field(settings, "DestroyWhenEmpty");
                     }
                 }
-            if (sections.Draw("Dispenser Output", "Choose carried pickup or release objects at independently placed outlets.", settings, "Mode", "Interval", "Outlets", "PickupDuration", "OutputRotation"))
+            if (sections.Draw("Dispenser Output", "Choose carried pickup or release objects at independently placed outlets.", settings,
+                "Mode", "SeparateToolOutput", "ToolMode", "Interval", "OutputsPerShot", "ScatterShotOutputs", "ScatterDistanceMultiplier", "Outlets", "PickupDuration", "OutputRotation"))
                 using (new StudioIndentScope())
-                {
-                    HoverControls.Field(settings, "Mode", "Output Mode");
-                    if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex == DispenseMode.ToHand)
-                    {
-                        HoverControls.Field(settings, "PickupDuration");
-                        HoverControls.Field(settings, "OutputRotation");
-                    }
-                    else if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex != DispenseMode.ScoopOnly)
-                    {
-                        if ((DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex == DispenseMode.ContinuousOutput)
-                            HoverControls.Field(settings, "Interval");
-                        DispenserOutletControls.Draw(settings);
-                    }
-                }
+                    DispenserOutput(settings, requirement, action);
             if (sections.Draw("Dispense counting", "Choose what advances each step.", settings, "StepCounter"))
                 using (new StudioIndentScope())
                     HoverControls.Field(settings, "StepCounter");
             if (!scoopOnly && settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue
                 || settings.FindPropertyRelative("StepCounter").enumValueIndex == (int)DispenseStepCounter.Dispensed)
                 InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Dispense Steps");
+        }
+
+        /// <summary>Shows shared placement and timing only when at least one route uses them.</summary>
+        /// <param name="settings">Dispenser output properties.</param>
+        /// <param name="requirement">Draft restriction and its specific tool.</param>
+        /// <param name="action">Targeting button configured in the same draft.</param>
+        private static void DispenserOutput(SerializedProperty settings, SerializedProperty requirement, InputActionReference action)
+        {
+            HoverControls.Field(settings, "Mode", "Targeting Output");
+            DispenseMode mode = (DispenseMode)settings.FindPropertyRelative("Mode").enumValueIndex;
+            DispenseMode toolMode = mode;
+            InteractionToolMode restriction = (InteractionToolMode)requirement.FindPropertyRelative("Mode").enumValueIndex;
+            PlayerTool tool = requirement.FindPropertyRelative("Tool").objectReferenceValue as PlayerTool;
+            // Only a distinct Use Tool button can select a second output mode.
+            if (DispenserSettings.CanSeparateToolOutput(mode, restriction, tool) && DispenserToolActions.HasDistinctAction(action, tool))
+            {
+                HoverControls.Field(settings, "SeparateToolOutput");
+                if (settings.FindPropertyRelative("SeparateToolOutput").boolValue)
+                {
+                    SerializedProperty output = settings.FindPropertyRelative("ToolMode");
+                    if (ObjectGroupScope.Allows(output))
+                        output.enumValueIndex = StudioGUI.Popup(StudioFieldMenu.Value(output, new GUIContent("Tool Output", output.tooltip)),
+                            output.enumValueIndex, toolOutputs);
+                    toolMode = (DispenseMode)output.enumValueIndex;
+                }
+            }
+            // Each output family keeps its own settings when the other route uses a different mode.
+            if (mode == DispenseMode.ToHand || toolMode == DispenseMode.ToHand)
+            {
+                HoverControls.Field(settings, "PickupDuration");
+                HoverControls.Field(settings, "OutputRotation");
+            }
+            if (mode == DispenseMode.ContinuousOutput || toolMode == DispenseMode.ContinuousOutput && tool?.UsesImpactInteractions != true)
+                HoverControls.Field(settings, "Interval");
+            if (DispenserSettings.UsesWeaponBatch(toolMode, restriction, tool))
+            {
+                HoverControls.Field(settings, "OutputsPerShot");
+                HoverControls.Field(settings, "ScatterShotOutputs");
+                if (settings.FindPropertyRelative("ScatterShotOutputs").boolValue)
+                    HoverControls.Field(settings, "ScatterDistanceMultiplier");
+            }
+            if (DispenserSettings.UsesWorldOutput(mode) || DispenserSettings.UsesWorldOutput(toolMode))
+                DispenserOutletControls.Draw(settings);
         }
 
         /// <summary>Draws a real allowed-flag list and optional visible storage arrangement.</summary>

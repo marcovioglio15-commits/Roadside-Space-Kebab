@@ -19,11 +19,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Discovery is editor-only; runtime routing continues to use the stable board ID.
             OrderBoard[] boards = Resources.FindObjectsOfTypeAll<OrderBoard>();
             OrderBoard matched = Array.Find(boards, board => IsSceneBoard(board) && board.Identity == identity.stringValue);
-            Rect rect = EditorGUILayout.GetControlRect();
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Scene Board", "Select a board in a loaded gameplay scene. Only its ID is saved in the prefab."));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(rect, identity);
             using (new StudioFieldColors(rect, StudioFieldColors.Key(identity)))
             {
-                rect = EditorGUI.PrefixLabel(rect, new GUIContent("Scene Board", "Select a board in a loaded gameplay scene. Only its ID is saved in the prefab."));
+                rect = field.ValueRect(rect);
                 if (EditorGUI.DropdownButton(rect, new GUIContent(matched != null
                     ? matched.gameObject.scene.name + " / " + matched.name + " (" + matched.Capacity + " slots)"
                     : identity.stringValue + " (not loaded)"), FocusType.Keyboard))

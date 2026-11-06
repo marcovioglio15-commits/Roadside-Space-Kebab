@@ -26,10 +26,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             string label = !reference.Assigned ? "Select Interaction" : reference.Kind + " / " + reference.Name;
             if (reference.Assigned && owner != null && selected == null)
                 label += " (missing)";
-            Rect rect = EditorGUILayout.GetControlRect();
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Source Interaction", property.tooltip));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(rect, property);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("Source Interaction", property.tooltip));
+            rect = field.ValueRect(rect);
             using (new EditorGUI.DisabledScope(owner == null))
                 if (GUI.Button(rect, new GUIContent(label, property.tooltip), EditorStyles.popup))
                     Show(property, owner, selected, rect, includeAnimations);

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using Guid = System.Guid;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Assembly action used this frame, suppressed in subsequent dialogue and single-action routing.</summary>
-        internal static InputActionReference Consumed { get; private set; }
+        internal static Guid Consumed { get; private set; }
 
         #endregion
 
@@ -69,7 +69,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // This does not reset recipe progress on any table or product.
             input.Reset();
             bindings.Clear();
-            Consumed = null;
+            Consumed = Guid.Empty;
             dirty = true;
             revision = -1;
         }
@@ -175,20 +175,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal static void Tick(HoverObserver observer)
         {
             // Empty categories perform no input discovery or physics work.
-            Consumed = null;
+            Consumed = Guid.Empty;
             if (items.Count == 0)
                 return;
             input.Refresh(observer.Player);
             if (dirty || revision != input.Revision)
                 Bind();
-            foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
+            input.PrepareToolAction();
+            foreach (Guid action in InteractionUnlockRegistry.Consumed)
                 input.Consume(action);
             ObjectAssemblyStation selected = null;
+            InteractionButton selectedButton = null;
             float nearest = float.PositiveInfinity;
             if (input.Usable && Time.timeScale > 0f && observer.HeldObject != null)
                 foreach (KeyValuePair<ObjectAssemblyStation, InteractionButton> pair in bindings)
                 {
-                    if (!pair.Value.Pending || pair.Key == null || !InteractionProjectileInput.Allows(pair.Key))
+                    if (input.Read(pair.Key, pair.Value) is not InteractionButton button)
                         continue;
                     ObjectAssemblyStation station = pair.Key;
                     float distance = (station.OutputPosition - observer.Player.position).sqrMagnitude;
@@ -201,10 +203,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         && EntityId.ToULong(station.GetEntityId()) > EntityId.ToULong(selected.GetEntityId()))
                         continue;
                     selected = station;
+                    selectedButton = button;
                     nearest = distance;
                 }
             if (selected != null && selected.Execute(observer.HeldObject))
-                Consumed = selected.Action;
+                Consumed = selectedButton.Id;
             input.ClearSignals();
         }
 

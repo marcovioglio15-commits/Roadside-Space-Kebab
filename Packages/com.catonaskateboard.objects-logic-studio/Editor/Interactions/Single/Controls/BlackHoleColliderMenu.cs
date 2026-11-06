@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using CatOnASkateboard.PlayerStudio;
 using UnityEditor;
@@ -18,8 +19,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Enumerate only when the menu opens; ordinary repaints resolve one saved branch.
             Collider current = source != null ? ((BlackHoleSettings)settings.boxedValue).Resolve(source.transform) : null;
-            Rect rect = EditorGUILayout.GetControlRect();
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("Destination Collider", "Select the exact solid or trigger collider on this ejector or any child. Component numbers follow Inspector order."));
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Destination Collider", "Select the exact solid or trigger collider on this ejector or any child. Component numbers follow Inspector order."));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
+            rect = field.ValueRect(rect);
             using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(source == null);
             if (GUI.Button(rect, new GUIContent(current != null ? Label(source.transform, current) : "Select Collider"), EditorStyles.popup))
                 Show(settings, source, current);

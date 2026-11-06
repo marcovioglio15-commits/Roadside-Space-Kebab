@@ -29,10 +29,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(gate, "Occurrence");
                 return;
             }
-            Rect rect = EditorGUILayout.GetControlRect();
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("After Dialogue", "Enable consuming modifications after this local dialogue completes."));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(rect, gate);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(gate));
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("After Dialogue", "Enable consuming modifications after this local dialogue completes."));
+            rect = field.ValueRect(rect);
             string name = gate.FindPropertyRelative("DialogueName").stringValue;
             bool open = GUI.Button(rect, string.IsNullOrEmpty(name) ? "Select Dialogue" : name, EditorStyles.popup);
             DialogueStepControls.Draw(gate.FindPropertyRelative("Step"), ((ContactDialogueGate)gate.boxedValue).Resolve(root));

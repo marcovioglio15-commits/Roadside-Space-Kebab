@@ -354,9 +354,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (showInteraction)
             {
                 using (new EditorGUILayout.VerticalScope(GUILayout.Width(catalogWidth)))
+                using (new StudioFieldLayout.WidthScope(catalogWidth))
                     DrawCatalog(height);
                 GUILayout.Space(8f);
-                using (new EditorGUILayout.VerticalScope(GUILayout.Width(width - catalogWidth - presetsWidth - (showPresets ? 16f : 8f))))
+                float interactionWidth = width - catalogWidth - presetsWidth - (showPresets ? 16f : 8f);
+                using (new EditorGUILayout.VerticalScope(GUILayout.Width(interactionWidth)))
+                using (new StudioFieldLayout.WidthScope(interactionWidth))
                     DrawInteraction(height);
             }
             if (showPresets)
@@ -365,6 +368,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using EditorGUILayout.VerticalScope column = showInteraction
                     ? new EditorGUILayout.VerticalScope(GUILayout.Width(presetsWidth))
                     : new EditorGUILayout.VerticalScope(GUILayout.ExpandWidth(true));
+                using StudioFieldLayout.WidthScope pane = new StudioFieldLayout.WidthScope(showInteraction ? presetsWidth : width);
                 if (ObjectWorkspaceGUI.Foldout(state, "View.Presets", "Presets", "Presets for the visible interaction types."))
                     using (new StudioIndentScope())
                         using (EditorGUILayout.ScrollViewScope scroll = new EditorGUILayout.ScrollViewScope(state.Navigation.PresetsScroll, GUILayout.Height(height)))

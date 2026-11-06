@@ -1,3 +1,4 @@
+using CatOnASkateboard.PlayerStudio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -55,21 +56,40 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Material arrays use shared references; no source asset or material instance is modified.
             appearance?.Commit();
-            SliceCarryGroup group = step.Consume && step.KeepOutputsHeld && owner.TryGetComponent(out ObjectGrab carried) && carried.IsHeld
+            bool held = owner.TryGetComponent(out ObjectGrab carried) && carried.IsHeld;
+            SliceCarryGroup group = step.Consume && step.KeepOutputsHeld && held
                 ? SliceCarryGroup.Create(carried, step.Spawns.Length) : null;
-            foreach (SliceSpawn spawn in step.Spawns)
+            PlayerToolImpactForceSettings force = group == null && step.Spawns.Length > 0 && InteractionProjectileInput.Active
+                && InteractionProjectileInput.Allows(owner) ? InteractionProjectileInput.Tool?.Weapon?.SimulatedImpactForce : null;
+            bool shatter = force is { Enabled: true, SliceShattering: true } && (!held || !force.IgnoreCarriedObjects);
+            Vector3 shotBias = shatter ? Vector3.ProjectOnPlane(InteractionProjectileInput.Velocity, Vector3.up).normalized * 0.28f : Vector3.zero;
+            float phase = shatter ? Random.Range(0f, 360f) : 0f;
+            // Scaling both speed components by the square root scales free-flight range at equal heights.
+            float launchScale = shatter ? Mathf.Sqrt(force.SliceDistanceMultiplier) : 1f;
+            // Each loose piece gets its own heading. The carry group keeps its original assembly path.
+            for (int index = 0; index < step.Spawns.Length; index++)
             {
+                SliceSpawn spawn = step.Spawns[index];
                 GameObject created = group != null ? ObjectSpawnHistory.Create(spawn.Prefab, group.transform, false)
                     : ObjectSpawnHistory.Create(spawn.Prefab, owner.TransformPoint(spawn.Position), owner.rotation * Quaternion.Euler(spawn.Rotation));
                 if (group != null)
                     created.transform.SetPositionAndRotation(owner.TransformPoint(spawn.Position), owner.rotation * Quaternion.Euler(spawn.Rotation));
                 else
                     SceneManager.MoveGameObjectToScene(created, owner.gameObject.scene);
-                ObjectSpawnPhysics.Protect(created);
+                Vector3 velocity = Vector3.zero;
+                Vector3 tumble = Vector3.zero;
+                if (shatter)
+                {
+                    Vector3 heading = Quaternion.AngleAxis(phase + 360f * index / step.Spawns.Length, Vector3.up) * Vector3.forward;
+                    force.SampleBurst((heading + shotBias).normalized, 1f, out velocity, out tumble);
+                    velocity *= launchScale;
+                    ShotBurstCollisions.Add(created.TryGetComponent(out ObjectGrab piece) ? piece.Colliders : created.GetComponentsInChildren<Collider>());
+                }
+                ObjectSpawnPhysics.Protect(created, velocity, tumble);
                 ObjectGravityGenerator.IncludeSpawn(created);
                 group?.Add(created);
             }
-            group?.Take(owner.GetComponent<ObjectGrab>());
+            group?.Take(carried);
         }
 
         #endregion

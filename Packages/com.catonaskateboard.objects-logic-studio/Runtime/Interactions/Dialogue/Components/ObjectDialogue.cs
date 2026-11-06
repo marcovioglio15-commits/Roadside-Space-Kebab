@@ -289,10 +289,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Collects eligible text rows or selects one triggered conversation branch.</summary>
         /// <param name="player">Current player root.</param>
         /// <param name="buttons">Already resolved input buttons.</param>
+        /// <param name="input">Router for configured triggers and accepted tool presses.</param>
         /// <param name="observer">Optional view used while choosing routing branches.</param>
         /// <param name="visibility">Observer-owned visibility cache.</param>
         /// <returns>True when this component may claim the idle dialogue channel.</returns>
-        internal bool CanStart(Transform player, Dictionary<InputActionReference, InteractionButton> buttons,
+        internal bool CanStart(Transform player, Dictionary<InputActionReference, InteractionButton> buttons, InteractionInputRouter input,
             HoverObserver observer = null, DialogueVisibility visibility = null)
         {
             if (!Ready || session == null || IsSpeaking || !Available(InteractionChannels.Dialogue)
@@ -311,7 +312,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             session.RouteRow = null;
             DialogueNode block = session.RequestBlock;
             bool routed = block.Routing && !retained;
-            if (routed && !SelectRoute(block, distance, buttons, observer, visibility))
+            if (routed && !SelectRoute(block, distance, buttons, input, observer, visibility))
                 return false;
             block = session.RequestBlock;
             SetPresentation(block.OverridePolicy ? block.Policy : settings);
@@ -319,7 +320,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int index = 0; index < block.Entries.Length; index++)
                 if ((!retained || session.Row == null || block.Entries[index] == session.Row)
                     && (block.Selection != DialogueSelection.WeightedRandom || block.Entries[index].Weight > 0f)
-                    && Matches(block.Entries[index], Presentation, distance, buttons, !routed))
+                    && Matches(block.Entries[index], Presentation, distance, buttons, input, !routed))
                     eligible.Add(index);
             return eligible.Count > 0;
         }
@@ -328,11 +329,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="router">Routing block containing trigger-only entries.</param>
         /// <param name="distance">Squared player distance.</param>
         /// <param name="buttons">Resolved activation buttons.</param>
+        /// <param name="input">Router for configured triggers and accepted tool presses.</param>
         /// <param name="observer">Current view, when supplied by the dialogue driver.</param>
         /// <param name="visibility">Shared visibility cache.</param>
         /// <returns>True when a conversation branch was selected.</returns>
         private bool SelectRoute(DialogueNode router, float distance, Dictionary<InputActionReference, InteractionButton> buttons,
-            HoverObserver observer, DialogueVisibility visibility)
+            InteractionInputRouter input, HoverObserver observer, DialogueVisibility visibility)
         {
             DialoguePolicy selected = null;
             DialogueNode selectedBlock = null;
@@ -343,7 +345,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 DialogueNode target = session.Find(route.Next);
                 DialoguePolicy policy = target.OverridePolicy ? target.Policy : settings;
                 session.Route = target;
-                if (selected != null && selected.Priority >= policy.Priority || !Matches(route, policy, distance, buttons, true))
+                if (selected != null && selected.Priority >= policy.Priority || !Matches(route, policy, distance, buttons, input, true))
                     continue;
                 SetPresentation(policy);
                 if (observer != null && !CanPresent(observer, visibility, false))
@@ -372,10 +374,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="policy">Presentation policy of the destination branch.</param>
         /// <param name="distance">Squared player distance.</param>
         /// <param name="buttons">Resolved input buttons.</param>
+        /// <param name="input">Router for configured triggers and accepted tool presses.</param>
         /// <param name="replay">Whether this is a new request rather than a routed text row.</param>
         /// <returns>True when this row can accept the current event.</returns>
         private bool Matches(DialogueRow row, DialoguePolicy policy, float distance,
-            Dictionary<InputActionReference, InteractionButton> buttons, bool replay)
+            Dictionary<InputActionReference, InteractionButton> buttons, InteractionInputRouter input, bool replay)
         {
             DialogueTriggerPreset trigger = row.Trigger;
             if (InteractionProjectileInput.Active && replay && trigger.Type != DialogueTrigger.InputAction)
@@ -388,7 +391,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             bool matches = retained && row == session.Row || arrivalPending && ArrivalContext || (trigger.Type switch
             {
-                DialogueTrigger.InputAction => ActionFor(trigger) is InputActionReference action && buttons.TryGetValue(action, out InteractionButton button) && button.Pending,
+                DialogueTrigger.InputAction => ActionFor(trigger) is InputActionReference action
+                    && buttons.TryGetValue(action, out InteractionButton button) && input.Read(this, button) != null,
                 DialogueTrigger.Proximity => !session.ProximityUsed.Contains(row.Id),
                 DialogueTrigger.Consumption => consumptionMatches.Contains(trigger) && (AwaitsContact(trigger)
                     ? contact != null && session.ContactRevision != contact.ContactRevision : session.ConsumptionRevision != Item.ConsumptionRevision

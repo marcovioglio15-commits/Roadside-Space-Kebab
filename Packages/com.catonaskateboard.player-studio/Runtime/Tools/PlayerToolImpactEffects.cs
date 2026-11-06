@@ -44,7 +44,8 @@ namespace CatOnASkateboard.PlayerStudio
             effects = new PlayerToolEffectPool(new PlayerToolVisualPool(weapon.Impact, weapon.Capacity, player.gameObject.scene,
                 weapon.ImpactScale, weapon.UsesImpactOrientation && weapon.ImpactSurfaceAligned
                     && weapon.ImpactOrientation == PlayerToolImpactOrientation.SurfaceNormal,
-                weapon.AutomaticImpactPlacement ? weapon.ImpactLifetime : 0f, faceCamera), weapon.Capacity, weapon.ImpactLifetime);
+                weapon.AutomaticImpactPlacement ? weapon.ImpactLifetime : 0f, faceCamera,
+                weapon.ImpactPlayback?.Speed(weapon.ImpactLifetime) ?? 0f), weapon.Capacity, weapon.ImpactLifetime);
             placement = weapon.AutomaticImpactPlacement
                 ? new PlayerToolImpactPlacement(physics, camera, effects.Envelope, faceCamera, weapon.ImpactPenetration) : null;
             rotationOffset = weapon.UsesImpactOrientation ? (weapon.ImpactOrientation == PlayerToolImpactOrientation.PrefabRotation
@@ -58,10 +59,10 @@ namespace CatOnASkateboard.PlayerStudio
         }
 
         /// <summary>Expires visible impacts independently of the currently selected tool.</summary>
-        /// <param name="delta">Scaled physics interval.</param>
-        internal void Advance(float delta)
+        /// <param name="now">Scaled frame time.</param>
+        internal void Advance(double now)
         {
-            effects?.Advance(delta);
+            effects?.Advance(now);
         }
 
         #endregion

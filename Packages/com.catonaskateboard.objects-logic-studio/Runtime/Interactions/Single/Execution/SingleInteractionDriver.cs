@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -21,7 +22,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool missingInputReported;
         private bool performed;
         private ObjectSpraySauce spraying;
+        private Guid sprayAction;
         private ObjectDispenser dispensing;
+        private Guid dispenseAction;
         private ObjectContainer scoopReceiver;
         private float nextDispense;
         private readonly AssemblyChargeRun assembly = new AssemblyChargeRun();
@@ -179,9 +182,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Registry changes are resolved before either driver dispatches an action.
             Bind(observer);
+            input.PrepareToolAction();
             performed = false;
             input.Consume(AssemblyInteractionRegistry.Consumed);
-            foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
+            foreach (Guid action in InteractionUnlockRegistry.Consumed)
                 input.Consume(action);
             if (held != null && !held.IsHeld)
                 held = null;
@@ -217,20 +221,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Suppress(InteractionButton consumed)
         {
             input.Consume(consumed);
-            if (dispensing != null && bindings.TryGetValue(dispensing, out InteractionButton button) && button.SharesPress(consumed))
+            if (dispensing != null && input.Find(dispenseAction) is InteractionButton button && button.SharesPress(consumed))
                 dispensing = null;
         }
 
         /// <summary>Processes remaining input after dialogue arbitration, allowing only one Single per pass.</summary>
         /// <param name="observer">Shared camera and player context.</param>
-        /// <param name="consumed">Action already used by dialogue in this frame, if any.</param>
-        internal void Tick(HoverObserver observer, InputActionReference consumed = null)
+        /// <param name="consumed">ID of the action already used by dialogue, if any.</param>
+        internal void Tick(HoverObserver observer, Guid consumed = default)
         {
             // A prioritized Single already owns this pass, including its carry-slot transition.
             input.Consume(consumed);
             if (!InteractionProjectileInput.Active && spraying != null && (!input.Usable || Time.timeScale <= 0f || !spraying.CanContinue()
-                || !bindings.TryGetValue(spraying, out InteractionButton flow) || !flow.Held
-                || consumed != null && input.Find(consumed) == flow || !CommandTarget(observer, spraying, out _)))
+                || !bindings.ContainsKey(spraying) || input.Find(sprayAction) is not { Held: true }
+                || consumed == sprayAction || !CommandTarget(observer, spraying, out _)))
             {
                 spraying.StopEmission();
                 spraying = null;
@@ -238,14 +242,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             AdvanceDispenser(observer, consumed);
             if (!performed && input.Usable && Time.timeScale > 0f)
             {
-                bool pending = false;
                 foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                    pending |= pair.Value.Pending || pair.Key is ObjectAssemblyProduct { Settings: { ProlongedAssembly: true } } && pair.Value.Pressed;
-                if (pending)
-                {
-                    Physics.SyncTransforms();
-                    Execute(observer, null);
-                }
+                    if (Pending(pair, null, DialogueActionPriority.All) != null)
+                    {
+                        Physics.SyncTransforms();
+                        Execute(observer, null);
+                        break;
+                    }
             }
             input.ClearSignals();
         }
@@ -273,20 +276,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (receiver == null || !receiver.isActiveAndEnabled || !receiver.Settings.ScoopFromDispenser)
                 return false;
             ObjectDispenser selected = null;
+            InteractionButton selectedButton = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (Pending(pair, requested, allowed) && pair.Key is ObjectDispenser source && source.gameObject != receiver.gameObject
-                    && source.RequestToolAllowed && !source.IsLocked && source.MatchesScoop(receiver)
+                if (pair.Key is ObjectDispenser source && Pending(pair, requested, allowed) is InteractionButton button && source.gameObject != receiver.gameObject
+                    && !source.UsesSeparateOutput(button.Id) && !source.IsLocked && source.MatchesScoop(receiver)
                     && Eligible(observer, source, out float score) && Nearer(source, selected, score, distance))
                 {
                     selected = source;
+                    selectedButton = button;
                     distance = score;
                 }
             if (selected == null)
                 return false;
             receiver.TryScoop(selected, held);
+            // A shot claims one scoop without taking over a direct input hold.
+            if (InteractionProjectileInput.Active)
+                return true;
             scoopReceiver = selected.Settings.Mode == DispenseMode.ContinuousOutput ? receiver : null;
             dispensing = scoopReceiver != null ? selected : null;
+            dispenseAction = selectedButton.Id;
             nextDispense = Time.time + selected.Settings.Interval;
             return true;
         }
@@ -295,13 +304,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="pair">Bound interaction and its buffered button.</param>
         /// <param name="requested">Competing dialogue button, or null for ordinary input.</param>
         /// <param name="allowed">Interaction types permitted for this pass.</param>
-        /// <returns>True when this participant has an eligible performed press.</returns>
-        private static bool Pending(KeyValuePair<ObjectInteraction, InteractionButton> pair, InteractionButton requested, DialogueActionPriority allowed)
+        /// <returns>The targeting or tool button that can dispatch this participant.</returns>
+        private InteractionButton Pending(KeyValuePair<ObjectInteraction, InteractionButton> pair, InteractionButton requested, DialogueActionPriority allowed)
         {
-            return pair.Key != null && InteractionProjectileInput.Allows(pair.Key) && (pair.Value.Pending
-                    || pair.Key is ObjectAssemblyProduct { Settings: { ProlongedAssembly: true } } && pair.Value.Pressed)
-                && (requested == null || pair.Value.SharesPress(requested))
-                && DialogueActionRules.Allows(pair.Key, allowed);
+            InteractionButton button = input.Read(pair.Key, pair.Value, requested,
+                pair.Key is ObjectAssemblyProduct { Settings: { ProlongedAssembly: true } });
+            return button != null && DialogueActionRules.Allows(pair.Key, allowed) ? button : null;
         }
 
         /// <summary>Advances the highest-priority visible Slice before considering pickup or release.</summary>
@@ -316,7 +324,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
             {
-                if (!Pending(pair, requested, allowed) || pair.Key is not ObjectSlice candidate || !candidate.CanAdvance()
+                if (pair.Key is not ObjectSlice candidate || Pending(pair, requested, allowed) == null || !candidate.CanAdvance()
                     || candidate.transform.IsChildOf(observer.Player))
                     continue;
                 TransferTargetSettings target = candidate.Settings.Target;
@@ -342,13 +350,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A shared press selects one nearest command before carry or inventory actions consume it.
             ObjectInteraction selected = null;
+            InteractionButton selectedButton = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (Pending(pair, requested, allowed) && CanCommand(pair.Key)
+                if (Pending(pair, requested, allowed) is InteractionButton button && CanCommand(pair.Key, button)
                     && !pair.Key.transform.IsChildOf(observer.Player) && CommandTarget(observer, pair.Key, out float score)
                     && Nearer(pair.Key, selected, score, distance))
                 {
                     selected = pair.Key;
+                    selectedButton = button;
                     distance = score;
                 }
             // Releasing the held item or picking up a nearer piece takes precedence over another world output.
@@ -356,21 +366,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 if (held != null)
                 {
-                    if (Release(observer, bindings[selected], allowed, false))
+                    if (Release(observer, selectedButton, allowed, false))
                         return true;
                 }
                 else
                 {
-                    ObjectInteraction pickup = FindPickup(observer, requested, allowed, bindings[selected], distance);
+                    ObjectInteraction pickup = FindPickup(observer, requested, allowed, out InteractionButton pickupButton, selectedButton, distance);
                     if (pickup != null)
-                        return TakePickup(observer, pickup);
+                        return TakePickup(observer, pickup, pickupButton);
                 }
             }
             return selected switch
             {
                 ObjectCommandInteraction command => command.Execute(),
-                ObjectSpraySauce spray => StartSpray(spray),
-                ObjectDispenser dispenser => StartDispenser(observer, dispenser),
+                ObjectSpraySauce spray => StartSpray(spray, selectedButton),
+                ObjectDispenser dispenser => StartDispenser(observer, dispenser, selectedButton),
                 ObjectRequestedInteraction process => process.Request(),
                 _ => false
             };
@@ -378,14 +388,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Checks command eligibility without querying physics for inactive processes.</summary>
         /// <param name="feature">Interaction bound to a pending button.</param>
+        /// <param name="button">Action selected for this interaction.</param>
         /// <returns>True for an executable command or a waiting process.</returns>
-        private static bool CanCommand(ObjectInteraction feature)
+        private static bool CanCommand(ObjectInteraction feature, InteractionButton button)
         {
             return feature switch
             {
                 ObjectCommandInteraction command => command.CanExecute(),
                 ObjectRequestedInteraction process => process.CanRequest(),
-                ObjectDispenser dispenser => dispenser.Settings.Mode is DispenseMode.SingleOutput or DispenseMode.ContinuousOutput && dispenser.CanTake(),
+                ObjectDispenser dispenser => DispenserSettings.UsesWorldOutput(dispenser.OutputMode(button.Id)) && dispenser.CanTake(),
                 _ => false
             };
         }
@@ -413,42 +424,53 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Starts one continuous source only while its selected action is still held.</summary>
         /// <param name="spray">Emitter selected by normal command arbitration.</param>
+        /// <param name="button">Input route that started this spray.</param>
         /// <returns>True when the held request started emission.</returns>
-        private bool StartSpray(ObjectSpraySauce spray)
+        private bool StartSpray(ObjectSpraySauce spray, InteractionButton button)
         {
-            if (!bindings.TryGetValue(spray, out InteractionButton button) || !spray.Request(button))
+            if (!spray.Request(button))
                 return false;
             if (spraying != null && spraying != spray)
                 spraying.StopEmission();
             // Autonomous bursts retain their own timer after button release or a change of aim.
             spraying = spray.Settings.Emission == SprayEmissionMode.Hold ? spray : null;
+            sprayAction = button.Id;
             return true;
         }
 
-        /// <summary>Emits one world output and retains only an ordinary held continuous request.</summary>
+        /// <summary>Dispatches one weapon contact or starts a held world output request.</summary>
         /// <param name="observer">Player targeting this dispenser, possibly already carrying another item.</param>
         /// <param name="dispenser">Supply selected by normal command arbitration.</param>
-        /// <returns>True after one atomic withdrawal succeeds.</returns>
-        private bool StartDispenser(HoverObserver observer, ObjectDispenser dispenser)
+        /// <param name="button">Input route that started this output.</param>
+        /// <returns>True after at least one withdrawal succeeds.</returns>
+        private bool StartDispenser(HoverObserver observer, ObjectDispenser dispenser, InteractionButton button)
         {
-            if (!dispenser.TryTake(observer, out _))
+            // A contact is one pulse, even when it releases several items.
+            DispenseMode mode = dispenser.OutputMode(button.Id);
+            if (InteractionProjectileInput.Active)
+                return dispenser.TryTakeShot(observer, mode, InteractionProjectileInput.Tool, InteractionProjectileInput.Velocity);
+            if (!dispenser.TryTake(observer, mode, out _))
                 return false;
-            dispensing = dispenser.Settings.Mode == DispenseMode.ContinuousOutput && !InteractionProjectileInput.Active ? dispenser : null;
-            nextDispense = Time.time + dispenser.Settings.Interval;
+            // A held action schedules one item per interval.
+            scoopReceiver = null;
+            dispensing = dispenser != null && mode == DispenseMode.ContinuousOutput ? dispenser : null;
+            dispenseAction = button.Id;
+            if (dispensing != null)
+                nextDispense = Time.time + dispensing.Settings.Interval;
             return true;
         }
 
         /// <summary>Advances one held supply without catch-up bursts, and stops on release, pause, lost aim or stock exhaustion.</summary>
         /// <param name="observer">Current camera and player used for normal reach and obstruction checks.</param>
-        /// <param name="consumed">Action already owned by dialogue during this pass.</param>
-        private void AdvanceDispenser(HoverObserver observer, InputActionReference consumed)
+        /// <param name="consumed">ID of the action already owned by dialogue during this pass.</param>
+        private void AdvanceDispenser(HoverObserver observer, Guid consumed)
         {
             if (InteractionProjectileInput.Active || dispensing == null)
                 return;
             // A fresh press returns to selection even when release occurred between observer passes.
-            if (!input.Usable || Time.timeScale <= 0f || dispensing.Settings.Mode != DispenseMode.ContinuousOutput
-                || !bindings.TryGetValue(dispensing, out InteractionButton button) || !button.Held || button.Pending
-                || consumed != null && input.Find(consumed) == button || !Eligible(observer, dispensing, out _))
+            if (!input.Usable || Time.timeScale <= 0f || dispensing.OutputMode(dispenseAction) != DispenseMode.ContinuousOutput
+                || !bindings.ContainsKey(dispensing) || input.Find(dispenseAction) is not { Held: true, Pending: false }
+                || consumed == dispenseAction || !Eligible(observer, dispensing, out _))
             {
                 dispensing = null;
                 scoopReceiver = null;
@@ -460,7 +482,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (performed || Time.time < nextDispense)
                 return;
             performed = scoopReceiver != null ? held != null && held.CarryContainer == scoopReceiver && scoopReceiver.TryScoop(dispensing, held)
-                : dispensing.TryTake(observer, out _);
+                : dispensing.TryTake(observer, DispenseMode.ContinuousOutput, out _);
             nextDispense = Time.time + dispensing.Settings.Interval;
             if (!performed)
                 dispensing = null;
@@ -480,7 +502,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float distance = float.PositiveInfinity;
             if (allowDeposit && group == null)
                 foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                    if (Pending(pair, requested, allowed) && pair.Key is ObjectContainer candidate && candidate.CanStore(held)
+                    if (pair.Key is ObjectContainer candidate && Pending(pair, requested, allowed) != null && candidate.CanStore(held)
                         && Eligible(observer, candidate, out float score) && Nearer(candidate, container, score, distance))
                     {
                         container = candidate;
@@ -494,7 +516,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Throw wins simultaneous Drop/Throw requests; using one action for Grab and Drop provides a toggle.
             ObjectRelease selected = null;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (Pending(pair, requested, allowed) && pair.Key is ObjectRelease release && release.Available(InteractionChannels.Release)
+                if (pair.Key is ObjectRelease release && Pending(pair, requested, allowed) != null && release.Available(InteractionChannels.Release)
                     && release.Grab == held && (selected == null || release.Kind == SingleInteractionKind.Throw))
                     selected = release;
             if (selected == null)
@@ -515,39 +537,43 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool Grab(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed)
         {
             // Selection and commitment are shared with the dispenser's nearer-pickup arbitration.
-            return TakePickup(observer, FindPickup(observer, requested, allowed));
+            ObjectInteraction selected = FindPickup(observer, requested, allowed, out InteractionButton button);
+            return TakePickup(observer, selected, button);
         }
 
         /// <summary>Finds an eligible pickup, optionally restricting it to grabs nearer than a competing dispenser.</summary>
         /// <param name="observer">Player, camera and current targeting context.</param>
         /// <param name="requested">Optional dialogue button restricting this pass.</param>
         /// <param name="allowed">Interaction types permitted to claim the input.</param>
+        /// <param name="selectedButton">Input route selected for the winning pickup.</param>
         /// <param name="competing">Dispenser button that must share the pickup's physical press, or null for ordinary selection.</param>
         /// <param name="maximumDistance">Exclusive squared distance limit supplied by the dispenser's visible surface.</param>
         /// <returns>The preferred eligible pickup, or null when none can claim this press.</returns>
         private ObjectInteraction FindPickup(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed,
-            InteractionButton competing = null, float maximumDistance = float.PositiveInfinity)
+            out InteractionButton selectedButton, InteractionButton competing = null, float maximumDistance = float.PositiveInfinity)
         {
             // Only one eligible feature can claim the empty carry slot for this input event.
             ObjectInteraction selected = null;
+            selectedButton = null;
             float distance = float.PositiveInfinity;
             foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
             {
-                if (!Pending(pair, requested, allowed) || pair.Key.transform.IsChildOf(observer.Player)
-                    || competing != null && (pair.Key is not ObjectGrab || !pair.Value.SharesPress(competing)))
+                if (Pending(pair, requested, allowed) is not InteractionButton button || pair.Key.transform.IsChildOf(observer.Player)
+                    || competing != null && (pair.Key is not ObjectGrab || !button.SharesPress(competing)))
                     continue;
                 float score = float.PositiveInfinity;
                 bool eligible = pair.Key switch
                 {
                     ObjectGrab grab => retrieval.Contains(grab) ? retrieval.Eligible(grab, observer, targeting, out score)
                         : grab.Available(InteractionChannels.Grab) && !grab.IsHeld && Eligible(observer, grab, out score),
-                    ObjectDispenser dispenser => dispenser.Settings.Mode == DispenseMode.ToHand && dispenser.CanTake() && Eligible(observer, dispenser, out score),
+                    ObjectDispenser dispenser => dispenser.OutputMode(button.Id) == DispenseMode.ToHand && dispenser.CanTake() && Eligible(observer, dispenser, out score),
                     ObjectAssemblyProduct product => product.Pickup.Eligible(observer, targeting, out score),
                     _ => false
                 };
                 if (eligible && score < maximumDistance && PreferPickup(pair.Key, selected, score, distance))
                 {
                     selected = pair.Key;
+                    selectedButton = button;
                     distance = score;
                 }
             }
@@ -557,21 +583,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Commits the selected pickup without rerunning geometry queries or changing its input priority.</summary>
         /// <param name="observer">Player receiving the selected object.</param>
         /// <param name="selected">Eligible grab, assembly product or direct-to-hand dispenser.</param>
+        /// <param name="button">Input route selected for this pickup.</param>
         /// <returns>True when the carry slot or prolonged assembly request was acquired.</returns>
-        private bool TakePickup(HoverObserver observer, ObjectInteraction selected)
+        private bool TakePickup(HoverObserver observer, ObjectInteraction selected, InteractionButton button)
         {
             // Each pickup family retains its own atomic ownership and rollback behavior.
             switch (selected)
             {
                 case ObjectAssemblyProduct product when product.Settings.ProlongedAssembly:
-                    return assembly.Begin(product.Pickup, bindings[product], observer);
+                    return assembly.Begin(product.Pickup, button, observer);
                 case ObjectAssemblyProduct product when product.Pickup.Execute(observer, out ObjectGrab carried):
                     held = carried;
                     return true;
                 case ObjectGrab grab when retrieval.Release(grab) && grab.Begin(observer):
                     held = grab;
                     return true;
-                case ObjectDispenser dispenser when dispenser.TryTake(observer, out ObjectGrab supplied):
+                case ObjectDispenser dispenser when dispenser.TryTake(observer, DispenseMode.ToHand, out ObjectGrab supplied):
                     held = supplied;
                     return true;
             }

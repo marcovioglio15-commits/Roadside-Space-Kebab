@@ -15,6 +15,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [Tooltip("Sample hierarchy matching the root selected in Tools. It is not stored in the animation asset.")]
         [SerializeField]
         private GameObject hierarchySource;
+        private bool setupOpen = true;
+        private bool tracksOpen = true;
 
         #endregion
 
@@ -37,46 +39,78 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (EditorUtility.IsPersistent(target)
                 && StudioButton.Draw(new GUIContent("Open Animation Editor", "Edit this preset in its own Apply/Discard window.")))
                 PlayerToolAnimationWindow.Open((PlayerToolAnimationPreset)target, hierarchySource != null ? hierarchySource.transform : null);
-            hierarchySource = (GameObject)StudioGUI.ObjectField(new GUIContent("Hierarchy Source",
-                "Use the same hierarchy root selected by the Tools preset."), hierarchySource, typeof(GameObject), true);
+            using EditorGUI.DisabledScope editing = new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode);
             serializedObject.Update();
-            StudioGUI.PropertyField(serializedObject.FindProperty("Duration"));
-            SerializedProperty tracks = serializedObject.FindProperty("Tracks");
-            StudioArrayGUI.Add(tracks, "Add Track", () => new PlayerToolTrack());
+            if (PlayerToolFields.Section(ref setupOpen, "Animation Setup", "Duration and hierarchy used by this animation."))
+            {
+                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                hierarchySource = (GameObject)StudioGUI.ObjectField(new GUIContent("Hierarchy Source",
+                    "Use the same hierarchy root selected by the Tools preset."), hierarchySource, typeof(GameObject), true);
+                PlayerToolFields.Scalar(serializedObject.FindProperty("Duration"));
+            }
+            if (PlayerToolFields.Section(ref tracksOpen, "Tracks", "Transform targets and their timed keys."))
+                DrawTracks(serializedObject.FindProperty("Tracks"));
+            serializedObject.ApplyModifiedProperties();
+            if (!((PlayerToolAnimationPreset)target).TryValidate(out string warning))
+                EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
+        }
+
+        /// <summary>Lists each track by target and draws only the expanded tracks.</summary>
+        /// <param name="tracks">Animation track array.</param>
+        private void DrawTracks(SerializedProperty tracks)
+        {
+            using EditorGUI.IndentLevelScope listIndent = new EditorGUI.IndentLevelScope();
+            Transform root = hierarchySource != null ? hierarchySource.transform : null;
+            bool allowRoot = hierarchySource != null && hierarchySource.GetComponent<PlayerHost>() == null;
             // Each track resolves only once at runtime; no manual path field is exposed here.
             for (int index = 0; index < tracks.arraySize; index++)
             {
                 SerializedProperty track = tracks.GetArrayElementAtIndex(index);
-                if (StudioArrayGUI.Header(tracks, index, new GUIContent("Track " + (index + 1), "Local transform keys for one hierarchy target.")))
+                SerializedProperty path = track.FindPropertyRelative("Path");
+                string route = path.stringValue;
+                string targetName = route.Length == 0 ? "Hierarchy Root" : route.Substring(route.LastIndexOf('/') + 1);
+                if (StudioArrayGUI.Header(tracks, index, new GUIContent($"{index + 1}. {targetName}", route)))
                     break;
                 if (!track.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
-                PlayerHierarchyMenu.DrawPath(track.FindPropertyRelative("Path"), hierarchySource != null ? hierarchySource.transform : null,
-                    new GUIContent("Target", track.FindPropertyRelative("Path").tooltip), hierarchySource != null && hierarchySource.GetComponent<PlayerHost>() == null);
+                using EditorGUI.IndentLevelScope trackIndent = new EditorGUI.IndentLevelScope();
+                PlayerHierarchyMenu.DrawPath(path, root, new GUIContent("Target", path.tooltip), allowRoot);
                 StudioFields.Draw(track, "Space", "RelativeToStart");
                 SerializedProperty keys = track.FindPropertyRelative("Keys");
-                StudioArrayGUI.Add(keys, "Add Key", () => new PlayerToolKey());
-                for (int key = 0; key < keys.arraySize; key++)
-                {
-                    if (StudioArrayGUI.Header(keys, key, new GUIContent("Key " + (key + 1), keys.tooltip)))
-                        break;
-                    if (!keys.GetArrayElementAtIndex(key).isExpanded)
-                        continue;
-                    SerializedProperty frame = keys.GetArrayElementAtIndex(key);
-                    StudioFields.Draw(frame, "Time", "RotationDirection");
-                    PlayerToolFields.Pose(frame.FindPropertyRelative("Pose"));
-                    Transform animated = PlayerHierarchy.Resolve(hierarchySource != null ? hierarchySource.transform : null,
-                        track.FindPropertyRelative("Path").stringValue);
-                    using (new EditorGUI.DisabledScope(animated == null))
-                        if (StudioButton.Draw(new GUIContent("Read Current Pose", "Capture the selected target in the track's coordinate space. Start-relative tracks capture an identity offset.")))
-                            frame.FindPropertyRelative("Pose").boxedValue = track.FindPropertyRelative("RelativeToStart").boolValue
-                                ? PlayerToolPose.Identity : PlayerToolPose.Read(animated, (PlayerToolSpace)track.FindPropertyRelative("Space").enumValueIndex);
-                }
+                keys.isExpanded = StudioArrayGUI.Foldout(keys, new GUIContent($"Keys ({keys.arraySize})", keys.tooltip));
+                if (keys.isExpanded)
+                    DrawKeys(keys, track, PlayerHierarchy.Resolve(root, path.stringValue));
             }
-            serializedObject.ApplyModifiedProperties();
-            if (!((PlayerToolAnimationPreset)target).TryValidate(out string warning))
-                EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
+            StudioArrayGUI.Add(tracks, "Add Track", () => new PlayerToolTrack());
+        }
+
+        /// <summary>Shows key times in the list and resolves capture against the current track target.</summary>
+        /// <param name="keys">Transform key array.</param>
+        /// <param name="track">Track supplying the coordinate space and offset mode.</param>
+        /// <param name="animated">Target in the sample hierarchy, if resolved.</param>
+        private static void DrawKeys(SerializedProperty keys, SerializedProperty track, Transform animated)
+        {
+            using EditorGUI.IndentLevelScope listIndent = new EditorGUI.IndentLevelScope();
+            // Resolve the hierarchy once per expanded track, even when several keys are open.
+            for (int index = 0; index < keys.arraySize; index++)
+            {
+                SerializedProperty frame = keys.GetArrayElementAtIndex(index);
+                SerializedProperty time = frame.FindPropertyRelative("Time");
+                if (StudioArrayGUI.Header(keys, index, new GUIContent($"Key {index + 1} · {time.floatValue:0.###} s", keys.tooltip)))
+                    break;
+                if (!frame.isExpanded)
+                    continue;
+                using EditorGUI.IndentLevelScope keyIndent = new EditorGUI.IndentLevelScope();
+                PlayerToolFields.Scalar(time);
+                StudioFields.Draw(frame, "RotationDirection");
+                SerializedProperty pose = frame.FindPropertyRelative("Pose");
+                PlayerToolFields.Pose(pose);
+                using (new EditorGUI.DisabledScope(animated == null))
+                    if (StudioButton.Draw(new GUIContent("Read Current Pose", "Capture this target in the track's coordinate space. Relative tracks capture an identity offset.")))
+                        pose.boxedValue = track.FindPropertyRelative("RelativeToStart").boolValue
+                            ? PlayerToolPose.Identity : PlayerToolPose.Read(animated, (PlayerToolSpace)track.FindPropertyRelative("Space").enumValueIndex);
+            }
+            StudioArrayGUI.Add(keys, "Add Key", () => new PlayerToolKey());
         }
 
         #endregion

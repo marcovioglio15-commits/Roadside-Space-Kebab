@@ -9,7 +9,7 @@ namespace CatOnASkateboard.PlayerStudio
         #region State
 
         private readonly PlayerToolVisualPool visuals;
-        private readonly float[] lifetimes;
+        private readonly double[] deadlines;
         private readonly float lifetime;
         private int active;
         private bool disposed;
@@ -34,7 +34,7 @@ namespace CatOnASkateboard.PlayerStudio
         internal PlayerToolEffectPool(PlayerToolVisualPool pool, int capacity, float duration)
         {
             visuals = pool;
-            lifetimes = new float[capacity];
+            deadlines = new double[capacity];
             lifetime = duration;
         }
 
@@ -62,34 +62,30 @@ namespace CatOnASkateboard.PlayerStudio
             if (!visuals.HasSpace)
             {
                 int oldest = 0;
-                for (int index = 1; index < lifetimes.Length; index++)
-                    if (lifetimes[index] < lifetimes[oldest])
+                for (int index = 1; index < deadlines.Length; index++)
+                    if (deadlines[index] < deadlines[oldest])
                         oldest = index;
                 visuals.Return(oldest);
-                lifetimes[oldest] = 0f;
-                active--;
             }
+            else
+                active++;
             int slot = visuals.Rent(position, rotation, scale, parent);
-            lifetimes[slot] = lifetime;
-            active++;
+            deadlines[slot] = Time.timeAsDouble + lifetime;
         }
 
         /// <summary>Updates occupied lifetimes only while at least one effect is visible.</summary>
-        /// <param name="delta">Scaled physics interval.</param>
-        internal void Advance(float delta)
+        /// <param name="now">Scaled frame time.</param>
+        internal void Advance(double now)
         {
             if (disposed || active == 0)
                 return;
-            // Attached effects follow existing transforms without a per-frame position update.
-            for (int index = 0; index < lifetimes.Length; index++)
-                if (lifetimes[index] > 0f)
+            // Compare against emission time so short lifetimes do not round to a physics tick.
+            for (int index = 0; index < deadlines.Length; index++)
+                if (deadlines[index] > 0d && deadlines[index] <= now)
                 {
-                    lifetimes[index] -= delta;
-                    if (lifetimes[index] <= 0f)
-                    {
-                        visuals.Return(index);
-                        active--;
-                    }
+                    deadlines[index] = 0d;
+                    visuals.Return(index);
+                    active--;
                 }
         }
 

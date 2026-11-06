@@ -14,12 +14,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Player Tool")]
-        [Tooltip("All leaves tool selection unrestricted. None requires no active tool. Specific and Selection accept the chosen tool assets.")]
+        [Tooltip("All leaves tool selection unrestricted. None requires no active tool. Specific and Selection also accept Use Tool from the chosen tools.")]
         public InteractionToolMode Mode;
         [Tooltip("Tool that must be active for this interaction.")]
         public PlayerTool Tool;
         [Tooltip("Any one of these tools may activate this interaction.")]
         public PlayerTool[] Tools = Array.Empty<PlayerTool>();
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Whether this restriction explicitly identifies tools that can supply a second input route.</summary>
+        internal bool HasExplicitTools => Mode is InteractionToolMode.Specific or InteractionToolMode.Selection;
 
         #endregion
 

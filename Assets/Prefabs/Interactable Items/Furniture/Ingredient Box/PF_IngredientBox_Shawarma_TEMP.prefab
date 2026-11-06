@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 746817314116535194}
   - component: {fileID: 8013964568907177101}
   m_Layer: 0
-  m_Name: PF_IngredientBox_Shawarma_Temp
+  m_Name: PF_IngredientBox_Shawarma_TEMP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -103,8 +103,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
   interactionName: Dispenser
   toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
+    Mode: 2
+    Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
     Tools: []
   flagChange:
     Enabled: 0
@@ -136,12 +136,19 @@ MonoBehaviour:
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 3974403703203748344, guid: 536ae3a8429f3e447bb8cd6f50472260, type: 3}
+    ScoopFlag: {fileID: 0}
     Unlimited: 0
     Stock: 10
-    Mode: 2
+    DestroyWhenEmpty: 0
+    Mode: 0
+    SeparateToolOutput: 1
+    ToolMode: 2
     Interval: 0.25
+    OutputsPerShot: 5
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 0.2
     Outlets:
-    - Position: {x: 0, y: 0.5, z: 0.25}
+    - Position: {x: 0.006, y: 0.375, z: 0.447}
       Rotation: {x: 0, y: 0, z: 0}
     PickupDuration: 0.35
     OutputRotation: {x: 0, y: 0, z: 0}
@@ -155,6 +162,10 @@ MonoBehaviour:
           UpdateCollider: 0
         Materials: []
         Visibility: []
+      Flags:
+        Mode: 0
+        Flags: []
+        Remove: []
     - Count: 5
       Appearance:
         Meshes:
@@ -163,6 +174,10 @@ MonoBehaviour:
           UpdateCollider: 0
         Materials: []
         Visibility: []
+      Flags:
+        Mode: 0
+        Flags: []
+        Remove: []
     - Count: 8
       Appearance:
         Meshes:
@@ -171,6 +186,10 @@ MonoBehaviour:
           UpdateCollider: 0
         Materials: []
         Visibility: []
+      Flags:
+        Mode: 0
+        Flags: []
+        Remove: []
     - Count: 10
       Appearance:
         Meshes: []
@@ -178,6 +197,10 @@ MonoBehaviour:
         Visibility:
         - Path: SM_ShawarmaStack_1Full
           Visible: 0
+      Flags:
+        Mode: 0
+        Flags: []
+        Remove: []
 --- !u!114 &6841947802560516959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,7 +235,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -368,17 +390,38 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    Mode: 1
     AllowedFlags:
     - {fileID: 11400000, guid: 7543dcca76d2627419ed9abf1e3b8f76, type: 2}
     Match: 0
     Unlimited: 0
     Capacity: 10
     LimitToDispenserSpace: 1
-    Mode: 1
     KeepVisible: 0
     Position: {x: 0, y: 0, z: 0}
     Rotation: {x: 0, y: 0, z: 0}
     Spacing: {x: 0, y: 0.2, z: 0}
+    InitialFill: 0
+    ScoopAnimation:
+      Enabled: 0
+      Mode: 0
+      Approach:
+        Id: dispenser-approach
+        Name: Dispenser Approach
+        Space: 0
+        Position: {x: 0, y: 0, z: 0}
+        Rotate: 0
+        Rotation: {x: 0, y: 0, z: 0}
+        Duration: 0.3
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      Keyframes: []
+      FillAfter: 
+      ReturnToStart: 1
+      ReturnDuration: 0.3
+      ObstacleMargin: 1
+      VisualPath: 
     FillSteps: []
 --- !u!114 &8013964568907177101
 MonoBehaviour:

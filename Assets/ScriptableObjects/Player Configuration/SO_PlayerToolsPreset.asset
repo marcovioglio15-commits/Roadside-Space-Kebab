@@ -20,14 +20,14 @@ MonoBehaviour:
     MaximumRotationLag: 10
     Path: 
     IdleEnabled: 1
-    Idle: {fileID: 11400000, guid: b7062ae87c9e4474b8fbe2d80c490a11, type: 2}
+    Idle: {fileID: 11400000, guid: 88d9ee6568c08174d9e86abfc5ed99b1, type: 2}
   SingleTool: 1
   Tools:
   - Tool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}
     MoveVisual: 0
-    Path: PF_PlayerArmTest_Visual/Tool_A
+    Path: PF_ShotgunBlockout
     PassivePose:
-      Position: {x: 0, y: 0.69, z: 0}
+      Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
   InitialTool: {fileID: 11400000, guid: c2b05c5a638c0fa44aa37aed41b430b6, type: 2}

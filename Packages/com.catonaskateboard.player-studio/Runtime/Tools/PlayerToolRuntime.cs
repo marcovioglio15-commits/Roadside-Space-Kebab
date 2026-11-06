@@ -199,45 +199,75 @@ namespace CatOnASkateboard.PlayerStudio
                 remainingShots = magazine.CanFire ? remainingShots - 1 : 0;
                 nextShot = Time.time + tool.Weapon.ShotInterval;
                 autoReloadPending |= tool.ReloadEnabled && tool.AutoReload && !magazine.CanFire;
-                effects.Emit(position, rotation);
                 if (tool.Weapon.Mode == PlayerToolWeaponMode.CursorInteraction)
                     FireCursor(position, rotation);
+                else
+                    effects.Emit(position, rotation);
             }
             else
                 remainingShots = 0;
             aim?.FinishShotAlignment();
         }
 
-        /// <summary>Captures the exact pointer contact after camera following without allocating a projectile.</summary>
+        /// <summary>Uses the same cursor ray for shot effects and any captured contact.</summary>
         /// <param name="position">Current world muzzle position.</param>
-        /// <param name="rotation">Current positive-Z shot orientation.</param>
+        /// <param name="rotation">Muzzle orientation retained when the cursor ray is unavailable.</param>
         private void FireCursor(Vector3 position, Quaternion rotation)
         {
-            if (camera == null || !camera.isActiveAndEnabled || !PlayerToolPointer.TryRay(camera.View, out Ray ray))
+            RaycastHit contact = default;
+            Camera view = camera != null && camera.isActiveAndEnabled ? camera.View : null;
+            Vector3 direction = rotation * Vector3.forward;
+            // Aim the burst from the muzzle to the exact hit, or toward the ray's endpoint on a miss.
+            if (PlayerToolPointer.TryRay(view, out Ray ray))
+            {
+                Physics.SyncTransforms();
+                float distance = Mathf.Min(tool.Weapon.Distance, view.farClipPlane - view.nearClipPlane);
+                Vector3 endpoint = physics.CastPointer(ray, distance, tool.Weapon.Layers.value & view.cullingMask,
+                    tool.Weapon.HitTriggers, out contact) ? contact.point : ray.GetPoint(distance);
+                Vector3 travel = endpoint - position;
+                // A carried surface can be closer than the muzzle. Keep the effect facing the camera ray.
+                Vector3 shot = Vector3.Dot(travel, ray.direction) > 0.001f ? travel.normalized : ray.direction;
+                rotation = Quaternion.FromToRotation(direction, shot) * rotation;
+                direction = shot;
+            }
+            effects.Emit(position, rotation);
+            // Only a real hit reaches impact playback and interaction arbitration.
+            if (contact.collider == null)
                 return;
-            // A screen ray uses the same culling and collision layers as the visible weapon target.
-            Physics.SyncTransforms();
-            if (!physics.Cast(ray.origin, ray.direction, Mathf.Min(tool.Weapon.Distance, camera.View.farClipPlane - camera.View.nearClipPlane), 0f,
-                tool.Weapon.Layers.value & camera.View.cullingMask, tool.Weapon.HitTriggers, out RaycastHit contact))
-                return;
-            Vector3 direction = contact.point - position;
-            PlayerTools.PublishCursorUse(new PlayerToolHit(owner, tool, owner.UseActionId, true, contact, position,
-                direction.sqrMagnitude > 0.000001f ? direction.normalized : rotation * Vector3.forward,
-                tool.Weapon.Speed, true, tool.Weapon.IgnoreInteractionRange));
+            PlayerToolHit hit = new PlayerToolHit(owner, tool, owner.UseActionId, true, contact, position, direction,
+                tool.Weapon.Speed, true, tool.Weapon.IgnoreInteractionRange);
+            if (tool.Weapon.ImpactOnCursorContact)
+                EmitCursorImpact(hit);
+            physics.DispatchImpact(tool.Weapon, hit, tool.Weapon.Layers.value & view.cullingMask);
         }
 
-        /// <summary>Shows impact feedback only after an interaction accepts this cursor contact.</summary>
+        /// <summary>Plays deferred feedback when an interaction accepts the cursor contact.</summary>
         /// <param name="hit">Captured cursor shot confirmed by the interaction package.</param>
         internal void ConfirmCursorHit(PlayerToolHit hit)
+        {
+            // Immediate feedback already played before interaction arbitration.
+            if (!tool.Weapon.ImpactOnCursorContact)
+                EmitCursorImpact(hit);
+        }
+
+        /// <summary>Spawns the pooled impact from the original cursor raycast.</summary>
+        /// <param name="hit">Cursor shot with its recorded contact and travel direction.</param>
+        private void EmitCursorImpact(PlayerToolHit hit)
         {
             effects?.Impacts.Emit(hit.Origin, hit.Contact.point, hit.Contact.normal, hit.Direction);
         }
 
-        /// <summary>Advances projectiles even while another tool is selected.</summary>
+        /// <summary>Expires visual bursts before the current frame presents new shots.</summary>
+        /// <param name="now">Scaled frame time.</param>
+        internal void AdvanceEffects(double now)
+        {
+            effects?.Advance(now);
+        }
+
+        /// <summary>Advances projectile physics even while another tool is selected.</summary>
         /// <param name="delta">Scaled physics step.</param>
         internal void Simulate(float delta)
         {
-            effects?.Advance(delta);
             projectiles?.Advance(delta);
         }
 

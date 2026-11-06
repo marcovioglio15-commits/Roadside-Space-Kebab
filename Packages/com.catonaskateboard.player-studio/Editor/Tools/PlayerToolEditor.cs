@@ -17,6 +17,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         [Tooltip("Whether the player used to open this Inspector supports tool switching.")]
         [SerializeField]
         private bool switching = true;
+        private readonly PlayerToolWeaponControls weaponControls = new PlayerToolWeaponControls();
+        private bool setupOpen = true;
+        private bool useOpen = true;
+        private bool weaponOpen = true;
+        private bool reloadOpen = true;
+        private bool switchOpen;
 
         #endregion
 
@@ -51,36 +57,61 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             if (EditorUtility.IsPersistent(target)
                 && StudioButton.Draw(new GUIContent("Open Tool Editor", "Edit a detached tool proposal with independent Apply and Discard.")))
                 Open((PlayerTool)target, hierarchySource != null ? hierarchySource.transform : null, switching);
-            hierarchySource = (GameObject)StudioFieldGUI.ObjectField(new GUIContent("Hierarchy Source",
-                "Choose the same root used by Tools, so animation, muzzle and aim paths match."), hierarchySource, typeof(GameObject), true);
-            StudioFields.Draw(serializedObject, "DisplayName");
-            Animation("UseAnimation");
-            StudioFields.Draw(serializedObject, "UseInterval", "IsWeapon");
-            if (serializedObject.FindProperty("IsWeapon").boolValue)
-                PlayerToolWeaponControls.Draw(serializedObject, (PlayerTool)target, hierarchySource);
-            StudioFields.Draw(serializedObject, "ReloadEnabled");
-            if (serializedObject.FindProperty("IsWeapon").boolValue)
+            using EditorGUI.DisabledScope editing = new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode);
+            // Sections share the draft while keeping unrelated controls out of the way.
+            if (PlayerToolFields.Section(ref setupOpen, "Tool Setup", "Name the tool and choose the sample hierarchy."))
+                Setup();
+            if (PlayerToolFields.Section(ref useOpen, "Use", "Animation and cooldown for each accepted use."))
             {
-                StudioFields.Draw(serializedObject, "LimitedMagazine");
-                if (serializedObject.FindProperty("LimitedMagazine").boolValue)
-                    StudioFields.Draw(serializedObject, "MagazineSize");
+                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                Animation("UseAnimation");
+                StudioFields.Draw(serializedObject, "UseInterval");
             }
-            if (serializedObject.FindProperty("ReloadEnabled").boolValue)
+            SerializedProperty weapon = serializedObject.FindProperty("IsWeapon");
+            if (PlayerToolFields.Section(ref weaponOpen, "Weapon", "Firing, effects and aiming settings."))
+            {
+                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                if (PlayerToolFields.Toggle(weapon))
+                    weaponControls.Draw(serializedObject, (PlayerTool)target, hierarchySource);
+            }
+            if (PlayerToolFields.Section(ref reloadOpen, "Reload", "Magazine size, automatic reload and the animation sequence."))
                 Reload();
             // Shared tool assets retain switch clips for players that use multiple tools.
-            if (switching)
+            if (switching && PlayerToolFields.Section(ref switchOpen, "Switch Animations", "Optional animations when selecting and leaving this tool."))
             {
+                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
                 Animation("SwitchIn");
                 Animation("SwitchOut");
             }
             serializedObject.ApplyModifiedProperties();
-            if (!((PlayerTool)target).TryValidate(false, out string warning))
+            if (!((PlayerTool)target).TryValidate(switching, out string warning))
                 EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
+        }
+
+        /// <summary>Edits the tool name and the local hierarchy sample used by its child editors.</summary>
+        private void Setup()
+        {
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            SerializedProperty name = serializedObject.FindProperty("DisplayName");
+            string editedName = StudioFieldGUI.TextField(PlayerToolFields.Label(name), name.stringValue);
+            if (editedName != name.stringValue)
+                name.stringValue = editedName;
+            hierarchySource = (GameObject)StudioFieldGUI.ObjectField(new GUIContent("Hierarchy Source",
+                "Choose the same root used by Tools, so animation, muzzle and aim paths match."), hierarchySource, typeof(GameObject), true);
         }
 
         /// <summary>Draws the automatic reload option and ordered animation steps when reload is enabled.</summary>
         private void Reload()
         {
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            bool enabled = PlayerToolFields.Toggle(serializedObject.FindProperty("ReloadEnabled"));
+            // Keep an invalid saved magazine visible so it can be turned off.
+            if (serializedObject.FindProperty("IsWeapon").boolValue
+                && (enabled || serializedObject.FindProperty("LimitedMagazine").boolValue)
+                && PlayerToolFields.Toggle(serializedObject.FindProperty("LimitedMagazine")))
+                StudioFields.Draw(serializedObject, "MagazineSize");
+            if (!enabled)
+                return;
             // Automatic and manual reload share the same animation combo.
             StudioFields.Draw(serializedObject, "AutoReload");
             SerializedProperty steps = serializedObject.FindProperty("ReloadCombo");
@@ -91,7 +122,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     break;
                 if (!steps.GetArrayElementAtIndex(index).isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using EditorGUI.IndentLevelScope stepIndent = new EditorGUI.IndentLevelScope();
                 PlayerToolFields.Animation(steps.GetArrayElementAtIndex(index), hierarchySource != null ? hierarchySource.transform : null,
                     new GUIContent("Animation", steps.tooltip));
             }

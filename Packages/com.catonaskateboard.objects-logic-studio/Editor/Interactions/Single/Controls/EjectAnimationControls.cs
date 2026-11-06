@@ -46,10 +46,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Connection(SerializedProperty property)
         {
             ObjectTriggerAnimation current = Resolve(property.stringValue);
-            Rect rect = EditorGUILayout.GetControlRect();
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Scene Animation", "Select the exact animation from a loaded gameplay scene; its identity is safe to store in a prefab."));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
             StudioFieldMenu.Context(rect, property);
             using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("Scene Animation", "Select the exact animation from a loaded gameplay scene; its identity is safe to store in a prefab."));
+            rect = field.ValueRect(rect);
             string label = current != null ? current.gameObject.scene.name + " / " + current.name + " / " + current.InteractionName
                 : string.IsNullOrEmpty(property.stringValue) ? "Select Animation" : "Selected animation is not loaded";
             if (EditorGUI.DropdownButton(rect, new GUIContent(label), FocusType.Keyboard))

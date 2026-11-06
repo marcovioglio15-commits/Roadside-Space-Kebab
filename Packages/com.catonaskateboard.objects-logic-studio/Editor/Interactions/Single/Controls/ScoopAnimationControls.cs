@@ -123,7 +123,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     selected = index + offset;
             }
             EditorGUI.BeginChangeCheck();
-            selected = EditorGUILayout.Popup(new GUIContent("Apply Fill After", marker.tooltip), selected, labels);
+            selected = StudioFieldGUI.Popup(new GUIContent("Apply Fill After", marker.tooltip), selected, labels);
             if (EditorGUI.EndChangeCheck())
                 marker.stringValue = selected == 0 ? string.Empty : selected < offset ? approach.FindPropertyRelative("Id").stringValue
                     : frames.GetArrayElementAtIndex(selected - offset).FindPropertyRelative("Id").stringValue;

@@ -34,7 +34,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!sections.Draw("Ambient sound", "Pick the sound to play.", settings, "Event"))
                 return;
             using StudioIndentScope sectionContent2 = new StudioIndentScope();
-            Rect rect = EditorGUI.PrefixLabel(EditorGUILayout.GetControlRect(), new GUIContent("Event", selected.tooltip));
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Event", selected.tooltip));
+            Rect rect = field.ValueRect(field.GetRect(EditorGUIUtility.singleLineHeight));
             if (GUI.Button(rect, selected.stringValue, EditorStyles.popup))
                 Menu(selected, rect);
         }

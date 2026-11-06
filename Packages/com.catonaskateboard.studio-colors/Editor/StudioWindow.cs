@@ -87,6 +87,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             Toolbar toolbar = new Toolbar();
             toolbar.style.flexWrap = Wrap.Wrap;
             toolbar.style.height = StyleKeyword.Auto;
+            toolbar.style.flexShrink = 0f;
             selector = new ObjectField { objectType = PresetType, value = session.Source, allowSceneObjects = false, tooltip = "Select the preset to edit." };
             StudioFieldMenu.Attach(selector, value => value == null || PresetType.IsInstanceOfType(value) && EditorUtility.IsPersistent(value));
             selector.style.flexGrow = 1f;
@@ -97,36 +98,66 @@ namespace CatOnASkateboard.StudioColors.Editor
             toolbar.Add(ActionButton("Duplicate", "Copy the selected preset to a new asset.", () => CreatePreset(true)));
             rootVisualElement.Add(toolbar);
 
+            if (Tabs.Length > 1)
+                DrawTabs();
+            ScrollView content = new ScrollView(ScrollViewMode.Vertical);
+            content.style.flexGrow = 1f;
+            content.style.flexShrink = 1f;
+            content.style.flexBasis = 0f;
+            content.style.minHeight = 0f;
+            content.style.paddingLeft = 6f;
+            content.style.paddingRight = 6f;
+            content.Add(new IMGUIContainer(() => DrawContent(content.contentViewport.contentRect.width)));
+            rootVisualElement.Add(content);
+
+            BuildFooter();
+            RefreshActions();
+        }
+
+        /// <summary>Adds page navigation when the window has more than one settings page.</summary>
+        private void DrawTabs()
+        {
+            // Keep navigation outside the scrolling fields.
             VisualElement tabs = new VisualElement();
             tabs.style.flexDirection = FlexDirection.Row;
             tabs.style.flexWrap = Wrap.Wrap;
+            tabs.style.flexShrink = 0f;
             for (int index = 0; index < Tabs.Length; index++)
             {
                 int requested = index;
                 tabs.Add(ActionButton(Tabs[index], "Show " + Tabs[index] + ".", () => { tab = requested; Repaint(); }));
             }
             rootVisualElement.Add(tabs);
-            ScrollView content = new ScrollView(ScrollViewMode.Vertical);
-            content.style.flexGrow = 1f;
-            content.style.minHeight = 0f;
-            content.style.paddingLeft = 6f;
-            content.style.paddingRight = 6f;
-            content.Add(new IMGUIContainer(DrawContent));
-            rootVisualElement.Add(content);
+        }
 
-            // Status wraps above actions; long forms cannot push Apply off screen.
-            status = new Label { tooltip = "Current validation or operation result." };
-            status.style.whiteSpace = WhiteSpace.Normal;
-            rootVisualElement.Add(status);
+        /// <summary>Reserves a padded action row and keeps long status messages available on hover.</summary>
+        private void BuildFooter()
+        {
+            // Only the form can shrink when its foldouts grow or the window gets shorter.
             VisualElement footer = new VisualElement();
-            footer.style.flexDirection = FlexDirection.Row;
+            footer.style.flexShrink = 0f;
+            footer.style.paddingLeft = footer.style.paddingRight = 6f;
+            footer.style.paddingTop = footer.style.paddingBottom = 5f;
+            status = new Label { tooltip = "Current validation or operation result." };
+            status.style.height = 18f;
+            status.style.flexShrink = 0f;
+            status.style.whiteSpace = WhiteSpace.NoWrap;
+            status.style.overflow = Overflow.Hidden;
+            status.style.textOverflow = TextOverflow.Ellipsis;
+            footer.Add(status);
+
+            VisualElement actions = new VisualElement();
+            actions.style.flexDirection = FlexDirection.Row;
+            actions.style.flexShrink = 0f;
             apply = ActionButton("Apply", "Validate and save this proposal to the selected asset.", SaveChanges);
             discard = ActionButton("Discard", "Reload the source preset and discard pending edits.", DiscardChanges);
             apply.style.flexGrow = discard.style.flexGrow = 1f;
-            footer.Add(apply);
-            footer.Add(discard);
+            apply.style.flexBasis = discard.style.flexBasis = 0f;
+            apply.style.minHeight = discard.style.minHeight = 26f;
+            actions.Add(apply);
+            actions.Add(discard);
+            footer.Add(actions);
             rootVisualElement.Add(footer);
-            RefreshActions();
         }
         #endregion
 
@@ -145,7 +176,8 @@ namespace CatOnASkateboard.StudioColors.Editor
         }
 
         /// <summary>Draws the active tab against a detached serialized draft.</summary>
-        private void DrawContent()
+        /// <param name="width">Available width inside the scrolling editor panel.</param>
+        private void DrawContent(float width)
         {
             // Empty workspaces create no assets until New is clicked.
             if (session.Draft == null)
@@ -153,9 +185,15 @@ namespace CatOnASkateboard.StudioColors.Editor
                 EditorGUILayout.LabelField("Select a preset or create a new one.", EditorStyles.wordWrappedLabel);
                 return;
             }
-            serialized ??= new SerializedObject(session.Draft);
+            using StudioFieldLayout.WidthScope pane = new StudioFieldLayout.WidthScope(width);
+            if (serialized == null || serialized.targetObject != session.Draft)
+            {
+                serialized?.Dispose();
+                serialized = new SerializedObject(session.Draft);
+            }
             serialized.UpdateIfRequiredOrScript();
-            EditorGUILayout.LabelField(Tabs[tab], EditorStyles.boldLabel);
+            if (Tabs.Length > 1)
+                EditorGUILayout.LabelField(Tabs[tab], EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
                 DrawTab(serialized);
@@ -202,8 +240,6 @@ namespace CatOnASkateboard.StudioColors.Editor
             // A clean proposal follows source Undo; unfinished proposals retain conflict protection.
             if (!Pending && session.SourceChanged)
             {
-                serialized?.Dispose();
-                serialized = null;
                 session.Refresh();
                 RefreshActions();
             }
@@ -270,8 +306,6 @@ namespace CatOnASkateboard.StudioColors.Editor
                 SetStatus(string.Join("\n", warnings));
                 return;
             }
-            serialized?.Dispose();
-            serialized = null;
             if (session.Save("Apply " + PresetType.Name, out warning))
             {
                 base.SaveChanges();
@@ -286,8 +320,6 @@ namespace CatOnASkateboard.StudioColors.Editor
         public override void DiscardChanges()
         {
             // Explicit discard also removes the recovery record for this exact asset.
-            serialized?.Dispose();
-            serialized = null;
             session.Discard();
             base.DiscardChanges();
             SetStatus(string.Empty);

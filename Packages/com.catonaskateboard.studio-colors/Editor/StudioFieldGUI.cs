@@ -18,9 +18,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static bool Toggle(GUIContent label, bool value, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.Toggle(rect, label, StudioValueMenu.Edit(rect, label, value));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.Toggle(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value));
         }
 
         /// <summary>Draws a native IntField with typed Copy/Paste support.</summary>
@@ -31,9 +33,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static int IntField(GUIContent label, int value, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.IntField(rect, label, StudioValueMenu.Edit(rect, label, value));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.IntField(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value));
         }
 
         /// <summary>Edits an index through a bounded slider without changing saved data on repaint.</summary>
@@ -46,11 +50,13 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static int IntField(GUIContent label, int value, int minimum, int maximum, params GUILayoutOption[] options)
         {
             // Keep the shared context menu and leave validation to the owning settings.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            value = StudioValueMenu.Edit(rect, label, value);
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            value = StudioValueMenu.Edit(row, label, value);
             EditorGUI.BeginChangeCheck();
-            int selected = EditorGUI.IntSlider(rect, label, value, minimum, maximum);
+            int selected = EditorGUI.IntSlider(rect, layout.InlineLabel, value, minimum, maximum);
             return EditorGUI.EndChangeCheck() ? selected : value;
         }
 
@@ -85,9 +91,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         private static float FloatField(GUIContent label, float value, RangeAttribute range, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return StudioFloatGUI.Draw(rect, label, StudioValueMenu.Edit(rect, label, value), range);
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return StudioFloatGUI.Draw(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value), range);
         }
 
         /// <summary>Draws a transient scalar with visible recommended endpoints and precise numeric entry.</summary>
@@ -99,9 +107,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         /// <returns>The edited scalar without clamping existing data on repaint.</returns>
         public static float FloatField(GUIContent label, float value, float minimum, float maximum, params GUILayoutOption[] options)
         {
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return StudioFloatGUI.Draw(rect, label, StudioValueMenu.Edit(rect, label, value), minimum, maximum);
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return StudioFloatGUI.Draw(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value), minimum, maximum);
         }
 
         /// <summary>Draws a native TextField with typed Copy/Paste support.</summary>
@@ -112,9 +122,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static string TextField(GUIContent label, string value, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.TextField(rect, label, StudioValueMenu.Edit(rect, label, value));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.TextField(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value));
         }
 
         /// <summary>Draws a native Vector2Field with typed Copy/Paste support.</summary>
@@ -125,9 +137,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static Vector2 Vector2Field(GUIContent label, Vector2 value, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.wideMode ? EditorGUIUtility.singleLineHeight : EditorGUIUtility.singleLineHeight * 2f, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.Vector2Field(rect, label, StudioValueMenu.Edit(rect, label, value));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.wideMode ? EditorGUIUtility.singleLineHeight : EditorGUIUtility.singleLineHeight * 2f, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.Vector2Field(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value));
         }
 
         /// <summary>Draws a native Vector3Field with typed Copy/Paste support.</summary>
@@ -138,9 +152,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static Vector3 Vector3Field(GUIContent label, Vector3 value, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.wideMode ? EditorGUIUtility.singleLineHeight : EditorGUIUtility.singleLineHeight * 2f, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.Vector3Field(rect, label, StudioValueMenu.Edit(rect, label, value));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.wideMode ? EditorGUIUtility.singleLineHeight : EditorGUIUtility.singleLineHeight * 2f, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.Vector3Field(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value));
         }
 
         /// <summary>Draws a native ColorField with typed Copy/Paste support.</summary>
@@ -151,9 +167,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static Color ColorField(GUIContent label, Color value, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.ColorField(rect, label, StudioValueMenu.Edit(rect, label, value));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.ColorField(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value));
         }
 
         /// <summary>Draws a native EnumPopup with typed Copy/Paste support.</summary>
@@ -164,9 +182,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static Enum EnumPopup(GUIContent label, Enum value, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.EnumPopup(rect, label, StudioValueMenu.Edit(rect, label, value, result => result != null && result.GetType() == value.GetType()));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.EnumPopup(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value, result => result != null && result.GetType() == value.GetType()));
         }
 
         /// <summary>Draws a native EnumFlagsField with typed Copy/Paste support.</summary>
@@ -177,9 +197,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static Enum EnumFlagsField(GUIContent label, Enum value, params GUILayoutOption[] options)
         {
             // Keep Unity's built-in editing behavior and existing indentation.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.EnumFlagsField(rect, label, StudioValueMenu.Edit(rect, label, value, result => result != null && result.GetType() == value.GetType()));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.EnumFlagsField(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value, result => result != null && result.GetType() == value.GetType()));
         }
 
         /// <summary>Draws a multiline text field with whole-field Copy/Paste.</summary>
@@ -204,9 +226,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static UnityEngine.Object ObjectField(GUIContent label, UnityEngine.Object value, Type type, bool sceneObjects, params GUILayoutOption[] options)
         {
             // Object pickers keep Unity's drag/drop and scene-reference restrictions.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.ObjectField(rect, label, StudioValueMenu.Edit(rect, label, value,
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.ObjectField(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value,
                 result => result == null || type.IsInstanceOfType(result) && (sceneObjects || EditorUtility.IsPersistent(result))), type, sceneObjects);
         }
 
@@ -220,10 +244,12 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static float Slider(GUIContent label, float value, float minimum, float maximum, params GUILayoutOption[] options)
         {
             // Reject an out-of-range paste instead of silently changing its value.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
             EditorGUI.BeginChangeCheck();
-            float edited = StudioFloatGUI.Draw(rect, label, StudioValueMenu.Edit(rect, label, value,
+            float edited = StudioFloatGUI.Draw(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, value,
                 result => result >= minimum && result <= maximum), minimum, maximum);
             return EditorGUI.EndChangeCheck() ? Mathf.Clamp(edited, minimum, maximum) : value;
         }
@@ -237,9 +263,11 @@ namespace CatOnASkateboard.StudioColors.Editor
         public static int Popup(GUIContent label, int selected, GUIContent[] choices, params GUILayoutOption[] options)
         {
             // Serialized enums use their actual enum type through StudioFieldMenu.Next.
-            Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight, options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
-            return EditorGUI.Popup(rect, label, StudioValueMenu.Edit(rect, label, selected,
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight, options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(StudioFieldMenu.NextProperty, label.text));
+            Rect rect = layout.Control(row);
+            return EditorGUI.Popup(rect, layout.InlineLabel, StudioValueMenu.Edit(row, label, selected,
                 result => result >= 0 && result < choices.Length), choices);
         }
 
@@ -253,6 +281,17 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             // GUIContent conversion preserves the existing slash-separated submenu labels.
             return Popup(label, selected, Array.ConvertAll(choices, caption => new GUIContent(caption)), options);
+        }
+
+        /// <summary>Shows a read-only field using the same caption layout as editable settings.</summary>
+        /// <param name="label">Visible field name.</param>
+        /// <param name="value">Value or diagnostic displayed beside the field name.</param>
+        /// <param name="style">Optional style for the read-only text.</param>
+        public static void ReadOnly(string label, string value, GUIStyle style = null)
+        {
+            using StudioFieldLayout layout = new StudioFieldLayout(new GUIContent(label));
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight);
+            EditorGUI.LabelField(layout.Control(row), layout.InlineLabel, new GUIContent(value), style ?? EditorStyles.label);
         }
 
         #endregion
@@ -288,20 +327,22 @@ namespace CatOnASkateboard.StudioColors.Editor
             RangeAttribute range = property.propertyType == SerializedPropertyType.Float ? StudioPropertySchema.Range(property) : null;
             if (range != null)
                 StudioFloatGUI.Decorations(property);
-            Rect rect = EditorGUILayout.GetControlRect(true, range != null ? EditorGUIUtility.singleLineHeight
-                : EditorGUI.GetPropertyHeight(property, label, includeChildren), options);
-            using StudioFieldColors colors = new StudioFieldColors(rect, StudioFieldColors.Key(property));
-            if (Event.current.type == EventType.ContextClick && rect.Contains(Event.current.mousePosition))
+            using StudioFieldLayout layout = new StudioFieldLayout(label);
+            Rect row = layout.GetRect(range != null ? EditorGUIUtility.singleLineHeight
+                : EditorGUI.GetPropertyHeight(property, layout.InlineLabel, includeChildren), options);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(property));
+            Rect rect = layout.Control(row);
+            if (Event.current.type == EventType.ContextClick && row.Contains(Event.current.mousePosition))
             {
                 using SerializedProperty clicked = Row(property, rect, includeChildren);
-                StudioFieldMenu.Context(rect, clicked);
+                StudioFieldMenu.Context(row, clicked);
             }
             if (range != null)
             {
-                StudioFloatGUI.Property(rect, property, label, range);
+                StudioFloatGUI.Property(rect, property, layout.InlineLabel, range);
                 return false;
             }
-            return EditorGUI.PropertyField(rect, property, label, includeChildren);
+            return EditorGUI.PropertyField(rect, property, layout.InlineLabel, includeChildren);
         }
 
         /// <summary>Finds the visible child row underneath a click on an expanded native property.</summary>

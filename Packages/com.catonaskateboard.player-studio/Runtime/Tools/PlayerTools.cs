@@ -59,8 +59,12 @@ namespace CatOnASkateboard.PlayerStudio
         public Guid UseActionId => useActionId;
         /// <summary>Emitted once for each real bullet collision after the bullet returns to its pool.</summary>
         public static event Action<PlayerToolHit> ProjectileHit;
-        /// <summary>Emitted for a cursor weapon contact; the interaction package validates and arbitrates it before confirming impact feedback.</summary>
+        /// <summary>Emitted for a cursor weapon contact so the interaction package can arbitrate it and confirm any deferred feedback.</summary>
         public static event Action<PlayerToolHit> CursorUsed;
+        /// <summary>Reports the primary hit and optional nearby contacts together. The list is valid during the callback.</summary>
+        public static event Action<PlayerToolHit, IReadOnlyList<PlayerToolAreaContact>> ImpactContacts;
+        /// <summary>Supplies held shapes absent from scene queries when world collisions are disabled.</summary>
+        public static event Func<Transform, Collider[]> CarriedTargetShapes;
 
         #endregion
 
@@ -75,24 +79,28 @@ namespace CatOnASkateboard.PlayerStudio
             // Disabled domain reload must not preserve listeners from a previous gameplay session.
             ProjectileHit = null;
             CursorUsed = null;
+            ImpactContacts = null;
+            CarriedTargetShapes = null;
         }
 
-        /// <summary>Publishes a physical hit without depending on any optional interaction package.</summary>
-        /// <param name="hit">Shot and exact physics contact.</param>
-        internal static void PublishHit(PlayerToolHit hit)
+        /// <summary>Reads the optional carry provider without searching the scene.</summary>
+        /// <param name="player">Player whose cursor is being aimed or fired.</param>
+        /// <returns>Borrowed collider array for this player's non-colliding held object.</returns>
+        internal static Collider[] QueryCarriedTargetShapes(Transform player) => CarriedTargetShapes?.Invoke(player);
+
+        /// <summary>Publishes one impact, preserving the primary event for existing listeners.</summary>
+        /// <param name="hit">Confirmed primary contact.</param>
+        /// <param name="area">Reusable list of nearby contacts, or null when area impact is disabled.</param>
+        internal static void PublishImpact(PlayerToolHit hit, IReadOnlyList<PlayerToolAreaContact> area)
         {
-            // Subscribers may queue work until their own normal gameplay update.
-            ProjectileHit?.Invoke(hit);
+            ImpactContacts?.Invoke(hit, area);
+            if (hit.IsCursorUse)
+                CursorUsed?.Invoke(hit);
+            else
+                ProjectileHit?.Invoke(hit);
         }
 
-        /// <summary>Publishes an instant pointer contact without taking a dependency on the interaction package.</summary>
-        /// <param name="hit">Tool, action and cursor contact captured at emission.</param>
-        internal static void PublishCursorUse(PlayerToolHit hit)
-        {
-            CursorUsed?.Invoke(hit);
-        }
-
-        /// <summary>Plays cursor impact feedback after a connected interaction accepts the captured contact.</summary>
+        /// <summary>Plays deferred cursor impact feedback after a connected interaction accepts the captured contact.</summary>
         /// <param name="hit">Successful cursor request belonging to this player.</param>
         public void ConfirmCursorHit(PlayerToolHit hit)
         {
@@ -198,7 +206,13 @@ namespace CatOnASkateboard.PlayerStudio
         /// <summary>Applies reversible idle and aim after the camera and all configured animation poses.</summary>
         private void LateUpdate()
         {
-            if (!ready || Time.deltaTime <= 0f || ActiveTool == null)
+            if (!ready || Time.deltaTime <= 0f)
+                return;
+            // Parked tools and switching players still own their emitted effects.
+            double now = Time.timeAsDouble;
+            foreach (PlayerToolRuntime behavior in behaviors)
+                behavior.AdvanceEffects(now);
+            if (ActiveTool == null)
                 return;
             if (!IsUsing)
                 arm?.Sample(Time.deltaTime);
@@ -206,7 +220,7 @@ namespace CatOnASkateboard.PlayerStudio
             behaviors[active].Present(Time.deltaTime);
         }
 
-        /// <summary>Continues bullets and impact lifetimes independently of the selected tool.</summary>
+        /// <summary>Continues bullet physics independently of the selected tool.</summary>
         private void FixedUpdate()
         {
             if (!ready)

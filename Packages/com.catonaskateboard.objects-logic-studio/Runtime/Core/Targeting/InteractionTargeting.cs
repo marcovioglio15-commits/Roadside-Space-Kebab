@@ -38,10 +38,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 score = 0f;
                 if (!InteractionProjectileInput.Allows(root))
                     return false;
+                // Nearby contacts already passed the blast's solid cover check.
+                if (InteractionProjectileInput.AreaContact)
+                {
+                    score = (InteractionProjectileInput.TargetPoint - observer.Player.position).sqrMagnitude;
+                    return (!solidHitOnly || !InteractionProjectileInput.TargetCollider.isTrigger)
+                        && (InteractionProjectileInput.IgnoreRange || score <= distance * distance);
+                }
                 // Pointer shots keep exact geometry, clipping, solid-only rules and obstruction checks.
                 return InteractionProjectileInput.PhysicalImpact
-                    || (!solidHitOnly || !InteractionProjectileInput.Contact.collider.isTrigger)
-                        && Visible(observer, root, InteractionProjectileInput.Contact.point,
+                    || (!solidHitOnly || !InteractionProjectileInput.TargetCollider.isTrigger)
+                        && Visible(observer, root, InteractionProjectileInput.TargetPoint,
                             InteractionProjectileInput.IgnoreRange ? float.PositiveInfinity : distance, float.PositiveInfinity, mask, out score);
             }
             // Target geometry may have moved since the last physics step or assembly insertion.

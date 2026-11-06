@@ -1,5 +1,7 @@
+using CatOnASkateboard.PlayerStudio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Guid = System.Guid;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -33,6 +35,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Supply and placement configuration.</summary>
         public DispenserSettings Settings => settings;
+        /// <summary>Whether the configuration supports separate output for a specific tool with a distinct action.</summary>
+        public bool HasSeparateToolOutput => settings.SeparateToolOutput && ToolRequirement != null
+            && DispenserSettings.CanSeparateToolOutput(settings.Mode, ToolRequirement.Mode, ToolRequirement.Tool);
         /// <summary>Successful withdrawals from finite prefab stock during this instance's lifetime.</summary>
         public int DispensedCount => dispensed;
         /// <summary>Counter supplied to the authored appearance thresholds.</summary>
@@ -90,12 +95,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Validates reusable settings and a same-object Container when linked storage is selected.</summary>
         /// <param name="configuration">Proposed supply settings.</param>
         /// <param name="warning">Receives the first missing dependency.</param>
+        /// <param name="requirement">Optional proposed tool restriction. Defaults to the applied restriction.</param>
         /// <returns>True for a complete dispenser setup.</returns>
-        public bool TryValidate(DispenserSettings configuration, out string warning)
+        public bool TryValidate(DispenserSettings configuration, out string warning, InteractionToolRequirement requirement = null)
         {
             // Prefab mode and inventory mode have no hidden fallback into one another.
             warning = "Dispenser settings are missing.";
-            if (configuration == null || !configuration.TryValidate(out warning))
+            if (configuration == null || !configuration.TryValidate(out warning, requirement ?? ToolRequirement))
                 return false;
             if (configuration.StoredSupply && GetComponent<ObjectContainer>() == null)
                 warning = "Add Container to this same object before linking its stored items.";
@@ -113,6 +119,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
 
         #region Supply
+
+        /// <summary>Resolves output from the action that won input arbitration.</summary>
+        /// <param name="action">Actual action ID from the buffered press or captured contact.</param>
+        /// <returns>The output mode for this use.</returns>
+        internal DispenseMode OutputMode(Guid action) => UsesSeparateOutput(action) ? settings.ToolMode : settings.Mode;
+
+        /// <summary>Checks that this request came from the specific tool's distinct action.</summary>
+        /// <param name="action">Action ID selected by the input router.</param>
+        /// <returns>True when the tool route overrides the targeting output.</returns>
+        internal bool UsesSeparateOutput(Guid action)
+        {
+            // A delayed hit retains the weapon and action that produced it.
+            if (!HasSeparateToolOutput || action == Guid.Empty || Action == null || Action.action == null || Action.action.id == action)
+                return false;
+            return InteractionProjectileInput.Active
+                ? InteractionProjectileInput.ActionId == action && InteractionProjectileInput.Tool == ToolRequirement.Tool
+                : HoverObserver.ActiveTools is PlayerTools tools && tools.ActiveTool == ToolRequirement.Tool && tools.UseActionId == action;
+        }
 
         /// <summary>Checks an entire refill against missing finite prefab stock.</summary>
         /// <param name="units">Logical units carried by the deposited item.</param>
@@ -150,17 +174,54 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return !transferring && !settings.Unlimited && stored < (settings.UseContainer ? settings.Stock : dispensed);
         }
 
+        /// <summary>Releases the outputs requested by one captured weapon contact in the same frame.</summary>
+        /// <param name="observer">Player whose interaction reached this dispenser.</param>
+        /// <param name="mode">World output mode resolved for the captured action.</param>
+        /// <param name="tool">Weapon that fired the shot, retained even if the player switched tools.</param>
+        /// <param name="velocity">Incoming shot velocity captured at contact.</param>
+        /// <returns>True when at least one output succeeded.</returns>
+        internal bool TryTakeShot(HoverObserver observer, DispenseMode mode, PlayerTool tool, Vector3 velocity)
+        {
+            // Each withdrawal retains its stock, outlet and completion rules.
+            InteractionToolRequirement requirement = ToolRequirement;
+            bool batch = requirement != null && DispenserSettings.UsesWeaponBatch(mode, requirement.Mode, requirement.Tool)
+                && requirement.Tool == tool;
+            int outputs = batch ? settings.OutputsPerShot : 1;
+            bool scatter = batch && settings.ScatterShotOutputs;
+            DispenserShotSpread spread = scatter ? new DispenserShotSpread(velocity, settings.ScatterDistanceMultiplier) : default;
+            int taken = 0;
+            // Keep the batch in this input pulse and stop as soon as supply becomes unavailable.
+            while (taken < outputs && this != null && TryTake(observer, mode, out ObjectGrab output, spread, taken, outputs))
+            {
+                if (scatter && output != null)
+                    ShotBurstCollisions.Add(output.Colliders);
+                taken++;
+            }
+            return taken > 0;
+        }
+
         /// <summary>Commits stock only after carrying succeeds or an item is released at the selected world outlet.</summary>
         /// <param name="observer">Player receiving one object.</param>
-        /// <param name="grab">Receives the carried object; world output leaves this null.</param>
+        /// <param name="mode">Output selected by the actual input route.</param>
+        /// <param name="grab">Receives the new or restored object.</param>
         /// <returns>True for a successful atomic withdrawal.</returns>
-        internal bool TryTake(HoverObserver observer, out ObjectGrab grab)
+        internal bool TryTake(HoverObserver observer, DispenseMode mode, out ObjectGrab grab) => TryTake(observer, mode, out grab, default, 0, 1);
+
+        /// <summary>Withdraws one item using the selected outlet and optional shot spread.</summary>
+        /// <param name="observer">Player receiving the output.</param>
+        /// <param name="mode">Output mode selected by the actual request.</param>
+        /// <param name="grab">Receives the new or restored object.</param>
+        /// <param name="spread">Optional launch fan for this shot.</param>
+        /// <param name="index">Slot of this output inside the fan.</param>
+        /// <param name="count">Total slots requested for the shot.</param>
+        /// <returns>True after one withdrawal commits.</returns>
+        private bool TryTake(HoverObserver observer, DispenseMode mode, out ObjectGrab grab, DispenserShotSpread spread, int index, int count)
         {
             // A second button event cannot re-enter this transaction through lifecycle events.
             grab = null;
-            if (settings.Mode == DispenseMode.ScoopOnly)
+            if (mode == DispenseMode.ScoopOnly)
                 return false;
-            bool carry = settings.Mode == DispenseMode.ToHand;
+            bool carry = mode == DispenseMode.ToHand;
             if (carry && (observer == null || observer.HeldObject != null) || !CanTake())
                 return false;
             transferring = true;
@@ -179,11 +240,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     if (!Container.TryTake(observer, position, rotation, out grab, transform, settings.PickupDuration, carry))
                         return false;
-                    if (!carry)
-                    {
-                        ObjectSpawnPhysics.Protect(grab.gameObject);
-                        grab = null;
-                    }
                 }
                 else
                 {
@@ -192,16 +248,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     GameObject created = ObjectSpawnHistory.Create(settings.Prefab, position, rotation);
                     SceneManager.MoveGameObjectToScene(created, gameObject.scene);
                     ObjectGrab candidate = created.GetComponent<ObjectGrab>();
-                    if (!carry)
-                        ObjectSpawnPhysics.Protect(created);
                     if (candidate == null || carry && (!candidate.Begin(observer, transform, settings.PickupDuration) || !candidate.IsHeld))
                     {
                         created.SetActive(false);
                         Destroy(created);
                         return false;
                     }
-                    grab = carry ? candidate : null;
+                    grab = candidate;
                     dispensed++;
+                }
+                if (!carry)
+                {
+                    spread.GetLaunch(transform.position, position, transform.forward, index, count, out Vector3 velocity, out Vector3 tumble);
+                    ObjectSpawnPhysics.Protect(grab.gameObject, velocity, tumble);
                 }
                 CompleteWithdrawal();
                 Signal(InteractionMoment.Started);

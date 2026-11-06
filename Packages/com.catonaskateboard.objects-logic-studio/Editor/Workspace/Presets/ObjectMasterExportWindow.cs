@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -169,8 +170,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             EditorGUILayout.LabelField(master.name, EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
-            includePrefab = EditorGUILayout.Toggle(new GUIContent("Include source prefab", "Include the original object."), includePrefab);
-            includeResources = EditorGUILayout.Toggle(new GUIContent("Include resources", "Include the referenced models, effects, audio and other resources."), includeResources);
+            includePrefab = StudioFieldGUI.Toggle(new GUIContent("Include source prefab", "Include the original object."), includePrefab);
+            includeResources = StudioFieldGUI.Toggle(new GUIContent("Include resources", "Include the referenced models, effects, audio and other resources."), includeResources);
             if (EditorGUI.EndChangeCheck())
                 Refresh();
             EditorGUILayout.LabelField("Install the matching Studio packages in the other project.", EditorStyles.wordWrappedMiniLabel);

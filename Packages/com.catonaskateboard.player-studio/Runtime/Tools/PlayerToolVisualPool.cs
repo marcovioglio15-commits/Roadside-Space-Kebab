@@ -17,6 +17,7 @@ namespace CatOnASkateboard.PlayerStudio
         private readonly bool[] rented;
         private readonly Vector3[] scales;
         private readonly float[][] speeds;
+        private readonly float[][] trailWidths;
         private readonly float[] scaleMultipliers;
         private int available;
 
@@ -43,8 +44,9 @@ namespace CatOnASkateboard.PlayerStudio
         /// <param name="alignBillboards">Whether ordinary billboards follow the impact's local plane.</param>
         /// <param name="measureLifetime">Positive effect lifetime requests a one-time clearance envelope measurement.</param>
         /// <param name="faceCamera">Whether automatic placement explicitly overrides ordinary billboards to face the camera.</param>
+        /// <param name="playbackSpeed">Particle and trail speed multiplier, or zero to keep prefab timing.</param>
         internal PlayerToolVisualPool(GameObject prefab, int capacity, Scene scene, float scale = 1f, bool alignBillboards = false,
-            float measureLifetime = 0f, bool faceCamera = false)
+            float measureLifetime = 0f, bool faceCamera = false, float playbackSpeed = 0f)
         {
             // The disabled parent keeps even active prefab roots inert until a slot is rented.
             root = new GameObject(prefab.name + " Pool");
@@ -57,6 +59,7 @@ namespace CatOnASkateboard.PlayerStudio
             rented = new bool[capacity];
             scales = new Vector3[capacity];
             speeds = measureLifetime > 0f ? new float[capacity][] : Array.Empty<float[]>();
+            trailWidths = measureLifetime > 0f ? new float[capacity][] : Array.Empty<float[]>();
             scaleMultipliers = measureLifetime > 0f ? new float[capacity] : Array.Empty<float>();
             available = capacity;
             for (int index = 0; index < capacity; index++)
@@ -80,6 +83,12 @@ namespace CatOnASkateboard.PlayerStudio
                 {
                     ParticleSystem.MainModule main = particle.main;
                     main.stopAction = ParticleSystemStopAction.None;
+                    // A fitted burst advances on the same scaled clock as its pool deadline.
+                    if (playbackSpeed > 0f)
+                    {
+                        main.simulationSpeed *= playbackSpeed;
+                        main.useUnscaledTime = false;
+                    }
                     // Child systems inherit effect scale; world-space emission speed scales separately.
                     if (scale != 1f || measureLifetime > 0f)
                     {
@@ -95,6 +104,20 @@ namespace CatOnASkateboard.PlayerStudio
                         main.startRotationX = new ParticleSystem.MinMaxCurve(0f);
                         main.startRotationY = new ParticleSystem.MinMaxCurve(Mathf.PI);
                     }
+                }
+                // Trails use a world-space width and age rather than the particle main module.
+                if (measureLifetime > 0f)
+                    trailWidths[index] = new float[trails[index].Length];
+                for (int trail = 0; trail < trails[index].Length; trail++)
+                {
+                    TrailRenderer renderer = trails[index][trail];
+                    renderer.autodestruct = false;
+                    if (scale != 1f)
+                        renderer.widthMultiplier *= scale;
+                    if (playbackSpeed > 0f)
+                        renderer.time /= playbackSpeed;
+                    if (measureLifetime > 0f)
+                        trailWidths[index][trail] = renderer.widthMultiplier;
                 }
                 free[index] = capacity - index - 1;
                 if (measureLifetime > 0f)
@@ -163,6 +186,10 @@ namespace CatOnASkateboard.PlayerStudio
                     ParticleSystem.MainModule main = particles[index][particle].main;
                     main.startSpeedMultiplier = speeds[index][particle] * scale;
                 }
+                // Automatic placement applies the same fallback scale to trail widths.
+                for (int trail = 0; trail < trails[index].Length; trail++)
+                    if (trails[index][trail] != null)
+                        trails[index][trail].widthMultiplier = trailWidths[index][trail] * scale;
             }
             instances[index].SetPositionAndRotation(position, rotation);
             instances[index].gameObject.SetActive(true);
@@ -171,7 +198,7 @@ namespace CatOnASkateboard.PlayerStudio
                 if (trail != null)
                     trail.Clear();
             foreach (ParticleSystem particle in particles[index])
-                if (particle != null)
+                if (particle != null && particle.gameObject.activeInHierarchy)
                 {
                     particle.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
                     particle.Play(false);

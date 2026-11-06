@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Guid = System.Guid;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -92,15 +93,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Advances the current page or starts one matching row from the highest-priority tree.</summary>
         /// <param name="observer">Current camera, player and shared HUD.</param>
         /// <param name="singles">Single-action driver sharing physical input presses.</param>
-        /// <returns>The action consumed this frame, or null for automatic work.</returns>
-        internal InputActionReference Tick(HoverObserver observer, SingleInteractionDriver singles)
+        /// <returns>The action ID consumed this frame, or an empty ID for automatic work.</returns>
+        internal Guid Tick(HoverObserver observer, SingleInteractionDriver singles)
         {
             Bind(observer);
             if (InteractionProjectileInput.Active && active != null && !InteractionProjectileInput.Allows(active))
-                return null;
+                return Guid.Empty;
+            input.PrepareToolAction();
             input.Consume(singles.AssemblyButton);
             input.Consume(AssemblyInteractionRegistry.Consumed);
-            foreach (InputActionReference action in InteractionUnlockRegistry.Consumed)
+            foreach (Guid action in InteractionUnlockRegistry.Consumed)
                 input.Consume(action);
             bool ready = observer.DialogueHud != null && observer.DialogueHud.IsOwnedBy(observer);
             if (!ready && bindings.Count > 0 && !missingHudReported)
@@ -115,10 +117,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (active != null && (!input.Usable || !ready))
                     active.Interrupt();
                 input.ClearSignals();
-                return null;
+                return Guid.Empty;
             }
             if (active != null && (!active.IsSpeaking || !active.CanContinue(player) || !active.CanPresent(observer, visibility, true)
-                || !bindings.TryGetValue(active, out Buttons current) || !current.Advance.Enabled))
+                || !bindings.TryGetValue(active, out Buttons current) || !input.HasEnabledAction(active, current.Advance)))
             {
                 active.Interrupt();
                 active = null;
@@ -126,18 +128,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ObjectDialogue selected = null;
             // Observe ranges while another page is visible, but choose at most one waiting tree.
             foreach (KeyValuePair<ObjectDialogue, Buttons> pair in bindings)
-                if (pair.Key != null && InteractionProjectileInput.Allows(pair.Key) && pair.Key.CanStart(player, pair.Value.Starts, observer, visibility)
-                    && active == null && pair.Value.Advance.Enabled
+                if (pair.Key != null && InteractionProjectileInput.Allows(pair.Key) && pair.Key.CanStart(player, pair.Value.Starts, input, observer, visibility)
+                    && active == null && input.HasEnabledAction(pair.Key, pair.Value.Advance)
                     && (selected == null || pair.Key.Presentation.Priority > selected.Presentation.Priority
                         || pair.Key.Presentation.Priority == selected.Presentation.Priority
                         && EntityId.ToULong(pair.Key.GetEntityId()) < EntityId.ToULong(selected.GetEntityId()))
                     && pair.Key.CanPresent(observer, visibility, false))
                     selected = pair.Key;
-            InputActionReference consumed = null;
-            if (active != null && bindings[active].Advance.Pending)
+            InteractionButton consumed = null;
+            // Advance or start with the exact button that won the route.
+            if (active != null && input.Read(active, bindings[active].Advance) is InteractionButton advance)
             {
-                consumed = active.AdvanceAction;
-                if ((!active.Presentation.PreferSingleActions || !singles.TryPrioritize(observer, bindings[active].Advance, active.Presentation.PreferredActions))
+                consumed = advance;
+                if ((!active.Presentation.PreferSingleActions || !singles.TryPrioritize(observer, advance, active.Presentation.PreferredActions))
                     && active.CanAdvance(observer, visibility))
                 {
                     InteractionProjectileInput.Confirm(active);
@@ -148,23 +151,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 selected.PrepareRequest();
                 InputActionReference requested = selected.RequestedAction;
-                bool preferred = requested != null && selected.Presentation.PreferSingleActions
-                    && bindings[selected].Starts.TryGetValue(requested, out InteractionButton start)
+                InteractionButton start = requested != null && bindings[selected].Starts.TryGetValue(requested, out InteractionButton targeting)
+                    ? input.Read(selected, targeting) : null;
+                bool preferred = start != null && selected.Presentation.PreferSingleActions
                     && singles.TryPrioritize(observer, start, selected.Presentation.PreferredActions);
                 if (preferred)
-                    consumed = requested;
+                    consumed = start;
                 else
                 {
                     if (selected.Begin(observer.DialogueHud))
-                        consumed = requested;
+                        consumed = start;
                     if (selected.IsSpeaking)
                         active = selected;
                 }
             }
             if (consumed != null)
-                singles.Suppress(input.Find(consumed));
+                singles.Suppress(consumed);
             input.ClearSignals();
-            return consumed;
+            return consumed?.Id ?? Guid.Empty;
         }
 
         #endregion

@@ -133,12 +133,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             EditorGUILayout.LabelField(master.name + " → " + destination.name, EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
-            replace = EditorGUILayout.Toggle(new GUIContent("Replace configuration", "Remove other interactions in the selected slots. Leave off to merge."), replace);
-            includeShared = EditorGUILayout.Toggle(new GUIContent("Include shared settings", "Also copy flags and shared item settings."), includeShared);
+            replace = StudioFieldGUI.Toggle(new GUIContent("Replace configuration", "Remove other interactions in the selected slots. Leave off to merge."), replace);
+            includeShared = StudioFieldGUI.Toggle(new GUIContent("Include shared settings", "Also copy flags and shared item settings."), includeShared);
             scroll = EditorGUILayout.BeginScrollView(scroll);
             EditorGUILayout.LabelField("Object slots", EditorStyles.boldLabel);
             foreach (ObjectImportChoices.Node node in nodes)
-                node.Target = (Transform)EditorGUILayout.ObjectField(new GUIContent(string.IsNullOrEmpty(node.Path) ? "Object root" : node.Path, "Choose the object to use for this slot."), node.Target, typeof(Transform), true);
+                node.Target = (Transform)StudioFieldGUI.ObjectField(new GUIContent(string.IsNullOrEmpty(node.Path) ? "Object root" : node.Path, "Choose the object to use for this slot."), node.Target, typeof(Transform), true);
             EditorGUILayout.Space(6f);
             EditorGUILayout.LabelField("Interactions", EditorStyles.boldLabel);
             for (int index = 0; index < choices.Length; index++)
@@ -149,9 +149,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 choice.Include = EditorGUILayout.ToggleLeft(new GUIContent(entry.Name, "Import this interaction."), choice.Include);
                 using (new EditorGUI.DisabledScope(!choice.Include))
                 {
-                    choice.Add = EditorGUILayout.Toggle(new GUIContent("Add new", "Add a separate interaction. Leave off to update an existing one."), choice.Add);
+                    choice.Add = StudioFieldGUI.Toggle(new GUIContent("Add new", "Add a separate interaction. Leave off to update an existing one."), choice.Add);
                     if (!choice.Add)
-                        choice.Target = (ObjectInteraction)EditorGUILayout.ObjectField(new GUIContent("Update", "Choose the existing interaction to update."), choice.Target, typeof(ObjectInteraction), true);
+                        choice.Target = (ObjectInteraction)StudioFieldGUI.ObjectField(new GUIContent("Update", "Choose the existing interaction to update."), choice.Target, typeof(ObjectInteraction), true);
                     EditorGUILayout.LabelField(choice.Add ? "Add " + entry.Name : "Update " + entry.Name, EditorStyles.miniLabel);
                     DrawGroups(choice, entry.Preset);
                     using (new EditorGUI.DisabledScope(!ready || plan?.PreviewInteraction(entry.SourceId) == null))
@@ -179,7 +179,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         links.Add(replacement);
                     }
                     Type type = Type.GetType(slot.TypeName, false) ?? typeof(UnityEngine.Object);
-                    replacement.Target = EditorGUILayout.ObjectField(new GUIContent(string.IsNullOrEmpty(slot.Path) ? slot.Label.Length > 0 ? slot.Label : "Object root" : slot.Path,
+                    replacement.Target = StudioFieldGUI.ObjectField(new GUIContent(string.IsNullOrEmpty(slot.Path) ? slot.Label.Length > 0 ? slot.Label : "Object root" : slot.Path,
                         "Choose the replacement for this link."), replacement.Target, type, true);
                 }
             }
@@ -251,7 +251,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void DrawGroups(ObjectImportChoices.Interaction choice, ObjectInteractionPreset preset)
         {
             bool previous = choice.ChooseGroups;
-            choice.ChooseGroups = EditorGUILayout.Toggle(new GUIContent("Choose groups", "Import only the groups you select below."), choice.ChooseGroups);
+            choice.ChooseGroups = StudioFieldGUI.Toggle(new GUIContent("Choose groups", "Import only the groups you select below."), choice.ChooseGroups);
             if (!choice.ChooseGroups || preset == null)
                 return;
             List<string> selected = choice.Groups;

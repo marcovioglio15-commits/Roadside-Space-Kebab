@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using System;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -86,7 +87,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             VisualElement controlsPane = new VisualElement();
             controlsPane.style.minHeight = 0f;
             controlsPane.style.minWidth = 0f;
-            IMGUIContainer transformPanel = new IMGUIContainer(drawTransform) { name = "preview-transform-panel" };
+            IMGUIContainer transformPanel = FieldPane(drawTransform);
+            transformPanel.name = "preview-transform-panel";
             transformPanel.style.flexShrink = 0f;
 
             controls = new ScrollView(ScrollViewMode.Vertical);
@@ -94,7 +96,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             controls.style.minWidth = 0f;
             controls.style.minHeight = 0f;
             controls.viewDataKey = "player-studio-controls";
-            controls.Add(new IMGUIContainer(drawControls));
+            controls.Add(FieldPane(drawControls));
             controlsPane.Add(controls);
             split.Add(controlsPane);
 
@@ -191,6 +193,20 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             button.style.flexGrow = 1f;
             button.style.flexBasis = 0f;
             return button;
+        }
+
+        /// <summary>Measures fields against their own pane instead of the Scene view's full width.</summary>
+        /// <param name="draw">Draws the controls shown in the pane.</param>
+        /// <returns>The IMGUI container retaining that drawing callback.</returns>
+        private static IMGUIContainer FieldPane(Action draw)
+        {
+            IMGUIContainer pane = new IMGUIContainer();
+            pane.onGUIHandler = () =>
+            {
+                using StudioFieldLayout.WidthScope width = new StudioFieldLayout.WidthScope(pane.contentRect.width);
+                draw();
+            };
+            return pane;
         }
 
         #endregion

@@ -18,10 +18,70 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         internal static void Animation(SerializedProperty property, Transform root, GUIContent label = null)
         {
             // Editing the referenced preset never applies its parent tool or module draft.
-            StudioFieldGUI.PropertyField(property, label ?? new GUIContent(property.displayName, property.tooltip));
+            Reference(property, typeof(PlayerToolAnimationPreset), label);
             if (property.objectReferenceValue is PlayerToolAnimationPreset animation
                 && StudioButton.Draw(new GUIContent("Edit Animation", "Edit this preset's tracks and keyframes in its own Apply/Discard window.")))
                 PlayerToolAnimationWindow.Open(animation, root);
+        }
+
+        #endregion
+
+        #region Sections and Fields
+
+        /// <summary>Draws a clickable heading with the same treatment as the track and key headers.</summary>
+        /// <param name="expanded">Expansion state retained by the owning Inspector.</param>
+        /// <param name="label">Section caption.</param>
+        /// <param name="tooltip">Brief description of the grouped fields.</param>
+        /// <returns>True when the section body should be drawn.</returns>
+        internal static bool Section(ref bool expanded, string label, string tooltip)
+        {
+            // The complete heading toggles the section, including its caption.
+            Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
+            StudioFoldoutGUI.Background(rect, EditorGUI.indentLevel == 0);
+            return expanded = EditorGUI.Foldout(rect, expanded, new GUIContent(label, tooltip), true);
+        }
+
+        /// <summary>Draws a toggle inside a foldout without repeating the field's Inspector header.</summary>
+        /// <param name="property">Serialized boolean field.</param>
+        /// <returns>Whether the option is enabled.</returns>
+        internal static bool Toggle(SerializedProperty property)
+        {
+            // Preserve the serialized context menu on the custom row.
+            bool enabled = StudioFieldGUI.Toggle(Label(property), property.boolValue);
+            if (enabled != property.boolValue)
+                property.boolValue = enabled;
+            return enabled;
+        }
+
+        /// <summary>Draws an asset reference as one row inside its existing section.</summary>
+        /// <param name="property">Serialized reference.</param>
+        /// <param name="type">Accepted Unity asset type.</param>
+        /// <param name="label">Optional row caption.</param>
+        internal static void Reference(SerializedProperty property, System.Type type, GUIContent label = null)
+        {
+            // Delayed Copy and Paste still address the same serialized reference.
+            Object asset = StudioFieldGUI.ObjectField(StudioFieldMenu.Value(property,
+                label ?? new GUIContent(property.displayName, property.tooltip)), property.objectReferenceValue, type, false);
+            if (asset != property.objectReferenceValue)
+                property.objectReferenceValue = asset;
+        }
+
+        /// <summary>Draws a bounded float without repeating its section header.</summary>
+        /// <param name="property">Serialized float with a declared slider range.</param>
+        internal static void Scalar(SerializedProperty property)
+        {
+            // The bound widget reads its range directly from the field declaration.
+            float value = StudioFieldGUI.FloatField(Label(property), property.floatValue);
+            if (!value.Equals(property.floatValue))
+                property.floatValue = value;
+        }
+
+        /// <summary>Associates a custom row with its serialized field menu and tooltip.</summary>
+        /// <param name="property">Field shown in the next Studio widget.</param>
+        /// <returns>The display label for the next widget.</returns>
+        internal static GUIContent Label(SerializedProperty property)
+        {
+            return StudioFieldMenu.Value(property, new GUIContent(property.displayName, property.tooltip));
         }
 
         #endregion

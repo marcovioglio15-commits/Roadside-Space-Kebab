@@ -307,3 +307,9 @@ MonoBehaviour:
       Trigger: {fileID: 11400000, guid: ab85c4e63b5a67b6403066964faad6e3, type: 2}
       Next: wrong
       Weight: 1
+    - Id: 7fb76846166a4f46af90a911be8cc93f
+      Name: Reorder
+      Entry: {fileID: 0}
+      Trigger: {fileID: 11400000, guid: b67c44f3f332128587e7e63e58726790, type: 2}
+      Next: order
+      Weight: 1

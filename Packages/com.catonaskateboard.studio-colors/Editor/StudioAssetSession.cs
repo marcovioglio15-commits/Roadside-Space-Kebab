@@ -123,7 +123,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         }
 
         /// <summary>Refreshes a clean proposal after asset changes while preserving unfinished work.</summary>
-        /// <returns>True when the temporary inspector target was replaced.</returns>
+        /// <returns>True when the latest applied values were read.</returns>
         public bool Refresh()
         {
             if (HasChanges || !SourceChanged || recoveryWarning.Length > 0)
@@ -132,13 +132,16 @@ namespace CatOnASkateboard.StudioColors.Editor
             return true;
         }
 
-        /// <summary>Copies the latest applied source without changing project data.</summary>
+        /// <summary>Reads applied values while retaining the same inspector target for the current source.</summary>
         private void Reload()
         {
-            Release();
-            draft = source != null ? UnityEngine.Object.Instantiate(source) : null;
-            if (draft != null)
+            // Keeping the draft identity also keeps native property foldouts and cached editors.
+            if (source != null)
             {
+                if (draft == null)
+                    draft = UnityEngine.Object.Instantiate(source);
+                else
+                    EditorUtility.CopySerialized(source, draft);
                 draft.name = source.name;
                 draft.hideFlags = draftFlags;
             }

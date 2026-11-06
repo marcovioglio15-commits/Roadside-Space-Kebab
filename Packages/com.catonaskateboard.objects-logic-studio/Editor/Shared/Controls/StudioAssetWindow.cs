@@ -178,11 +178,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Refreshes clean copies when another editor or a source-control import changes their asset.</summary>
         private void RefreshSource()
         {
-            if (!session.HasChanges && session.SourceChanged)
-            {
-                ReleaseInspector();
-                session.Refresh();
-            }
+            session.Refresh();
             UpdatePending();
             Repaint();
         }
@@ -220,7 +216,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             UpdatePending();
             if (session.CanSave(out warning) && Validate(session.Draft, out warning))
             {
-                ReleaseInspector();
                 if (session.Save("Apply " + titleContent.text, out warning))
                     base.SaveChanges();
             }
@@ -231,7 +226,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Explicitly abandons this proposal and reloads the latest shared source.</summary>
         public override void DiscardChanges()
         {
-            ReleaseInspector();
             session.Discard();
             warning = string.Empty;
             base.DiscardChanges();

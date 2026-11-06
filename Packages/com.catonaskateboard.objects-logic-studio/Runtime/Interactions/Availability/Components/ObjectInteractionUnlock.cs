@@ -173,21 +173,44 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Accepts availability commands only inside their independently configured ranges.</summary>
         /// <param name="player">Observer's flagged player root.</param>
-        internal void Tick(Transform player)
+        /// <param name="input">Router for the configured and tool actions.</param>
+        internal void Tick(Transform player, InteractionInputRouter input)
         {
             // Conditions retain their progress while an active rule waits for its remaining requirements.
-            if (!ready || applying || IsApplied && !settings.Repeat || !Available(InteractionChannels.None))
+            if (!ready || applying || IsApplied && !settings.Repeat || settings.Target == null || !Available(InteractionChannels.None))
                 return;
+            float distance = (settings.Target.transform.position - player.position).sqrMagnitude;
+            int fallback = -1;
+            bool usedTool = false;
+            // A tool press can advance one fallback condition. An exact tool binding takes priority.
             for (int index = 0; index < buttons.Length; index++)
-                if (counts[index] < settings.Conditions[index].Count && buttons[index] is { Pending: true }
-                    && (InteractionProjectileInput.IgnoreRange || (settings.Target.transform.position - player.position).sqrMagnitude
-                    <= settings.Conditions[index].Distance * settings.Conditions[index].Distance))
+            {
+                if (counts[index] >= settings.Conditions[index].Count || !InteractionProjectileInput.IgnoreRange
+                    && distance > settings.Conditions[index].Distance * settings.Conditions[index].Distance
+                    || input.Read(this, buttons[index]) is not InteractionButton button)
+                    continue;
+                if (button == buttons[index])
                 {
-                    InteractionProjectileInput.Confirm(this);
-                    counts[index]++;
-                    InteractionUnlockRegistry.Consume(settings.Conditions[index].Action);
+                    RecordPress(index, button);
+                    usedTool |= input.IsToolAction(button);
                 }
+                else if (fallback < 0)
+                    fallback = index;
+            }
+            if (!usedTool && fallback >= 0 && input.Read(this, buttons[fallback]) is InteractionButton alternate)
+                RecordPress(fallback, alternate);
             TryApply();
+        }
+
+        /// <summary>Records one condition and reserves its actual action for the rest of the observer pass.</summary>
+        /// <param name="index">Condition that received the press.</param>
+        /// <param name="button">Targeting or tool button that triggered it.</param>
+        private void RecordPress(int index, InteractionButton button)
+        {
+            // Confirm the contact before the availability operation can replace the target.
+            InteractionProjectileInput.Confirm(this);
+            counts[index]++;
+            InteractionUnlockRegistry.Consume(button.Id);
         }
 
         /// <summary>Records the exact source component and lifecycle boundary required by each condition.</summary>

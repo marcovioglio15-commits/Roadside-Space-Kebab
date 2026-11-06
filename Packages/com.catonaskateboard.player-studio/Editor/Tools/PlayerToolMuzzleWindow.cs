@@ -52,6 +52,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private SerializedObject data;
         private bool dirty = true;
         private string status = string.Empty;
+        private const float FooterHeight = 62f;
 
         #endregion
 
@@ -145,6 +146,17 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private void OnGUI()
         {
             ResolveTool();
+            // The fixed footer never participates in the viewport's flexible layout.
+            float bodyHeight = Mathf.Max(0f, position.height - FooterHeight);
+            using (new GUILayout.AreaScope(new Rect(0f, 0f, position.width, bodyHeight)))
+                DrawBody();
+            using (new GUILayout.AreaScope(new Rect(6f, bodyHeight + 4f, position.width - 12f, FooterHeight - 4f)))
+                DrawFooter();
+        }
+
+        /// <summary>Draws the pose controls and fits the live preview into the available body.</summary>
+        private void DrawBody()
+        {
             if (tool == null || hierarchySource == null || tool.Weapon == null || EditorApplication.isPlayingOrWillChangePlaymode)
             {
                 EditorGUILayout.LabelField("Choose a tool and its hierarchy in Edit mode.", EditorStyles.wordWrappedMiniLabel);
@@ -172,17 +184,26 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 DrawViewport(GUILayoutUtility.GetRect(1f, 100f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true)), anchor);
             else
                 EditorGUILayout.LabelField("The muzzle parent is missing or its coordinates are invalid.", EditorStyles.wordWrappedMiniLabel);
+        }
+
+        /// <summary>Keeps the muzzle transaction accessible regardless of the visible preview or pose fields.</summary>
+        private void DrawFooter()
+        {
+            // The tooltip exposes the full status when a narrow window clips the label.
             hasUnsavedChanges = HasChanges;
             saveChangesMessage = "Apply or discard the pending muzzle pose.";
-            EditorGUILayout.LabelField(status.Length > 0 ? status : HasChanges ? "Pending muzzle" : "Applied muzzle", EditorStyles.miniLabel);
+            string message = status.Length > 0 ? status : HasChanges ? "Pending muzzle" : "Applied muzzle";
+            EditorGUILayout.LabelField(new GUIContent(message, message), EditorStyles.miniLabel);
             using StudioButton.RowScope row = new StudioButton.RowScope();
-            using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(!HasChanges);
-            if (StudioButton.Draw(new GUIContent("Apply", owner != null
-                ? "Update the tool window's muzzle proposal. Apply the tool to save it."
-                : "Save only this muzzle's position and rotation."), expandWidth: true))
-                SaveChanges();
-            if (StudioButton.Draw(new GUIContent("Discard", "Reload the tool's current muzzle position and rotation."), expandWidth: true))
-                DiscardChanges();
+            using (new EditorGUI.DisabledScope(!HasChanges || tool == null || tool.Weapon == null || EditorApplication.isPlayingOrWillChangePlaymode))
+                if (StudioButton.Draw(new GUIContent("Apply", owner != null
+                    ? "Update the tool window's muzzle proposal. Apply the tool to save it."
+                    : "Save only this muzzle's position and rotation."), expandWidth: true, minimumHeight: 26f))
+                    SaveChanges();
+            using (new EditorGUI.DisabledScope(!HasChanges))
+                if (StudioButton.Draw(new GUIContent("Discard", "Reload the tool's current muzzle position and rotation."),
+                    expandWidth: true, minimumHeight: 26f))
+                    DiscardChanges();
         }
 
         /// <summary>Renders cached meshes and handles in root-relative coordinates.</summary>
@@ -318,6 +339,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>Discards only the detached muzzle proposal.</summary>
         public override void DiscardChanges()
         {
+            // Discard also clears the proposal when its source has been removed.
+            pose = baseline;
+            status = string.Empty;
             Read();
             base.DiscardChanges();
             Repaint();

@@ -76,8 +76,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             RuntimeInteractionReference selected = (RuntimeInteractionReference)property.boxedValue;
             string label = !selected.Assigned ? "Choose Interaction" : selected.AllOfType ? selected.Kind + " (all)" : selected.Kind + " / " + selected.Name;
-            Rect rect = EditorGUILayout.GetControlRect();
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent("Interaction", property.tooltip));
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Interaction", property.tooltip));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
+            rect = field.ValueRect(rect);
             using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(source == null && !allowTypes);
             if (!GUI.Button(rect, new GUIContent(label, allowTypes ? "Remove a type from any contact item. Missing types are ignored." : property.tooltip), EditorStyles.popup))
                 return;

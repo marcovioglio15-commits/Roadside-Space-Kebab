@@ -1,3 +1,4 @@
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             serializedObject.Update();
             SerializedProperty description = serializedObject.FindProperty("Description");
             if (description != null)
-                EditorGUILayout.PropertyField(description, new GUIContent("Description", "A short note about this preset."));
+                StudioFieldGUI.PropertyField(description, new GUIContent("Description", "A short note about this preset."));
             switch (target)
             {
                 case ObjectGroupPreset group:
@@ -30,11 +31,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Group(interaction, index);
                     break;
                 case ObjectMasterPreset master:
-                    EditorGUILayout.PropertyField(serializedObject.FindProperty("SourcePrefab"), new GUIContent("Source prefab", "Original object. Include it when exporting, if needed."));
+                    StudioFieldGUI.PropertyField(serializedObject.FindProperty("SourcePrefab"), new GUIContent("Source prefab", "Original object. Include it when exporting, if needed."));
                     for (int index = 0; index < master.Shared.Length; index++)
                     {
                         ObjectMasterPreset.SharedEntry shared = master.Shared[index];
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("Shared").GetArrayElementAtIndex(index).FindPropertyRelative("Preset"),
+                        StudioFieldGUI.PropertyField(serializedObject.FindProperty("Shared").GetArrayElementAtIndex(index).FindPropertyRelative("Preset"),
                             new GUIContent(string.IsNullOrEmpty(shared.Path) ? "Root shared settings" : shared.Path, "Choose the flags and shared settings for this object."));
                         if (shared.Preset != null && GUILayout.Button(new GUIContent("Edit shared settings", "Edit these reusable flags and switches.")))
                             ObjectSharedPresetWindow.Open(shared.Preset);
@@ -42,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     for (int entryIndex = 0; entryIndex < master.Interactions.Length; entryIndex++)
                     {
                         ObjectMasterPreset.InteractionEntry entry = master.Interactions[entryIndex];
-                        EditorGUILayout.PropertyField(serializedObject.FindProperty("Interactions").GetArrayElementAtIndex(entryIndex).FindPropertyRelative("Preset"),
+                        StudioFieldGUI.PropertyField(serializedObject.FindProperty("Interactions").GetArrayElementAtIndex(entryIndex).FindPropertyRelative("Preset"),
                             new GUIContent(entry.Name, "Choose the main preset for this interaction."));
                         if (entry.Preset != null)
                         {
@@ -84,7 +85,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectGroupPreset preset = owner.Groups[index];
             using SerializedObject data = new SerializedObject(owner);
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
-            EditorGUILayout.PropertyField(data.FindProperty("Groups").GetArrayElementAtIndex(index), new GUIContent(preset?.Group?.Title ?? "Missing group", "Choose a reusable preset for this group."));
+            StudioFieldGUI.PropertyField(data.FindProperty("Groups").GetArrayElementAtIndex(index), new GUIContent(preset?.Group?.Title ?? "Missing group", "Choose a reusable preset for this group."));
             data.ApplyModifiedProperties();
             using (new EditorGUI.DisabledScope(preset == null))
             {

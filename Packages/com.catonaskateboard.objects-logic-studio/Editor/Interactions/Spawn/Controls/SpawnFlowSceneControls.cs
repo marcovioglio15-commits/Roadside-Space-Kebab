@@ -43,8 +43,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static void Selection(SerializedProperty property, string scene, bool animationsOnly, string label)
         {
             SceneInteractionReference current = (SceneInteractionReference)property.boxedValue;
-            Rect rect = EditorGUILayout.GetControlRect();
-            rect = EditorGUI.PrefixLabel(rect, new GUIContent(label, property.tooltip));
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent(label, property.tooltip));
+            Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
+            rect = field.ValueRect(rect);
             string caption = current is { IsValid: true } ? current.Path + " / " + current.Interaction.Kind + " · " + current.Interaction.Name : "Select Interaction";
             if (!EditorGUI.DropdownButton(rect, new GUIContent(caption), FocusType.Keyboard))
                 return;

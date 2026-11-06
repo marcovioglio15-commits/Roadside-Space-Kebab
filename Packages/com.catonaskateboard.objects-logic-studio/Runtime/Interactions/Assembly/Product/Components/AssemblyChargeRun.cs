@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
+using Guid = System.Guid;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -10,7 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private AssemblyPickup active;
         private AssemblyChargeHud hud;
-        private InputActionReference blockedAction;
+        private Guid blockedAction;
         private uint ingredientRevision;
         private float elapsed;
         private int releaseFrame = -1;
@@ -47,7 +47,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             active = pickup;
             ingredientRevision = pickup.Owner.IngredientRevision;
             BlockedButton = button;
-            blockedAction = pickup.Action;
+            blockedAction = button.Id;
             releaseFrame = -1;
             elapsed = 0f;
             hud = settings.ShowHud ? observer.AssemblyHud : null;
@@ -112,7 +112,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void RefreshButton(InteractionInputRouter input)
         {
             // Rebinding another spawned object must not interrupt an otherwise continuous hold.
-            if (blockedAction == null)
+            if (blockedAction == Guid.Empty)
                 return;
             BlockedButton = input.Find(blockedAction);
             if (BlockedButton == null || !BlockedButton.Enabled)
@@ -127,7 +127,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else if (Time.frameCount > releaseFrame)
             {
                 BlockedButton = null;
-                blockedAction = null;
+                blockedAction = Guid.Empty;
             }
         }
 
@@ -146,7 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             Cancel();
             BlockedButton = null;
-            blockedAction = null;
+            blockedAction = Guid.Empty;
             releaseFrame = -1;
         }
 

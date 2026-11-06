@@ -1,0 +1,176 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c99460e8178c52f44a29ddc119173a20, type: 3}
+  m_Name: SO_Shotgun_Reload
+  m_EditorClassIdentifier: CatOnASkateboard.PlayerStudio.Runtime::CatOnASkateboard.PlayerStudio.PlayerToolAnimationPreset
+  Duration: 1.38
+  Tracks:
+  - Path: 
+    Space: 0
+    RelativeToStart: 1
+    Keys:
+    - Time: 0
+      Pose:
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.28
+      Pose:
+        Position: {x: -0.071, y: 0.1, z: 0.031}
+        Rotation: {x: -4.5, y: -3.5, z: -10.5}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.66
+      Pose:
+        Position: {x: -0.078, y: 0.108, z: 0.035}
+        Rotation: {x: -5.3, y: -3, z: -8.5}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.99
+      Pose:
+        Position: {x: -0.07, y: 0.095, z: 0.025}
+        Rotation: {x: -4.3, y: -3, z: -9}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 1.17
+      Pose:
+        Position: {x: -0.039, y: 0.049, z: -0.01}
+        Rotation: {x: 2.7, y: -1.8, z: -4}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 1.23
+      Pose:
+        Position: {x: -0.022, y: 0.023, z: -0.015}
+        Rotation: {x: 3.2, y: -0.5, z: -2.4}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 1.38
+      Pose:
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+  - Path: PF_ShotgunBlockout/SM_ShotgunBarrels
+    Space: 0
+    RelativeToStart: 0
+    Keys:
+    - Time: 0
+      Pose:
+        Position: {x: 0, y: 0.106, z: 0.493}
+        Rotation: {x: -88.17587, y: 0.00091184245, z: -90.00079}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 0
+    - Time: 0.055
+      Pose:
+        Position: {x: 0, y: 0.106, z: 0.493}
+        Rotation: {x: -88.17587, y: 0.00091184245, z: -90.00079}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 0
+    - Time: 0.28
+      Pose:
+        Position: {x: 0, y: 0.106, z: 0.493}
+        Rotation: {x: 0, y: 0.00091184245, z: -90.00079}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 0
+    - Time: 0.99
+      Pose:
+        Position: {x: 0, y: 0.106, z: 0.493}
+        Rotation: {x: 0, y: 0.00091184245, z: -90.00079}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 0
+    - Time: 1.17
+      Pose:
+        Position: {x: 0, y: 0.106, z: 0.493}
+        Rotation: {x: -88.17587, y: 0.00091184245, z: -90.00079}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 0
+    - Time: 1.21
+      Pose:
+        Position: {x: 0, y: 0.106, z: 0.493}
+        Rotation: {x: -88.975876, y: 0.00091184245, z: -90.00079}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 0
+    - Time: 1.28
+      Pose:
+        Position: {x: 0, y: 0.106, z: 0.493}
+        Rotation: {x: -88.17587, y: 0.00091184245, z: -90.00079}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 0
+  - Path: PF_ShotgunBlockout/SM_ShotgunBarrels/SM_ShotgunSlug
+    Space: 0
+    RelativeToStart: 0
+    Keys:
+    - Time: 0
+      Pose:
+        Position: {x: -0.6531631, y: 1.1898929, z: 0.0174823}
+        Rotation: {x: 12, y: 14, z: 24}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.3
+      Pose:
+        Position: {x: -0.6531631, y: 1.1898929, z: 0.0174823}
+        Rotation: {x: 12, y: 14, z: 24}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.42000002
+      Pose:
+        Position: {x: -0.42315096, y: 0.30989712, z: -0.047531705}
+        Rotation: {x: 8, y: 5, z: 15}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.5
+      Pose:
+        Position: {x: -0.318146, y: -0.050102174, z: 0.0004625658}
+        Rotation: {x: -0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.63
+      Pose:
+        Position: {x: -0.13314602, y: -0.05009965, z: 0.002462566}
+        Rotation: {x: -0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+  - Path: PF_ShotgunBlockout/SM_ShotgunBarrels/SM_ShotgunSlug (1)
+    Space: 0
+    RelativeToStart: 0
+    Keys:
+    - Time: 0
+      Pose:
+        Position: {x: -0.65316284, y: 1.2881929, z: 0.017482359}
+        Rotation: {x: 12, y: 14, z: 24}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.48
+      Pose:
+        Position: {x: -0.65316284, y: 1.2881929, z: 0.017482359}
+        Rotation: {x: 12, y: 14, z: 24}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.624
+      Pose:
+        Position: {x: -0.42315072, y: 0.4081971, z: -0.047531646}
+        Rotation: {x: 8, y: 5, z: 15}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.72
+      Pose:
+        Position: {x: -0.31814575, y: 0.048197825, z: 0.0004626254}
+        Rotation: {x: -0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1
+    - Time: 0.9
+      Pose:
+        Position: {x: -0.13314576, y: 0.04820035, z: 0.0024626255}
+        Rotation: {x: -0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      RotationDirection: 1

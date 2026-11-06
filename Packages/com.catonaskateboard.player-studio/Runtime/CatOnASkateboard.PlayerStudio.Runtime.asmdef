@@ -4,6 +4,7 @@
   "references": [
     "Unity.InputSystem",
     "CatOnASkateboard.AudioStudio.Runtime",
+    "CatOnASkateboard.StudioIdentity.Runtime",
     "UnityEngine.UI"
   ]
 }

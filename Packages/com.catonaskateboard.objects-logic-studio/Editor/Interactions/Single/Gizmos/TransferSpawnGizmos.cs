@@ -26,10 +26,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Handles.Label(target, feature.Kind + " · " + feature.Target.Distance.ToString("0.##") + " m");
             switch (feature)
             {
-                case ObjectDispenser dispenser when dispenser.Settings.TryValidate(out _):
-                    if (dispenser.Settings.Mode == DispenseMode.ToHand)
+                case ObjectDispenser dispenser when dispenser.Settings.TryValidate(out _, dispenser.ToolRequirement):
+                    DispenseMode mode = dispenser.Settings.Mode;
+                    DispenseMode toolMode = dispenser.HasSeparateToolOutput ? dispenser.Settings.ToolMode : mode;
+                    if (mode == DispenseMode.ToHand || toolMode == DispenseMode.ToHand)
                         Pose(dispenser.transform, Vector3.zero, dispenser.Settings.OutputRotation, "Dispenser pickup origin");
-                    else if (dispenser.Settings.Mode != DispenseMode.ScoopOnly)
+                    if (DispenserSettings.UsesWorldOutput(mode) || DispenserSettings.UsesWorldOutput(toolMode))
                         for (int index = 0; index < dispenser.Settings.Outlets.Length; index++)
                         {
                             DispenserOutlet outlet = dispenser.Settings.Outlets[index];

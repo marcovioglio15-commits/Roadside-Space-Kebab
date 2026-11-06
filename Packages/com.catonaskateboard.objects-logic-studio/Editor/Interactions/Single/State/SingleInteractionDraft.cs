@@ -161,7 +161,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case ObjectEject eject:
                     return eject.TryValidate(Eject, out warning, EjectAnimationControls.Resolve(Eject.AnimationIdentity));
                 case ObjectDispenser dispenser:
-                    return dispenser.TryValidate(Dispenser, out warning);
+                    return dispenser.TryValidate(Dispenser, out warning, ToolRequirement);
                 case ObjectContainer container:
                     return container.TryValidate(Container, out warning);
             }
