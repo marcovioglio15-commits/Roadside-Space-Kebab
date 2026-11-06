@@ -271,7 +271,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
                 binding.isExpanded = EditorGUILayout.Foldout(binding.isExpanded, binding.FindPropertyRelative("Key").stringValue, true);
                 if (!binding.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope entryIndent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope entryIndent = new StudioFieldLayout.SectionScope(1);
                 if (!limitsOnly)
                 {
                     StudioFields.Draw(binding, "Key", "DisplayName", "Description", "EventPath", "EventGuid", "Volume", "Pitch", "Spatialize");
@@ -316,7 +316,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
                 item.isExpanded = EditorGUILayout.Foldout(item.isExpanded, item.FindPropertyRelative("Context").stringValue, true);
                 if (!item.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope entryIndent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope entryIndent = new StudioFieldLayout.SectionScope(1);
                 StudioFields.Draw(item, "Context", "Enabled");
                 if (item.FindPropertyRelative("Enabled").boolValue)
                     StudioFields.Draw(item, "EventPath", "EventGuid", "Bank", "Volume", "AutoStart", "RestartWhenPathChanges", "StopWhenDisabled");

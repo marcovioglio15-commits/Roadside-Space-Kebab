@@ -50,6 +50,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal uint PickupRevision => grab != null ? grab.PickupRevision : 0;
         /// <summary>Whether a modification currently owns this item's appearance or consumption state.</summary>
         public bool IsReserved => reservation != null;
+        /// <summary>Whether a dispenser magnet currently owns the item's physical motion.</summary>
+        internal bool IsFloatingSupply { get; set; }
 
         #endregion
 

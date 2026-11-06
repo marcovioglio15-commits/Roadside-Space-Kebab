@@ -188,7 +188,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanAccept(ObjectGrab held, bool requireHeld = true)
         {
             // Availability includes independent Unlock Interactions and temporary contact restrictions.
-            if (!Available(InteractionChannels.Assembly) || Item == null || Item.IsReserved || Template == null || held == null || !held.isActiveAndEnabled
+            if (!Available(InteractionChannels.Assembly) || Item == null || Item.IsReserved || Template == null || held == null || held.RequiresAssemblyRelease || !held.isActiveAndEnabled
                 || requireHeld && !held.IsHeld || !requireHeld && !AssemblyIngredientDock.Allows(this, held))
                 return false;
             current = CurrentProduct;
@@ -322,7 +322,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 current = PrepareProduct();
             // Activation and completion may release table ownership through a matching gravity pulse.
             ObjectAssemblyProduct product = current;
-            bool complete = product.IsComplete;
             if (!(sequence != null ? product.AcceptSequence(sequence) : product.Accept(ingredient, requireHeld)))
             {
                 if (spawned)
@@ -332,7 +331,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
                 return false;
             }
-            ActivateProduct(product, complete);
+            ActivateProduct(product);
             return true;
         }
 
@@ -352,8 +351,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Publishes one successful insertion after an ordinary commit or a full recipe revision.</summary>
         /// <param name="product">Prepared product that now owns all accepted ingredients.</param>
-        /// <param name="wasComplete">Whether this same recipe was already complete before the insertion.</param>
-        internal void ActivateProduct(ObjectAssemblyProduct product, bool wasComplete)
+        internal void ActivateProduct(ObjectAssemblyProduct product)
         {
             current = product;
             Pending.Release();
@@ -361,8 +359,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 product.gameObject.SetActive(true);
             product.PublishPending();
             Signal(InteractionMoment.Started);
-            if (!product.Settings.ProlongedAssembly && !wasComplete && product.IsComplete)
-                Signal(InteractionMoment.Completed);
         }
 
         /// <summary>Publishes delayed station completion only after its product finishes prolonged assembly.</summary>
@@ -395,6 +391,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Product pickup captures this kinematic policy; Drop and Throw can still make it dynamic.
             product.Table = this;
             Rigidbody body = product.GetComponent<Rigidbody>();
+            ObjectGravityGenerator.Forget(body);
             body.collisionDetectionMode = CollisionDetectionMode.Discrete;
             body.isKinematic = true;
             body.interpolation = RigidbodyInterpolation.None;

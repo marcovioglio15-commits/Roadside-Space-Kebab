@@ -136,6 +136,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public static void RestoreSession()
         {
             pending.Clear();
+            InteractionChangeRun.ResetClaims();
             using (Stage())
             {
                 foreach (InteractionRuntimeSnapshot snapshot in originals.Values)

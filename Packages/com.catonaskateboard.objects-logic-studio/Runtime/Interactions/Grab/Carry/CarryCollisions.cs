@@ -47,9 +47,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Pickup is an allocation boundary; ordinary carry frames reuse the captured pairs.
             Restore(true);
-            Collider[] players = player.GetComponentsInChildren<Collider>(true);
+            Add(owned, player.GetComponentsInChildren<Collider>(true));
+        }
+
+        /// <summary>Adds ignored pairs for an additional source without clearing the current set.</summary>
+        /// <param name="owned">Colliders on the carried body.</param>
+        /// <param name="others">Additional source colliders.</param>
+        internal void Add(Collider[] owned, Collider[] others)
+        {
             foreach (Collider collider in owned)
-                foreach (Collider other in players)
+                foreach (Collider other in others)
                     if (collider != null && other != null && collider != other && !Physics.GetIgnoreCollision(collider, other))
                     {
                         pairs.Add(new Pair(collider, other));

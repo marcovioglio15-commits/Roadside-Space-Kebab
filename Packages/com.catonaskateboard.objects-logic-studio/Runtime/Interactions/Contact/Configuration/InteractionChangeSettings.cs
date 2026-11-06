@@ -6,7 +6,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Lists interaction families accepted by runtime contact edits, including availability rules.</summary>
     public enum InteractionRuntimeKind { Hover, Grab, Drop, Throw, Dispenser, Container, Dialogue, Slice, Contact, Outline, Spawn, AssemblyStation, AssemblyProduct, Ambient, AvailableOrders, TriggerAnimation, Eject, ObjectDegradation, GravityGenerator, ElasticDeformation, DirtTrail, SpraySauce, Deathbox, PresenceCap, Unlock }
     /// <summary>Operations applied atomically when a contact modification completes.</summary>
-    public enum InteractionChangeOperation { Add, Remove, ApplyPreset }
+    public enum InteractionChangeOperation { Add, Remove, ApplyPreset, Enable, Disable }
 
     /// <summary>Finds an exact local card without storing a reference to another prefab instance.</summary>
     [Serializable]
@@ -19,7 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool Assigned;
         [Tooltip("Interaction family used by this selection.")]
         public InteractionRuntimeKind Kind;
-        [Tooltip("Remove every card of this type. A missing type has no effect.")]
+        [Tooltip("Select by interaction type instead of by card name.")]
         public bool AllOfType;
         [Tooltip("Selected card name. Set by the interaction menu.")]
         [HideInInspector]
@@ -60,7 +60,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Fields
 
         [Header("Interaction Change")]
-        [Tooltip("Add a card from a preset, remove a card, or import a preset into an existing card.")]
+        [Tooltip("Add, remove, enable, disable or update an interaction from a preset.")]
         public InteractionChangeOperation Operation;
         [Tooltip("Interaction family to create. Used only by Add.")]
         public InteractionRuntimeKind AddKind;
@@ -94,7 +94,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Interaction family accepting the selected preset.</summary>
-        public InteractionRuntimeKind Kind => Operation == InteractionChangeOperation.Add ? AddKind : Target.Kind;
+        public InteractionRuntimeKind Kind => Operation == InteractionChangeOperation.Add || Target == null ? AddKind : Target.Kind;
+
+        /// <summary>Whether this operation imports settings groups.</summary>
+        public bool UsesGroups => Operation is InteractionChangeOperation.Add or InteractionChangeOperation.ApplyPreset;
 
         #endregion
 
@@ -108,7 +111,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool TryValidate(out string warning)
         {
             warning = "Choose a supported interaction operation and target.";
-            if (Operation is not (InteractionChangeOperation.Add or InteractionChangeOperation.Remove or InteractionChangeOperation.ApplyPreset)
+            if (Operation is < InteractionChangeOperation.Add or > InteractionChangeOperation.Disable
                 || Target == null || Kind is < InteractionRuntimeKind.Hover or > InteractionRuntimeKind.Unlock
                 || Operation != InteractionChangeOperation.Add && !Target.Assigned)
                 return false;
@@ -118,7 +121,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             }
             warning = "Assign matching settings-group presets.";
-            if (Operation != InteractionChangeOperation.Remove
+            if (UsesGroups
                 && (Groups == null || Groups.Length == 0 || Array.Exists(Groups, group => group == null || !group.Accepts(Kind))))
                 return false;
             warning = string.Empty;

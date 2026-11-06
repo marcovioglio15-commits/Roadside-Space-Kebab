@@ -81,6 +81,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal uint PickupRevision { get; private set; }
         /// <summary>Suspended ingredients require a deliberate Drop, Throw or station placement before automatic assembly.</summary>
         internal bool RequiresAssemblyPlacement { get; set; }
+        /// <summary>Blocks dismantled ingredients until the player explicitly drops or throws them.</summary>
+        internal bool RequiresAssemblyRelease { get; set; }
         /// <summary>Owned rigidbody used by release actions.</summary>
         public Rigidbody Body => body;
         /// <summary>Whether selected-object debug geometry is enabled.</summary>
@@ -94,7 +96,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Temporary magnet placement shared by undecided recipes on one assembly table.</summary>
         internal AssemblyIngredientDock Dock { get; set; }
         /// <summary>Container cached at activation for direct held scoops.</summary>
-        internal ObjectContainer CarryContainer { get; private set; }
+        internal ObjectContainer[] CarryContainers { get; private set; }
+        /// <summary>Supply cycle to which a released floating portion can return.</summary>
+        internal ScoopDisplay ScoopSupply { get; set; }
+        /// <summary>Release revision captured when the portion entered its magnet.</summary>
+        internal uint ScoopReleaseRevision { get; set; }
         /// <summary>Whether ordinary pickup has finished and can accept a scoop pose.</summary>
         internal bool CanScoop => IsHeld && pickupCompleted && !physical.Active;
         /// <summary>Current desired carry pose, including a retained scoop offset.</summary>
@@ -111,6 +117,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Inventory suspension within a session preserves first-grab history.
             RequiresAssemblyPlacement = false;
+            RequiresAssemblyRelease = false;
             ReleaseRevision = 0;
             PickupRevision = 0;
             grabbedOnce = false;
@@ -122,6 +129,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void OnCollisionEnter(Collision collision)
         {
             physical.Contact(collision);
+            ScoopSupply?.Return(this, collision.collider);
             // Held, consumed and stored items never emit ingredient impact sounds.
             if (!grabbedOnce || IsHeld || Item != null && (Item.IsConsumed || Item.IsReserved)
                 || drop == null && throwing == null || !settings.CollisionAudio.Enabled || Time.time < nextImpact)
@@ -140,8 +148,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void OnCollisionStay(Collision collision)
         {
             physical.Contact(collision);
+            ScoopSupply?.Return(this, collision.collider);
         }
 
+
+        /// <summary>Reinstates a dropped or thrown portion as it enters its original supply volume.</summary>
+        /// <param name="other">Trigger on the dispenser the portion touched.</param>
+        private void OnTriggerEnter(Collider other)
+        {
+            ScoopSupply?.Return(this, other);
+        }
+
+        /// <summary>Handles releases that already overlap their original supply volume.</summary>
+        /// <param name="other">Trigger that still overlaps the released portion.</param>
+        private void OnTriggerStay(Collider other)
+        {
+            ScoopSupply?.Return(this, other);
+        }
 
         /// <summary>Caches the authored body, colliders and hover labels at activation.</summary>
         protected override void OnEnable()
@@ -150,7 +173,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             // Compound colliders belonging to another rigidbody must never inherit these overrides.
             body = GetComponent<Rigidbody>();
-            CarryContainer = GetComponent<ObjectContainer>();
+            CarryContainers = GetComponents<ObjectContainer>();
             drop = GetComponent<ObjectDrop>();
             throwing = GetComponent<ObjectThrow>();
             degradation = GetComponent<ObjectDegradation>();
@@ -326,6 +349,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             BlackHoleRun.ReleaseForGrab(body);
             Dock?.Release();
+            ScoopDisplay pickupSupply = Item.IsFloatingSupply ? ScoopSupply : null;
+            pickupSupply?.Withdraw(Item);
             // Restore visual magnet overrides before capturing the body's carry policy and scaled geometry.
             if (TryGetComponent(out ObjectAssemblyProduct product))
                 product.ReleaseTable();
@@ -344,6 +369,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             collisions.Ignore(colliders, observer.Player);
             if (pickupSource != null)
                 sourceCollisions.Ignore(colliders, pickupSource);
+            else
+                pickupSupply?.IgnorePickup(sourceCollisions, colliders);
             motion.Bind(body, colliders, observer.Player);
             if (!body.isKinematic)
             {
@@ -387,12 +414,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Hands one temporary movement to the existing carry pose writer.</summary>
         /// <param name="operation">Prepared scoop owning the current source reservation.</param>
-        /// <param name="source">Dispenser surfaces temporarily excluded from carry collisions.</param>
-        internal void BeginScoop(ScoopRun operation, Transform source)
+        /// <param name="source">Dispenser and its supply temporarily excluded from carry collisions.</param>
+        internal void BeginScoop(ScoopRun operation, ObjectDispenser source)
         {
             scoop = operation;
             scoopCollisions.Restore(true);
-            scoopCollisions.Ignore(colliders, source);
+            scoopCollisions.Ignore(colliders, source.transform);
+            source.IgnoreScoopSupply(scoopCollisions, colliders);
         }
 
         /// <summary>Retains the final pose relative to the carry frame without a closing snap.</summary>
@@ -414,7 +442,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             drop = GetComponent<ObjectDrop>();
             throwing = GetComponent<ObjectThrow>();
             degradation = GetComponent<ObjectDegradation>();
-            CarryContainer = GetComponent<ObjectContainer>();
+            CarryContainers = GetComponents<ObjectContainer>();
             hovers = GetComponentsInChildren<ObjectHover>(true);
             // Contact effects invoke this only after committing geometry, never during ordinary following.
             CacheGeometry();
@@ -529,6 +557,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             scoop?.Cancel();
             customCarry = false;
             RequiresAssemblyPlacement = false;
+            RequiresAssemblyRelease = false;
             ReleaseRevision++;
             IsHeld = false;
             physical.Stop();

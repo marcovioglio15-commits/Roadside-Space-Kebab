@@ -53,7 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             for (int index = 0; index < settings.Magnets.Length; index++)
                 if (settings.Magnets[index].PreviewPrefab != null)
-                    Add(settings.Magnets[index].PreviewPrefab, index, true, settings.Magnets[index].Appearance);
+                    Add(settings.Magnets[index].PreviewPrefab, index, true, settings.Magnets[index].Appearance,
+                        completed ? settings.Magnets[index].CompletedAppearance : null);
         }
 
         /// <summary>Queues every cached submesh using the current magnet placement.</summary>
@@ -103,7 +104,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="magnet">Guide slot, or minus one for product geometry.</param>
         /// <param name="includeRootScale">Include the guide's root scale used by actual ingredient insertion.</param>
         /// <param name="appearance">Optional replacements shown as the assembled result.</param>
-        private void Add(GameObject source, int magnet, bool includeRootScale, ItemAppearanceSettings appearance)
+        /// <param name="completion">Optional ingredient-specific changes layered over its placement look.</param>
+        private void Add(GameObject source, int magnet, bool includeRootScale, ItemAppearanceSettings appearance, ItemAppearanceSettings completion = null)
         {
             // Inactive renderers are excluded from neutral placement guides.
             Matrix4x4 basis = (includeRootScale ? Matrix4x4.Scale(source.transform.localScale) : Matrix4x4.identity)
@@ -120,19 +122,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 };
                 Material[] materials = renderer.sharedMaterials;
                 string path = AnimationUtility.CalculateTransformPath(renderer.transform, source.transform);
-                if (appearance != null)
-                {
-                    // Show the assembled appearance without assigning anything to the source prefab.
-                    foreach (ContactMeshReplacement replacement in appearance.Meshes)
-                        if (replacement != null && replacement.Path == path && replacement.Mesh != null)
-                            mesh = replacement.Mesh;
-                    foreach (ItemMaterialReplacement replacement in appearance.Materials)
-                        if (replacement != null && replacement.Path == path && replacement.Materials != null)
-                            materials = replacement.Materials;
-                }
+                ApplyAppearance(appearance, path, ref mesh, ref materials);
+                ApplyAppearance(completion, path, ref mesh, ref materials);
                 if (mesh != null)
                     entries.Add(new Entry(mesh, materials, basis * renderer.transform.localToWorldMatrix, magnet));
             }
+        }
+
+        /// <summary>Applies one visual layer to the preview without modifying any prefab renderer.</summary>
+        /// <param name="appearance">Placement or completion appearance settings.</param>
+        /// <param name="path">Renderer's path relative to its source.</param>
+        /// <param name="mesh">Current shared preview mesh.</param>
+        /// <param name="materials">Current shared preview materials.</param>
+        private static void ApplyAppearance(ItemAppearanceSettings appearance, string path, ref Mesh mesh, ref Material[] materials)
+        {
+            if (appearance == null)
+                return;
+            foreach (ContactMeshReplacement replacement in appearance.Meshes)
+                if (replacement != null && replacement.Path == path && replacement.Mesh != null)
+                    mesh = replacement.Mesh;
+            foreach (ItemMaterialReplacement replacement in appearance.Materials)
+                if (replacement != null && replacement.Path == path && replacement.Materials != null)
+                    materials = replacement.Materials;
         }
 
         /// <summary>Combines a cached local mesh matrix with its current guide slot.</summary>

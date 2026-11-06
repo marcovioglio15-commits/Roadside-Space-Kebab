@@ -17,24 +17,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained foldout states used by the assembly tool.</param>
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
-            if (!sections.Draw("Assembly completion", "Choose how assembly finishes.", settings, "ProlongedAssembly", "FinalizeOnGrab", "FinalizeAction", "FinalizeTarget", "Charge"))
+            if (!sections.Draw("Assembly completion", "Set the hold to complete a ready recipe or bind a dismantle command.", settings, "Charge", "Dismantle"))
                 return;
             using StudioIndentScope sectionContent1 = new StudioIndentScope();
-            // A product with Grab can still choose a completely independent assembly action and target.
-            HoverControls.Field(settings, "ProlongedAssembly");
             GameObject source = HierarchyPathMenu.Source(settings);
             bool hasGrab = source == null || source.GetComponent<ObjectGrab>() != null;
-            if (!settings.FindPropertyRelative("ProlongedAssembly").boolValue)
-            {
-                HoverControls.Field(settings, "FinalizeOnGrab");
-                if (settings.FindPropertyRelative("FinalizeOnGrab").boolValue && (source == null || !hasGrab))
-                {
-                    StudioInputActionMenu.Draw(settings.serializedObject, settings.FindPropertyRelative("FinalizeAction").propertyPath,
-                        "ObjectsLogicStudio.Assembly.Finalize", ExtendedInteractionControls.Button);
-                    TransferInteractionControls.Target(settings.FindPropertyRelative("FinalizeTarget"), sections);
-                }
-                return;
-            }
             SerializedProperty charge = settings.FindPropertyRelative("Charge");
             StudioInputActionMenu.Draw(settings.serializedObject, charge.FindPropertyRelative("Action").propertyPath,
                 "ObjectsLogicStudio.Assembly.Charge", ExtendedInteractionControls.Button);
@@ -44,6 +31,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(charge, "GrabOnComplete");
             TransferInteractionControls.Target(charge.FindPropertyRelative("Target"), sections);
             DrawHud(charge, sections);
+            DrawDismantle(settings.FindPropertyRelative("Dismantle"));
+        }
+
+        /// <summary>Shows the dismantle options enabled by its assigned action and switches.</summary>
+        /// <param name="settings">Detached dismantle settings.</param>
+        private static void DrawDismantle(SerializedProperty settings)
+        {
+            SerializedProperty action = settings.FindPropertyRelative("Action");
+            StudioInputActionMenu.Draw(settings.serializedObject, action.propertyPath,
+                "ObjectsLogicStudio.Assembly.Dismantle", ExtendedInteractionControls.Button);
+            if (action.objectReferenceValue == null)
+                return;
+            HoverControls.Field(settings, "Hold");
+            if (settings.FindPropertyRelative("Hold").boolValue)
+                HoverControls.Field(settings, "Duration");
+            HoverControls.Field(settings, "Lift");
+            HoverControls.Field(settings, "Spread");
+            HoverControls.Field(settings, "CameraImpact");
+            if (settings.FindPropertyRelative("CameraImpact").boolValue)
+            {
+                HoverControls.Field(settings, "CameraDuration");
+                HoverControls.Field(settings, "CameraArcHeight");
+                HoverControls.Field(settings, "CameraClearance");
+            }
         }
 
         /// <summary>Exposes visual details only while the configured charge HUD is requested.</summary>

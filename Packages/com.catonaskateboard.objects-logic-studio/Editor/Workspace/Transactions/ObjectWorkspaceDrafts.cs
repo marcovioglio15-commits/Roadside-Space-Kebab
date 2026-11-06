@@ -71,8 +71,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     case ObjectSingleInteraction single:
                         state.Category = ObjectInteractionCategory.SingleInteraction;
-                        state.Single.Kind = single.Kind;
-                        state.Single.Read(single.gameObject);
+                        state.Single.Select(single);
                         break;
                     case ObjectExtendedInteraction extended:
                         state.Category = ObjectInteractionCategory.MultipleInteraction;
@@ -150,7 +149,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectInteraction initial = state.Category switch
                 {
                     ObjectInteractionCategory.Hover => ObjectWorkspaceSession.Resolve(state),
-                    ObjectInteractionCategory.SingleInteraction => SingleInteractionSession.Resolve(target, state.Single.Kind),
+                    ObjectInteractionCategory.SingleInteraction => state.Single.Resolve(target),
                     _ => state.Extended.Resolve(target)
                 };
                 if (initial != null)

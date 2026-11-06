@@ -18,7 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             change.GroupWarning = string.Empty;
             change.CompiledKind = change.Kind;
-            if (change.Operation == InteractionChangeOperation.Remove)
+            if (!change.UsesGroups)
                 return true;
             List<InteractionGroupPatch> patches = new List<InteractionGroupPatch>();
             try

@@ -16,6 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly ContactImpactBuffer impacts = new ContactImpactBuffer();
         private readonly ContactIdentityRun identityRun = new ContactIdentityRun();
         private readonly ContactPreparationRun preparation = new ContactPreparationRun();
+        private ContactParallelEffects parallel;
         private readonly HashSet<ObjectItem> contacts = new HashSet<ObjectItem>();
         private readonly HashSet<ObjectItem> completed = new HashSet<ObjectItem>();
         private readonly HashSet<ObjectItem> failed = new HashSet<ObjectItem>();
@@ -53,13 +54,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Whether the containing interaction accepts the active player tool.</summary>
         internal bool ToolAllowed => owner.ToolAllowed;
         /// <summary>Whether any transition owned by this rule is running.</summary>
-        internal bool IsRunning => running || returning || identityRun.IsRunning;
+        internal bool IsRunning => running || returning || identityRun.IsRunning || parallel is { Running: true };
         /// <summary>Whether this rule retains a snapped item while awaiting its Button.</summary>
         internal bool Waiting => preparation.Waiting;
         /// <summary>Whether an interrupted visual transition retains its counterpart.</summary>
         internal bool IsPaused => paused;
         /// <summary>Whether the effect is actively advancing rather than preparing, retaining or returning.</summary>
-        internal bool IsAudible => running && effectsStarted && !paused && !IsLocked && ToolAllowed;
+        internal bool IsAudible => parallel is { Running: true } || running && effectsStarted && !paused && !IsLocked && ToolAllowed;
 
         #endregion
 
@@ -74,7 +75,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             Cancel();
             owner = component;
+            parallel?.Clear(this, true);
             settings = configuration;
+            parallel = settings.ParallelOther ? parallel ?? new ContactParallelEffects() : null;
             contacts.Clear();
             entered.Clear();
             completed.Clear();
@@ -90,6 +93,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Deactivation or consumption can occur inside another feature's completion callback.
             Cancel();
+            parallel?.Clear(this, true);
             impacts.Clear();
             contacts.Clear();
             entered.Clear();
@@ -102,12 +106,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!Active || Item == null || !Item.isActiveAndEnabled || Item.IsConsumed)
             {
                 Cancel();
+                parallel?.Clear(this);
                 impacts.Clear();
                 return;
             }
             if (Time.timeScale <= 0f)
             {
                 impacts.Clear();
+                return;
+            }
+            if (parallel != null)
+            {
+                TickParallel();
                 return;
             }
             // Brief impacts are processed once, before interval-based overlap queries can miss them.
@@ -143,6 +153,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 UpdateContacts();
             }
             Advance(false);
+        }
+
+        /// <summary>Shares one contact query among all independent tint transitions on this rule.</summary>
+        private void TickParallel()
+        {
+            if (!Available(InteractionChannels.Passive))
+            {
+                parallel.Clear(this);
+                nextQuery = 0f;
+                return;
+            }
+            if (Time.time >= nextQuery)
+            {
+                nextQuery = Time.time + settings.QueryInterval;
+                detection.Query(Item, settings, contacts);
+                parallel.Scan(this, contacts);
+            }
+            parallel.Tick(this, contacts);
         }
 
         /// <summary>Advances an acquired pair using live contact or one solver-confirmed impact.</summary>
@@ -442,6 +470,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Commits mesh effects and a single consumption receipt before releasing ownership.</summary>
         private void Complete()
         {
+            if (!selfEffect.CanCommit() || !otherEffect.CanCommit())
+            {
+                ObjectItem rejected = other;
+                Cancel();
+                failed.Add(rejected);
+                return;
+            }
             // Clear running first: deactivating the victim must not roll back an already completed tint.
             selfEffect.Commit();
             otherEffect.Commit();
@@ -548,7 +583,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Report(string warning)
         {
             // Successful activation clears the diagnostic so a later independent failure remains visible.
-            if (lastWarning == warning)
+            if (string.IsNullOrEmpty(warning) || lastWarning == warning)
                 return;
             lastWarning = warning;
             Debug.LogWarning($"Modify by Contact '{owner.InteractionName}', modification '{settings.Name}': {warning}", owner);

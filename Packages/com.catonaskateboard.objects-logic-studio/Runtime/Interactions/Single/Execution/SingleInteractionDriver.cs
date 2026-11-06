@@ -137,8 +137,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (feature.UsesInput)
                     BindFeature(feature, feature.Action);
             foreach (AssemblyPickup pickup in AssemblyPickup.Registered)
-                if (pickup.Owner.Settings.ProlongedAssembly || pickup.Owner.Settings.FinalizeOnGrab)
-                    BindFeature(pickup.Owner, pickup.Action);
+                BindFeature(pickup.Owner, pickup.Action);
+            assembly.BindDismantle(input);
             retrieval.Bind(input, bindings);
         }
 
@@ -272,21 +272,34 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when a compatible scoop target owns the press, including a full or busy receiver.</returns>
         private bool Scoop(HoverObserver observer, InteractionButton requested, DialogueActionPriority allowed)
         {
-            ObjectContainer receiver = held != null ? held.CarryContainer : null;
-            if (receiver == null || !receiver.isActiveAndEnabled || !receiver.Settings.ScoopFromDispenser)
+            if (held == null || held.CarryContainers == null || held.CarryContainers.Length == 0)
                 return false;
+            ObjectContainer receiver = null;
             ObjectDispenser selected = null;
             InteractionButton selectedButton = null;
             float distance = float.PositiveInfinity;
-            foreach (KeyValuePair<ObjectInteraction, InteractionButton> pair in bindings)
-                if (pair.Key is ObjectDispenser source && Pending(pair, requested, allowed) is InteractionButton button && source.gameObject != receiver.gameObject
-                    && !source.UsesSeparateOutput(button.Id) && !source.IsLocked && source.MatchesScoop(receiver)
-                    && Eligible(observer, source, out float score) && Nearer(source, selected, score, distance))
+            foreach (ObjectContainer candidate in held.CarryContainers)
+            {
+                if (candidate == null || !candidate.isActiveAndEnabled || !candidate.Settings.ScoopFromDispenser)
+                    continue;
+                InteractionButton scoopButton = bindings.TryGetValue(candidate, out InteractionButton bound)
+                    ? Pending(new KeyValuePair<ObjectInteraction, InteractionButton>(candidate, bound), requested, allowed) : null;
+                foreach (ObjectSingleInteraction feature in SingleInteractionRegistry.Items)
                 {
+                    if (feature is not ObjectDispenser source || !source.isActiveAndEnabled || source.gameObject == candidate.gameObject || source.IsLocked)
+                        continue;
+                    InteractionButton button = source.Settings.ScoopOnly ? scoopButton
+                        : bindings.TryGetValue(source, out InteractionButton output)
+                            ? Pending(new KeyValuePair<ObjectInteraction, InteractionButton>(source, output), requested, allowed) : null;
+                    if (button == null || source.UsesSeparateOutput(button.Id) || !source.MatchesScoop(candidate)
+                        || !Eligible(observer, source, out float score) || !Nearer(source, selected, score, distance))
+                        continue;
+                    receiver = candidate;
                     selected = source;
                     selectedButton = button;
                     distance = score;
                 }
+            }
             if (selected == null)
                 return false;
             receiver.TryScoop(selected, held);
@@ -308,7 +321,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private InteractionButton Pending(KeyValuePair<ObjectInteraction, InteractionButton> pair, InteractionButton requested, DialogueActionPriority allowed)
         {
             InteractionButton button = input.Read(pair.Key, pair.Value, requested,
-                pair.Key is ObjectAssemblyProduct { Settings: { ProlongedAssembly: true } });
+                pair.Key is ObjectAssemblyProduct);
             return button != null && DialogueActionRules.Allows(pair.Key, allowed) ? button : null;
         }
 
@@ -481,7 +494,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // At most one output per observation pass keeps long frames from allocating a burst of missed intervals.
             if (performed || Time.time < nextDispense)
                 return;
-            performed = scoopReceiver != null ? held != null && held.CarryContainer == scoopReceiver && scoopReceiver.TryScoop(dispensing, held)
+            performed = scoopReceiver != null ? held != null && scoopReceiver.TryScoop(dispensing, held)
                 : dispensing.TryTake(observer, DispenseMode.ContinuousOutput, out _);
             nextDispense = Time.time + dispensing.Settings.Interval;
             if (!performed)
@@ -590,11 +603,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Each pickup family retains its own atomic ownership and rollback behavior.
             switch (selected)
             {
-                case ObjectAssemblyProduct product when product.Settings.ProlongedAssembly:
+                case ObjectAssemblyProduct product:
                     return assembly.Begin(product.Pickup, button, observer);
-                case ObjectAssemblyProduct product when product.Pickup.Execute(observer, out ObjectGrab carried):
-                    held = carried;
-                    return true;
                 case ObjectGrab grab when retrieval.Release(grab) && grab.Begin(observer):
                     held = grab;
                     return true;
@@ -648,10 +658,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Transfer interactions have their own range and aim settings, independent of Grab.
             TransferTargetSettings settings = target.Target;
-            return targeting.Eligible(observer, target.transform, target.Colliders, target.transform.TransformPoint(settings.Offset),
-                settings.Distance, settings.Mode, settings.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
+            ObjectDispenser dispenser = target as ObjectDispenser;
+            return targeting.Eligible(observer, target.transform, dispenser != null ? dispenser.AimColliders : target.Colliders,
+                target.transform.TransformPoint(settings.Offset), settings.Distance, settings.Mode,
+                settings.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
                 settings.ObstacleMask, settings.SolidHitOnly, out score,
-                target is ObjectTriggerAnimation animation && animation.Settings.Activation == TriggerAnimationActivation.CenterCollider);
+                target is ObjectTriggerAnimation animation && animation.Settings.Activation == TriggerAnimationActivation.CenterCollider,
+                dispenser?.FloatingColliders);
         }
 
         /// <summary>Applies independent Grab targeting even when the object has no Hover feature.</summary>
@@ -661,7 +674,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the candidate is in range, visible and unobstructed.</returns>
         private bool Eligible(HoverObserver observer, ObjectGrab target, out float score)
         {
-            // Test actual compound geometry as well as the authored pivot.
+            // A provisional stack selects its newest recoverable ingredient as a group.
+            if (target.Dock != null)
+                return retrieval.EligiblePending(target, observer, targeting, out score);
             GrabSettings settings = target.Settings;
             return targeting.Eligible(observer, target.transform, target.Colliders, target.WorldTarget, settings.Distance,
                 settings.TargetMode, settings.TargetMode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,

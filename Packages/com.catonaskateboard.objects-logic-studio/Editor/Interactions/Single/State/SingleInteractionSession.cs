@@ -13,6 +13,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Header("Selection")]
         [Tooltip("Single-interaction feature currently selected on the workspace object.")]
         public SingleInteractionKind Kind;
+        [Tooltip("Stable prefab identifier of the selected interaction card.")]
+        public long ComponentId;
         [Tooltip("Whether the selected feature's settings are expanded.")]
         public bool Expanded = true;
         [Tooltip("Whether this session began with an existing component.")]
@@ -36,26 +38,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Selection
 
-        /// <summary>Resolves one unique feature type on the selected object.</summary>
-        /// <param name="target">Workspace object in a scene, stage or asset.</param>
-        /// <param name="kind">Requested feature type.</param>
-        /// <returns>The matching component, or null when unavailable.</returns>
-        internal static ObjectSingleInteraction Resolve(GameObject target, SingleInteractionKind kind)
+        /// <summary>Resolves the exact card so duplicate dispensers or containers keep independent drafts.</summary>
+        /// <param name="target">Workspace object in the prefab or its stage.</param>
+        /// <returns>The matching component, or null when it is unavailable.</returns>
+        internal ObjectSingleInteraction Resolve(GameObject target)
         {
-            // A type-based identity does not shift when another feature card is removed.
-            if (target == null)
-                return null;
-            return kind switch
-            {
-                SingleInteractionKind.Grab => target.GetComponent<ObjectGrab>(),
-                SingleInteractionKind.Drop => target.GetComponent<ObjectDrop>(),
-                SingleInteractionKind.Throw => target.GetComponent<ObjectThrow>(),
-                SingleInteractionKind.Dispenser => target.GetComponent<ObjectDispenser>(),
-                SingleInteractionKind.Container => target.GetComponent<ObjectContainer>(),
-                SingleInteractionKind.Eject => target.GetComponent<ObjectEject>(),
-                SingleInteractionKind.TriggerAnimation => target.GetComponent<ObjectTriggerAnimation>(),
-                _ => null
-            };
+            if (target != null)
+                foreach (ObjectSingleInteraction feature in target.GetComponents<ObjectSingleInteraction>())
+                    if (feature.Kind == Kind && (ComponentId == 0 || ObjectWorkspaceTarget.FileId(feature) == ComponentId))
+                        return feature;
+            return null;
+        }
+
+        /// <summary>Opens a specific card and captures its independent proposal.</summary>
+        /// <param name="feature">Selected card on the current workspace object.</param>
+        internal void Select(ObjectSingleInteraction feature)
+        {
+            Kind = feature.Kind;
+            ComponentId = ObjectWorkspaceTarget.FileId(feature);
+            Read(feature.gameObject);
         }
 
         /// <summary>Loads the applied component after an explicit selection or Discard.</summary>
@@ -63,8 +64,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal void Read(GameObject target)
         {
             // An absent feature stays absent rather than changing an unfinished proposal's identity.
-            ObjectSingleInteraction feature = Resolve(target, Kind);
+            ObjectSingleInteraction feature = Resolve(target);
             HasBinding = feature != null;
+            if (feature != null)
+                ComponentId = ObjectWorkspaceTarget.FileId(feature);
             Draft = SingleInteractionDraft.Capture(feature);
             Baseline = ObjectWorkspace.Copy(Draft);
         }
@@ -84,7 +87,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!HasChanges)
                 return true;
 
-            ObjectSingleInteraction feature = Resolve(target, Kind);
+            ObjectSingleInteraction feature = Resolve(target);
             if (feature == null || JsonUtility.ToJson(SingleInteractionDraft.Capture(feature)) != JsonUtility.ToJson(Baseline))
                 warning = "The selected single interaction changed outside this session. Discard to reload it.";
             else if (EditorUtility.IsPersistent(feature) && !AssetDatabase.IsOpenForEdit(feature))
@@ -101,7 +104,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // The caller validates every workspace domain before entering this method.
             if (!HasChanges)
                 return;
-            ObjectSingleInteraction feature = Resolve(target, Kind);
+            ObjectSingleInteraction feature = Resolve(target);
             if (recordUndo)
                 Undo.RecordObject(feature, "Apply " + Kind);
             if (prepare && Kind == SingleInteractionKind.Eject && Draft.Eject.Behavior == EjectBehavior.Impulse && Draft.Eject.SelfEject && Draft.Eject.TemporaryPhysics && target.GetComponent<Rigidbody>() == null)

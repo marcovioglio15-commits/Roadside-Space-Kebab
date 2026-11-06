@@ -95,7 +95,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             if (!Foldout(pose, label))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             Vector(pose.FindPropertyRelative("Position"), -10f, 10f);
             Vector(pose.FindPropertyRelative("Rotation"), -720f, 720f);
             Vector(pose.FindPropertyRelative("Scale"), 0.01f, 5f);
@@ -109,7 +109,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             if (!Foldout(property))
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             // Each axis retains its serialized context menu and the parent field's explanation.
             for (int index = 0; index < 3; index++)
             {

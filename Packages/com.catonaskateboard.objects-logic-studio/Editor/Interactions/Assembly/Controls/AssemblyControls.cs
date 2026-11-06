@@ -85,11 +85,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Shared requirement rows use project flags and positive integer counts throughout the tool.
             SerializedProperty settings = draft.FindPropertyRelative("Settings");
             DrawRecipe(settings, sections);
-            if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly.", draft, "Settings.LockFirstIngredient", "Settings.WaitForNextIngredient", "Settings.InteractionRules", "TargetIds"))
+            if (sections.Draw("Product Interactions", "Unlisted interactions wait for completion. Override specific existing interactions to allow partial assembly.", draft, "Settings.WaitForNextIngredient", "Settings.InteractionRules", "TargetIds"))
                 using (new StudioIndentScope())
                 {
-                    if (!settings.FindPropertyRelative("ProlongedAssembly").boolValue)
-                        HoverControls.Field(settings, "LockFirstIngredient");
                     if (state.Target.Resolve().GetComponent<ObjectGrab>() != null)
                         HoverControls.Field(settings, "WaitForNextIngredient", "Wait for Ingredient");
                     DrawRules(settings.FindPropertyRelative("InteractionRules"), draft.FindPropertyRelative("TargetIds"), state);
@@ -196,6 +194,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             prefab.objectReferenceValue = StudioGUI.ObjectField(StudioFieldMenu.Value(prefab, new GUIContent("Preview Prefab", prefab.tooltip)),
                 prefab.objectReferenceValue, typeof(GameObject), false);
             ItemAppearanceControls.Draw(magnet.FindPropertyRelative("Appearance"), true, prefab.objectReferenceValue as GameObject);
+            SerializedProperty completed = magnet.FindPropertyRelative("CompletedAppearance");
+            completed.isExpanded = StudioArrayGUI.Foldout(completed, new GUIContent("On Completion", completed.tooltip));
+            if (completed.isExpanded)
+                using (new StudioIndentScope())
+                    ItemAppearanceControls.Draw(completed, true, prefab.objectReferenceValue as GameObject);
         }
 
         /// <summary>Connects ingredient requirements to named existing product interactions.</summary>

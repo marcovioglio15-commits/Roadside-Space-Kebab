@@ -66,7 +66,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     break;
                 if (!entry.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
                 StudioGUI.PropertyField(entry.FindPropertyRelative("Tool"));
                 if (tool == null && StudioButton.Draw(new GUIContent("Create Tool", "Save a tool identity with a custom name and optional switch animations.")))
                     entry.FindPropertyRelative("Tool").objectReferenceValue = PlayerToolsAuthoring.Create<PlayerTool>("Player Tool");

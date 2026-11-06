@@ -112,13 +112,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 firstGrab = true;
         }
 
-        /// <summary>Checks policies shared by time and collision progression.</summary>
+        /// <summary>Checks progression policies, including the optional exception for a simulated weapon hit.</summary>
+        /// <param name="simulatedImpact">Whether this stage would advance from the weapon's simulated impulse.</param>
         /// <returns>True when this instance may advance its next stage.</returns>
-        private bool CanProgress()
+        private bool CanProgress(bool simulatedImpact = false)
         {
+            // The weapon exception applies to this hit without unlocking physical impacts before Grab.
             return isActiveAndEnabled && ready && CompletedSteps < settings.Steps.Length && Available(InteractionChannels.Passive) && Item != null && !Item.IsReserved
                 && (settings.Carry == DegradationCarryPolicy.FromSpawn
-                    || settings.Carry == DegradationCarryPolicy.AfterFirstGrab && firstGrab
+                    || settings.Carry == DegradationCarryPolicy.AfterFirstGrab && (firstGrab || simulatedImpact && settings.AllowSimulatedImpactBeforeGrab)
                     || settings.Carry == DegradationCarryPolicy.OnlyWhileCarried && grab != null && grab.IsHeld);
         }
 
@@ -142,32 +144,45 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             RegisterImpact(collision.impulse.magnitude);
         }
 
-        /// <summary>Routes the simulated impulse through the same thresholds as a solver collision.</summary>
+        /// <summary>Lets a simulated hit spend its impulse across successive impact stages.</summary>
         /// <param name="impulse">Equivalent impulse supplied by the weapon.</param>
-        void IPlayerToolImpactReceiver.ReceiveToolImpact(float impulse) => RegisterImpact(impulse);
+        void IPlayerToolImpactReceiver.ReceiveToolImpact(float impulse) => RegisterImpact(impulse, true);
 
         /// <summary>Shares impact thresholds between physical collisions, carry sweeps and weapon impulses.</summary>
         /// <param name="impulse">Solver impulse, or the equivalent impulse from a simulated hit.</param>
-        internal void RegisterImpact(float impulse)
+        /// <param name="simulatedImpact">Whether the hit uses the weapon's impulse budget and carry exception.</param>
+        internal void RegisterImpact(float impulse, bool simulatedImpact = false)
         {
             // Compound contacts at the same time count once; sustained pressure is not a fresh carry impact.
-            if (settings.Mode != DegradationMode.Impacts || Time.timeScale <= 0f || !CanProgress()
-                || impulse < settings.MinimumImpulse || Time.time <= lastImpact || Time.time - lastImpact < settings.ImpactInterval)
+            if (settings.Mode != DegradationMode.Impacts || Time.timeScale <= 0f || !CanProgress(simulatedImpact)
+                || !float.IsFinite(impulse) || impulse < settings.MinimumImpulse
+                || Time.time <= lastImpact || Time.time - lastImpact < settings.ImpactInterval)
                 return;
             lastImpact = Time.time;
-            impacts++;
-            if (impacts >= settings.Steps[CompletedSteps].Impacts)
+            // Consume the budget per stage, even when a single hit exceeds an integer impact count.
+            double budget = simulatedImpact ? (double)impulse / settings.MinimumImpulse : 1d;
+            do
             {
+                int remaining = settings.Steps[CompletedSteps].Impacts - impacts;
+                if (budget < remaining)
+                {
+                    impacts += (int)budget;
+                    return;
+                }
+                budget -= remaining;
                 impacts = 0;
-                Advance();
+                if (!Advance())
+                    return;
             }
+            while (budget >= 1d && CanProgress(simulatedImpact));
         }
 
         /// <summary>Commits one appearance and identity change before publishing sequence completion.</summary>
-        private void Advance()
+        /// <returns>True after the current stage was committed.</returns>
+        private bool Advance()
         {
             if (!Item.Acquire(this, InteractionChannels.None))
-                return;
+                return false;
             try
             {
                 DegradationStep step = settings.Steps[CompletedSteps];
@@ -181,10 +196,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     Signal(InteractionMoment.Started);
                 }
                 if (CompletedSteps != settings.Steps.Length)
-                    return;
+                    return true;
                 Signal(InteractionMoment.Completed);
                 if (!settings.DestroyAtEnd)
-                    return;
+                    return true;
                 foreach (DegradationFragment fragment in settings.Fragments)
                 {
                     GameObject created = ObjectSpawnHistory.Create(fragment.Prefab, transform.TransformPoint(fragment.Position), transform.rotation * Quaternion.Euler(fragment.Rotation));
@@ -195,6 +210,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     StudioAudio.Play(settings.BreakMaterial == DegradationBreakSound.Ceramic ? "sfx_ceramicbreak" : "sfx_glassbreak", transform);
                 Item.ConsumeSelf();
                 Destroy(gameObject);
+                return true;
             }
             finally
             {

@@ -5,7 +5,6 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Deposits carried instances by flag and exposes recovery only through a linked Dispenser.</summary>
-    [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Object Container")]
     public sealed class ObjectContainer : ObjectInventoryInteraction
     {
@@ -39,7 +38,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Whether a scoop currently owns this held object's movement.</summary>
         internal bool IsScooping => scoop != null && scoop.Active;
         /// <summary>Scoop mode receives the dispenser's input instead of binding another Button.</summary>
-        public override bool UsesInput => !settings.ScoopFromDispenser;
+        public override bool UsesInput => !settings.ScoopFromDispenser || Action != null;
         /// <summary>Identifies this single interaction card.</summary>
         public override SingleInteractionKind Kind => SingleInteractionKind.Container;
         /// <summary>Selection settings shared by deposits and normal object targeting.</summary>
@@ -93,7 +92,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (configuration.ScoopFromDispenser)
             {
                 warning = "Scoop From Dispenser requires Grab on this object and cannot supply stored originals to a local Dispenser.";
-                if (GetComponent<ObjectGrab>() == null || GetComponent<ObjectDispenser>() is ObjectDispenser local && local.Settings.UseContainer)
+                if (GetComponent<ObjectGrab>() == null || GetComponent<ObjectDispenser>() is ObjectDispenser local && local.Settings.StoredSupply)
                     return false;
                 return ScoopRun.ValidateVisual(transform, configuration.ScoopAnimation, out warning);
             }
@@ -316,7 +315,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 fillInitialized = true;
             }
             ScoopRun operation = scoop;
-            grab.BeginScoop(scoop, source.transform);
+            grab.BeginScoop(scoop, source);
             source.Signal(InteractionMoment.Started);
             Signal(InteractionMoment.Started);
             operation.Start();
@@ -326,6 +325,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Advances logical fill after the source commits its reserved withdrawal.</summary>
         internal void CommitScoop()
         {
+            // Keep the first successful recipe on this box, even while its animation returns to carry.
+            if (fillCount == settings.InitialFill)
+                foreach (ObjectContainer alternative in GetComponents<ObjectContainer>())
+                    if (alternative != this && alternative.Settings.ScoopFromDispenser && alternative.enabled)
+                    {
+                        InteractionRuntimeState.Remember(alternative);
+                        alternative.enabled = false;
+                    }
             fillCount++;
             RefreshFill();
         }

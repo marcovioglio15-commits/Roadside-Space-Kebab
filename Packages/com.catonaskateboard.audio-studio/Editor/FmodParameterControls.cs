@@ -20,7 +20,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
             parameters.isExpanded = StudioArrayGUI.Foldout(parameters, new GUIContent(parameters.displayName, parameters.tooltip));
             if (!parameters.isExpanded)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             string path = binding.FindPropertyRelative("EventPath").stringValue;
 
             // Loaded event limits take precedence; unavailable metadata leaves precise entry unrestricted.
@@ -32,6 +32,7 @@ namespace CatOnASkateboard.AudioStudio.Editor
                     break;
                 if (!parameter.isExpanded)
                     continue;
+                using StudioFieldLayout.SectionScope fields = new StudioFieldLayout.SectionScope(0);
                 StudioFields.Draw(parameter, "Name", "Global");
                 FmodCatalogParameter metadata = Find(catalog, path, parameter.FindPropertyRelative("Name").stringValue);
                 SerializedProperty value = parameter.FindPropertyRelative("Value");

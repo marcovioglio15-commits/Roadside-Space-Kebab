@@ -7,7 +7,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region State
 
+        private static ulong sequence;
         private Rigidbody body;
+        private ulong placed;
+        private bool optional;
         private CarryBodyState originalBody;
         private Transform parent;
         private Vector3 originalScale;
@@ -81,6 +84,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && (Ingredient.transform.localScale - snappedScale).sqrMagnitude < 0.000001f;
         }
 
+        /// <summary>Checks withdrawal precedence among previews on the same table.</summary>
+        /// <param name="other">Dock for the currently considered pickup.</param>
+        /// <returns>True when this dock is optional before a required dock, or newer within its group.</returns>
+        internal bool RetrievesBefore(AssemblyIngredientDock other)
+        {
+            return optional != other.optional ? optional : placed > other.placed;
+        }
+
         #endregion
 
         #region Placement
@@ -89,7 +100,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="station">Empty station whose next recipe provides the magnet.</param>
         /// <param name="ingredient">Independent ingredient retaining its own interactions.</param>
         /// <param name="index">Validated slot in the proposed recipe.</param>
-        internal void Snap(ObjectAssemblyStation station, ObjectGrab ingredient, int index)
+        /// <param name="optionalIngredient">Whether the proposed ingredient uses an optional recipe row.</param>
+        internal void Snap(ObjectAssemblyStation station, ObjectGrab ingredient, int index, bool optionalIngredient)
         {
             // No product prefab, assembly part, collision proxy or reservation is created for a preview.
             if (Ingredient != null || ingredient.Dock != null || ingredient.IsHeld || !station.CanPreview(ingredient))
@@ -97,8 +109,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             AssemblyMagnet magnet = station.Template.Settings.Magnets[index];
             Station = station;
             Ingredient = ingredient;
+            placed = ++sequence;
+            optional = optionalIngredient;
             ingredient.Dock = this;
             body = ingredient.Body;
+            ObjectGravityGenerator.Forget(body);
             originalBody = new CarryBodyState(body);
             parent = ingredient.transform.parent;
             originalScale = ingredient.transform.localScale;

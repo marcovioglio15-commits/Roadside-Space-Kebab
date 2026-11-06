@@ -81,6 +81,7 @@ MonoBehaviour:
       BurstLift: 2.5
       BurstSpin: 12
       AffectImpactDegradation: 1
+      DegradationImpulseMultiplier: 100
       SliceShattering: 1
       SliceDistanceMultiplier: 0.1
       IgnoreCarriedObjects: 1

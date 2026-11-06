@@ -97,6 +97,16 @@
                     "priority": 0
                 },
                 {
+                    "name": "Dismantle",
+                    "type": "Button",
+                    "id": "3a5d2a32-9977-4d02-b6b4-3da811b13911",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
                     "name": "Drop",
                     "type": "Button",
                     "id": "c104f20f-5435-4134-a8e7-bd29aed59a7f",
@@ -138,6 +148,28 @@
                 }
             ],
             "bindings": [
+                {
+                    "name": "",
+                    "id": "7e29a258-6ead-4b86-a608-3404c372598a",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Dismantle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ab295138-3d73-4208-90ad-c63b75be1334",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Dismantle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
                 {
                     "name": "2DVector",
                     "id": "f8d3da7e-1f45-4751-8705-3baa1e84a8fc",

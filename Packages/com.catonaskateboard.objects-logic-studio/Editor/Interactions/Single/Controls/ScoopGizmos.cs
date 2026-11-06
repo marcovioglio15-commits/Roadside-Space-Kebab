@@ -16,14 +16,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [DrawGizmo(GizmoType.Selected | GizmoType.Active)]
         private static void Draw(ObjectDispenser source, GizmoType type)
         {
-            ObjectContainer receiver = Object.FindAnyObjectByType<HoverObserver>()?.HeldObject?.CarryContainer;
-            if (receiver == null || !receiver.Settings.ScoopFromDispenser || !receiver.Settings.ScoopAnimation.Enabled
-                || !receiver.Settings.ScoopAnimation.TryValidate(out string warning))
+            ObjectGrab held = Object.FindAnyObjectByType<HoverObserver>()?.HeldObject;
+            ObjectContainer receiver = held?.CarryContainers != null ? System.Array.Find(held.CarryContainers,
+                candidate => candidate != null && candidate.isActiveAndEnabled && candidate.Settings.ScoopFromDispenser
+                    && source.MatchesScoop(candidate)) : null;
+            if (receiver == null || !receiver.Settings.ScoopAnimation.Enabled || !receiver.Settings.ScoopAnimation.TryValidate(out _))
                 return;
             ScoopAnimationSettings settings = receiver.Settings.ScoopAnimation;
             Pose initial = new Pose(receiver.transform.position, receiver.transform.rotation);
             ScoopPath path = new ScoopPath(settings, initial, new Pose(source.transform.position, source.transform.rotation),
-                receiver.GetComponent<ObjectGrab>().CarryPose, Vector3.one);
+                held.CarryPose, Vector3.one);
             Vector3 previous = initial.position;
             // Colors distinguish the fill boundary while labels remain sufficient without color.
             using (new Handles.DrawingScope(new Color(0.35f, 0.75f, 0.9f)))

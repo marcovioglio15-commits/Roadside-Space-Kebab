@@ -1,4 +1,5 @@
 using System;
+using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -143,7 +144,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     case 0 when state.Body.Source != null:
                         if (!sections.Draw("Body.Shape", "Collision Shape"))
                             return false;
-                        using (new EditorGUI.IndentLevelScope())
+                        using (new StudioFieldLayout.SectionScope(1))
                             return PlayerBodyDraftView.Draw(state.Body, owner);
                     case 1 when state.Locomotion.Source != null || state.Locomotion.HasChanges:
                         return PlayerLocomotionDraftView.Draw(state.Locomotion, owner, sections);
@@ -154,7 +155,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     case 3 when state.Camera.Source != null || state.Camera.HasChanges:
                         bool changed = DrawModule(state.Camera, owner, true);
                         if (sections.Draw("Camera.Binding", "Scene Binding"))
-                            using (new EditorGUI.IndentLevelScope())
+                            using (new StudioFieldLayout.SectionScope(1))
                                 changed |= state.CameraScene.Draw(owner, PlayerCameraControls.UsesModel(state.Camera.GetEditor()));
                         return changed;
                     default:
@@ -181,17 +182,17 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             else
             {
                 if (sections.Draw("Input.Movement", "Movement"))
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioFieldLayout.SectionScope(1))
                         PlayerPresetField.DrawAction(serialized, "movementAction");
                 if (sections.Draw("Input.Jump", "Jump"))
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioFieldLayout.SectionScope(1))
                         PlayerPresetField.DrawAction(serialized, "jumpAction");
                         PlayerPresetField.DrawAction(serialized, "crouchAction");
                 if (sections.Draw("Input.Tools", "Tool Commands"))
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioFieldLayout.SectionScope(1))
                         PlayerToolsControls.DrawInput(serialized, switching);
                 if (sections.Draw("Input.Camera", "Camera"))
-                    using (new EditorGUI.IndentLevelScope())
+                    using (new StudioFieldLayout.SectionScope(1))
                     {
                         PlayerPresetField.DrawAction(serialized, "lookDeltaAction");
                         PlayerPresetField.DrawAction(serialized, "lookRateAction");

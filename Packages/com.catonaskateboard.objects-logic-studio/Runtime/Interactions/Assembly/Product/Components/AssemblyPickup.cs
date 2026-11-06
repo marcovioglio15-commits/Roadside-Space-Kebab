@@ -19,11 +19,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Local Grab binding, or the standalone product's explicitly selected finalization action.</summary>
-        internal InputActionReference Action => Owner.Settings.ProlongedAssembly ? Owner.Settings.Charge.Action
-            : Grab != null ? Grab.Action : Owner.Settings.FinalizeAction;
+        internal InputActionReference Action => Owner.Settings.Charge.Action;
+        /// <summary>Product and proxy surfaces cached together when the composition changes.</summary>
+        internal Collider[] Colliders => colliders;
         /// <summary>Whether this assembled recipe still needs its empty-hand pickup confirmation.</summary>
-        internal bool Waiting => Owner != null && (Owner.Settings.ProlongedAssembly || Owner.Settings.FinalizeOnGrab)
-            && Owner.RecipeReady && !Owner.IsFinalized && Owner.Item != null && !Owner.Item.IsReserved
+        internal bool Waiting => Owner != null && Owner.RecipeReady && !Owner.IsFinalized && Owner.Item != null && !Owner.Item.IsReserved
             && Owner.Available(InteractionChannels.Assembly);
 
         #endregion
@@ -63,7 +63,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Refreshes geometry only when composition changes, not while awaiting input.</summary>
         internal void RefreshGeometry()
         {
-            colliders = Owner.GetComponentsInChildren<Collider>();
+            colliders = Owner.GetComponentsInChildren<Collider>(true);
         }
 
         #endregion
@@ -79,14 +79,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             score = float.PositiveInfinity;
             if (!Waiting || observer.HeldObject != null)
                 return false;
-            if (!Owner.Settings.ProlongedAssembly && Grab != null)
-            {
-                GrabSettings settings = Grab.Settings;
-                return targeting.Eligible(observer, Owner.transform, colliders, Grab.WorldTarget, settings.Distance,
-                    settings.TargetMode, settings.TargetMode == HoverTargetMode.Cursor ? float.PositiveInfinity : settings.CenterRadius,
-                    settings.ObstacleMask, settings.SolidHitOnly, out score);
-            }
-            TransferTargetSettings target = Owner.Settings.ProlongedAssembly ? Owner.Settings.Charge.Target : Owner.Settings.FinalizeTarget;
+            TransferTargetSettings target = Owner.Settings.Charge.Target;
             return targeting.Eligible(observer, Owner.transform, colliders, Owner.transform.TransformPoint(target.Offset),
                 target.Distance, target.Mode, target.Mode == HoverTargetMode.Cursor ? float.PositiveInfinity : target.CenterRadius,
                 target.ObstacleMask, target.SolidHitOnly, out score);

@@ -57,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             },
             ["Dispenser Supply"] = new[]
             {
-                new Split("Supply source", "UseContainer", "Prefab", "ScoopFlag"),
+                new Split("Supply source", "UseContainer", "Prefab", "ScoopDisplay"),
                 new Split("Stock", "Unlimited", "Stock", "DestroyWhenEmpty")
             },
             ["Dispenser Output"] = new[]

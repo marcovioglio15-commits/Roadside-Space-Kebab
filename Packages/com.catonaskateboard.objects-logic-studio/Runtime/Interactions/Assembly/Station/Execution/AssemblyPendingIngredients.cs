@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CatOnASkateboard.StudioIdentity;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -22,8 +23,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="contacts">Physical contacts before adding retained magnet previews.</param>
         internal void Refresh(HashSet<ObjectItem> contacts)
         {
-            // Movement may release a preview outside the trigger during this same query.
-            RefreshDocks();
+            // The query has already excluded any stale preview surfaces.
             removed.Clear();
             foreach (KeyValuePair<ObjectItem, uint> entry in withdrawn)
             {
@@ -80,12 +80,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int index = 0; index < ingredients.Count; index++)
             {
                 ObjectGrab ingredient = ingredients[index];
-                if (!selection.Append(station.Template.Settings, ingredient, index + 1, out int magnet, out _))
+                if (!selection.Append(station.Template.Settings, ingredient, index + 1, out int magnet, out ObjectFlag flag))
                     return;
                 if (ingredient.Dock != null || ingredient.IsHeld)
                     continue;
                 AssemblyIngredientDock dock = new AssemblyIngredientDock();
-                dock.Snap(station, ingredient, magnet);
+                dock.Snap(station, ingredient, magnet, AssemblyIngredientSelection.IsOptional(station.Template.Settings, flag));
                 if (dock.Ingredient != null)
                     docks.Add(dock);
             }

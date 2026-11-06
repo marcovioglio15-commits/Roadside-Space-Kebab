@@ -107,7 +107,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             string runtimePath;
             if (path.StartsWith("Single.Draft.", StringComparison.Ordinal))
             {
-                source = SingleInteractionSession.Resolve(workspace.Target.Resolve(), workspace.Single.Kind);
+                source = workspace.Single.Resolve(workspace.Target.Resolve());
                 preset = GroupSource(workspace, property.propertyPath);
                 snapshotPath = "Single." + path.Substring(13);
                 runtimePath = RuntimePath(path.Substring(13), source);

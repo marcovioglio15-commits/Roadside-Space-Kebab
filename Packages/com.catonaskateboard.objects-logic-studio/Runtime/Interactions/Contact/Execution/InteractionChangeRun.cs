@@ -36,12 +36,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region State
 
+        private static readonly HashSet<InteractionChangeRun> claimed = new HashSet<InteractionChangeRun>();
         private readonly ObjectItem item;
         private readonly List<Operation> operations = new List<Operation>();
         private readonly Dictionary<ObjectInteraction, InteractionRuntimeSnapshot> snapshots = new Dictionary<ObjectInteraction, InteractionRuntimeSnapshot>();
         private readonly HashSet<ObjectInteraction> removed = new HashSet<ObjectInteraction>();
         private readonly HashSet<ObjectInteraction> created = new HashSet<ObjectInteraction>();
-        private readonly HashSet<ObjectInteraction> additions = new HashSet<ObjectInteraction>();
+        private readonly Dictionary<ObjectInteraction, bool> availability = new Dictionary<ObjectInteraction, bool>();
         private bool applied;
         private bool cancelled;
 
@@ -77,6 +78,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     if (!change.TryValidate(out warning))
                         return proposed.Reject(out run);
+                    // Resolve availability before any visual effects or consumption can start.
+                    if (change.Operation is InteractionChangeOperation.Enable or InteractionChangeOperation.Disable)
+                    {
+                        if (!proposed.PrepareAvailability(change))
+                            return proposed.Reject(out run);
+                        continue;
+                    }
                     // Missing removal targets are optional; other edits still validate as a complete batch.
                     if (change.Operation == InteractionChangeOperation.Remove)
                     {
@@ -87,6 +95,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     bool added = false;
                     if (change.Operation == InteractionChangeOperation.Add)
                     {
+                        if (proposed.HasEnabled(change.Kind, null))
+                            return proposed.Reject(out run);
                         feature = InteractionRuntimeState.FindRemoved(item.gameObject, change.Kind);
                         foreach (Operation previous in proposed.operations)
                             if (previous.Settings.Operation == InteractionChangeOperation.Remove && previous.Settings.Kind == change.Kind)
@@ -113,10 +123,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     }
                     proposed.operations.Add(new Operation(change, feature, added));
                 }
+                if (proposed.operations.Count == 0)
+                    return true;
                 bool valid = proposed.StageValues(out warning);
                 proposed.Restore(false);
                 if (!valid)
                     return proposed.Reject(out run);
+                claimed.Add(proposed);
                 run = proposed;
                 return true;
             }
@@ -145,6 +158,100 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     operations.Add(new Operation(change, feature, false));
         }
 
+        /// <summary>Prepares a state change only when a matching card can actually transition.</summary>
+        /// <param name="change">Type or exact card selected by the contact rule.</param>
+        /// <returns>True when the requested transition has an eligible target without a conflicting card.</returns>
+        private bool PrepareAvailability(InteractionChangeSettings change)
+        {
+            bool enable = change.Operation == InteractionChangeOperation.Enable;
+            if (!change.Target.AllOfType)
+            {
+                ObjectInteraction feature = change.Target.Resolve(item.gameObject);
+                if (feature == null || feature.enabled == enable)
+                    return false;
+                if (enable && HasEnabled(change.Kind, feature))
+                    return false;
+                operations.Add(new Operation(change, feature, false));
+                return true;
+            }
+
+            // Type selection changes the first eligible card in component order.
+            if (enable && HasEnabled(change.Kind, null))
+                return false;
+            int previousCount = operations.Count;
+            foreach (ObjectInteraction feature in item.GetComponents<ObjectInteraction>())
+                if (InteractionRuntimeCatalog.KindOf(feature) == change.Kind && !InteractionRuntimeState.IsRemoved(feature)
+                    && feature.enabled != enable)
+                {
+                    operations.Add(new Operation(change, feature, false));
+                    break;
+                }
+            return operations.Count > previousCount;
+        }
+
+        /// <summary>Checks for a conflict on the participant or among prepared additions.</summary>
+        /// <param name="kind">Interaction family that would become enabled.</param>
+        /// <param name="except">Exact card receiving the edit, if any.</param>
+        /// <returns>True when another card of the same type is enabled or queued to enable.</returns>
+        private bool HasEnabled(InteractionRuntimeKind kind, ObjectInteraction except)
+        {
+            foreach (ObjectInteraction feature in item.GetComponents<ObjectInteraction>())
+                if (feature != except && feature.enabled && InteractionRuntimeCatalog.KindOf(feature) == kind)
+                    return true;
+            if (Claims(kind, except))
+                return true;
+            // A completed contact can release its item before the modifier flushes queued edits.
+            foreach (InteractionChangeRun run in claimed)
+                if (run != this && run.item == item && run.Claims(kind, null))
+                    return true;
+            return false;
+        }
+
+        /// <summary>Checks the activation requests retained by this prepared batch.</summary>
+        /// <param name="kind">Type being checked for a conflict.</param>
+        /// <param name="except">Current operation's card when rechecking the batch.</param>
+        /// <returns>True when a different operation will activate this type.</returns>
+        private bool Claims(InteractionRuntimeKind kind, ObjectInteraction except)
+        {
+            foreach (Operation operation in operations)
+                if (operation.Feature != except && operation.Settings.Kind == kind
+                    && operation.Settings.Operation is InteractionChangeOperation.Add or InteractionChangeOperation.Enable)
+                    return true;
+            return false;
+        }
+
+        /// <summary>Confirms that a transition can still commit after its contact delay.</summary>
+        /// <returns>True when no target disappeared or changed availability.</returns>
+        internal bool CanCommit()
+        {
+            if (item == null || item.IsConsumed)
+                return false;
+            foreach (Operation operation in operations)
+            {
+                ObjectInteraction feature = operation.Feature;
+                if (feature == null)
+                    return false;
+                switch (operation.Settings.Operation)
+                {
+                    case InteractionChangeOperation.Enable when feature.enabled:
+                    case InteractionChangeOperation.Disable when !feature.enabled:
+                        return false;
+                    case InteractionChangeOperation.Add:
+                    case InteractionChangeOperation.Enable:
+                        if (HasEnabled(operation.Settings.Kind, feature))
+                            return false;
+                        break;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>Clears any queued or unfinished availability claims at the Play boundary.</summary>
+        internal static void ResetClaims()
+        {
+            claimed.Clear();
+        }
+
         /// <summary>Checks uniqueness and required physics before invoking Unity's component factory.</summary>
         /// <param name="kind">Requested interaction family.</param>
         /// <param name="warning">Receives a missing dependency or duplicate card.</param>
@@ -152,7 +259,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool CanCreate(InteractionRuntimeKind kind, out string warning)
         {
             warning = "This object already has that interaction. Edit it instead of adding another.";
-            if (kind is not (InteractionRuntimeKind.Hover or InteractionRuntimeKind.Dialogue or InteractionRuntimeKind.Unlock))
+            if (kind is not (InteractionRuntimeKind.Hover or InteractionRuntimeKind.Dialogue or InteractionRuntimeKind.Unlock
+                or InteractionRuntimeKind.Dispenser or InteractionRuntimeKind.Container))
                 foreach (ObjectInteraction feature in item.GetComponents<ObjectInteraction>())
                     if (InteractionRuntimeCatalog.KindOf(feature) == kind)
                         return false;
@@ -179,7 +287,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             snapshots.Clear();
             removed.Clear();
-            additions.Clear();
+            availability.Clear();
             warning = "An interaction changed or disappeared before the contact completed.";
             foreach (Operation operation in operations)
             {
@@ -193,9 +301,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     removed.Add(operation.Feature);
                     continue;
                 }
+                if (settings.Operation is InteractionChangeOperation.Enable or InteractionChangeOperation.Disable)
+                {
+                    availability[operation.Feature] = settings.Operation == InteractionChangeOperation.Enable;
+                    continue;
+                }
                 if (settings.Operation == InteractionChangeOperation.Add)
                 {
-                    additions.Add(operation.Feature);
+                    availability[operation.Feature] = true;
                     removed.Remove(operation.Feature);
                     operation.Feature.SetRuntimeName(settings.Name);
                     InteractionRuntimeCatalog.BindActions(operation.Feature, settings.Action, settings.AdvanceAction);
@@ -204,7 +317,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
             }
             foreach (ObjectInteraction feature in snapshots.Keys)
-                if (!removed.Contains(feature) && !InteractionRuntimeCatalog.Validate(feature, out warning))
+                if (!removed.Contains(feature) && (!availability.TryGetValue(feature, out bool enable) || enable)
+                    && !InteractionRuntimeCatalog.Validate(feature, out warning))
                     return false;
             warning = string.Empty;
             return true;
@@ -224,8 +338,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Applies final values outside the modifier's active rule iteration.</summary>
         internal void Apply()
         {
-            if (cancelled || applied || item == null || item.IsConsumed)
+            claimed.Remove(this);
+            if (cancelled || applied)
                 return;
+            if (!CanCommit())
+            {
+                Cancel();
+                return;
+            }
             try
             {
                 // Session baselines precede every real write; validation probes never enter them.
@@ -247,8 +367,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     InteractionRuntimeState.SetRemoved(feature, removed.Contains(feature));
                     if (removed.Contains(feature))
                         feature.enabled = false;
-                    else if (additions.Contains(feature) && !feature.enabled)
-                        feature.enabled = true;
+                    else if (availability.TryGetValue(feature, out bool enable) && feature.enabled != enable)
+                        feature.enabled = enable;
                     else
                         InteractionRuntimeCatalog.Refresh(feature);
                 }
@@ -269,6 +389,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (cancelled)
                 return;
             cancelled = true;
+            claimed.Remove(this);
             if (applied)
                 Restore(true);
             // New cards remain absent after temporary contact ends; originals keep their component identity.

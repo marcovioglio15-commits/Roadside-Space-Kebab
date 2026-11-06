@@ -43,7 +43,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             serializedObject.Update();
             if (PlayerToolFields.Section(ref setupOpen, "Animation Setup", "Duration and hierarchy used by this animation."))
             {
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
                 hierarchySource = (GameObject)StudioGUI.ObjectField(new GUIContent("Hierarchy Source",
                     "Use the same hierarchy root selected by the Tools preset."), hierarchySource, typeof(GameObject), true);
                 PlayerToolFields.Scalar(serializedObject.FindProperty("Duration"));
@@ -59,7 +59,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="tracks">Animation track array.</param>
         private void DrawTracks(SerializedProperty tracks)
         {
-            using EditorGUI.IndentLevelScope listIndent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope listIndent = new StudioFieldLayout.SectionScope(1);
             Transform root = hierarchySource != null ? hierarchySource.transform : null;
             bool allowRoot = hierarchySource != null && hierarchySource.GetComponent<PlayerHost>() == null;
             // Each track resolves only once at runtime; no manual path field is exposed here.
@@ -73,7 +73,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     break;
                 if (!track.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope trackIndent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope trackIndent = new StudioFieldLayout.SectionScope(1);
                 PlayerHierarchyMenu.DrawPath(path, root, new GUIContent("Target", path.tooltip), allowRoot);
                 StudioFields.Draw(track, "Space", "RelativeToStart");
                 SerializedProperty keys = track.FindPropertyRelative("Keys");
@@ -90,7 +90,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="animated">Target in the sample hierarchy, if resolved.</param>
         private static void DrawKeys(SerializedProperty keys, SerializedProperty track, Transform animated)
         {
-            using EditorGUI.IndentLevelScope listIndent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope listIndent = new StudioFieldLayout.SectionScope(1);
             // Resolve the hierarchy once per expanded track, even when several keys are open.
             for (int index = 0; index < keys.arraySize; index++)
             {
@@ -100,7 +100,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     break;
                 if (!frame.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope keyIndent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope keyIndent = new StudioFieldLayout.SectionScope(1);
                 PlayerToolFields.Scalar(time);
                 StudioFields.Draw(frame, "RotationDirection");
                 SerializedProperty pose = frame.FindPropertyRelative("Pose");

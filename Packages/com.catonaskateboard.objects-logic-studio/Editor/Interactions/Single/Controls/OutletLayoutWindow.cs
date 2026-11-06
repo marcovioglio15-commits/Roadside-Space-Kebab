@@ -41,18 +41,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Opens an independent layout transaction from the selected spray or dispenser card.</summary>
         /// <param name="workspace">Main tool containing the pending emitter settings.</param>
         /// <param name="dispenser">Whether to edit multiple dispenser points instead of a single spray nozzle.</param>
-        internal static void Open(ObjectWorkspace workspace, bool dispenser)
+        /// <param name="magnets">Whether to place floating supply magnets.</param>
+        internal static void Open(ObjectWorkspace workspace, bool dispenser, bool magnets = false)
         {
-            OutletLayoutWindow window = GetWindow<OutletLayoutWindow>(dispenser ? "Outlet Layout" : "Nozzle Layout");
+            string title = magnets ? "Magnet Layout" : dispenser ? "Outlet Layout" : "Nozzle Layout";
+            OutletLayoutWindow window = GetWindow<OutletLayoutWindow>(title);
             if (window.session.HasChanges)
             {
                 window.status = "Apply or Discard before opening another layout.";
                 window.Show();
                 return;
             }
-            window.session.Read(workspace, dispenser);
+            window.session.Read(workspace, dispenser, magnets);
+            window.mode = 0;
             window.selected = 0;
-            window.titleContent = new GUIContent(dispenser ? "Outlet Layout" : "Nozzle Layout");
+            window.titleContent = new GUIContent(title);
             window.cached = null;
             window.dirty = true;
             window.Show();
@@ -119,29 +122,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             GameObject root = session.Target.Resolve();
             if (root == null || EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
-            if (dirty || cached != root)
-            {
-                geometry.Refresh(root, geometrySettings, false);
-                if (cached != root)
-                    Frame();
-                cached = root;
-                dirty = false;
-            }
+            RefreshGeometry(root);
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                StudioOutletHandles.Toolbar(ref mode);
+                if (!session.Magnets)
+                    StudioOutletHandles.Toolbar(ref mode);
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button(new GUIContent("Frame", "Fit the object in the preview."), EditorStyles.toolbarButton, GUILayout.Width(60f)))
                     Frame();
             }
             Points();
+            RefreshGeometry(root);
             if (session.Draft.Points is { Length: > 0 })
             {
                 selected = Mathf.Clamp(selected, 0, session.Draft.Points.Length - 1);
                 data.Update();
                 SerializedProperty point = data.FindProperty("session.Draft.Points").GetArrayElementAtIndex(selected);
-                StudioFieldGUI.PropertyField(point.FindPropertyRelative("Position"));
-                StudioFieldGUI.PropertyField(point.FindPropertyRelative("Rotation"));
+                ObjectNumericControls.Vector(point.FindPropertyRelative("Position"), -2f, 2f);
+                if (!session.Magnets)
+                    ObjectNumericControls.Vector(point.FindPropertyRelative("Rotation"), -360f, 360f);
                 data.ApplyModifiedProperties();
                 // Reserve the viewport after Unity has measured headers and wrapped vector controls.
                 Rect viewport = GUILayoutUtility.GetRect(1f, 100f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
@@ -170,6 +169,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Rect local = new Rect(0f, 0f, rect.width, rect.height);
             if (navigation.Handle(local, ref orbit, ref pivot, ref distance, ref mode))
                 Frame();
+            if (session.Magnets)
+                mode = 0;
             Quaternion rotation = Quaternion.Euler(orbit.x, orbit.y, 0f);
             preview.camera.transform.SetPositionAndRotation(pivot - rotation * Vector3.forward * distance, rotation);
             preview.camera.nearClipPlane = Mathf.Max(0.001f, distance * 0.001f);
@@ -181,6 +182,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 if (Event.current.type == EventType.Repaint)
                 {
+                    for (int index = 0; index < geometrySettings.Magnets.Length; index++)
+                        geometrySettings.Magnets[index].Position = session.Draft.Points[index].Position;
                     geometry.Draw(preview, geometrySettings);
                     preview.Render(true, false);
                 }
@@ -228,7 +231,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new EditorGUI.DisabledScope(selected <= 0))
                 if (GUILayout.Button(new GUIContent("◀", "Edit the previous outlet."), GUILayout.Width(28f)))
                     selected--;
-            EditorGUILayout.LabelField(count > 0 ? "Outlet " + (selected + 1) + " / " + count : "No outlets", EditorStyles.miniLabel);
+            string label = session.Magnets ? "Magnet" : "Outlet";
+            EditorGUILayout.LabelField(count > 0 ? label + " " + (selected + 1) + " / " + count : "No points", EditorStyles.miniLabel);
             using (new EditorGUI.DisabledScope(selected >= count - 1))
                 if (GUILayout.Button(new GUIContent("▶", "Edit the next outlet."), GUILayout.Width(28f)))
                     selected++;
@@ -238,6 +242,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 System.Array.Resize(ref session.Draft.Points, count + 1);
                 selected = session.Draft.Points.Length - 1;
                 session.Draft.Points[selected] = new DispenserOutlet();
+                dirty = true;
             }
             using (new EditorGUI.DisabledScope(count <= 1))
                 if (GUILayout.Button(new GUIContent("−", "Remove the selected output point."), GUILayout.Width(28f)))
@@ -247,9 +252,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         session.Draft.Points[index] = session.Draft.Points[index + 1];
                     System.Array.Resize(ref session.Draft.Points, session.Draft.Points.Length - 1);
                     selected = Mathf.Min(selected, session.Draft.Points.Length - 1);
+                    dirty = true;
                 }
         }
-        /// <summary>Fits the current source mesh without changing the nozzle pose.</summary>
+        /// <summary>Updates cached meshes and local portion guides only when the layout changes.</summary>
+        /// <param name="root">Dispenser or nozzle owner being previewed.</param>
+        private void RefreshGeometry(GameObject root)
+        {
+            int count = session.Magnets ? session.Draft.Points.Length : 0;
+            if (!dirty && cached == root && geometrySettings.Magnets.Length == count)
+                return;
+            geometrySettings.Magnets = new AssemblyMagnet[count];
+            for (int index = 0; index < count; index++)
+                geometrySettings.Magnets[index] = new AssemblyMagnet { Position = session.Draft.Points[index].Position, PreviewPrefab = session.Portion };
+            geometry.Refresh(root, geometrySettings, false);
+            if (cached != root)
+                Frame();
+            cached = root;
+            dirty = false;
+        }
+
+        /// <summary>Fits the current source mesh and guide bounds without changing the layout.</summary>
         private void Frame()
         {
             Bounds bounds = geometry.Bounds(geometrySettings);

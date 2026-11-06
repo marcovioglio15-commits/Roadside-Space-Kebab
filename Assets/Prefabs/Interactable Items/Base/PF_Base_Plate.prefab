@@ -444,6 +444,7 @@ MonoBehaviour:
   settings:
     Mode: 1
     Carry: 1
+    AllowSimulatedImpactBeforeGrab: 1
     MinimumImpulse: 0.1
     ImpactInterval: 0.1
     Steps:

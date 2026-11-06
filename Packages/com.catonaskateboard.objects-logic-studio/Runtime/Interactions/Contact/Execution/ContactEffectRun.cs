@@ -113,6 +113,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
         }
 
+        /// <summary>Rechecks availability before either participant commits effects or consumption.</summary>
+        /// <returns>True when all prepared interaction changes remain valid.</returns>
+        internal bool CanCommit()
+        {
+            return interactions == null || interactions.CanCommit();
+        }
+
         /// <summary>Commits discrete mesh replacements only after the timed transition finishes.</summary>
         internal void Commit()
         {

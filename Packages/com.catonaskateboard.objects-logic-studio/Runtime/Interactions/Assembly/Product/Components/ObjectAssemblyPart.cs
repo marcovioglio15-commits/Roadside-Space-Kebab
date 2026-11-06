@@ -26,6 +26,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool attached;
         private bool physicsSuppressed;
         private ItemAppearanceChanges appearance;
+        private ItemAppearanceChanges completedAppearance;
+        private bool completed;
         private AssemblyPartVisibility visibility;
         private AssemblyPartMotion motion;
         private readonly Dictionary<Collider, Collider> shapes = new Dictionary<Collider, Collider>();
@@ -49,10 +51,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Mass { get; private set; }
         /// <summary>Original pickup binding retained while ingredient interactions are suspended.</summary>
         internal ObjectGrab Grab { get; private set; }
-        /// <summary>Product-owned shapes used to target retrieval of the sole ingredient.</summary>
-        internal Collider[] PickupColliders { get; private set; }
-        /// <summary>Whether this sole ingredient can leave the product through its original Grab.</summary>
-        internal bool CanRetrieve => product != null && product.RetrievablePart == this && isActiveAndEnabled
+        /// <summary>Whether this ingredient fulfilled an optional recipe row.</summary>
+        internal bool IsOptional { get; private set; }
+        /// <summary>Whether this original can leave the incomplete product through Grab.</summary>
+        internal bool CanRetrieve => product != null && product.RetrievalPart == this && isActiveAndEnabled
             && product.Available(InteractionChannels.Assembly) && !product.Item.IsReserved && !product.Item.IsCarried
             && Grab != null && !Grab.IsLocked && Grab.ToolAllowed;
 
@@ -73,6 +75,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Capture state after ending carry, so later detachment restores the ingredient's own body policy.
             grab.Cancel();
             grab.Dock?.Release();
+            grab.ScoopSupply?.Withdraw(grab.Item);
             if (grab.TryGetComponent(out ObjectAssemblyProduct ingredient))
                 ingredient.ReleaseTable();
             appearance = changes;
@@ -80,6 +83,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             product = owner;
             Grab = grab;
             IngredientFlag = flag;
+            IsOptional = AssemblyIngredientSelection.IsOptional(owner.Settings, flag);
             // Preserve every insertion flag, not only the single category selected by the recipe magnet.
             HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>(grab.Item.Identity.ActiveFlags);
             if (ingredient != null && ingredient.IsComplete)
@@ -89,6 +93,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Units = grab.Units;
             MagnetIndex = index;
             body = grab.Body;
+            ObjectGravityGenerator.Forget(body);
             original = new CarryBodyState(body);
             Mass = body.mass;
             originalScale = transform.localScale;
@@ -112,6 +117,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Actual ingredients remain children; separate shape transforms bypass their dormant rigidbody.
             AssemblyMagnet magnet = owner.Settings.Magnets[index];
+            if (magnet.CompletedAppearance.HasChanges)
+                ItemAppearanceChanges.TryPrepare(grab.Item, magnet.CompletedAppearance, out completedAppearance, out _);
             Pose incoming = new Pose(transform.position, transform.rotation);
             Vector3 incomingScale = (owner.transform.worldToLocalMatrix * transform.localToWorldMatrix).lossyScale;
             gameObject.name = magnet.Name;
@@ -119,7 +126,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             transform.SetLocalPositionAndRotation(magnet.Position, Quaternion.Euler(magnet.Rotation));
             transform.localScale = Vector3.Scale(originalScale, magnet.Scale);
             geometry = AssemblyGeometry.Create(transform, colliders, shapes);
-            PickupColliders = geometry.GetComponentsInChildren<Collider>(true);
             for (int entry = 0; entry < colliders.Length; entry++)
             {
                 enabledColliders[entry] = colliders[entry].enabled;
@@ -154,7 +160,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Detach();
         }
 
-        /// <summary>Restores the sole ingredient before its original Grab captures standalone physics.</summary>
+        /// <summary>Restores this ingredient before its original Grab captures standalone physics.</summary>
         /// <returns>True when the ingredient detached without bypassing a product or tool restriction.</returns>
         internal bool ReleaseForPickup()
         {
@@ -212,6 +218,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return attached && source != null && shapes.TryGetValue(source, out Collider proxy) ? proxy : null;
         }
 
+        /// <summary>Applies or restores the ingredient's final appearance relative to its placed look.</summary>
+        /// <param name="value">Whether the recipe is finalized.</param>
+        internal void SetCompletedAppearance(bool value)
+        {
+            if (completedAppearance == null || completed == value)
+                return;
+            completed = value;
+            if (value)
+                completedAppearance.Commit();
+            else
+                completedAppearance.Restore();
+        }
+
         /// <summary>Suppresses ingredient geometry when its product displays a replacement mesh.</summary>
         /// <param name="hidden">Whether completion currently replaces this ingredient's visuals.</param>
         internal void SetGeometryHidden(bool hidden)
@@ -245,6 +264,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             product.Remove(this);
             product = null;
             SetGeometryHidden(false);
+            SetCompletedAppearance(false);
+            completedAppearance = null;
             appearance.Restore();
             appearance = null;
             transform.localScale = originalScale;

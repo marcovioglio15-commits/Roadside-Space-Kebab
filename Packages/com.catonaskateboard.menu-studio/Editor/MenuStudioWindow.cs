@@ -282,7 +282,7 @@ namespace CatOnASkateboard.MenuStudio.Editor
                 state.isExpanded = EditorGUILayout.Foldout(state.isExpanded, name, true);
                 if (!state.isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope entryIndent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope entryIndent = new StudioFieldLayout.SectionScope(1);
                 if (transforms)
                     StudioFields.Draw(state, "Scale", "Offset", "Rotation");
                 if (clips)

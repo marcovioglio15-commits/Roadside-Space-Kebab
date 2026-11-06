@@ -34,6 +34,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return false;
         }
 
+        /// <summary>Reports whether a selected category belongs to an optional row.</summary>
+        /// <param name="settings">Recipe accepting the ingredient.</param>
+        /// <param name="flag">Exact category chosen for its magnet.</param>
+        /// <returns>True when that row is optional.</returns>
+        internal static bool IsOptional(AssemblyProductSettings settings, ObjectFlag flag)
+        {
+            foreach (AssemblyIngredient ingredient in settings.Ingredients)
+                if (Array.IndexOf(ingredient.Flags, flag) >= 0)
+                    return ingredient.Optional;
+            return false;
+        }
+
         #endregion
 
         #region Selection
@@ -66,7 +78,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                                 if ((slot.AnyIngredient || Array.IndexOf(slot.Flags, alternative) >= 0)
                                     && grab.Identity.Has(alternative)
                                     && capacity.CanFit(settings, counts, occupied, index, alternative, grab.Units)
-                                    && (!slot.Appearance.HasChanges || slot.Appearance.CanBind(grab.Item)))
+                                    && (!slot.Appearance.HasChanges || slot.Appearance.CanBind(grab.Item))
+                                    && (!slot.CompletedAppearance.HasChanges || slot.CompletedAppearance.CanBind(grab.Item)))
                                 {
                                     magnet = index;
                                     flag = alternative;

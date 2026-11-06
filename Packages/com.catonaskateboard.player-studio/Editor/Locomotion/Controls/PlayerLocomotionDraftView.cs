@@ -33,7 +33,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             float acceleration = session.Acceleration;
             float deceleration = session.Deceleration;
             if (sections.Draw("Locomotion.Movement", "Movement"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     speed = StudioGUI.FloatField<PlayerLocomotionPreset>(speedLabel, speed, "speed");
                     acceleration = StudioGUI.FloatField<PlayerLocomotionPreset>(accelerationLabel, acceleration, "acceleration");
@@ -44,14 +44,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             float terminalSpeed = session.TerminalSpeed;
             float groundSpeed = session.GroundSpeed;
             if (sections.Draw("Locomotion.Gravity", "Gravity"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                     PlayerGravityControls.Draw(ref useGravity, ref gravityAcceleration, ref terminalSpeed, ref groundSpeed);
             bool useJump = session.UseJump;
             float height = session.JumpHeight;
             float bufferTime = session.JumpBufferTime;
             float coyoteTime = session.CoyoteTime;
             if ((useGravity || useJump) && sections.Draw("Locomotion.Jump", "Jump"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                     PlayerJumpControls.Draw(useGravity, ref useJump, ref height, ref bufferTime, ref coyoteTime);
             bool changed = EditorGUI.EndChangeCheck();
             if (changed)

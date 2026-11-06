@@ -13,6 +13,11 @@ GameObject:
   - component: {fileID: 6575901947250521784}
   - component: {fileID: 6943642627807494274}
   - component: {fileID: 1446148368216571378}
+  - component: {fileID: 1446148368216571379}
+  - component: {fileID: 782348595122866100}
+  - component: {fileID: 782348595122866101}
+  - component: {fileID: 782348595122866102}
+  - component: {fileID: 782348595122866103}
   m_Layer: 0
   m_Name: PF_Frier_Basket
   m_TagString: Untagged
@@ -73,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
-  interactionName: Cook Fries
+  interactionName: Fryer Basket
   toolRequirement:
     Mode: 0
     Tool: {fileID: 0}
@@ -86,11 +91,11 @@ MonoBehaviour:
   visualEffect:
     Enabled: 1
     Prefab: {fileID: 2878869678474554673, guid: bf740f1a33186404e9b7e6c155d1b033, type: 3}
-    AutoTiming: 1
-    Duration: 1
-    OnContactObject: 1
-    FollowObject: 0
-    Position: {x: 0, y: 0, z: 0}
+    AutoTiming: 0
+    Duration: 10
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: -0.11, y: 0.32, z: 0.28}
     Rotation: {x: 0, y: 0, z: 0}
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
@@ -98,10 +103,14 @@ MonoBehaviour:
   action: {fileID: 0}
   settings:
     Modifications:
-    - {fileID: 11400000, guid: d578edb2262163c42a71ea603fbf3dd9, type: 2}
+    - {fileID: 11400000, guid: e7c78d2a700142718e559cead496d816, type: 2}
     - {fileID: 11400000, guid: d565d370b7a543c3a05326d7897ad222, type: 2}
     - {fileID: 11400000, guid: c956ba15614f51d4e95bc2e9effea6dd, type: 2}
     - {fileID: 11400000, guid: 8fdf74ee869337344b60365a93dd27d8, type: 2}
+    - {fileID: 11400000, guid: 04e7df8a7e2d4f7f44c8450bc3594337, type: 2}
+    - {fileID: 11400000, guid: b0b88bc45432df5933b4062c16cc109f, type: 2}
+    - {fileID: 11400000, guid: 2f963c1a102142901c7f89a8d4ccb02f, type: 2}
+    - {fileID: 11400000, guid: 761b2f236643c6a8bf5b3a6cecb37933, type: 2}
     Target:
       Distance: 3
       Mode: 0
@@ -116,6 +125,9 @@ MonoBehaviour:
       Enabled: 0
       DialogueName: 
       Occurrence: 0
+      Step:
+        Block: 
+        Entry: 
     Price:
       CollectPrice: 0
       Sound: 1
@@ -139,12 +151,353 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.36, y: 0.29, z: 0.6}
+  m_Center: {x: -0.157, y: 0.271, z: 0.292}
+--- !u!65 &1446148368216571379
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.4139473, y: 0.5553118, z: 0.6870652}
-  m_Center: {x: -0.11203541, y: 0.09879341, z: 0.26020196}
+  m_Size: {x: 0.33, y: 0.03, z: 0.56}
+  m_Center: {x: -0.155, y: 0.245, z: 0.297}
+--- !u!114 &782348595122866100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d69ddefe9b2499095a570e106dd4e91, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+  interactionName: Scoop Crab Claw
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: 0}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.19
+      Offset: {x: -0.155, y: 0.325, z: 0.292}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    UseContainer: 0
+    Prefab: {fileID: 3003482873436781798, guid: 41cb897d69e4ec29524fca6075973c2e, type: 3}
+    ScoopDisplay:
+      VisibleCount: 9
+      Magnets:
+      - {x: -0.26, y: 0.304, z: 0.115}
+      - {x: -0.158, y: 0.306, z: 0.082}
+      - {x: -0.064, y: 0.303, z: 0.147}
+      - {x: -0.244, y: 0.303, z: 0.294}
+      - {x: -0.136, y: 0.304, z: 0.258}
+      - {x: -0.062, y: 0.305, z: 0.329}
+      - {x: -0.258, y: 0.305, z: 0.465}
+      - {x: -0.163, y: 0.302, z: 0.503}
+      - {x: -0.075, y: 0.304, z: 0.469}
+      Drift: {x: 0.019, y: 0.029, z: 0.036}
+      Speed: 0.49
+      BobCrestPower: 3.2
+      Steps: 080000000700000006000000050000000400000003000000020000000100000000000000i
+    Unlimited: 0
+    Stock: 9
+    DestroyWhenEmpty: 0
+    Mode: 3
+    SeparateToolOutput: 0
+    ToolMode: 2
+    Interval: 0.25
+    OutputsPerShot: 1
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 1
+    Outlets:
+    - Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+    PickupDuration: 0.35
+    OutputRotation: {x: 0, y: 0, z: 0}
+    StepCounter: 0
+    FillSteps: []
+--- !u!114 &782348595122866101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d69ddefe9b2499095a570e106dd4e91, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+  interactionName: Scoop Falafel Balls
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: 0}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.19
+      Offset: {x: -0.155, y: 0.325, z: 0.292}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    UseContainer: 0
+    Prefab: {fileID: 7576674769820030107, guid: da1b7bc7b4ce7196a9667b388f0f253c, type: 3}
+    ScoopDisplay:
+      VisibleCount: 9
+      Magnets:
+      - {x: -0.26, y: 0.304, z: 0.115}
+      - {x: -0.158, y: 0.306, z: 0.082}
+      - {x: -0.064, y: 0.303, z: 0.147}
+      - {x: -0.244, y: 0.303, z: 0.294}
+      - {x: -0.136, y: 0.304, z: 0.258}
+      - {x: -0.062, y: 0.305, z: 0.329}
+      - {x: -0.258, y: 0.305, z: 0.465}
+      - {x: -0.163, y: 0.302, z: 0.503}
+      - {x: -0.075, y: 0.304, z: 0.469}
+      Drift: {x: 0.019, y: 0.029, z: 0.036}
+      Speed: 0.49
+      BobCrestPower: 3.2
+      Steps: 080000000700000006000000050000000400000003000000020000000100000000000000i
+    Unlimited: 0
+    Stock: 9
+    DestroyWhenEmpty: 0
+    Mode: 3
+    SeparateToolOutput: 0
+    ToolMode: 2
+    Interval: 0.25
+    OutputsPerShot: 1
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 1
+    Outlets:
+    - Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+    PickupDuration: 0.35
+    OutputRotation: {x: 0, y: 0, z: 0}
+    StepCounter: 0
+    FillSteps: []
+--- !u!114 &782348595122866102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d69ddefe9b2499095a570e106dd4e91, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+  interactionName: Scoop French Fries
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: 0}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.19
+      Offset: {x: -0.155, y: 0.325, z: 0.292}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    UseContainer: 0
+    Prefab: {fileID: 2578056937270180844, guid: 2e346e4f55b1dde43ce0a7274433952b, type: 3}
+    ScoopDisplay:
+      VisibleCount: 9
+      Magnets:
+      - {x: -0.26, y: 0.304, z: 0.115}
+      - {x: -0.158, y: 0.306, z: 0.082}
+      - {x: -0.064, y: 0.303, z: 0.147}
+      - {x: -0.244, y: 0.303, z: 0.294}
+      - {x: -0.136, y: 0.304, z: 0.258}
+      - {x: -0.062, y: 0.305, z: 0.329}
+      - {x: -0.258, y: 0.305, z: 0.465}
+      - {x: -0.163, y: 0.302, z: 0.503}
+      - {x: -0.075, y: 0.304, z: 0.469}
+      Drift: {x: 0.019, y: 0.029, z: 0.036}
+      Speed: 0.49
+      BobCrestPower: 3.2
+      Steps: 080000000700000006000000050000000400000003000000020000000100000000000000i
+    Unlimited: 0
+    Stock: 9
+    DestroyWhenEmpty: 0
+    Mode: 3
+    SeparateToolOutput: 0
+    ToolMode: 2
+    Interval: 0.25
+    OutputsPerShot: 1
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 1
+    Outlets:
+    - Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+    PickupDuration: 0.35
+    OutputRotation: {x: 0, y: 0, z: 0}
+    StepCounter: 0
+    FillSteps: []
+--- !u!114 &782348595122866103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d69ddefe9b2499095a570e106dd4e91, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+  interactionName: Scoop Nuggets
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: 0}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.19
+      Offset: {x: -0.155, y: 0.325, z: 0.292}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    UseContainer: 0
+    Prefab: {fileID: 4872291968861290408, guid: 165fadd03675918042b41667cca4bf37, type: 3}
+    ScoopDisplay:
+      VisibleCount: 9
+      Magnets:
+      - {x: -0.26, y: 0.304, z: 0.115}
+      - {x: -0.158, y: 0.306, z: 0.082}
+      - {x: -0.064, y: 0.303, z: 0.147}
+      - {x: -0.244, y: 0.303, z: 0.294}
+      - {x: -0.136, y: 0.304, z: 0.258}
+      - {x: -0.062, y: 0.305, z: 0.329}
+      - {x: -0.258, y: 0.305, z: 0.465}
+      - {x: -0.163, y: 0.302, z: 0.503}
+      - {x: -0.075, y: 0.304, z: 0.469}
+      Drift: {x: 0.019, y: 0.029, z: 0.036}
+      Speed: 0.49
+      BobCrestPower: 3.2
+      Steps: 080000000700000006000000050000000400000003000000020000000100000000000000i
+    Unlimited: 0
+    Stock: 9
+    DestroyWhenEmpty: 0
+    Mode: 3
+    SeparateToolOutput: 0
+    ToolMode: 2
+    Interval: 0.25
+    OutputsPerShot: 1
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 1
+    Outlets:
+    - Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+    PickupDuration: 0.35
+    OutputRotation: {x: 0, y: 0, z: 0}
+    StepCounter: 0
+    FillSteps: []
 --- !u!1001 &6958182981859541995
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -208,6 +561,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4792f45ce509aa147b199a5d76ebc7b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3718681048532113906}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4792f45ce509aa147b199a5d76ebc7b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4934787716280354398}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4792f45ce509aa147b199a5d76ebc7b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6643939168132347393}
   m_SourcePrefab: {fileID: 100100000, guid: 4792f45ce509aa147b199a5d76ebc7b3, type: 3}
 --- !u!4 &7429487974738650112 stripped
 Transform:
@@ -241,3 +600,28 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4140014274244540197, guid: 4792f45ce509aa147b199a5d76ebc7b3, type: 3}
+--- !u!114 &4934787716280354398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7805027736898322106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
+  flags: []
+--- !u!114 &6643939168132347393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7805027736898322106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem

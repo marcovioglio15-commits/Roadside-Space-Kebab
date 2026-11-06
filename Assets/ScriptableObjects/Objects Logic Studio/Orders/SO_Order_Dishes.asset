@@ -39,7 +39,7 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
     - Name: WrapKebabNoTomato
       Text: '- Tomato'
       AppendToBaseText: 1
@@ -89,7 +89,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
   - Name: PaninoKebab
@@ -118,7 +118,7 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
     - Name: PaninoKebabNoTomato
       Text: '- Tomato'
       AppendToBaseText: 1
@@ -168,7 +168,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
   - Name: WrapFalafel
@@ -197,7 +197,7 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
     - Name: WrapFalafelNoTomato
       Text: '- Tomato'
       AppendToBaseText: 1
@@ -247,7 +247,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
   - Name: PaninoFalafel
@@ -276,7 +276,7 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
     - Name: PaninoFalafelNoTomato
       Text: '- Tomato'
       AppendToBaseText: 1
@@ -326,7 +326,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
   - Name: PizzaRossa
@@ -355,7 +355,7 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
     - Name: PizzaRossaWithFries
       Text: + Fries
       AppendToBaseText: 1
@@ -366,7 +366,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
   - Name: PizzaMargherita
@@ -395,7 +395,7 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
     - Name: PizzaMargheritaWithFries
       Text: + Fries
       AppendToBaseText: 1
@@ -406,7 +406,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
   - Name: PizzaKebab
@@ -435,7 +435,7 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
     - Name: PizzaKebabNoTomato
       Text: '- Tomato'
       AppendToBaseText: 1
@@ -485,7 +485,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
   - Name: FrenchFries

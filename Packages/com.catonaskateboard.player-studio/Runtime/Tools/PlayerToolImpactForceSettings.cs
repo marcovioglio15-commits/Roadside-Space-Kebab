@@ -77,10 +77,13 @@ namespace CatOnASkateboard.PlayerStudio
         public float BurstSpin = 12f;
         [Tooltip("Let impact-based degradation count this simulated hit using the object's normal impulse threshold and cooldown.")]
         public bool AffectImpactDegradation;
+        [Tooltip("Scale the impulse reported to Degradation. Stronger hits can complete multiple stages. Zero skips degradation. Launch strength is set separately.")]
+        [Range(0f, 100f)]
+        public float DegradationImpulseMultiplier = 50f;
         [Tooltip("Launch loose outputs from Slice steps performed by the shot. Outputs transferred to the carry slot stay held.")]
         public bool SliceShattering;
         [Tooltip("Scale the travel distance of loose Slice outputs. One uses the base launch. Spread and tumble stay the same.")]
-        [Range(0.1f, 4f)]
+        [Range(0.001f, 4f)]
         public float SliceDistanceMultiplier = 1f;
         [Tooltip("Skip simulated pushes, impact degradation and slice shattering for objects currently owned by Grab.")]
         public bool IgnoreCarriedObjects = true;
@@ -131,8 +134,10 @@ namespace CatOnASkateboard.PlayerStudio
             if ((ExplosiveResponse || SliceShattering) && (!float.IsFinite(BurstSpeed) || BurstSpeed is < 0.1f or > 16f
                 || !float.IsFinite(BurstLift) || BurstLift is < 0f or > 10f || !float.IsFinite(BurstSpin) || BurstSpin is < 0f or > 30f))
                 warning = "Set burst speed from 0.1 to 16, lift from 0 to 10 and spin from 0 to 30.";
-            else if (SliceShattering && (!float.IsFinite(SliceDistanceMultiplier) || SliceDistanceMultiplier is < 0.1f or > 4f))
-                warning = "Set Slice Distance Multiplier from 0.1 to 4.";
+            else if (SliceShattering && (!float.IsFinite(SliceDistanceMultiplier) || SliceDistanceMultiplier is < 0.001f or > 4f))
+                warning = "Set Slice Distance Multiplier from 0.001 to 4.";
+            else if (AffectImpactDegradation && (!float.IsFinite(DegradationImpulseMultiplier) || DegradationImpulseMultiplier is < 0f or > 100f))
+                warning = "Set Degradation Impulse Multiplier from 0 to 100.";
             else if (!ExplosiveResponse && (!float.IsFinite(Impulse) || Impulse <= 0f))
                 warning = "Simulated impact force needs a positive finite impulse.";
             else if (FilterLayers && Layers.value == 0)

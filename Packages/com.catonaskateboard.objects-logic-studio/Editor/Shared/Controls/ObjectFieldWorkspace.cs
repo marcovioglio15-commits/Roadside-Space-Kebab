@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Inactive sessions still retain baselines and must not report the batch's own edit as an outside conflict.
             foreach (ObjectFieldTarget field in target.Fields)
             {
-                Sync(workspace, SingleInteractionSession.Resolve(workspace.Target.Resolve(), workspace.Single.Kind), field, "Single");
+                Sync(workspace, workspace.Single.Resolve(workspace.Target.Resolve()), field, "Single");
                 Sync(workspace, workspace.Extended.Resolve(workspace.Target.Resolve()), field, "Extended");
                 Sync(workspace, ObjectWorkspaceSession.Resolve(workspace), field, "Hover");
             }

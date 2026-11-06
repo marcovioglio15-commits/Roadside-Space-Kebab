@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -121,6 +122,7 @@ namespace CatOnASkateboard.PlayerStudio
         /// <summary>Releases this rig's subscriptions and restores cursor and renderer state.</summary>
         private void OnDisable()
         {
+            PlayerCameraImpact.Stop(view);
             // The input asset, camera object and model remain owned by the player hierarchy.
             initialized = false;
             commands.Dispose();
@@ -186,6 +188,14 @@ namespace CatOnASkateboard.PlayerStudio
             look.DiscardPending();
         }
 
+        /// <summary>Checks whether this rig can apply a directed impact to the observer's camera.</summary>
+        /// <param name="camera">View used by the requesting interaction.</param>
+        /// <returns>True when this rig is actively following that view.</returns>
+        public bool Drives(Camera camera)
+        {
+            return initialized && isActiveAndEnabled && camera != null && camera == view && camera.isActiveAndEnabled;
+        }
+
         /// <summary>Follows the final player and model pose after movement, without delaying pointer rotation.</summary>
         private void LateUpdate()
         {
@@ -215,7 +225,9 @@ namespace CatOnASkateboard.PlayerStudio
                     motor != null && motor.isActiveAndEnabled && motor.IsGrounded, Time.deltaTime, ref position, ref rotation))
                 motor?.PlayFootstep();
             PlayerCameraRumble.Apply(ref position, ref rotation);
+            Action<bool> strike = PlayerCameraImpact.Apply(view, ref position, ref rotation);
             view.transform.SetPositionAndRotation(position, rotation);
+            strike?.Invoke(true);
         }
 
         #endregion

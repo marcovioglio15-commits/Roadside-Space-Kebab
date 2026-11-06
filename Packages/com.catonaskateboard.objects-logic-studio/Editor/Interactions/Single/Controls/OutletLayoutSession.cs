@@ -28,6 +28,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private ObjectLayoutSource source = new ObjectLayoutSource();
         [Tooltip("Edit dispenser outlets instead of a spray nozzle.")]
         public bool Dispenser;
+        [Tooltip("Edit floating supply magnets instead of physical outlet poses.")]
+        public bool Magnets;
+        [Tooltip("Prefab guide drawn at each floating supply magnet.")]
+        public GameObject Portion;
         [Tooltip("Output positions and directions edited by this preview.")]
         public OutletLayout Draft = new OutletLayout();
         [Tooltip("Poses copied when the preview was opened or last applied.")]
@@ -53,9 +57,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Copies the caller's current poses without changing the original group or prefab.</summary>
         /// <param name="workspace">Draft that opened the preview.</param>
         /// <param name="dispenser">Whether to edit multiple outlets instead of one nozzle.</param>
-        internal void Read(ObjectWorkspace workspace, bool dispenser)
+        /// <param name="magnets">Whether dispenser points represent floating supply magnets.</param>
+        internal void Read(ObjectWorkspace workspace, bool dispenser, bool magnets)
         {
             Dispenser = dispenser;
+            Magnets = magnets;
             source.Capture(workspace);
             ReadDraft(workspace);
         }
@@ -89,7 +95,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (point is not { IsValid: true })
                         throw new InvalidOperationException("Use finite values for each outlet's position and rotation.");
                 Undo.RecordObject(workspace, "Apply Outlet Layout to Draft");
-                if (Dispenser)
+                if (Magnets)
+                    workspace.Single.Draft.Dispenser.ScoopDisplay.Magnets = Array.ConvertAll(Draft.Points, point => point.Position);
+                else if (Dispenser)
                     workspace.Single.Draft.Dispenser.Outlets = ObjectWorkspace.Copy(Draft).Points;
                 else
                     workspace.Extended.Draft.SpraySauce.Nozzle = new SprayNozzle
@@ -112,6 +120,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="workspace">Exact draft retained by the preview.</param>
         private void ReadDraft(ObjectWorkspace workspace)
         {
+            Portion = Magnets ? workspace.Single.Draft.Dispenser.Prefab : null;
             Draft = ReadLayout(workspace);
             baseline = JsonUtility.ToJson(Draft);
         }
@@ -123,7 +132,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             return new OutletLayout
             {
-                Points = Dispenser ? ObjectWorkspace.Copy(workspace.Single.Draft.Dispenser).Outlets
+                Points = Magnets ? Array.ConvertAll(workspace.Single.Draft.Dispenser.ScoopDisplay.Magnets,
+                    position => new DispenserOutlet { Position = position })
+                    : Dispenser ? ObjectWorkspace.Copy(workspace.Single.Draft.Dispenser).Outlets
                     : new[] { new DispenserOutlet
                     {
                         Position = workspace.Extended.Draft.SpraySauce.Nozzle.Position,

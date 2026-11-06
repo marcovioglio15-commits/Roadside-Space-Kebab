@@ -23,14 +23,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Retains two prepared step lists whose snapshots all precede the first visual change.</summary>
         /// <param name="configuration">Container and dispenser thresholds.</param>
         /// <param name="prepared">Bound appearance operations for each threshold.</param>
-        /// <param name="item">Root supplying independent fill layer owners.</param>
-        private InventoryFillRun(InventoryFillStep[][] configuration, ItemAppearanceChanges[][] prepared, ObjectItem item)
+        /// <param name="item">Root supplying the shared identity.</param>
+        /// <param name="container">Owner of the container layer.</param>
+        /// <param name="dispenser">Owner of the dispenser layer.</param>
+        private InventoryFillRun(InventoryFillStep[][] configuration, ItemAppearanceChanges[][] prepared, ObjectItem item,
+            ObjectContainer container, ObjectDispenser dispenser)
         {
             // A shared baseline avoids one feature capturing the other's already modified mesh.
             steps = configuration;
             changes = prepared;
             identity = item.Identity;
-            owners = new ObjectInteraction[] { item.GetComponent<ObjectContainer>(), item.GetComponent<ObjectDispenser>() };
+            owners = new ObjectInteraction[] { container, dispenser };
         }
 
         /// <summary>Prepares both features atomically before either can alter the object's geometry.</summary>
@@ -40,14 +43,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="run">Receives the shared visual state.</param>
         /// <param name="warning">Receives an invalid appearance target.</param>
         /// <returns>True when all configured steps were bound successfully.</returns>
-        internal static bool TryCreate(ObjectItem item, ContainerSettings container, DispenserSettings dispenser,
+        internal static bool TryCreate(ObjectItem item, ObjectContainer container, ObjectDispenser dispenser,
             out InventoryFillRun run, out string warning)
         {
             // The two features may be linked for counts or use their own independent quantities.
             run = null;
-            InventoryFillStep[][] configuration = { container?.FillSteps ?? System.Array.Empty<InventoryFillStep>(),
-                dispenser != null && dispenser.SupportsSteps
-                    ? dispenser.FillSteps : System.Array.Empty<InventoryFillStep>() };
+            InventoryFillStep[][] configuration = { container?.Settings.FillSteps ?? System.Array.Empty<InventoryFillStep>(),
+                dispenser != null && dispenser.Settings.SupportsSteps
+                    ? dispenser.Settings.FillSteps : System.Array.Empty<InventoryFillStep>() };
             ItemAppearanceChanges[][] prepared = new ItemAppearanceChanges[2][];
             for (int group = 0; group < configuration.Length; group++)
             {
@@ -58,7 +61,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (!ItemAppearanceChanges.TryPrepare(item, configuration[group][index].Appearance, out prepared[group][index], out warning))
                         return false;
             }
-            run = new InventoryFillRun(configuration, prepared, item);
+            run = new InventoryFillRun(configuration, prepared, item, container, dispenser);
             warning = string.Empty;
             return true;
         }

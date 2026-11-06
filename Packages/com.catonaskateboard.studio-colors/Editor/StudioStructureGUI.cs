@@ -41,7 +41,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             property.isExpanded = StudioArrayGUI.Foldout(property, label);
             if (!property.isExpanded)
                 return false;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             using SerializedProperty child = property.Copy();
             using SerializedProperty end = property.GetEndProperty();
             if (child.NextVisible(true))

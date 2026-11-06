@@ -16,6 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly List<ObjectItem> removed = new List<ObjectItem>();
         private readonly List<ObjectGrab> candidates = new List<ObjectGrab>();
         private readonly List<ObjectGrab> ready = new List<ObjectGrab>();
+        private readonly List<Collider> extensions = new List<Collider>();
         private float nextQuery;
 
         #endregion
@@ -44,6 +45,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             removed.Clear();
             candidates.Clear();
             ready.Clear();
+            extensions.Clear();
             nextQuery = 0f;
         }
 
@@ -66,12 +68,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             AssemblyStationSettings settings = station.Settings;
             nextQuery = time + settings.ContactQueryInterval;
-            detection.Query(station.Item, settings.ContactTolerance, settings.IncludeTriggers, contacts);
-            station.Pending.Refresh(contacts);
-            candidates.Clear();
-            AssemblyInteractionRegistry.CollectPending(station, candidates);
-            foreach (ObjectGrab ingredient in candidates)
-                contacts.Add(ingredient.Item);
+            FindContacts(station, settings);
             removed.Clear();
             foreach (ObjectItem item in started.Keys)
                 if (item == null || !contacts.Contains(item))
@@ -130,6 +127,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     started.Remove(ingredient.Item);
             else
                 station.Pending.Show(station, proposal.Ingredients);
+        }
+
+        /// <summary>Combines the table and its retained ingredients into one contact surface.</summary>
+        /// <param name="station">Recipe station owning the current stack.</param>
+        /// <param name="settings">Contact distance and trigger policy.</param>
+        private void FindContacts(ObjectAssemblyStation station, AssemblyStationSettings settings)
+        {
+            extensions.Clear();
+            candidates.Clear();
+            AssemblyInteractionRegistry.CollectPending(station, candidates);
+
+            // Provisional ingredients use their original bodies. Committed ones use the product's current proxies.
+            foreach (ObjectGrab ingredient in candidates)
+                extensions.AddRange(ingredient.Colliders);
+            ObjectAssemblyProduct product = station.CurrentProduct;
+            if (product != null && product.Pickup?.Colliders != null)
+                extensions.AddRange(product.Pickup.Colliders);
+
+            detection.Query(station.Item, settings.ContactTolerance, settings.IncludeTriggers, contacts, extensions);
+            station.Pending.Refresh(contacts);
+            if (product != null)
+                contacts.Remove(product.Item);
+            foreach (ObjectGrab ingredient in candidates)
+                contacts.Add(ingredient.Item);
         }
 
         /// <summary>Keeps selection stable across unordered physics query results.</summary>

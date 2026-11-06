@@ -48,8 +48,10 @@ namespace CatOnASkateboard.PlayerStudio
                 impulse = Burst(settings, body, direction, strength, radial);
             else if (!body.isKinematic)
                 body.AddForceAtPosition(direction * impulse, point, ForceMode.Impulse);
-            if (settings.AffectImpactDegradation && body.TryGetComponent(out IPlayerToolImpactReceiver receiver))
-                receiver.ReceiveToolImpact(impulse);
+            // Scale the reported impact after applying the physical response and area falloff.
+            if (settings.AffectImpactDegradation && settings.DegradationImpulseMultiplier > 0f
+                && body.TryGetComponent(out IPlayerToolImpactReceiver receiver))
+                receiver.ReceiveToolImpact(impulse * settings.DegradationImpulseMultiplier);
         }
 
         /// <summary>Gives a body a consistent launch and spin regardless of its mass or shape.</summary>

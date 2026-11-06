@@ -21,7 +21,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             SerializedProperty settings = serialized.FindProperty("settings");
             PlayerCameraMode mode = (PlayerCameraMode)settings.FindPropertyRelative("mode").enumValueIndex;
             if (sections.Draw("Camera.View", "View"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     PlayerPresetField.Draw(settings, "mode", "Camera Mode");
                     mode = (PlayerCameraMode)settings.FindPropertyRelative("mode").enumValueIndex;
@@ -49,7 +49,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                         Field(settings, "distance");
                 }
             if (mode != PlayerCameraMode.Fixed && sections.Draw("Camera.Look", "Look"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     Field(settings, "lookEnabled");
                     if (settings.FindPropertyRelative("lookEnabled").boolValue)
@@ -75,7 +75,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 }
             if (mode != PlayerCameraMode.Fixed && settings.FindPropertyRelative("lookEnabled").boolValue
                 && sections.Draw("Camera.Cursor", "Cursor"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     Field(settings, "lockCursor");
                     if (settings.FindPropertyRelative("lockCursor").boolValue)
@@ -89,7 +89,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     }
                 }
             if (mode == PlayerCameraMode.ThirdPerson && sections.Draw("Camera.Obstacles", "Obstacles"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     Field(settings, "avoidObstacles");
                     if (settings.FindPropertyRelative("avoidObstacles").boolValue)
@@ -101,17 +101,17 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     }
                 }
             if (mode == PlayerCameraMode.FirstPerson && sections.Draw("Camera.HeadTilt", "Head Tilt"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                     PlayerHeadTiltControls.Draw(settings.FindPropertyRelative("headTilt"));
             if (sections.Draw("Camera.Lens", "Lens"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     Field(settings, "fieldOfView");
                     Field(settings, "nearClip");
                     Field(settings, "farClip");
                 }
             if (sections.Draw("Camera.Presentation", "Player Presentation"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     Field(settings, "movementFrame");
                     Field(settings, "modelFacing");

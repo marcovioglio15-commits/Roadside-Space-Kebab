@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,12 +27,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="point">Receives the nearest hit position.</param>
         /// <param name="solidOnly">Ignore trigger colliders when an action requires a physical surface hit.</param>
         /// <returns>True when an enabled owned collider was hit.</returns>
-        internal static bool TryCursorHit(Ray ray, Collider[] colliders, int cameraMask, float distance, out Vector3 point, bool solidOnly = false)
+        internal static bool TryCursorHit(Ray ray, IReadOnlyList<Collider> colliders, int cameraMask, float distance, out Vector3 point, bool solidOnly = false)
         {
             // Collider.Raycast includes target triggers without making unrelated triggers obstruct sight.
             point = default;
             bool found = false;
-            foreach (Collider collider in colliders)
+            for (int index = 0; index < colliders.Count; index++)
+            {
+                Collider collider = colliders[index];
                 if (collider != null && collider.enabled && (!solidOnly || !collider.isTrigger) && collider.gameObject.activeInHierarchy
                     && (cameraMask & (1 << collider.gameObject.layer)) != 0
                     && collider.Raycast(ray, out RaycastHit hit, distance))
@@ -40,6 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     point = hit.point;
                     found = true;
                 }
+            }
             return found;
         }
 
@@ -59,8 +63,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="target">Hierarchy excluded from obstruction tests.</param>
         /// <param name="point">World point that must remain visible.</param>
         /// <param name="mask">Solid obstacle layers.</param>
+        /// <param name="extra">Additional shapes that belong to the target without sharing its hierarchy.</param>
         /// <returns>True when no external solid collider blocks the complete sight segment.</returns>
-        internal bool HasSight(HoverObserver observer, Transform target, Vector3 point, int mask)
+        internal bool HasSight(HoverObserver observer, Transform target, Vector3 point, int mask, ISet<Collider> extra = null)
         {
             // Query the observer's physics scene, including projects using local physics scenes.
             PhysicsScene scene = observer.View.gameObject.scene.GetPhysicsScene();
@@ -72,7 +77,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Rays do not report a collider containing their origin; check that case explicitly.
             for (int index = 0; index < count; index++)
-                if (Blocks(overlaps[index], observer.Player, target))
+                if (Blocks(overlaps[index], observer.Player, target, extra))
                     return false;
             if (segment.sqrMagnitude < 0.000001f)
                 return true;
@@ -82,7 +87,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Results are unordered, so every returned collider must be inspected.
             for (int index = 0; index < count; index++)
-                if (Blocks(hits[index].collider, observer.Player, target))
+                if (Blocks(hits[index].collider, observer.Player, target, extra))
                     return false;
             return true;
         }
@@ -95,11 +100,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="collider">Collider returned by the physics scene.</param>
         /// <param name="player">Flagged player root.</param>
         /// <param name="target">Hovered object root.</param>
+        /// <param name="extra">Additional shapes owned by the target.</param>
         /// <returns>True for an external solid collider.</returns>
-        private static bool Blocks(Collider collider, Transform player, Transform target)
+        private static bool Blocks(Collider collider, Transform player, Transform target, ISet<Collider> extra)
         {
             // Transform ownership avoids runtime reflection and per-query component searches.
-            return collider != null && !collider.transform.IsChildOf(player) && !collider.transform.IsChildOf(target);
+            return collider != null && !collider.transform.IsChildOf(player) && !collider.transform.IsChildOf(target)
+                && (extra == null || !extra.Contains(collider));
         }
 
         /// <summary>Fails closed when a fixed buffer cannot prove that all hits were returned.</summary>

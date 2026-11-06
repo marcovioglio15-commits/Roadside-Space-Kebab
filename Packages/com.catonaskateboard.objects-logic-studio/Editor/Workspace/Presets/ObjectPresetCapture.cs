@@ -53,8 +53,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ObjectSingleInteraction single:
                     document.Category = ObjectInteractionCategory.SingleInteraction;
-                    document.Single.Kind = single.Kind;
-                    document.Single.Read(feature.gameObject);
+                    document.Single.Select(single);
                     break;
                 case ObjectExtendedInteraction extended:
                     document.Category = ObjectInteractionCategory.MultipleInteraction;

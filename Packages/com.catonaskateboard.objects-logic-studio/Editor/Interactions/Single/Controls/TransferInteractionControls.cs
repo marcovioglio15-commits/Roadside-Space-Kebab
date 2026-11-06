@@ -31,32 +31,34 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Linked storage restores original instances and has no separate prefab stock.
             Target(settings.FindPropertyRelative("Target"), sections);
             bool scoopOnly = settings.FindPropertyRelative("Mode").enumValueIndex == (int)DispenseMode.ScoopOnly;
-            if (sections.Draw("Dispenser Supply", "Choose a supply flag, prefab or linked storage.", settings, "UseContainer", "Prefab", "ScoopFlag", "Unlimited", "Stock", "DestroyWhenEmpty"))
+            if (sections.Draw("Dispenser Supply", "Choose a prefab or linked storage.", settings, "UseContainer", "Prefab", "Unlimited", "Stock", "DestroyWhenEmpty"))
                 using (new StudioIndentScope())
                 {
-                    if (scoopOnly)
-                        HoverControls.Field(settings, "ScoopFlag");
-                    else
-                    {
+                    if (!scoopOnly)
                         HoverControls.Field(settings, "UseContainer");
-                        if (!settings.FindPropertyRelative("UseContainer").boolValue)
-                            Prefab(settings.FindPropertyRelative("Prefab"));
-                    }
+                    if (scoopOnly || !settings.FindPropertyRelative("UseContainer").boolValue)
+                        Prefab(settings.FindPropertyRelative("Prefab"));
                     HoverControls.Field(settings, "Unlimited");
                     if (!settings.FindPropertyRelative("Unlimited").boolValue)
                     {
                         HoverControls.Field(settings, "Stock");
-                        HoverControls.Field(settings, "DestroyWhenEmpty");
+                        if (!scoopOnly)
+                            HoverControls.Field(settings, "DestroyWhenEmpty");
                     }
                 }
             if (sections.Draw("Dispenser Output", "Choose carried pickup or release objects at independently placed outlets.", settings,
                 "Mode", "SeparateToolOutput", "ToolMode", "Interval", "OutputsPerShot", "ScatterShotOutputs", "ScatterDistanceMultiplier", "Outlets", "PickupDuration", "OutputRotation"))
                 using (new StudioIndentScope())
                     DispenserOutput(settings, requirement, action);
+            if (scoopOnly)
+            {
+                ScoopDisplayControls.Draw(settings, sections);
+                return;
+            }
             if (sections.Draw("Dispense counting", "Choose what advances each step.", settings, "StepCounter"))
                 using (new StudioIndentScope())
                     HoverControls.Field(settings, "StepCounter");
-            if (!scoopOnly && settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue
+            if (settings.FindPropertyRelative("UseContainer").boolValue || !settings.FindPropertyRelative("Unlimited").boolValue
                 || settings.FindPropertyRelative("StepCounter").enumValueIndex == (int)DispenseStepCounter.Dispensed)
                 InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Dispense Steps");
         }

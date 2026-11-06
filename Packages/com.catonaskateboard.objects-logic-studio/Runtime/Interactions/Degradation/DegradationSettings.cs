@@ -66,10 +66,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public DegradationMode Mode;
         [Tooltip("Begin at spawn, after the first successful Grab, or progress only while carried. Carry modes require Grab on this object.")]
         public DegradationCarryPolicy Carry;
-        [Tooltip("Minimum impulse in newton-seconds counted as an impact. Kinematic carry estimates it from mass and the normal speed stopped by an obstacle.")]
+        [Tooltip("Let simulated weapon impacts count before the first Grab. Physical impacts still require a successful Grab.")]
+        public bool AllowSimulatedImpactBeforeGrab;
+        [Tooltip("Impulse per counted impact, in newton-seconds. A simulated weapon hit can count once for each full multiple of this threshold.")]
         [Range(0.01f, 100f)]
         public float MinimumImpulse = 1f;
-        [Tooltip("Minimum scaled seconds between counted impacts; simultaneous compound contacts count only once.")]
+        [Tooltip("Minimum scaled seconds between separate hits. Compound contacts from one hit share the same cooldown.")]
         [Range(0f, 5f)]
         public float ImpactInterval = 0.1f;
         [Tooltip("Stages entered in array order, each with its own time or impact requirement.")]

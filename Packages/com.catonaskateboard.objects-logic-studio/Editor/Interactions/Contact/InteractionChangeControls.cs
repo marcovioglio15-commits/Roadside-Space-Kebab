@@ -34,18 +34,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     continue;
                 using StudioIndentScope row = new StudioIndentScope();
                 HoverControls.Field(change, "Operation");
-                bool add = change.FindPropertyRelative("Operation").enumValueIndex == (int)InteractionChangeOperation.Add;
-                bool remove = change.FindPropertyRelative("Operation").enumValueIndex == (int)InteractionChangeOperation.Remove;
+                InteractionChangeOperation operation = (InteractionChangeOperation)change.FindPropertyRelative("Operation").enumValueIndex;
+                bool add = operation == InteractionChangeOperation.Add;
                 if (add)
                 {
                     HoverControls.Field(change, "AddKind", "Interaction Type");
                     HoverControls.Field(change, "Name");
                 }
                 else
-                    Target(change.FindPropertyRelative("Target"), source, remove);
+                    Target(change.FindPropertyRelative("Target"), source, operation);
                 InteractionRuntimeKind kind = add ? (InteractionRuntimeKind)change.FindPropertyRelative("AddKind").enumValueIndex
                     : (InteractionRuntimeKind)change.FindPropertyRelative("Target.Kind").enumValueIndex;
-                if (remove)
+                if (operation is not (InteractionChangeOperation.Add or InteractionChangeOperation.ApplyPreset))
                     continue;
                 InteractionGroupControls.Draw(change, kind);
                 if (add)
@@ -71,16 +71,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Selects an existing exact card without asking for a type or field name as text.</summary>
         /// <param name="property">Portable interaction descriptor.</param>
         /// <param name="source">Sample object supplying selectable cards.</param>
-        /// <param name="allowTypes">Whether removal can select a type without a sample object.</param>
-        private static void Target(SerializedProperty property, GameObject source, bool allowTypes)
+        /// <param name="operation">Determines whether type selection changes one or all matching cards.</param>
+        private static void Target(SerializedProperty property, GameObject source, InteractionChangeOperation operation)
         {
+            bool allowTypes = operation != InteractionChangeOperation.ApplyPreset;
+            bool remove = operation == InteractionChangeOperation.Remove;
             RuntimeInteractionReference selected = (RuntimeInteractionReference)property.boxedValue;
-            string label = !selected.Assigned ? "Choose Interaction" : selected.AllOfType ? selected.Kind + " (all)" : selected.Kind + " / " + selected.Name;
+            string label = !selected.Assigned ? "Choose Interaction" : selected.AllOfType ? selected.Kind + (remove ? " (all)" : " (by type)") : selected.Kind + " / " + selected.Name;
             using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Interaction", property.tooltip));
             Rect rect = field.GetRect(EditorGUIUtility.singleLineHeight);
             rect = field.ValueRect(rect);
             using EditorGUI.DisabledScope disabled = new EditorGUI.DisabledScope(source == null && !allowTypes);
-            if (!GUI.Button(rect, new GUIContent(label, allowTypes ? "Remove a type from any contact item. Missing types are ignored." : property.tooltip), EditorStyles.popup))
+            if (!GUI.Button(rect, new GUIContent(label, allowTypes ? "Select a type or an exact card. Missing targets are ignored." : property.tooltip), EditorStyles.popup))
                 return;
             UnityEngine.Object owner = property.serializedObject.targetObject;
             string path = property.propertyPath;
@@ -89,7 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             GenericMenu menu = new GenericMenu { allowDuplicateNames = true };
             if (allowTypes)
                 foreach (InteractionRuntimeKind kind in Enum.GetValues(typeof(InteractionRuntimeKind)))
-                    AddTarget(menu, "All of Type/" + ObjectNames.NicifyVariableName(kind.ToString()), selected,
+                    AddTarget(menu, (remove ? "All of Type/" : "By Type/") + ObjectNames.NicifyVariableName(kind.ToString()), selected,
                         new RuntimeInteractionReference { Assigned = true, AllOfType = true, Kind = kind }, owner, path, guard);
             foreach (ObjectInteraction feature in source != null ? source.GetComponents<ObjectInteraction>() : Array.Empty<ObjectInteraction>())
             {

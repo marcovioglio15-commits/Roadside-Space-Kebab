@@ -1,7 +1,6 @@
 using CatOnASkateboard.StudioIdentity;
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -40,6 +39,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public Vector3 Scale = Vector3.one;
         [Tooltip("Mesh and material replacements applied to the actual ingredient on insertion and restored when it detaches.")]
         public ItemAppearanceSettings Appearance = new ItemAppearanceSettings();
+        [Tooltip("Optional visual changes applied to this ingredient when the recipe is finalized.")]
+        public ItemAppearanceSettings CompletedAppearance = new ItemAppearanceSettings();
 #if UNITY_EDITOR
         [Tooltip("Optional ingredient prefab displayed only as a visual guide in the assembly preview. It is never spawned by gameplay assembly.")]
         public GameObject PreviewPrefab;
@@ -79,18 +80,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Base price per consumed logical product unit. A fulfilled order's price override has priority.")]
         [Range(0f, 10000f)]
         public float Price = 5f;
-        [Tooltip("Keep the product incomplete and allow compatible recipe extensions on the same table until the held assembly action finishes, then commit completed appearance, flags and product interactions.")]
-        public bool ProlongedAssembly;
-        [Tooltip("Independent assembly input, charging behavior and HUD appearance. Used only by Prolonged Assembly.")]
+        [Tooltip("Assembly input, hold timing and progress indicator.")]
         public AssemblyChargeSettings Charge = new AssemblyChargeSettings();
-        [Tooltip("Keep the first ingredient inside the product. With Prolonged Assembly, defer this lock until successful completion. Otherwise disable to allow retrieval while it is the sole ingredient and the product is not finalized.")]
-        public bool LockFirstIngredient = true;
-        [Tooltip("Apply completed appearance and release product interaction gates only when the player first requests Grab with empty hands after mandatory ingredients are present.")]
-        public bool FinalizeOnGrab = true;
-        [Tooltip("Grab button used to finalize a product without its own Grab interaction. Products with Grab reuse its input and targeting.")]
-        public InputActionReference FinalizeAction;
-        [Tooltip("Targeting for finalization when the product has no Grab interaction.")]
-        public TransferTargetSettings FinalizeTarget = new TransferTargetSettings();
+        [Tooltip("Optional input, launch and camera feedback for dismantling a ready recipe.")]
+        public AssemblyDismantleSettings Dismantle = new AssemblyDismantleSettings();
         [Tooltip("Snap this completed product to the next recipe's magnet while keeping its interactions usable. Another compatible ingredient starts assembly; Grab releases the snap. Explicit input insertion remains immediate.")]
         public bool WaitForNextIngredient;
         [Tooltip("Groups of alternative ingredient flags sharing one quantity per row. A flag belongs to only one row. Mandatory rows must be filled; optional rows can be omitted.")]

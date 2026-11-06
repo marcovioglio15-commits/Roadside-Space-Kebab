@@ -276,10 +276,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
                 grab.Cancel();
                 grab.Dock?.Release();
+                grab.ScoopSupply?.Withdraw(grab.Item);
                 grab.RequiresAssemblyPlacement = true;
             }
             if (body.TryGetComponent(out ObjectAssemblyProduct product))
-                product.ReleaseForSuspension();
+                product.ReleaseForEjection();
             ownership.Add(body, this);
             BlackHoleBody entry = new BlackHoleBody(body, item, owner, destination, surface, this);
             participants[body] = entry;

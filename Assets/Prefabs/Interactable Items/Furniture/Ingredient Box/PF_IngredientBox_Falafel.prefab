@@ -144,7 +144,7 @@ MonoBehaviour:
     Interval: 0.25
     OutputsPerShot: 5
     ScatterShotOutputs: 1
-    ScatterDistanceMultiplier: 0.2
+    ScatterDistanceMultiplier: 0.1
     Outlets:
     - Position: {x: 0.442, y: 0.179, z: 0.047}
       Rotation: {x: 0, y: 0, z: 0}

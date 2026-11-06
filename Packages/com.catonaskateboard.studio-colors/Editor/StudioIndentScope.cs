@@ -42,7 +42,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         private static int suspensions;
         private readonly EditorGUILayout.HorizontalScope row;
         private readonly EditorGUILayout.VerticalScope column;
-        private readonly EditorGUI.IndentLevelScope nativeIndent;
+        private readonly StudioFieldLayout.SectionScope fields;
 
         #endregion
 
@@ -55,16 +55,18 @@ namespace CatOnASkateboard.StudioColors.Editor
         {
             if (suspensions > 0 || Event.current == null)
                 return;
+            // The layout group already handles indentation, so its native controls start at zero.
+            float inset = 24f + EditorGUI.IndentedRect(new Rect()).x;
             row = new EditorGUILayout.HorizontalScope();
-            GUILayout.Space(24f + EditorGUI.IndentedRect(new Rect()).x);
+            GUILayout.Space(inset);
             column = new EditorGUILayout.VerticalScope();
-            nativeIndent = new EditorGUI.IndentLevelScope(-EditorGUI.indentLevel);
+            fields = new StudioFieldLayout.SectionScope(-EditorGUI.indentLevel, inset);
         }
 
         /// <summary>Restores native indentation and closes both layout groups even after ExitGUI.</summary>
         public void Dispose()
         {
-            nativeIndent?.Dispose();
+            fields.Dispose();
             column?.Dispose();
             row?.Dispose();
         }

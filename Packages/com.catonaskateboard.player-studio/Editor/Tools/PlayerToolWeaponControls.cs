@@ -39,16 +39,16 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 Muzzle(data, weapon, tool, hierarchy, root);
             if (PlayerToolFields.Section(ref effectsOpen, "Effects", "Configure muzzle, shot and impact feedback."))
             {
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
                 Effect(weapon.FindPropertyRelative("MuzzleEffect"), root, true);
                 Effect(weapon.FindPropertyRelative("ShotEffect"), root, false);
                 if (PlayerToolFields.Section(ref impactOpen, "Impact", "Surface effects, area contacts and simulated force."))
                 {
+                    using StudioFieldLayout.SectionScope impactIndent = new StudioFieldLayout.SectionScope(1);
                     Impact(weapon, projectile);
-                    using EditorGUI.IndentLevelScope impactIndent = new EditorGUI.IndentLevelScope();
                     if (PlayerToolFields.Section(ref impactAreaOpen, "Impact Area", "Extend a confirmed hit to nearby exposed targets."))
                     {
-                        using EditorGUI.IndentLevelScope areaIndent = new EditorGUI.IndentLevelScope();
+                        using StudioFieldLayout.SectionScope areaIndent = new StudioFieldLayout.SectionScope(1);
                         if (PlayerToolFields.Toggle(weapon.FindPropertyRelative("ImpactAreaEnabled")))
                             StudioFields.Draw(weapon, "ImpactAreaRadius");
                     }
@@ -64,9 +64,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="settings">Serialized simulated impact force settings.</param>
         private static void ImpactForce(SerializedProperty settings)
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
-            StudioFields.Draw(settings, "Enabled");
-            if (!settings.FindPropertyRelative("Enabled").boolValue)
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
+            if (!PlayerToolFields.Toggle(settings.FindPropertyRelative("Enabled")))
                 return;
             // Layer and flag groups can be enabled independently.
             bool explosive = PlayerToolFields.Toggle(settings.FindPropertyRelative("ExplosiveResponse"));
@@ -77,8 +76,11 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 StudioFields.Draw(settings, "Impulse");
             if (explosive || shatter)
                 StudioFields.Draw(settings, "BurstSpeed", "BurstLift", "BurstSpin");
-            StudioFields.Draw(settings, "IgnoreCarriedObjects", "AffectImpactDegradation", "FilterLayers");
-            if (settings.FindPropertyRelative("FilterLayers").boolValue)
+            StudioFields.Draw(settings, "IgnoreCarriedObjects");
+            // Keep the multiplier with the effect it controls.
+            if (PlayerToolFields.Toggle(settings.FindPropertyRelative("AffectImpactDegradation")))
+                StudioFields.Draw(settings, "DegradationImpulseMultiplier");
+            if (PlayerToolFields.Toggle(settings.FindPropertyRelative("FilterLayers")))
                 StudioFields.Draw(settings, "Layers");
             StudioFields.Draw(settings, "Interactions", "FilterFlags");
             if (settings.FindPropertyRelative("FilterFlags").boolValue)
@@ -96,7 +98,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <returns>True when the weapon launches projectiles.</returns>
         private static bool Firing(SerializedObject data, SerializedProperty weapon)
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             SerializedProperty mode = weapon.FindPropertyRelative("Mode");
             PlayerToolWeaponMode selected = (PlayerToolWeaponMode)StudioFieldGUI.EnumPopup(StudioFieldMenu.Value(mode,
                 new GUIContent("Weapon Mode", mode.tooltip)), (PlayerToolWeaponMode)mode.intValue);
@@ -130,7 +132,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="root">Resolved sample transform.</param>
         private static void Muzzle(SerializedObject data, SerializedProperty weapon, PlayerTool tool, GameObject hierarchy, Transform root)
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             PlayerHierarchyMenu.DrawPath(weapon.FindPropertyRelative("MuzzlePath"), root,
                 new GUIContent("Muzzle Parent", weapon.FindPropertyRelative("MuzzlePath").tooltip), true);
             PlayerToolFields.Vector(weapon.FindPropertyRelative("MuzzlePosition"), -5f, 5f);
@@ -158,7 +160,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             effect.isExpanded = StudioArrayGUI.Foldout(effect, new GUIContent(effect.displayName, effect.tooltip));
             if (!effect.isExpanded)
                 return;
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             SerializedProperty prefab = effect.FindPropertyRelative("Prefab");
             PlayerToolFields.Reference(prefab, typeof(GameObject));
             if (prefab.objectReferenceValue == null)
@@ -177,7 +179,6 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="projectile">Whether physical range-end impacts are meaningful.</param>
         private static void Impact(SerializedProperty weapon, bool projectile)
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
             SerializedProperty prefab = weapon.FindPropertyRelative("Impact");
             PlayerToolFields.Reference(prefab, typeof(GameObject), new GUIContent("Prefab", prefab.tooltip));
             if (prefab.objectReferenceValue == null)
@@ -223,7 +224,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="projectile">Whether a physical shot can require impact alignment.</param>
         private static void Aim(SerializedProperty weapon, Transform root, bool projectile)
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             if (!PlayerToolFields.Toggle(weapon.FindPropertyRelative("AutoAim")))
                 return;
             PlayerHierarchyMenu.DrawPath(weapon.FindPropertyRelative("AimPath"), root,

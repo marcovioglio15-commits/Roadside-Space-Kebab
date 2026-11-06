@@ -24,13 +24,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Supply")]
         [Tooltip("Take existing items from the Container on this object. Empty storage disables dispensing; no prefab is spawned.")]
         public bool UseContainer;
-        [Tooltip("Physical supply prefab. Requires Grab and a valid body. Hidden in Scoop Only.")]
+        [Tooltip("Prefab supplied at the outlet or displayed by the Scoop Only magnets.")]
         public GameObject Prefab;
-        [Tooltip("Flag supplied to compatible scoop containers. Scoop Only does not create or consume a prefab.")]
-        public CatOnASkateboard.StudioIdentity.ObjectFlag ScoopFlag;
+        [Tooltip("Magnets, floating motion and visible stock steps for Scoop Only.")]
+        public ScoopDisplaySettings ScoopDisplay = new ScoopDisplaySettings();
         [Tooltip("Allow unlimited portions. Disable to define finite supply and the spaces available to a linked Container.")]
         public bool Unlimited = true;
         [Tooltip("Initial prefab stock, or total spaces for stored-only supply. Returned originals refill vacancies when Container limits storage to this Dispenser.")]
+        [Range(1, 1000)]
         public int Stock = 1;
         [Tooltip("Destroy this object after its final finite portion. Animated scoops finish before the dispenser disappears.")]
         public bool DestroyWhenEmpty;
@@ -50,7 +51,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Fan shot outputs out from the outlet with lift and tumble. The incoming shot skews the fan.")]
         public bool ScatterShotOutputs = true;
         [Tooltip("Scale the travel distance of the dispersed items. One uses the base launch. Spread and tumble stay the same.")]
-        [Range(0.1f, 4f)]
+        [Range(0.001f, 4f)]
         public float ScatterDistanceMultiplier = 1f;
         [Tooltip("Output poses relative to the dispenser root. One is selected uniformly at random for each successful output.")]
         public DispenserOutlet[] Outlets = { new DispenserOutlet() };
@@ -65,8 +66,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Appearance selected by the configured counter. Refills reverse finite-supply thresholds. Unlimited prefab supply supports the dispensed counter only.")]
         public InventoryFillStep[] FillSteps = Array.Empty<InventoryFillStep>();
         /// <summary>Whether the selected supply counter has a meaningful finite value.</summary>
-        public bool SupportsSteps => StoredSupply || !Unlimited || StepCounter == DispenseStepCounter.Dispensed;
-        /// <summary>Whether supply is represented by a flag rather than physical output.</summary>
+        public bool SupportsSteps => !ScoopOnly && (StoredSupply || !Unlimited || StepCounter == DispenseStepCounter.Dispensed);
+        /// <summary>Whether supply floats at magnets for held containers to scoop.</summary>
         public bool ScoopOnly => Mode == DispenseMode.ScoopOnly;
         /// <summary>Whether the active mode restores stored originals.</summary>
         public bool StoredSupply => !ScoopOnly && UseContainer;
@@ -117,6 +118,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Dispenser targeting is missing.";
             if (Target == null || !Target.TryValidate(out warning))
                 return false;
+            if (ScoopOnly)
+            {
+                warning = "Choose an active prefab root with Object Item and configure its floating display.";
+                return Prefab != null && !Prefab.scene.IsValid() && Prefab.transform.parent == null && Prefab.activeSelf
+                    && Prefab.GetComponent<ObjectItem>() != null && ScoopDisplay != null
+                    && ScoopDisplay.TryValidate(Unlimited ? ScoopDisplay.VisibleCount : Stock, out warning);
+            }
             if (SupportsSteps && !InventoryFillStep.TryValidate(FillSteps, out warning))
                 return false;
             if (StepCounter is not (DispenseStepCounter.Remaining or DispenseStepCounter.Dispensed))
@@ -139,9 +147,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     warning = "Outputs Per Shot must be between 1 and " + maximumOutputsPerShot + ".";
                     return false;
                 }
-                if (ScatterShotOutputs && (!float.IsFinite(ScatterDistanceMultiplier) || ScatterDistanceMultiplier is < 0.1f or > 4f))
+                if (ScatterShotOutputs && (!float.IsFinite(ScatterDistanceMultiplier) || ScatterDistanceMultiplier is < 0.001f or > 4f))
                 {
-                    warning = "Set Scatter Distance Multiplier from 0.1 to 4.";
+                    warning = "Set Scatter Distance Multiplier from 0.001 to 4.";
                     return false;
                 }
             }
@@ -162,8 +170,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Dispenser pickup duration must be positive and finite, with a finite output rotation.";
             else if (!Unlimited && Stock <= 0)
                 warning = "Dispenser Stock must be a positive whole number.";
-            else if (ScoopOnly && ScoopFlag == null)
-                warning = "Choose a supply flag for Scoop Only.";
             else if (!StoredSupply && !ScoopOnly && (Prefab == null || Prefab.scene.IsValid() || Prefab.transform.parent != null || !Prefab.activeSelf))
                 warning = "Choose an active prefab root for supply.";
             else if (!StoredSupply && !ScoopOnly && (!Prefab.TryGetComponent(out ObjectGrab grab) || !grab.enabled))

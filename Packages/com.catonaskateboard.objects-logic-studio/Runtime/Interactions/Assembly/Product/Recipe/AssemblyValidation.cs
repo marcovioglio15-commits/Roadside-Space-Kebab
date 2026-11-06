@@ -1,7 +1,6 @@
 using CatOnASkateboard.StudioIdentity;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
@@ -48,21 +47,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Recipe Price must be finite and between zero and ten thousand.";
             if (settings.PriceEnabled && !CollectedPrice.Valid(settings.Price))
                 return false;
-            // A product with Grab inherits that feature's binding and targeting; standalone products need their own.
-            if (settings.ProlongedAssembly)
-            {
-                warning = "Configure Prolonged Assembly.";
-                if (settings.Charge == null || !settings.Charge.TryValidate(out warning))
-                    return false;
-            }
-            else if (settings.FinalizeOnGrab && owner != null && owner.GetComponent<ObjectGrab>() == null)
-            {
-                warning = "Assign a finalization Button for a product without Grab, or disable Finalize On Grab.";
-                if (settings.FinalizeAction == null || settings.FinalizeAction.action == null || settings.FinalizeAction.action.type != InputActionType.Button)
-                    return false;
-                if (settings.FinalizeTarget == null || !settings.FinalizeTarget.TryValidate(out warning))
-                    return false;
-            }
+            // Both commands share targeting but require distinct input actions.
+            warning = "Configure the assembly hold and dismantle settings.";
+            if (settings.Charge == null || !settings.Charge.TryValidate(out warning)
+                || settings.Dismantle == null || !settings.Dismantle.TryValidate(settings.Charge.Action, out warning))
+                return false;
             // Completed recipes retire ingredient colliders, so carry geometry must exist on the product itself.
             if (owner != null && owner.TryGetComponent(out ObjectGrab _) && !ObjectGrab.ValidateBody(owner, out warning))
             {
@@ -107,7 +96,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     warning = "Magnet order must be zero or a unique insertion number within the slot and ingredient capacity.";
                     return false;
                 }
-                if (magnet.Appearance == null || !magnet.Appearance.TryValidate(out warning))
+                if (magnet.Appearance == null || !magnet.Appearance.TryValidate(out warning)
+                    || magnet.CompletedAppearance == null || !magnet.CompletedAppearance.TryValidate(out warning))
                     return false;
                 if (!magnet.AnyIngredient)
                 {

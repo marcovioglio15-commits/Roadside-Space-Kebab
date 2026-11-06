@@ -22,7 +22,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             using SerializedObject data = new SerializedObject(owner);
             SerializedProperty audio = data.FindProperty("state.Locomotion.audio");
             if (sections.Draw("Locomotion.Footsteps", "Footsteps"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     Field(audio, "Footsteps", "Enabled");
                     if (audio.FindPropertyRelative("Footsteps").boolValue)
@@ -35,7 +35,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     }
                 }
             if (sections.Draw("Locomotion.ImpactAudio", "Collision Audio"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                 {
                     SerializedProperty impact = audio.FindPropertyRelative("Collision");
                     Field(impact, "Enabled");

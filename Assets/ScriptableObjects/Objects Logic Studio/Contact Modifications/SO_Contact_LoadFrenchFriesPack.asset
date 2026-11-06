@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a439b7286b394b02ae0ea92882a14ea2, type: 3}
+  m_Name: SO_Contact_LoadFrenchFriesPack
+  m_EditorClassIdentifier: 
+  Settings:
+    Name: Load French Fries Pack
+    Preparation:
+      Snap: 0
+      SnapSpace: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Instant: 1
+      Duration: 0.35
+      RequireInput: 0
+      Animate: 0
+      AnimateOther: 0
+      Path: 
+      AnimationSpace: 0
+      StateA:
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      StateB:
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      AnimationDuration: 0.35
+      ForwardRotation: 0
+      Return: 0
+      ReturnDuration: 0.35
+      ReturnRotation: 0
+    Flags:
+    - {fileID: 11400000, guid: bace8ab8525cc1c40932f1e55bed40f1, type: 2}
+    ContactDuration: 0
+    ContactTolerance: 0.04
+    QueryInterval: 0.04
+    IncludeTriggers: 1
+    AllowCarriedSelf: 1
+    AllowCarriedOther: 0
+    Duration: 0
+    ParallelOther: 0
+    CompleteAfterSeparation: 0
+    ResumeAfterInterruption: 0
+    RepeatAfterSeparation: 1
+    WhileContact: 0
+    RevertDelay: 0.25
+    Self:
+      Tint: 0
+      Multiplier: {r: 1, g: 1, b: 1, a: 1}
+      ColorProperty: _BaseColor
+      RendererPath: 
+      MaterialSlot: -1
+      Meshes: []
+      Consume: 0
+      Interactions:
+      - Operation: 3
+        AddKind: 0
+        Name: Interaction
+        Target:
+          Assigned: 1
+          Kind: 4
+          AllOfType: 0
+          Name: Scoop French Fries
+          Occurrence: 0
+        GroupPresets: []
+        RequiresAction: 1
+        GroupWarning: 
+        CompiledKind: 4
+        Groups: []
+        Action: {fileID: 0}
+        AdvanceAction: {fileID: 0}
+    Other:
+      Tint: 0
+      Multiplier: {r: 1, g: 1, b: 1, a: 1}
+      ColorProperty: _BaseColor
+      RendererPath: 
+      MaterialSlot: -1
+      Meshes: []
+      Consume: 1
+      Interactions: []
+    ChangeContactFlag: 0
+    ContactFlag: {fileID: 0}
+    ContactFlagOperation: 0
+    BlockSelf: 0
+    BlockOther: 0

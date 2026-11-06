@@ -10,9 +10,12 @@ namespace CatOnASkateboard.StudioColors.Editor
         #region State
 
         private const float panePadding = 26f;
+        private const float prefixPadding = 2f;
         private static float paneWidth;
+        private static SectionColumn section;
         private readonly float previousLabelWidth;
         private readonly float captionHeight;
+        private readonly float valueInset;
         private readonly GUIContent caption;
 
         #endregion
@@ -36,20 +39,39 @@ namespace CatOnASkateboard.StudioColors.Editor
             previousLabelWidth = EditorGUIUtility.labelWidth;
             caption = label ?? GUIContent.none;
             captionHeight = 0f;
+            valueInset = 0f;
             if (string.IsNullOrEmpty(caption.text))
                 return;
 
             // Measure bold captions as well, since Unity can bold overridden properties.
-            float viewWidth = paneWidth > 0f ? paneWidth : EditorGUIUtility.currentViewWidth;
-            float width = (float.IsFinite(viewWidth) && viewWidth > panePadding ? viewWidth : 360f) - panePadding;
+            float width = Mathf.Max(1f, PaneWidth() - panePadding);
             float indentation = EditorGUI.IndentedRect(new Rect(0f, 0f, width, 0f)).x;
             float required = CaptionStyle(false).CalcSize(caption).x + indentation + 10f;
             float available = width - minimumValueWidth;
-            if (required <= available)
-                EditorGUIUtility.labelWidth = Mathf.Clamp(previousLabelWidth, required, available);
-            else
-                captionHeight = Mathf.Max(EditorGUIUtility.singleLineHeight,
-                    CaptionStyle(true).CalcHeight(caption, Mathf.Max(1f, width - indentation)));
+            bool fits = required <= available;
+            if (fits && section != null && Event.current.type == EventType.Layout)
+                section.Measured = Mathf.Max(section.Measured, required);
+
+            // Stacked captions leave the same column available for their value when the pane permits it.
+            float column = Mathf.Max(previousLabelWidth, section?.Width ?? 0f);
+            if (fits)
+            {
+                EditorGUIUtility.labelWidth = Mathf.Clamp(column, required, available);
+                return;
+            }
+            captionHeight = Mathf.Max(EditorGUIUtility.singleLineHeight,
+                CaptionStyle(true).CalcHeight(caption, Mathf.Max(1f, width - indentation)));
+            // An empty Unity prefix omits the two-point gap after the label column.
+            if (section != null)
+                valueInset = Mathf.Max(0f, Mathf.Min(column, available) + prefixPadding - indentation);
+        }
+
+        /// <summary>Resolves the actual pane width when a control is embedded in a larger window.</summary>
+        /// <returns>Current width in GUI points before native row padding.</returns>
+        private static float PaneWidth()
+        {
+            float width = paneWidth > 0f ? paneWidth : EditorGUIUtility.currentViewWidth;
+            return float.IsFinite(width) && width > 0f ? width : 360f;
         }
 
         /// <summary>Uses Inspector styles even when a native drawer measures its height outside an IMGUI event.</summary>
@@ -91,6 +113,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             label.height = captionHeight;
             EditorGUI.LabelField(label, caption, EditorStyles.wordWrappedLabel);
             row.yMin = label.yMax + EditorGUIUtility.standardVerticalSpacing;
+            row.xMin += valueInset;
             return row;
         }
 
@@ -104,7 +127,62 @@ namespace CatOnASkateboard.StudioColors.Editor
 
         #endregion
 
-        #endregion
+        #region Section Scopes
+
+        /// <summary>Stores one section's measured label column between Layout and Repaint.</summary>
+        private sealed class SectionColumn
+        {
+            internal float Width;
+            internal float Measured;
+        }
+
+        /// <summary>Aligns the visible fields of one dropdown and isolates it from nested dropdowns.</summary>
+        public readonly struct SectionScope : IDisposable
+        {
+            private readonly SectionColumn previous;
+            private readonly int previousIndent;
+            private readonly float previousPane;
+            private readonly bool active;
+            private readonly bool measuring;
+
+            #region Methods
+
+            /// <summary>Starts a dropdown body and accounts for any layout-based left inset.</summary>
+            /// <param name="indent">Native indentation to add to the body.</param>
+            /// <param name="inset">Width already reserved to the left of the body by its layout group.</param>
+            public SectionScope(int indent, float inset = 0f) : this()
+            {
+                if (Event.current == null)
+                    return;
+
+                // IMGUI retains the column for this body across event passes in the same view.
+                active = true;
+                previous = section;
+                previousIndent = EditorGUI.indentLevel;
+                previousPane = paneWidth;
+                EditorGUI.indentLevel += indent;
+                if (inset > 0f)
+                    paneWidth = Mathf.Max(1f, PaneWidth() - inset);
+                section = (SectionColumn)GUIUtility.GetStateObject(typeof(SectionColumn), GUIUtility.GetControlID(FocusType.Passive));
+                measuring = Event.current.type == EventType.Layout;
+                if (measuring)
+                    section.Measured = 0f;
+            }
+
+            /// <summary>Publishes the current layout measurement and restores the enclosing body.</summary>
+            public void Dispose()
+            {
+                if (!active)
+                    return;
+                if (measuring)
+                    section.Width = section.Measured;
+                section = previous;
+                EditorGUI.indentLevel = previousIndent;
+                paneWidth = previousPane;
+            }
+
+            #endregion
+        }
 
         /// <summary>Uses the width of a settings pane that occupies only part of the editor window.</summary>
         public readonly struct WidthScope : IDisposable
@@ -127,5 +205,9 @@ namespace CatOnASkateboard.StudioColors.Editor
 
             #endregion
         }
+
+        #endregion
+
+        #endregion
     }
 }

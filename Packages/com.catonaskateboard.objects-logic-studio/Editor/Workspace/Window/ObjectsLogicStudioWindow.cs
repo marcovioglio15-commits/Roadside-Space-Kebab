@@ -15,6 +15,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private ObjectWorkspace state;
         private SerializedObject data;
         private GameObject currentObject;
+        private GameObject catalogOwner;
         private ObjectInteraction[] interactions = Array.Empty<ObjectInteraction>();
         private List<ObjectGroupInfo> groups = new List<ObjectGroupInfo>();
         private string status = string.Empty;
@@ -205,7 +206,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (state == null || openingPrefab)
                 return;
             currentObject = ObjectWorkspaceContext.Target(state);
-            interactions = ObjectWorkspaceContext.Interactions(state);
+            interactions = ObjectWorkspaceContext.Interactions(state, currentObject, out catalogOwner);
             UnlockInteractionControls.Refresh(state.Target.Resolve());
             AssemblyControls.Refresh(state.Target.Resolve());
             library.Invalidate();
@@ -388,6 +389,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!ObjectWorkspaceGUI.Foldout(state, "View.Interactions", "Interactions", "Choose an interaction on this object."))
                 return;
             using StudioIndentScope sectionContent4 = new StudioIndentScope();
+            if (catalogOwner != null && catalogOwner != currentObject)
+                EditorGUILayout.LabelField("Interactions on " + catalogOwner.name, EditorStyles.miniLabel);
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUI.SetNextControlName("ObjectsLogicStudio.Search");

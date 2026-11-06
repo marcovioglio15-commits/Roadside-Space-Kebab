@@ -189,19 +189,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     ExcludeCarried(settings, "AllowCarriedSelf", "Exclude Carried Self");
                     ExcludeCarried(settings, "AllowCarriedOther", "Exclude Carried Contact Item");
                 }
-            ContactPreparationControls.Draw(settings.FindPropertyRelative("Preparation"), sections);
-            if (sections.Draw("Modification", "Control transition timing and interruption behavior.", settings, "Duration", "WhileContact", "RevertDelay", "CompleteAfterSeparation", "ResumeAfterInterruption", "RepeatAfterSeparation"))
+            bool parallel = UsesParallelControls(settings);
+            if (sections.Draw("Modification", "Control transition timing and interruption behavior.", settings, "ParallelOther", "Duration", "WhileContact", "RevertDelay", "CompleteAfterSeparation", "ResumeAfterInterruption", "RepeatAfterSeparation"))
                 using (new StudioIndentScope())
                 {
+                    Field(settings, "ParallelOther");
+                    parallel = UsesParallelControls(settings);
                     Field(settings, "Duration");
-                    Field(settings, "WhileContact");
-                    if (settings.FindPropertyRelative("WhileContact").boolValue)
+                    if (!parallel)
+                        Field(settings, "WhileContact");
+                    if (!parallel && settings.FindPropertyRelative("WhileContact").boolValue)
                         Field(settings, "RevertDelay");
                     if (!settings.FindPropertyRelative("WhileContact").boolValue && settings.FindPropertyRelative("Duration").floatValue > 0f)
                     {
                         if (!settings.FindPropertyRelative("Preparation.Snap").boolValue)
                             Field(settings, "CompleteAfterSeparation");
-                        if (!settings.FindPropertyRelative("Preparation.Snap").boolValue && (!settings.FindPropertyRelative("CompleteAfterSeparation").boolValue
+                        if (!parallel && !settings.FindPropertyRelative("Preparation.Snap").boolValue && (!settings.FindPropertyRelative("CompleteAfterSeparation").boolValue
                             || !settings.FindPropertyRelative("AllowCarriedSelf").boolValue
                             || !settings.FindPropertyRelative("AllowCarriedOther").boolValue))
                             Field(settings, "ResumeAfterInterruption");
@@ -210,13 +213,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         && !settings.FindPropertyRelative("Self.Consume").boolValue && !settings.FindPropertyRelative("Other.Consume").boolValue)
                         Field(settings, "RepeatAfterSeparation");
                 }
-            if (sections.Draw("Self Effects", "Modify the item owning this component.", settings, "Self"))
+            if (!parallel)
+                ContactPreparationControls.Draw(settings.FindPropertyRelative("Preparation"), sections);
+            if (!parallel && sections.Draw("Self Effects", "Modify the item owning this component.", settings, "Self"))
                 using (new StudioIndentScope())
                     DrawEffects(settings.FindPropertyRelative("Self"), false, !settings.FindPropertyRelative("WhileContact").boolValue);
             if (sections.Draw("Contact Item Effects", "Modify the other item using paths relative to its root.", settings, "Other", "ChangeContactFlag", "ContactFlagOperation", "ContactFlag"))
                 using (new StudioIndentScope())
                 {
-                    DrawEffects(settings.FindPropertyRelative("Other"), true, !settings.FindPropertyRelative("WhileContact").boolValue);
+                    SerializedProperty other = settings.FindPropertyRelative("Other");
+                    if (parallel)
+                        MaterialTintControls.Draw(other, true, HierarchyPathMenu.Source(other, true), selectSource: false);
+                    else
+                        DrawEffects(other, true, !settings.FindPropertyRelative("WhileContact").boolValue);
                     Field(settings, "ChangeContactFlag");
                     if (settings.FindPropertyRelative("ChangeContactFlag").boolValue)
                     {
@@ -228,9 +237,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (sections.Draw("Temporary Restrictions", "Suspend interaction families while effects run; pausing releases these restrictions.", settings, "BlockSelf", "BlockOther"))
                 using (new StudioIndentScope())
                 {
-                    Field(settings, "BlockSelf");
+                    if (!parallel)
+                        Field(settings, "BlockSelf");
                     Field(settings, "BlockOther");
                 }
+        }
+
+        /// <summary>Keeps incompatible settings visible until the parallel rule can be applied.</summary>
+        /// <param name="settings">Current contact rule draft.</param>
+        /// <returns>True when only controls used by independent contact effects are needed.</returns>
+        private static bool UsesParallelControls(SerializedProperty settings)
+        {
+            return settings.FindPropertyRelative("ParallelOther").boolValue
+                && settings.boxedValue is ContactModificationRule { SupportsParallelEffects: true };
         }
 
         /// <summary>Shows only controls used by the participant's enabled effects.</summary>

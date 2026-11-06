@@ -31,9 +31,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         ObjectWorkspaceSession.Select(state, hover.gameObject, System.Array.IndexOf(hover.GetComponents<ObjectHover>(), hover), out _);
                         data.Update();
                         break;
-                    case ObjectSingleInteraction single when state.Single.Kind != single.Kind:
-                        state.Single.Kind = single.Kind;
-                        state.Single.Read(feature.gameObject);
+                    case ObjectSingleInteraction single when state.Single.ComponentId != ObjectWorkspaceTarget.FileId(single):
+                        state.Single.Select(single);
                         data.Update();
                         break;
                     case ObjectExtendedInteraction extended when state.Extended.ComponentId != ObjectWorkspaceTarget.FileId(extended):

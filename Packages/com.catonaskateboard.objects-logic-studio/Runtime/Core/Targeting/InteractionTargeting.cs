@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -28,9 +29,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="solidHitOnly">Require an exact solid surface hit instead of trigger hits or nearby anchors.</param>
         /// <param name="score">Receives the selected surface's squared distance from the player.</param>
         /// <param name="centerCollider">Require the centre ray to hit owned geometry, including triggers, as in Hover.</param>
+        /// <param name="extra">Additional target-owned shapes outside the root hierarchy.</param>
         /// <returns>True when at least one owned surface or configured anchor is reachable and visible.</returns>
-        internal bool Eligible(HoverObserver observer, Transform root, Collider[] colliders, Vector3 anchor,
-            float distance, HoverTargetMode mode, float radius, int mask, bool solidHitOnly, out float score, bool centerCollider = false)
+        internal bool Eligible(HoverObserver observer, Transform root, IReadOnlyList<Collider> colliders, Vector3 anchor,
+            float distance, HoverTargetMode mode, float radius, int mask, bool solidHitOnly, out float score, bool centerCollider = false, ISet<Collider> extra = null)
         {
             // An actual swept bullet hit already establishes target and line of fire, regardless of observer reach.
             if (InteractionProjectileInput.Active)
@@ -49,7 +51,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return InteractionProjectileInput.PhysicalImpact
                     || (!solidHitOnly || !InteractionProjectileInput.TargetCollider.isTrigger)
                         && Visible(observer, root, InteractionProjectileInput.TargetPoint,
-                            InteractionProjectileInput.IgnoreRange ? float.PositiveInfinity : distance, float.PositiveInfinity, mask, out score);
+                            InteractionProjectileInput.IgnoreRange ? float.PositiveInfinity : distance, float.PositiveInfinity, mask, out score, extra);
             }
             // Target geometry may have moved since the last physics step or assembly insertion.
             Camera view = observer.View;
@@ -68,22 +70,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (colliders != null && HoverPhysics.TryCursorHit(view.ScreenPointToRay(pixel), colliders, view.cullingMask,
                 Vector3.Distance(view.transform.position, observer.Player.position) + distance, out Vector3 hit, solidHitOnly && !centerCollider)
-                && Visible(observer, root, hit, distance, radius, mask, out score))
+                && Visible(observer, root, hit, distance, radius, mask, out score, extra))
                 return true;
             // Exact solid targeting cannot fall back to a nearby pivot or collider centre.
             if (solidHitOnly || centerCollider || mode != HoverTargetMode.ViewCenter)
                 return false;
             if ((view.cullingMask & (1 << root.gameObject.layer)) != 0
-                && Visible(observer, root, anchor, distance, radius, mask, out score))
+                && Visible(observer, root, anchor, distance, radius, mask, out score, extra))
                 return true;
 
             // A product pivot can be inside the worktop; each added ingredient contributes its own visible centre.
             if (colliders != null)
-                foreach (Collider collider in colliders)
+                for (int index = 0; index < colliders.Count; index++)
+                {
+                    Collider collider = colliders[index];
                     if (collider != null && collider.enabled && !collider.isTrigger && collider.gameObject.activeInHierarchy
                         && (view.cullingMask & (1 << collider.gameObject.layer)) != 0
-                        && Visible(observer, root, collider.bounds.center, distance, radius, mask, out score))
+                        && Visible(observer, root, collider.bounds.center, distance, radius, mask, out score, extra))
                         return true;
+                }
             return false;
         }
 
@@ -95,8 +100,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="radius">Allowed screen radius; one permits any cursor position.</param>
         /// <param name="mask">Obstacle layers.</param>
         /// <param name="score">Receives squared player distance.</param>
+        /// <param name="extra">Additional shapes that cannot occlude their own source.</param>
         /// <returns>True for a visible point inside the configured reach and viewport.</returns>
-        private bool Visible(HoverObserver observer, Transform root, Vector3 point, float distance, float radius, int mask, out float score)
+        private bool Visible(HoverObserver observer, Transform root, Vector3 point, float distance, float radius, int mask, out float score,
+            ISet<Collider> extra)
         {
             // Distance cannot be extended by using a distant third-person camera.
             score = (point - observer.Player.position).sqrMagnitude;
@@ -104,7 +111,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Rect viewport = observer.View.pixelRect;
             return score <= distance * distance && screen.z >= observer.View.nearClipPlane && screen.z <= observer.View.farClipPlane
                 && viewport.Contains(screen) && ((Vector2)screen - viewport.center).sqrMagnitude <= radius * radius * viewport.height * viewport.height
-                && physics.HasSight(observer, root, point, mask);
+                && physics.HasSight(observer, root, point, mask, extra);
         }
 
         #endregion

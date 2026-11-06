@@ -70,7 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Only the abandoned empty shell is removed; ingredient instances and their own state survive.
             previous.ReleaseTable();
             Object.Destroy(previous.gameObject);
-            next.ActivateProduct(replacement, false);
+            next.ActivateProduct(replacement);
             return true;
         }
 

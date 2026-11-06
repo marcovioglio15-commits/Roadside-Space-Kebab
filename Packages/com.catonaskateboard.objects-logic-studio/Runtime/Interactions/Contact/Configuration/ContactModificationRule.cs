@@ -127,6 +127,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Seconds for the color transition. Zero commits all effects immediately after the contact delay.")]
         [Range(0f, 60f)]
         public float Duration = 1f;
+        [Tooltip("Tint and change flags on each contact independently. Only permanent effects on the contacted item are supported.")]
+        public bool ParallelOther;
         [Tooltip("Finish a started modification after separation. Carried-item eligibility still applies.")]
         public bool CompleteAfterSeparation;
         [Tooltip("Without controlled counterpart motion, pause appearance and resume when contact returns. Snapped or animated counterpart processes instead cancel and restore their original pose when interrupted.")]
@@ -163,6 +165,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool IdentityOnly => WhileContact && Self != null && Other != null && !Self.HasAppearance && !Other.HasAppearance
             && Self.Interactions.Length == 0 && Other.Interactions.Length == 0;
 
+        /// <summary>Whether effects can run independently without claiming the source.</summary>
+        public bool SupportsParallelEffects => !WhileContact && !ResumeAfterInterruption && BlockSelf == InteractionChannels.None
+            && Preparation is { Snap: false, Animate: false }
+            && Self is { HasAppearance: false, Consume: false, Interactions: { Length: 0 } }
+            && Other is { Consume: false, Interactions: { Length: 0 }, Meshes: { Length: 0 } };
+
         #endregion
 
         #region Methods
@@ -197,6 +205,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Both participant effect settings are required.";
             else if (!Self.TryValidate(out warning) || !Other.TryValidate(out warning))
                 return false;
+            else if (ParallelOther && !SupportsParallelEffects)
+                warning = "Parallel contacts support permanent tint or flag changes on the counterpart, with no restrictions on the source.";
             else if (Self.Consume && Other.Consume)
                 warning = "Consume only one participant so the other can retain its receipt.";
             else if (WhileContact && (Self.Consume || Other.Consume || !float.IsFinite(RevertDelay) || RevertDelay < 0f))

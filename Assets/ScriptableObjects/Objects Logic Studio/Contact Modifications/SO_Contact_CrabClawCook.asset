@@ -14,40 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Settings:
     Name: ModifyByContact CrabClaw Cook
-    Preparation:
-      Snap: 1
-      SnapSpace: 0
-      Position: {x: -0.15, y: 0.3, z: 0.279}
-      Rotation: {x: 0, y: 0, z: 0}
-      Instant: 0
-      Duration: 0.5
-      RequireInput: 0
-      Animate: 1
-      AnimateOther: 1
-      Path: 
-      AnimationSpace: 0
-      StateA:
-        Position: {x: -0.15, y: 0.3, z: 0.279}
-        Rotation: {x: 0, y: 0, z: 0}
-        Scale: {x: 1, y: 1, z: 1}
-      StateB:
-        Position: {x: -0.15, y: 0.25, z: 0.279}
-        Rotation: {x: 0, y: 0, z: 0}
-        Scale: {x: 1, y: 1, z: 1}
-      AnimationDuration: 1
-      ForwardRotation: 0
-      Return: 1
-      ReturnDuration: 1
-      ReturnRotation: 0
     Flags:
     - {fileID: 11400000, guid: 7a9729a57801b554a91610d9c74a59d6, type: 2}
     ContactDuration: 0
     ContactTolerance: 0.02
     QueryInterval: 0.02
-    IncludeTriggers: 0
+    IncludeTriggers: 1
     AllowCarriedSelf: 1
     AllowCarriedOther: 0
     Duration: 10
+    ParallelOther: 1
     CompleteAfterSeparation: 0
     ResumeAfterInterruption: 0
     RepeatAfterSeparation: 1
@@ -63,7 +39,7 @@ MonoBehaviour:
       Consume: 0
     Other:
       Tint: 1
-      Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 0.3019608}
+      Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 1}
       ColorProperty: _BaseColor
       RendererPath: 
       MaterialSlot: -1
@@ -72,5 +48,5 @@ MonoBehaviour:
     ChangeContactFlag: 1
     ContactFlag: {fileID: 11400000, guid: a7939210dde959248b2f93747141a805, type: 2}
     ContactFlagOperation: 0
-    BlockSelf: 1
-    BlockOther: 1
+    BlockSelf: 0
+    BlockOther: 0

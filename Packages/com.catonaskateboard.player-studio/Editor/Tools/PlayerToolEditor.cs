@@ -63,14 +63,14 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 Setup();
             if (PlayerToolFields.Section(ref useOpen, "Use", "Animation and cooldown for each accepted use."))
             {
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
                 Animation("UseAnimation");
                 StudioFields.Draw(serializedObject, "UseInterval");
             }
             SerializedProperty weapon = serializedObject.FindProperty("IsWeapon");
             if (PlayerToolFields.Section(ref weaponOpen, "Weapon", "Firing, effects and aiming settings."))
             {
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
                 if (PlayerToolFields.Toggle(weapon))
                     weaponControls.Draw(serializedObject, (PlayerTool)target, hierarchySource);
             }
@@ -79,7 +79,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Shared tool assets retain switch clips for players that use multiple tools.
             if (switching && PlayerToolFields.Section(ref switchOpen, "Switch Animations", "Optional animations when selecting and leaving this tool."))
             {
-                using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
                 Animation("SwitchIn");
                 Animation("SwitchOut");
             }
@@ -91,7 +91,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>Edits the tool name and the local hierarchy sample used by its child editors.</summary>
         private void Setup()
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             SerializedProperty name = serializedObject.FindProperty("DisplayName");
             string editedName = StudioFieldGUI.TextField(PlayerToolFields.Label(name), name.stringValue);
             if (editedName != name.stringValue)
@@ -103,7 +103,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <summary>Draws the automatic reload option and ordered animation steps when reload is enabled.</summary>
         private void Reload()
         {
-            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope();
+            using StudioFieldLayout.SectionScope indent = new StudioFieldLayout.SectionScope(1);
             bool enabled = PlayerToolFields.Toggle(serializedObject.FindProperty("ReloadEnabled"));
             // Keep an invalid saved magazine visible so it can be turned off.
             if (serializedObject.FindProperty("IsWeapon").boolValue
@@ -122,7 +122,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                     break;
                 if (!steps.GetArrayElementAtIndex(index).isExpanded)
                     continue;
-                using EditorGUI.IndentLevelScope stepIndent = new EditorGUI.IndentLevelScope();
+                using StudioFieldLayout.SectionScope stepIndent = new StudioFieldLayout.SectionScope(1);
                 PlayerToolFields.Animation(steps.GetArrayElementAtIndex(index), hierarchySource != null ? hierarchySource.transform : null,
                     new GUIContent("Animation", steps.tooltip));
             }

@@ -18,14 +18,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             GameObject source = HierarchyPathMenu.Source(settings);
             bool impacts = settings.FindPropertyRelative("Mode").enumValueIndex == (int)DegradationMode.Impacts;
-            if (sections.Draw("Degradation trigger", "Advance with time or impacts.", settings, "Mode", "Carry", "MinimumImpulse", "ImpactInterval"))
+            if (sections.Draw("Degradation trigger", "Advance with time or impacts.", settings, "Mode", "Carry", "AllowSimulatedImpactBeforeGrab", "MinimumImpulse", "ImpactInterval"))
             {
                 using StudioIndentScope sectionContent1 = new StudioIndentScope();
                 HoverControls.Field(settings, "Mode", "Degradation Mode");
-                if (source == null || source.GetComponent<ObjectGrab>() != null || settings.FindPropertyRelative("Carry").enumValueIndex != 0)
+                SerializedProperty carry = settings.FindPropertyRelative("Carry");
+                if (source == null || source.GetComponent<ObjectGrab>() != null || carry.enumValueIndex != (int)DegradationCarryPolicy.FromSpawn)
                     HoverControls.Field(settings, "Carry");
                 if (impacts)
                 {
+                    // The exception is useful only while waiting for the first Grab.
+                    if (carry.enumValueIndex == (int)DegradationCarryPolicy.AfterFirstGrab)
+                        HoverControls.Field(settings, "AllowSimulatedImpactBeforeGrab", "Allow Shot Before Grab");
                     HoverControls.Field(settings, "MinimumImpulse");
                     HoverControls.Field(settings, "ImpactInterval");
                 }

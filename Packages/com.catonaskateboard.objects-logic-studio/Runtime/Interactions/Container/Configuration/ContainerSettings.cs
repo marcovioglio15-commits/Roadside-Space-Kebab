@@ -24,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ObjectFlagMatch Match;
         [Tooltip("Store any number of accepted objects.")]
         public bool Unlimited = true;
-        [Tooltip("Maximum number of stored instances when unlimited storage is disabled.")]
+        [Tooltip("Maximum scoop portions or stored instances when unlimited storage is disabled.")]
         [Range(1, 1000)]
         public int Capacity = 10;
         [Tooltip("Accept only spaces available in this object's finite Dispenser. Prefab supply starts full; stored-only supply starts empty. Deposited originals become available to that Dispenser.")]

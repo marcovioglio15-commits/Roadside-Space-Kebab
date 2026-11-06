@@ -403,7 +403,6 @@ MonoBehaviour:
   settings:
     PriceEnabled: 1
     Price: 5
-    ProlongedAssembly: 1
     Charge:
       Action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
       Target:
@@ -430,19 +429,16 @@ MonoBehaviour:
       OffsetY: -80
       Drain: 0
       Clockwise: 1
-    LockFirstIngredient: 0
-    FinalizeOnGrab: 1
-    FinalizeAction: {fileID: 0}
-    FinalizeTarget:
-      Distance: 3
-      Mode: 0
-      SolidHitOnly: 0
-      CenterRadius: 0.15
-      Offset: {x: 0, y: 0, z: 0}
-      ObstacleMask:
-        serializedVersion: 2
-        m_Bits: 4294967295
-      DrawGizmos: 1
+    Dismantle:
+      Action: {fileID: 11400000, guid: 357677893c74dfa00512b2435f33bc56, type: 2}
+      Hold: 0
+      Duration: 0.6
+      Lift: 1.4
+      Spread: 0.65
+      CameraImpact: 1
+      CameraDuration: 0.92
+      CameraArcHeight: 0.78
+      CameraClearance: 0.19
     WaitForNextIngredient: 1
     Ingredients:
     - Flags:
@@ -455,6 +451,7 @@ MonoBehaviour:
       Optional: 0
     - Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       Count: 1
       Optional: 1
     Magnets:
@@ -488,6 +485,7 @@ MonoBehaviour:
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       Order: 0
       Position: {x: 0, y: 0.025, z: 0}
       Rotation: {x: 0, y: 45, z: 0}

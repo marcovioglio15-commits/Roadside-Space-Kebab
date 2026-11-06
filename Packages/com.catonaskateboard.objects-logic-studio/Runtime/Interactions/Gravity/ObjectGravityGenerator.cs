@@ -27,8 +27,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             internal readonly Vector3 Force;
             internal readonly float Duration;
             internal readonly ObjectItem Item;
-            internal readonly ObjectAssemblyProduct Product;
-            internal readonly ObjectGrab Grab;
             internal bool Started;
             internal float ForceUntil;
 
@@ -46,8 +44,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Force = force;
                 Duration = duration;
                 Item = item;
-                Product = body.GetComponent<ObjectAssemblyProduct>();
-                Grab = body.GetComponent<ObjectGrab>();
             }
 
             #endregion
@@ -264,12 +260,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || GravitySuspension.Contains(body, this) || !settings.Area.Contains(transform, body.worldCenterOfMass)
                 || !settings.Filter.Matches(body, transform))
                 return;
-            // Exclude attached ingredient bodies and authored kinematic scenery, but retain pending item transitions.
+            // Recipe ownership and magnet placement take priority over pending gravity transitions.
             body.TryGetComponent(out ObjectItem item);
-            if (item != null && (!item.isActiveAndEnabled || item.IsConsumed)
-                || body.isKinematic && (item == null || !item.IsReserved && !item.IsCarried
-                    && !(body.TryGetComponent(out ObjectAssemblyProduct product) && product.Table != null)
-                    && !(body.TryGetComponent(out ObjectGrab grab) && grab.Dock != null)))
+            if (item != null && (!item.isActiveAndEnabled || item.IsConsumed || item.IsFloatingSupply)
+                || body.TryGetComponent(out ObjectAssemblyProduct product) && product.Table != null
+                || body.TryGetComponent(out ObjectGrab grab) && grab.Dock != null
+                || body.isKinematic && (item == null || !item.IsReserved && !item.IsCarried))
                 return;
             Vector3 force = settings.SampleForce(transform, out float duration);
             GravitySuspension.Acquire(body, this);
@@ -282,12 +278,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="entry">Participant whose force choices must not be resampled.</param>
         private void Activate(AffectedBody entry)
         {
-            // Station placement owns its pose until pickup or assembly releases the dock.
-            if (entry.Item != null && (entry.Item.IsReserved || entry.Item.IsCarried)
-                || entry.Grab != null && entry.Grab.Dock != null)
+            // Ownership transfers to stations and magnets remove the entry before this point.
+            if (entry.Item != null && (entry.Item.IsReserved || entry.Item.IsCarried))
                 return;
-            if (entry.Body.isKinematic && entry.Product != null)
-                entry.Product.ReleaseForSuspension();
             if (entry.Started || entry.Body.isKinematic || BlackHoleRun.Contains(entry.Body))
                 return;
             entry.Started = true;

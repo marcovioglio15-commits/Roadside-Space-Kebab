@@ -27,6 +27,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             switch (feature)
             {
                 case ObjectDispenser dispenser when dispenser.Settings.TryValidate(out _, dispenser.ToolRequirement):
+                    if (dispenser.Settings.ScoopOnly)
+                    {
+                        DrawMagnets(dispenser);
+                        break;
+                    }
                     DispenseMode mode = dispenser.Settings.Mode;
                     DispenseMode toolMode = dispenser.HasSeparateToolOutput ? dispenser.Settings.ToolMode : mode;
                     if (mode == DispenseMode.ToHand || toolMode == DispenseMode.ToHand)
@@ -46,6 +51,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Pose(container.transform, container.Settings.Position + container.Settings.Spacing * index,
                             container.Settings.Rotation, "Slot " + (index + 1));
                     break;
+            }
+        }
+
+        /// <summary>Shows the active card's floating envelope around every supply magnet.</summary>
+        /// <param name="dispenser">Selected dispenser owning the magnet poses.</param>
+        private static void DrawMagnets(ObjectDispenser dispenser)
+        {
+            // Disabled alternatives use the separate Magnet Layout preview.
+            if (!dispenser.enabled)
+                return;
+            ScoopDisplaySettings display = dispenser.Settings.ScoopDisplay;
+            using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.52f, 0.91f, 0.78f), dispenser.transform.localToWorldMatrix);
+            for (int index = 0; index < display.Magnets.Length; index++)
+            {
+                Vector3 magnet = display.Magnets[index];
+                Handles.DrawWireCube(magnet, display.Drift * 2f);
+                Handles.Label(magnet, (index + 1).ToString());
             }
         }
 

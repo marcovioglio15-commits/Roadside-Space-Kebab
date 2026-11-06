@@ -47,8 +47,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (InteractionRuntimeState.IsStaging)
                 return;
             // An observer binds input later, after PlayerInput has initialized its private action copy.
-            if (UsesInput)
-                SingleInteractionRegistry.Register(this);
+            SingleInteractionRegistry.Register(this);
         }
 
         /// <summary>Removes this feature before disabled objects can consume input.</summary>

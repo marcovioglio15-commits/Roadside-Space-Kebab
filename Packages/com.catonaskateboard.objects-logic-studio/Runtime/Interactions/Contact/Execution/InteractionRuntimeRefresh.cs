@@ -22,6 +22,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 case ObjectDialogue dialogue:
                     dialogue.RefreshRuntime();
                     break;
+                case ObjectDispenser dispenser:
+                    dispenser.RefreshDisplay();
+                    dispenser.RefreshRuntimeFill();
+                    break;
                 case ObjectInventoryInteraction inventory:
                     inventory.RefreshRuntimeFill();
                     break;

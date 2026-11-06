@@ -22,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && grab.TryGetComponent(out ObjectAssemblyPart retained) && retained.Product == previous && retained.Grab == grab)
                 return grab.Item != null && !grab.Item.IsConsumed && !grab.Item.IsReserved;
             // Match only the outer ingredient identity; its retained recipe children never count twice.
-            if (grab == null || !grab.isActiveAndEnabled || requireHeld && !grab.IsHeld || grab.Identity == null
+            if (grab == null || grab.RequiresAssemblyRelease || !grab.isActiveAndEnabled || requireHeld && !grab.IsHeld || grab.Identity == null
                 || grab.transform.IsChildOf(product.transform) || product.transform.IsChildOf(grab.transform)
                 || !ObjectGrab.ValidateBody(grab.gameObject, out _) || grab.GetComponentsInChildren<Joint>(true).Length > 0)
                 return false;

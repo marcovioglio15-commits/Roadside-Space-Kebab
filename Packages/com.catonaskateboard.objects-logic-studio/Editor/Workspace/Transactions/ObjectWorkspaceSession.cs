@@ -31,6 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Target.Capture(target, index);
             state.Prefab = target != null
                 ? AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(state.Target.PrefabGuid)) : null;
+            state.Single.ComponentId = 0;
             state.Single.Read(target);
             state.Extended.ComponentId = 0;
             state.Extended.Read(target);

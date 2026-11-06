@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using CatOnASkateboard.PlayerStudio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,7 +7,6 @@ using Guid = System.Guid;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Supplies a prefab or stored original to the carry slot or an authored world outlet.</summary>
-    [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Object Dispenser")]
     public sealed class ObjectDispenser : ObjectInventoryInteraction
     {
@@ -28,6 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectItem scoopOutput;
         private bool scoopStored;
         private bool destructionPending;
+        private ScoopDisplay display;
 
         #endregion
 
@@ -39,12 +40,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool HasSeparateToolOutput => settings.SeparateToolOutput && ToolRequirement != null
             && DispenserSettings.CanSeparateToolOutput(settings.Mode, ToolRequirement.Mode, ToolRequirement.Tool);
         /// <summary>Successful withdrawals from finite prefab stock during this instance's lifetime.</summary>
-        public int DispensedCount => dispensed;
+        public int DispensedCount => settings.ScoopOnly ? display?.ScoopedCount ?? 0 : dispensed;
         /// <summary>Counter supplied to the authored appearance thresholds.</summary>
         internal int StepCount => settings.StepCounter == DispenseStepCounter.Remaining ? RemainingCount
             : settings.StoredSupply || settings.Unlimited ? withdrawals : Mathf.Max(0, settings.Stock - RemainingCount);
         /// <summary>Actual recoverable instances plus unused prefab stock; minus one represents unbounded prefab supply.</summary>
-        public int RemainingCount => !settings.StoredSupply && settings.Unlimited ? -1
+        public int RemainingCount => settings.ScoopOnly ? display?.Count ?? 0 : !settings.StoredSupply && settings.Unlimited ? -1
             : (settings.StoredSupply ? 0 : Mathf.Max(0, settings.Stock - dispensed))
                 + (UsesStored && Container != null ? Container.StoredCount : 0);
         /// <summary>Whether originals are supplied from a linked Container before creating a prefab.</summary>
@@ -55,6 +56,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public override bool UsesInput => !settings.ScoopOnly;
         /// <summary>Range and aiming configuration.</summary>
         public override TransferTargetSettings Target => settings.Target;
+        /// <summary>Owned geometry including the currently floating portions.</summary>
+        internal Collider[] AimColliders => display?.Targets() ?? Colliders;
+        /// <summary>Floating shapes excluded from their source's visibility checks.</summary>
+        internal ISet<Collider> FloatingColliders => display?.SupplyColliders;
 
         #endregion
 
@@ -69,6 +74,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Ordinary pooling keeps stock; only a new Play session resets these instance counters.
             foreach (ObjectDispenser dispenser in FindObjectsByType<ObjectDispenser>(FindObjectsInactive.Include))
             {
+                dispenser.display?.Stop();
+                dispenser.display = null;
                 dispenser.dispensed = 0;
                 dispenser.withdrawals = 0;
                 dispenser.transferring = false;
@@ -77,6 +84,65 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 dispenser.scoopStored = false;
                 dispenser.destructionPending = false;
             }
+        }
+
+        /// <summary>Starts retained scene dispensers whose normal activation did not run at Play entry.</summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void RestoreDisplays()
+        {
+            foreach (ObjectDispenser dispenser in FindObjectsByType<ObjectDispenser>())
+                if (dispenser.isActiveAndEnabled && dispenser.settings.ScoopOnly && dispenser.display == null)
+                    dispenser.RefreshDisplay();
+        }
+
+        #endregion
+
+        #region Floating Supply
+
+        /// <summary>Starts a pristine set of portions whenever Scoop Only becomes active.</summary>
+        protected override void OnEnable()
+        {
+            if (InteractionRuntimeState.IsStaging)
+                return;
+            base.OnEnable();
+            RefreshDisplay();
+        }
+
+        /// <summary>Rebuilds floating stock when a committed preset changes the dispenser mode or magnets.</summary>
+        internal void RefreshDisplay()
+        {
+            display?.Stop();
+            display = null;
+            if (!settings.ScoopOnly)
+                return;
+            if (TryValidate(out string warning))
+                display = new ScoopDisplay(this);
+            else
+                Debug.LogWarning(warning, this);
+        }
+
+        /// <summary>Stops floating supply without touching already withdrawn originals.</summary>
+        protected override void OnDisable()
+        {
+            if (InteractionRuntimeState.IsStaging)
+                return;
+            display?.Stop();
+            display = null;
+            base.OnDisable();
+        }
+
+        /// <summary>Adds temporary collision exclusions for portions along the scoop path.</summary>
+        /// <param name="pairs">Collision exclusions owned by the carried container.</param>
+        /// <param name="colliders">Container's owned colliders.</param>
+        internal void IgnoreScoopSupply(CarryCollisions pairs, Collider[] colliders)
+        {
+            display?.Ignore(pairs, colliders);
+        }
+
+        /// <summary>Updates only the active display's floating transforms.</summary>
+        private void LateUpdate()
+        {
+            display?.Tick();
         }
 
         #endregion
@@ -105,7 +171,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (configuration.StoredSupply && GetComponent<ObjectContainer>() == null)
                 warning = "Add Container to this same object before linking its stored items.";
-            else if (GetComponent<ObjectContainer>() is ObjectContainer refill && refill.Settings.RefillDispenser
+            else if (!configuration.ScoopOnly && GetComponent<ObjectContainer>() is ObjectContainer refill && refill.Settings.RefillDispenser
                 && (configuration.StoredSupply || configuration.Unlimited))
                 warning = "A refill Container requires finite prefab supply, not stored-only or unlimited supply.";
             else if (!configuration.ScoopOnly && configuration.Unlimited && GetComponent<ObjectContainer>() is ObjectContainer container
@@ -161,7 +227,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Empty linked storage remains unavailable until a deposit succeeds.
             return !transferring && Available(InteractionChannels.Transfer) && !Item.IsReserved
-                && (UsesStored && Container != null && Container.HasStoredItem()
+                && (settings.ScoopOnly ? display is { Count: > 0 } : UsesStored && Container != null && Container.HasStoredItem()
                     || !settings.StoredSupply && (settings.Unlimited || dispensed < settings.Stock));
         }
 
@@ -283,10 +349,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True for a compatible next output; empty stored supply remains a handled scoop target.</returns>
         internal bool MatchesScoop(ObjectContainer receiver)
         {
-            // A single logical flag cannot satisfy an All filter containing several different flags.
+            // Live portions can change identity without leaving their magnets.
             if (settings.ScoopOnly)
-                return settings.ScoopFlag != null && System.Array.IndexOf(receiver.Settings.AllowedFlags, settings.ScoopFlag) >= 0
-                    && (receiver.Settings.Match == CatOnASkateboard.StudioIdentity.ObjectFlagMatch.Any || receiver.Settings.AllowedFlags.Length == 1);
+                return display?.Find(receiver, false) != null;
             // Exhausted supply must not turn the same press into a Drop.
             ObjectItem stored = UsesStored && Container != null ? Container.PeekStored() : null;
             CatOnASkateboard.StudioIdentity.ObjectIdentity identity = stored != null ? stored.Identity
@@ -303,8 +368,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             output = null;
             if (!CanTake() || !Item.Acquire(receiver, InteractionChannels.Transfer))
                 return false;
-            output = UsesStored && Container != null ? Container.PeekStored() : null;
-            if (output != null && !output.Acquire(receiver, InteractionChannels.None))
+            output = settings.ScoopOnly ? display?.Find(receiver, true) : UsesStored && Container != null ? Container.PeekStored() : null;
+            if (settings.ScoopOnly && output == null || output != null && !output.Acquire(receiver, settings.ScoopOnly ? InteractionChannels.Grab : InteractionChannels.None))
             {
                 Item.Release(receiver);
                 return false;
@@ -325,6 +390,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Keep ordinary withdrawals blocked until movement releases the transaction.
             if (scoopOwner != receiver || !isActiveAndEnabled || IsLocked || !Item.IsOwnedBy(receiver))
                 return false;
+            if (settings.ScoopOnly)
+                return output != null && output == scoopOutput && output.IsOwnedBy(receiver) && display != null && display.Take(output);
             if (scoopStored)
             {
                 if (output == null || output != scoopOutput || Container == null || !Container.ConsumeStored(output))
@@ -349,6 +416,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             scoopStored = false;
             scoopOwner = null;
             transferring = false;
+            if (display is { Exhausted: true })
+            {
+                InteractionRuntimeState.Remember(this);
+                enabled = false;
+            }
             DestroyIfExhausted();
         }
 

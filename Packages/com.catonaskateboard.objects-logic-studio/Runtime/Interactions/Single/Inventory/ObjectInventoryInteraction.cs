@@ -26,8 +26,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (InteractionRuntimeState.IsStaging)
                 return;
             // Storage and supply never discover each other in the per-frame input loop.
-            Container = GetComponent<ObjectContainer>();
-            Dispenser = GetComponent<ObjectDispenser>();
+            // Scoop alternatives own separate appearance layers. Traditional storage can still share a supply.
+            if (this is ObjectContainer { Settings: { ScoopFromDispenser: true } } scoopContainer)
+                Container = scoopContainer;
+            else if (this is ObjectDispenser { Settings: { ScoopOnly: true } } scoopDispenser)
+                Dispenser = scoopDispenser;
+            else
+            {
+                Container = this as ObjectContainer;
+                Dispenser = this as ObjectDispenser;
+                if (Container == null)
+                    foreach (ObjectContainer candidate in GetComponents<ObjectContainer>())
+                        if (!candidate.Settings.ScoopFromDispenser && (Container == null || candidate.isActiveAndEnabled))
+                            Container = candidate;
+                if (Dispenser == null)
+                    foreach (ObjectDispenser candidate in GetComponents<ObjectDispenser>())
+                        if (!candidate.Settings.ScoopOnly && (Dispenser == null || candidate.isActiveAndEnabled))
+                            Dispenser = candidate;
+            }
             if (Container != null)
             {
                 Container.Container = Container;
@@ -81,13 +97,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Refreshes both fill layers after an atomic stock change, with Dispenser taking precedence on shared targets.</summary>
         internal void RefreshFill()
         {
-            // The Container coordinates both features when present, including while its deposit action is disabled.
+            // Disabled alternatives must never write their initial appearance over the chosen recipe.
+            if (this is ObjectContainer { Settings: { ScoopFromDispenser: true } } && !isActiveAndEnabled
+                || this is ObjectDispenser { Settings: { ScoopOnly: true } })
+                return;
             ObjectInventoryInteraction owner = Container != null ? Container : this;
             if (!owner.fillChecked)
             {
                 owner.fillChecked = true;
-                if (!InventoryFillRun.TryCreate(Item, Container != null ? Container.Settings : null,
-                    Dispenser != null ? Dispenser.Settings : null, out owner.fill, out string warning))
+                if (!InventoryFillRun.TryCreate(Item, Container, Dispenser, out owner.fill, out string warning))
                     Debug.LogWarning(warning, this);
             }
             owner.fill?.Update(Container != null ? Container.Settings.RefillDispenser && Dispenser != null

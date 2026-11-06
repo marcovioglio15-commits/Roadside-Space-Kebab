@@ -55,7 +55,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Scroll, foldouts and ordinary field edits do not invalidate the active selection.
             if (path.StartsWith("Observer.", StringComparison.Ordinal))
                 return workspace.Observer.ObserverId + "|" + workspace.Observer.CameraId + "|" + workspace.Observer.PlayerId;
-            return JsonUtility.ToJson(workspace.Target) + "|" + workspace.Category + "|" + workspace.Single.Kind
+            return JsonUtility.ToJson(workspace.Target) + "|" + workspace.Category + "|" + workspace.Single.ComponentId
                 + "|" + workspace.Extended.Kind + "|" + workspace.Extended.ComponentId;
         }
 

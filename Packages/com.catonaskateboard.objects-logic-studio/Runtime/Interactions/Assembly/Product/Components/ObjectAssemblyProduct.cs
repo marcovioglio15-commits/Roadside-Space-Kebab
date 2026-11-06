@@ -57,17 +57,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int IngredientCount => parts.Count;
         /// <summary>Changes only when composition changes, invalidating a held assembly attempt.</summary>
         internal uint IngredientRevision { get; private set; }
-        /// <summary>Sole ingredient recoverable before finalization when its lock is disabled or prolonged assembly is pending.</summary>
-        internal ObjectAssemblyPart RetrievablePart => !IsFinalized && parts.Count == 1
-            && (!settings.LockFirstIngredient || settings.ProlongedAssembly) ? parts[0] : null;
+        /// <summary>Newest recoverable ingredient, with optional rows removed before required rows.</summary>
+        internal ObjectAssemblyPart RetrievalPart { get; private set; }
+        /// <summary>Whether the player can dismantle this exact composition while it is still on its station.</summary>
+        internal bool CanDismantle => Pickup != null && Pickup.Waiting && Table != null && Table.CurrentProduct == this;
         /// <summary>Total logical units supplied by the attached physical ingredients.</summary>
         public long IngredientUnits { get; private set; }
         /// <summary>Whether ingredients satisfy the recipe and any required prolonged assembly has completed.</summary>
-        public bool IsComplete => RecipeReady && (!settings.ProlongedAssembly || IsFinalized);
+        public bool IsComplete => IsFinalized;
         /// <summary>Whether attached quantities and required slots allow finalization to begin.</summary>
         internal bool RecipeReady { get; private set; }
         /// <summary>Whether this unconfirmed prolonged recipe may transfer its ingredients to another recipe on its table.</summary>
-        internal bool CanRevise => settings.ProlongedAssembly && !IsFinalized && Table != null && parts.Count > 0
+        internal bool CanRevise => !IsFinalized && Table != null && parts.Count > 0
             && Available(InteractionChannels.Assembly) && Item != null && !Item.IsReserved && !Item.IsCarried;
         /// <summary>Whether completed presentation and product interactions have been committed.</summary>
         public bool IsFinalized { get; private set; }
@@ -327,12 +328,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Table = null;
         }
 
-        /// <summary>Lets an active gravity pulse free a table-retained product without interrupting another transaction.</summary>
-        internal void ReleaseForSuspension()
+        /// <summary>Frees a station-owned product for an explicit ejection that permits kinematic bodies.</summary>
+        internal void ReleaseForEjection()
         {
-            // Ingredient bodies belong to the composite root; only independent active products may leave the table.
             if (!initialized || !isActiveAndEnabled || !Item.isActiveAndEnabled || Item.IsConsumed || Item.IsReserved || Item.IsCarried
-                || TryGetComponent(out ObjectGrab grab) && grab.Dock != null || Table == null)
+                || Table == null)
                 return;
             ReleaseTable();
             body.isKinematic = false;
@@ -427,7 +427,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 pendingCompletion = false;
                 Signal(InteractionMoment.Completed);
-                if (settings.ProlongedAssembly && Table != null)
+                if (Table != null)
                     Table.Complete(this);
             }
             ObjectGravityGenerator.IncludeSpawn(gameObject);
@@ -550,7 +550,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Pickup.Confirmed = false;
                 pendingCompletion = false;
             }
-            bool finalized = RecipeReady && (!(settings.ProlongedAssembly || settings.FinalizeOnGrab) || Pickup.Confirmed);
+            bool finalized = RecipeReady && Pickup.Confirmed;
             pendingCompletion |= finalized && !IsFinalized;
             IsFinalized = finalized;
             if (completedAppearanceApplied != IsFinalized)
@@ -561,9 +561,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     completedAppearance.Restore();
                 completedAppearanceApplied = IsFinalized;
             }
-            // Optional ingredients inserted after completion also inherit the final presentation immediately.
+            // Optional ingredients take pickup priority while the recipe is still incomplete.
+            RetrievalPart = null;
             foreach (ObjectAssemblyPart part in parts)
             {
+                if (!RecipeReady && (RetrievalPart == null || part.IsOptional || !RetrievalPart.IsOptional))
+                    RetrievalPart = part;
+                part.SetCompletedAppearance(IsFinalized);
                 part.SetGeometryHidden(IsFinalized && settings.ReplacesIngredients);
                 part.SetPhysicsSuppressed(IsFinalized);
             }
@@ -581,8 +585,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         break;
                     }
                 // A partial-interaction override cannot bypass prolonged assembly's pickup boundary.
-                feature.SetLocked(this, !available || feature is ObjectGrab && (RetrievablePart != null || settings.ProlongedAssembly && !IsFinalized));
+                feature.SetLocked(this, !available || feature is ObjectGrab && !IsFinalized);
             }
+        }
+
+        #endregion
+
+        #region Dismantling
+
+        /// <summary>Releases and launches every original while making it ineligible for automatic reinsertion.</summary>
+        /// <returns>True when the ready product was dismantled.</returns>
+        internal bool Dismantle()
+        {
+            if (!CanDismantle)
+                return false;
+
+            // Restore the original bodies together before the physics step can process the separated parts.
+            List<ObjectGrab> ingredients = new List<ObjectGrab>(parts.Count);
+            CollectIngredients(ingredients);
+            Vector3 center = transform.position;
+            foreach (ObjectGrab ingredient in ingredients)
+                ingredient.RequiresAssemblyRelease = true;
+            ReleaseIngredientsForRevision();
+            ReleaseTable();
+            AssemblyDismantleMotion.Launch(ingredients, center, settings.Dismantle);
+            Destroy(gameObject);
+            return true;
         }
 
         #endregion

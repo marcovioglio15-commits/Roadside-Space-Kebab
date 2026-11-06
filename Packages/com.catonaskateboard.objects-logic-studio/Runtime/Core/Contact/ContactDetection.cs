@@ -50,7 +50,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="tolerance">Allowed surface separation.</param>
         /// <param name="includeTriggers">Whether trigger surfaces participate.</param>
         /// <param name="contacts">Reusable result set.</param>
-        internal void Query(ObjectItem item, float tolerance, bool includeTriggers, HashSet<ObjectItem> contacts)
+        /// <param name="extensions">Temporary surfaces that contribute contacts for this owner.</param>
+        internal void Query(ObjectItem item, float tolerance, bool includeTriggers, HashSet<ObjectItem> contacts,
+            IReadOnlyList<Collider> extensions = null)
         {
             // Multiple passive features share one scripted-transform synchronization per render frame.
             contacts.Clear();
@@ -59,31 +61,55 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Physics.SyncTransforms();
                 synchronizedFrame = Time.frameCount;
             }
+            PhysicsScene scene = item.gameObject.scene.GetPhysicsScene();
             foreach (Collider collider in owned)
-            {
-                if (!Usable(collider, includeTriggers))
-                    continue;
-                Bounds bounds = collider.bounds;
-                int count = item.gameObject.scene.GetPhysicsScene().OverlapSphere(bounds.center, bounds.extents.magnitude + tolerance,
-                    buffer, ~0, includeTriggers ? QueryTriggerInteraction.Collide : QueryTriggerInteraction.Ignore);
-                // A full query cannot prove continuous contact reliably; retry at the next scheduled query.
-                if (count == buffer.Length)
+                if (!Scan(scene, item, collider, tolerance, includeTriggers, contacts))
                 {
                     contacts.Clear();
                     return;
                 }
-                for (int index = 0; index < count; index++)
-                {
-                    Collider other = buffer[index];
-                    if (!Usable(other, includeTriggers) || other.GetComponentInParent<ObjectItem>() is not ObjectItem candidate
-                        || candidate == item || !candidate.isActiveAndEnabled || candidate.IsConsumed || contacts.Contains(candidate)
-                        || Physics.GetIgnoreLayerCollision(collider.gameObject.layer, other.gameObject.layer)
-                        || Physics.GetIgnoreCollision(collider, other))
-                        continue;
-                    if (Touches(collider, other, tolerance))
-                        contacts.Add(candidate);
-                }
+            if (extensions != null)
+                for (int index = 0; index < extensions.Count; index++)
+                    if (!Scan(scene, item, extensions[index], tolerance, includeTriggers, contacts))
+                    {
+                        contacts.Clear();
+                        return;
+                    }
+        }
+
+        /// <summary>Collects actual contacts against one station or ingredient surface.</summary>
+        /// <param name="scene">Physics scene containing both shapes.</param>
+        /// <param name="item">Primary owner excluded from the results.</param>
+        /// <param name="surface">Shape temporarily contributing to the owner.</param>
+        /// <param name="tolerance">Maximum separation in metres.</param>
+        /// <param name="includeTriggers">Whether trigger shapes participate.</param>
+        /// <param name="contacts">Unique candidates found so far.</param>
+        /// <returns>False if the overlap buffer filled and results cannot be trusted.</returns>
+        private bool Scan(PhysicsScene scene, ObjectItem item, Collider surface, float tolerance, bool includeTriggers,
+            HashSet<ObjectItem> contacts)
+        {
+            if (!Usable(surface, includeTriggers))
+                return true;
+            Bounds bounds = surface.bounds;
+            int count = scene.OverlapSphere(bounds.center, bounds.extents.magnitude + tolerance, buffer, ~0,
+                includeTriggers ? QueryTriggerInteraction.Collide : QueryTriggerInteraction.Ignore);
+            if (count == buffer.Length)
+                return false;
+
+            // A compound ingredient contributes only one contact, even when several shapes touch.
+            int layer = surface.gameObject.layer;
+            for (int index = 0; index < count; index++)
+            {
+                Collider other = buffer[index];
+                if (other == surface || !Usable(other, includeTriggers)
+                    || other.GetComponentInParent<ObjectItem>() is not ObjectItem candidate
+                    || candidate == item || !candidate.isActiveAndEnabled || candidate.IsConsumed || contacts.Contains(candidate)
+                    || Physics.GetIgnoreLayerCollision(layer, other.gameObject.layer) || Physics.GetIgnoreCollision(surface, other))
+                    continue;
+                if (Touches(surface, other, tolerance))
+                    contacts.Add(candidate);
             }
+            return true;
         }
 
         /// <summary>Checks collider availability and supported exact-distance geometry.</summary>

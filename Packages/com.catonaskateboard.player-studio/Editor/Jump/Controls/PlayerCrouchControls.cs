@@ -34,7 +34,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             using SerializedObject data = new SerializedObject(owner);
             if (sections.Draw("Locomotion.Crouch", "Crouch"))
-                using (new EditorGUI.IndentLevelScope())
+                using (new StudioFieldLayout.SectionScope(1))
                     Draw(data.FindProperty("state.Locomotion.crouch"));
             return data.ApplyModifiedProperties();
         }
