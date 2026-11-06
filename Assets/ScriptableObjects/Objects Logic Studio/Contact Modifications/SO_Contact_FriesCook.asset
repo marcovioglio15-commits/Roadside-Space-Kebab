@@ -14,6 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Settings:
     Name: ModifyByContact Fries Cook
+    Preparation:
+      Snap: 0
+      SnapSpace: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Instant: 1
+      Duration: 0.35
+      RequireInput: 0
+      Animate: 0
+      AnimateOther: 0
+      Path: 
+      AnimationSpace: 0
+      StateA:
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      StateB:
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      AnimationDuration: 0.35
+      ForwardRotation: 0
+      Return: 0
+      ReturnDuration: 0.35
+      ReturnRotation: 0
     Flags:
     - {fileID: 11400000, guid: f3810201d1372f14a8eb7eda092ab735, type: 2}
     ContactDuration: 0
@@ -51,4 +76,4 @@ MonoBehaviour:
     ContactFlag: {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     ContactFlagOperation: 0
     BlockSelf: 0
-    BlockOther: 0
+    BlockOther: 1

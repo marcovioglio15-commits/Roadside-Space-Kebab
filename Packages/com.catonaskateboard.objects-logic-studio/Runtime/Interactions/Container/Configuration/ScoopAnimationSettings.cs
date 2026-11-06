@@ -82,7 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Keyframe after which supply and fill change. Empty commits after the final keyframe, before any return segment.")]
         [HideInInspector]
         public string FillAfter = string.Empty;
-        [Tooltip("Interpolate back to the world pose captured before this scoop.")]
+        [Tooltip("Blend to the current Grab position and rotation as the player moves. Off resumes Grab immediately after the keyframes.")]
         public bool ReturnToStart = true;
         [Tooltip("Scaled seconds for the optional return segment.")]
         [Range(0.01f, 10f)]

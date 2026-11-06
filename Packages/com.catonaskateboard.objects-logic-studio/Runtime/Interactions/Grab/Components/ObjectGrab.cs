@@ -31,9 +31,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly CarryCollisions sourceCollisions = new CarryCollisions();
         private readonly CarryCollisions scoopCollisions = new CarryCollisions();
         private ScoopRun scoop;
-        private bool customCarry;
-        private Vector3 carryOffset;
-        private Quaternion carryRotation;
         private readonly CarryMotion motion = new CarryMotion();
         private readonly PhysicalPickup physical = new PhysicalPickup();
         private Rigidbody body;
@@ -103,7 +100,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal uint ScoopReleaseRevision { get; set; }
         /// <summary>Whether ordinary pickup has finished and can accept a scoop pose.</summary>
         internal bool CanScoop => IsHeld && pickupCompleted && !physical.Active;
-        /// <summary>Current desired carry pose, including a retained scoop offset.</summary>
+        /// <summary>Configured grab offset and rotation in the current carry frame.</summary>
         internal Pose CarryPose => new Pose(CarryPosition(), CarryRotation());
 
         #endregion
@@ -402,14 +399,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector3 CarryPosition()
         {
             // Carry offsets are metres, even when the player or camera hierarchy has authored scale.
-            return carryFrame.position + carryFrame.rotation * (customCarry ? carryOffset : settings.Offset);
+            return carryFrame.position + carryFrame.rotation * settings.Offset;
         }
 
-        /// <summary>Resolves the ordinary or retained carry rotation in the current view frame.</summary>
+        /// <summary>Resolves the configured rotation in the current carry frame.</summary>
         /// <returns>Desired world rotation.</returns>
         private Quaternion CarryRotation()
         {
-            return carryFrame.rotation * (customCarry ? carryRotation : Quaternion.Euler(settings.Rotation));
+            return carryFrame.rotation * Quaternion.Euler(settings.Rotation);
         }
 
         /// <summary>Hands one temporary movement to the existing carry pose writer.</summary>
@@ -423,16 +420,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             source.IgnoreScoopSupply(scoopCollisions, colliders);
         }
 
-        /// <summary>Retains the final pose relative to the carry frame without a closing snap.</summary>
+        /// <summary>Hands movement back to normal grab following and releases temporary collision exclusions.</summary>
         internal void EndScoop()
         {
             scoop = null;
-            if (IsHeld && carryFrame != null)
-            {
-                customCarry = true;
-                carryOffset = Quaternion.Inverse(carryFrame.rotation) * (transform.position - carryFrame.position);
-                carryRotation = Quaternion.Inverse(carryFrame.rotation) * transform.rotation;
-            }
             scoopCollisions.Restore(false);
         }
 
@@ -461,12 +452,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Queries constrain the kinematic pose before committing it; release restores dynamic simulation.
             float progress = pickupDuration <= 0f ? 1f : Mathf.SmoothStep(0f, 1f, (Time.time - started) / pickupDuration);
-            Vector3 position = Vector3.Lerp(startPosition, CarryPosition(), progress);
-            Quaternion rotation = Quaternion.Slerp(startRotation, CarryRotation(), progress);
-            Pose pose = new Pose(position, rotation);
+            Pose carry = CarryPose;
+            Pose pose = new Pose(Vector3.Lerp(startPosition, carry.position, progress), Quaternion.Slerp(startRotation, carry.rotation, progress));
             ScoopRun movement = scoop;
             if (movement != null)
-                pose = movement.Target(out Pose requested) ? requested : new Pose(body.position, body.rotation);
+                pose = movement.Target(carry, out Pose requested) ? requested : new Pose(body.position, body.rotation);
             if (settings.WorldCollisions)
                 pose = motion.Resolve(pose, settings, Time.deltaTime, firstFollow && pickupDuration <= 0f);
             body.position = pose.position;
@@ -531,7 +521,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!IsHeld)
                 return;
             scoop?.Cancel();
-            customCarry = false;
             IsHeld = false;
             physical.Stop();
             // Early release inside the dispenser restores contact only after safe separation.
@@ -555,7 +544,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!IsHeld || body == null)
                 return;
             scoop?.Cancel();
-            customCarry = false;
             RequiresAssemblyPlacement = false;
             RequiresAssemblyRelease = false;
             ReleaseRevision++;

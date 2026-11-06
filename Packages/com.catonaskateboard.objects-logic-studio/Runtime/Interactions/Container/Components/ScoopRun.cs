@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly Vector3 initialScale;
         private readonly int commitStep;
         private Pose from;
+        private Pose goal;
         private Vector3 fromScale;
         private float started;
         private int step;
@@ -37,7 +38,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Preparation
 
-        /// <summary>Captures immutable targets once, including dispenser-first relative chains.</summary>
+        /// <summary>Captures scoop keyframes once. The return segment follows the live grab pose.</summary>
         /// <param name="receiver">Container receiving the portion.</param>
         /// <param name="source">Reserved supply.</param>
         /// <param name="grab">Existing carry owner.</param>
@@ -121,13 +122,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Computes a target for Grab's existing collision-constrained pose writer.</summary>
+        /// <param name="carry">Current grab pose in the camera or player frame.</param>
         /// <param name="pose">Receives this segment's interpolated world pose.</param>
         /// <returns>True while this run still owns movement.</returns>
-        internal bool Target(out Pose pose)
+        internal bool Target(Pose carry, out Pose pose)
         {
             pose = from;
-            // Source loss before commit cancels supply; after commit only remaining movement ends.
-            if (!Active || receiver == null || !receiver.isActiveAndEnabled || source == null || !source.isActiveAndEnabled || !grab.IsHeld)
+            // Once the portion is committed, an exhausted source can no longer interrupt the return.
+            if (!Active || receiver == null || !receiver.isActiveAndEnabled || !grab.IsHeld
+                || !committed && (source == null || !source.isActiveAndEnabled))
             {
                 Cancel();
                 return false;
@@ -139,11 +142,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Cancel();
                 return false;
             }
+            // Cache the exact endpoint tested after Grab applies this frame's collision constraints.
+            goal = step < frames.Length ? targets[step] : carry;
             float progress = Mathf.Clamp01((Time.time - started) / duration);
             if (step >= frames.Length || frames[step].Easing == ScoopEasing.Smooth)
                 progress = Mathf.SmoothStep(0f, 1f, progress);
-            pose = new Pose(Vector3.Lerp(from.position, targets[step].position, progress),
-                Quaternion.Slerp(from.rotation, targets[step].rotation, progress));
+            pose = new Pose(Vector3.Lerp(from.position, goal.position, progress),
+                Quaternion.Slerp(from.rotation, goal.rotation, progress));
             if (visual != null)
                 visual.localScale = Vector3.Lerp(fromScale, scales[step], progress);
             return true;
@@ -153,8 +158,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="pose">Actual body pose after Grab resolves world collisions.</param>
         internal void Reached(Pose pose)
         {
-            if (!Active || Time.time - started < Duration() || (pose.position - targets[step].position).sqrMagnitude > 0.0004f
-                || Quaternion.Angle(pose.rotation, targets[step].rotation) > 2f)
+            if (!Active || Time.time - started < Duration() || (pose.position - goal.position).sqrMagnitude > 0.0004f
+                || Quaternion.Angle(pose.rotation, goal.rotation) > 2f)
                 return;
             if (step == commitStep && !Commit())
             {

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Builds the same fixed scoop targets for runtime movement and selected-object gizmos.</summary>
+    /// <summary>Builds fixed scoop keyframes and a preview of the return to Grab.</summary>
     internal sealed class ScoopPath
     {
         #region State
@@ -22,7 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="settings">Validated optional sequence.</param>
         /// <param name="initial">Held object's starting world pose.</param>
         /// <param name="dispenser">Supply pivot used by the first relative target.</param>
-        /// <param name="carry">Ordinary carry pose for independent reference frames.</param>
+        /// <param name="carry">Current grab pose for independent keyframes and the return preview.</param>
         /// <param name="initialScale">Visual branch's original local scale.</param>
         internal ScoopPath(ScoopAnimationSettings settings, Pose initial, Pose dispenser, Pose carry, Vector3 initialScale)
         {
@@ -57,7 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (settings.Enabled && settings.ReturnToStart)
             {
-                Targets[Targets.Length - 1] = initial;
+                Targets[Targets.Length - 1] = carry;
                 Scales[Scales.Length - 1] = initialScale;
             }
         }

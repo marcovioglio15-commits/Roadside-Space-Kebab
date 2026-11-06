@@ -48,7 +48,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (resize)
                 HierarchyPathMenu.Draw(settings.FindPropertyRelative("VisualPath"), HierarchyPathMenu.Source(settings), false, transforms: true);
             FillMarker(settings.FindPropertyRelative("FillAfter"), frames, relative ? approach : null);
-            HoverControls.Field(settings, "ReturnToStart");
+            HoverControls.Field(settings, "ReturnToStart", "Animate Return to Grab");
             if (settings.FindPropertyRelative("ReturnToStart").boolValue)
                 HoverControls.Field(settings, "ReturnDuration");
             HoverControls.Field(settings, "ObstacleMargin");

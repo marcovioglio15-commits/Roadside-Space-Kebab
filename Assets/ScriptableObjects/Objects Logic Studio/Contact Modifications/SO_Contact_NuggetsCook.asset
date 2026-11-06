@@ -14,6 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Settings:
     Name: ModifyByContact Nuggets Cook
+    Preparation:
+      Snap: 0
+      SnapSpace: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Instant: 1
+      Duration: 0.35
+      RequireInput: 0
+      Animate: 0
+      AnimateOther: 0
+      Path: 
+      AnimationSpace: 0
+      StateA:
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      StateB:
+        Position: {x: 0, y: 0, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        Scale: {x: 1, y: 1, z: 1}
+      AnimationDuration: 0.35
+      ForwardRotation: 0
+      Return: 0
+      ReturnDuration: 0.35
+      ReturnRotation: 0
     Flags:
     - {fileID: 11400000, guid: b0f3691bf60a4e041bdb828b3c0edd18, type: 2}
     ContactDuration: 0
@@ -37,6 +62,7 @@ MonoBehaviour:
       MaterialSlot: -1
       Meshes: []
       Consume: 0
+      Interactions: []
     Other:
       Tint: 1
       Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 1}
@@ -45,8 +71,9 @@ MonoBehaviour:
       MaterialSlot: -1
       Meshes: []
       Consume: 0
+      Interactions: []
     ChangeContactFlag: 1
     ContactFlag: {fileID: 11400000, guid: 8ea79f8ddaadf97469ae5ccc95dbb6c2, type: 2}
     ContactFlagOperation: 0
     BlockSelf: 0
-    BlockOther: 0
+    BlockOther: 1
