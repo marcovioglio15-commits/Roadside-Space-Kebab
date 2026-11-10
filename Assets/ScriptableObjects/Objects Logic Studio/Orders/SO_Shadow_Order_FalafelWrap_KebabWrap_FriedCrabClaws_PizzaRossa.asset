@@ -57,6 +57,7 @@ MonoBehaviour:
     MaximumDraws: 1
     Flags:
     - {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+    - {fileID: 11400000, guid: 07d5cb887aee2ecae4c29d5c4699157c, type: 2}
     RequireAllFlags: 0
     UseRecipeModifiers: 0
     IncludeBaseOrder: 1

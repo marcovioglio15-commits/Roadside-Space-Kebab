@@ -40,7 +40,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     SerializedProperty count = requirement.FindPropertyRelative("Count");
                     ObjectNumericFields.Draw(count, new GUIContent("Quantity", count.tooltip));
                     if (optional)
+                    {
                         HoverControls.Field(requirement, "Optional");
+                        if (requirement.FindPropertyRelative("Flags").arraySize > 1
+                            || requirement.FindPropertyRelative("OrderFlag").objectReferenceValue != null)
+                            HoverControls.Field(requirement, "OrderFlag");
+                    }
                     if (count.intValue <= 0)
                         EditorGUILayout.LabelField("Quantity must be a positive whole number.", EditorStyles.miniLabel);
                 }
@@ -52,7 +57,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 added.FindPropertyRelative("Flags").arraySize = 0;
                 added.FindPropertyRelative("Count").intValue = 1;
                 if (optional)
+                {
                     added.FindPropertyRelative("Optional").boolValue = false;
+                    added.FindPropertyRelative("OrderFlag").objectReferenceValue = null;
+                }
             }
         }
 

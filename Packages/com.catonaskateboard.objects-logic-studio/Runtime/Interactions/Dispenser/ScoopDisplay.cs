@@ -77,14 +77,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             settings = owner.Settings.ScoopDisplay;
             portions = new Portion[settings.Magnets.Length];
             lastPositions = new Vector3[portions.Length];
-            currentPrefab = owner.Settings.Prefab;
-            rotation = currentPrefab.transform.rotation;
-            restockPrefab = settings.RestockPrefab != null ? settings.RestockPrefab : currentPrefab;
+            rotation = owner.Settings.Prefab.transform.rotation;
+            restockPrefab = settings.RestockPrefab != null ? settings.RestockPrefab : owner.Settings.Prefab;
             if (settings.RestockForNewContainer)
                 restockIdentity = restockPrefab.GetComponent<ObjectIdentity>();
             // Instances remain independent roots so contact and carry ownership stay separate.
-            for (int index = 0; index < portions.Length; index++)
-                Spawn(index);
+            Restock(initialSupply: true);
         }
 
         /// <summary>Updates local motion and prunes items consumed by other interactions.</summary>
@@ -197,12 +195,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && restockIdentity.Matches(receiver.Settings.AllowedFlags, receiver.Settings.Match);
         }
 
-        /// <summary>Refills all magnets after the winning container reserves the empty dispenser.</summary>
-        internal void Restock()
+        /// <summary>Refills the empty display after a pack is loaded or a compatible scoop wins its reservation.</summary>
+        /// <param name="initialSupply">Use the dispenser's initial prefab and reset the withdrawal count for a new pack.</param>
+        internal void Restock(bool initialSupply = false)
         {
             // The new cycle uses the same magnet positions and stock limits.
-            currentPrefab = restockPrefab;
-            usingRestockPrefab = settings.RestockPrefab != null;
+            currentPrefab = initialSupply ? owner.Settings.Prefab : restockPrefab;
+            usingRestockPrefab = !initialSupply && settings.RestockPrefab != null;
+            if (initialSupply)
+                WithdrawnCount = 0;
             for (int index = 0; index < portions.Length; index++)
                 Spawn(index);
         }

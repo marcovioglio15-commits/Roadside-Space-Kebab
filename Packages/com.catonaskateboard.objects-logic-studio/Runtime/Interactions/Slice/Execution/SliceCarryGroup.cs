@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Carries replacement pieces as one temporary compound body and frees them together on release.</summary>
+    /// <summary>Carries replacement pieces as one temporary compound body until a throw, drop or cancellation releases them.</summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("")]
     public sealed class SliceCarryGroup : MonoBehaviour
@@ -13,7 +13,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private SliceCarryPart[] parts;
         private ObjectGrab grab;
         private Rigidbody body;
+        private Vector3 carryCenter;
         private int count;
+        private bool throwAsShuriken;
         private bool released;
 
         #endregion
@@ -25,8 +27,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Prepares an inactive group using the held source's carry and release settings and existing input actions.</summary>
         /// <param name="source">Held source replaced by this cut.</param>
         /// <param name="capacity">Exact number of output prefabs.</param>
+        /// <param name="throwAsShuriken">Whether Throw releases one piece at a time.</param>
         /// <returns>The inactive group ready to receive newly spawned outputs.</returns>
-        internal static SliceCarryGroup Create(ObjectGrab source, int capacity)
+        internal static SliceCarryGroup Create(ObjectGrab source, int capacity, bool throwAsShuriken)
         {
             GameObject root = new GameObject("Slice Outputs · " + source.name);
             root.SetActive(false);
@@ -34,6 +37,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             root.transform.SetPositionAndRotation(source.transform.position, source.transform.rotation);
             SliceCarryGroup group = root.AddComponent<SliceCarryGroup>();
             group.parts = new SliceCarryPart[capacity];
+            group.throwAsShuriken = throwAsShuriken && capacity > 1;
             group.body = root.AddComponent<Rigidbody>();
             root.AddComponent<ObjectItem>();
             group.grab = root.AddComponent<ObjectGrab>();
@@ -78,6 +82,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Activate only after every original body and interaction has been suspended.
             gameObject.SetActive(true);
             SliceCarryLayout.Arrange(parts, count);
+            if (throwAsShuriken)
+                carryCenter = transform.InverseTransformPoint(SliceCarryLayout.Center(parts, count));
             if (!HoverObserver.ReplaceHeld(source, grab))
                 ReleaseMembers(null);
         }
@@ -98,6 +104,60 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return false;
         }
 
+        /// <summary>Releases the frontmost piece and keeps the other pieces centred around the original carry pose.</summary>
+        /// <param name="direction">World-space launch direction.</param>
+        /// <param name="profile">Throw body overrides for the released piece.</param>
+        /// <param name="piece">Receives the independent Rigidbody ready to launch.</param>
+        /// <returns>True when the sequential mode released one piece.</returns>
+        internal bool TryReleasePiece(Vector3 direction, ReleaseSettings profile, out Rigidbody piece)
+        {
+            piece = null;
+            if (!throwAsShuriken || released || count == 0)
+                return false;
+
+            // Choose the piece farthest along the shot and keep array order for equally placed pieces.
+            int front = 0;
+            float distance = Vector3.Dot(parts[0].Body.transform.position, direction);
+            for (int index = 1; index < count; index++)
+            {
+                float candidate = Vector3.Dot(parts[index].Body.transform.position, direction);
+                if (candidate <= distance)
+                    continue;
+                distance = candidate;
+                front = index;
+            }
+
+            // Remove the selected entry before release callbacks can inspect the carrier's ownership.
+            SliceCarryPart part = parts[front];
+            piece = part.Body;
+            count--;
+            System.Array.Copy(parts, front + 1, parts, front, count - front);
+            parts[count] = null;
+            if (count > 0)
+                body.mass -= piece.mass;
+            part.Release(Vector3.zero, Vector3.zero, piece.position, profile);
+
+            // Keep the same carry slot until the final piece leaves. Rebuild shapes once per throw.
+            if (count == 0)
+                ReleaseMembers(null);
+            else if (!released)
+            {
+                part.RemoveMirror();
+                Vector3 offset = transform.TransformPoint(carryCenter) - SliceCarryLayout.Center(parts, count);
+                for (int index = 0; index < count; index++)
+                    parts[index].Move(offset);
+                grab.RefreshCarryGeometry();
+            }
+
+            // Recentring can put the remaining shapes in the launch path before the next physics step.
+            Physics.SyncTransforms();
+            if (!released)
+                ShotBurstCollisions.IgnoreBriefly(part.Colliders, grab.Colliders);
+            if (HoverObserver.ActivePlayer is Transform player)
+                ShotBurstCollisions.IgnoreBriefly(part.Colliders, player.GetComponentsInChildren<Collider>());
+            return true;
+        }
+
         /// <summary>Separates all pieces after Throw has applied its impulse, or immediately when carrying is cancelled.</summary>
         /// <param name="profile">Successful release profile, or null for context loss or external deactivation.</param>
         internal void ReleaseMembers(ReleaseSettings profile)
@@ -112,6 +172,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Releasing children before destroying their temporary parent preserves every actual output prefab.
             for (int index = 0; index < count; index++)
                 parts[index].Release(velocity, spin, centre, profile);
+            count = 0;
             gameObject.SetActive(false);
             Destroy(gameObject);
         }

@@ -536,9 +536,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             selected.Signal(InteractionMoment.Started);
             selected.Execute(observer.View.transform);
-            group?.ReleaseMembers(selected.PhysicsSettings);
+            // A sequential Slice throw keeps the same grab and input bindings until the last piece leaves.
+            bool stillHeld = selected.Grab != null && selected.Grab.IsHeld;
+            if (!stillHeld)
+                group?.ReleaseMembers(selected.PhysicsSettings);
             selected.Signal(InteractionMoment.Completed);
-            held = null;
+            if (!stillHeld)
+                held = null;
             return true;
         }
 

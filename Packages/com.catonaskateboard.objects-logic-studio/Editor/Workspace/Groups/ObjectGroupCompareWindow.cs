@@ -33,11 +33,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             window.titleContent = new GUIContent(group.Title + " · Compare");
             List<string> rows = new List<string>();
             ObjectPresetValue[] local = ObjectGroupPresetStore.Capture(document, group);
-            if (preset.Group.Key != group.Key || preset.Values.Length != local.Length)
+            if (preset.Group.Key != group.Key || preset.Values.Length != preset.Group.Paths.Length)
                 rows.Add("This preset belongs to a different group.");
             else
                 for (int index = 0; index < local.Length; index++)
-                    Compare(ObjectWorkspace.Copy(preset.Values[index]), local[index], string.Empty, rows);
+                {
+                    int saved = Array.IndexOf(preset.Group.Paths, group.Paths[index]);
+                    if (saved >= 0)
+                        Compare(ObjectWorkspace.Copy(preset.Values[saved]), local[index], string.Empty, rows);
+                }
             window.differences = rows.Count == 0 ? new[] { "This group matches the preset." } : rows.ToArray();
             window.minSize = new Vector2(360f, 200f);
             window.Show();

@@ -427,6 +427,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && candidate.MatchesRecipe(consumedIngredients);
         }
 
+        /// <summary>Compares a pending recipe with the ingredients recorded before consumption.</summary>
+        /// <param name="candidate">Pending order and its selected variants.</param>
+        /// <returns>The number of requested ingredient flags present in the receipt.</returns>
+        internal int ConsumedIngredientOverlap(OrderCandidate candidate)
+        {
+            return candidate.IngredientOverlap(consumedIngredients);
+        }
+
 
         /// <summary>Keeps this interaction's identity change scoped to the rule that published it.</summary>
         /// <param name="moment">Successful event being published.</param>

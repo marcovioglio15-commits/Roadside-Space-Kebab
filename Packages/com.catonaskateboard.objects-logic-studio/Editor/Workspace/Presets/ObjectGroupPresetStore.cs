@@ -41,12 +41,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static void Import(ObjectGroupPreset preset, ObjectWorkspace state, ObjectGroupInfo group,
             Func<ObjectPresetLink, UnityEngine.Object> resolve = null, bool allowMissing = false)
         {
-            if (preset == null || preset.Group.Key != group.Key || preset.Values.Length != group.Paths.Length)
+            if (preset == null || preset.Group.Key != group.Key || preset.Values.Length != preset.Group.Paths.Length)
                 throw new InvalidOperationException("Choose a preset for this settings group.");
             using SerializedObject data = new SerializedObject(state);
             Transform root = state.Target.Resolve()?.transform.root;
-            for (int index = 0; index < group.Paths.Length; index++)
-                preset.Values[index].Apply(data.FindProperty(group.Paths[index]), root, resolve, allowMissing);
+            // Match by path so older presets can be imported after a group gains another option.
+            for (int index = 0; index < preset.Group.Paths.Length; index++)
+            {
+                string path = preset.Group.Paths[index];
+                if (Array.IndexOf(group.Paths, path) >= 0)
+                    preset.Values[index].Apply(data.FindProperty(path), root, resolve, allowMissing);
+            }
             data.ApplyModifiedProperties();
         }
 
@@ -138,6 +143,66 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorUtility.SetDirty(preset);
             AssetDatabase.SaveAssetIfDirty(preset);
             return preset;
+        }
+
+        /// <summary>Writes the intended group values and preserves the existing preview context checks.</summary>
+        /// <param name="preset">Preset receiving the values.</param>
+        /// <param name="group">Expected settings group.</param>
+        /// <param name="valuesSource">Document holding the values to save.</param>
+        /// <param name="expected">Preset stamp captured before editing.</param>
+        /// <param name="canSave">Whether local links were resolved on a sample.</param>
+        /// <returns>The stamp of the newly saved preset.</returns>
+        internal static string Write(ObjectGroupPreset preset, ObjectGroupInfo group, ObjectWorkspace valuesSource, string expected, bool canSave)
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new InvalidOperationException("Exit Play Mode before applying the preset.");
+            if (!canSave)
+                throw new InvalidOperationException("Choose a sample interaction to resolve this preset's object links first.");
+            if (preset == null || preset.Group.Key != group.Key)
+                throw new InvalidOperationException("Choose a preset for this group.");
+            if (AssetStamp(preset) != expected)
+                throw new InvalidOperationException("This preset changed elsewhere. Discard to reload it.");
+            ObjectPresetValue[] values = Capture(valuesSource, group);
+            StudioAssetWrites.Save(preset, "Update group preset", () =>
+            {
+                preset.Group = ObjectWorkspace.Copy(group);
+                preset.Values = values;
+                ObjectPresetContext.Update(preset, valuesSource);
+            });
+            return AssetStamp(preset);
+        }
+
+        /// <summary>Saves a layout within a preset without applying the other window's pending values.</summary>
+        /// <param name="preset">Preset receiving the selected layout.</param>
+        /// <param name="group">Expected settings group.</param>
+        /// <param name="document">Local settings copy that opened the layout.</param>
+        /// <param name="proposal">Local copy including this preview’s edits.</param>
+        /// <param name="paths">Exact layout fields to transfer.</param>
+        /// <param name="fillThreshold">Optional Actual Item Fill threshold.</param>
+        /// <param name="expected">Preset stamp captured before editing.</param>
+        /// <param name="canSave">Whether local links were resolved on a sample.</param>
+        /// <param name="baseline">Receives the applied group values for the settings window.</param>
+        /// <returns>The stamp of the newly saved preset.</returns>
+        internal static string WriteLayout(ObjectGroupPreset preset, ObjectGroupInfo group, ObjectWorkspace document, ObjectWorkspace proposal,
+            string[] paths, int fillThreshold, string expected, bool canSave, out string baseline)
+        {
+            ObjectWorkspace saved = ScriptableObject.CreateInstance<ObjectWorkspace>();
+            try
+            {
+                // Import the applied group before overlaying only the placements edited in this preview.
+                ObjectWorkspaceDraft.Capture(document).Restore(saved);
+                ObjectPresetContext.Apply(preset, saved);
+                Import(preset, saved, group);
+                ObjectSectionChanges.Synchronize(proposal, saved, paths, fillThreshold, updateBaseline: false);
+                string stamp = Write(preset, group, saved, expected, canSave);
+                baseline = Stamp(saved, group);
+                ObjectSectionChanges.Synchronize(saved, document, paths, fillThreshold, updateBaseline: false);
+                return stamp;
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(saved);
+            }
         }
 
         #endregion

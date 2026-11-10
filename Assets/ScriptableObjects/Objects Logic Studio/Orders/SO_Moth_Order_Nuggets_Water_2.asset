@@ -19,6 +19,7 @@ MonoBehaviour:
     Weight: 1
     Flags:
     - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+    - {fileID: 11400000, guid: 06632cf155821d249fe6b348dca4f5d2, type: 2}
     RequireAllFlags: 0
   - Name: "Water"
     Text: "Water"

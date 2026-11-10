@@ -27,7 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (node.Asset == null)
             {
                 if (node.Group != null)
-                    ObjectGroupWindow.Open(state, node.Group, node.Path);
+                    ObjectGroupWindow.Open(state, node.Group, node.Path, node.Label);
                 return;
             }
             switch (node.Asset)
@@ -55,7 +55,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     EditorGUIUtility.PingObject(node.Asset);
                     break;
             }
-            StudioAssetWindow.FocusSetting(node.Asset, node.Path);
+            StudioAssetWindow.FocusSetting(node.Asset, node.Path, node.Label);
         }
 
         #endregion

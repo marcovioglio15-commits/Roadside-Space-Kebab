@@ -70,6 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnEnable()
         {
             needsCheck = true;
+            saveChangesMessage = "Apply or discard the unsaved import choices.";
             EditorApplication.delayCall += Check;
         }
 
@@ -186,6 +187,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorGUILayout.EndScrollView();
             if (EditorGUI.EndChangeCheck())
             {
+                hasUnsavedChanges = true;
                 ready = false;
                 needsCheck = true;
                 EditorApplication.delayCall -= Check;
@@ -200,20 +202,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Check();
             }
             using (new EditorGUI.DisabledScope(!ready || EditorApplication.isPlayingOrWillChangePlaymode))
-                if (GUILayout.Button(new GUIContent("Import configuration", "Apply the previewed result to this object.")))
-                {
-                    ObjectWorkspace state = ObjectWorkspace.instance;
-                    if (ObjectWorkspaceDrafts.Count(state) > 0 || ObjectStructureChanges.Count(state) > 0)
-                        warning = "Apply or discard this object's drafts before importing a master.";
-                    else if (plan.Apply(out warning))
-                    {
-                        RememberSources(state);
-                        ObjectWorkspaceDrafts.Discard(state, false);
-                        state.Persist();
-                        ObjectsLogicStudioWindow.RefreshOpen();
-                        Close();
-                    }
-                }
+                if (GUILayout.Button(new GUIContent("Import configuration", "Apply the previewed result to this object.")) && ApplyImport())
+                    Close();
+        }
+
+        /// <summary>Applies only the previewed import and leaves drafts for other prefabs intact.</summary>
+        /// <returns>True when the destination was written.</returns>
+        private bool ApplyImport()
+        {
+            Check();
+            if (!ready || EditorApplication.isPlayingOrWillChangePlaymode)
+                return false;
+            ObjectWorkspace state = ObjectWorkspace.instance;
+            ObjectWorkspaceTarget target = new ObjectWorkspaceTarget();
+            target.Capture(destination, 0);
+            if (ObjectPendingChanges.HasForPrefab(state, target.PrefabGuid))
+            {
+                warning = "Apply or discard this object's drafts before importing a master.";
+                return false;
+            }
+            if (!plan.Apply(out warning))
+                return false;
+            RememberSources(state);
+            if (state.Target.PrefabGuid == target.PrefabGuid)
+                ObjectWorkspaceSession.Discard(state, includeScene: false);
+            state.Persist();
+            ObjectsLogicStudioWindow.RefreshOpen();
+            base.SaveChanges();
+            return true;
+        }
+
+        /// <summary>Applies the validated import when requested from Unity’s close confirmation.</summary>
+        public override void SaveChanges()
+        {
+            if (!ApplyImport())
+                throw new InvalidOperationException(warning);
         }
 
         #endregion

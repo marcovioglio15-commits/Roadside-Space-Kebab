@@ -190,18 +190,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="ticket">Assigned order whose completion may have changed.</param>
         internal void Draw(OrderTicket ticket)
         {
-            // TMP generates a real line through the text, including multiline layouts.
-            int index = ticket.Slot;
-            if (index < 0 || index >= occupied.Length || occupied[index] != ticket || slots[index] == null)
+            if (!OwnsSlot(ticket))
                 return;
+            int index = ticket.Slot;
             if (index < objectViews.Length)
-                objectViews[index]?.Show(ticket.Completed ? completedTint : ticket.Incorrect ? incorrectTint : pendingTint);
+                objectViews[index]?.Show(Tint(ticket));
             slots[index].text = ticket.Candidate.MainText;
-            slots[index].fontStyle = ticket.Completed ? styles[index] | FontStyles.Strikethrough : styles[index];
+            slots[index].fontStyle = styles[index];
             if (formatting[index] == null && ticket.Candidate.HasVariants)
                 Debug.LogWarning("Prepare variant paragraphs on this Order Board before Play.", this);
             else
-                formatting[index]?.Draw(ticket.Candidate, ticket.Completed);
+                formatting[index]?.Draw(ticket.Candidate);
+        }
+
+        /// <summary>Refreshes the color of a visible order after gameplay has resolved the receipt.</summary>
+        /// <param name="ticket">Ticket whose completion or incorrect state may have changed.</param>
+        internal void RefreshFeedback(OrderTicket ticket)
+        {
+            if (OwnsSlot(ticket) && ticket.Slot < objectViews.Length)
+                objectViews[ticket.Slot]?.ApplyTint(Tint(ticket));
+        }
+
+        /// <summary>Checks slot ownership before updating text or post-it colors.</summary>
+        /// <param name="ticket">Ticket to display.</param>
+        /// <returns>True when this board still displays the exact ticket.</returns>
+        private bool OwnsSlot(OrderTicket ticket)
+        {
+            return ticket.Slot >= 0 && ticket.Slot < occupied.Length && occupied[ticket.Slot] == ticket && slots[ticket.Slot] != null;
+        }
+
+        /// <summary>Maps gameplay results to the board's configured color multipliers.</summary>
+        /// <param name="ticket">Current order ticket.</param>
+        /// <returns>Completed, incorrect or pending tint.</returns>
+        private Color Tint(OrderTicket ticket)
+        {
+            return ticket.Completed ? completedTint : ticket.Incorrect ? incorrectTint : pendingTint;
         }
 
         /// <summary>Clears a departed customer's slot without shifting other visible orders.</summary>

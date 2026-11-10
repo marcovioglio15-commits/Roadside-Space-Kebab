@@ -34,16 +34,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return false;
         }
 
-        /// <summary>Reports whether a selected category belongs to an optional row.</summary>
+        /// <summary>Resolves the recipe row selected for an inserted ingredient.</summary>
         /// <param name="settings">Recipe accepting the ingredient.</param>
         /// <param name="flag">Exact category chosen for its magnet.</param>
-        /// <returns>True when that row is optional.</returns>
-        internal static bool IsOptional(AssemblyProductSettings settings, ObjectFlag flag)
+        /// <returns>The row that owns this flag, or null if the category is absent.</returns>
+        internal static AssemblyIngredient FindRow(AssemblyProductSettings settings, ObjectFlag flag)
         {
+            // Validation assigns each accepted flag to at most one recipe row.
             foreach (AssemblyIngredient ingredient in settings.Ingredients)
                 if (Array.IndexOf(ingredient.Flags, flag) >= 0)
-                    return ingredient.Optional;
-            return false;
+                    return ingredient;
+            return null;
         }
 
         #endregion

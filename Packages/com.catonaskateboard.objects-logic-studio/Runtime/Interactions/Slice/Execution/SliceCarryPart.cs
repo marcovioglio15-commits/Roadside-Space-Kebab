@@ -25,6 +25,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Original body retained for exact release, never replaced or destroyed.</summary>
         internal Rigidbody Body { get; }
+        /// <summary>Original shapes enabled again when this piece leaves the carrier.</summary>
+        internal Collider[] Colliders => colliders;
 
         #endregion
 
@@ -85,12 +87,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             original.Restore(Body, true);
             profile?.Apply(Body);
             // Restore items before their interaction components recache ownership and register their inputs.
+            double releaseTime = profile != null ? Time.timeAsDouble : double.NegativeInfinity;
             for (int index = 0; index < colliders.Length; index++)
                 if (colliders[index] != null)
                     colliders[index].enabled = enabledColliders[index];
             for (int index = 0; index < items.Length; index++)
                 if (items[index] != null)
+                {
+                    items[index].LastPlayerReleaseTime = releaseTime;
                     items[index].enabled = enabledItems[index];
+                }
             for (int index = 0; index < features.Length; index++)
                 if (features[index] != null)
                     features[index].enabled = enabledFeatures[index];
@@ -98,6 +104,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Body.linearVelocity = velocity + Vector3.Cross(spin, Body.worldCenterOfMass - centre);
             Body.angularVelocity = spin;
             Body.WakeUp();
+        }
+
+        /// <summary>Removes the released piece's mirror before the remaining carrier refreshes its owned shapes.</summary>
+        internal void RemoveMirror()
+        {
+            // Release already deactivated the branch. Detach now because destruction finishes after this input.
+            geometry.transform.SetParent(null, false);
+            Object.Destroy(geometry);
         }
 
         /// <summary>Finds the deepest overlap between live mirrored shapes while original output colliders remain suspended.</summary>

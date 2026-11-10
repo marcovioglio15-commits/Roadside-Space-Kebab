@@ -14,6 +14,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly bool wasActive;
         private readonly List<Surface> surfaces = new List<Surface>();
         private readonly MaterialPropertyBlock work = new MaterialPropertyBlock();
+        private Color? appliedTint;
 
         /// <summary>Retains the original overrides for one renderer material slot.</summary>
         private readonly struct Surface
@@ -103,6 +104,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (target == null)
                 return;
+            ApplyTint(tint);
+            if (!target.activeSelf)
+                target.SetActive(true);
+        }
+
+        /// <summary>Updates a visible post-it without rebuilding its order text or changing its visibility.</summary>
+        /// <param name="tint">Current delivery color multiplier.</param>
+        internal void ApplyTint(Color tint)
+        {
+            if (target == null || appliedTint == tint)
+                return;
+            appliedTint = tint;
             // Start with current overrides so unrelated properties remain present during the ticket.
             foreach (Surface surface in surfaces)
                 if (surface.Renderer != null)
@@ -113,13 +126,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     work.SetColor(surface.ColorId, surface.Original * tint);
                     surface.Renderer.SetPropertyBlock(work, surface.Index);
                 }
-            if (!target.activeSelf)
-                target.SetActive(true);
         }
 
         /// <summary>Hides the assigned object when its text slot becomes vacant.</summary>
         internal void Hide()
         {
+            appliedTint = null;
             if (target != null && target.activeSelf)
                 target.SetActive(false);
         }

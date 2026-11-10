@@ -177,7 +177,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             Field(settings, "Name");
             // Flag selection follows the project's current catalog.
-            if (sections.Draw("Contact Detection", "Require continuous contact with another flagged Object Item.", settings, "Flags", "ContactDuration", "ContactTolerance", "QueryInterval", "IncludeTriggers", "ExcludeSuspendedContacts"))
+            if (sections.Draw("Contact Detection", "Require continuous contact with another flagged Object Item.", settings,
+                "Flags", "ContactDuration", "ContactTolerance", "QueryInterval", "IncludeTriggers", "IgnoreBlackHole", "IgnoreGravityGenerator", "GravityReleaseGrace"))
                 using (new StudioIndentScope())
                 {
                     ObjectFlagSelector.Draw(settings.FindPropertyRelative("Flags"));
@@ -185,7 +186,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(settings, "ContactTolerance");
                     Field(settings, "QueryInterval");
                     Field(settings, "IncludeTriggers");
-                    Field(settings, "ExcludeSuspendedContacts");
+                    Field(settings, "IgnoreBlackHole");
+                    Field(settings, "IgnoreGravityGenerator");
+                    SerializedProperty gravity = settings.FindPropertyRelative("IgnoreGravityGenerator");
+                    if (gravity.boolValue || gravity.hasMultipleDifferentValues)
+                        using (new StudioIndentScope())
+                            Field(settings, "GravityReleaseGrace");
                 }
             if (sections.Draw("Carried Items", "Exclude carried participants from both contact activation and ongoing modification.", settings, "AllowCarriedSelf", "AllowCarriedOther"))
                 using (new StudioIndentScope())

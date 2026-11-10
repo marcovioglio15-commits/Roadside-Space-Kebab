@@ -64,9 +64,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             ItemAppearanceControls.DrawList(step.FindPropertyRelative("Meshes"), source, true);
                             ItemAppearanceControls.DrawList(step.FindPropertyRelative("Materials"), source, false);
                         }
-                        DrawSpawns(step.FindPropertyRelative("Spawns"));
-                        if (step.FindPropertyRelative("Consume").boolValue && step.FindPropertyRelative("Spawns").arraySize > 0)
+                        SerializedProperty spawns = step.FindPropertyRelative("Spawns");
+                        DrawSpawns(spawns);
+                        // Sequential throws only apply to a consuming step with multiple held outputs.
+                        if (step.FindPropertyRelative("Consume").boolValue && spawns.arraySize > 0)
+                        {
                             HoverControls.Field(step, "KeepOutputsHeld");
+                            if (spawns.arraySize > 1 && step.FindPropertyRelative("KeepOutputsHeld").boolValue)
+                                using (new StudioIndentScope())
+                                    HoverControls.Field(step, "ThrowAsShuriken");
+                        }
                     }
                 }
             }
@@ -77,6 +84,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 added.FindPropertyRelative("Name").stringValue = "Slice " + steps.arraySize;
                 added.FindPropertyRelative("Consume").boolValue = false;
                 added.FindPropertyRelative("KeepOutputsHeld").boolValue = false;
+                added.FindPropertyRelative("ThrowAsShuriken").boolValue = true;
                 added.FindPropertyRelative("Meshes").arraySize = 0;
                 added.FindPropertyRelative("Materials").arraySize = 0;
                 added.FindPropertyRelative("Spawns").arraySize = 0;

@@ -85,7 +85,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (ingredient.Dock != null || ingredient.IsHeld)
                     continue;
                 AssemblyIngredientDock dock = new AssemblyIngredientDock();
-                dock.Snap(station, ingredient, magnet, AssemblyIngredientSelection.IsOptional(station.Template.Settings, flag));
+                dock.Snap(station, ingredient, magnet, AssemblyIngredientSelection.FindRow(station.Template.Settings, flag) is { Optional: true });
                 if (dock.Ingredient != null)
                     docks.Add(dock);
             }

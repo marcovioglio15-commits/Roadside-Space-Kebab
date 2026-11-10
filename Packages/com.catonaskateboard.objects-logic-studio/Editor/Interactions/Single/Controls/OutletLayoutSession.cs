@@ -57,6 +57,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         };
         /// <summary>Object used for the preview geometry.</summary>
         internal ObjectWorkspaceTarget Target => source.Target;
+        /// <summary>Retained source and optional preset sample owned by this layout.</summary>
+        internal ObjectLayoutSource Source => source;
 
         /// <summary>Whether the preview contains pose changes beyond its opening draft.</summary>
         internal bool HasChanges => baseline.Length > 0 && JsonUtility.ToJson(Draft) != baseline;
@@ -66,6 +68,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Methods
 
         #region Transactions
+
+        /// <summary>Checks whether a pending layout belongs to a prefab operation’s source.</summary>
+        /// <param name="prefabGuid">Prefab involved in the operation.</param>
+        /// <param name="componentId">Exact component, or zero for the whole prefab.</param>
+        /// <returns>True when unresolved layout edits would be affected.</returns>
+        internal bool HasPendingFor(string prefabGuid, long componentId)
+        {
+            return HasChanges && source.Uses(prefabGuid, componentId);
+        }
+
 
         /// <summary>Copies the caller's current poses without changing the original group or prefab.</summary>
         /// <param name="workspace">Draft that opened the preview.</param>
@@ -87,15 +99,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Reloads poses from the original group, including its pending settings.</summary>
         internal void Discard()
         {
-            source.Edit(ReadDraft, out _);
+            if (!source.Edit(ReadDraft, out _))
+                baseline = string.Empty;
         }
 
-        /// <summary>Copies only output poses into the source draft after validating them and checking conflicts.</summary>
+        /// <summary>Saves only this preview’s poses after validation and conflict checks.</summary>
         /// <param name="warning">Receives missing source, invalid pose or conflict details.</param>
-        /// <returns>True when the original group received the preview's poses.</returns>
+        /// <returns>True when the selected layout was saved.</returns>
         internal bool Apply(out string warning)
         {
-            bool applied = source.Edit(workspace =>
+            string path = Layout switch
+            {
+                ObjectPointLayout.OrbitCenters => "Extended.Draft.GravityGenerator.Float.Centers",
+                ObjectPointLayout.Magnets => "Single.Draft.Dispenser.ScoopDisplay.Magnets",
+                ObjectPointLayout.Outlets => "Single.Draft.Dispenser.Outlets",
+                _ => "Extended.Draft.SpraySauce.Nozzle"
+            };
+            return source.Apply(workspace =>
             {
                 // Reject invalid poses without replacing the proposal or changing the source.
                 if (JsonUtility.ToJson(ReadLayout(workspace)) != baseline)
@@ -105,7 +125,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 foreach (DispenserOutlet point in Draft.Points)
                     if (point is not { IsValid: true })
                         throw new InvalidOperationException("Use finite values for each point’s position and rotation.");
-                Undo.RecordObject(workspace, "Apply Point Layout to Draft");
                 switch (Layout)
                 {
                     case ObjectPointLayout.OrbitCenters:
@@ -126,11 +145,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         };
                         break;
                 }
-                ReadDraft(workspace);
-            }, out warning);
-            if (applied)
-                source.Notify();
-            return applied;
+            }, new[] { path }, ReadDraft, out warning);
         }
 
         #endregion

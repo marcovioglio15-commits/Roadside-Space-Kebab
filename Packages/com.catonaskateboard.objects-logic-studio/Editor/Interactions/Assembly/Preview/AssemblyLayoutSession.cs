@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Edits product magnets independently before merging them into the group that opened the preview.</summary>
+    /// <summary>Edits product magnets and commits their layout independently from the rest of the settings.</summary>
     [Serializable]
     internal sealed class AssemblyLayoutSession
     {
@@ -29,6 +29,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Object used for geometry and ingredient guides.</summary>
         internal ObjectWorkspaceTarget Target => source.Target;
+        /// <summary>Retained source and optional preset sample owned by this layout.</summary>
+        internal ObjectLayoutSource Source => source;
         /// <summary>Whether these placements belong to a container threshold.</summary>
         internal bool IsItemFill => fillThreshold >= 0;
 
@@ -40,6 +42,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Methods
 
         #region Transactions
+
+        /// <summary>Checks whether a pending layout belongs to a prefab operation’s source.</summary>
+        /// <param name="prefabGuid">Prefab involved in the operation.</param>
+        /// <param name="componentId">Exact component, or zero for the whole prefab.</param>
+        /// <returns>True when unresolved layout edits would be affected.</returns>
+        internal bool HasPendingFor(string prefabGuid, long componentId)
+        {
+            return HasChanges && source.Uses(prefabGuid, componentId);
+        }
+
 
         /// <summary>Follows source draft changes while no local handle edits are pending.</summary>
         internal void Refresh()
@@ -74,15 +86,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Reloads placements from the original group, including its pending settings.</summary>
         internal void Discard()
         {
-            source.Edit(ReadDraft, out _);
+            if (!source.Edit(ReadDraft, out _))
+                baseline = null;
         }
 
-        /// <summary>Merges only magnets into the source draft after checking for concurrent layout edits.</summary>
+        /// <summary>Saves only this preview’s magnets after checking for concurrent layout edits.</summary>
         /// <param name="warning">Receives missing source, invalid placement or conflict details.</param>
-        /// <returns>True when the original group received the preview's placements.</returns>
+        /// <returns>True when the selected layout was saved.</returns>
         internal bool Apply(out string warning)
         {
-            bool applied = source.Edit(workspace =>
+            return source.Apply(workspace =>
             {
                 if (IsItemFill)
                 {
@@ -97,13 +110,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 proposal.Magnets = ObjectWorkspace.Copy(Draft).Settings.Magnets;
                 if (!AssemblyValidation.TryValidate(Target.Resolve(), proposal, out string detail))
                     throw new InvalidOperationException(detail);
-                Undo.RecordObject(workspace, "Apply Magnet Layout to Draft");
                 current.Magnets = proposal.Magnets;
-                ReadDraft(workspace);
-            }, out warning);
-            if (applied)
-                source.Notify();
-            return applied;
+            }, IsItemFill ? Array.Empty<string>() : new[] { "Extended.Draft.AssemblyProduct.Settings.Magnets" }, ReadDraft, out warning, fillThreshold);
         }
 
         #endregion
@@ -138,9 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             };
             if (!proposal.TryValidate(step.Count, out string warning))
                 throw new InvalidOperationException(warning);
-            Undo.RecordObject(workspace, "Apply Fill Magnet Layout");
             step.ItemFill = proposal;
-            ReadDraft(workspace);
         }
 
         /// <summary>Finds the same unique container threshold after draft changes.</summary>

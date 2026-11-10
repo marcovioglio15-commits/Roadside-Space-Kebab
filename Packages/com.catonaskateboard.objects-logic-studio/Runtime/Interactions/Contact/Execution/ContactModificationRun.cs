@@ -276,7 +276,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Dwell-time and temporary-contact rules still require uninterrupted measured contact.
             if (settings.ContactDuration > 0f || settings.WhileContact || !settings.Self.Consume && !settings.Other.Consume
                 || !ContactDetection.Usable(surface, settings.IncludeTriggers) || !ContactDetection.Usable(otherSurface, settings.IncludeTriggers)
-                || settings.ExcludeSuspendedContacts && (ContactDetection.IsSuspended(surface) || ContactDetection.IsSuspended(otherSurface))
+                || ContactDetection.ExcludesMotion(surface, Item, settings) || ContactDetection.ExcludesMotion(otherSurface, candidate, settings)
                 || !Eligible(candidate) || !Matches(candidate) || !CanBegin(candidate) || !AcceptsConsumption(candidate))
                 return;
             impacts.Record(candidate);

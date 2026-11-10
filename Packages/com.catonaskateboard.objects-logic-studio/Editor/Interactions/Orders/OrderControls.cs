@@ -27,6 +27,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (ObjectGroupScope.Allows(settings.FindPropertyRelative("WaitForCompletion")))
                         Completion(settings, owner);
                 }
+            if (sections.Draw("Order Delivery Feedback", "Choose the result when no pending order shares the delivered dish or any requested ingredient.", settings, "MarkAllWithoutIngredientMatch"))
+                using (new StudioIndentScope())
+                    HoverControls.Field(settings, "MarkAllWithoutIngredientMatch", "Mark All With No Match");
             // Hide the interaction-level mode when every reachable catalog defines its own pool policy.
             bool fallbackSelection = UsesFallbackSelection(settings);
             string[] selectionFields = fallbackSelection

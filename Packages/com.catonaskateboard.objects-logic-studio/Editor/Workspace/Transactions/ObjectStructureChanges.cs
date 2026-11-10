@@ -37,14 +37,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Persist();
         }
 
-        /// <summary>Counts staged operations for the visible prefab.</summary>
-        /// <param name="state">Workspace containing staged edits.</param>
-        /// <returns>The selected prefab's operation count.</returns>
-        internal static int Count(ObjectWorkspace state)
-        {
-            return state.Structure.FindAll(change => change.Target.PrefabGuid == state.Target.PrefabGuid).Count;
-        }
-
         #endregion
 
         #region Validation

@@ -16,6 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             internal readonly ObjectInteraction Feature;
             internal readonly bool Added;
             internal readonly bool RequiresEmptySupply;
+            /// <summary>Whether an exact Enable request loads the already active empty scoop card.</summary>
+            internal bool ReloadsSupply => RequiresEmptySupply && Settings.Operation == InteractionChangeOperation.Enable;
 
             #region Methods
 
@@ -169,14 +171,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             bool enable = change.Operation == InteractionChangeOperation.Enable;
             if (!change.Target.AllOfType)
             {
+                // A matching pack can load the same active card only after its previous cycle is empty.
                 ObjectInteraction feature = change.Target.Resolve(item.gameObject);
-                if (feature == null || feature.enabled == enable)
+                if (feature == null)
+                    return false;
+                bool reload = enable && feature is ObjectDispenser { CanReloadScoopSupply: true };
+                if (feature.enabled == enable && !reload)
                     return false;
                 if (enable && feature is ObjectDispenser { Settings: { ScoopOnly: true, ScoopDisplay: { RestockForNewContainer: true } } } dispenser)
                     StageDepletedSupply(dispenser);
                 if (enable && HasEnabled(change.Kind, feature))
                     return false;
-                operations.Add(new Operation(change, feature, false));
+                operations.Add(new Operation(change, feature, false, reload));
                 return true;
             }
 
@@ -216,7 +222,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (feature is not ObjectDispenser { CanYieldSupply: true })
                 return false;
             foreach (Operation operation in operations)
-                if (operation.Feature == feature && operation.RequiresEmptySupply)
+                if (operation.Feature == feature && operation.RequiresEmptySupply && !operation.ReloadsSupply)
                     return true;
             return false;
         }
@@ -260,12 +266,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             foreach (Operation operation in operations)
             {
+                // Stock may have returned or a scoop may have started during the contact delay.
                 ObjectInteraction feature = operation.Feature;
-                if (feature == null || operation.RequiresEmptySupply && !YieldsSupply(feature))
+                if (feature == null || operation.RequiresEmptySupply && feature is not ObjectDispenser { CanYieldSupply: true })
                     return false;
                 switch (operation.Settings.Operation)
                 {
-                    case InteractionChangeOperation.Enable when feature.enabled:
+                    case InteractionChangeOperation.Enable when operation.ReloadsSupply
+                        ? feature is not ObjectDispenser { CanReloadScoopSupply: true } : feature.enabled:
                     case InteractionChangeOperation.Disable when !feature.enabled:
                         return false;
                     case InteractionChangeOperation.Add:
@@ -393,8 +401,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
                 applied = true;
                 // End the old empty cycle before the new card creates its stock.
+                ObjectDispenser reload = null;
                 foreach (Operation operation in operations)
-                    if (operation.RequiresEmptySupply)
+                    if (operation.ReloadsSupply)
+                        reload = (ObjectDispenser)operation.Feature;
+                    else if (operation.RequiresEmptySupply)
                         operation.Feature.enabled = false;
                 foreach (ObjectInteraction feature in snapshots.Keys)
                 {
@@ -405,6 +416,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         feature.enabled = false;
                     else if (availability.TryGetValue(feature, out bool enable) && feature.enabled != enable)
                         feature.enabled = enable;
+                    else if (feature == reload)
+                        reload.ReloadScoopSupply();
                     else
                         InteractionRuntimeCatalog.Refresh(feature);
                 }

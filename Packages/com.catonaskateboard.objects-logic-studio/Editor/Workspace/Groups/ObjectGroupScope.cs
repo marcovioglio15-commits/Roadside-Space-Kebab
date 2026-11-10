@@ -86,7 +86,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     foreach (ObjectGroupInfo segment in current.focus.Segments)
                         if (Matches(segment, parent, title))
                             return parent.serializedObject.targetObject is not ObjectWorkspace workspace
-                                || ObjectWorkspaceGUI.Foldout(workspace, "Group." + parent.propertyPath + "." + title, title, ObjectFieldText.Short(tooltip));
+                                || ObjectWorkspaceGUI.Foldout(workspace, ObjectFieldFocus.SectionKey(parent.propertyPath, title), title, ObjectFieldText.Short(tooltip));
                 if (current.focus.Segments is { Length: > 0 })
                     return false;
                 if (current.focus.Parent == parent.propertyPath)

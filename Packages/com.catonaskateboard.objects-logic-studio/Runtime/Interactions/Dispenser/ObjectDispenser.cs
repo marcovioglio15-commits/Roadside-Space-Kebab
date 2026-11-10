@@ -63,6 +63,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal ISet<Collider> FloatingColliders => display?.SupplyColliders;
         /// <summary>Whether an idle, empty Scoop Only card may yield to a new recipe.</summary>
         internal bool CanYieldSupply => settings.ScoopOnly && !transferring && RemainingCount == 0;
+        /// <summary>Whether contact may reload this empty card with its initial portion prefab.</summary>
+        internal bool CanReloadScoopSupply => isActiveAndEnabled && !IsLocked && display != null
+            && settings.ScoopDisplay.RestockForNewContainer && CanYieldSupply;
 
         #endregion
 
@@ -122,6 +125,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 display = new ScoopDisplay(this);
             else
                 Debug.LogWarning(warning, this);
+        }
+
+        /// <summary>Begins a new pack cycle while retaining the display that accepts previously withdrawn originals.</summary>
+        internal void ReloadScoopSupply()
+        {
+            // A deposited pack uses initial stock. Scoop-triggered restock can still use its own prefab.
+            display.Restock(initialSupply: true);
         }
 
         /// <summary>Stops floating supply without touching already withdrawn originals.</summary>

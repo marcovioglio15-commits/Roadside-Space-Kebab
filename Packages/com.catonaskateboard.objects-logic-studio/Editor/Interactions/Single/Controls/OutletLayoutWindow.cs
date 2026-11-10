@@ -42,6 +42,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #endregion
         #region Methods
         #region Lifecycle
+
+        /// <summary>Source receiving this window’s independent layout changes.</summary>
+        internal ObjectLayoutSource Source => session.Source;
+
+        /// <summary>Checks whether a prefab operation would affect an open preview with pending edits.</summary>
+        /// <param name="prefabGuid">Prefab involved in the operation.</param>
+        /// <param name="componentId">Exact component, or zero for the whole prefab.</param>
+        /// <returns>True when this window must resolve its layout first.</returns>
+        internal static bool HasPendingFor(string prefabGuid, long componentId)
+        {
+            if (!HasOpenInstances<OutletLayoutWindow>())
+                return false;
+            foreach (OutletLayoutWindow window in Resources.FindObjectsOfTypeAll<OutletLayoutWindow>())
+                if (window.session.HasPendingFor(prefabGuid, componentId))
+                    return true;
+            return false;
+        }
+
         /// <summary>Opens an independent layout transaction from the selected spray or dispenser card.</summary>
         /// <param name="workspace">Main tool containing the pending emitter settings.</param>
         /// <param name="layout">Pose list to edit in the shared viewport.</param>
@@ -81,6 +99,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             drawHandle = DrawHandle;
             wantsMouseMove = true;
             hasUnsavedChanges = session.HasChanges;
+            saveChangesMessage = "Apply or discard the unsaved point layout changes.";
             EditorApplication.projectChanged += Refresh;
             EditorApplication.hierarchyChanged += Refresh;
             Undo.undoRedoPerformed += Refresh;
@@ -100,6 +119,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             viewport?.Dispose();
             viewport = null;
         }
+        /// <summary>Releases any preset sample transferred from a closed settings window.</summary>
+        private void OnDestroy()
+        {
+            session.Source.ReleasePreset();
+        }
+
         /// <summary>Refreshes cached geometry only after source or Undo changes.</summary>
         private void Refresh()
         {
@@ -169,14 +194,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             else
                 EditorGUILayout.LabelField("Add a point to place it in the preview.", EditorStyles.miniLabel);
-            saveChangesMessage = "Apply or discard the pending point layout.";
             using EditorGUILayout.VerticalScope footer = new EditorGUILayout.VerticalScope(GUILayout.Height(52f));
             EditorGUILayout.LabelField(status.Length > 0 ? status : hasUnsavedChanges ? "Pending layout" : "Applied layout", EditorStyles.miniLabel);
             using (new StudioButton.RowScope())
             using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
             {
-                if (StudioButton.Draw(new GUIContent("Apply to draft", "Copy these poses into the settings group."), expandWidth: true, minimumHeight: 26f))
-                    SaveChanges();
+                if (StudioButton.Draw(new GUIContent("Apply", "Save these poses now."), expandWidth: true, minimumHeight: 26f))
+                    ApplyLayout();
                 if (StudioButton.Draw(new GUIContent("Discard", "Reload poses from the settings group."), expandWidth: true, minimumHeight: 26f))
                     DiscardChanges();
             }
@@ -298,12 +322,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Saves only this window's independent nozzle proposal.</summary>
         public override void SaveChanges()
         {
-            if (session.Apply(out status))
-            {
-                hasUnsavedChanges = false;
+            if (!ApplyLayout())
+                throw new System.InvalidOperationException(status);
+        }
+
+        /// <summary>Saves this layout and keeps any rejected changes visible.</summary>
+        /// <returns>True when the layout was saved.</returns>
+        private bool ApplyLayout()
+        {
+            bool saved = session.Apply(out status);
+            if (saved)
                 base.SaveChanges();
-            }
             Repaint();
+            return saved;
         }
         /// <summary>Abandons nozzle edits without changing unrelated main-window settings.</summary>
         public override void DiscardChanges()

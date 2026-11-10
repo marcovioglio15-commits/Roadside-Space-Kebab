@@ -35,8 +35,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Slice";
         [Tooltip("Deactivate the sliced item after this final step. Prefab outputs and running VFX keep their own lifetime.")]
         public bool Consume;
-        [Tooltip("When this consuming cut replaces a held item, carry all outputs together until Drop or Throw. Overlapping output shapes are separated once before the group starts carrying.")]
+        [Tooltip("When this consuming cut replaces a held item, keep its outputs in hand. Overlapping shapes separate before carrying starts.")]
         public bool KeepOutputsHeld;
+        [Tooltip("Throw one held output per press and recenter the rest. Drop still releases all remaining outputs together.")]
+        public bool ThrowAsShuriken = true;
         [Tooltip("Mesh substitutions on existing branches, optionally updating their MeshColliders.")]
         public ContactMeshReplacement[] Meshes = Array.Empty<ContactMeshReplacement>();
         [Tooltip("Complete material-slot replacements on existing renderers.")]

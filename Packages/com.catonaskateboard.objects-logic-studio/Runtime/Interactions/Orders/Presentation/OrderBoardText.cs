@@ -71,8 +71,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Keeps base text in the main slot and draws selected variants in separate authored paragraphs.</summary>
         /// <param name="candidate">Base, single variant or combo currently occupying this slot.</param>
-        /// <param name="completed">Whether every displayed paragraph must be crossed out.</param>
-        internal void Draw(OrderCandidate candidate, bool completed)
+        internal void Draw(OrderCandidate candidate)
         {
             // Restore all existing paragraph objects before drawing a replacement ticket.
             Clear();
@@ -80,7 +79,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             if (candidate.HasVariants)
             {
-                DrawVariants(candidate, completed);
+                DrawVariants(candidate);
                 return;
             }
             // Base-only orders without custom styling keep the original slot's direct text path.
@@ -93,13 +92,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             original.enabled = false;
             float offset = 0f;
-            Present(0, candidate.Entry.Text, candidate.Entry.TextStyle, completed, ref offset);
+            Present(0, candidate.Entry.Text, candidate.Entry.TextStyle, ref offset);
         }
 
         /// <summary>Draws recipe paragraphs while keeping base text in the main slot or its own styled paragraph.</summary>
         /// <param name="candidate">Variant or combo currently occupying this slot.</param>
-        /// <param name="completed">Whether every displayed paragraph must be crossed out.</param>
-        private void DrawVariants(OrderCandidate candidate, bool completed)
+        private void DrawVariants(OrderCandidate candidate)
         {
             // Keep the main slot independent while applying optional paragraph typography.
             bool styledBase = candidate.Entry.TextStyle is { Enabled: true };
@@ -116,16 +114,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (styledBase && includeBase)
             {
                 original.enabled = false;
-                Present(index++, candidate.MainText, candidate.Entry.TextStyle, completed, ref offset);
+                Present(index++, candidate.MainText, candidate.Entry.TextStyle, ref offset);
             }
             else if (includeBase)
                 offset = original.preferredHeight;
             // Variant members follow the base line and never enter the main order text.
             if (candidate.Combo != null)
                 foreach (OrderRecipeVariant variant in candidate.Combo)
-                    Present(index++, variant.Text, variant.TextStyle, completed, ref offset);
+                    Present(index++, variant.Text, variant.TextStyle, ref offset);
             else
-                Present(index, candidate.Variant.Text, candidate.Variant.TextStyle, completed, ref offset);
+                Present(index, candidate.Variant.Text, candidate.Variant.TextStyle, ref offset);
         }
 
         /// <summary>Restores the plain slot before clearing or replacing a ticket.</summary>
@@ -153,9 +151,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="index">Authored paragraph index.</param>
         /// <param name="content">Independent base or variant content.</param>
         /// <param name="style">Optional local appearance override.</param>
-        /// <param name="completed">Whether this paragraph is fulfilled.</param>
         /// <param name="offset">Accumulated vertical layout in board-local units.</param>
-        private void Present(int index, string content, OrderTextStyle style, bool completed, ref float offset)
+        private void Present(int index, string content, OrderTextStyle style, ref float offset)
         {
             // Empty variants retain their recipe meaning without occupying visual space.
             if (string.IsNullOrWhiteSpace(content))
@@ -169,8 +166,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (indent > 0f || offset > 0f)
                 text.rectTransform.anchoredPosition = new Vector2(paragraphPositions[index].x + indent, paragraphPositions[index].y - offset);
             text.text = content.Replace("\\n", "\n");
-            if (completed)
-                text.fontStyle |= FontStyles.Strikethrough;
             text.gameObject.SetActive(true);
             offset += text.preferredHeight + (style is { Enabled: true } ? style.SpaceAfter : 0f);
         }

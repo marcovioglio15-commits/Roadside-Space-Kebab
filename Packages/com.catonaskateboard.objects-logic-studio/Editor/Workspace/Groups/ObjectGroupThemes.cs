@@ -75,7 +75,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return "Animation";
             if (section.Contains("dialogue"))
                 return "Dialogue";
-            if (section is "text" or "layout" or "background" or "appearance" or "placement")
+            if (section is "text" or "layout" or "background" or "appearance" or "placement" or "interaction labels")
                 return "Appearance";
             if (section.Contains("dispenser") || section.Contains("dispens"))
                 return "Dispenser";

@@ -51,21 +51,44 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="view">Gameplay camera defining the launch frame.</param>
         internal override void Execute(Transform view)
         {
+            Quaternion aim = view.rotation;
+            Vector3 direction = trajectory.Direction(aim);
+            SliceCarryGroup group = GetComponent<SliceCarryGroup>();
+            // A sequential throw launches the actual output while the carrier keeps the other pieces.
+            if (Grab.IsHeld && group != null && group.TryReleasePiece(direction, PhysicsSettings, out Rigidbody piece))
+            {
+                if (piece.TryGetComponent(out ObjectGrab output))
+                    output.RecordThrow();
+                Launch(piece, direction, aim, false);
+                return;
+            }
+
             // Use an impulse or velocity change without multiplying a one-shot action by frame time.
             bool carried = Grab.IsHeld;
             base.Execute(view);
             if (!carried || Grab.IsHeld)
                 return;
             Grab.RecordThrow();
-            Vector3 launch = trajectory.Direction(view.rotation) * trajectory.Strength;
+            Launch(Grab.Body, direction, aim, group != null);
+        }
+
+        /// <summary>Applies the configured launch to the body already restored by the release.</summary>
+        /// <param name="body">Released body with its final mass and constraints.</param>
+        /// <param name="direction">Normalized throw direction in world space.</param>
+        /// <param name="aim">Camera rotation used to orient spin.</param>
+        /// <param name="separatingGroup">Write velocity immediately so a grouped throw can distribute it to its pieces.</param>
+        private void Launch(Rigidbody body, Vector3 direction, Quaternion aim, bool separatingGroup)
+        {
+            Vector3 launch = direction * trajectory.Strength;
+            bool impulse = trajectory.Mode == ThrowStrengthMode.Impulse;
             // A slice carrier separates in this input frame, before PhysX could integrate a queued impulse.
-            if (Grab.TryGetComponent(out SliceCarryGroup _))
-                Grab.Body.linearVelocity = launch / (trajectory.Mode == ThrowStrengthMode.Impulse ? Grab.Body.mass : 1f);
+            if (separatingGroup)
+                body.linearVelocity = launch / (impulse ? body.mass : 1f);
             else
-                Grab.Body.AddForce(launch, trajectory.Mode == ThrowStrengthMode.Impulse ? ForceMode.Impulse : ForceMode.VelocityChange);
-            Grab.Body.angularVelocity = view.rotation * trajectory.Spin;
+                body.AddForce(launch, impulse ? ForceMode.Impulse : ForceMode.VelocityChange);
+            body.angularVelocity = aim * trajectory.Spin;
             if (trajectory.Sound)
-                StudioAudio.Play("sfx_throw", transform);
+                StudioAudio.Play("sfx_throw", body.transform);
         }
 
         #endregion

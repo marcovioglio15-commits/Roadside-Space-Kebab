@@ -56,9 +56,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 if (owner == null || Event.current.type != EventType.Repaint)
                     return;
-                owner.Rect = GUILayoutUtility.GetLastRect();
-                owner.Found = true;
-                EditorGUI.DrawRect(new Rect(owner.Rect.x - 3f, owner.Rect.y, 2f, owner.Rect.height), new Color(0.3f, 0.65f, 0.95f));
+                owner.Highlight(GUILayoutUtility.GetLastRect());
             }
 
             #endregion
@@ -79,6 +77,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Methods
 
         #region Navigation
+
+        /// <summary>Builds the same focus identity for a tree section and its visible heading.</summary>
+        /// <param name="parent">Serialized section owner.</param>
+        /// <param name="section">Drawer section name.</param>
+        /// <returns>Navigation key for the heading rather than a serialized field.</returns>
+        internal static string SectionKey(string parent, string section)
+        {
+            return "Group." + parent + "." + section;
+        }
+
+        /// <summary>Highlights the heading of a selected settings section.</summary>
+        /// <param name="key">Section identity shared with its tree branch.</param>
+        /// <param name="rect">Drawn foldout position.</param>
+        internal static void Heading(string key, Rect rect)
+        {
+            if (current != null && current.path == key && Event.current.type == EventType.Repaint)
+                current.Highlight(rect);
+        }
+
+        /// <summary>Draws the navigation accent on a field, section or selection caption.</summary>
+        /// <param name="rect">Selected row rectangle.</param>
+        internal static void Accent(Rect rect)
+        {
+            if (Event.current.type == EventType.Repaint)
+                EditorGUI.DrawRect(new Rect(rect.x - 3f, rect.y, 2f, rect.height), new Color(0.3f, 0.65f, 0.95f));
+        }
+
+        /// <summary>Records a visible target so the window can scroll to it after layout.</summary>
+        /// <param name="rect">Selected field or heading rectangle.</param>
+        private void Highlight(Rect rect)
+        {
+            Rect = rect;
+            Found = true;
+            Accent(rect);
+        }
 
         /// <summary>Expands parent properties so a block can navigate to a nested setting.</summary>
         /// <param name="data">Group document.</param>

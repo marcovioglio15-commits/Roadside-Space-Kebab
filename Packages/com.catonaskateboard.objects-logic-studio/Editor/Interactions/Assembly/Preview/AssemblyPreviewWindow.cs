@@ -56,6 +56,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Lifecycle
 
+        /// <summary>Source receiving this window’s independent layout changes.</summary>
+        internal ObjectLayoutSource Source => session.Source;
+
+        /// <summary>Checks whether a prefab operation would affect an open preview with pending edits.</summary>
+        /// <param name="prefabGuid">Prefab involved in the operation.</param>
+        /// <param name="componentId">Exact component, or zero for the whole prefab.</param>
+        /// <returns>True when this window must resolve its layout first.</returns>
+        internal static bool HasPendingFor(string prefabGuid, long componentId)
+        {
+            if (!HasOpenInstances<AssemblyPreviewWindow>())
+                return false;
+            foreach (AssemblyPreviewWindow window in Resources.FindObjectsOfTypeAll<AssemblyPreviewWindow>())
+                if (window.session.HasPendingFor(prefabGuid, componentId))
+                    return true;
+            return false;
+        }
+
+
         /// <summary>Opens the preview for the currently retained product card without changing scenes.</summary>
         /// <param name="workspace">Workspace owning the pending recipe.</param>
         /// <param name="product">Existing product component represented by that draft.</param>
@@ -120,6 +138,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             drawHandles = DrawHandles;
             wantsMouseMove = true;
             hasUnsavedChanges = session.HasChanges;
+            saveChangesMessage = "Apply or discard the unsaved magnet layout changes.";
             minSize = new Vector2(740f, 480f);
             EditorApplication.hierarchyChanged += Refresh;
             EditorApplication.projectChanged += Refresh;
@@ -142,6 +161,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             data = null;
             viewport?.Dispose();
             viewport = null;
+        }
+
+        /// <summary>Releases any preset sample transferred from a closed settings window.</summary>
+        private void OnDestroy()
+        {
+            session.Source.ReleasePreset();
         }
 
         /// <summary>Invalidates source geometry after asset edits, Undo or native hierarchy changes.</summary>
@@ -234,14 +259,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 DrawSelection(settings);
             EditorGUILayout.EndScrollView();
             GUILayout.EndArea();
-            saveChangesMessage = "Apply or discard the pending Magnet Layout changes.";
             GUILayout.BeginArea(new Rect(8f, position.height - 52f, position.width - 16f, 48f));
             EditorGUILayout.LabelField(status.Length > 0 ? status : hasUnsavedChanges ? "Pending layout" : "Applied layout", EditorStyles.miniLabel);
             using (new StudioButton.RowScope())
             using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
             {
-                if (StudioButton.Draw(new GUIContent("Apply to draft", "Copy these placements into the settings group."), expandWidth: true, minimumHeight: 26f))
-                    SaveChanges();
+                if (StudioButton.Draw(new GUIContent("Apply", "Save these placements now."), expandWidth: true, minimumHeight: 26f))
+                    ApplyLayout();
                 if (StudioButton.Draw(new GUIContent("Discard", "Reload placements from the settings group."), expandWidth: true, minimumHeight: 26f))
                     DiscardChanges();
             }
@@ -281,9 +305,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Commits this window's layout and resolves the native unsaved-change prompt.</summary>
         public override void SaveChanges()
         {
-            if (session.Apply(out status))
+            if (!ApplyLayout())
+                throw new System.InvalidOperationException(status);
+        }
+
+        /// <summary>Applies the layout and keeps a failed proposal visible for correction.</summary>
+        /// <returns>True when the layout was saved.</returns>
+        private bool ApplyLayout()
+        {
+            bool saved = session.Apply(out status);
+            if (saved)
                 base.SaveChanges();
             Refresh();
+            return saved;
         }
 
         /// <summary>Discards this window's proposal without changing pending main-window settings.</summary>

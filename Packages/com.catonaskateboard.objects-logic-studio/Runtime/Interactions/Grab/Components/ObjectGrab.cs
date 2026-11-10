@@ -388,6 +388,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 physical.Begin(body, settings);
             IsHeld = true;
             LastThrowTime = double.NegativeInfinity;
+            Item.LastPlayerReleaseTime = double.NegativeInfinity;
             PickupRevision++;
             grabbedOnce = true;
             if (settings.PickupSound)
@@ -552,6 +553,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             RequiresAssemblyPlacement = false;
             RequiresAssemblyRelease = false;
             ReleaseRevision++;
+            Item.LastPlayerReleaseTime = Time.timeAsDouble;
             LastThrowTime = double.NegativeInfinity;
             IsHeld = false;
             physical.Stop();

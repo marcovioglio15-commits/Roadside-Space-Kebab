@@ -107,7 +107,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="target">Scene board receiving a new slot.</param>
         private static void AddSlot(OrderBoard target)
         {
-            // Strikethrough is rendered by TMP itself; gameplay never creates line objects.
+            // Prepare the slot and its text paragraphs before Play.
             using SerializedObject data = new SerializedObject(target);
             SerializedProperty slots = data.FindProperty("slots");
             GameObject child = new GameObject("Order " + (slots.arraySize + 1), typeof(RectTransform), typeof(TextMeshPro));

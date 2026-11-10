@@ -13,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Maximum portions this ingredient can supply in one scoop.")]
         [Range(1, 32)]
         public int ScoopLimit = 32;
-        [Tooltip("Restock an empty display when a fresh compatible container starts a scoop.")]
+        [Tooltip("Restock an empty display when a fresh compatible container starts a scoop or a matching pack reloads this card through Modify by Contact.")]
         public bool RestockForNewContainer;
         [Tooltip("Optional prefab used for restock. Leave empty to use the initial portion prefab.")]
         public GameObject RestockPrefab;

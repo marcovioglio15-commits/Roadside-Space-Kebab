@@ -39,6 +39,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             return true;
         }
 
+        /// <summary>Protects unrelated unsaved native Prefab Mode edits from a section Apply.</summary>
+        /// <param name="target">Object about to receive a section transaction.</param>
+        internal static void CheckSectionStage(GameObject target)
+        {
+            PrefabStage stage = PrefabStageUtility.GetPrefabStage(target);
+            if (stage != null && stage.scene.isDirty)
+                throw new InvalidOperationException("Save or revert the existing Prefab Mode edits before applying this section.");
+        }
+
         /// <summary>Saves the containing prefab immediately and reports a failed disk write.</summary>
         /// <param name="target">Object whose applied interaction settings changed.</param>
         internal static void Save(GameObject target)
