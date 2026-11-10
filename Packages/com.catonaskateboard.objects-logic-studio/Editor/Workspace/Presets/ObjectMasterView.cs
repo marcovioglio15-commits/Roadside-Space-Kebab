@@ -53,7 +53,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="target">Applied object to capture.</param>
         private void Save(ObjectWorkspace state, GameObject target)
         {
-            if (ObjectWorkspaceDrafts.Count(state) > 0 || ObjectStructureChanges.Count(state) > 0)
+            ObjectWorkspaceTarget route = new ObjectWorkspaceTarget();
+            route.Capture(target, 0);
+            if (ObjectPendingChanges.HasForPrefab(state, route.PrefabGuid))
             {
                 warning = "Apply the object before saving a master preset.";
                 return;

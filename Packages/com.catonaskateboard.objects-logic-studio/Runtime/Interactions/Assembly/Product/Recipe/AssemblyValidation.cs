@@ -1,3 +1,4 @@
+using System;
 using CatOnASkateboard.StudioIdentity;
 using System.Collections.Generic;
 using UnityEngine;
@@ -64,6 +65,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 if (ingredient == null || !ingredient.TryValidate(out warning))
                     return false;
+                if (ingredient.OrderFlag != null && Array.IndexOf(ingredient.Flags, ingredient.OrderFlag) < 0)
+                {
+                    warning = "Choose an Order Flag already accepted by its ingredient row.";
+                    return false;
+                }
                 foreach (ObjectFlag flag in ingredient.Flags)
                     if (!quantities.TryAdd(flag, ingredient.Count))
                     {

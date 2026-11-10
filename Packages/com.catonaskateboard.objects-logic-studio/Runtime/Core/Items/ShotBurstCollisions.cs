@@ -31,20 +31,29 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 earlier.Clear();
                 impact = InteractionProjectileInput.Impact;
             }
-            // Keep ordinary layer rules and pre-existing pair exclusions untouched.
-            float deadline = Time.fixedTime + 0.3f;
             foreach (Collider[] other in earlier)
-                foreach (Collider first in output)
-                    foreach (Collider second in other)
-                        if (first != null && second != null && first != second && !first.isTrigger && !second.isTrigger
-                            && first.enabled && second.enabled && first.gameObject.activeInHierarchy && second.gameObject.activeInHierarchy
-                            && Close(first, second) && !Physics.GetIgnoreCollision(first, second))
-                        {
-                            Physics.IgnoreCollision(first, second);
-                            pairs.Add((first, second, deadline));
-                        }
+                IgnoreBriefly(output, other);
             earlier.Add(output);
             checkedStep = Time.fixedTime;
+        }
+
+        /// <summary>Gives a released piece time to clear nearby carry geometry without changing existing exclusions.</summary>
+        /// <param name="output">Shapes on the released piece.</param>
+        /// <param name="others">Shapes it needs to clear during launch.</param>
+        internal static void IgnoreBriefly(Collider[] output, Collider[] others)
+        {
+            // Restore the pairs on the usual physics cadence, even if the original carrier disappears.
+            checkedStep = Time.fixedTime;
+            float deadline = checkedStep + 0.3f;
+            foreach (Collider first in output)
+                foreach (Collider second in others)
+                    if (first != null && second != null && first != second && !first.isTrigger && !second.isTrigger
+                        && first.enabled && second.enabled && first.gameObject.activeInHierarchy && second.gameObject.activeInHierarchy
+                        && Close(first, second) && !Physics.GetIgnoreCollision(first, second))
+                    {
+                        Physics.IgnoreCollision(first, second);
+                        pairs.Add((first, second, deadline));
+                    }
         }
 
         /// <summary>Skips distant output pairs that cannot meet during the initial separation.</summary>

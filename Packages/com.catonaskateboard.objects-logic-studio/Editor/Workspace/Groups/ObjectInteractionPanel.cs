@@ -104,7 +104,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     InteractionToolControls.Draw(binding.FindPropertyRelative("ToolRequirement"));
             InteractionFlagControls.Draw(binding.FindPropertyRelative("FlagChange"), state.Sections);
             InteractionVfxControls.Draw(binding.FindPropertyRelative("VisualEffect"), state.Sections, 0f);
-            HoverControls.Draw(data.FindProperty("Draft"), state.Sections);
+            HoverControls.Draw(data.FindProperty("Draft"), state.Sections, binding.FindPropertyRelative("InteractionText"));
             if (state.Sections.Draw("Debug guides", "Show guides when this object is selected.", binding, "DrawGizmos"))
                 using (new StudioIndentScope())
                     HoverControls.Field(binding, "DrawGizmos");

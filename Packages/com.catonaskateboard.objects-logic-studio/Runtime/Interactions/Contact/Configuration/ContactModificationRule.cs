@@ -119,6 +119,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float QueryInterval = 0.02f;
         [Tooltip("Allow trigger volumes to count as contact.")]
         public bool IncludeTriggers;
+        [Tooltip("Ignore contact while Black Hole is pulling either item.")]
+        public bool IgnoreBlackHole = true;
+        [Tooltip("Ignore contact while Gravity Generator controls either item. A recent player release can still allow contact.")]
+        public bool IgnoreGravityGenerator;
+        [Tooltip("Seconds after a player Throw or Drop during which that item bypasses the Gravity Generator filter. Zero disables the exception.")]
+        [Range(0f, 10f)]
+        public float GravityReleaseGrace = 0.75f;
         [Tooltip("Allow this interaction while its own item is carried by the player.")]
         public bool AllowCarriedSelf = true;
         [Tooltip("Allow contact with an item currently carried by the player.")]
@@ -201,6 +208,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || !InteractionValues.Positive(ContactTolerance) || !InteractionValues.Positive(QueryInterval)
                 || !InteractionValues.Finite(Duration) || Duration < 0f)
                 warning = "Choose a flag, non-negative finite durations, and positive finite contact tolerance and query interval.";
+            else if (IgnoreGravityGenerator && !(GravityReleaseGrace is >= 0f and <= 10f))
+                warning = "Set Gravity Release Grace between 0 and 10 seconds.";
             else if (Self == null || Other == null)
                 warning = "Both participant effect settings are required.";
             else if (!Self.TryValidate(out warning) || !Other.TryValidate(out warning))

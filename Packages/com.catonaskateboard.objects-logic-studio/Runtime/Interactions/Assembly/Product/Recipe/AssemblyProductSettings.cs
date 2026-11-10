@@ -12,6 +12,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Tooltip("Allow this ingredient to be omitted when completing the recipe. Quantity still limits how many may be added.")]
         public bool Optional;
+        [Tooltip("Optional flag from this row to record for order matching when any accepted ingredient is inserted. The ingredient keeps its original flags.")]
+        public ObjectFlag OrderFlag;
 
         #endregion
     }

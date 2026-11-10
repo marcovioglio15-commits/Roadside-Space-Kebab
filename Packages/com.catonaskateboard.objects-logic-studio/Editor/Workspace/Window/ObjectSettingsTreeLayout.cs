@@ -110,7 +110,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     if (!string.IsNullOrEmpty(ObjectGroupAvailability.Requirement(data, section, out _)))
                         continue;
-                    int branch = Add(new Node(group.Key + "/" + section.Key, section.Title, section.Tooltip, string.Empty, group, theme, 2, NodeKind.Section));
+                    int branch = Add(new Node(group.Key + "/" + section.Key, section.Title, section.Tooltip, ObjectFieldFocus.SectionKey(section.Parent, section.Section), group, theme, 2, NodeKind.Section));
                     Nodes[branch].Expandable = section.Paths.Length > 0;
                     if (Expanded(Nodes[branch]))
                         Fields(data, section.Paths, group, branch, 3);

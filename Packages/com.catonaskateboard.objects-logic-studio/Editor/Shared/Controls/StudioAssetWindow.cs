@@ -1,7 +1,9 @@
+using System;
 using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 using CatOnASkateboard.StudioColors.Editor;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
@@ -19,6 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private string warning = string.Empty;
         private readonly ObjectFieldFocus fieldFocus = new ObjectFieldFocus();
         private string focusPath = string.Empty;
+        private string focusLabel = string.Empty;
         private bool focusPending;
         private bool focusConfigured;
 
@@ -51,6 +54,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ReleaseInspector();
             session.Select(asset, out warning);
             focusPath = string.Empty;
+            focusLabel = string.Empty;
             focusPending = false;
             focusConfigured = false;
             UpdatePending();
@@ -72,6 +76,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
             {
+                Rect selection = default;
+                if (focusLabel.Length > 0)
+                {
+                    selection = EditorGUILayout.GetControlRect(false);
+                    EditorGUI.LabelField(selection, "Selected · " + focusLabel, EditorStyles.miniLabel);
+                }
                 if (ScrollInspector)
                     using (EditorGUILayout.ScrollViewScope view = new EditorGUILayout.ScrollViewScope(scroll))
                     {
@@ -80,6 +90,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 else
                     DrawContent();
+                if (focusLabel.Length > 0 && !fieldFocus.Found)
+                    ObjectFieldFocus.Accent(selection);
                 UpdatePending();
                 string message = session.RecoveryWarning.Length > 0 ? session.RecoveryWarning : warning;
                 DrawWarning(message);
@@ -87,7 +99,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     using (new EditorGUI.DisabledScope(!session.HasChanges))
                         if (StudioButton.Draw(new GUIContent("Apply", "Validate and save this shared asset to its project file."), expandWidth: true, minimumHeight: 26f))
-                            SaveChanges();
+                            ApplyChanges();
                     using (new EditorGUI.DisabledScope(session.Source == null || !session.HasChanges))
                         if (StudioButton.Draw(new GUIContent("Discard", "Abandon the retained proposal and reload the latest source."), expandWidth: true, minimumHeight: 26f))
                             DiscardChanges();
@@ -136,12 +148,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Reveals a tree-selected option in its already open asset editing session.</summary>
         /// <param name="asset">Source asset opened by its specialized editor.</param>
         /// <param name="path">Exact serialized option path.</param>
-        internal static void FocusSetting(ScriptableObject asset, string path)
+        /// <param name="label">Selected tree caption.</param>
+        internal static void FocusSetting(ScriptableObject asset, string path, string label)
         {
             foreach (StudioAssetWindow window in Resources.FindObjectsOfTypeAll<StudioAssetWindow>())
                 if (window.session.Source == asset)
                 {
                     window.focusPath = path;
+                    window.focusLabel = label;
                     window.focusPending = !string.IsNullOrEmpty(path);
                     window.focusConfigured = false;
                     window.Focus();
@@ -213,14 +227,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Validates and saves the exact shared asset while retaining any rejected proposal.</summary>
         public override void SaveChanges()
         {
+            if (!ApplyChanges())
+                throw new InvalidOperationException(warning);
+        }
+
+        /// <summary>Saves this asset without clearing validation errors or the retained proposal on failure.</summary>
+        /// <returns>True when the current proposal was saved.</returns>
+        private bool ApplyChanges()
+        {
             UpdatePending();
-            if (session.CanSave(out warning) && Validate(session.Draft, out warning))
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                if (session.Save("Apply " + titleContent.text, out warning))
-                    base.SaveChanges();
+                warning = "Exit Play Mode before applying the shared asset.";
+                return false;
             }
+            bool saved = session.CanSave(out warning) && Validate(session.Draft, out warning)
+                && session.Save("Apply " + titleContent.text, out warning);
+            if (saved)
+                base.SaveChanges();
             UpdatePending();
             Repaint();
+            return saved;
         }
 
         /// <summary>Explicitly abandons this proposal and reloads the latest shared source.</summary>

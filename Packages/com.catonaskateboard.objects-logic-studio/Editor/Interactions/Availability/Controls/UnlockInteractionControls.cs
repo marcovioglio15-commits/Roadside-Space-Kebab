@@ -50,13 +50,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // This category never creates Grab, Dialogue, Contact or other source interactions.
             SerializedProperty settings = draft.FindPropertyRelative("Settings");
             InteractionAvailabilityChange operation = (InteractionAvailabilityChange)settings.FindPropertyRelative("Operation").enumValueIndex;
-            if (sections.Draw("Availability change", "Choose the interaction to lock, unlock or replace.", draft, "Settings.Operation", "Settings.InitiallyLocked", "Settings.Repeat", "TargetId", "ReplacementId"))
+            if (sections.Draw("Availability change", "Choose the interaction to lock, unlock or replace.", draft, "Settings.Operation", "Settings.InitiallyLocked", "Settings.Repeat", "Settings.ReleaseOnEmptyScoop", "TargetId", "ReplacementId"))
             {
                 using StudioIndentScope sectionContent1 = new StudioIndentScope();
                 HoverControls.Field(settings, "Operation");
                 if (operation == InteractionAvailabilityChange.Unlock)
                     HoverControls.Field(settings, "InitiallyLocked");
                 HoverControls.Field(settings, "Repeat");
+                if (operation == InteractionAvailabilityChange.Lock)
+                    HoverControls.Field(settings, "ReleaseOnEmptyScoop");
                 choices.Draw(draft.FindPropertyRelative("TargetId"), operation switch
                 {
                     InteractionAvailabilityChange.Unlock => "Interaction To Unlock",

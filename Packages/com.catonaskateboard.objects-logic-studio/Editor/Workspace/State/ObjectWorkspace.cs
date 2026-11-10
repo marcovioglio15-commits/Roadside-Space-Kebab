@@ -44,9 +44,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public string Hierarchy = string.Empty;
         [Tooltip("Whether a component binding belongs to this session, including temporarily missing objects.")]
         public bool HasBinding;
-        [Tooltip("Retained Grab, Drop or Throw proposal sharing the common Apply and Discard transaction.")]
+        [Tooltip("Retained single-interaction proposal and its applied baseline.")]
         public SingleInteractionSession Single = new SingleInteractionSession();
-        [Tooltip("Retained contact or dialogue proposal sharing the common Apply and Discard transaction.")]
+        [Tooltip("Retained extended-interaction proposal and its applied baseline.")]
         public ExtendedInteractionSession Extended = new ExtendedInteractionSession();
 
         [Header("Workspace")]
@@ -130,7 +130,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal bool InteractionChanged => PresetChanged || HasBinding && JsonUtility.ToJson(Binding) != JsonUtility.ToJson(OriginalBinding);
         /// <summary>Pending object settings requiring the retained prefab to be open before Apply.</summary>
         internal bool PrefabChanged => InteractionChanged || Single.HasChanges || Extended.HasChanges;
-        /// <summary>Whether any domain requires the common Apply action.</summary>
+        /// <summary>Whether the main window owns pending object settings or Scene Setup.</summary>
         internal bool HasChanges => PrefabChanged || Observer.HasChanges;
 
         #endregion

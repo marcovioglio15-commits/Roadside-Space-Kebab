@@ -32,6 +32,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Exact spawn overrides win over the most recent From threshold. Duplicate rules for the same mode and spawn are invalid.")]
         public OrderSpawnCatalog[] SpawnCatalogs = Array.Empty<OrderSpawnCatalog>();
         [Header("Board Presentation")]
+        [Tooltip("Mark all pending orders as incorrect when a wrong delivery matches neither the dish identity nor any requested ingredient on a pending order.")]
+        public bool MarkAllWithoutIngredientMatch = true;
         [Tooltip("Draw orders at spawn, but display them only after the selected local interaction completes successfully.")]
         public bool WaitForCompletion;
         [Tooltip("Existing interaction on this same object whose completion reveals the drawn orders until despawn.")]

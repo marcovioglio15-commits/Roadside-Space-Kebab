@@ -40,6 +40,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Initial logical portions in Scoop From Dispenser mode.")]
         [Range(0, 1000)]
         public int InitialFill;
+        [Tooltip("Maximum portions taken in one scoop of this ingredient. Free capacity and available stock may reduce the amount.")]
+        [Range(1, 32)]
+        public int ScoopAmount = 1;
         [Tooltip("Optional movement and fill timing used only by Scoop From Dispenser.")]
         public ScoopAnimationSettings ScoopAnimation = new ScoopAnimationSettings();
         [Header("Fill Steps")]
@@ -50,6 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool RefillDispenser => Mode == ContainerMode.RefillDispenser;
         /// <summary>Whether a held container receives logical portions directly from a dispenser.</summary>
         public bool ScoopFromDispenser => Mode == ContainerMode.ScoopFromDispenser;
+        /// <summary>Whether visual copies can represent contents without duplicating visible stored items.</summary>
+        public bool SupportsItemFill => ScoopFromDispenser || Mode == ContainerMode.StoreObjects && !KeepVisible;
 
         #endregion
 
@@ -68,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (!ObjectFlagRules.TryValidate(AllowedFlags, false, out warning))
                 return false;
-            if (!InventoryFillStep.TryValidate(FillSteps, out warning))
+            if (!InventoryFillStep.TryValidate(FillSteps, out warning, SupportsItemFill))
                 return false;
             if (Mode is not (ContainerMode.StoreObjects or ContainerMode.RefillDispenser or ContainerMode.ScoopFromDispenser))
                 warning = "Choose a supported Container mode.";
@@ -76,6 +81,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Choose Any or All for the accepted flags.";
             else if (!RefillDispenser && (ScoopFromDispenser || !Unlimited) && Capacity <= 0)
                 warning = "Container Capacity must be a positive whole number.";
+            else if (ScoopFromDispenser && ScoopAmount is < 1 or > 32)
+                warning = "Scoop Amount must be between 1 and 32.";
             else if (ScoopFromDispenser && (InitialFill < 0 || InitialFill > Capacity))
                 warning = "Initial Fill must fit the Scoop Capacity.";
             else if (ScoopFromDispenser && (ScoopAnimation == null || !ScoopAnimation.TryValidate(out warning)))

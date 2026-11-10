@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private ObjectInteraction lockedTarget;
+        private ObjectDispenser lockingSupply;
         private ObjectInteraction replacementTarget;
         private int[] counts;
         private InteractionButton[] buttons;
@@ -93,6 +94,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Removes only this activation's ownership before resetting or disabling the rule.</summary>
         private void ReleaseLocks()
         {
+            BindSupply(null);
             // Independent rules retain their own restrictions on the same components.
             if (lockedTarget != null)
             {
@@ -105,6 +107,33 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 replacementTarget.ReleaseRuleLock(this);
             }
             lockedTarget = replacementTarget = null;
+        }
+
+        /// <summary>Watches only the dispenser that currently owns this temporary lock.</summary>
+        /// <param name="source">Supply whose next empty boundary releases this lock.</param>
+        private void BindSupply(ObjectDispenser source)
+        {
+            if (lockingSupply == source)
+                return;
+            if (lockingSupply != null)
+                lockingSupply.ScoopEmptied -= ReleaseEmptySupply;
+            lockingSupply = source;
+            if (lockingSupply != null)
+                lockingSupply.ScoopEmptied += ReleaseEmptySupply;
+        }
+
+        /// <summary>Rearms this lock after the active scoop cycle ends.</summary>
+        /// <param name="source">Dispenser that no longer has stock or a pending transfer.</param>
+        private void ReleaseEmptySupply(ObjectDispenser source)
+        {
+            // Other availability rules retain their independent ownership.
+            if (source != lockingSupply)
+                return;
+            BindSupply(null);
+            if (lockedTarget != null)
+                lockedTarget.ReleaseRuleLock(this);
+            IsApplied = false;
+            System.Array.Clear(counts, 0, counts.Length);
         }
 
         /// <summary>Applies the initial or completed phase without changing component enabled states.</summary>
@@ -156,7 +185,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             IsApplied = applied;
             ApplyLocks();
             if (locked && lockedTarget != null)
+            {
                 lockedTarget.SetRuleLocked(this, true);
+                if (settings.ReleaseOnEmptyScoop)
+                    foreach (InteractionUnlockCondition condition in settings.Conditions)
+                        if (condition.Source is ObjectDispenser { isActiveAndEnabled: true, CanYieldSupply: false } source)
+                        {
+                            BindSupply(source);
+                            return;
+                        }
+                if (settings.ReleaseOnEmptyScoop)
+                {
+                    lockedTarget.ReleaseRuleLock(this);
+                    IsApplied = false;
+                    System.Array.Clear(counts, 0, counts.Length);
+                }
+            }
         }
 
         /// <summary>Resolves configured Buttons only when the registry or player action asset changes.</summary>
@@ -229,11 +273,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     && (!settings.Conditions[index].FilterConsumed
                         || source is ObjectContactModifier contact && contact.ConsumedAny(settings.Conditions[index].ConsumedFlags)))
                     counts[index]++;
-            TryApply();
+            TryApply(source as ObjectDispenser);
         }
 
         /// <summary>Commits this rule's operation once its any/all requirement is satisfied.</summary>
-        private void TryApply()
+        /// <param name="source">Scoop Only source when this rule is tied to its stock cycle.</param>
+        private void TryApply(ObjectDispenser source = null)
         {
             // A target with multiple rules becomes usable only after every owning rule releases it.
             bool any = false;
@@ -249,6 +294,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             IsApplied = true;
             ApplyLocks();
             lockedTarget.SetRuleLocked(this, settings.Operation != InteractionAvailabilityChange.Unlock);
+            if (settings.ReleaseOnEmptyScoop)
+                BindSupply(source);
             if (replacementTarget != null)
                 replacementTarget.SetRuleLocked(this, false);
             if (settings.Repeat)

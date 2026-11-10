@@ -20,7 +20,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         DirtTrail, 
         SpraySauce, 
         Deathbox, 
-        PresenceCap 
+        PresenceCap,
+        Knockback
     }
 
     /// <summary>Shares validation and item ownership for interactions with persistent progress.</summary>

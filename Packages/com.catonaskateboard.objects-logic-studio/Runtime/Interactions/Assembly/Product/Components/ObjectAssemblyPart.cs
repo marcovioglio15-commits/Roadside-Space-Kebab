@@ -83,9 +83,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             product = owner;
             Grab = grab;
             IngredientFlag = flag;
-            IsOptional = AssemblyIngredientSelection.IsOptional(owner.Settings, flag);
-            // Preserve every insertion flag, not only the single category selected by the recipe magnet.
+            AssemblyIngredient row = AssemblyIngredientSelection.FindRow(owner.Settings, flag);
+            IsOptional = row != null && row.Optional;
+            // Keep the original ingredient flags and the row's explicit equivalent for order receipts.
             HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>(grab.Item.Identity.ActiveFlags);
+            if (row != null && row.OrderFlag != null)
+                flags.Add(row.OrderFlag);
             if (ingredient != null && ingredient.IsComplete)
                 ingredient.CollectIngredientFlags(flags);
             ingredientFlags = new ObjectFlag[flags.Count];

@@ -19,6 +19,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Prefab-local anchor route retained across closing and reopening the workspace.")]
         public string AnchorPath = "-";
 
+        [Tooltip("Replacement labels bound to other local interactions.")]
+        public HoverInteractionText[] InteractionText = Array.Empty<HoverInteractionText>();
+
         [Tooltip("Independent optional start effect retained on this exact interaction, including its own prefab and timing.")]
         public InteractionVfxSettings VisualEffect = new InteractionVfxSettings();
 
@@ -40,16 +43,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal static HoverBindingDraft Capture(ObjectHover hover)
         {
             // Null supports editing a preset before attaching it to an object.
-            return hover == null ? new HoverBindingDraft() : new HoverBindingDraft
+            return hover == null ? new HoverBindingDraft() : ObjectWorkspace.Copy(new HoverBindingDraft
             {
-                ToolRequirement = ObjectWorkspace.Copy(hover.ToolRequirement),
-                FlagChange = ObjectWorkspace.Copy(hover.FlagChange),
-                VisualEffect = ObjectWorkspace.Copy(hover.VisualEffect),
+                InteractionText = hover.InteractionText,
+                ToolRequirement = hover.ToolRequirement,
+                FlagChange = hover.FlagChange,
+                VisualEffect = hover.VisualEffect,
                 Name = hover.InteractionName,
                 Enabled = hover.enabled,
                 DrawGizmos = hover.DrawGizmos,
                 AnchorPath = HoverHierarchy.Path(hover.transform, hover.Anchor)
-            };
+            });
         }
 
         #endregion

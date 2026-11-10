@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Edits product magnets independently before merging them into the group that opened the preview.</summary>
+    /// <summary>Edits product magnets and commits their layout independently from the rest of the settings.</summary>
     [Serializable]
     internal sealed class AssemblyLayoutSession
     {
@@ -19,6 +19,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Placements copied when this preview was opened or last applied.")]
         [SerializeField]
         private AssemblyProductSettings baseline;
+        [Tooltip("Container count threshold opened by the fill preview. Negative means Assembly Product.")]
+        [SerializeField]
+        private int fillThreshold = -1;
 
         #endregion
 
@@ -26,6 +29,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Object used for geometry and ingredient guides.</summary>
         internal ObjectWorkspaceTarget Target => source.Target;
+        /// <summary>Retained source and optional preset sample owned by this layout.</summary>
+        internal ObjectLayoutSource Source => source;
+        /// <summary>Whether these placements belong to a container threshold.</summary>
+        internal bool IsItemFill => fillThreshold >= 0;
 
         /// <summary>Whether the preview contains changes beyond its opening draft.</summary>
         internal bool HasChanges => baseline != null && Capture(Draft.Settings) != Capture(baseline);
@@ -35,6 +42,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Methods
 
         #region Transactions
+
+        /// <summary>Checks whether a pending layout belongs to a prefab operation’s source.</summary>
+        /// <param name="prefabGuid">Prefab involved in the operation.</param>
+        /// <param name="componentId">Exact component, or zero for the whole prefab.</param>
+        /// <returns>True when unresolved layout edits would be affected.</returns>
+        internal bool HasPendingFor(string prefabGuid, long componentId)
+        {
+            return HasChanges && source.Uses(prefabGuid, componentId);
+        }
+
 
         /// <summary>Follows source draft changes while no local handle edits are pending.</summary>
         internal void Refresh()
@@ -51,6 +68,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Reject mismatched callers before retaining their transaction.
             if (ObjectWorkspaceDrafts.Selected(workspace) != product)
                 throw new InvalidOperationException("Open this preview from the product's settings.");
+            fillThreshold = -1;
+            source.Capture(workspace);
+            ReadDraft(workspace);
+        }
+
+        /// <summary>Opens the same preview for one container fill threshold.</summary>
+        /// <param name="workspace">Container draft owning the layout.</param>
+        /// <param name="threshold">Unique count identifying the selected step.</param>
+        internal void ReadFill(ObjectWorkspace workspace, int threshold)
+        {
+            fillThreshold = threshold;
             source.Capture(workspace);
             ReadDraft(workspace);
         }
@@ -58,16 +86,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Reloads placements from the original group, including its pending settings.</summary>
         internal void Discard()
         {
-            source.Edit(ReadDraft, out _);
+            if (!source.Edit(ReadDraft, out _))
+                baseline = null;
         }
 
-        /// <summary>Merges only magnets into the source draft after checking for concurrent layout edits.</summary>
+        /// <summary>Saves only this preview’s magnets after checking for concurrent layout edits.</summary>
         /// <param name="warning">Receives missing source, invalid placement or conflict details.</param>
-        /// <returns>True when the original group received the preview's placements.</returns>
+        /// <returns>True when the selected layout was saved.</returns>
         internal bool Apply(out string warning)
         {
-            bool applied = source.Edit(workspace =>
+            return source.Apply(workspace =>
             {
+                if (IsItemFill)
+                {
+                    ApplyFill(workspace);
+                    return;
+                }
                 // Compare only placements so unrelated group edits remain independent.
                 AssemblyProductSettings current = workspace.Extended.Draft.AssemblyProduct.Settings;
                 if (Capture(current) != Capture(baseline))
@@ -76,13 +110,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 proposal.Magnets = ObjectWorkspace.Copy(Draft).Settings.Magnets;
                 if (!AssemblyValidation.TryValidate(Target.Resolve(), proposal, out string detail))
                     throw new InvalidOperationException(detail);
-                Undo.RecordObject(workspace, "Apply Magnet Layout to Draft");
                 current.Magnets = proposal.Magnets;
-                ReadDraft(workspace);
-            }, out warning);
-            if (applied)
-                source.Notify();
-            return applied;
+            }, IsItemFill ? Array.Empty<string>() : new[] { "Extended.Draft.AssemblyProduct.Settings.Magnets" }, ReadDraft, out warning, fillThreshold);
         }
 
         #endregion
@@ -93,8 +122,67 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="workspace">Exact product draft retained by the preview.</param>
         private void ReadDraft(ObjectWorkspace workspace)
         {
-            Draft = ObjectWorkspace.Copy(workspace.Extended.Draft.AssemblyProduct);
+            Draft = IsItemFill ? new AssemblyProductDraft { Settings = FillPreview(FindStep(workspace).ItemFill) }
+                : ObjectWorkspace.Copy(workspace.Extended.Draft.AssemblyProduct);
             baseline = ObjectWorkspace.Copy(new AssemblyProductSettings { Magnets = Draft.Settings.Magnets });
+        }
+
+        /// <summary>Applies a fill layout only if its original step and magnet values still match.</summary>
+        /// <param name="workspace">Container draft receiving these placements.</param>
+        private void ApplyFill(ObjectWorkspace workspace)
+        {
+            InventoryFillStep step = FindStep(workspace);
+            if (Capture(FillPreview(step.ItemFill)) != Capture(baseline))
+                throw new InvalidOperationException("This fill layout changed in another window. Discard to reload it.");
+            InventoryItemFill proposal = new InventoryItemFill
+            {
+                VisualPrefab = step.ItemFill.VisualPrefab,
+                Magnets = Array.ConvertAll(Draft.Settings.Magnets, magnet => new InventoryFillMagnet
+                {
+                    Position = magnet.Position,
+                    Rotation = magnet.Rotation,
+                    Scale = magnet.Scale
+                })
+            };
+            if (!proposal.TryValidate(step.Count, out string warning))
+                throw new InvalidOperationException(warning);
+            step.ItemFill = proposal;
+        }
+
+        /// <summary>Finds the same unique container threshold after draft changes.</summary>
+        /// <param name="workspace">Workspace holding the original container.</param>
+        /// <returns>Fill step that owns the layout.</returns>
+        private InventoryFillStep FindStep(ObjectWorkspace workspace)
+        {
+            InventoryFillStep match = null;
+            foreach (InventoryFillStep step in workspace.Single.Draft.Container.FillSteps)
+                if (step != null && step.Count == fillThreshold)
+                {
+                    if (match != null)
+                        throw new InvalidOperationException("Fill steps need unique counts.");
+                    match = step;
+                }
+            if (match is not { Mode: InventoryFillMode.ActualItemFill })
+                throw new InvalidOperationException("The original Actual Item Fill step is no longer available.");
+            return match;
+        }
+
+        /// <summary>Projects fill magnets into the existing mesh guide format without touching recipe settings.</summary>
+        /// <param name="fill">Container visual layout and optional guide model.</param>
+        /// <returns>Preview settings with independent positions, rotations and scales.</returns>
+        private static AssemblyProductSettings FillPreview(InventoryItemFill fill)
+        {
+            return new AssemblyProductSettings
+            {
+                Magnets = Array.ConvertAll(fill.Magnets, magnet => new AssemblyMagnet
+                {
+                    Name = "Fill Unit",
+                    PreviewPrefab = fill.VisualPrefab,
+                    Position = magnet.Position,
+                    Rotation = magnet.Rotation,
+                    Scale = magnet.Scale
+                })
+            };
         }
 
         /// <summary>Compares only layout values so recipe and feedback changes do not cause conflicts.</summary>

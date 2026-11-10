@@ -149,7 +149,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 0
@@ -163,7 +162,7 @@ MonoBehaviour:
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
-      fixedHud: 0
+      fixedHud: 1
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -190,6 +189,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!114 &2597272258431737081
 MonoBehaviour:
@@ -443,18 +443,22 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 18d78c779f0c889469ae7c1e595d4383, type: 2}
       Count: 1
       Optional: 0
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       Count: 1
       Optional: 0
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: a0e42af0629e8484fa131faa689723bf, type: 2}
       Count: 1
       Optional: 0
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       Count: 1
       Optional: 1
+      OrderFlag: {fileID: 0}
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0
@@ -465,6 +469,10 @@ MonoBehaviour:
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []
@@ -481,6 +489,10 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
     - Name: Magnet 3
       AnyIngredient: 0
@@ -494,6 +506,10 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 4357755812359040115, guid: b337591f6f4024a40a7b3024484e4fc8, type: 3}
     - Name: Magnet 4
       AnyIngredient: 0
@@ -504,6 +520,10 @@ MonoBehaviour:
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []

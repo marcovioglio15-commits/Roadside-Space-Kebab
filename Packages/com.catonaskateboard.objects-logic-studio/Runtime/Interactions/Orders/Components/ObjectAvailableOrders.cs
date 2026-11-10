@@ -234,8 +234,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (ticket.Completed || ticket.Candidate.Specificity != pass || !contact.ConsumedMatches(ticket.Candidate))
                         continue;
                     ticket.Completed = true;
+                    ticket.Incorrect = false;
                     contact.OverrideConsumedPrice(ticket.Candidate.Entry);
-                    ticket.Board?.Draw(ticket);
                     changed = true;
                     remaining--;
                 }
@@ -252,9 +252,46 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Revision++;
             if (changed && complete)
                 Signal(InteractionMoment.Completed);
+
+            // Delivery feedback is evaluated after the receipt and dialogue state are committed.
+            if (UnexpectedConsumption)
+                MarkIncorrectDelivery(contact);
+            foreach (OrderTicket ticket in tickets)
+                ticket.Board?.RefreshFeedback(ticket);
         }
 
-        /// <summary>Classifies the latest delivery using the ticket state before that delivery crossed out any slots.</summary>
+        /// <summary>Prefers the delivered dish among pending tickets, then ranks the recipes by shared ingredients.</summary>
+        /// <param name="contact">Consuming interaction with the delivery receipt.</param>
+        private void MarkIncorrectDelivery(ObjectContactModifier contact)
+        {
+            // Finished tickets keep their completed presentation.
+            OrderTicket closest = null;
+            int mostShared = 0;
+            bool closestHasIdentity = false;
+            foreach (OrderTicket ticket in tickets)
+            {
+                if (ticket.Completed)
+                    continue;
+                // An ingredient shared with a different dish must not override a matching dish identity.
+                bool sameDish = contact.ConsumedMatches(ticket.Entry.Flags, ticket.Entry.RequireAllFlags);
+                if (closestHasIdentity && !sameDish)
+                    continue;
+                // For the same identity rank, require a positive overlap or keep the earlier equally close ticket.
+                int shared = contact.ConsumedIngredientOverlap(ticket.Candidate);
+                if (sameDish == closestHasIdentity && shared <= mostShared)
+                    continue;
+                mostShared = shared;
+                closestHasIdentity = sameDish;
+                closest = ticket;
+            }
+            // Each wrong receipt replaces earlier feedback on the pending tickets.
+            bool markAll = closest == null && settings.MarkAllWithoutIngredientMatch;
+            foreach (OrderTicket ticket in tickets)
+                if (!ticket.Completed)
+                    ticket.Incorrect = markAll || ticket == closest;
+        }
+
+        /// <summary>Classifies the latest delivery using the ticket state before that delivery fulfilled any slots.</summary>
         /// <param name="pending">True when at least one open slot accepted the consumed object.</param>
         /// <returns>True only when this result belongs to the item's latest consumption receipt.</returns>
         internal bool TryLatestDelivery(out bool pending)

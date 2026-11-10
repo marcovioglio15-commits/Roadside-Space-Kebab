@@ -36,19 +36,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region State
 
-        private static readonly GUIContent[] modes =
-        {
-            new GUIContent("Move", "Move the selected magnet in product-local space."),
-            new GUIContent("Rotate", "Rotate the selected ingredient placement."),
-            new GUIContent("Scale", "Scale the ingredient relative to its original prefab scale."),
-            new GUIContent("Hand", "Pan the view with the left mouse button (Q).")
-        };
         private readonly StudioPreviewNavigation navigation = new StudioPreviewNavigation();
         private readonly AssemblyPreviewGeometry geometry = new AssemblyPreviewGeometry();
-        private PreviewRenderUtility preview;
+        private ObjectLayoutViewport viewport;
+        private System.Action<PreviewRenderUtility, AssemblyProductSettings> drawMeshes;
+        private System.Action<AssemblyProductSettings> drawHandles;
         private SerializedObject data;
         private GameObject cachedRoot;
         private bool dirty = true;
+        private bool resolvePending = true;
+        private GameObject resolvedRoot;
         private bool framePending = true;
         private Vector2 scroll;
         private string status = string.Empty;
@@ -59,22 +56,76 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Lifecycle
 
+        /// <summary>Source receiving this window’s independent layout changes.</summary>
+        internal ObjectLayoutSource Source => session.Source;
+
+        /// <summary>Checks whether a prefab operation would affect an open preview with pending edits.</summary>
+        /// <param name="prefabGuid">Prefab involved in the operation.</param>
+        /// <param name="componentId">Exact component, or zero for the whole prefab.</param>
+        /// <returns>True when this window must resolve its layout first.</returns>
+        internal static bool HasPendingFor(string prefabGuid, long componentId)
+        {
+            if (!HasOpenInstances<AssemblyPreviewWindow>())
+                return false;
+            foreach (AssemblyPreviewWindow window in Resources.FindObjectsOfTypeAll<AssemblyPreviewWindow>())
+                if (window.session.HasPendingFor(prefabGuid, componentId))
+                    return true;
+            return false;
+        }
+
+
         /// <summary>Opens the preview for the currently retained product card without changing scenes.</summary>
         /// <param name="workspace">Workspace owning the pending recipe.</param>
         /// <param name="product">Existing product component represented by that draft.</param>
         internal static void Open(ObjectWorkspace workspace, ObjectAssemblyProduct product)
         {
-            // Each layout owns its transaction independently of the main workspace.
             AssemblyPreviewWindow window = GetWindow<AssemblyPreviewWindow>("Magnet Layout");
-            if (window.session.HasChanges)
-            {
-                window.status = "Apply or Discard before opening another layout.";
-                window.Show();
+            if (!window.CanOpen())
                 return;
-            }
             window.session.Read(workspace, product);
-            window.dirty = window.framePending = true;
-            window.Show();
+            window.ShowLayout("Magnet Layout");
+        }
+
+        /// <summary>Opens the shared placement viewport for an Actual Item Fill step.</summary>
+        /// <param name="workspace">Container draft supplying the box and magnets.</param>
+        /// <param name="threshold">Unique count of the step being edited.</param>
+        internal static void OpenFill(ObjectWorkspace workspace, int threshold)
+        {
+            AssemblyPreviewWindow window = GetWindow<AssemblyPreviewWindow>("Fill Magnet Layout");
+            if (!window.CanOpen())
+                return;
+            try
+            {
+                window.session.ReadFill(workspace, threshold);
+                window.ShowLayout("Fill Magnet Layout");
+            }
+            catch (System.InvalidOperationException exception)
+            {
+                Debug.LogWarning(exception.Message);
+            }
+        }
+
+        /// <summary>Keeps pending changes attached to their original source before switching previews.</summary>
+        /// <returns>True when the window can show another layout.</returns>
+        private bool CanOpen()
+        {
+            if (!session.HasChanges)
+                return true;
+            status = "Apply or Discard before opening another layout.";
+            Show();
+            return false;
+        }
+
+        /// <summary>Frames a newly selected layout and clears the previous view state.</summary>
+        /// <param name="title">Window title for the selected placement type.</param>
+        private void ShowLayout(string title)
+        {
+            titleContent = new GUIContent(title);
+            completed = false;
+            status = string.Empty;
+            dirty = framePending = resolvePending = true;
+            hasUnsavedChanges = false;
+            Show();
         }
 
         /// <summary>Creates only editor preview resources and reconnects source-change notifications.</summary>
@@ -82,11 +133,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // PreviewRenderUtility owns a private preview scene; gameplay and native prefab stages stay untouched.
             data = new SerializedObject(this);
-            preview = new PreviewRenderUtility();
-            preview.cameraFieldOfView = 35f;
-            preview.camera.clearFlags = CameraClearFlags.Color;
-            preview.camera.backgroundColor = new Color(0.12f, 0.13f, 0.15f);
-            preview.ambientColor = Color.gray;
+            viewport = new ObjectLayoutViewport();
+            drawMeshes = geometry.Draw;
+            drawHandles = DrawHandles;
+            wantsMouseMove = true;
+            hasUnsavedChanges = session.HasChanges;
+            saveChangesMessage = "Apply or discard the unsaved magnet layout changes.";
             minSize = new Vector2(740f, 480f);
             EditorApplication.hierarchyChanged += Refresh;
             EditorApplication.projectChanged += Refresh;
@@ -107,14 +159,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             navigation.Release();
             data?.Dispose();
             data = null;
-            preview?.Cleanup();
-            preview = null;
+            viewport?.Dispose();
+            viewport = null;
+        }
+
+        /// <summary>Releases any preset sample transferred from a closed settings window.</summary>
+        private void OnDestroy()
+        {
+            session.Source.ReleasePreset();
         }
 
         /// <summary>Invalidates source geometry after asset edits, Undo or native hierarchy changes.</summary>
         private void Refresh()
         {
             session.Refresh();
+            resolvePending = true;
             hasUnsavedChanges = session.HasChanges;
             // Mesh and material discovery is deferred until the next visible preview pass.
             dirty = true;
@@ -152,10 +211,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnGUI()
         {
             // A window retained for a different or closed prefab must never expose another product's settings.
-            GameObject root = session.Target.Resolve();
+            // Resolve stable prefab identity only after source changes, not while orbiting or dragging a handle.
+            if (resolvePending)
+            {
+                resolvedRoot = session.Target.Resolve();
+                resolvePending = false;
+            }
+            GameObject root = resolvedRoot;
             if (root == null || EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                EditorGUILayout.LabelField("Reopen Magnet Layout from the product's Assembly settings.", EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField("Reopen the layout from its interaction settings.", EditorStyles.wordWrappedLabel);
                 return;
             }
             AssemblyProductSettings settings = session.Draft.Settings;
@@ -172,16 +237,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                mode = GUILayout.Toolbar(mode, modes, EditorStyles.toolbarButton, GUILayout.Width(240f));
+                ObjectLayoutViewport.DrawTools(ref mode, scale: true);
                 if (GUILayout.Button(new GUIContent("Frame All", "Fit the product and all guide prefabs in the viewport."), EditorStyles.toolbarButton, GUILayout.Width(80f)))
                     Frame(settings);
-                EditorGUI.BeginChangeCheck();
-                completed = GUILayout.Toggle(completed, new GUIContent("Completed", "Show the final mesh and ingredient visibility after the recipe completes."),
-                    EditorStyles.toolbarButton, GUILayout.Width(80f));
-                if (EditorGUI.EndChangeCheck())
-                    Refresh();
+                if (!session.IsItemFill)
+                {
+                    EditorGUI.BeginChangeCheck();
+                    completed = GUILayout.Toggle(completed, new GUIContent("Completed", "Show the final mesh and ingredient visibility after the recipe completes."),
+                        EditorStyles.toolbarButton, GUILayout.Width(80f));
+                    if (EditorGUI.EndChangeCheck())
+                        Refresh();
+                }
                 GUILayout.FlexibleSpace();
-                GUILayout.Label(new GUIContent("RMB + WASD/QE · Alt + drag · F", "RMB: look and fly with WASD/QE; Shift: faster; wheel while flying: speed. Alt+LMB: orbit; MMB: pan; Alt+RMB or wheel: zoom. F: frame selected; Q/W/E/R: hand/move/rotate/scale."), EditorStyles.miniLabel);
+                ObjectLayoutViewport.DrawNavigationHint();
             }
             Rect viewport = new Rect(0f, 22f, Mathf.Max(200f, position.width - 390f), position.height - 78f);
             DrawViewport(viewport, settings);
@@ -191,15 +259,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 DrawSelection(settings);
             EditorGUILayout.EndScrollView();
             GUILayout.EndArea();
-            hasUnsavedChanges = session.HasChanges;
-            saveChangesMessage = "Apply or discard the pending Magnet Layout changes.";
             GUILayout.BeginArea(new Rect(8f, position.height - 52f, position.width - 16f, 48f));
             EditorGUILayout.LabelField(status.Length > 0 ? status : hasUnsavedChanges ? "Pending layout" : "Applied layout", EditorStyles.miniLabel);
             using (new StudioButton.RowScope())
             using (new EditorGUI.DisabledScope(!hasUnsavedChanges))
             {
-                if (StudioButton.Draw(new GUIContent("Apply to draft", "Copy these placements into the settings group."), expandWidth: true, minimumHeight: 26f))
-                    SaveChanges();
+                if (StudioButton.Draw(new GUIContent("Apply", "Save these placements now."), expandWidth: true, minimumHeight: 26f))
+                    ApplyLayout();
                 if (StudioButton.Draw(new GUIContent("Discard", "Reload placements from the settings group."), expandWidth: true, minimumHeight: 26f))
                     DiscardChanges();
             }
@@ -213,7 +279,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Slots are created in the product card; this panel focuses on placement and guide selection.
             if (settings.Magnets.Length == 0)
             {
-                EditorGUILayout.LabelField("Add magnets in the Assembly settings to arrange ingredients here.", EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField("Add magnets in the interaction settings to place them here.", EditorStyles.wordWrappedLabel);
                 return;
             }
             selected = Mathf.Clamp(selected, 0, settings.Magnets.Length - 1);
@@ -223,10 +289,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     selected = index;
             EditorGUILayout.Space(8f);
             data.Update();
-            AssemblyControls.DrawMagnet(data.FindProperty("session.Draft.Settings.Magnets").GetArrayElementAtIndex(selected));
+            SerializedProperty magnet = data.FindProperty("session.Draft.Settings.Magnets").GetArrayElementAtIndex(selected);
+            if (session.IsItemFill)
+                InventoryFillMagnetControls.Pose(magnet);
+            else
+                AssemblyControls.DrawMagnet(magnet);
             if (data.ApplyModifiedProperties())
             {
                 dirty = true;
+                hasUnsavedChanges = session.HasChanges;
                 Repaint();
             }
         }
@@ -234,9 +305,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Commits this window's layout and resolves the native unsaved-change prompt.</summary>
         public override void SaveChanges()
         {
-            if (session.Apply(out status))
+            if (!ApplyLayout())
+                throw new System.InvalidOperationException(status);
+        }
+
+        /// <summary>Applies the layout and keeps a failed proposal visible for correction.</summary>
+        /// <returns>True when the layout was saved.</returns>
+        private bool ApplyLayout()
+        {
+            bool saved = session.Apply(out status);
+            if (saved)
                 base.SaveChanges();
             Refresh();
+            return saved;
         }
 
         /// <summary>Discards this window's proposal without changing pending main-window settings.</summary>
@@ -257,40 +338,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Current recipe layout.</param>
         private void DrawViewport(Rect rect, AssemblyProductSettings settings)
         {
-            // A local GUI group keeps input and render coordinates aligned at arbitrary editor DPI.
-            GUI.BeginGroup(rect);
-            Rect local = new Rect(0f, 0f, rect.width, rect.height);
-            if (navigation.Handle(local, ref orbit, ref pivot, ref distance, ref mode))
+            Rect area = viewport.ResolveRect(rect);
+            if (navigation.Handle(area, ref orbit, ref pivot, ref distance, ref mode))
                 FrameSelection(settings);
-            if (Event.current.type == EventType.Used)
+            viewport.Draw(area, orbit, pivot, distance, settings, drawMeshes, drawHandles);
+            if (Event.current.type == EventType.Used || Event.current.type == EventType.MouseMove && area.Contains(Event.current.mousePosition))
                 Repaint();
-            Quaternion rotation = Quaternion.Euler(orbit.x, orbit.y, 0f);
-            preview.camera.transform.SetPositionAndRotation(pivot - rotation * Vector3.forward * distance, rotation);
-            preview.camera.nearClipPlane = Mathf.Max(0.001f, distance * 0.001f);
-            preview.camera.farClipPlane = Mathf.Max(100f, distance * 20f);
-            preview.camera.aspect = rect.width / rect.height;
-            preview.BeginPreview(local, GUIStyle.none);
-            Texture texture;
-            try
-            {
-                if (Event.current.type == EventType.Repaint)
-                {
-                    geometry.Draw(preview, settings);
-                    preview.Render(true, false);
-                }
-                using (new Handles.DrawingScope(Matrix4x4.identity))
-                {
-                    Handles.SetCamera(preview.camera);
-                    DrawHandles(settings);
-                }
-            }
-            finally
-            {
-                texture = preview.EndPreview();
-            }
-            if (Event.current.type == EventType.Repaint)
-                GUI.DrawTexture(local, texture, ScaleMode.StretchToFill, false);
-            GUI.EndGroup();
         }
 
         /// <summary>Edits selected magnet transforms with standard native position, rotation and scale handles.</summary>
@@ -339,6 +392,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             magnet.Position = position;
             magnet.Rotation = rotation.eulerAngles;
             magnet.Scale = scale;
+            hasUnsavedChanges = session.HasChanges;
             Repaint();
         }
 

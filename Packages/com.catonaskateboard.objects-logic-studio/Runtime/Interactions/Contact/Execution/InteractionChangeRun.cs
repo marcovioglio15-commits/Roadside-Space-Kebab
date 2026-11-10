@@ -15,6 +15,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             internal readonly InteractionChangeSettings Settings;
             internal readonly ObjectInteraction Feature;
             internal readonly bool Added;
+            internal readonly bool RequiresEmptySupply;
+            /// <summary>Whether an exact Enable request loads the already active empty scoop card.</summary>
+            internal bool ReloadsSupply => RequiresEmptySupply && Settings.Operation == InteractionChangeOperation.Enable;
 
             #region Methods
 
@@ -22,11 +25,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             /// <param name="settings">Read-only operation data.</param>
             /// <param name="feature">Existing or staged target card.</param>
             /// <param name="added">Whether the card was created for this batch.</param>
-            internal Operation(InteractionChangeSettings settings, ObjectInteraction feature, bool added)
+            /// <param name="requiresEmptySupply">Whether the card must still be empty when the recipe changes.</param>
+            internal Operation(InteractionChangeSettings settings, ObjectInteraction feature, bool added, bool requiresEmptySupply = false)
             {
                 Settings = settings;
                 Feature = feature;
                 Added = added;
+                RequiresEmptySupply = requiresEmptySupply;
             }
 
             #endregion
@@ -166,12 +171,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             bool enable = change.Operation == InteractionChangeOperation.Enable;
             if (!change.Target.AllOfType)
             {
+                // A matching pack can load the same active card only after its previous cycle is empty.
                 ObjectInteraction feature = change.Target.Resolve(item.gameObject);
-                if (feature == null || feature.enabled == enable)
+                if (feature == null)
                     return false;
+                bool reload = enable && feature is ObjectDispenser { CanReloadScoopSupply: true };
+                if (feature.enabled == enable && !reload)
+                    return false;
+                if (enable && feature is ObjectDispenser { Settings: { ScoopOnly: true, ScoopDisplay: { RestockForNewContainer: true } } } dispenser)
+                    StageDepletedSupply(dispenser);
                 if (enable && HasEnabled(change.Kind, feature))
                     return false;
-                operations.Add(new Operation(change, feature, false));
+                operations.Add(new Operation(change, feature, false, reload));
                 return true;
             }
 
@@ -189,6 +200,33 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return operations.Count > previousCount;
         }
 
+        /// <summary>Stages removal of idle stock ownership before loading a different scoop recipe.</summary>
+        /// <param name="incoming">Exact scoop card requested by the pack.</param>
+        private void StageDepletedSupply(ObjectDispenser incoming)
+        {
+            // Normal dispensers and supplied baskets keep the existing exclusivity check.
+            foreach (ObjectDispenser source in item.GetComponents<ObjectDispenser>())
+                if (source != incoming && source.enabled && source.CanYieldSupply && !YieldsSupply(source))
+                    operations.Add(new Operation(new InteractionChangeSettings
+                    {
+                        Operation = InteractionChangeOperation.Disable,
+                        Target = new RuntimeInteractionReference { Kind = InteractionRuntimeKind.Dispenser }
+                    }, source, false, true));
+        }
+
+        /// <summary>Checks whether this transaction can replace one idle scoop card.</summary>
+        /// <param name="feature">Current card competing with the new recipe.</param>
+        /// <returns>True when this batch stages a still-empty source for deactivation.</returns>
+        private bool YieldsSupply(ObjectInteraction feature)
+        {
+            if (feature is not ObjectDispenser { CanYieldSupply: true })
+                return false;
+            foreach (Operation operation in operations)
+                if (operation.Feature == feature && operation.RequiresEmptySupply && !operation.ReloadsSupply)
+                    return true;
+            return false;
+        }
+
         /// <summary>Checks for a conflict on the participant or among prepared additions.</summary>
         /// <param name="kind">Interaction family that would become enabled.</param>
         /// <param name="except">Exact card receiving the edit, if any.</param>
@@ -196,7 +234,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool HasEnabled(InteractionRuntimeKind kind, ObjectInteraction except)
         {
             foreach (ObjectInteraction feature in item.GetComponents<ObjectInteraction>())
-                if (feature != except && feature.enabled && InteractionRuntimeCatalog.KindOf(feature) == kind)
+                if (feature != except && feature.enabled && InteractionRuntimeCatalog.KindOf(feature) == kind && !YieldsSupply(feature))
                     return true;
             if (Claims(kind, except))
                 return true;
@@ -228,12 +266,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             foreach (Operation operation in operations)
             {
+                // Stock may have returned or a scoop may have started during the contact delay.
                 ObjectInteraction feature = operation.Feature;
-                if (feature == null)
+                if (feature == null || operation.RequiresEmptySupply && feature is not ObjectDispenser { CanYieldSupply: true })
                     return false;
                 switch (operation.Settings.Operation)
                 {
-                    case InteractionChangeOperation.Enable when feature.enabled:
+                    case InteractionChangeOperation.Enable when operation.ReloadsSupply
+                        ? feature is not ObjectDispenser { CanReloadScoopSupply: true } : feature.enabled:
                     case InteractionChangeOperation.Disable when !feature.enabled:
                         return false;
                     case InteractionChangeOperation.Add:
@@ -360,6 +400,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return;
                 }
                 applied = true;
+                // End the old empty cycle before the new card creates its stock.
+                ObjectDispenser reload = null;
+                foreach (Operation operation in operations)
+                    if (operation.ReloadsSupply)
+                        reload = (ObjectDispenser)operation.Feature;
+                    else if (operation.RequiresEmptySupply)
+                        operation.Feature.enabled = false;
                 foreach (ObjectInteraction feature in snapshots.Keys)
                 {
                     if (created.Contains(feature))
@@ -369,6 +416,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         feature.enabled = false;
                     else if (availability.TryGetValue(feature, out bool enable) && feature.enabled != enable)
                         feature.enabled = enable;
+                    else if (feature == reload)
+                        reload.ReloadScoopSupply();
                     else
                         InteractionRuntimeCatalog.Refresh(feature);
                 }

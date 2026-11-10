@@ -26,7 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Whether the descriptor contains a supported kind and a usable local occurrence.</summary>
-        public bool IsValid => Assigned && Kind is >= InteractionTemplateKind.Hover and <= InteractionTemplateKind.PresenceCap
+        public bool IsValid => Assigned && Kind is >= InteractionTemplateKind.Hover and <= InteractionTemplateKind.Knockback
             && Name != null && Occurrence >= 0;
 
         #endregion

@@ -41,6 +41,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly ScoopDisplaySettings settings;
         private readonly Portion[] portions;
         private readonly Quaternion rotation;
+        private readonly GameObject restockPrefab;
+        private readonly ObjectIdentity restockIdentity;
+        private GameObject currentPrefab;
+        private bool usingRestockPrefab;
+        private readonly Vector3[] lastPositions;
+        private readonly List<int> batch = new List<int>();
         private readonly HashSet<Collider> supplyColliders = new HashSet<Collider>();
         private Collider[] combinedTargets;
         private bool active = true;
@@ -52,10 +58,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Number of originals currently occupying magnets.</summary>
         internal int Count => count;
-        /// <summary>Successful container scoops since the display was activated.</summary>
-        internal int ScoopedCount { get; private set; }
-        /// <summary>Whether a configured scoop depleted the interaction.</summary>
-        internal bool Exhausted { get; private set; }
+        /// <summary>Logical scoops and original departures since this display was activated.</summary>
+        internal int WithdrawnCount { get; private set; }
         /// <summary>Portion shapes that count as part of the source for aiming.</summary>
         internal ISet<Collider> SupplyColliders => supplyColliders;
 
@@ -72,15 +76,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             this.owner = owner;
             settings = owner.Settings.ScoopDisplay;
             portions = new Portion[settings.Magnets.Length];
+            lastPositions = new Vector3[portions.Length];
             rotation = owner.Settings.Prefab.transform.rotation;
+            restockPrefab = settings.RestockPrefab != null ? settings.RestockPrefab : owner.Settings.Prefab;
+            if (settings.RestockForNewContainer)
+                restockIdentity = restockPrefab.GetComponent<ObjectIdentity>();
             // Instances remain independent roots so contact and carry ownership stay separate.
-            for (int index = 0; index < portions.Length; index++)
-                Spawn(index);
+            Restock(initialSupply: true);
         }
 
         /// <summary>Updates local motion and prunes items consumed by other interactions.</summary>
         internal void Tick()
         {
+            if (count == 0)
+                return;
             float time = Time.time * settings.Speed * (Mathf.PI * 2f);
             Matrix4x4 frame = owner.transform.localToWorldMatrix;
             Quaternion orientation = owner.transform.rotation * rotation;
@@ -89,9 +98,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Portion portion = portions[index];
                 if (ReferenceEquals(portion.Item, null))
                     continue;
-                if (portion.Item == null || !portion.Item.isActiveAndEnabled || portion.Item.IsConsumed)
+                // External movement releases the magnet instead of pulling an escaped original back.
+                if (portion.Item == null || !portion.Item.isActiveAndEnabled || portion.Item.IsConsumed || portion.Item.IsCarried
+                    || portion.Body != null && !portion.Body.isKinematic
+                    || (portion.Item.transform.position - lastPositions[index]).sqrMagnitude > 0.0004f)
                 {
-                    Remove(index);
+                    Remove(index, true);
                     continue;
                 }
                 // Slow eddies carry each portion sideways while a separate rhythm makes it bob.
@@ -104,7 +116,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     0.72f * Mathf.Sin(orbit) + 0.28f * Mathf.Sin(localTime * 0.58f + portion.Phase.z),
                     bob * 2f - 1f,
                     0.72f * Mathf.Cos(orbit) + 0.28f * Mathf.Sin(localTime * 0.86f + portion.Phase.y)));
-                portion.Item.transform.SetPositionAndRotation(frame.MultiplyPoint3x4(settings.Magnets[index] + drift), orientation);
+                lastPositions[index] = frame.MultiplyPoint3x4(settings.Magnets[index] + drift);
+                portion.Item.transform.SetPositionAndRotation(lastPositions[index], orientation);
             }
         }
 
@@ -168,11 +181,31 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Cooking and other modifications can change flags while an item stays on its magnet.
             foreach (Portion portion in portions)
-                if (portion.Item != null && portion.Item.isActiveAndEnabled && !portion.Item.IsConsumed
-                    && (!available || !portion.Item.IsReserved)
-                    && portion.Item.Identity.Matches(receiver.Settings.AllowedFlags, receiver.Settings.Match))
+                if (portion.Item != null && (!available || !portion.Item.IsReserved) && Matches(portion.Item, receiver))
                     return portion.Item;
             return null;
+        }
+
+        /// <summary>Checks whether a fresh compatible container can begin a new stock cycle.</summary>
+        /// <param name="receiver">Container attempting to scoop from the empty display.</param>
+        /// <returns>True when this display can provide compatible new stock.</returns>
+        internal bool CanRestock(ObjectContainer receiver)
+        {
+            return active && count == 0 && receiver.FillCount == 0 && restockIdentity != null
+                && restockIdentity.Matches(receiver.Settings.AllowedFlags, receiver.Settings.Match);
+        }
+
+        /// <summary>Refills the empty display after a pack is loaded or a compatible scoop wins its reservation.</summary>
+        /// <param name="initialSupply">Use the dispenser's initial prefab and reset the withdrawal count for a new pack.</param>
+        internal void Restock(bool initialSupply = false)
+        {
+            // The new cycle uses the same magnet positions and stock limits.
+            currentPrefab = initialSupply ? owner.Settings.Prefab : restockPrefab;
+            usingRestockPrefab = !initialSupply && settings.RestockPrefab != null;
+            if (initialSupply)
+                WithdrawnCount = 0;
+            for (int index = 0; index < portions.Length; index++)
+                Spawn(index);
         }
 
         /// <summary>Releases a portion before Grab captures its standalone body state.</summary>
@@ -181,16 +214,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             int index = IndexOf(item);
             if (index >= 0)
-                Remove(index);
+                Remove(index, true);
         }
 
         /// <summary>Reinstates a released original when it hits the dispenser and a magnet is free.</summary>
         /// <param name="grab">Former portion that completed Drop or Throw.</param>
         /// <param name="contact">Collider struck by the returning portion.</param>
-        internal void Return(ObjectGrab grab, Collider contact)
+        /// <param name="entered">True for a new contact, including an object moved by external physics.</param>
+        internal void Return(ObjectGrab grab, Collider contact, bool entered = false)
         {
-            if (!active || Exhausted || grab.IsHeld || grab.Item.IsReserved || grab.ReleaseRevision == grab.ScoopReleaseRevision
-                || !contact.transform.IsChildOf(owner.transform) || IndexOf(grab.Item) >= 0)
+            // Empty stock stays receptive. An availability rule can still prevent this supply from accepting a return.
+            if (!active || owner == null || !owner.isActiveAndEnabled || owner.IsLocked || count >= portions.Length
+                || grab.IsHeld || grab.Item.IsReserved || grab.Item.IsConsumed || grab.Item.IsFloatingSupply
+                || !entered && grab.ReleaseRevision == grab.ScoopReleaseRevision || !contact.transform.IsChildOf(owner.transform))
                 return;
             // A returning object keeps its current identity and appearance.
             for (int index = 0; index < portions.Length; index++)
@@ -201,47 +237,64 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 }
         }
 
-        /// <summary>Consumes the reserved original and advances the configured visible count.</summary>
-        /// <param name="output">Original reserved by the scoop animation.</param>
-        /// <returns>True when that original still belongs to this cycle.</returns>
-        internal bool Take(ObjectItem output)
+        /// <summary>Consumes compatible originals in one scoop and advances the visible stock step once.</summary>
+        /// <param name="output">First original held by the animation reservation.</param>
+        /// <param name="receiver">Container providing the acceptance filter.</param>
+        /// <param name="limit">Maximum number of logical portions this scoop can transfer.</param>
+        /// <returns>Number of compatible originals transferred before the display advances.</returns>
+        internal int Take(ObjectItem output, ObjectContainer receiver, int limit)
         {
-            int index = IndexOf(output);
-            if (index < 0 || output.IsConsumed || !output.isActiveAndEnabled)
-                return false;
+            int first = IndexOf(output);
+            if (!active || first < 0 || limit <= 0 || !output.IsOwnedBy(receiver) || !Matches(output, receiver))
+                return 0;
 
-            // Select the next step from actual stock, including previous manual withdrawals or returns.
-            int target = count - 1;
+            // Select distinct available originals before changing any magnet or respawning unlimited stock.
+            batch.Clear();
+            batch.Add(first);
+            for (int index = 0; index < portions.Length && batch.Count < limit; index++)
+                if (index != first && portions[index].Item is ObjectItem item && item != null && !item.IsReserved && Matches(item, receiver))
+                    batch.Add(index);
+
+            // A display step may clear extra decorative stock. Reserved portions always stay in place.
+            int target = count - batch.Count;
             foreach (int step in settings.Steps)
                 if (step < count)
                 {
-                    target = step;
+                    target = Mathf.Min(target, step);
                     break;
                 }
-
-            // A step must reach its exact visible count or leave the entire transfer pending.
-            int removable = 1;
-            for (int slot = 0; slot < portions.Length && removable < count - target; slot++)
-                if (slot != index && portions[slot].Item is ObjectItem item && item != null && !item.IsReserved)
+            int removable = batch.Count;
+            for (int index = 0; index < portions.Length && removable < count - target; index++)
+                if (!batch.Contains(index) && portions[index].Item is ObjectItem item && item != null && !item.IsReserved)
                     removable++;
             if (removable < count - target)
-                return false;
+                return 0;
 
-            Remove(index);
-            Discard(output);
-            for (int slot = portions.Length - 1; count > target && slot >= 0; slot--)
-                if (portions[slot].Item is ObjectItem surplus && surplus != null && !surplus.IsReserved)
-                {
-                    Remove(slot);
-                    Discard(surplus);
-                }
+            foreach (int index in batch)
+            {
+                receiver.RecordScoopPortion(portions[index].Item.gameObject);
+                Consume(index);
+            }
+            for (int index = portions.Length - 1; count > target && index >= 0; index--)
+                if (portions[index].Item is ObjectItem item && item != null && !item.IsReserved)
+                    Consume(index);
+            if (active && owner.Settings.Unlimited && settings.Steps.Length == 0)
+                foreach (int index in batch)
+                    if (ReferenceEquals(portions[index].Item, null))
+                        Spawn(index);
+            WithdrawnCount += batch.Count;
+            return batch.Count;
+        }
 
-            // A step-free unlimited supply replaces the portion only after a committed scoop.
-            if (owner.Settings.Unlimited && settings.Steps.Length == 0)
-                Spawn(index);
-            ScoopedCount++;
-            Exhausted = count == 0;
-            return true;
+        /// <summary>Checks the live original against the container's current ingredient filter.</summary>
+        /// <param name="item">Portion currently on a magnet.</param>
+        /// <param name="receiver">Container that will receive the portion.</param>
+        /// <returns>True while the original is still usable and compatible.</returns>
+        private static bool Matches(ObjectItem item, ObjectContainer receiver)
+        {
+            // Contact effects may change the flags between scoop start and the fill keyframe.
+            return item.isActiveAndEnabled && !item.IsConsumed && !item.IsCarried
+                && item.Identity.Matches(receiver.Settings.AllowedFlags, receiver.Settings.Match);
         }
 
         #endregion
@@ -249,9 +302,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Magnets
 
         /// <summary>Removes a spent clone after releasing any effects that should finish independently.</summary>
-        /// <param name="item">Portion no longer participating in the supply.</param>
-        private static void Discard(ObjectItem item)
+        /// <param name="index">Occupied magnet being cleared.</param>
+        private void Consume(int index)
         {
+            // Release physics and stock ownership before consumption notifies other interactions.
+            ObjectItem item = portions[index].Item;
+            Remove(index);
             item.ConsumeSelf();
             Object.Destroy(item.gameObject);
         }
@@ -260,11 +316,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="index">Vacant magnet index.</param>
         private void Spawn(int index)
         {
-            GameObject portion = Object.Instantiate(owner.Settings.Prefab,
+            GameObject portion = Object.Instantiate(currentPrefab,
                 owner.transform.TransformPoint(settings.Magnets[index]), owner.transform.rotation * rotation);
             // Instantiation without a parent uses the active scene, which may differ from the dispenser's scene.
             if (portion.scene != owner.gameObject.scene)
                 UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(portion, owner.gameObject.scene);
+            if (usingRestockPrefab)
+                portion.transform.localScale *= settings.RestockScale;
             Attach(index, portion.GetComponent<ObjectItem>());
         }
 
@@ -284,7 +342,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             combinedTargets = null;
             count++;
             item.IsFloatingSupply = true;
-            item.transform.SetPositionAndRotation(owner.transform.TransformPoint(settings.Magnets[index]), owner.transform.rotation * rotation);
+            lastPositions[index] = owner.transform.TransformPoint(settings.Magnets[index]);
+            item.transform.SetPositionAndRotation(lastPositions[index], owner.transform.rotation * rotation);
             if (body != null)
             {
                 body.collisionDetectionMode = CollisionDetectionMode.Discrete;
@@ -300,7 +359,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Frees one magnet and restores the original's physics before another interaction uses it.</summary>
         /// <param name="index">Occupied magnet index.</param>
-        private void Remove(int index)
+        /// <param name="departed">Whether an original left independently of a scoop or teardown.</param>
+        private void Remove(int index, bool departed = false)
         {
             Portion portion = portions[index];
             portions[index] = default;
@@ -308,10 +368,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 supplyColliders.Remove(collider);
             combinedTargets = null;
             count--;
+            if (departed)
+                WithdrawnCount++;
             if (portion.Item != null)
                 portion.Item.IsFloatingSupply = false;
             if (portion.Body != null)
                 portion.Original.Restore(portion.Body, false);
+            if (departed && count == 0)
+                owner.NotifyScoopEmpty();
         }
 
         /// <summary>Looks up the exact original instead of relying on flags or world position.</summary>

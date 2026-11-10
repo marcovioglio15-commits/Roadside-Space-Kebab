@@ -1,3 +1,4 @@
+using System;
 using CatOnASkateboard.StudioIdentity;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -69,6 +70,41 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (!variant.Matches(ingredients))
                     return false;
             return true;
+        }
+
+
+        #endregion
+
+        #region Delivery feedback
+
+        /// <summary>Counts distinct delivered ingredient flags requested by the base order or its selected variants.</summary>
+        /// <param name="ingredients">Unique ingredient flags captured from the assembled product.</param>
+        /// <returns>The number of shared flags. Exclusions never contribute.</returns>
+        internal int IngredientOverlap(ObjectFlag[] ingredients)
+        {
+            // Non-assembled items have no ingredient receipt.
+            if (ingredients == null)
+                return 0;
+            int shared = 0;
+            foreach (ObjectFlag flag in ingredients)
+                if (flag != null && Requests(flag))
+                    shared++;
+            return shared;
+        }
+
+        /// <summary>Checks positive flags across the base order and every active recipe variant.</summary>
+        /// <param name="flag">Ingredient flag from the delivered product.</param>
+        /// <returns>True when at least one requirement asks for the flag.</returns>
+        private bool Requests(ObjectFlag flag)
+        {
+            // Stop at the first requirement so repeated flags count once.
+            if (Array.IndexOf(Entry.Flags, flag) >= 0 || Variant != null && Array.IndexOf(Variant.Flags, flag) >= 0)
+                return true;
+            if (Combo != null)
+                foreach (OrderRecipeVariant variant in Combo)
+                    if (Array.IndexOf(variant.Flags, flag) >= 0)
+                        return true;
+            return false;
         }
 
         #endregion

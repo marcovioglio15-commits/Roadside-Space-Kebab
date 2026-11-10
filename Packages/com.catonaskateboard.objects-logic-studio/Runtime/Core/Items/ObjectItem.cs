@@ -46,6 +46,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool IsCarried => grab != null && grab.IsHeld;
         /// <summary>Deliberate player releases, retained across disable/enable to distinguish fresh offerings.</summary>
         internal uint ReleaseRevision => grab != null ? grab.ReleaseRevision : 0;
+        /// <summary>Scaled time of the most recent player Throw or Drop, cleared on pickup.</summary>
+        internal double LastPlayerReleaseTime { get; set; } = double.NegativeInfinity;
         /// <summary>Successful player pickups used to rearm contact dialogue independently of consumption.</summary>
         internal uint PickupRevision => grab != null ? grab.PickupRevision : 0;
         /// <summary>Whether a modification currently owns this item's appearance or consumption state.</summary>
@@ -89,6 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 item.receipts.Clear();
                 item.ConsumptionRevision++;
                 item.IsConsumed = false;
+                item.LastPlayerReleaseTime = double.NegativeInfinity;
                 item.grab = item.GetComponent<ObjectGrab>();
                 item.contactModifier = item.GetComponent<ObjectContactModifier>();
             }

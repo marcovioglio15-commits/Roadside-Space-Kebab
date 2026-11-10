@@ -24,6 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Rect rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight + 4f);
             StudioFoldoutGUI.Background(rect, key.StartsWith("View.", System.StringComparison.Ordinal));
             bool open = EditorGUI.Foldout(rect, previous, new GUIContent(title, tooltip), true, EditorStyles.foldoutHeader);
+            ObjectFieldFocus.Heading(key, rect);
             GUI.changed = changed;
             if (open != previous)
             {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CatOnASkateboard.AudioStudio;
 using UnityEngine;
 
 namespace CatOnASkateboard.PlayerStudio
@@ -16,6 +17,7 @@ namespace CatOnASkateboard.PlayerStudio
         private readonly PlayerCameraRig camera;
         private readonly Transform root;
         private readonly PlayerToolMagazine magazine;
+        private readonly PlayerToolCursorTravel cursorTravel;
         private PlayerToolProjectiles projectiles;
         private PlayerToolWeaponEffects effects;
         private PlayerTools owner;
@@ -65,6 +67,8 @@ namespace CatOnASkateboard.PlayerStudio
                 return;
             physics = new PlayerToolPhysics(player, identity.Weapon.Capacity);
             aim = new PlayerToolAim(identity.Weapon, root, camera, physics);
+            if (identity.Weapon.Mode == PlayerToolWeaponMode.CursorInteraction && identity.Weapon.DelayCursorImpact)
+                cursorTravel = new PlayerToolCursorTravel();
         }
 
         /// <summary>Validates every animation and muzzle binding before a pool is created.</summary>
@@ -101,6 +105,7 @@ namespace CatOnASkateboard.PlayerStudio
             aim?.Restore();
             action.Stop();
             projectiles?.Dispose();
+            cursorTravel?.Clear();
             effects?.Dispose();
         }
 
@@ -134,7 +139,10 @@ namespace CatOnASkateboard.PlayerStudio
         /// <summary>Starts the combo and handles a valid zero-duration reload in the same call.</summary>
         private void BeginReload()
         {
+            // Reload audio follows the tool during the animation.
             action.Begin(true);
+            if (tool.IsWeapon && tool.Weapon.PlayReloadSound)
+                StudioAudio.Play("sfx_reload", root);
             if (!action.IsReloading)
                 magazine.Refill();
         }
@@ -195,6 +203,9 @@ namespace CatOnASkateboard.PlayerStudio
                     remainingShots = 0;
                     return;
                 }
+                // Emit audio only after the shot has passed muzzle and pool checks.
+                if (tool.Weapon.PlayShootSound)
+                    StudioAudio.PlayAt("sfx_shoot", position);
                 magazine.Spend();
                 remainingShots = magazine.CanFire ? remainingShots - 1 : 0;
                 nextShot = Time.time + tool.Weapon.ShotInterval;
@@ -236,9 +247,26 @@ namespace CatOnASkateboard.PlayerStudio
                 return;
             PlayerToolHit hit = new PlayerToolHit(owner, tool, owner.UseActionId, true, contact, position, direction,
                 tool.Weapon.Speed, true, tool.Weapon.IgnoreInteractionRange);
+            // Keep the original collider, tool, input and layer mask while this shot travels.
+            int layers = tool.Weapon.Layers.value & view.cullingMask;
+            if (cursorTravel != null && tool.Weapon.DelayCursorImpact)
+                cursorTravel.Add(hit, layers, Mathf.Min(0.75f,
+                    Vector3.Distance(position, contact.point) / tool.Weapon.Speed * tool.Weapon.CursorTravelMultiplier));
+            else
+                ResolveCursorImpact(hit, layers);
+        }
+
+        /// <summary>Plays and dispatches a captured impact if the original target is still active.</summary>
+        /// <param name="hit">Shot captured at the muzzle.</param>
+        /// <param name="layers">Target layers visible at emission.</param>
+        internal void ResolveCursorImpact(PlayerToolHit hit, int layers)
+        {
+            // A consumed, destroyed or disabled target cannot receive a delayed hit.
+            if (hit.Contact.collider is not Collider collider || collider == null || !collider.enabled || !collider.gameObject.activeInHierarchy)
+                return;
             if (tool.Weapon.ImpactOnCursorContact)
                 EmitCursorImpact(hit);
-            physics.DispatchImpact(tool.Weapon, hit, tool.Weapon.Layers.value & view.cullingMask);
+            physics.DispatchImpact(tool.Weapon, hit, layers);
         }
 
         /// <summary>Plays deferred feedback when an interaction accepts the cursor contact.</summary>
@@ -257,11 +285,12 @@ namespace CatOnASkateboard.PlayerStudio
             effects?.Impacts.Emit(hit.Origin, hit.Contact.point, hit.Contact.normal, hit.Direction);
         }
 
-        /// <summary>Expires visual bursts before the current frame presents new shots.</summary>
+        /// <summary>Expires visual bursts and resolves arriving cursor shots before new emissions.</summary>
         /// <param name="now">Scaled frame time.</param>
         internal void AdvanceEffects(double now)
         {
             effects?.Advance(now);
+            cursorTravel?.Advance(now, this);
         }
 
         /// <summary>Advances projectile physics even while another tool is selected.</summary>

@@ -35,6 +35,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
         }
 
+        /// <summary>Finds the visual centre of the output pivots without weighting them by Rigidbody mass.</summary>
+        /// <param name="parts">Prepared outputs still attached to the carrier.</param>
+        /// <param name="count">Number of remaining outputs, which must be positive.</param>
+        /// <returns>The mean world position of the carried pieces.</returns>
+        internal static Vector3 Center(SliceCarryPart[] parts, int count)
+        {
+            // Use the rendered transforms so the layout follows the hand's current pose.
+            Vector3 center = Vector3.zero;
+            for (int index = 0; index < count; index++)
+                center += parts[index].Body.transform.position;
+            return center / count;
+        }
+
         #endregion
         #endregion
     }

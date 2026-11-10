@@ -152,6 +152,15 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    Source:
+      Assigned: 0
+      Kind: 0
+      Name: 
+      Occurrence: 0
+      Step:
+        Block: 
+        Entry: 
+    Moment: 0
     ProximityDistance: 3
     ExitDistance: 3.2
     Loop: 0
@@ -174,6 +183,7 @@ MonoBehaviour:
     ReturnDelay: 1
     AutoReturnDuration: 0.35
     AutoReturnRotation: 1
+  sceneIdentity: 
 --- !u!114 &6032012166276996630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,7 +258,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 0
@@ -262,7 +271,7 @@ MonoBehaviour:
       obstacleMask:
         serializedVersion: 2
         m_Bits: 4294967291
-      fixedHud: 0
+      fixedHud: 1
       anchorOffset: {x: 0, y: 0, z: 0}
       worldOffset: {x: 0, y: 0.25, z: 0}
       screenOffset: {x: 0, y: 35}
@@ -289,6 +298,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!1001 &4713017773215037506
 PrefabInstance:

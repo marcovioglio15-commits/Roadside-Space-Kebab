@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Lists interaction families accepted by runtime contact edits, including availability rules.</summary>
-    public enum InteractionRuntimeKind { Hover, Grab, Drop, Throw, Dispenser, Container, Dialogue, Slice, Contact, Outline, Spawn, AssemblyStation, AssemblyProduct, Ambient, AvailableOrders, TriggerAnimation, Eject, ObjectDegradation, GravityGenerator, ElasticDeformation, DirtTrail, SpraySauce, Deathbox, PresenceCap, Unlock }
+    public enum InteractionRuntimeKind { Hover, Grab, Drop, Throw, Dispenser, Container, Dialogue, Slice, Contact, Outline, Spawn, AssemblyStation, AssemblyProduct, Ambient, AvailableOrders, TriggerAnimation, Eject, ObjectDegradation, GravityGenerator, ElasticDeformation, DirtTrail, SpraySauce, Deathbox, PresenceCap, Unlock, Knockback }
     /// <summary>Operations applied atomically when a contact modification completes.</summary>
     public enum InteractionChangeOperation { Add, Remove, ApplyPreset, Enable, Disable }
 
@@ -112,7 +112,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             warning = "Choose a supported interaction operation and target.";
             if (Operation is < InteractionChangeOperation.Add or > InteractionChangeOperation.Disable
-                || Target == null || Kind is < InteractionRuntimeKind.Hover or > InteractionRuntimeKind.Unlock
+                || Target == null || Kind is < InteractionRuntimeKind.Hover or > InteractionRuntimeKind.Knockback
                 || Operation != InteractionChangeOperation.Add && !Target.Assigned)
                 return false;
             if (Operation == InteractionChangeOperation.ApplyPreset && Target.AllOfType)

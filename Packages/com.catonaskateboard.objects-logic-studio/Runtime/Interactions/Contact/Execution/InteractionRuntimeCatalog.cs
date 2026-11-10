@@ -41,6 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 ObjectSpraySauce => InteractionRuntimeKind.SpraySauce,
                 ObjectDeathbox => InteractionRuntimeKind.Deathbox,
                 ObjectPresenceCap => InteractionRuntimeKind.PresenceCap,
+                ObjectKnockback => InteractionRuntimeKind.Knockback,
                 ObjectInteractionUnlock => InteractionRuntimeKind.Unlock,
                 _ => null
             };
@@ -77,6 +78,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 InteractionRuntimeKind.SpraySauce => typeof(ObjectSpraySauce),
                 InteractionRuntimeKind.Deathbox => typeof(ObjectDeathbox),
                 InteractionRuntimeKind.PresenceCap => typeof(ObjectPresenceCap),
+                InteractionRuntimeKind.Knockback => typeof(ObjectKnockback),
                 InteractionRuntimeKind.Unlock => typeof(ObjectInteractionUnlock),
                 _ => null
             };
@@ -114,6 +116,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 InteractionRuntimeKind.SpraySauce => root.AddComponent<ObjectSpraySauce>(),
                 InteractionRuntimeKind.Deathbox => root.AddComponent<ObjectDeathbox>(),
                 InteractionRuntimeKind.PresenceCap => root.AddComponent<ObjectPresenceCap>(),
+                InteractionRuntimeKind.Knockback => root.AddComponent<ObjectKnockback>(),
                 InteractionRuntimeKind.Unlock => root.AddComponent<ObjectInteractionUnlock>(),
                 _ => null
             };
@@ -150,6 +153,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 ObjectSpraySauce value => new object[] { value.Settings },
                 ObjectDeathbox value => new object[] { value.Settings },
                 ObjectPresenceCap value => new object[] { value.Settings },
+                ObjectKnockback value => new object[] { value.Settings },
                 ObjectInteractionUnlock value => new object[] { value.Settings },
                 _ => Array.Empty<object>()
             };

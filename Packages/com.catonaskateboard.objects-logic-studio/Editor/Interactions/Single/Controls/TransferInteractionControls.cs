@@ -115,10 +115,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             HoverControls.Field(settings, "Mode", "Container Mode");
             if (settings.FindPropertyRelative("Mode").enumValueIndex != (int)ContainerMode.ScoopFromDispenser)
                 Target(settings.FindPropertyRelative("Target"), sections);
-            if (sections.Draw("Container Storage", "Choose accepted flags and storage or scoop settings.", settings, "AllowedFlags", "Match", "Unlimited", "Capacity", "LimitToDispenserSpace", "KeepVisible", "Position", "Rotation", "Spacing", "InitialFill", "ScoopAnimation"))
+            if (sections.Draw("Container Storage", "Choose accepted flags and storage or scoop settings.", settings, "AllowedFlags", "Match", "Unlimited", "Capacity", "LimitToDispenserSpace", "KeepVisible", "Position", "Rotation", "Spacing", "InitialFill", "ScoopAmount", "ScoopAnimation"))
                 using (new StudioIndentScope())
                     Storage(settings);
-            InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Container Steps");
+            ContainerMode mode = (ContainerMode)settings.FindPropertyRelative("Mode").enumValueIndex;
+            bool allowItemFill = mode == ContainerMode.ScoopFromDispenser
+                || mode == ContainerMode.StoreObjects && !settings.FindPropertyRelative("KeepVisible").boolValue;
+            InventoryFillControls.Draw(settings.FindPropertyRelative("FillSteps"), sections, "Container Steps", allowItemFill);
         }
 
         /// <summary>Draws deposit constraints and the optional display of retained originals.</summary>
@@ -138,6 +141,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 HoverControls.Field(settings, "Capacity");
                 HoverControls.Field(settings, "InitialFill");
+                HoverControls.Field(settings, "ScoopAmount");
                 ScoopAnimationControls.Draw(settings.FindPropertyRelative("ScoopAnimation"));
                 return;
             }

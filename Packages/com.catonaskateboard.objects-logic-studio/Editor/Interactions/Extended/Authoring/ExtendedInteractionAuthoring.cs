@@ -41,6 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectExtendedInteraction feature = kind switch
             {
                 ExtendedInteractionKind.ObjectDegradation => Undo.AddComponent<ObjectDegradation>(target),
+                ExtendedInteractionKind.Knockback => Undo.AddComponent<ObjectKnockback>(target),
                 ExtendedInteractionKind.GravityGenerator => Undo.AddComponent<ObjectGravityGenerator>(target),
                 ExtendedInteractionKind.ElasticDeformation => Undo.AddComponent<ObjectElasticDeformation>(target),
                 ExtendedInteractionKind.DirtTrail => Undo.AddComponent<ObjectDirtTrail>(target),

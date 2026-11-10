@@ -16,7 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="steps">Serialized fill-step list.</param>
         /// <param name="sections">Workspace or Inspector foldout state.</param>
         /// <param name="title">Feature-specific section title.</param>
-        internal static void Draw(SerializedProperty steps, ObjectStudioSections sections, string title)
+        /// <param name="allowItemFill">Whether this container supports visual copies of its contents.</param>
+        internal static void Draw(SerializedProperty steps, ObjectStudioSections sections, string title, bool allowItemFill = false)
         {
             // Thresholds work in both directions; explicit counts avoid percentage-rounding ambiguities.
             if (!sections.Draw(title, steps.tooltip, steps))
@@ -39,7 +40,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     continue;
                 using StudioIndentScope rowIndent = new StudioIndentScope();
                 HoverControls.Field(step, "Count");
-                ItemAppearanceControls.Draw(step.FindPropertyRelative("Appearance"));
+                SerializedProperty mode = step.FindPropertyRelative("Mode");
+                if (allowItemFill || mode.enumValueIndex == (int)InventoryFillMode.ActualItemFill)
+                    HoverControls.Field(step, "Mode");
+                if (mode.enumValueIndex == (int)InventoryFillMode.ActualItemFill)
+                    InventoryFillMagnetControls.Draw(step);
+                else
+                    ItemAppearanceControls.Draw(step.FindPropertyRelative("Appearance"));
                 SerializedProperty flags = step.FindPropertyRelative("Flags");
                 HoverControls.Field(flags, "Mode", "Flag Update Mode");
                 if (flags.FindPropertyRelative("Mode").enumValueIndex == (int)InventoryFlagMode.KeepBase)

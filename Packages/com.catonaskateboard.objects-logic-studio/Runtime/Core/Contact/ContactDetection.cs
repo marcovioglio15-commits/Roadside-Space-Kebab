@@ -42,7 +42,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Query(ObjectItem item, ContactModificationRule settings, HashSet<ObjectItem> contacts)
         {
             // Keep a retained counterpart detectable after a completed effect changes its identity.
-            Query(item, settings.ContactTolerance, settings.IncludeTriggers, contacts);
+            Query(item, settings.ContactTolerance, settings.IncludeTriggers, contacts, filters: settings);
         }
 
         /// <summary>Collects physical item roots in the owner's physics scene for caller-specific filtering.</summary>
@@ -51,8 +51,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="includeTriggers">Whether trigger surfaces participate.</param>
         /// <param name="contacts">Reusable result set.</param>
         /// <param name="extensions">Temporary surfaces that contribute contacts for this owner.</param>
+        /// <param name="filters">Optional rules for excluding bodies controlled by other interactions.</param>
         internal void Query(ObjectItem item, float tolerance, bool includeTriggers, HashSet<ObjectItem> contacts,
-            IReadOnlyList<Collider> extensions = null)
+            IReadOnlyList<Collider> extensions = null, ContactModificationRule filters = null)
         {
             // Multiple passive features share one scripted-transform synchronization per render frame.
             contacts.Clear();
@@ -63,14 +64,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             PhysicsScene scene = item.gameObject.scene.GetPhysicsScene();
             foreach (Collider collider in owned)
-                if (!Scan(scene, item, collider, tolerance, includeTriggers, contacts))
+                if (!Scan(scene, item, collider, tolerance, includeTriggers, contacts, filters))
                 {
                     contacts.Clear();
                     return;
                 }
             if (extensions != null)
                 for (int index = 0; index < extensions.Count; index++)
-                    if (!Scan(scene, item, extensions[index], tolerance, includeTriggers, contacts))
+                    if (!Scan(scene, item, extensions[index], tolerance, includeTriggers, contacts, filters))
                     {
                         contacts.Clear();
                         return;
@@ -84,11 +85,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="tolerance">Maximum separation in metres.</param>
         /// <param name="includeTriggers">Whether trigger shapes participate.</param>
         /// <param name="contacts">Unique candidates found so far.</param>
+        /// <param name="filters">Optional rules for excluding bodies controlled by other interactions.</param>
         /// <returns>False if the overlap buffer filled and results cannot be trusted.</returns>
         private bool Scan(PhysicsScene scene, ObjectItem item, Collider surface, float tolerance, bool includeTriggers,
-            HashSet<ObjectItem> contacts)
+            HashSet<ObjectItem> contacts, ContactModificationRule filters)
         {
-            if (!Usable(surface, includeTriggers))
+            // Skip excluded source shapes before querying the scene.
+            if (!Usable(surface, includeTriggers) || filters != null && ExcludesMotion(surface, item, filters))
                 return true;
             Bounds bounds = surface.bounds;
             int count = scene.OverlapSphere(bounds.center, bounds.extents.magnitude + tolerance, buffer, ~0,
@@ -106,10 +109,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     || candidate == item || !candidate.isActiveAndEnabled || candidate.IsConsumed || contacts.Contains(candidate)
                     || Physics.GetIgnoreLayerCollision(layer, other.gameObject.layer) || Physics.GetIgnoreCollision(surface, other))
                     continue;
-                if (Touches(surface, other, tolerance))
+                if ((filters == null || !ExcludesMotion(other, candidate, filters)) && Touches(surface, other, tolerance))
                     contacts.Add(candidate);
             }
             return true;
+        }
+
+        /// <summary>Applies the same motion filters to measured contact and collision callbacks.</summary>
+        /// <param name="shape">Collider on either side of the contact.</param>
+        /// <param name="item">Item owning this contact shape and its release history.</param>
+        /// <param name="settings">Independent exclusions and the Gravity Generator release grace.</param>
+        /// <returns>True when an enabled filter excludes the current physical owner.</returns>
+        internal static bool ExcludesMotion(Collider shape, ObjectItem item, ContactModificationRule settings)
+        {
+            // Skip body lookups for unfiltered rules. The release exception applies only to gravity.
+            if (!settings.IgnoreBlackHole && !settings.IgnoreGravityGenerator)
+                return false;
+            Rigidbody body = shape.attachedRigidbody;
+            return body != null && (settings.IgnoreBlackHole && BlackHoleRun.Contains(body)
+                || settings.IgnoreGravityGenerator && !body.isKinematic && GravitySuspension.Contains(body)
+                    && (settings.GravityReleaseGrace <= 0f || Time.timeAsDouble - item.LastPlayerReleaseTime >= settings.GravityReleaseGrace));
         }
 
         /// <summary>Checks collider availability and supported exact-distance geometry.</summary>

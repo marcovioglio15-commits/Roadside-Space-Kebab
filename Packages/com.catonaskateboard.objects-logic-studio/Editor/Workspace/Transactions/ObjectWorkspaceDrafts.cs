@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Preserves interaction drafts during navigation and applies one prefab's changes together.</summary>
+    /// <summary>Preserves independent interaction drafts during navigation.</summary>
     internal static class ObjectWorkspaceDrafts
     {
         #region Methods
@@ -191,84 +191,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (draft.Changed && draft.Key != state.DraftKey && draft.Target.PrefabGuid == state.Target.PrefabGuid)
                     count++;
             return count;
-        }
-
-        /// <summary>Validates all pending interaction proposals before saving the current prefab in one Undo group.</summary>
-        /// <param name="state">Workspace containing the prefab's proposals.</param>
-        /// <param name="warning">Receives a validation or save failure.</param>
-        /// <returns>True when every selected-prefab proposal and scene setup change was saved.</returns>
-        internal static bool Apply(ObjectWorkspace state, out string warning)
-        {
-            Park(state);
-            ObjectWorkspaceDraft selected = ObjectWorkspaceDraft.Capture(state);
-            List<ObjectWorkspaceDraft> pending = state.SavedDrafts.FindAll(draft => draft.Changed && draft.Target.PrefabGuid == selected.Target.PrefabGuid);
-            warning = string.Empty;
-            if (!ObjectStructureChanges.Validate(state, out warning))
-                return false;
-            foreach (ObjectWorkspaceDraft draft in pending)
-            {
-                draft.Restore(state);
-                if (!ObjectWorkspaceSession.TryValidate(state, out warning))
-                {
-                    selected.Restore(state);
-                    return false;
-                }
-            }
-            selected.Restore(state);
-            Undo.IncrementCurrentGroup();
-            int group = Undo.GetCurrentGroup();
-            Undo.SetCurrentGroupName("Apply object configuration");
-            Undo.RecordObject(state, "Apply object configuration");
-            try
-            {
-                if (pending.Count == 0 && !ObjectWorkspaceSession.Apply(state, out warning))
-                    return false;
-                foreach (ObjectWorkspaceDraft draft in pending)
-                {
-                    draft.Restore(state);
-                    if (!ObjectWorkspaceSession.Apply(state, out warning))
-                    {
-                        Undo.RevertAllDownToGroup(group);
-                        selected.Restore(state);
-                        GameObject target = state.Target.Resolve();
-                        if (target != null)
-                            ObjectAuthoringSave.Save(target);
-                        return false;
-                    }
-                }
-                selected.Restore(state);
-                ObjectInteraction added = ObjectStructureChanges.Apply(state);
-                state.SavedDrafts.RemoveAll(draft => draft.Target.PrefabGuid == selected.Target.PrefabGuid);
-                state.Structure.RemoveAll(change => change.Target.PrefabGuid == selected.Target.PrefabGuid);
-                selected.Restore(state);
-                ObjectWorkspaceSession.Discard(state);
-                if (added != null)
-                    Select(state, added, out _);
-                state.Persist();
-                Undo.CollapseUndoOperations(group);
-                return true;
-            }
-            catch (Exception exception)
-            {
-                Undo.RevertAllDownToGroup(group);
-                selected.Restore(state);
-                GameObject target = state.Target.Resolve();
-                if (target != null)
-                    ObjectAuthoringSave.Save(target);
-                warning = "The object could not be saved: " + exception.Message;
-                return false;
-            }
-        }
-
-        /// <summary>Abandons the selected prefab's proposals while keeping drafts for other prefabs.</summary>
-        /// <param name="state">Workspace whose current prefab is being reset.</param>
-        /// <param name="includeScene">Whether pending Scene Setup should be discarded too.</param>
-        internal static void Discard(ObjectWorkspace state, bool includeScene = true)
-        {
-            Undo.RecordObject(state, "Discard object configuration");
-            state.SavedDrafts.RemoveAll(draft => draft.Target.PrefabGuid == state.Target.PrefabGuid);
-            state.Structure.RemoveAll(change => change.Target.PrefabGuid == state.Target.PrefabGuid);
-            ObjectWorkspaceSession.Discard(state, includeScene);
         }
 
         #endregion

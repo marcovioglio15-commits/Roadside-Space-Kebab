@@ -4,6 +4,9 @@ using CatOnASkateboard.PlayerStudio;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
+    /// <summary>Chooses timed suspension or continuous floating within an area.</summary>
+    public enum GravityMode { Pulse, ContinuousFloating }
+
     /// <summary>Chooses how an active pulse restores its affected bodies.</summary>
     public enum GravityRestoreMode { Timer, Interaction, TimerOrInteraction }
 
@@ -12,6 +15,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     public sealed class GravitySettings
     {
         #region Fields
+
+        [Header("Gravity")]
+        [Tooltip("Run timed pulses or keep matching objects floating inside the area.")]
+        public GravityMode Mode;
 
         [Header("Pulse")]
         [Tooltip("Suspend matching dynamic Rigidbody objects during each pulse.")]
@@ -34,6 +41,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Duration = 5f;
         [Tooltip("Reach, aim and obstruction checks for the restoration Button.")]
         public TransferTargetSettings Target = new TransferTargetSettings();
+        [Header("Continuous Floating")]
+        [Tooltip("Optional perpetual motion for matching bodies inside a gravity area.")]
+        public GravityFloatSettings Float = new GravityFloatSettings();
+
         [Header("Physical Force")]
         [Tooltip("Apply an impulse or sustained acceleration while gravity is suspended.")]
         public bool Push = true;
@@ -70,6 +81,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public PlayerFloatSettings Player = new PlayerFloatSettings();
 
         #endregion
+        #region Properties
+
+        /// <summary>Whether the generator stays active inside its area instead of running pulses.</summary>
+        public bool Continuous => Mode == GravityMode.ContinuousFloating;
+
+        /// <summary>Whether the selected pulse can be restored using a player request.</summary>
+        public bool UsesRestoreInput => !Continuous && Restore != GravityRestoreMode.Timer;
+
+        #endregion
         #region Methods
         #region Validation
 
@@ -78,8 +98,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the reusable generator configuration is complete.</returns>
         public bool TryValidate(out string warning)
         {
-            warning = "Configure gravity selection.";
-            if (Area == null || !Area.TryValidate(out warning))
+            warning = "Choose Pulse or Continuous Floating and configure gravity selection.";
+            if (Mode is not (GravityMode.Pulse or GravityMode.ContinuousFloating) || Area == null || !Area.TryValidate(out warning))
                 return false;
             if ((AffectObjects || AffectPlayer && FilterPlayer) && (Filter == null || !Filter.TryValidate(out warning)))
                 return false;
@@ -89,6 +109,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = "Configure player suspension.";
             if (Player == null || !Player.ValidatePush(out warning) || AffectPlayer && !Player.TryValidate(out warning))
                 return false;
+            // Continuous motion uses the area's entry queries and does not schedule pulse restoration.
+            if (Continuous)
+            {
+                warning = "Continuous floating needs affected objects and an enabled area with a positive query interval.";
+                return AffectObjects && Area.Enabled && InteractionValues.Positive(Area.QueryInterval)
+                    && Float != null && Float.TryValidate(out warning);
+            }
             warning = "Choose a positive interval, supported restoration mode and positive enabled timer duration.";
             if ((RandomInterval ? !Range(IntervalRange, true) : !InteractionValues.Positive(Interval))
                 || Restore is not (GravityRestoreMode.Timer or GravityRestoreMode.Interaction or GravityRestoreMode.TimerOrInteraction)
@@ -135,7 +162,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal Vector3 SampleForce(Transform owner, out float duration)
         {
             duration = 0f;
-            if (!Push)
+            if (!Push || Continuous)
                 return Vector3.zero;
             Vector3 direction = RandomDirection ? new Vector3(
                 UnityEngine.Random.Range(DirectionMinimum.x, DirectionMaximum.x),

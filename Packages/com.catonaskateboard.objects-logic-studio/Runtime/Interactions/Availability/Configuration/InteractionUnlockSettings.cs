@@ -63,6 +63,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool InitiallyLocked = true;
         [Tooltip("Clear condition progress after each successful operation so later events can apply this rule again.")]
         public bool Repeat;
+        [Tooltip("For Lock, release and rearm this rule when the Scoop Only dispenser that started it runs out. Use OR with Scoop Only Started conditions.")]
+        public bool ReleaseOnEmptyScoop;
         [Tooltip("Existing interaction to unlock, lock, or replace. Disabling this rule removes only the locks it owns.")]
         public ObjectInteraction Target;
         [Tooltip("Existing incoming interaction of the same type. This rule locks it initially and releases it when replacing the target.")]
@@ -95,6 +97,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Select a different existing interaction of the same type in this prefab as the replacement.";
             else if (Conditions == null || Conditions.Length == 0)
                 warning = "Add at least one availability condition.";
+            else if (ReleaseOnEmptyScoop && (Operation != InteractionAvailabilityChange.Lock
+                || RequireAll && Conditions.Length > 1 || Array.Exists(Conditions, condition => condition is not
+                    { Trigger: UnlockTrigger.Interaction, Moment: InteractionMoment.Started, Source: ObjectDispenser { Settings: { ScoopOnly: true } } })))
+                warning = "Release On Empty Scoop requires Lock with OR conditions from Scoop Only Started events.";
             else
                 foreach (InteractionUnlockCondition condition in Conditions)
                 {

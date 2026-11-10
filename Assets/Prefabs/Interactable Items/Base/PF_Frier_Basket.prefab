@@ -18,6 +18,10 @@ GameObject:
   - component: {fileID: 782348595122866101}
   - component: {fileID: 782348595122866102}
   - component: {fileID: 782348595122866103}
+  - component: {fileID: 7726128058076309210}
+  - component: {fileID: 7726128058076309211}
+  - component: {fileID: 7726128058076309212}
+  - component: {fileID: 7726128058076309213}
   m_Layer: 0
   m_Name: PF_Frier_Basket
   m_TagString: Untagged
@@ -226,6 +230,10 @@ MonoBehaviour:
     UseContainer: 0
     Prefab: {fileID: 3003482873436781798, guid: 41cb897d69e4ec29524fca6075973c2e, type: 3}
     ScoopDisplay:
+      ScoopLimit: 32
+      RestockForNewContainer: 1
+      RestockPrefab: {fileID: 8012813332604229035, guid: 87e4fe0292d459c45935d1f543f29cdc, type: 3}
+      RestockScale: 0.17
       VisibleCount: 9
       Magnets:
       - {x: -0.26, y: 0.304, z: 0.115}
@@ -306,6 +314,10 @@ MonoBehaviour:
     UseContainer: 0
     Prefab: {fileID: 7576674769820030107, guid: da1b7bc7b4ce7196a9667b388f0f253c, type: 3}
     ScoopDisplay:
+      ScoopLimit: 32
+      RestockForNewContainer: 1
+      RestockPrefab: {fileID: 8331006917502743928, guid: b686d2134be718c49817c4ebdac86ca8, type: 3}
+      RestockScale: 0.17
       VisibleCount: 9
       Magnets:
       - {x: -0.26, y: 0.304, z: 0.115}
@@ -386,6 +398,10 @@ MonoBehaviour:
     UseContainer: 0
     Prefab: {fileID: 2578056937270180844, guid: 2e346e4f55b1dde43ce0a7274433952b, type: 3}
     ScoopDisplay:
+      ScoopLimit: 32
+      RestockForNewContainer: 1
+      RestockPrefab: {fileID: 6484676068278646964, guid: a7f8a1a708ab7fc4db668aa796f19a34, type: 3}
+      RestockScale: 0.17
       VisibleCount: 9
       Magnets:
       - {x: -0.26, y: 0.304, z: 0.115}
@@ -466,6 +482,10 @@ MonoBehaviour:
     UseContainer: 0
     Prefab: {fileID: 4872291968861290408, guid: 165fadd03675918042b41667cca4bf37, type: 3}
     ScoopDisplay:
+      ScoopLimit: 32
+      RestockForNewContainer: 1
+      RestockPrefab: {fileID: 8679780426785485698, guid: 6c0036d8a7f781f40b4934a8f18a8995, type: 3}
+      RestockScale: 0.17
       VisibleCount: 9
       Magnets:
       - {x: -0.26, y: 0.304, z: 0.115}
@@ -498,6 +518,310 @@ MonoBehaviour:
     OutputRotation: {x: 0, y: 0, z: 0}
     StepCounter: 0
     FillSteps: []
+--- !u!114 &7726128058076309210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 994c55d568d64030bf050b32ec59ecf9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
+  interactionName: Lock Scoop Crab Claw
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Operation: 1
+    InitiallyLocked: 0
+    Repeat: 0
+    ReleaseOnEmptyScoop: 1
+    Target: {fileID: 782348595122866100}
+    Replacement: {fileID: 0}
+    RequireAll: 0
+    Conditions:
+    - Trigger: 0
+      Source: {fileID: 782348595122866101}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Trigger: 0
+      Source: {fileID: 782348595122866102}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Trigger: 0
+      Source: {fileID: 782348595122866103}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+--- !u!114 &7726128058076309211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 994c55d568d64030bf050b32ec59ecf9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
+  interactionName: Lock Scoop Falafel Balls
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Operation: 1
+    InitiallyLocked: 0
+    Repeat: 0
+    ReleaseOnEmptyScoop: 1
+    Target: {fileID: 782348595122866101}
+    Replacement: {fileID: 0}
+    RequireAll: 0
+    Conditions:
+    - Trigger: 0
+      Source: {fileID: 782348595122866100}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Trigger: 0
+      Source: {fileID: 782348595122866102}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Trigger: 0
+      Source: {fileID: 782348595122866103}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+--- !u!114 &7726128058076309212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 994c55d568d64030bf050b32ec59ecf9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
+  interactionName: Lock Scoop French Fries
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Operation: 1
+    InitiallyLocked: 0
+    Repeat: 0
+    ReleaseOnEmptyScoop: 1
+    Target: {fileID: 782348595122866102}
+    Replacement: {fileID: 0}
+    RequireAll: 0
+    Conditions:
+    - Trigger: 0
+      Source: {fileID: 782348595122866100}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Trigger: 0
+      Source: {fileID: 782348595122866101}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Trigger: 0
+      Source: {fileID: 782348595122866103}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+--- !u!114 &7726128058076309213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203704695898630952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 994c55d568d64030bf050b32ec59ecf9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
+  interactionName: Lock Scoop Nuggets
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Operation: 1
+    InitiallyLocked: 0
+    Repeat: 0
+    ReleaseOnEmptyScoop: 1
+    Target: {fileID: 782348595122866103}
+    Replacement: {fileID: 0}
+    RequireAll: 0
+    Conditions:
+    - Trigger: 0
+      Source: {fileID: 782348595122866100}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Trigger: 0
+      Source: {fileID: 782348595122866101}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+    - Trigger: 0
+      Source: {fileID: 782348595122866102}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
 --- !u!1001 &6958182981859541995
 PrefabInstance:
   m_ObjectHideFlags: 0

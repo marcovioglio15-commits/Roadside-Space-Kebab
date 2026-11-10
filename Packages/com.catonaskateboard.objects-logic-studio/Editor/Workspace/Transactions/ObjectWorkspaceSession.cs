@@ -1,10 +1,11 @@
 using System;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Owns source selection, detached proposals, conflict checks and the common Apply/Discard transaction.</summary>
+    /// <summary>Reads and commits validated object interaction snapshots.</summary>
     internal static class ObjectWorkspaceSession
     {
         #region Methods
@@ -61,11 +62,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Reloads current applied sources and abandons only the workspace's proposals.</summary>
         /// <param name="state">Workspace whose source objects remain untouched.</param>
-        /// <param name="includeScene">Whether the common Discard also drops pending Scene Setup changes.</param>
-        internal static void Discard(ObjectWorkspace state, bool includeScene = true)
+        /// <param name="includeScene">Whether to also drop pending Scene Setup changes.</param>
+        /// <param name="recordUndo">Whether a retained workspace is being reset by the user.</param>
+        internal static void Discard(ObjectWorkspace state, bool includeScene = true, bool recordUndo = true)
         {
             // A missing target retains its identity so reopening its prefab can recover navigation.
-            Undo.RecordObject(state, "Discard object interaction draft");
+            if (recordUndo)
+                Undo.RecordObject(state, "Discard object interaction draft");
             ObjectHover hover = Resolve(state);
             state.Binding = HoverBindingDraft.Capture(hover);
             state.OriginalBinding = ObjectWorkspace.Copy(state.Binding);
@@ -91,11 +94,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>True when the complete transaction may be applied.</returns>
         internal static bool TryValidate(ObjectWorkspace state, out string warning)
         {
-            // Observer-only setup does not require a hover preset selection.
+            // Validate the detached object snapshot before making any prefab changes.
             warning = string.Empty;
-            if (state.PrefabChanged && !state.Target.IsOpen)
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
             {
-                warning = "Open the selected prefab before applying its retained changes.";
+                warning = "Exit Play Mode before applying object settings.";
                 return false;
             }
             if ((state.Single.HasChanges || state.Extended.HasChanges || state.HasBinding && state.InteractionChanged)
@@ -106,7 +109,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (!state.Extended.TryValidate(state.Target.Resolve(), out warning))
                 return false;
             if (!state.InteractionChanged)
-                return state.Observer.TryValidate(out warning);
+                return true;
             if (!state.HasBinding)
             {
                 warning = "Select a Hover interaction before Apply, or use Update or Export to save the preset.";
@@ -118,7 +121,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             ObjectHover hover = Resolve(state);
             if (state.HasBinding && hover != null && (!state.Binding.ToolRequirement.TryValidate(out warning) || !state.Binding.FlagChange.TryValidate(hover.gameObject, out warning)
-                || state.Binding.Enabled && !state.Binding.VisualEffect.TryValidate(false, out warning)))
+                || state.Binding.Enabled && (!state.Binding.VisualEffect.TryValidate(false, out warning)
+                    || !HoverInteractionText.TryValidate(state.Binding.InteractionText, hover.gameObject, out warning))))
                 return false;
             if (state.HasBinding)
             {
@@ -136,14 +140,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 else if (EditorUtility.IsPersistent(hover) && !AssetDatabase.IsOpenForEdit(hover))
                     warning = "The selected prefab is not writable.";
             }
-            return warning.Length == 0 && state.Observer.TryValidate(out warning);
+            return warning.Length == 0;
         }
 
         #endregion
 
         #region Confirmation
 
-        /// <summary>Commits validated preset, binding and observer changes in one Undo group.</summary>
+        /// <summary>Commits a validated interaction in one Undo group.</summary>
         /// <param name="state">Workspace whose proposal should become applied data.</param>
         /// <param name="warning">Receives a validation or save failure.</param>
         /// <returns>True when every pending domain was applied successfully.</returns>
@@ -152,10 +156,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Nothing is written until all references and baselines have passed validation.
             if (!TryValidate(state, out warning))
                 return false;
+            bool prepareSpawn = state.Extended.HasChanges && state.Extended.Kind == ExtendedInteractionKind.SpawnManagement
+                && state.Extended.Draft.Enabled;
+            // A source stage outside this transaction cannot receive completion bindings that would remain unsaved.
+            if (prepareSpawn && !state.Target.IsOpen && state.Extended.Draft.SpawnManagement.SourcePrefab is GameObject source
+                && PrefabStageUtility.GetCurrentPrefabStage() is PrefabStage stage && stage.assetPath == AssetDatabase.GetAssetPath(source))
+            {
+                warning = "Open the spawn manager's prefab before applying changes to its source bindings.";
+                return false;
+            }
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
             Undo.SetCurrentGroupName("Apply object interaction");
-            Undo.RecordObject(state, "Apply object interaction");
             GameObject target = state.Target.Resolve();
             SpawnSourceAuthoring spawnSources = new SpawnSourceAuthoring();
             bool savePrefab = state.Single.HasChanges || state.Extended.HasChanges || state.HasBinding && state.InteractionChanged;
@@ -168,14 +180,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
                 state.Single.Apply(target);
                 state.Extended.Apply(target);
-                if (state.Extended.HasChanges && state.Extended.Resolve(target) is ObjectSpawnManager manager && state.Extended.Draft.Enabled)
+                if (prepareSpawn && state.Extended.Resolve(target) is ObjectSpawnManager manager)
                     spawnSources.Prepare(manager.Settings);
                 if (savePrefab)
                     ObjectAuthoringSave.Save(target);
-                state.Observer.Apply();
                 spawnSources.Save();
                 Undo.FlushUndoRecordObjects();
-                Discard(state);
+                Discard(state, includeScene: false, recordUndo: false);
                 Undo.CollapseUndoOperations(group);
                 return true;
             }
@@ -211,6 +222,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("m_Enabled").boolValue = state.Binding.Enabled;
                 data.FindProperty("drawGizmos").boolValue = state.Binding.DrawGizmos;
                 data.FindProperty("anchor").objectReferenceValue = HoverHierarchy.Resolve(hover.transform, state.Binding.AnchorPath);
+                SerializedProperty labels = data.FindProperty("interactionText");
+                labels.arraySize = state.Binding.InteractionText.Length;
+                for (int index = 0; index < labels.arraySize; index++)
+                    labels.GetArrayElementAtIndex(index).boxedValue = state.Binding.InteractionText[index];
                 if (recordUndo)
                     data.ApplyModifiedProperties();
                 else

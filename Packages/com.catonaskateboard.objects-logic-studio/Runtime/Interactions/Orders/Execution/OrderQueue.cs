@@ -16,6 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal OrderBoard Board;
         internal int Slot = -1;
         internal bool Completed;
+        internal bool Incorrect;
 
         #endregion
         #region Methods

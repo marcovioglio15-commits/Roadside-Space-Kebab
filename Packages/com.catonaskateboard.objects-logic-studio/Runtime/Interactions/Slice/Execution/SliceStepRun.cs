@@ -58,7 +58,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             appearance?.Commit();
             bool held = owner.TryGetComponent(out ObjectGrab carried) && carried.IsHeld;
             SliceCarryGroup group = step.Consume && step.KeepOutputsHeld && held
-                ? SliceCarryGroup.Create(carried, step.Spawns.Length) : null;
+                ? SliceCarryGroup.Create(carried, step.Spawns.Length, step.ThrowAsShuriken) : null;
             PlayerToolImpactForceSettings force = group == null && step.Spawns.Length > 0 && InteractionProjectileInput.Active
                 && InteractionProjectileInput.Allows(owner) ? InteractionProjectileInput.Tool?.Weapon?.SimulatedImpactForce : null;
             bool shatter = force is { Enabled: true, SliceShattering: true } && (!held || !force.IgnoreCarriedObjects);

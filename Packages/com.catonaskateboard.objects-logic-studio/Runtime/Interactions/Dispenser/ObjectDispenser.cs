@@ -29,6 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool scoopStored;
         private bool destructionPending;
         private ScoopDisplay display;
+        internal event System.Action<ObjectDispenser> ScoopEmptied;
 
         #endregion
 
@@ -39,8 +40,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Whether the configuration supports separate output for a specific tool with a distinct action.</summary>
         public bool HasSeparateToolOutput => settings.SeparateToolOutput && ToolRequirement != null
             && DispenserSettings.CanSeparateToolOutput(settings.Mode, ToolRequirement.Mode, ToolRequirement.Tool);
-        /// <summary>Successful withdrawals from finite prefab stock during this instance's lifetime.</summary>
-        public int DispensedCount => settings.ScoopOnly ? display?.ScoopedCount ?? 0 : dispensed;
+        /// <summary>Prefab withdrawals, or logical scoops and other original departures in Scoop Only.</summary>
+        public int DispensedCount => settings.ScoopOnly ? display?.WithdrawnCount ?? 0 : dispensed;
         /// <summary>Counter supplied to the authored appearance thresholds.</summary>
         internal int StepCount => settings.StepCounter == DispenseStepCounter.Remaining ? RemainingCount
             : settings.StoredSupply || settings.Unlimited ? withdrawals : Mathf.Max(0, settings.Stock - RemainingCount);
@@ -60,6 +61,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal Collider[] AimColliders => display?.Targets() ?? Colliders;
         /// <summary>Floating shapes excluded from their source's visibility checks.</summary>
         internal ISet<Collider> FloatingColliders => display?.SupplyColliders;
+        /// <summary>Whether an idle, empty Scoop Only card may yield to a new recipe.</summary>
+        internal bool CanYieldSupply => settings.ScoopOnly && !transferring && RemainingCount == 0;
+        /// <summary>Whether contact may reload this empty card with its initial portion prefab.</summary>
+        internal bool CanReloadScoopSupply => isActiveAndEnabled && !IsLocked && display != null
+            && settings.ScoopDisplay.RestockForNewContainer && CanYieldSupply;
 
         #endregion
 
@@ -121,6 +127,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning(warning, this);
         }
 
+        /// <summary>Begins a new pack cycle while retaining the display that accepts previously withdrawn originals.</summary>
+        internal void ReloadScoopSupply()
+        {
+            // A deposited pack uses initial stock. Scoop-triggered restock can still use its own prefab.
+            display.Restock(initialSupply: true);
+        }
+
         /// <summary>Stops floating supply without touching already withdrawn originals.</summary>
         protected override void OnDisable()
         {
@@ -128,7 +141,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             display?.Stop();
             display = null;
+            NotifyScoopEmpty();
             base.OnDisable();
+        }
+
+        /// <summary>Releases availability rules when the last portion and its active transfer are gone.</summary>
+        internal void NotifyScoopEmpty()
+        {
+            if (CanYieldSupply)
+                ScoopEmptied?.Invoke(this);
         }
 
         /// <summary>Adds temporary collision exclusions for portions along the scoop path.</summary>
@@ -226,9 +247,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanTake()
         {
             // Empty linked storage remains unavailable until a deposit succeeds.
-            return !transferring && Available(InteractionChannels.Transfer) && !Item.IsReserved
-                && (settings.ScoopOnly ? display is { Count: > 0 } : UsesStored && Container != null && Container.HasStoredItem()
+            return CanWithdraw() && (settings.ScoopOnly ? display is { Count: > 0 } : UsesStored && Container != null && Container.HasStoredItem()
                     || !settings.StoredSupply && (settings.Unlimited || dispensed < settings.Stock));
+        }
+
+        /// <summary>Checks the common transfer gate before using stock or restocking.</summary>
+        /// <returns>True when this dispenser can reserve the transfer channel.</returns>
+        private bool CanWithdraw()
+        {
+            return !transferring && Available(InteractionChannels.Transfer) && !Item.IsReserved;
         }
 
         /// <summary>Checks unoccupied spaces without treating a previously returned object as a second free slot.</summary>
@@ -351,7 +378,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Live portions can change identity without leaving their magnets.
             if (settings.ScoopOnly)
-                return display?.Find(receiver, false) != null;
+                return display != null && (display.Find(receiver, false) != null || display.CanRestock(receiver));
             // Exhausted supply must not turn the same press into a Drop.
             ObjectItem stored = UsesStored && Container != null ? Container.PeekStored() : null;
             CatOnASkateboard.StudioIdentity.ObjectIdentity identity = stored != null ? stored.Identity
@@ -366,8 +393,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool TryReserveScoop(ObjectContainer receiver, out ObjectItem output)
         {
             output = null;
-            if (!CanTake() || !Item.Acquire(receiver, InteractionChannels.Transfer))
+            // Empty supply may restock only for a fresh compatible box that won targeting.
+            bool restock = settings.ScoopOnly && display != null && display.CanRestock(receiver);
+            if (!(restock ? CanWithdraw() : CanTake())
+                || !Item.Acquire(receiver, InteractionChannels.Transfer))
                 return false;
+            if (restock)
+                display.Restock();
             output = settings.ScoopOnly ? display?.Find(receiver, true) : UsesStored && Container != null ? Container.PeekStored() : null;
             if (settings.ScoopOnly && output == null || output != null && !output.Acquire(receiver, settings.ScoopOnly ? InteractionChannels.Grab : InteractionChannels.None))
             {
@@ -381,26 +413,43 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return true;
         }
 
-        /// <summary>Commits reserved supply exactly once.</summary>
+        /// <summary>Commits a batch under the original scoop reservation.</summary>
         /// <param name="receiver">Current reservation owner.</param>
         /// <param name="output">Stored original captured at reservation, or null.</param>
-        /// <returns>True when stock and appearance were updated.</returns>
-        internal bool CommitScoop(ObjectContainer receiver, ObjectItem output)
+        /// <returns>Number of logical portions withdrawn.</returns>
+        internal int CommitScoop(ObjectContainer receiver, ObjectItem output)
         {
-            // Keep ordinary withdrawals blocked until movement releases the transaction.
-            if (scoopOwner != receiver || !isActiveAndEnabled || IsLocked || !Item.IsOwnedBy(receiver))
-                return false;
+            // Keep the source reserved even if the fill keyframe withdraws several portions.
+            if (scoopOwner != receiver || !isActiveAndEnabled || IsLocked || !Item.IsOwnedBy(receiver)
+                || output != scoopOutput || scoopStored && (output == null || !output.IsOwnedBy(receiver)))
+                return 0;
+            int limit = receiver.ScoopSpace;
             if (settings.ScoopOnly)
-                return output != null && output == scoopOutput && output.IsOwnedBy(receiver) && display != null && display.Take(output);
-            if (scoopStored)
+                return display?.Take(output, receiver, Mathf.Min(limit, settings.ScoopDisplay.ScoopLimit)) ?? 0;
+
+            // Stored outputs keep their stack order. Stop at an incompatible original.
+            int taken = 0;
+            while (taken < limit && this != null && isActiveAndEnabled && !IsLocked)
             {
-                if (output == null || output != scoopOutput || Container == null || !Container.ConsumeStored(output))
-                    return false;
+                ObjectItem next = taken == 0 ? output : UsesStored ? Container?.PeekStored() : null;
+                if (next != null)
+                {
+                    if (Container == null || !next.Identity.Matches(receiver.Settings.AllowedFlags, receiver.Settings.Match)
+                        || taken > 0 && next.IsReserved || !Container.ConsumeStored(next))
+                        break;
+                }
+                else
+                {
+                    if (settings.StoredSupply || !settings.Unlimited && dispensed >= settings.Stock || !MatchesScoop(receiver))
+                        break;
+                    dispensed++;
+                }
+                receiver.RecordScoopPortion(next != null ? next.gameObject : settings.Prefab);
+                taken++;
             }
-            else
-                dispensed++;
-            CompleteWithdrawal();
-            return true;
+            if (taken > 0)
+                CompleteWithdrawal(taken);
+            return taken;
         }
 
         /// <summary>Releases this scoop's source and original reservations.</summary>
@@ -416,19 +465,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             scoopStored = false;
             scoopOwner = null;
             transferring = false;
-            if (display is { Exhausted: true })
-            {
-                InteractionRuntimeState.Remember(this);
-                enabled = false;
-            }
+            NotifyScoopEmpty();
             DestroyIfExhausted();
         }
 
         /// <summary>Updates appearance and queues optional destruction only after a successful withdrawal.</summary>
-        private void CompleteWithdrawal()
+        /// <param name="amount">Number of portions taken by this action.</param>
+        private void CompleteWithdrawal(int amount = 1)
         {
             // Supply and fill steps change before completion listeners inspect the dispenser.
-            withdrawals++;
+            withdrawals += amount;
             RefreshFill();
             destructionPending = settings.DestroyWhenEmpty && !settings.Unlimited && RemainingCount == 0;
         }

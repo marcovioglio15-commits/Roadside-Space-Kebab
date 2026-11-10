@@ -129,6 +129,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             string settings = Kind switch
             {
                 ExtendedInteractionKind.ObjectDegradation => JsonUtility.ToJson(Draft.ObjectDegradation),
+                ExtendedInteractionKind.Knockback => JsonUtility.ToJson(Draft.Knockback),
                 ExtendedInteractionKind.GravityGenerator => JsonUtility.ToJson(Draft.GravityGenerator),
                 ExtendedInteractionKind.ElasticDeformation => JsonUtility.ToJson(Draft.ElasticDeformation),
                 ExtendedInteractionKind.DirtTrail => JsonUtility.ToJson(Draft.DirtTrail),

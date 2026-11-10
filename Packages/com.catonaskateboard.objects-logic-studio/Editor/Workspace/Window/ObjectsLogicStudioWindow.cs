@@ -205,6 +205,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             if (state == null || openingPrefab)
                 return;
+            RefreshPending();
             currentObject = ObjectWorkspaceContext.Target(state);
             interactions = ObjectWorkspaceContext.Interactions(state, currentObject, out catalogOwner);
             UnlockInteractionControls.Refresh(state.Target.Resolve());
@@ -290,7 +291,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     using (new StudioIndentScope())
                         state.Observer.Draw(state);
             }
-            DrawFooter(locked);
+            DrawFooter();
         }
 
         /// <summary>Refreshes all column indexes once after their context changes.</summary>
@@ -445,7 +446,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     state.Persist();
                 }
                 using (new EditorGUI.DisabledScope(!CanEdit))
-                    if (GUILayout.Button(new GUIContent("Remove", "Remove this interaction after Apply."), EditorStyles.miniButton, GUILayout.Width(60f)))
+                    if (GUILayout.Button(new GUIContent("Remove", "Stage removal for review."), EditorStyles.miniButton, GUILayout.Width(60f)))
                         ObjectStructureChanges.Remove(state, feature);
             }
             if ((state.Navigation.Views & ObjectStudioNavigation.Panels.SettingsTree) != 0)
@@ -497,7 +498,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (change.Target.PrefabGuid != state.Target.PrefabGuid)
                     continue;
                 using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
-                EditorGUILayout.LabelField((change.Add ? "Add " : "Remove ") + ObjectInteractionCatalog.Find(ObjectStructureChanges.ResolveType(change.TypeName)).Name + " · after Apply", EditorStyles.miniLabel);
+                EditorGUILayout.LabelField((change.Add ? "Add " : "Remove ") + ObjectInteractionCatalog.Find(ObjectStructureChanges.ResolveType(change.TypeName)).Name + " · pending", EditorStyles.miniLabel);
                 if (GUILayout.Button(new GUIContent("Cancel", "Cancel this change."), EditorStyles.miniButton, GUILayout.Width(50f)))
                 {
                     state.Structure.RemoveAt(index);
@@ -528,31 +529,48 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             menu.ShowAsContext();
         }
 
-        /// <summary>Places equal-width Apply and Discard actions across the bottom of the workspace.</summary>
-        /// <param name="locked">Whether Play suspends editing.</param>
-        private void DrawFooter(bool locked)
+        /// <summary>Shows the status and opens the separate review for main-window proposals.</summary>
+        private void DrawFooter()
         {
             if (!string.IsNullOrEmpty(status))
                 EditorGUILayout.LabelField(status, EditorStyles.wordWrappedMiniLabel);
-            int count = ObjectWorkspaceDrafts.Count(state) + ObjectStructureChanges.Count(state);
-            EditorGUILayout.LabelField(count > 0 ? count + " pending changes" : "Up to date", EditorStyles.miniLabel);
-            using StudioButton.RowScope row = new StudioButton.RowScope();
-            using (new EditorGUI.DisabledScope(locked || count == 0 && !state.Observer.HasChanges))
+            RefreshPending();
+            if (hasUnsavedChanges)
             {
-                if (StudioButton.Draw(new GUIContent("Apply", "Save pending changes."), expandWidth: true, minimumHeight: 26f))
-                {
-                    RestoreEditing();
-                    if (ObjectWorkspaceDrafts.Apply(state, out status))
-                        status = "Object saved. Save the scene if Scene Setup changed.";
-                    Refresh();
-                }
-                if (StudioButton.Draw(new GUIContent("Discard", "Drop pending changes."), expandWidth: true, minimumHeight: 26f))
-                {
-                    ObjectWorkspaceDrafts.Discard(state);
-                    status = string.Empty;
-                    Refresh();
-                }
+                if (GUILayout.Button(new GUIContent("Review Pending Changes", "Review Scene Setup, structure and retained interaction drafts.")))
+                    ObjectPendingWindow.Open();
             }
+            else
+                EditorGUILayout.LabelField("Up to date", EditorStyles.miniLabel);
+        }
+
+        /// <summary>Tracks only proposals owned by this window, including drafts from earlier sessions.</summary>
+        private void RefreshPending()
+        {
+            hasUnsavedChanges = state != null && (state.HasChanges || state.Structure.Count > 0
+                || state.SavedDrafts.Exists(draft => draft.Changed && draft.Key != state.DraftKey));
+            saveChangesMessage = "Apply or discard the unsaved Object Logic Studio session changes.";
+        }
+
+        /// <summary>Resolves main-window proposals when the native close dialog requests Apply.</summary>
+        public override void SaveChanges()
+        {
+            if (!ObjectPendingChanges.ApplyAll(state, out status))
+            {
+                Refresh();
+                throw new System.InvalidOperationException(status);
+            }
+            base.SaveChanges();
+        }
+
+        /// <summary>Discards main-window proposals while leaving detached editors independent.</summary>
+        public override void DiscardChanges()
+        {
+            ObjectWorkspaceSession.Discard(state);
+            state.SavedDrafts.Clear();
+            state.Structure.Clear();
+            state.Persist();
+            base.DiscardChanges();
         }
 
         #endregion

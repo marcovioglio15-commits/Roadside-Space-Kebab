@@ -54,11 +54,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ItemAppearanceChanges[][] prepared = new ItemAppearanceChanges[2][];
             for (int group = 0; group < configuration.Length; group++)
             {
-                if (!InventoryFillStep.TryValidate(configuration[group], out warning))
+                if (!InventoryFillStep.TryValidate(configuration[group], out warning, group == 0 && container != null && container.Settings.SupportsItemFill))
                     return false;
                 prepared[group] = new ItemAppearanceChanges[configuration[group].Length];
                 for (int index = 0; index < prepared[group].Length; index++)
-                    if (!ItemAppearanceChanges.TryPrepare(item, configuration[group][index].Appearance, out prepared[group][index], out warning))
+                    if (configuration[group][index].Mode == InventoryFillMode.Appearance
+                        && !ItemAppearanceChanges.TryPrepare(item, configuration[group][index].Appearance, out prepared[group][index], out warning))
                         return false;
             }
             run = new InventoryFillRun(configuration, prepared, item, container, dispenser);
@@ -78,6 +79,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Returning across a threshold restores the baseline before applying the newly selected complete step.
             int container = Select(steps[0], stored);
             int dispenser = Select(steps[1], remaining);
+            if (owners[0] is ObjectContainer receiver)
+                receiver.RefreshItemFill(container);
             if (container == selected[0] && dispenser == selected[1])
                 return;
             using ObjectIdentityChangeScope scope = identity.GroupChanges();
@@ -87,7 +90,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int group = 0; group < selected.Length; group++)
                 if (selected[group] >= 0)
                 {
-                    changes[group][selected[group]].Commit();
+                    changes[group][selected[group]]?.Commit();
                     InventoryFlagSettings flags = steps[group][selected[group]].Flags;
                     if (flags.Mode != InventoryFlagMode.KeepBase)
                         identity.SetState(owners[group], flags.Mode == InventoryFlagMode.Replace, flags.Flags,
@@ -103,7 +106,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int group = selected.Length - 1; group >= 0; group--)
             {
                 if (selected[group] >= 0)
-                    changes[group][selected[group]].Restore();
+                    changes[group][selected[group]]?.Restore();
                 if (owners[group] != null)
                     identity.RemoveState(owners[group]);
                 selected[group] = -1;

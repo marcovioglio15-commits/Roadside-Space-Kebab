@@ -12,6 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private sealed class Lease
         {
             internal bool Gravity;
+            internal Object MotionOwner;
             internal readonly HashSet<Object> Owners = new HashSet<Object>();
         }
 
@@ -56,11 +57,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (ReferenceEquals(body, null) || !bodies.TryGetValue(body, out Lease lease))
                 return;
             lease.Owners.Remove(owner);
+            if (lease.MotionOwner == owner)
+                lease.MotionOwner = null;
             if (lease.Owners.Count > 0)
                 return;
             if (body != null)
                 body.useGravity = lease.Gravity;
             bodies.Remove(body);
+        }
+
+        /// <summary>Lets one active generator steer a body while other suspension leases retain gravity ownership.</summary>
+        /// <param name="body">Suspended body ready for continuous motion.</param>
+        /// <param name="owner">Generator requesting control of the float path.</param>
+        /// <returns>True when this generator is the body's continuous motion owner.</returns>
+        internal static bool OwnMotion(Rigidbody body, Object owner)
+        {
+            // The first ready controller wins until it releases or yields to another interaction.
+            if (!bodies.TryGetValue(body, out Lease lease) || lease.MotionOwner != null && lease.MotionOwner != owner)
+                return false;
+            lease.MotionOwner = owner;
+            return true;
+        }
+
+        /// <summary>Yields continuous steering without ending the suspension lease.</summary>
+        /// <param name="body">Body now controlled by carrying or another interaction.</param>
+        /// <param name="owner">Generator that may currently steer the body.</param>
+        internal static void YieldMotion(Rigidbody body, Object owner)
+        {
+            if (bodies.TryGetValue(body, out Lease lease) && lease.MotionOwner == owner)
+                lease.MotionOwner = null;
         }
 
         /// <summary>Reads the underlying policy before carrying temporarily disables physics.</summary>

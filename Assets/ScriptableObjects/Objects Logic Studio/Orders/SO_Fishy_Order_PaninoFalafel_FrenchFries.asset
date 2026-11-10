@@ -26,4 +26,5 @@ MonoBehaviour:
     Weight: 1
     Flags:
     - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
+    - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     RequireAllFlags: 0

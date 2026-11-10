@@ -21,7 +21,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Edits a detached workspace proposal or a preset inspector through the same controls.</summary>
         /// <param name="configuration">Configuration property owned by the caller.</param>
         /// <param name="sections">Retained dropdown visibility.</param>
-        internal static void Draw(SerializedProperty configuration, ObjectStudioSections sections)
+        /// <param name="labels">Optional object-specific label rules.</param>
+        internal static void Draw(SerializedProperty configuration, ObjectStudioSections sections, SerializedProperty labels = null)
         {
             // Closing a section changes only navigation; hidden values remain in the draft.
             SerializedProperty settings = configuration.FindPropertyRelative("settings");
@@ -69,13 +70,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (settings.FindPropertyRelative("popIn").boolValue)
                         Field(settings, "exitDuration");
                 }
-            DrawStyle(configuration.FindPropertyRelative("style"), sections);
+            DrawStyle(configuration.FindPropertyRelative("style"), sections, labels);
         }
 
         /// <summary>Shows typography, layout and only background options used by the selected style.</summary>
         /// <param name="style">Reusable appearance data.</param>
         /// <param name="sections">Retained dropdown visibility.</param>
-        private static void DrawStyle(SerializedProperty style, ObjectStudioSections sections)
+        /// <param name="labels">Optional object-specific label rules.</param>
+        private static void DrawStyle(SerializedProperty style, ObjectStudioSections sections, SerializedProperty labels)
         {
             // Appearance has one reusable source instead of independent native-graphic edits.
             if (sections.Draw("Text", "Edit the content, font and text rendering options.", style, "content", "font", "fontSize", "fontStyle", "textColor", "alignment", "richText", "horizontalOverflow", "verticalOverflow"))
@@ -84,9 +86,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     SerializedProperty content = style.FindPropertyRelative("content");
                     if (ObjectGroupScope.Allows(content))
                     {
+                        using ObjectFieldFocus.Marker marker = new ObjectFieldFocus.Marker(content);
                         EditorGUILayout.LabelField(new GUIContent("Content", content.tooltip));
                         content.stringValue = StudioGUI.TextArea(StudioFieldMenu.Value(content, content.stringValue), GUILayout.MinHeight(42f));
                     }
+                    if (labels != null)
+                        HoverInteractionTextControls.Draw(labels, sections);
                     Field(style, "font");
                     Field(style, "fontSize");
                     Field(style, "fontStyle");
@@ -96,6 +101,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     Field(style, "horizontalOverflow");
                     Field(style, "verticalOverflow");
                 }
+            else if (labels != null && ObjectGroupScope.Active)
+                HoverInteractionTextControls.Draw(labels, sections);
             if (sections.Draw("Layout", "Size and inset the preauthored label in reference pixels.", style, "size", "textSizeOffset", "textOffset"))
                 using (new StudioIndentScope())
                 {
