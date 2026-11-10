@@ -28,6 +28,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public DegradationSettings ObjectDegradation = new DegradationSettings();
         [Tooltip("Scene-body filtering, suspension, impulse and restoration settings.")]
         public GravitySettings GravityGenerator = new GravitySettings();
+        [Tooltip("Detached response to a player throw collision.")]
+        public KnockbackSettings Knockback = new KnockbackSettings();
         [Tooltip("Detached elastic deformation configuration.")]
         public ElasticSettings ElasticDeformation = new ElasticSettings();
         [Tooltip("Detached dirt trail configuration.")]
@@ -112,6 +114,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ObjectDegradation degradation:
                     draft.ObjectDegradation = ObjectWorkspace.Copy(degradation.Settings);
+                    break;
+                case ObjectKnockback knockback:
+                    draft.Knockback = ObjectWorkspace.Copy(knockback.Settings);
                     break;
                 case ObjectGravityGenerator gravity:
                     draft.GravityGenerator = ObjectWorkspace.Copy(gravity.Settings);
@@ -202,8 +207,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 ObjectContactModifier contact => contact.TryValidate(Contact, out warning)
                     && ObjectRequestedInteraction.ValidateInput(Contact.RequiresInput, StartAction, out warning),
                 ObjectDegradation degradation => degradation.TryValidate(ObjectDegradation, out warning),
+                ObjectKnockback knockback => knockback.TryValidate(Knockback, out warning),
                 ObjectGravityGenerator => GravityGenerator.TryValidate(out warning)
-                    && ObjectRequestedInteraction.ValidateInput(GravityGenerator.Restore != GravityRestoreMode.Timer, StartAction, out warning),
+                    && ObjectRequestedInteraction.ValidateInput(GravityGenerator.UsesRestoreInput, StartAction, out warning),
                 ObjectDialogue dialogue => dialogue.TryValidate(Dialogue, StartAction, AdvanceAction, out warning),
                 _ => false
             };

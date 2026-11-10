@@ -80,6 +80,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #endregion
 
+        #region Properties
+
+        /// <summary>Default text used when no local label rule matches.</summary>
+        internal string Content => content;
+
+        #endregion
+
         #region Methods
 
         #region Validation

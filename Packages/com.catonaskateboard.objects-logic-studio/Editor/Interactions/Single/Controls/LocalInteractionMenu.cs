@@ -16,7 +16,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="property">Detached source descriptor receiving a menu selection.</param>
         /// <param name="includeAnimations">Whether animation completions can also be selected.</param>
         /// <param name="includeSteps">Whether Dialogue entry checkpoints are accepted by this consumer.</param>
-        internal static void Draw(SerializedProperty property, bool includeAnimations = false, bool includeSteps = false)
+        /// <param name="excludeHover">Whether to omit hover cards from the source menu.</param>
+        internal static void Draw(SerializedProperty property, bool includeAnimations = false, bool includeSteps = false, bool excludeHover = false)
         {
             // Component inspectors use the component's own object, even when its ObjectItem belongs to a parent.
             GameObject owner = property.serializedObject.targetObject is Component component
@@ -33,7 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             rect = field.ValueRect(rect);
             using (new EditorGUI.DisabledScope(owner == null))
                 if (GUI.Button(rect, new GUIContent(label, property.tooltip), EditorStyles.popup))
-                    Show(property, owner, selected, rect, includeAnimations);
+                    Show(property, owner, selected, rect, includeAnimations, excludeHover);
             if (includeSteps)
                 DialogueStepControls.Draw(property.FindPropertyRelative("Step"), selected);
         }
@@ -44,7 +45,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="selected">Currently resolved source, if present.</param>
         /// <param name="rect">Popup anchor in the current editor window.</param>
         /// <param name="includeAnimations">Whether animation cards are valid sources for this selection.</param>
-        private static void Show(SerializedProperty property, GameObject owner, ObjectInteraction selected, Rect rect, bool includeAnimations)
+        /// <param name="excludeHover">Whether to omit hover cards from the source menu.</param>
+        private static void Show(SerializedProperty property, GameObject owner, ObjectInteraction selected, Rect rect, bool includeAnimations, bool excludeHover)
         {
             UnityEngine.Object target = property.serializedObject.targetObject;
             string path = property.propertyPath;
@@ -53,7 +55,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Bind a snapshot of the selected card; no source GameObject reference enters a preset.
             foreach (ObjectInteraction candidate in owner.GetComponents<ObjectInteraction>())
             {
-                if (candidate is ObjectTriggerAnimation && !includeAnimations || InteractionTemplateKinds.Of(candidate) is not InteractionTemplateKind kind)
+                if (candidate is ObjectTriggerAnimation && !includeAnimations || excludeHover && candidate is ObjectHover
+                    || InteractionTemplateKinds.Of(candidate) is not InteractionTemplateKind kind)
                     continue;
                 LocalInteractionReference reference = LocalInteractionReference.Capture(candidate);
                 string label = kind + "/" + candidate.InteractionName + " [" + (reference.Occurrence + 1) + "]";

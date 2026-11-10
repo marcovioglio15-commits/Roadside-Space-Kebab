@@ -18,7 +18,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // The shared field renderer keeps array resizing behind explicit add/remove commands.
             if (property.NextVisible(true))
                 while (property.NextVisible(false))
-                    StudioFieldGUI.PropertyField(property, true);
+                {
+                    bool matching = serializedObject.FindProperty("mode").enumValueIndex == (int)OrderBoardMode.MatchingOrders;
+                    bool objects = serializedObject.FindProperty("showSlotObjects").boolValue;
+                    bool tint = objects && serializedObject.FindProperty("tintByState").boolValue;
+                    if (property.name switch
+                        {
+                            "orderNames" => matching,
+                            "slotObjects" or "tintByState" => objects,
+                            "pendingTint" or "completedTint" or "incorrectTint" => tint,
+                            _ => true
+                        })
+                        StudioFieldGUI.PropertyField(property, true);
+                }
             serializedObject.ApplyModifiedProperties();
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
                 if (StudioButton.Draw(new UnityEngine.GUIContent("Prepare Order Paragraphs", "Prepare existing slots for variant paragraphs and optional custom typography before Play.")))

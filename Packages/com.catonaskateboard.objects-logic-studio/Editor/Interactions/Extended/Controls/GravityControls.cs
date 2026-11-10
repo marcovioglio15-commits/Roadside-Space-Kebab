@@ -16,9 +16,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="sections">Retained window foldout state.</param>
         internal static void Draw(SerializedProperty settings, ObjectStudioSections sections)
         {
+            SerializedProperty area = settings.FindPropertyRelative("Area");
+            SerializedProperty motion = settings.FindPropertyRelative("Float");
+            // The operating mode belongs to the same Gravity Generator configuration.
+            HoverControls.Field(settings, "Mode", "Gravity Mode");
+            bool continuous = settings.FindPropertyRelative("Mode").enumValueIndex == (int)GravityMode.ContinuousFloating;
             if (sections.Draw("Area of Effect", "Optional spatial selection shared by objects and the player.", settings, "Area"))
                 using (new StudioIndentScope())
-                    Area(settings.FindPropertyRelative("Area"));
+                    Area(area, continuous);
             HoverControls.Field(settings, "AffectObjects");
             HoverControls.Field(settings, "AffectPlayer");
             SerializedProperty player = settings.FindPropertyRelative("Player");
@@ -42,6 +47,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 && sections.Draw("Affected Objects", "Combine the enabled layer, identity and interaction groups.", settings, "Filter"))
                 using (new StudioIndentScope())
                     Filter(settings.FindPropertyRelative("Filter"));
+            if (continuous)
+            {
+                GravityFloatControls.Draw(motion);
+                return;
+            }
             RandomScalar(settings, "RandomInterval", "Interval", "IntervalRange");
             HoverControls.Field(settings, "Restore");
             GravityRestoreMode restore = (GravityRestoreMode)settings.FindPropertyRelative("Restore").enumValueIndex;
@@ -67,7 +77,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Shows dimensions and movement policies only for an enabled spatial restriction.</summary>
         /// <param name="area">Serialized sphere or oriented box configuration.</param>
-        private static void Area(SerializedProperty area)
+        /// <param name="continuous">Whether entry and exit tracking are required by continuous motion.</param>
+        private static void Area(SerializedProperty area, bool continuous)
         {
             using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(area, "Enabled");
@@ -82,10 +93,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(area, "Size");
                 HoverControls.Field(area, "Rotation");
             }
-            HoverControls.Field(area, "TrackEntries");
-            if (area.FindPropertyRelative("TrackEntries").boolValue)
+            if (!continuous)
+                HoverControls.Field(area, "TrackEntries");
+            if (continuous || area.FindPropertyRelative("TrackEntries").boolValue)
                 HoverControls.Field(area, "QueryInterval");
-            HoverControls.Field(area, "RestoreOutside");
+            if (!continuous)
+                HoverControls.Field(area, "RestoreOutside");
         }
 
         /// <summary>Shows only player controls that participate in the chosen suspension simulation.</summary>

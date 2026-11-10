@@ -91,6 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             owner.fill?.Restore();
             owner.fill = null;
             owner.fillChecked = false;
+            Container?.CheckItemFill();
             RefreshFill();
         }
 

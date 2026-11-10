@@ -242,6 +242,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (OrderTicket ticket in tickets)
                 complete &= ticket.Completed;
             UnexpectedConsumption = remaining > 0;
+            // A wrong delivery marks only orders still pending for this customer.
+            if (UnexpectedConsumption)
+                foreach (OrderTicket ticket in tickets)
+                    if (!ticket.Completed && !ticket.Incorrect)
+                    {
+                        ticket.Incorrect = true;
+                        ticket.Board?.Draw(ticket);
+                    }
             AllCompleted = tickets.Length > 0 && complete;
             // Stop immediately on a fulfilled set or a delivery that matched no open ticket.
             if (UnexpectedConsumption || changed && complete)

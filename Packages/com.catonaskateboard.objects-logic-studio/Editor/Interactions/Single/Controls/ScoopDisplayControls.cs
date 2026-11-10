@@ -25,6 +25,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(display, "VisibleCount");
             SerializedProperty drift = display.FindPropertyRelative("Drift");
             ObjectNumericControls.Vector(drift, 0f, 0.25f);
+            HoverControls.Field(display, "ScoopLimit");
+            HoverControls.Field(display, "RestockForNewContainer");
+            if (display.FindPropertyRelative("RestockForNewContainer").boolValue)
+            {
+                HoverControls.Field(display, "RestockPrefab");
+                if (display.FindPropertyRelative("RestockPrefab").objectReferenceValue != null)
+                    HoverControls.Field(display, "RestockScale");
+            }
             HoverControls.Field(display, "Speed");
             if (drift.vector3Value.y > 0f)
                 HoverControls.Field(display, "BobCrestPower");
@@ -34,7 +42,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 && StudioButton.Draw(new GUIContent("Magnet Layout", "Place floating portions against the dispenser mesh.")))
             {
                 settings.serializedObject.ApplyModifiedProperties();
-                OutletLayoutWindow.Open(workspace, true, true);
+                OutletLayoutWindow.Open(workspace, ObjectPointLayout.Magnets);
             }
 
             SerializedProperty magnets = display.FindPropertyRelative("Magnets");

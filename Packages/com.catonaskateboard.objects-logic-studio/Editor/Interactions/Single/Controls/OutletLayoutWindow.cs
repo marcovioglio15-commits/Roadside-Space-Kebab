@@ -30,21 +30,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private readonly AssemblyPreviewGeometry geometry = new AssemblyPreviewGeometry();
         private readonly StudioPreviewNavigation navigation = new StudioPreviewNavigation();
         private readonly AssemblyProductSettings geometrySettings = new AssemblyProductSettings();
-        private PreviewRenderUtility preview;
+        private ObjectLayoutViewport viewport;
+        private System.Action<PreviewRenderUtility, AssemblyProductSettings> drawMeshes;
+        private System.Action<AssemblyProductSettings> drawHandle;
         private SerializedObject data;
         private GameObject cached;
         private bool dirty = true;
+        private bool resolvePending = true;
+        private GameObject resolvedRoot;
         private string status = string.Empty;
         #endregion
         #region Methods
         #region Lifecycle
         /// <summary>Opens an independent layout transaction from the selected spray or dispenser card.</summary>
         /// <param name="workspace">Main tool containing the pending emitter settings.</param>
-        /// <param name="dispenser">Whether to edit multiple dispenser points instead of a single spray nozzle.</param>
-        /// <param name="magnets">Whether to place floating supply magnets.</param>
-        internal static void Open(ObjectWorkspace workspace, bool dispenser, bool magnets = false)
+        /// <param name="layout">Pose list to edit in the shared viewport.</param>
+        internal static void Open(ObjectWorkspace workspace, ObjectPointLayout layout)
         {
-            string title = magnets ? "Magnet Layout" : dispenser ? "Outlet Layout" : "Nozzle Layout";
+            string title = layout switch
+            {
+                ObjectPointLayout.OrbitCenters => "Orbit Center Layout",
+                ObjectPointLayout.Magnets => "Scoop Magnet Layout",
+                ObjectPointLayout.Outlets => "Outlet Layout",
+                _ => "Nozzle Layout"
+            };
             OutletLayoutWindow window = GetWindow<OutletLayoutWindow>(title);
             if (window.session.HasChanges)
             {
@@ -52,7 +61,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 window.Show();
                 return;
             }
-            window.session.Read(workspace, dispenser, magnets);
+            window.session.Read(workspace, layout);
+            window.hasUnsavedChanges = false;
+            window.resolvePending = true;
             window.mode = 0;
             window.selected = 0;
             window.titleContent = new GUIContent(title);
@@ -65,11 +76,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             minSize = new Vector2(500f, 400f);
             data = new SerializedObject(this);
-            preview = new PreviewRenderUtility();
-            preview.cameraFieldOfView = 35f;
-            preview.camera.clearFlags = CameraClearFlags.Color;
-            preview.camera.backgroundColor = new Color(0.12f, 0.13f, 0.15f);
-            preview.ambientColor = Color.gray;
+            viewport = new ObjectLayoutViewport();
+            drawMeshes = geometry.Draw;
+            drawHandle = DrawHandle;
+            wantsMouseMove = true;
+            hasUnsavedChanges = session.HasChanges;
             EditorApplication.projectChanged += Refresh;
             EditorApplication.hierarchyChanged += Refresh;
             Undo.undoRedoPerformed += Refresh;
@@ -86,12 +97,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorApplication.update -= Navigate;
             navigation.Release();
             data?.Dispose();
-            preview?.Cleanup();
+            viewport?.Dispose();
+            viewport = null;
         }
         /// <summary>Refreshes cached geometry only after source or Undo changes.</summary>
         private void Refresh()
         {
             session.Refresh();
+            resolvePending = true;
             hasUnsavedChanges = session.HasChanges;
             dirty = true;
             Repaint();
@@ -119,15 +132,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Draws transform handles, precise coordinates and a full-width footer.</summary>
         private void OnGUI()
         {
-            GameObject root = session.Target.Resolve();
+            // Resolve stable prefab identity only after source changes, not while orbiting or dragging a handle.
+            if (resolvePending)
+            {
+                resolvedRoot = session.Target.Resolve();
+                resolvePending = false;
+            }
+            GameObject root = resolvedRoot;
             if (root == null || EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
             RefreshGeometry(root);
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                if (!session.Magnets)
-                    StudioOutletHandles.Toolbar(ref mode);
+                ObjectLayoutViewport.DrawTools(ref mode, session.Rotatable);
                 GUILayout.FlexibleSpace();
+                ObjectLayoutViewport.DrawNavigationHint();
                 if (GUILayout.Button(new GUIContent("Frame", "Fit the object in the preview."), EditorStyles.toolbarButton, GUILayout.Width(60f)))
                     Frame();
             }
@@ -138,18 +157,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 selected = Mathf.Clamp(selected, 0, session.Draft.Points.Length - 1);
                 data.Update();
                 SerializedProperty point = data.FindProperty("session.Draft.Points").GetArrayElementAtIndex(selected);
-                ObjectNumericControls.Vector(point.FindPropertyRelative("Position"), -2f, 2f);
-                if (!session.Magnets)
+                float positionRange = session.Layout == ObjectPointLayout.OrbitCenters ? 20f : 2f;
+                ObjectNumericControls.Vector(point.FindPropertyRelative("Position"), -positionRange, positionRange);
+                if (session.Rotatable)
                     ObjectNumericControls.Vector(point.FindPropertyRelative("Rotation"), -360f, 360f);
-                data.ApplyModifiedProperties();
+                if (data.ApplyModifiedProperties())
+                    hasUnsavedChanges = session.HasChanges;
                 // Reserve the viewport after Unity has measured headers and wrapped vector controls.
-                Rect viewport = GUILayoutUtility.GetRect(1f, 100f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                DrawViewport(viewport);
+                Rect area = GUILayoutUtility.GetRect(1f, 100f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                DrawViewport(area);
             }
             else
-                EditorGUILayout.LabelField("Add an outlet to place it in the preview.", EditorStyles.miniLabel);
-            hasUnsavedChanges = session.HasChanges;
-            saveChangesMessage = "Apply or discard the pending outlet layout.";
+                EditorGUILayout.LabelField("Add a point to place it in the preview.", EditorStyles.miniLabel);
+            saveChangesMessage = "Apply or discard the pending point layout.";
             using EditorGUILayout.VerticalScope footer = new EditorGUILayout.VerticalScope(GUILayout.Height(52f));
             EditorGUILayout.LabelField(status.Length > 0 ? status : hasUnsavedChanges ? "Pending layout" : "Applied layout", EditorStyles.miniLabel);
             using (new StudioButton.RowScope())
@@ -165,93 +185,83 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="rect">Viewport in window coordinates.</param>
         private void DrawViewport(Rect rect)
         {
-            GUI.BeginGroup(rect);
-            Rect local = new Rect(0f, 0f, rect.width, rect.height);
-            if (navigation.Handle(local, ref orbit, ref pivot, ref distance, ref mode))
+            Rect area = viewport.ResolveRect(rect);
+            if (navigation.Handle(area, ref orbit, ref pivot, ref distance, ref mode))
                 Frame();
-            if (session.Magnets)
-                mode = 0;
-            Quaternion rotation = Quaternion.Euler(orbit.x, orbit.y, 0f);
-            preview.camera.transform.SetPositionAndRotation(pivot - rotation * Vector3.forward * distance, rotation);
-            preview.camera.nearClipPlane = Mathf.Max(0.001f, distance * 0.001f);
-            preview.camera.farClipPlane = Mathf.Max(100f, distance * 20f);
-            preview.camera.aspect = rect.width / rect.height;
-            preview.BeginPreview(local, GUIStyle.none);
-            Texture texture;
-            try
-            {
-                if (Event.current.type == EventType.Repaint)
-                {
-                    for (int index = 0; index < geometrySettings.Magnets.Length; index++)
-                        geometrySettings.Magnets[index].Position = session.Draft.Points[index].Position;
-                    geometry.Draw(preview, geometrySettings);
-                    preview.Render(true, false);
-                }
-                using (new Handles.DrawingScope(Matrix4x4.identity))
-                {
-                    Handles.SetCamera(preview.camera);
-                    DrawHandle();
-                }
-            }
-            finally
-            {
-                texture = preview.EndPreview();
-            }
-            if (Event.current.type == EventType.Repaint)
-                GUI.DrawTexture(local, texture, ScaleMode.StretchToFill, false);
-            GUI.EndGroup();
-            if (Event.current.type == EventType.Used)
+            if (mode is 1 or 2)
+                mode = session.Rotatable ? 1 : 0;
+            // Guide meshes track local moves without rebuilding their render entries.
+            for (int index = 0; index < geometrySettings.Magnets.Length; index++)
+                geometrySettings.Magnets[index].Position = session.Draft.Points[index].Position;
+            viewport.Draw(area, orbit, pivot, distance, geometrySettings, drawMeshes, drawHandle);
+            if (Event.current.type == EventType.Used || Event.current.type == EventType.MouseMove && area.Contains(Event.current.mousePosition))
                 Repaint();
         }
-        /// <summary>Updates only the detached nozzle with standard move and rotate handles.</summary>
-        private void DrawHandle()
+
+        /// <summary>Draws point markers and edits the selected pose with native handles.</summary>
+        /// <param name="layout">Preview geometry using the same point positions as the draft.</param>
+        private void DrawHandle(AssemblyProductSettings layout)
         {
-            DispenserOutlet nozzle = session.Draft.Points[selected];
-            if (!nozzle.IsValid)
+            DispenserOutlet point = session.Draft.Points[selected];
+            if (!point.IsValid)
                 return;
-            Quaternion rotation = Quaternion.Euler(nozzle.Rotation);
-            for (int index = 0; index < session.Draft.Points.Length; index++)
-                if (session.Draft.Points[index] is { IsValid: true } outlet)
-                    StudioOutletHandles.Marker(outlet.Position, Quaternion.Euler(outlet.Rotation), index == selected);
-            Vector3 point = nozzle.Position;
-            if (!StudioOutletHandles.Edit(ref point, ref rotation, mode, navigation.Active))
+            // An orbit marker points along local Y; emitter markers point along local Z.
+            if (Event.current.type == EventType.Repaint)
+                for (int index = 0; index < layout.Magnets.Length; index++)
+                    if (session.Draft.Points[index] is { IsValid: true } marker)
+                    {
+                        Quaternion orientation = Quaternion.Euler(marker.Rotation);
+                        if (session.Layout == ObjectPointLayout.OrbitCenters)
+                            GravityOrbitGizmos.Draw(marker.Position, orientation, index == selected);
+                        else
+                            StudioOutletHandles.Marker(marker.Position, orientation, index == selected);
+                    }
+
+            Vector3 position = point.Position;
+            Quaternion rotation = Quaternion.Euler(point.Rotation);
+            if (!StudioOutletHandles.Edit(ref position, ref rotation, mode, navigation.Active))
                 return;
-            Undo.RecordObject(this, "Place Nozzle");
-            nozzle.Position = point;
-            nozzle.Rotation = rotation.eulerAngles;
+            Undo.RecordObject(this, "Place " + session.PointName);
+            point.Position = position;
+            if (mode == 1)
+                point.Rotation = rotation.eulerAngles;
+            hasUnsavedChanges = session.HasChanges;
             Repaint();
         }
+
         /// <summary>Selects, appends or removes independent dispenser points without modifying the source component.</summary>
         private void Points()
         {
-            if (!session.Dispenser)
+            if (!session.Multiple)
                 return;
             int count = session.Draft.Points?.Length ?? 0;
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
             using (new EditorGUI.DisabledScope(selected <= 0))
-                if (GUILayout.Button(new GUIContent("◀", "Edit the previous outlet."), GUILayout.Width(28f)))
+                if (GUILayout.Button(new GUIContent("◀", "Edit the previous point."), GUILayout.Width(28f)))
                     selected--;
-            string label = session.Magnets ? "Magnet" : "Outlet";
+            string label = session.PointName;
             EditorGUILayout.LabelField(count > 0 ? label + " " + (selected + 1) + " / " + count : "No points", EditorStyles.miniLabel);
             using (new EditorGUI.DisabledScope(selected >= count - 1))
-                if (GUILayout.Button(new GUIContent("▶", "Edit the next outlet."), GUILayout.Width(28f)))
+                if (GUILayout.Button(new GUIContent("▶", "Edit the next point."), GUILayout.Width(28f)))
                     selected++;
-            if (GUILayout.Button(new GUIContent("+", "Add a new output point."), GUILayout.Width(28f)))
+            if (GUILayout.Button(new GUIContent("+", "Add a new point."), GUILayout.Width(28f)))
             {
-                Undo.RecordObject(this, "Add Outlet");
+                Undo.RecordObject(this, "Add " + label);
                 System.Array.Resize(ref session.Draft.Points, count + 1);
                 selected = session.Draft.Points.Length - 1;
                 session.Draft.Points[selected] = new DispenserOutlet();
+                hasUnsavedChanges = session.HasChanges;
                 dirty = true;
             }
             using (new EditorGUI.DisabledScope(count <= 1))
-                if (GUILayout.Button(new GUIContent("−", "Remove the selected output point."), GUILayout.Width(28f)))
+                if (GUILayout.Button(new GUIContent("−", "Remove the selected point."), GUILayout.Width(28f)))
                 {
-                    Undo.RecordObject(this, "Remove Outlet");
+                    Undo.RecordObject(this, "Remove " + label);
                     for (int index = selected; index < session.Draft.Points.Length - 1; index++)
                         session.Draft.Points[index] = session.Draft.Points[index + 1];
                     System.Array.Resize(ref session.Draft.Points, session.Draft.Points.Length - 1);
                     selected = Mathf.Min(selected, session.Draft.Points.Length - 1);
+                    hasUnsavedChanges = session.HasChanges;
                     dirty = true;
                 }
         }
@@ -259,7 +269,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="root">Dispenser or nozzle owner being previewed.</param>
         private void RefreshGeometry(GameObject root)
         {
-            int count = session.Magnets ? session.Draft.Points.Length : 0;
+            int count = session.Draft.Points?.Length ?? 0;
             if (!dirty && cached == root && geometrySettings.Magnets.Length == count)
                 return;
             geometrySettings.Magnets = new AssemblyMagnet[count];
@@ -276,6 +286,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void Frame()
         {
             Bounds bounds = geometry.Bounds(geometrySettings);
+            foreach (DispenserOutlet point in session.Draft.Points)
+                if (point is { IsValid: true })
+                    bounds.Encapsulate(point.Position);
             pivot = bounds.center;
             distance = Mathf.Max(0.2f, bounds.extents.magnitude * 3.5f);
             Repaint();
@@ -286,7 +299,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public override void SaveChanges()
         {
             if (session.Apply(out status))
+            {
+                hasUnsavedChanges = false;
                 base.SaveChanges();
+            }
             Repaint();
         }
         /// <summary>Abandons nozzle edits without changing unrelated main-window settings.</summary>
@@ -294,6 +310,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             session.Discard();
             status = string.Empty;
+            hasUnsavedChanges = false;
+            dirty = true;
             base.DiscardChanges();
             Repaint();
         }

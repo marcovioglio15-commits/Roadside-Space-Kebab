@@ -42,7 +42,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Query(ObjectItem item, ContactModificationRule settings, HashSet<ObjectItem> contacts)
         {
             // Keep a retained counterpart detectable after a completed effect changes its identity.
-            Query(item, settings.ContactTolerance, settings.IncludeTriggers, contacts);
+            Query(item, settings.ContactTolerance, settings.IncludeTriggers, contacts, excludeSuspended: settings.ExcludeSuspendedContacts);
         }
 
         /// <summary>Collects physical item roots in the owner's physics scene for caller-specific filtering.</summary>
@@ -51,8 +51,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="includeTriggers">Whether trigger surfaces participate.</param>
         /// <param name="contacts">Reusable result set.</param>
         /// <param name="extensions">Temporary surfaces that contribute contacts for this owner.</param>
+        /// <param name="excludeSuspended">Ignore surfaces controlled by a gravity pulse or black hole.</param>
         internal void Query(ObjectItem item, float tolerance, bool includeTriggers, HashSet<ObjectItem> contacts,
-            IReadOnlyList<Collider> extensions = null)
+            IReadOnlyList<Collider> extensions = null, bool excludeSuspended = false)
         {
             // Multiple passive features share one scripted-transform synchronization per render frame.
             contacts.Clear();
@@ -63,14 +64,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             PhysicsScene scene = item.gameObject.scene.GetPhysicsScene();
             foreach (Collider collider in owned)
-                if (!Scan(scene, item, collider, tolerance, includeTriggers, contacts))
+                if (!Scan(scene, item, collider, tolerance, includeTriggers, contacts, excludeSuspended))
                 {
                     contacts.Clear();
                     return;
                 }
             if (extensions != null)
                 for (int index = 0; index < extensions.Count; index++)
-                    if (!Scan(scene, item, extensions[index], tolerance, includeTriggers, contacts))
+                    if (!Scan(scene, item, extensions[index], tolerance, includeTriggers, contacts, excludeSuspended))
                     {
                         contacts.Clear();
                         return;
@@ -84,11 +85,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="tolerance">Maximum separation in metres.</param>
         /// <param name="includeTriggers">Whether trigger shapes participate.</param>
         /// <param name="contacts">Unique candidates found so far.</param>
+        /// <param name="excludeSuspended">Ignore surfaces controlled by a gravity pulse or black hole.</param>
         /// <returns>False if the overlap buffer filled and results cannot be trusted.</returns>
         private bool Scan(PhysicsScene scene, ObjectItem item, Collider surface, float tolerance, bool includeTriggers,
-            HashSet<ObjectItem> contacts)
+            HashSet<ObjectItem> contacts, bool excludeSuspended)
         {
-            if (!Usable(surface, includeTriggers))
+            if (!Usable(surface, includeTriggers) || excludeSuspended && IsSuspended(surface))
                 return true;
             Bounds bounds = surface.bounds;
             int count = scene.OverlapSphere(bounds.center, bounds.extents.magnitude + tolerance, buffer, ~0,
@@ -106,10 +108,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     || candidate == item || !candidate.isActiveAndEnabled || candidate.IsConsumed || contacts.Contains(candidate)
                     || Physics.GetIgnoreLayerCollision(layer, other.gameObject.layer) || Physics.GetIgnoreCollision(surface, other))
                     continue;
-                if (Touches(surface, other, tolerance))
+                if ((!excludeSuspended || !IsSuspended(other)) && Touches(surface, other, tolerance))
                     contacts.Add(candidate);
             }
             return true;
+        }
+
+        /// <summary>Tests physical ownership using the actual body of a compound contact shape.</summary>
+        /// <param name="shape">Collider on either side of the contact.</param>
+        /// <returns>True while a suspension or attraction owns the shape's Rigidbody.</returns>
+        internal static bool IsSuspended(Collider shape)
+        {
+            // Static colliders have no body and cannot participate in either effect.
+            Rigidbody body = shape.attachedRigidbody;
+            return body != null && (!body.isKinematic && GravitySuspension.Contains(body) || BlackHoleRun.Contains(body));
         }
 
         /// <summary>Checks collider availability and supported exact-distance geometry.</summary>

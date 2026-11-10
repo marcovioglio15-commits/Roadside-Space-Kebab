@@ -48,6 +48,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             new Entry(typeof(ObjectContainer), "Container", Categories.Inventory, "store inventory capacity deposit"),
             new Entry(typeof(ObjectTriggerAnimation), "Trigger Animation", Categories.Physics, "transform pose rotate return"),
             new Entry(typeof(ObjectEject), "Eject", Categories.Physics, "impulse black hole attraction"),
+            new Entry(typeof(ObjectKnockback), "Knockback", Categories.Physics, "throw hit collision wobble recoil"),
             new Entry(typeof(ObjectGravityGenerator), "Gravity Generator", Categories.Physics, "suspension weight force"),
             new Entry(typeof(ObjectElasticDeformation), "Elastic Deformation", Categories.Physics, "bend squash stretch recovery"),
             new Entry(typeof(ObjectContactModifier), "Modify by Contact", Categories.Processes, "cook consume snap price contact"),

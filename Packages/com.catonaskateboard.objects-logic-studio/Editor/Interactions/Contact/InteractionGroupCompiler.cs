@@ -73,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     ObjectDialogue dialogue => dialogue.Settings.NeedsStartAction,
                     ObjectSingleInteraction single => single.UsesInput,
                     ObjectContactModifier contact => contact.Settings.RequiresInput,
-                    ObjectGravityGenerator gravity => gravity.Settings.Restore != GravityRestoreMode.Timer,
+                    ObjectGravityGenerator gravity => gravity.Settings.UsesRestoreInput,
                     ObjectAmbient ambient => ambient.Settings.Mode == AmbientMode.Radio,
                     ObjectAssemblyStation station => station.Settings.Trigger == AssemblyStationTrigger.InputAction,
                     ObjectRequestedInteraction or ObjectSlice => true,

@@ -196,10 +196,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             using (source.Item.Identity.GroupChanges())
             using (receiver.Item.Identity.GroupChanges())
             {
-                if (!source.CommitScoop(receiver, output))
+                int amount = source.CommitScoop(receiver, output);
+                if (amount <= 0)
                     return false;
                 committed = true;
-                receiver.CommitScoop();
+                receiver.CommitScoop(amount);
             }
             if (source != null)
                 source.Signal(InteractionMoment.Completed);

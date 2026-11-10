@@ -14,6 +14,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Minimum item count for this appearance. The highest reached threshold wins, including while the count decreases.")]
         [Range(0, 1000)]
         public int Count;
+        [Tooltip("Change the container appearance or display one visual piece for each occupied magnet.")]
+        public InventoryFillMode Mode;
+        [Tooltip("Placement and optional ingredient model for Actual Item Fill.")]
+        public InventoryItemFill ItemFill = new InventoryItemFill();
         [Tooltip("Mesh and material changes relative to the original object. Below all thresholds the original appearance is restored.")]
         public ItemAppearanceSettings Appearance = new ItemAppearanceSettings();
         [Tooltip("Optional reversible flag state selected by this threshold.")]
@@ -28,8 +32,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Checks threshold uniqueness and reusable appearance data without sorting or changing the list.</summary>
         /// <param name="steps">Authored fill thresholds.</param>
         /// <param name="warning">Receives invalid thresholds or replacements.</param>
+        /// <param name="allowItemFill">Whether these thresholds belong to a container with hidden or scooped contents.</param>
         /// <returns>True when the configuration can select one unambiguous step for any count.</returns>
-        internal static bool TryValidate(InventoryFillStep[] steps, out string warning)
+        internal static bool TryValidate(InventoryFillStep[] steps, out string warning, bool allowItemFill = false)
         {
             // Empty lists opt out of appearance management entirely.
             warning = "Fill steps need unique non-negative counts and valid appearance settings.";
@@ -38,9 +43,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             HashSet<int> counts = new HashSet<int>();
             foreach (InventoryFillStep step in steps)
             {
-                if (step == null || step.Count < 0 || !counts.Add(step.Count) || step.Appearance == null)
+                if (step == null || step.Count < 0 || !counts.Add(step.Count) || step.Flags == null)
                     return false;
-                if (!step.Appearance.TryValidate(out warning) || step.Flags == null || !step.Flags.TryValidate(out warning))
+                switch (step.Mode)
+                {
+                    case InventoryFillMode.Appearance when step.Appearance != null:
+                        if (!step.Appearance.TryValidate(out warning))
+                            return false;
+                        break;
+                    case InventoryFillMode.ActualItemFill when allowItemFill && step.ItemFill != null:
+                        if (!step.ItemFill.TryValidate(step.Count, out warning))
+                            return false;
+                        break;
+                    default:
+                        warning = "Actual Item Fill requires a container with hidden contents or Scoop From Dispenser.";
+                        return false;
+                }
+                if (!step.Flags.TryValidate(out warning))
                     return false;
             }
             warning = string.Empty;
@@ -57,7 +76,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Bindings are checked at activation or explicit authoring boundaries, never per frame.
             warning = "A fill-step target is missing or belongs to a different item. Rebind it using the hierarchy selector.";
             foreach (InventoryFillStep step in steps)
-                if (!step.Appearance.CanBind(item))
+                if (step.Mode == InventoryFillMode.Appearance && !step.Appearance.CanBind(item))
                     return false;
             warning = string.Empty;
             return true;

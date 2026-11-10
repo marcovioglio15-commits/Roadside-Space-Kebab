@@ -76,6 +76,38 @@ MonoBehaviour:
     MaxPlays: 8
     WindowSeconds: 0.25
     Parameters: []
+  - Key: sfx_reload
+    DisplayName: Shotgun Reload
+    Description:
+    EventPath: event:/SFX/PLAYER/sfx_shotgunreload
+    EventGuid: '{1a30c012-7130-494d-9d2c-42e104241740}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
+  - Key: sfx_shoot
+    DisplayName: Shotgun
+    Description:
+    EventPath: event:/SFX/PLAYER/sfx_shotgun
+    EventGuid: '{03248f13-1d61-47cc-a549-93758f8e98e4}'
+    Volume: 1
+    Pitch: 1
+    Spatialize: 0
+    OverrideDistances: 0
+    MinimumDistance: 8
+    MaximumDistance: 45
+    SingleInstance: 0
+    LimitRate: 0
+    MaxPlays: 8
+    WindowSeconds: 0.25
+    Parameters: []
   - Key: sfx_pickup
     DisplayName: sfx_pickup
     Description: 

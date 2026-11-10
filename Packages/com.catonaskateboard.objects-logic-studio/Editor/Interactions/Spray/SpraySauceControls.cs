@@ -89,7 +89,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 && StudioButton.Draw(new GUIContent("Nozzle Layout", "Position and rotate the outlet against the object preview.")))
             {
                 settings.serializedObject.ApplyModifiedProperties();
-                OutletLayoutWindow.Open(workspace, false);
+                OutletLayoutWindow.Open(workspace, ObjectPointLayout.Nozzle);
             }
             Fields(nozzle, "Position", "Rotation");
         }

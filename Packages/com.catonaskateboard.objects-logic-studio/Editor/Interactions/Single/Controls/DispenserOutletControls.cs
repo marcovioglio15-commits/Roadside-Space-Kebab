@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 && StudioButton.Draw(new GUIContent("Outlet Layout", "Place output points against the dispenser preview.")))
             {
                 settings.serializedObject.ApplyModifiedProperties();
-                OutletLayoutWindow.Open(workspace, true);
+                OutletLayoutWindow.Open(workspace, ObjectPointLayout.Outlets);
             }
             SerializedProperty outlets = settings.FindPropertyRelative("Outlets");
             // Each output has independent coordinates and foldout state.

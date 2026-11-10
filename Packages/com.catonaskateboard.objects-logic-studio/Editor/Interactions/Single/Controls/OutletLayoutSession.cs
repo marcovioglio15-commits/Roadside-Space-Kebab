@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
+    /// <summary>Identifies the pose list opened in the common point preview.</summary>
+    internal enum ObjectPointLayout { Nozzle, Outlets, Magnets, OrbitCenters }
+
     /// <summary>Wraps one nozzle or several dispenser points for independent pose editing.</summary>
     [Serializable]
     internal sealed class OutletLayout
@@ -26,10 +29,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Settings group that opened this preview.")]
         [SerializeField]
         private ObjectLayoutSource source = new ObjectLayoutSource();
-        [Tooltip("Edit dispenser outlets instead of a spray nozzle.")]
-        public bool Dispenser;
-        [Tooltip("Edit floating supply magnets instead of physical outlet poses.")]
-        public bool Magnets;
+        [Tooltip("Interaction pose list opened in this preview.")]
+        public ObjectPointLayout Layout;
         [Tooltip("Prefab guide drawn at each floating supply magnet.")]
         public GameObject Portion;
         [Tooltip("Output positions and directions edited by this preview.")]
@@ -42,6 +43,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Properties
 
+        /// <summary>Whether the current layout accepts several points.</summary>
+        internal bool Multiple => Layout != ObjectPointLayout.Nozzle;
+        /// <summary>Whether the current points retain local Euler angles.</summary>
+        internal bool Rotatable => Layout != ObjectPointLayout.Magnets;
+        /// <summary>Short name used to identify one point in the preview.</summary>
+        internal string PointName => Layout switch
+        {
+            ObjectPointLayout.OrbitCenters => "Orbit Center",
+            ObjectPointLayout.Magnets => "Magnet",
+            ObjectPointLayout.Outlets => "Outlet",
+            _ => "Nozzle"
+        };
         /// <summary>Object used for the preview geometry.</summary>
         internal ObjectWorkspaceTarget Target => source.Target;
 
@@ -56,12 +69,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Copies the caller's current poses without changing the original group or prefab.</summary>
         /// <param name="workspace">Draft that opened the preview.</param>
-        /// <param name="dispenser">Whether to edit multiple outlets instead of one nozzle.</param>
-        /// <param name="magnets">Whether dispenser points represent floating supply magnets.</param>
-        internal void Read(ObjectWorkspace workspace, bool dispenser, bool magnets)
+        /// <param name="layout">Pose list selected by the caller.</param>
+        internal void Read(ObjectWorkspace workspace, ObjectPointLayout layout)
         {
-            Dispenser = dispenser;
-            Magnets = magnets;
+            Layout = layout;
             source.Capture(workspace);
             ReadDraft(workspace);
         }
@@ -89,22 +100,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 // Reject invalid poses without replacing the proposal or changing the source.
                 if (JsonUtility.ToJson(ReadLayout(workspace)) != baseline)
                     throw new InvalidOperationException("The layout changed in another window. Discard to reload it.");
-                if (Draft?.Points == null || Draft.Points.Length == 0 || !Dispenser && Draft.Points.Length != 1)
-                    throw new InvalidOperationException("Add at least one outlet. Spray Sauce uses one nozzle.");
+                if (Draft?.Points == null || Draft.Points.Length == 0 || !Multiple && Draft.Points.Length != 1)
+                    throw new InvalidOperationException("Add at least one point. Spray Sauce uses one nozzle.");
                 foreach (DispenserOutlet point in Draft.Points)
                     if (point is not { IsValid: true })
-                        throw new InvalidOperationException("Use finite values for each outlet's position and rotation.");
-                Undo.RecordObject(workspace, "Apply Outlet Layout to Draft");
-                if (Magnets)
-                    workspace.Single.Draft.Dispenser.ScoopDisplay.Magnets = Array.ConvertAll(Draft.Points, point => point.Position);
-                else if (Dispenser)
-                    workspace.Single.Draft.Dispenser.Outlets = ObjectWorkspace.Copy(Draft).Points;
-                else
-                    workspace.Extended.Draft.SpraySauce.Nozzle = new SprayNozzle
-                    {
-                        Position = Draft.Points[0].Position,
-                        Rotation = Draft.Points[0].Rotation
-                    };
+                        throw new InvalidOperationException("Use finite values for each point’s position and rotation.");
+                Undo.RecordObject(workspace, "Apply Point Layout to Draft");
+                switch (Layout)
+                {
+                    case ObjectPointLayout.OrbitCenters:
+                        workspace.Extended.Draft.GravityGenerator.Float.Centers = Array.ConvertAll(Draft.Points,
+                            point => new GravityOrbitCenter { Position = point.Position, Rotation = point.Rotation });
+                        break;
+                    case ObjectPointLayout.Magnets:
+                        workspace.Single.Draft.Dispenser.ScoopDisplay.Magnets = Array.ConvertAll(Draft.Points, point => point.Position);
+                        break;
+                    case ObjectPointLayout.Outlets:
+                        workspace.Single.Draft.Dispenser.Outlets = ObjectWorkspace.Copy(Draft).Points;
+                        break;
+                    case ObjectPointLayout.Nozzle:
+                        workspace.Extended.Draft.SpraySauce.Nozzle = new SprayNozzle
+                        {
+                            Position = Draft.Points[0].Position,
+                            Rotation = Draft.Points[0].Rotation
+                        };
+                        break;
+                }
                 ReadDraft(workspace);
             }, out warning);
             if (applied)
@@ -120,7 +141,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="workspace">Exact draft retained by the preview.</param>
         private void ReadDraft(ObjectWorkspace workspace)
         {
-            Portion = Magnets ? workspace.Single.Draft.Dispenser.Prefab : null;
+            Portion = Layout == ObjectPointLayout.Magnets ? workspace.Single.Draft.Dispenser.Prefab : null;
             Draft = ReadLayout(workspace);
             baseline = JsonUtility.ToJson(Draft);
         }
@@ -132,14 +153,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             return new OutletLayout
             {
-                Points = Magnets ? Array.ConvertAll(workspace.Single.Draft.Dispenser.ScoopDisplay.Magnets,
-                    position => new DispenserOutlet { Position = position })
-                    : Dispenser ? ObjectWorkspace.Copy(workspace.Single.Draft.Dispenser).Outlets
-                    : new[] { new DispenserOutlet
+                Points = Layout switch
+                {
+                    ObjectPointLayout.OrbitCenters => Array.ConvertAll(workspace.Extended.Draft.GravityGenerator.Float.Centers,
+                        center => new DispenserOutlet { Position = center.Position, Rotation = center.Rotation }),
+                    ObjectPointLayout.Magnets => Array.ConvertAll(workspace.Single.Draft.Dispenser.ScoopDisplay.Magnets,
+                        position => new DispenserOutlet { Position = position }),
+                    ObjectPointLayout.Outlets => ObjectWorkspace.Copy(workspace.Single.Draft.Dispenser).Outlets,
+                    _ => new[]
                     {
-                        Position = workspace.Extended.Draft.SpraySauce.Nozzle.Position,
-                        Rotation = workspace.Extended.Draft.SpraySauce.Nozzle.Rotation
-                    } }
+                        new DispenserOutlet
+                        {
+                            Position = workspace.Extended.Draft.SpraySauce.Nozzle.Position,
+                            Rotation = workspace.Extended.Draft.SpraySauce.Nozzle.Rotation
+                        }
+                    }
+                }
             };
         }
 

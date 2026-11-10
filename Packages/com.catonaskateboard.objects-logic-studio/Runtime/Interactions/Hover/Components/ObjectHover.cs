@@ -17,6 +17,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         private HoverConfiguration configuration = new HoverConfiguration();
 
+        [Tooltip("Optional labels from other local interactions. Hover Text is the fallback.")]
+        [SerializeField]
+        private HoverInteractionText[] interactionText = System.Array.Empty<HoverInteractionText>();
+
         [Header("Debug")]
         [Tooltip("Draw the anchor, player range and label world offset only while this object is selected.")]
         [SerializeField]
@@ -27,6 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region State
 
         private Collider[] colliders;
+        private ObjectInteraction[] textSources = System.Array.Empty<ObjectInteraction>();
         private bool ready;
         private float nextQuery;
         private bool hovered;
@@ -54,6 +59,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public HoverConfiguration Configuration => configuration;
         /// <summary>Optional local hierarchy anchor retained independently of shared presets.</summary>
         public Transform Anchor => anchor;
+        /// <summary>Local labels selected by other interaction states.</summary>
+        public HoverInteractionText[] InteractionText => interactionText;
         /// <summary>Current world point used for range and view-center tests.</summary>
         public Vector3 WorldAnchor => (anchor != null ? anchor : transform).TransformPoint(Settings.AnchorOffset);
         /// <summary>Whether this interaction owns an active hover after selection and availability checks.</summary>
@@ -110,7 +117,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             carrySuppressed = grab != null && grab.IsHeld && !grab.Settings.ShowHover;
             ready = TryValidate(out string warning);
             if (ready)
+            {
                 settings = new HoverSettings(configuration.Settings);
+                textSources = interactionText.Length > 0 ? new ObjectInteraction[interactionText.Length] : System.Array.Empty<ObjectInteraction>();
+                for (int index = 0; index < textSources.Length; index++)
+                    textSources[index] = interactionText[index].Source.Resolve(gameObject);
+            }
             nextQuery = 0f;
             if (!ready)
                 Debug.LogWarning(warning, this);
@@ -129,11 +141,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "The hover anchor must belong to this object's prefab hierarchy.";
             else if (!configuration.TryValidate(out warning))
                 return false;
+            else if (!HoverInteractionText.TryValidate(interactionText, gameObject, out warning))
+                return false;
             else if (configuration.Settings.TargetMode != HoverDetectionMode.ViewCenter && GetComponentInChildren<Collider>(true) == null
                 && GetComponent<ObjectAssemblyProduct>() == null)
                 warning = "Collider hover requires a 3D collider on this object or one of its children.";
 
             return warning.Length == 0;
+        }
+
+        /// <summary>Resolves the current label without changing its style or animation.</summary>
+        /// <returns>First matching text or the default text.</returns>
+        internal string ResolveText()
+        {
+            // Only the winning hover checks these cached sources.
+            for (int index = 0; index < textSources.Length; index++)
+                if (interactionText[index].Matches(textSources[index]))
+                    return interactionText[index].Text;
+            return configuration.Style.Content;
         }
 
         #endregion

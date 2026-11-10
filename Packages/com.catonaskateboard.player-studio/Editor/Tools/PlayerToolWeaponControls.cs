@@ -104,10 +104,13 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 new GUIContent("Weapon Mode", mode.tooltip)), (PlayerToolWeaponMode)mode.intValue);
             if ((int)selected != mode.intValue)
                 mode.intValue = (int)selected;
+            StudioFields.Draw(weapon, "PlayShootSound");
+            if (data.FindProperty("ReloadEnabled").boolValue)
+                StudioFields.Draw(weapon, "PlayReloadSound");
             StudioFields.Draw(weapon, "ShotsPerUse");
             if (weapon.FindPropertyRelative("ShotsPerUse").intValue > 1)
                 StudioFields.Draw(weapon, "ShotInterval");
-            // Cursor shots use speed only as the contact velocity reported to interactions.
+            // Projectile and cursor shots share speed. The cursor can also use it for travel time.
             bool projectile = selected == PlayerToolWeaponMode.Projectile;
             if (projectile)
             {
@@ -117,8 +120,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
             else
             {
-                StudioFields.Draw(weapon, "IgnoreInteractionRange");
-                StudioFieldGUI.PropertyField(weapon.FindPropertyRelative("Speed"), new GUIContent("Impact speed", weapon.FindPropertyRelative("Speed").tooltip));
+                StudioFields.Draw(weapon, "IgnoreInteractionRange", "DelayCursorImpact");
+                bool delayed = weapon.FindPropertyRelative("DelayCursorImpact").boolValue;
+                if (delayed)
+                    StudioFields.Draw(weapon, "CursorTravelMultiplier");
+                SerializedProperty speed = weapon.FindPropertyRelative("Speed");
+                StudioFieldGUI.PropertyField(speed, new GUIContent(delayed ? "Travel and Impact Speed" : "Impact Speed", speed.tooltip));
             }
             StudioFields.Draw(weapon, "Distance", "Layers", "HitTriggers", "Capacity");
             return projectile;

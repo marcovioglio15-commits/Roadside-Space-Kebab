@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
+    /// <summary>Chooses FIFO rows or rows bound to specific catalog orders.</summary>
+    public enum OrderBoardMode { Queue, MatchingOrders }
+
     /// <summary>Owns pre-authored world-space text slots shared by all queued customer orders.</summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("Objects Logic Studio/Order Board")]
@@ -22,6 +25,35 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [SerializeField]
         [Range(1, 33)]
         private int paragraphCapacity = 9;
+
+        [Header("Display Mode")]
+        [Tooltip("Queue uses the next free slot. Matching Orders displays tickets on slots bound to their catalog names.")]
+        [SerializeField]
+        private OrderBoardMode mode;
+        [Tooltip("One exact catalog name per text slot, in slot order. A base name also accepts its variants and combos.")]
+        [SerializeField]
+        private string[] orderNames = Array.Empty<string>();
+        [Header("Slot Objects")]
+        [Tooltip("Show each assigned scene object only while its text slot has an order.")]
+        [SerializeField]
+        private bool showSlotObjects;
+        [Tooltip("Optional scene objects in text-slot order. Each assigned object is shown and tinted independently.")]
+        [SerializeField]
+        private GameObject[] slotObjects = Array.Empty<GameObject>();
+        [Tooltip("Multiply the assigned scene object's material colors by the order's delivery state.")]
+        [SerializeField]
+        private bool tintByState;
+        [Tooltip("Object color multiplier while the order is waiting for delivery.")]
+        [SerializeField]
+        private Color pendingTint = new Color(0.78f, 0.60f, 0.43f, 1f);
+        [Tooltip("Object color multiplier after the correct delivery.")]
+        [SerializeField]
+        private Color completedTint = new Color(0.46f, 0.88f, 0.49f, 1f);
+        [Tooltip("Object color multiplier for a pending order after a wrong delivery.")]
+        [SerializeField]
+        private Color incorrectTint = new Color(1f, 0.39f, 0.35f, 1f);
+
+        private OrderSlotObject[] objectViews = Array.Empty<OrderSlotObject>();
         private OrderBoardText[] formatting = Array.Empty<OrderBoardText>();
         private OrderTicket[] occupied = Array.Empty<OrderTicket>();
         private FontStyles[] styles = Array.Empty<FontStyles>();
@@ -72,6 +104,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             occupied = new OrderTicket[slots.Length];
             styles = new FontStyles[slots.Length];
             originals = new string[slots.Length];
+            objectViews = showSlotObjects ? new OrderSlotObject[slots.Length] : Array.Empty<OrderSlotObject>();
             formatting = new OrderBoardText[slots.Length];
             for (int index = 0; index < slots.Length; index++)
             {
@@ -79,6 +112,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 formatting[index]?.Initialize(slots[index]);
                 styles[index] = slots[index].fontStyle;
                 originals[index] = slots[index].text;
+                if (index < objectViews.Length && index < slotObjects.Length && slotObjects[index] != null)
+                    objectViews[index] = new OrderSlotObject(slotObjects[index], tintByState);
                 slots[index].text = string.Empty;
             }
             registered = OrderQueue.Add(this);
@@ -104,6 +139,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (text != null)
                     text.Restore();
             formatting = Array.Empty<OrderBoardText>();
+            foreach (OrderSlotObject view in objectViews)
+                view?.Restore();
+            objectViews = Array.Empty<OrderSlotObject>();
             for (int index = 0; index < originals.Length; index++)
                 if (index < slots.Length && slots[index] != null)
                 {
@@ -122,18 +160,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when a slot was reserved.</returns>
         internal bool TryAssign(OrderTicket ticket)
         {
-            // Completed waiting orders are assigned already crossed out.
+            // Prefer a variant or combo's exact slot before using a base-order slot.
+            int index = mode == OrderBoardMode.Queue ? FindSlot(null) : FindSlot(ticket.Name);
+            if (index < 0 && mode == OrderBoardMode.MatchingOrders && ticket.Name != ticket.Entry.Name)
+                index = FindSlot(ticket.Entry.Name);
+            if (index < 0)
+                return false;
+            occupied[index] = ticket;
+            ticket.Board = this;
+            ticket.Slot = index;
+            Draw(ticket);
+            ticket.Owner.NotifyDisplayed();
+            return true;
+        }
+
+        /// <summary>Finds a free slot that can present this catalog entry.</summary>
+        /// <param name="order">Exact catalog name, or null in Queue mode.</param>
+        /// <returns>Index of the first compatible free slot, or minus one.</returns>
+        private int FindSlot(string order)
+        {
+            // A vacant row never borrows another order's named position.
             for (int index = 0; index < occupied.Length; index++)
-                if (occupied[index] == null && slots[index] != null)
-                {
-                    occupied[index] = ticket;
-                    ticket.Board = this;
-                    ticket.Slot = index;
-                    Draw(ticket);
-                    ticket.Owner.NotifyDisplayed();
-                    return true;
-                }
-            return false;
+                if (occupied[index] == null && slots[index] != null && (order == null || orderNames[index] == order))
+                    return index;
+            return -1;
         }
 
         /// <summary>Updates only the slot belonging to this exact ticket.</summary>
@@ -144,6 +194,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             int index = ticket.Slot;
             if (index < 0 || index >= occupied.Length || occupied[index] != ticket || slots[index] == null)
                 return;
+            if (index < objectViews.Length)
+                objectViews[index]?.Show(ticket.Completed ? completedTint : ticket.Incorrect ? incorrectTint : pendingTint);
             slots[index].text = ticket.Candidate.MainText;
             slots[index].fontStyle = ticket.Completed ? styles[index] | FontStyles.Strikethrough : styles[index];
             if (formatting[index] == null && ticket.Candidate.HasVariants)
@@ -161,6 +213,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (index >= 0 && index < occupied.Length && occupied[index] == ticket)
             {
                 occupied[index] = null;
+                if (index < objectViews.Length)
+                    objectViews[index]?.Hide();
                 formatting[index]?.Clear();
                 if (slots[index] != null)
                 {
@@ -189,6 +243,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (text == null || !unique.Add(text) || !text.transform.IsChildOf(transform)
                     || text is TextMeshProUGUI && (text.canvas == null || text.canvas.renderMode != RenderMode.WorldSpace))
                     return false;
+            // Named boards need a stable association for every pre-existing text slot.
+            warning = "Choose Queue or Matching Orders and enter one catalog name per text slot in Matching Orders.";
+            if (mode is not (OrderBoardMode.Queue or OrderBoardMode.MatchingOrders)
+                || mode == OrderBoardMode.MatchingOrders && (orderNames == null || orderNames.Length != slots.Length
+                    || Array.Exists(orderNames, string.IsNullOrWhiteSpace)))
+                return false;
+            if (showSlotObjects)
+            {
+                // A slot object can live anywhere in the scene as long as it cannot deactivate this board.
+                warning = "Assign distinct scene objects in text-slot order. Do not assign the board or one of its parents.";
+                if (slotObjects == null || slotObjects.Length > slots.Length)
+                    return false;
+                System.Collections.Generic.HashSet<GameObject> objects = new System.Collections.Generic.HashSet<GameObject>();
+                foreach (GameObject target in slotObjects)
+                    if (target != null && (!objects.Add(target) || transform.IsChildOf(target.transform)
+                        || gameObject.scene.IsValid() && !target.scene.IsValid()))
+                        return false;
+            }
             warning = string.Empty;
             return true;
         }

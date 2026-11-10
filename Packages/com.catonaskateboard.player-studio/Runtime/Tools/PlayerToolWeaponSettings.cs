@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.PlayerStudio
 {
-    /// <summary>Selects physical projectile travel or immediate interaction with the cursor target.</summary>
+    /// <summary>Selects physical projectiles or direct targeting with the cursor.</summary>
     public enum PlayerToolWeaponMode { Projectile, CursorInteraction }
 
     /// <summary>Chooses the impact prefab's forward axis relative to the struck surface or bullet travel.</summary>
@@ -30,6 +30,19 @@ namespace CatOnASkateboard.PlayerStudio
         [Range(0f, 2f)]
         public float ShotInterval = 0.08f;
 
+        [Header("Audio")]
+        [Tooltip("Play SFX_Shoot at the muzzle for each emitted shot.")]
+        public bool PlayShootSound = true;
+        [Tooltip("Play SFX_Reload when a manual or automatic reload starts.")]
+        public bool PlayReloadSound = true;
+
+        [Header("Cursor Travel")]
+        [Tooltip("Delay cursor impacts by distance divided by weapon speed, up to 0.75 seconds.")]
+        public bool DelayCursorImpact;
+        [Tooltip("Multiply the calculated cursor travel time. One uses the weapon speed directly.")]
+        [Range(0.05f, 2f)]
+        public float CursorTravelMultiplier = 1f;
+
         [Header("Shot Effects")]
         [Tooltip("Optional effect on the player's arm.")]
         public PlayerToolEffectSettings MuzzleEffect = new PlayerToolEffectSettings();
@@ -47,7 +60,7 @@ namespace CatOnASkateboard.PlayerStudio
         [Header("Bullet")]
         [Tooltip("Bullet prefab. Positive Z points forward. The tool handles its movement.")]
         public GameObject Bullet;
-        [Tooltip("Bullet speed. In Cursor Interaction, this sets the speed used by interactions that push objects.")]
+        [Tooltip("Speed in metres per second. Cursor Interaction uses it for impact force and optional travel time.")]
         [Range(0.1f, 300f)]
         public float Speed = 40f;
         [Tooltip("How far the shot can reach. Turn off Ignore Interaction Range to also use each target's range.")]
@@ -171,6 +184,9 @@ namespace CatOnASkateboard.PlayerStudio
                 return false;
             warning = "Use a positive speed. Projectile mode also needs a bullet prefab and a non-negative collision radius.";
             if (!Positive(Speed) || Mode == PlayerToolWeaponMode.Projectile && (Bullet == null || !NonNegative(Radius)))
+                return false;
+            warning = "Cursor travel needs a positive finite time multiplier.";
+            if (Mode == PlayerToolWeaponMode.CursorInteraction && DelayCursorImpact && !Positive(CursorTravelMultiplier))
                 return false;
             if (MuzzleEffect != null && !MuzzleEffect.TryValidate(true, out warning)
                 || ShotEffect != null && !ShotEffect.TryValidate(false, out warning))

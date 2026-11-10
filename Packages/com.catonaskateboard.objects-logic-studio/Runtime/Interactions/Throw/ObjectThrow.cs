@@ -52,7 +52,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal override void Execute(Transform view)
         {
             // Use an impulse or velocity change without multiplying a one-shot action by frame time.
+            bool carried = Grab.IsHeld;
             base.Execute(view);
+            if (!carried || Grab.IsHeld)
+                return;
+            Grab.RecordThrow();
             Vector3 launch = trajectory.Direction(view.rotation) * trajectory.Strength;
             // A slice carrier separates in this input frame, before PhysX could integrate a queued impulse.
             if (Grab.TryGetComponent(out SliceCarryGroup _))

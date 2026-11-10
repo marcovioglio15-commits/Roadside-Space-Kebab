@@ -20,7 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 ExtendedInteractionKind.Dialogue => state.Extended.Draft.Dialogue.NeedsStartAction,
                 ExtendedInteractionKind.SpraySauce or ExtendedInteractionKind.Slice => true,
-                ExtendedInteractionKind.GravityGenerator => state.Extended.Draft.GravityGenerator.Restore != GravityRestoreMode.Timer,
+                ExtendedInteractionKind.GravityGenerator => state.Extended.Draft.GravityGenerator.UsesRestoreInput,
                 ExtendedInteractionKind.PlayAmbient => state.Extended.Draft.Ambient.Mode == AmbientMode.Radio,
                 ExtendedInteractionKind.AssemblyStation => state.Extended.Draft.AssemblyStation.Trigger == AssemblyStationTrigger.InputAction,
                 ExtendedInteractionKind.ModifyByContact => state.Extended.Draft.Contact.RequiresInput,

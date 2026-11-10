@@ -280,7 +280,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float distance = float.PositiveInfinity;
             foreach (ObjectContainer candidate in held.CarryContainers)
             {
-                if (candidate == null || !candidate.isActiveAndEnabled || !candidate.Settings.ScoopFromDispenser)
+                if (candidate == null || !candidate.isActiveAndEnabled || candidate.IsLocked || !candidate.Settings.ScoopFromDispenser)
                     continue;
                 InteractionButton scoopButton = bindings.TryGetValue(candidate, out InteractionButton bound)
                     ? Pending(new KeyValuePair<ObjectInteraction, InteractionButton>(candidate, bound), requested, allowed) : null;

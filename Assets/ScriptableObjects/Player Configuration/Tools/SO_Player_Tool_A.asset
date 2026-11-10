@@ -20,6 +20,10 @@ MonoBehaviour:
   IsWeapon: 1
   InteractOnBulletImpact: 1
   Weapon:
+    PlayShootSound: 1
+    PlayReloadSound: 1
+    DelayCursorImpact: 0
+    CursorTravelMultiplier: 1
     Mode: 1
     IgnoreInteractionRange: 1
     ShotsPerUse: 1

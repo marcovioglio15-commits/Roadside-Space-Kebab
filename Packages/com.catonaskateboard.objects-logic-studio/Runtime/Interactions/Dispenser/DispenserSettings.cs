@@ -108,6 +108,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Validation
 
+        /// <summary>Checks an optional replacement prefab before an empty display can refill.</summary>
+        /// <param name="warning">Receives a missing root, item or identity.</param>
+        /// <returns>True when the replacement can use the same display magnets.</returns>
+        private bool ValidateRestock(out string warning)
+        {
+            warning = string.Empty;
+            // A disabled restock option does not constrain the selected asset.
+            GameObject prefab = ScoopDisplay.RestockPrefab;
+            if (ScoopDisplay.RestockForNewContainer && prefab != null && (prefab.scene.IsValid() || prefab.transform.parent != null
+                || !prefab.activeSelf || !prefab.TryGetComponent(out ObjectItem _) || !prefab.TryGetComponent(out CatOnASkateboard.StudioIdentity.ObjectIdentity _)))
+                warning = "Choose an active restock prefab root with Object Item and Object Identity.";
+            return warning.Length == 0;
+        }
+
         /// <summary>Checks reusable supply settings without requiring a scene or modifying the prefab.</summary>
         /// <param name="warning">Receives a missing prefab or invalid setting.</param>
         /// <param name="requirement">Optional tool restriction used to validate weapon output.</param>
@@ -123,7 +137,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Choose an active prefab root with Object Item and configure its floating display.";
                 return Prefab != null && !Prefab.scene.IsValid() && Prefab.transform.parent == null && Prefab.activeSelf
                     && Prefab.GetComponent<ObjectItem>() != null && ScoopDisplay != null
-                    && ScoopDisplay.TryValidate(Unlimited ? ScoopDisplay.VisibleCount : Stock, out warning);
+                    && ScoopDisplay.TryValidate(Unlimited ? ScoopDisplay.VisibleCount : Stock, out warning)
+                    && ValidateRestock(out warning);
             }
             if (SupportsSteps && !InventoryFillStep.TryValidate(FillSteps, out warning))
                 return false;

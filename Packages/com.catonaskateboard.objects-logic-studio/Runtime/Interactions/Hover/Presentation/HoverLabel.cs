@@ -76,6 +76,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Hide();
                 return;
             }
+            // Keep animation progress and update the canvas only when the label changes.
+            if (source == selected)
+            {
+                string content = source.ResolveText();
+                if (text.text != content)
+                    text.text = content;
+            }
             Animate(observer.View, source.WorldAnchor, source.Settings, time, source == selected);
         }
 

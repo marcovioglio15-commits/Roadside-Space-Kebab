@@ -119,6 +119,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float QueryInterval = 0.02f;
         [Tooltip("Allow trigger volumes to count as contact.")]
         public bool IncludeTriggers;
+        [Tooltip("Skip contacts while either Rigidbody is suspended by Gravity Generator or controlled by Black Hole.")]
+        public bool ExcludeSuspendedContacts = true;
         [Tooltip("Allow this interaction while its own item is carried by the player.")]
         public bool AllowCarriedSelf = true;
         [Tooltip("Allow contact with an item currently carried by the player.")]

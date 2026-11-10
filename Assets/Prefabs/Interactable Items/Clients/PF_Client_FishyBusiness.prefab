@@ -112,6 +112,7 @@ GameObject:
   - component: {fileID: 5527052003444599054}
   - component: {fileID: 6912887087282466169}
   - component: {fileID: 7313425721650699864}
+  - component: {fileID: 7726128058076309196}
   m_Layer: 13
   m_Name: PF_Client_FishyBusiness
   m_TagString: Untagged
@@ -801,3 +802,69 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &7726128058076309196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3097014450015891093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84bd220c40aa4554991f0dbec8071473, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectKnockback
+  interactionName: Knockback
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    ThrowWindow: 2.5
+    MinimumImpact: 0.1
+    MaximumImpact: 4
+    VolumeInfluence: 0.35
+    ReferenceVolume: 0.008
+    FilterThrows: 0
+    Distance:
+      UseRange: 1
+      Value: 0.075
+      Minimum: 0.012
+      Maximum: 0.075
+    Tilt:
+      UseRange: 1
+      Value: 16
+      Minimum: 2
+      Maximum: 16
+    Duration:
+      UseRange: 1
+      Value: 0.65
+      Minimum: 0.35
+      Maximum: 0.65
+    Cycles:
+      UseRange: 1
+      Value: 1.35
+      Minimum: 1.1
+      Maximum: 1.35
+    Damping:
+      UseRange: 1
+      Value: 2.6
+      Minimum: 1.8
+      Maximum: 2.6

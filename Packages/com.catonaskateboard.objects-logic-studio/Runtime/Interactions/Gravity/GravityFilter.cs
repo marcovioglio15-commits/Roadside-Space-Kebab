@@ -14,7 +14,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         Availability = 2048, AssemblyStation = 4096, AssemblyProduct = 8192, SpawnManagement = 16384,
         Slice = 32768, PlayAmbient = 65536, AvailableOrders = 131072, ObjectDegradation = 262144, GravityGenerator = 524288,
         ElasticDeformation = 1048576, DirtTrail = 2097152, SpraySauce = 4194304,
-        Deathbox = 8388608, PresenceCap = 16777216, All = 33554431
+        Deathbox = 8388608, PresenceCap = 16777216, Knockback = 33554432, All = 67108863
     }
 
     /// <summary>Combines independently enabled layer, identity and interaction filters for a gravity pulse.</summary>
@@ -132,6 +132,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 ObjectDirtTrail => GravityInteractionFilter.DirtTrail,
                 ObjectDeathbox => GravityInteractionFilter.Deathbox,
                 ObjectPresenceCap => GravityInteractionFilter.PresenceCap,
+                ObjectKnockback => GravityInteractionFilter.Knockback,
                 ObjectSpraySauce => GravityInteractionFilter.SpraySauce,
                 _ => GravityInteractionFilter.None
             };

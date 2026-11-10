@@ -98,6 +98,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal ScoopDisplay ScoopSupply { get; set; }
         /// <summary>Release revision captured when the portion entered its magnet.</summary>
         internal uint ScoopReleaseRevision { get; set; }
+        /// <summary>Scaled time of the latest player Throw in this loose lifetime.</summary>
+        internal double LastThrowTime { get; private set; } = double.NegativeInfinity;
         /// <summary>Whether ordinary pickup has finished and can accept a scoop pose.</summary>
         internal bool CanScoop => IsHeld && pickupCompleted && !physical.Active;
         /// <summary>Configured grab offset and rotation in the current carry frame.</summary>
@@ -116,6 +118,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             RequiresAssemblyPlacement = false;
             RequiresAssemblyRelease = false;
             ReleaseRevision = 0;
+            LastThrowTime = double.NegativeInfinity;
             PickupRevision = 0;
             grabbedOnce = false;
             nextImpact = 0f;
@@ -126,7 +129,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void OnCollisionEnter(Collision collision)
         {
             physical.Contact(collision);
-            ScoopSupply?.Return(this, collision.collider);
+            ScoopSupply?.Return(this, collision.collider, true);
             // Held, consumed and stored items never emit ingredient impact sounds.
             if (!grabbedOnce || IsHeld || Item != null && (Item.IsConsumed || Item.IsReserved)
                 || drop == null && throwing == null || !settings.CollisionAudio.Enabled || Time.time < nextImpact)
@@ -153,7 +156,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="other">Trigger on the dispenser the portion touched.</param>
         private void OnTriggerEnter(Collider other)
         {
-            ScoopSupply?.Return(this, other);
+            ScoopSupply?.Return(this, other, true);
         }
 
         /// <summary>Handles releases that already overlap their original supply volume.</summary>
@@ -199,6 +202,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (InteractionRuntimeState.IsStaging)
                 return;
+            LastThrowTime = double.NegativeInfinity;
             // Disabling a carried component must not leave a kinematic or collision-free object behind.
             Cancel();
             Dock?.Release();
@@ -383,6 +387,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.PhysicalPickup && pickupDuration > 0f)
                 physical.Begin(body, settings);
             IsHeld = true;
+            LastThrowTime = double.NegativeInfinity;
             PickupRevision++;
             grabbedOnce = true;
             if (settings.PickupSound)
@@ -547,6 +552,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             RequiresAssemblyPlacement = false;
             RequiresAssemblyRelease = false;
             ReleaseRevision++;
+            LastThrowTime = double.NegativeInfinity;
             IsHeld = false;
             physical.Stop();
             // Early release inside the dispenser restores contact only after safe separation.
@@ -561,6 +567,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     colliders[index].sharedMaterial = surface != null ? surface : surfaces[index];
             SetHoverSuppression(false);
             body.WakeUp();
+        }
+
+        /// <summary>Records a player launch after the shared release has finished.</summary>
+        internal void RecordThrow()
+        {
+            // A new pickup or ordinary release invalidates this throw immediately.
+            LastThrowTime = Time.timeAsDouble;
         }
 
         /// <summary>Restores material references before a runtime surface is destroyed.</summary>

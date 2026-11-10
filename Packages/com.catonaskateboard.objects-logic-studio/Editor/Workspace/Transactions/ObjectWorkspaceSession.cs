@@ -118,7 +118,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return false;
             ObjectHover hover = Resolve(state);
             if (state.HasBinding && hover != null && (!state.Binding.ToolRequirement.TryValidate(out warning) || !state.Binding.FlagChange.TryValidate(hover.gameObject, out warning)
-                || state.Binding.Enabled && !state.Binding.VisualEffect.TryValidate(false, out warning)))
+                || state.Binding.Enabled && (!state.Binding.VisualEffect.TryValidate(false, out warning)
+                    || !HoverInteractionText.TryValidate(state.Binding.InteractionText, hover.gameObject, out warning))))
                 return false;
             if (state.HasBinding)
             {
@@ -211,6 +212,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.FindProperty("m_Enabled").boolValue = state.Binding.Enabled;
                 data.FindProperty("drawGizmos").boolValue = state.Binding.DrawGizmos;
                 data.FindProperty("anchor").objectReferenceValue = HoverHierarchy.Resolve(hover.transform, state.Binding.AnchorPath);
+                SerializedProperty labels = data.FindProperty("interactionText");
+                labels.arraySize = state.Binding.InteractionText.Length;
+                for (int index = 0; index < labels.arraySize; index++)
+                    labels.GetArrayElementAtIndex(index).boxedValue = state.Binding.InteractionText[index];
                 if (recordUndo)
                     data.ApplyModifiedProperties();
                 else

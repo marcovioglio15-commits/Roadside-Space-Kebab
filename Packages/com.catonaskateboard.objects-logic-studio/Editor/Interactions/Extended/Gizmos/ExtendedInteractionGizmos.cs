@@ -113,6 +113,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 else
                     Handles.DrawWireCube(Vector3.zero, area.Size);
             }
+            if (settings.Continuous)
+            {
+                // Show the orbit axes without drawing lines to individual participants.
+                if (settings.Float is { Rotation: GravityFloatRotation.Orbit, Centers: not null })
+                    foreach (GravityOrbitCenter center in settings.Float.Centers)
+                        if (center != null && InteractionValues.Finite(center.Position) && InteractionValues.Finite(center.Rotation))
+                            GravityOrbitGizmos.Draw(generator.transform.TransformPoint(center.Position),
+                                generator.transform.rotation * Quaternion.Euler(center.Rotation), false);
+                return;
+            }
             if (!settings.Push || settings.RandomDirection
                 || !float.IsFinite(settings.Direction.x) || !float.IsFinite(settings.Direction.y)
                 || !float.IsFinite(settings.Direction.z) || settings.Direction.sqrMagnitude < 0.000001f)

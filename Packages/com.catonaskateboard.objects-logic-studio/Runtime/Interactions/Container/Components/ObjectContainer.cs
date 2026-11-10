@@ -24,6 +24,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int fillCount;
         private bool fillInitialized;
         private ScoopRun scoop;
+        private ContainerFillVisuals itemFill;
+        private bool hasItemFill;
 
         #endregion
 
@@ -35,6 +37,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public int StoredCount => stored.Count;
         /// <summary>Logical portions in Scoop mode, or retained original count in storage mode.</summary>
         public int FillCount => settings.ScoopFromDispenser ? fillInitialized ? fillCount : settings.InitialFill : stored.Count;
+        /// <summary>Limits one scoop to the available space and the amount configured for this ingredient.</summary>
+        internal int ScoopSpace => Mathf.Min(settings.ScoopAmount, settings.Capacity - FillCount);
         /// <summary>Whether a scoop currently owns this held object's movement.</summary>
         internal bool IsScooping => scoop != null && scoop.Active;
         /// <summary>Scoop mode receives the dispenser's input instead of binding another Button.</summary>
@@ -58,6 +62,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (ObjectContainer container in FindObjectsByType<ObjectContainer>(FindObjectsInactive.Include))
             {
                 container.stored.Clear();
+                container.itemFill?.Clear();
+                container.itemFill = null;
                 container.transferring = false;
                 container.scoop?.Cancel();
                 container.scoop = null;
@@ -285,8 +291,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return true;
         }
 
-        /// <summary>Reserves one compatible dispenser output while preserving the occupied carry slot.</summary>
-        /// <param name="source">Targeted dispenser supplying one logical portion.</param>
+        /// <summary>Reserves the first compatible portion and starts one scoop for the configured batch.</summary>
+        /// <param name="source">Targeted dispenser supplying the portions.</param>
         /// <param name="grab">Grab currently carrying this container.</param>
         /// <returns>True when the transfer started or committed immediately.</returns>
         internal bool TryScoop(ObjectDispenser source, ObjectGrab grab)
@@ -309,11 +315,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning(warning, this);
                 return false;
             }
-            if (!fillInitialized)
-            {
-                fillCount = settings.InitialFill;
-                fillInitialized = true;
-            }
             ScoopRun operation = scoop;
             grab.BeginScoop(scoop, source);
             source.Signal(InteractionMoment.Started);
@@ -322,18 +323,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return true;
         }
 
-        /// <summary>Advances logical fill after the source commits its reserved withdrawal.</summary>
-        internal void CommitScoop()
+        /// <summary>Advances logical fill after the source commits the withdrawal.</summary>
+        /// <param name="amount">Portions successfully withdrawn during this scoop.</param>
+        internal void CommitScoop(int amount)
         {
-            // Keep the first successful recipe on this box, even while its animation returns to carry.
-            if (fillCount == settings.InitialFill)
-                foreach (ObjectContainer alternative in GetComponents<ObjectContainer>())
-                    if (alternative != this && alternative.Settings.ScoopFromDispenser && alternative.enabled)
-                    {
-                        InteractionRuntimeState.Remember(alternative);
-                        alternative.enabled = false;
-                    }
-            fillCount++;
+            // Initialize only when the source successfully commits its first portion.
+            if (!fillInitialized)
+            {
+                fillCount = settings.InitialFill;
+                fillInitialized = true;
+            }
+            fillCount += amount;
             RefreshFill();
         }
 
@@ -344,12 +344,64 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             scoop = null;
         }
 
+        /// <summary>Configures actual fill support before the first appearance refresh.</summary>
+        protected override void OnEnable()
+        {
+            if (InteractionRuntimeState.IsStaging)
+                return;
+            CheckItemFill();
+            base.OnEnable();
+        }
+
+        /// <summary>Detects whether this configuration can show copied ingredient meshes.</summary>
+        internal void CheckItemFill()
+        {
+            hasItemFill = settings.SupportsItemFill && settings.FillSteps != null
+                && Array.Exists(settings.FillSteps, step => step is { Mode: InventoryFillMode.ActualItemFill });
+        }
+
+        /// <summary>Captures a successfully withdrawn portion before it is consumed.</summary>
+        /// <param name="source">Original item or prefab supplying its appearance.</param>
+        internal void RecordScoopPortion(GameObject source)
+        {
+            if (!hasItemFill)
+                return;
+            itemFill ??= new ContainerFillVisuals(transform);
+            itemFill.Record(source);
+        }
+
+        /// <summary>Applies the visual layout only after the logical fill or stored stock changes.</summary>
+        /// <param name="index">Selected fill step, or minus one below the first threshold.</param>
+        internal void RefreshItemFill(int index)
+        {
+            if (!hasItemFill || !isActiveAndEnabled)
+            {
+                itemFill?.Hide();
+                return;
+            }
+            InventoryFillStep step = index >= 0 ? settings.FillSteps[index] : null;
+            if (step is not { Mode: InventoryFillMode.ActualItemFill } || FillCount <= 0)
+            {
+                itemFill?.Hide();
+                return;
+            }
+            itemFill ??= new ContainerFillVisuals(transform);
+            itemFill.Update(step.ItemFill, FillCount, settings.InitialFill, settings.ScoopFromDispenser ? null : stored);
+        }
+
+        /// <summary>Releases mesh copies if this component is removed from a live box.</summary>
+        private void OnDestroy()
+        {
+            itemFill?.Clear();
+        }
+
         /// <summary>Stops an unfinished movement before this interaction unregisters.</summary>
         protected override void OnDisable()
         {
             if (InteractionRuntimeState.IsStaging)
                 return;
             scoop?.Cancel();
+            itemFill?.Hide();
             base.OnDisable();
         }
 
