@@ -112,6 +112,10 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 7e3f727cfc4f4179a5a520801735af44, type: 2}
     - {fileID: 11400000, guid: 0272116bbe70a614faf37a36a0493289, type: 2}
     - {fileID: 11400000, guid: 58de2772da244ebe8573c26f9e10bcac, type: 2}
+    - {fileID: 11400000, guid: 6763c67936ae2294e9ce3fe604948064, type: 2}
+    - {fileID: 11400000, guid: dbff11e02218e5d46bd26ebe3ae97bfa, type: 2}
+    - {fileID: 11400000, guid: 83414fbcb3326904c917f60334fdfbfc, type: 2}
+    - {fileID: 11400000, guid: 3b4caac3d65454941bf695e65217a5bb, type: 2}
     Target:
       Distance: 3
       Mode: 0
@@ -126,6 +130,9 @@ MonoBehaviour:
       Enabled: 0
       DialogueName: 
       Occurrence: 0
+      Step:
+        Block: 
+        Entry: 
     Price:
       CollectPrice: 0
       Sound: 1
@@ -223,7 +230,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -264,6 +270,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!114 &4682773638508215407
 MonoBehaviour:
