@@ -4319,6 +4319,42 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: pendingTint.b
+      value: 0.22745098
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: pendingTint.g
+      value: 0.7921569
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: pendingTint.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: completedTint.b
+      value: 0.14901961
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: completedTint.g
+      value: 0.7882353
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: completedTint.r
+      value: 0.5411765
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: incorrectTint.b
+      value: 0.36862746
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: incorrectTint.g
+      value: 0.34901962
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: incorrectTint.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
       propertyPath: showSlotObjects
       value: 1
       objectReference: {fileID: 0}

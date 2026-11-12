@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: SO_Plates
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
   DisplayName: Plates
-  Group: 
+  Group: Spawner
   Description: 

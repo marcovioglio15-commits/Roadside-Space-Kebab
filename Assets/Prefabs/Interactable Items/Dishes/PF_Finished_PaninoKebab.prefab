@@ -104,7 +104,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
   flags:
-  - {fileID: 11400000, guid: 18f248795564abc439f110a6d722aeb4, type: 2}
+  - {fileID: 11400000, guid: dacc0fad23526ca4b811251aba556819, type: 2}
 --- !u!114 &1278111475397958004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -324,7 +324,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -365,6 +364,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!114 &7202886261825108978
 MonoBehaviour:
@@ -445,22 +445,27 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 1ac7af2c5229af545bf8eb66046023af, type: 2}
       Count: 1
       Optional: 0
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: c69745f27196e29439f70f5d1d5c1ea1, type: 2}
       Count: 1
       Optional: 0
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       Count: 1
       Optional: 1
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       Count: 1
       Optional: 1
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       Count: 1
       Optional: 1
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
@@ -480,6 +485,10 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 2615674392044304233, guid: dbc2bd29052637e46920a7c7e7633213, type: 3}
     - Name: Magnet 2
       AnyIngredient: 0
@@ -490,6 +499,10 @@ MonoBehaviour:
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []
@@ -506,6 +519,10 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 5670531666105826227, guid: 2d69bed870900d34bb3c3287321ff055, type: 3}
     - Name: Magnet 4
       AnyIngredient: 0
@@ -516,6 +533,10 @@ MonoBehaviour:
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 2}
       Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []
@@ -532,6 +553,10 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 2891034634997325463, guid: 750a7a35b9d541f4b805396137f7c6b6, type: 3}
     - Name: Magnet 6
       AnyIngredient: 0
@@ -543,6 +568,10 @@ MonoBehaviour:
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 0.8, y: 0.8, z: 0.8}
       Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []
