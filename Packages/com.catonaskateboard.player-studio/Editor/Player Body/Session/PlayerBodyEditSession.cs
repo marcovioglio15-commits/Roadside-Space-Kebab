@@ -163,14 +163,21 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
             // The coordinator owns this separate view until the complete session is confirmed.
             changes = serialized;
-            changes.FindProperty("radius").floatValue = radius;
-            changes.FindProperty("height").floatValue = height;
+            WriteDraft(changes);
             return true;
         }
 
         #endregion
 
         #region Serialization
+
+        /// <summary>Copies raw pending dimensions into an isolated serialized candidate.</summary>
+        /// <param name="destination">Candidate owned by Apply or a contextual preset action.</param>
+        internal void WriteDraft(SerializedObject destination)
+        {
+            destination.FindProperty("radius").floatValue = radius;
+            destination.FindProperty("height").floatValue = height;
+        }
 
         /// <summary>Reads raw dimensions so invalid assets can still be opened for correction.</summary>
         /// <param name="serialized">Fresh serialized view of the source Body.</param>

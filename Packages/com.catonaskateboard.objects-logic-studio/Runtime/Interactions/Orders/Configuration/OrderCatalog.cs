@@ -17,8 +17,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         [Header("Available Orders")]
         [Tooltip("Named candidates shared by every interaction referencing this catalog. Quantities occupy individual board slots.")]
+        [InspectorName("Orders")]
         public OrderEntry[] Entries = Array.Empty<OrderEntry>();
         [Tooltip("Optional first-stage pools. Each can include orders, variants and generated combos; an empty list uses all candidates.")]
+        [InspectorName("Extraction Pools")]
         public OrderPool[] Pools = Array.Empty<OrderPool>();
 
         #endregion

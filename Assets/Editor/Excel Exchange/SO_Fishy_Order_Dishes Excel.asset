@@ -1,0 +1,141 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93360600987f6724eb5eb2e314ce8e50, type: 3}
+  m_Name: SO_Fishy_Order_Dishes Excel
+  m_EditorClassIdentifier: CatOnASkateboard.ExcelExchangeStudio.Editor::CatOnASkateboard.ExcelExchangeStudio.Editor.ExcelExchangePreset
+  Target: {fileID: 11400000, guid: 66ec0f0a64b1494c86e47657a5933e7b, type: 2}
+  Scope: 
+  Worksheet: Sheet1
+  Rows: 12
+  Columns: 10
+  WorkbookPath: Assets/Editor/Excel Exchange/Examples/Order Catalog.xlsx
+  TemplatePath: Assets/Editor/Excel Exchange/Examples/Order Catalog.xlsx
+  UseFormulaResults: 0
+  Mappings:
+  - Cell: B2
+    Kind: 1
+    Path: Entries[].Name
+    Group: Entries / Variants
+    Indices: 
+    Direction: 0
+    Text: 
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: C2
+    Kind: 0
+    Path: Entries[].Variants[].Name
+    Group: Entries / Variants
+    Indices: 
+    Direction: 0
+    Text: 
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: D2
+    Kind: 0
+    Path: Entries[].Variants[].Text
+    Group: Entries / Variants
+    Indices: 
+    Direction: 0
+    Text: 
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: E2
+    Kind: 0
+    Path: Entries[].Variants[].Flags
+    Group: Entries / Variants
+    Indices: 
+    Direction: 0
+    Text: 
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: F2
+    Kind: 0
+    Path: Entries[].Variants[].ExcludedFlags
+    Group: Entries / Variants
+    Indices: 
+    Direction: 0
+    Text: 
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: G2
+    Kind: 0
+    Path: Entries[].Variants[].RequireAllFlags
+    Group: Entries / Variants
+    Indices: 
+    Direction: 0
+    Text: 
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: B1
+    Kind: 3
+    Path: 
+    Group: 
+    Indices: 
+    Direction: 2
+    Text: Main Dish
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: C1
+    Kind: 3
+    Path: 
+    Group: 
+    Indices: 
+    Direction: 2
+    Text: Name
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: D1
+    Kind: 3
+    Path: 
+    Group: 
+    Indices: 
+    Direction: 2
+    Text: Text
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: E1
+    Kind: 3
+    Path: 
+    Group: 
+    Indices: 
+    Direction: 2
+    Text: Flag
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: F1
+    Kind: 3
+    Path: 
+    Group: 
+    Indices: 
+    Direction: 2
+    Text: Subtractive Flags
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: G1
+    Kind: 3
+    Path: 
+    Group: 
+    Indices: 
+    Direction: 2
+    Text: Require All Flags
+    KeepEmpty: 0
+    Separator: ;
+  Groups:
+  - Name: Entries / Variants
+    Path: 'Entries[].Variants[]'
+    Match: 1
+    KeyPath: Name
+    Policy: 0
+    GuideCell: C2
+    Extent: 0
+    LastRow: 100
+    TableName: 

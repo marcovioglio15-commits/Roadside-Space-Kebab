@@ -24,6 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private string focusLabel = string.Empty;
         private bool focusPending;
         private bool focusConfigured;
+        private Func<StudioPresetContext> exchangeContext;
 
         #endregion
         #region Properties
@@ -40,6 +41,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Recovers unfinished edits and observes source imports, Undo and delayed field menus.</summary>
         protected virtual void OnEnable()
         {
+            exchangeContext = CaptureExchangeContext;
             session.Restore();
             EditorApplication.projectChanged += RefreshSource;
             Undo.undoRedoPerformed += RefreshSource;
@@ -74,6 +76,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (EditorGUI.EndChangeCheck())
                     Select(selected);
             }
+            StudioPresetActions.Draw(session.Source, exchangeContext);
             using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
             {
                 Rect selection = default;
@@ -105,6 +108,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             DiscardChanges();
                 }
             }
+        }
+
+        /// <summary>Connects preset actions to the current Apply/Discard session.</summary>
+        /// <returns>A snapshot and import route confined to this asset.</returns>
+        private StudioPresetContext CaptureExchangeContext()
+        {
+            ScriptableObject source = session.Source;
+            return StudioPresetContext.ForDraft(source, session.Draft, this, UpdatePending,
+                current: () => session.Source == source,
+                validate: proposal => Validate((ScriptableObject)proposal, out string issue) ? string.Empty : issue);
         }
 
         /// <summary>Draws the detached inspector, allowing specialized windows to supply non-persistent context.</summary>

@@ -27,11 +27,17 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // The object picker accepts only assets; Apply also checks persistence and dimensions.
             EditorGUI.BeginChangeCheck();
+            PlayerStudioWindow window = undoTarget as PlayerStudioWindow;
             PlayerBodyPreset body = PlayerPresetPicker.Draw(bodyLabel, session.BodyPreset);
+            window?.DrawExcel(body, 0);
             PlayerInputPreset input = PlayerPresetPicker.Draw(inputLabel, session.InputPreset);
+            window?.DrawExcel(input, 2);
             PlayerLocomotionPreset locomotion = PlayerPresetPicker.Draw(locomotionLabel, session.LocomotionPreset);
+            window?.DrawExcel(locomotion, 1);
             PlayerCameraPreset camera = PlayerPresetPicker.Draw(new GUIContent("Camera Slot", "Optional view and follow configuration."), session.CameraPreset);
+            window?.DrawExcel(camera, 3);
             PlayerToolsPreset tools = PlayerPresetPicker.Draw(new GUIContent("Tools Slot", "Optional manual tools and visual switching configuration."), session.ToolsPreset);
+            window?.DrawExcel(tools, 4);
             if (!EditorGUI.EndChangeCheck())
                 return false;
 

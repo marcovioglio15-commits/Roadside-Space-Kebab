@@ -1,0 +1,6 @@
+{
+  "name": "CatOnASkateboard.ExcelExchangeStudio.Editor",
+  "rootNamespace": "CatOnASkateboard.ExcelExchangeStudio.Editor",
+  "references": [ "CatOnASkateboard.StudioColors.Editor" ],
+  "includePlatforms": [ "Editor" ]
+}

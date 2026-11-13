@@ -30,6 +30,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         private PlayerWorkspaceRecovery recovery;
         private PlayerSynchronizationPrompt synchronization;
         private PlayerWorkspaceStore.Snapshot beforePlay;
+        private Func<StudioPresetContext>[] exchangeContexts;
         private bool shutdownSaved;
         private PlayerQuickPlayView quickPlayView;
         private PlayerPreviewNavigation navigation;
@@ -74,6 +75,12 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             // SceneView owns rendering, navigation, shortcuts and its Editor-only camera.
             base.OnEnable();
+            exchangeContexts = new Func<StudioPresetContext>[6];
+            for (int index = 0; index < exchangeContexts.Length; index++)
+            {
+                int module = index - 1;
+                exchangeContexts[index] = () => PlayerExcelContext.Create(state, this, module);
+            }
             shutdownSaved = false;
             titleContent = new GUIContent("Player Studio");
             minSize = new Vector2(360f, 400f);
@@ -166,6 +173,8 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 }
             }
 
+            DrawExcel(state.Selection.Master, -1);
+
             // Resolve a slot assignment before editing the candidate Body's dimensions.
             if (state.Selection.Mode == PlayerStudioSourceMode.Master && (state.Selection.Master != null || state.Selection.HasChanges(state.Body)))
             {
@@ -205,6 +214,16 @@ namespace CatOnASkateboard.PlayerStudio.Editor
                 if (state.TransformView.Draw(state.Transform, this))
                     HandleDraftChanged();
             }
+        }
+
+        /// <summary>Draws contextual exchange actions below a selected preset slot.</summary>
+        /// <param name="selected">Preset currently displayed by the selector.</param>
+        /// <param name="module">Master is -1; module indices follow the tab order.</param>
+        internal void DrawExcel(ScriptableObject selected, int module)
+        {
+            // An unapplied slot choice must not redirect an existing module proposal.
+            using EditorGUI.DisabledScope unavailable = new EditorGUI.DisabledScope(selected != PlayerExcelContext.Source(state, module));
+            StudioPresetActions.Draw(selected, exchangeContexts[module + 1]);
         }
 
         /// <summary>Refreshes session actions after edits, Undo, selection or mode transitions.</summary>

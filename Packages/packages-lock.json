@@ -8,6 +8,14 @@
         "com.catonaskateboard.studio-colors": "1.0.0"
       }
     },
+    "com.catonaskateboard.excel-exchange-studio": {
+      "version": "file:com.catonaskateboard.excel-exchange-studio",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.catonaskateboard.studio-colors": "1.0.0"
+      }
+    },
     "com.catonaskateboard.menu-studio": {
       "version": "file:com.catonaskateboard.menu-studio",
       "depth": 0,

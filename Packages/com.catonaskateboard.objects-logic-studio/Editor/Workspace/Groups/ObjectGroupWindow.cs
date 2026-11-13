@@ -67,6 +67,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private readonly ObjectFieldFocus fieldFocus = new ObjectFieldFocus();
         private bool focusPending;
         private bool pendingChanges;
+        private Func<StudioPresetContext> exchangeContext;
 
         #endregion
 
@@ -120,6 +121,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Reconnects the serialized wrapper after a script reload.</summary>
         private void OnEnable()
         {
+            exchangeContext = CaptureExchangeContext;
             Undo.undoRedoPerformed += RefreshChanges;
             StudioFieldMenu.Changed += FieldChanged;
             ObjectFlagSelector.SelectionChanged += FieldChanged;
@@ -276,6 +278,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
         }
 
+        /// <summary>Exposes typed group settings instead of portable storage records.</summary>
+        /// <returns>A context restricted to this group's existing field paths.</returns>
+        private StudioPresetContext CaptureExchangeContext()
+        {
+            ObjectGroupPreset source = preset;
+            string key = group.Key;
+            return StudioPresetContext.ForDraft(source, document, this, ExchangeChanged, group.Paths, key,
+                () => preset == source && group.Key == key);
+        }
+
+        /// <summary>Refreshes cached serialized controls after an external preset action updates the document.</summary>
+        private void ExchangeChanged()
+        {
+            data?.Update();
+            RefreshChanges();
+        }
+
         /// <summary>Edits the group preset source without changing another settings group.</summary>
         private void DrawPreset()
         {
@@ -283,6 +302,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             preset = (ObjectGroupPreset)StudioFieldGUI.ObjectField(new GUIContent("Preset", "Choose a preset for this group."), preset, typeof(ObjectGroupPreset), false);
             if (EditorGUI.EndChangeCheck())
                 presetBaseline = preset != null ? ObjectGroupPresetStore.AssetStamp(preset) : string.Empty;
+            StudioPresetActions.Draw(preset, exchangeContext);
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
             using (new EditorGUI.DisabledScope(preset == null))
             {

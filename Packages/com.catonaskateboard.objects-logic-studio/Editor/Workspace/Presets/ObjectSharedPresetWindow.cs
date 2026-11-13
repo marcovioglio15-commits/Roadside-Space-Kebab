@@ -31,6 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         private string warning = string.Empty;
         private Vector2 scroll;
+        private readonly Dictionary<string, Func<StudioPresetContext>> exchangeContexts = new Dictionary<string, Func<StudioPresetContext>>();
 
         #endregion
 
@@ -78,6 +79,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Rebuilds the isolated values from the saved preset.</summary>
         private void Load()
         {
+            exchangeContexts.Clear();
             if (preview != null)
                 DestroyImmediate(preview);
             preview = ObjectPresetCapture.Preview(null);
@@ -112,6 +114,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 foreach (ObjectComponentPreset component in preset.Components)
                 {
                     Type type = Type.GetType(component.TypeName, true);
+                    if (!exchangeContexts.TryGetValue(component.TypeName, out Func<StudioPresetContext> exchange))
+                        exchangeContexts.Add(component.TypeName, exchange = () => CaptureExchangeContext(component));
+                    EditorGUILayout.LabelField(ObjectNames.NicifyVariableName(type.Name), EditorStyles.boldLabel);
+                    StudioPresetActions.Draw(preset, exchange);
                     using SerializedObject data = new SerializedObject(preview.GetComponent(type));
                     foreach (ObjectPresetValue field in component.Fields)
                     {
@@ -140,6 +146,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #endregion
 
         #region Transactions
+
+        /// <summary>Connects a component's logical settings to the shared preset proposal.</summary>
+        /// <param name="settings">Portable component descriptor supplying the allowed field names.</param>
+        /// <returns>A context confined to this component and source asset.</returns>
+        private StudioPresetContext CaptureExchangeContext(ObjectComponentPreset settings)
+        {
+            ObjectSharedPreset source = preset;
+            Type type = Type.GetType(settings.TypeName, true);
+            Component component = preview.GetComponent(type);
+            return StudioPresetContext.ForDraft(source, component, this, RefreshPending,
+                Array.ConvertAll(settings.Fields, field => field.Name), settings.TypeName,
+                () => preset == source && preview != null && preview.GetComponent(type) == component);
+        }
 
         /// <summary>Captures the displayed components using the same schema as the preset.</summary>
         /// <returns>Portable shared component settings.</returns>

@@ -335,20 +335,41 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             }
 
             changes = serialized;
-            changes.FindProperty("Crouch").boxedValue = JsonUtility.FromJson<PlayerCrouchSettings>(JsonUtility.ToJson(crouch));
-            changes.FindProperty("Audio").boxedValue = JsonUtility.FromJson<PlayerAudioSettings>(JsonUtility.ToJson(audio));
-            changes.FindProperty("speed").floatValue = speed;
-            changes.FindProperty("acceleration").floatValue = acceleration;
-            changes.FindProperty("deceleration").floatValue = deceleration;
-            changes.FindProperty("useGravity").boolValue = useGravity;
-            changes.FindProperty("gravityAcceleration").floatValue = gravityAcceleration;
-            changes.FindProperty("terminalSpeed").floatValue = terminalSpeed;
-            changes.FindProperty("groundSpeed").floatValue = groundSpeed;
-            changes.FindProperty("useJump").boolValue = useJump;
-            changes.FindProperty("jumpHeight").floatValue = jumpHeight;
-            changes.FindProperty("jumpBufferTime").floatValue = jumpBufferTime;
-            changes.FindProperty("coyoteTime").floatValue = coyoteTime;
+            WriteDraft(changes);
             return true;
+        }
+
+        /// <summary>Copies current movement values to an isolated candidate shared by Apply and exchange.</summary>
+        /// <param name="destination">Serialized locomotion candidate.</param>
+        internal void WriteDraft(SerializedObject destination)
+        {
+            destination.FindProperty("Crouch").boxedValue = JsonUtility.FromJson<PlayerCrouchSettings>(JsonUtility.ToJson(crouch));
+            destination.FindProperty("Audio").boxedValue = JsonUtility.FromJson<PlayerAudioSettings>(JsonUtility.ToJson(audio));
+            destination.FindProperty("speed").floatValue = speed;
+            destination.FindProperty("acceleration").floatValue = acceleration;
+            destination.FindProperty("deceleration").floatValue = deceleration;
+            destination.FindProperty("useGravity").boolValue = useGravity;
+            destination.FindProperty("gravityAcceleration").floatValue = gravityAcceleration;
+            destination.FindProperty("terminalSpeed").floatValue = terminalSpeed;
+            destination.FindProperty("groundSpeed").floatValue = groundSpeed;
+            destination.FindProperty("useJump").boolValue = useJump;
+            destination.FindProperty("jumpHeight").floatValue = jumpHeight;
+            destination.FindProperty("jumpBufferTime").floatValue = jumpBufferTime;
+            destination.FindProperty("coyoteTime").floatValue = coyoteTime;
+        }
+
+        /// <summary>Loads reviewed exchange values into the pending session without changing its baseline.</summary>
+        /// <param name="incoming">Validated conversion result, including raw values needing later correction.</param>
+        internal void ReadDraft(SerializedObject incoming)
+        {
+            // Existing setters retain the same session behavior used by the regular controls.
+            SetDraft(incoming.FindProperty("speed").floatValue, incoming.FindProperty("acceleration").floatValue, incoming.FindProperty("deceleration").floatValue);
+            SetGravityDraft(incoming.FindProperty("useGravity").boolValue, incoming.FindProperty("gravityAcceleration").floatValue,
+                incoming.FindProperty("terminalSpeed").floatValue, incoming.FindProperty("groundSpeed").floatValue);
+            SetJumpDraft(incoming.FindProperty("useJump").boolValue, incoming.FindProperty("jumpHeight").floatValue,
+                incoming.FindProperty("jumpBufferTime").floatValue, incoming.FindProperty("coyoteTime").floatValue);
+            crouch = (PlayerCrouchSettings)incoming.FindProperty("Crouch").boxedValue;
+            audio = (PlayerAudioSettings)incoming.FindProperty("Audio").boxedValue;
         }
 
         #endregion

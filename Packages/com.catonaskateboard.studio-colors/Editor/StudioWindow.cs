@@ -24,6 +24,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         private Button discard;
         private ObjectField selector;
         private readonly List<string> warnings = new List<string>();
+        private Func<StudioPresetContext> exchangeContext;
         #endregion
 
         #region Properties
@@ -40,6 +41,7 @@ namespace CatOnASkateboard.StudioColors.Editor
         /// <summary>Restores draft editing after domain reload and subscribes to Undo.</summary>
         protected virtual void OnEnable()
         {
+            exchangeContext = CaptureExchangeContext;
             // A small minimum width keeps the window useful when docked beside Scene view.
             minSize = new Vector2(360f, 360f);
             Undo.undoRedoPerformed += HandleUndo;
@@ -97,6 +99,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             toolbar.Add(ActionButton("New", "Create an empty project preset.", () => CreatePreset(false)));
             toolbar.Add(ActionButton("Duplicate", "Copy the selected preset to a new asset.", () => CreatePreset(true)));
             rootVisualElement.Add(toolbar);
+            rootVisualElement.Add(new IMGUIContainer(() => StudioPresetActions.Draw(session.Source, exchangeContext)));
 
             if (Tabs.Length > 1)
                 DrawTabs();
@@ -112,6 +115,15 @@ namespace CatOnASkateboard.StudioColors.Editor
 
             BuildFooter();
             RefreshActions();
+        }
+
+        /// <summary>Connects preset actions to this window's recoverable proposal.</summary>
+        /// <returns>The exact source and editable values currently selected.</returns>
+        private StudioPresetContext CaptureExchangeContext()
+        {
+            ScriptableObject source = session.Source;
+            return StudioPresetContext.ForDraft(source, session.Draft, this, RefreshActions,
+                current: () => session.Source == source);
         }
 
         /// <summary>Adds page navigation when the window has more than one settings page.</summary>

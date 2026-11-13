@@ -245,12 +245,19 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
             // Prepare slot references only; no candidate preset is modified here.
             changes = new SerializedObject(source);
-            changes.FindProperty("bodyPreset").objectReferenceValue = bodyPreset;
-            changes.FindProperty("inputPreset").objectReferenceValue = inputPreset;
-            changes.FindProperty("locomotionPreset").objectReferenceValue = locomotionPreset;
-            changes.FindProperty("cameraPreset").objectReferenceValue = cameraPreset;
-            changes.FindProperty("toolsPreset").objectReferenceValue = toolsPreset;
+            WriteDraft(changes);
             return true;
+        }
+
+        /// <summary>Copies pending slot references into an isolated candidate without applying assets.</summary>
+        /// <param name="destination">Serialized master candidate.</param>
+        internal void WriteDraft(SerializedObject destination)
+        {
+            destination.FindProperty("bodyPreset").objectReferenceValue = bodyPreset;
+            destination.FindProperty("inputPreset").objectReferenceValue = inputPreset;
+            destination.FindProperty("locomotionPreset").objectReferenceValue = locomotionPreset;
+            destination.FindProperty("cameraPreset").objectReferenceValue = cameraPreset;
+            destination.FindProperty("toolsPreset").objectReferenceValue = toolsPreset;
         }
 
         #endregion
