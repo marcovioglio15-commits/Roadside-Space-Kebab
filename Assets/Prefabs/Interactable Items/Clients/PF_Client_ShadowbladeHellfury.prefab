@@ -114,7 +114,7 @@ GameObject:
   - component: {fileID: 7313425721650699864}
   - component: {fileID: 7726128058076309196}
   m_Layer: 13
-  m_Name: PF_Client_FishyBusiness
+  m_Name: PF_Client_ShadowbladeHellfury
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -935,6 +935,14 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 02c6f193e7fe62d458b417e45f135ed6, type: 3}
       propertyPath: m_Name
       value: CH_ShadowbladeHellfury
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 02c6f193e7fe62d458b417e45f135ed6, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 037d13a26c94c7e4d815711cfda0bd34, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 02c6f193e7fe62d458b417e45f135ed6, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

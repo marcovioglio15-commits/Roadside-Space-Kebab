@@ -12,6 +12,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44f15e5399d34c7d8b9a653944ba1f3a, type: 3}
   m_Name: SO_Fishy_Order_Dishes
   m_EditorClassIdentifier: 
+  TextStyle:
+    Enabled: 1
+    Font: {fileID: 0}
+    Material: {fileID: 0}
+    Color: {r: 1, g: 1, b: 1, a: 1}
+    Style: 0
+    Weight: 400
+    Size: 0.35
+    AutoSize: 0
+    MinimumSize: 1
+    MaximumSize: 3
+    Alignment: 257
+    Wrapping: 1
+    Overflow: 0
+    RichText: 1
+    CharacterSpacing: 0
+    WordSpacing: 0
+    LineSpacing: 0
+    ParagraphSpacing: 0
+    Indent: 0.05
+    SpaceBefore: 0
+    SpaceAfter: 0
+    Margins: {x: 0, y: 0, z: 0, w: 0}
+    UseGradient: 0
+    TopLeft: {r: 1, g: 1, b: 1, a: 1}
+    TopRight: {r: 1, g: 1, b: 1, a: 1}
+    BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    BottomRight: {r: 1, g: 1, b: 1, a: 1}
   Entries:
   - Name: WrapKebab
     Text: Kebab Wrap
@@ -60,7 +88,7 @@ MonoBehaviour:
     - Name: WrapKebabBaseOrder
       Text: 
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 1, g: 1, b: 1, a: 1}
@@ -106,7 +134,7 @@ MonoBehaviour:
     - Name: WrapKebabNoTomato
       Text: '- Tomato'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -152,7 +180,7 @@ MonoBehaviour:
     - Name: WrapKebabNoLettuce
       Text: '- Lettuce'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -198,7 +226,7 @@ MonoBehaviour:
     - Name: WrapKebabNoOnion
       Text: '- Onion'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -244,7 +272,7 @@ MonoBehaviour:
     - Name: WrapKebabWithFries
       Text: + Fries
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -345,7 +373,7 @@ MonoBehaviour:
     - Name: PaninoKebabBaseOrder
       Text: 
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -391,7 +419,7 @@ MonoBehaviour:
     - Name: PaninoKebabNoTomato
       Text: '- Tomato'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -437,7 +465,7 @@ MonoBehaviour:
     - Name: PaninoKebabNoLettuce
       Text: '- Lettuce'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -483,7 +511,7 @@ MonoBehaviour:
     - Name: PaninoKebabNoOnion
       Text: '- Onion'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -529,7 +557,7 @@ MonoBehaviour:
     - Name: PaninoKebabWithFries
       Text: + Fries
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -630,7 +658,7 @@ MonoBehaviour:
     - Name: WrapFalafelBaseOrder
       Text: 
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -676,7 +704,7 @@ MonoBehaviour:
     - Name: WrapFalafelNoTomato
       Text: '- Tomato'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -722,7 +750,7 @@ MonoBehaviour:
     - Name: WrapFalafelNoLettuce
       Text: '- Lettuce'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -768,7 +796,7 @@ MonoBehaviour:
     - Name: WrapFalafelNoOnion
       Text: '- Onion'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -814,7 +842,7 @@ MonoBehaviour:
     - Name: WrapFalafelWithFries
       Text: + Fries
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -915,7 +943,7 @@ MonoBehaviour:
     - Name: PaninoFalafelBaseOrder
       Text: 
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -961,7 +989,7 @@ MonoBehaviour:
     - Name: PaninoFalafelNoTomato
       Text: '- Tomato'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1007,7 +1035,7 @@ MonoBehaviour:
     - Name: PaninoFalafelNoLettuce
       Text: '- Lettuce'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1053,7 +1081,7 @@ MonoBehaviour:
     - Name: PaninoFalafelNoOnion
       Text: '- Onion'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1099,7 +1127,7 @@ MonoBehaviour:
     - Name: PaninoFalafelWithFries
       Text: + Fries
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1200,7 +1228,7 @@ MonoBehaviour:
     - Name: PizzaRossaBaseOrder
       Text: 
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1243,7 +1271,7 @@ MonoBehaviour:
     - Name: PizzaRossaWithFries
       Text: + Fries
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1341,7 +1369,7 @@ MonoBehaviour:
     - Name: PizzaMargheritaBaseOrder
       Text: 
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1384,7 +1412,7 @@ MonoBehaviour:
     - Name: PizzaMargheritaWithFries
       Text: + Fries
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1482,7 +1510,7 @@ MonoBehaviour:
     - Name: PizzaKebabBaseOrder
       Text: 
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1527,7 +1555,7 @@ MonoBehaviour:
     - Name: PizzaKebabNoLettuce
       Text: '- Lettuce'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1572,7 +1600,7 @@ MonoBehaviour:
     - Name: PizzaKebabNoOnion
       Text: '- Onion'
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
@@ -1617,7 +1645,7 @@ MonoBehaviour:
     - Name: PizzaKebabWithFries
       Text: + Fries
       TextStyle:
-        Enabled: 1
+        Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
         Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}

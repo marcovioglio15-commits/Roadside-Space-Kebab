@@ -4,17 +4,19 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Shares conditional paragraph controls between base orders and recipe variants.</summary>
+    /// <summary>Shares conditional typography controls between catalogs, orders and recipe variants.</summary>
     internal static class OrderTextControls
     {
         #region Methods
         #region Drawing
 
-        /// <summary>Exposes typography only when this paragraph requests an independent appearance.</summary>
-        /// <param name="style">Detached paragraph settings inside a catalog entry or variant.</param>
-        internal static void Draw(SerializedProperty style)
+        /// <summary>Exposes typography when the shared catalog style or a paragraph override is enabled.</summary>
+        /// <param name="style">Detached catalog, order or variant text settings.</param>
+        /// <param name="localOverride">Whether these settings replace the shared catalog appearance.</param>
+        internal static void Draw(SerializedProperty style, bool localOverride = true)
         {
-            HoverControls.Field(style, "Enabled", "Customize Board Text");
+            // A single control layout keeps shared settings and paragraph overrides consistent.
+            HoverControls.Field(style, "Enabled", localOverride ? "Override Board Text" : "Customize Board Text");
             if (!style.FindPropertyRelative("Enabled").boolValue)
                 return;
             using StudioIndentScope indent = new StudioIndentScope();

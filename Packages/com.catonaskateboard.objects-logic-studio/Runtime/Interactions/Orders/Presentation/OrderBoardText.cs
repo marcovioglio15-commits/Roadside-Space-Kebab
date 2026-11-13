@@ -71,7 +71,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Keeps base text in the main slot and draws selected variants in separate authored paragraphs.</summary>
         /// <param name="candidate">Base, single variant or combo currently occupying this slot.</param>
-        internal void Draw(OrderCandidate candidate)
+        /// <param name="shared">Typography from the catalog selected for this customer's spawn.</param>
+        internal void Draw(OrderCandidate candidate, OrderTextStyle shared)
         {
             // Restore all existing paragraph objects before drawing a replacement ticket.
             Clear();
@@ -79,11 +80,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             if (candidate.HasVariants)
             {
-                DrawVariants(candidate);
+                DrawVariants(candidate, shared);
                 return;
             }
             // Base-only orders without custom styling keep the original slot's direct text path.
-            if (candidate.Entry.TextStyle is not { Enabled: true })
+            OrderTextStyle style = OrderTextStyle.Resolve(candidate.Entry.TextStyle, shared);
+            if (style == null)
                 return;
             if (paragraphs.Length == 0)
             {
@@ -92,15 +94,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             original.enabled = false;
             float offset = 0f;
-            Present(0, candidate.Entry.Text, candidate.Entry.TextStyle, ref offset);
+            Present(0, candidate.Entry.Text, style, ref offset);
         }
 
         /// <summary>Draws recipe paragraphs while keeping base text in the main slot or its own styled paragraph.</summary>
         /// <param name="candidate">Variant or combo currently occupying this slot.</param>
-        private void DrawVariants(OrderCandidate candidate)
+        /// <param name="shared">Catalog appearance inherited independently by each paragraph.</param>
+        private void DrawVariants(OrderCandidate candidate, OrderTextStyle shared)
         {
             // Keep the main slot independent while applying optional paragraph typography.
-            bool styledBase = candidate.Entry.TextStyle is { Enabled: true };
+            OrderTextStyle style = OrderTextStyle.Resolve(candidate.Entry.TextStyle, shared);
+            bool styledBase = style != null;
             bool includeBase = !string.IsNullOrWhiteSpace(candidate.MainText);
             int count = (candidate.Combo?.Length ?? 1) + (styledBase && includeBase ? 1 : 0);
             if (count > paragraphs.Length)
@@ -114,16 +118,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (styledBase && includeBase)
             {
                 original.enabled = false;
-                Present(index++, candidate.MainText, candidate.Entry.TextStyle, ref offset);
+                Present(index++, candidate.MainText, style, ref offset);
             }
             else if (includeBase)
                 offset = original.preferredHeight;
             // Variant members follow the base line and never enter the main order text.
             if (candidate.Combo != null)
                 foreach (OrderRecipeVariant variant in candidate.Combo)
-                    Present(index++, variant.Text, variant.TextStyle, ref offset);
+                    Present(index++, variant.Text, OrderTextStyle.Resolve(variant.TextStyle, shared), ref offset);
             else
-                Present(index, candidate.Variant.Text, candidate.Variant.TextStyle, ref offset);
+                Present(index, candidate.Variant.Text, OrderTextStyle.Resolve(candidate.Variant.TextStyle, shared), ref offset);
         }
 
         /// <summary>Restores the plain slot before clearing or replacing a ticket.</summary>

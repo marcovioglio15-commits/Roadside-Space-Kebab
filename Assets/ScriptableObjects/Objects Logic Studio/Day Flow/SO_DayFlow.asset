@@ -61,30 +61,78 @@ MonoBehaviour:
       NewCustomerSound: 1
       Weight: 1
       Delay: 0
-      Position: {x: 0, y: 1, z: 0}
-      Rotation: {x: 0, y: 90, z: 0}
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 165, z: 0}
       WalkIn:
         Enabled: 1
         Space: 1
+        Interpolation: 2
         Keyframes:
+        - Pose:
+            Position: {x: 1.5, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1.6
+          Direction: 1
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1.1
+          Direction: 1
         - Pose:
             Position: {x: 3, y: 1, z: -5}
             Rotation: {x: 0, y: 0, z: 0}
             Scale: {x: 1, y: 1, z: 1}
           Delay: 0
-          Duration: 1
+          Duration: 0.35
           Direction: 1
       WalkOut:
         Enabled: 1
         Space: 1
+        Interpolation: 2
         Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 0.35
+          Direction: 1
         - Pose:
             Position: {x: 6, y: 1, z: -5}
             Rotation: {x: 0, y: 90, z: 0}
             Scale: {x: 1, y: 1, z: 1}
           Delay: 0
-          Duration: 1
+          Duration: 2.3
           Direction: 1
+      CharacterAnimation:
+        Target: {fileID: 8094522055128292449, guid: 1ffcb0b9b0141834faf18db62ddc6bc4, type: 3}
+        Walk:
+          Path: Base Layer.Walk
+          Clip: {fileID: -3661132242451996280, guid: 20a7daef952a00b4daa659ef4fb3dd53, type: 3}
+          Layer: 0
+          SpeedParameter: WalkSpeed
+        Idle:
+          Path: Base Layer.Idle
+          Clip: {fileID: 4616504228028260366, guid: 20a7daef952a00b4daa659ef4fb3dd53, type: 3}
+          Layer: 0
+          SpeedParameter: 
+        Pay:
+          Path: Base Layer.Pay
+          Clip: {fileID: -5090220924670980960, guid: 20a7daef952a00b4daa659ef4fb3dd53, type: 3}
+          Layer: 0
+          SpeedParameter: 
+        Death:
+          Path: Base Layer.Death
+          Clip: {fileID: 789342168842323621, guid: 20a7daef952a00b4daa659ef4fb3dd53, type: 3}
+          Layer: 0
+          SpeedParameter: 
+        BlendDuration: 0.16
+        SynchronizeWalk: 1
+        WalkReferenceSpeed: 0.95
   Loop: 1
   PreserveScene: 1
   MainMenu: 

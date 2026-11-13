@@ -147,6 +147,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     HoverControls.Field(step, "Rotation");
                     Animation(step.FindPropertyRelative("WalkIn"), "Walk In");
                     Animation(step.FindPropertyRelative("WalkOut"), "Walk Out");
+                    SpawnFlowAnimatorControls.Draw(step);
                 }
             if (StudioButton.Draw(new GUIContent("+ Add Spawn", "Append a prefab template with its own completion interaction.")))
             {
@@ -163,10 +164,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 added.FindPropertyRelative("Delay").floatValue = 0f;
                 added.FindPropertyRelative("Position").vector3Value = Vector3.zero;
                 added.FindPropertyRelative("Rotation").vector3Value = Vector3.zero;
+                SpawnFlowAnimatorControls.Clear(added);
                 foreach (string name in new[] { "WalkIn", "WalkOut" })
                 {
                     added.FindPropertyRelative(name + ".Enabled").boolValue = false;
                     added.FindPropertyRelative(name + ".Space").enumValueIndex = (int)SpawnFlowSpace.World;
+                    added.FindPropertyRelative(name + ".Interpolation").enumValueIndex = (int)SpawnFlowInterpolation.EaseInOut;
                     added.FindPropertyRelative(name + ".Keyframes").arraySize = 0;
                 }
                 added.isExpanded = true;
@@ -252,6 +255,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             using StudioIndentScope indent = new StudioIndentScope();
             HoverControls.Field(animation, "Space", "Key Space");
+            HoverControls.Field(animation, "Interpolation");
             SerializedProperty frames = animation.FindPropertyRelative("Keyframes");
             for (int index = 0; index < frames.arraySize; index++)
             {

@@ -22,6 +22,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool closed;
         private bool inReceipt;
         private Transform emitter;
+        private ObjectContactModifier collector;
         private Vector3 position;
 
         #endregion
@@ -32,9 +33,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Binds completion sources once per spawn, preserving progress through temporary deactivation.</summary>
         /// <param name="configuration">Validated collection settings.</param>
-        /// <param name="owner">Object containing every selected completion source.</param>
+        /// <param name="owner">Collector containing every selected completion source and receiving payout notifications.</param>
         /// <param name="newSpawn">Whether previous earnings and completion state belong to another lifetime.</param>
-        internal void Configure(ContactPriceSettings configuration, GameObject owner, bool newSpawn)
+        internal void Configure(ContactPriceSettings configuration, ObjectContactModifier owner, bool newSpawn)
         {
             ObjectInteraction.Signaled -= Observe;
             if (generation != CollectedPrice.Generation)
@@ -53,6 +54,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 remaining = 0;
             }
             settings = configuration;
+            collector = owner;
             emitter = owner.transform;
             position = emitter.position;
             if (closed || settings is not { CollectPrice: true, DeferDisplay: true })
@@ -65,7 +67,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Subscription remains through temporary deactivation so an already running local source can finish.
             for (int index = 0; index < sources.Length; index++)
             {
-                ObjectInteraction source = settings.CompletionSources[index].Resolve(owner);
+                ObjectInteraction source = settings.CompletionSources[index].Resolve(owner.gameObject);
                 if (sources[index] != source)
                     completed[index] = false;
                 sources[index] = source;
@@ -220,6 +222,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (amount <= 0m)
                 return;
             CollectedPrice.Publish(amount);
+            if (collector != null)
+                collector.NotifyPriceCollected();
             if (settings.Sound)
                 StudioAudio.PlayAt("sfx_cashcollect", emitter != null ? emitter.position : position);
         }

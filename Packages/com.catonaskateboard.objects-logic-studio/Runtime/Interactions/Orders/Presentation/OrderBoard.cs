@@ -197,10 +197,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 objectViews[index]?.Show(Tint(ticket));
             slots[index].text = ticket.Candidate.MainText;
             slots[index].fontStyle = styles[index];
-            if (formatting[index] == null && ticket.Candidate.HasVariants)
-                Debug.LogWarning("Prepare variant paragraphs on this Order Board before Play.", this);
+            // The active spawn catalog also covers occurrence-specific catalog overrides.
+            OrderTextStyle shared = ticket.Owner.ActiveCatalog?.TextStyle;
+            if (formatting[index] == null && (ticket.Candidate.HasVariants
+                || OrderTextStyle.Resolve(ticket.Entry.TextStyle, shared) != null))
+                Debug.LogWarning("Prepare text paragraphs on this Order Board before Play to display recipe variants or custom typography.", this);
             else
-                formatting[index]?.Draw(ticket.Candidate);
+                formatting[index]?.Draw(ticket.Candidate, shared);
         }
 
         /// <summary>Refreshes the color of a visible order after gameplay has resolved the receipt.</summary>

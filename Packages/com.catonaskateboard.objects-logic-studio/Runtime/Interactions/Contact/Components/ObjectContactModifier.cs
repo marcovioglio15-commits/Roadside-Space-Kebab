@@ -58,10 +58,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal int ContactRevision { get; private set; }
         /// <summary>Whether the latest contact event was rejected solely by the consumption dialogue gate.</summary>
         internal bool AwaitingContact { get; private set; }
+        /// <summary>Raised when this collector releases a positive payment, including deferred batches.</summary>
+        internal event Action PriceCollected;
 
         #endregion
         #region Methods
         #region Lifecycle
+
+        /// <summary>Notifies this spawn's animation when a real payment is released.</summary>
+        internal void NotifyPriceCollected()
+        {
+            // Keep animation callbacks separate from contact completion and order accounting.
+            PriceCollected?.Invoke();
+        }
 
         /// <summary>Starts reusable rule state only when an object enters gameplay.</summary>
         protected override void OnEnable()
@@ -103,7 +112,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 gateGeneration = ObjectSpawnHistory.Generation;
                 gateSpawn = Item.Spawn.Index;
             }
-            price.Configure(settings.ConsumesAny ? settings.Price : null, gameObject, newSpawn);
+            price.Configure(settings.ConsumesAny ? settings.Price : null, this, newSpawn);
             consumeDialogue = settings.ConsumesAny && settings.ConsumeOn.Enabled ? settings.ConsumeOn.Resolve(gameObject) : null;
             ObjectInteraction.Signaled += ObserveDialogue;
             // Runtime state needs distinct Unity identities for existing reservation and temporary-flag ownership.

@@ -17,7 +17,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Board suffix or replacement. Empty displays only the base order text. Both actual line breaks and \\n are supported.")]
         [TextArea(2, 5)]
         public string Text = "Variant";
-        [Tooltip("Independent board typography and paragraph spacing. Combo members retain their individual overrides.")]
+        [Tooltip("Override the catalog typography and paragraph spacing for this variant. Combo members keep their individual overrides.")]
         public OrderTextStyle TextStyle = new OrderTextStyle();
         [Tooltip("Display the base order text followed by this variant's text, separated by a space. Disable to use only the variant text.")]
         public bool AppendToBaseText = true;

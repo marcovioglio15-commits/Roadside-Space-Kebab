@@ -16,7 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Order text shown until the object despawns. Completion adds strikethrough without freeing its slot.")]
         [TextArea(2, 5)]
         public string Text = "Order";
-        [Tooltip("Independent board typography and paragraph spacing. Combo members retain their individual overrides.")]
+        [Tooltip("Override the catalog typography and paragraph spacing for this order's base text.")]
         public OrderTextStyle TextStyle = new OrderTextStyle();
         [Tooltip("Replace the recipe price when a consumed assembly product fulfils an open ticket for this order. Recipe variants and combos inherit this override.")]
         public bool OverridePrice;

@@ -7,6 +7,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     /// <summary>Chooses offsets in the spawn frame or absolute scene coordinates.</summary>
     public enum SpawnFlowSpace { Relative, World }
 
+    /// <summary>Chooses individual easing, uniform segment travel or continuous movement through keyframes.</summary>
+    public enum SpawnFlowInterpolation { EaseInOut, Linear, Continuous }
+
     /// <summary>Owns one prefab's placement, interaction completion and arrival/departure keyframes.</summary>
     [Serializable]
     public sealed class SpawnFlowStep
@@ -45,6 +48,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public SpawnFlowAnimation WalkIn = new SpawnFlowAnimation();
         [Tooltip("Optional transform path performed after completion and before despawning.")]
         public SpawnFlowAnimation WalkOut = new SpawnFlowAnimation();
+        [Tooltip("Optional controller states for walking, waiting, payment and Self Eject.")]
+        public SpawnFlowAnimatorSettings CharacterAnimation = new SpawnFlowAnimatorSettings();
 
         #endregion
 
@@ -103,7 +108,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || !SpawnFlowPlan.Duration(Delay) || !SpawnFlowPlan.Duration(Weight))
                 return false;
             warning = "Both animation settings must be present.";
-            return WalkIn != null && WalkOut != null && WalkIn.TryValidate(out warning) && WalkOut.TryValidate(out warning);
+            return WalkIn != null && WalkOut != null && WalkIn.TryValidate(out warning) && WalkOut.TryValidate(out warning)
+                && (CharacterAnimation == null || CharacterAnimation.TryValidate(Prefab, out warning));
         }
 
         #endregion
@@ -121,6 +127,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool Enabled;
         [Tooltip("World uses exact scene positions and rotations. Relative uses offsets rotated by the spawn orientation and scale multipliers.")]
         public SpawnFlowSpace Space;
+        [Tooltip("Ease In Out stops at every keyframe. Linear keeps each segment's speed constant. Continuous joins moving segments smoothly and stops at delays, stationary turns and path endpoints.")]
+        public SpawnFlowInterpolation Interpolation;
         [Tooltip("Ordered destinations. Each Duration is travel time from the preceding pose, after its Delay. A zero-duration first frame sets an explicit starting pose.")]
         public SpawnFlowKeyframe[] Keyframes = Array.Empty<SpawnFlowKeyframe>();
 
@@ -139,7 +147,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!Enabled)
                 return true;
             warning = "Enabled walk paths need keyframes with finite poses, positive scale and nonnegative timing.";
-            if (Keyframes == null || Keyframes.Length == 0 || Space is not (SpawnFlowSpace.Relative or SpawnFlowSpace.World))
+            if (Keyframes == null || Keyframes.Length == 0 || Space is not (SpawnFlowSpace.Relative or SpawnFlowSpace.World)
+                || Interpolation is not (SpawnFlowInterpolation.EaseInOut or SpawnFlowInterpolation.Linear or SpawnFlowInterpolation.Continuous))
                 return false;
             foreach (SpawnFlowKeyframe frame in Keyframes)
                 if (frame == null || !frame.Pose.IsValid() || !SpawnFlowPlan.Duration(frame.Duration)

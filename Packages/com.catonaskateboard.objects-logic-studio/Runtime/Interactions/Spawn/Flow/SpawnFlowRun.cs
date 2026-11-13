@@ -24,6 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectDialogue arrivalDialogue;
         private SpawnFlowStep step;
         private SpawnFlowMotion motion;
+        private SpawnFlowAnimatorRun characterAnimation;
         private SuspendedItemState suspended;
         private Phase phase = Phase.Stopped;
         private int day;
@@ -238,6 +239,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 FinishStep();
                 return;
             }
+            characterAnimation?.Tick();
             switch (phase)
             {
                 case Phase.AwaitingStart:
@@ -253,24 +255,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         Spawn();
                     break;
                 case Phase.Arrival:
-                    if (motion.Tick(Time.deltaTime))
+                    if (AdvanceMotion())
                     {
                         phase = Phase.Waiting;
                         suspended.Restore();
+                        characterAnimation?.Move(false);
                         AnnounceArrival();
                     }
                     break;
                 case Phase.Waiting:
-                    if (!signaled || instance.TryGetComponent(out ObjectEject eject) && eject.AwaitingDespawn)
+                    if (!signaled || characterAnimation is { Busy: true }
+                        || instance.TryGetComponent(out ObjectEject eject) && eject.AwaitingDespawn)
                         return;
+                    if (characterAnimation is { Dying: true })
+                    {
+                        FinishStep();
+                        return;
+                    }
                     suspended = new SuspendedItemState(instance, true);
                     suspended.Suspend();
                     motion.Begin(step.WalkOut);
                     suspended.Reveal();
+                    characterAnimation?.Move(false);
                     phase = Phase.Departure;
                     break;
                 case Phase.Departure:
-                    if (motion.Tick(Time.deltaTime))
+                    if (AdvanceMotion())
                         FinishStep();
                     break;
             }
@@ -300,6 +310,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 arrivalDialogue?.ConfigureArrival();
             }
             motion = new SpawnFlowMotion(instance.transform);
+            if (step.CharacterAnimation is { Enabled: true })
+                characterAnimation = new SpawnFlowAnimatorRun(step.CharacterAnimation, step.Prefab, instance);
             if (step.WalkIn.Enabled)
             {
                 suspended = new SuspendedItemState(instance, true);
@@ -313,8 +325,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 suspended.Reveal();
             else
                 instance.SetActive(true);
+            characterAnimation?.Move(false);
             if (!step.WalkIn.Enabled)
                 AnnounceArrival();
+        }
+
+        /// <summary>Advances one path and passes its actual travel speed to the gait controller.</summary>
+        /// <returns>True when the active walk path has finished.</returns>
+        private bool AdvanceMotion()
+        {
+            // Animation consumes the same movement sample, including delays and stationary rotations.
+            bool completedMotion = motion.Tick(Time.deltaTime);
+            characterAnimation?.Travel(motion.Speed);
+            return completedMotion;
         }
 
         /// <summary>Announces physical arrival once, independently of whether dialogue can open immediately.</summary>
@@ -332,6 +355,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="moment">Successful lifecycle boundary.</param>
         private void Observe(ObjectInteraction source, InteractionMoment moment)
         {
+            // Successful Self Eject takes animation priority before completion can schedule departure.
+            characterAnimation?.Observe(source, moment);
             // Only a completion after this day's start opens the first spawn; unrelated scene events are ignored.
             if (phase == Phase.AwaitingStart && source == startInteraction && moment == InteractionMoment.Completed)
                 signaled = true;
@@ -420,6 +445,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Removes only this run's active visitor and clears its completion identity.</summary>
         private void RemoveInstance()
         {
+            characterAnimation?.Dispose();
+            characterAnimation = null;
             // Spawned products unrelated to the visitor remain in their own scene until normal scene unload.
             if (instance != null)
             {

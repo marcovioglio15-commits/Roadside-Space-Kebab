@@ -23,8 +23,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             }
             serializedObject.Update();
-            OrderCatalog catalog = (OrderCatalog)target;
-            SerializedProperty entries = serializedObject.FindProperty("Entries");
+            // Shared typography precedes the independently collapsible order list.
+            SerializedProperty style = serializedObject.FindProperty("TextStyle");
+            style.isExpanded = StudioArrayGUI.Foldout(style,
+                new GUIContent("Board Text Settings", "Shared typography for orders and recipe variants without a local override."));
+            if (style.isExpanded)
+                using (new StudioIndentScope())
+                    OrderTextControls.Draw(style, false);
+            DrawEntries(serializedObject.FindProperty("Entries"));
+            DrawPools((OrderCatalog)target, serializedObject.FindProperty("Pools"));
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        /// <summary>Keeps the complete order list under one foldout while retaining per-order controls.</summary>
+        /// <param name="entries">Serialized order candidates in the current catalog proposal.</param>
+        private static void DrawEntries(SerializedProperty entries)
+        {
+            // Collapsing the list leaves global typography and extraction pools accessible.
+            entries.isExpanded = StudioArrayGUI.Foldout(entries,
+                new GUIContent("Available Orders", entries.tooltip));
+            if (!entries.isExpanded)
+                return;
+            using StudioIndentScope listIndent = new StudioIndentScope();
             for (int index = 0; index < entries.arraySize; index++)
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
@@ -56,8 +76,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                             Variants(entry);
                 }
             StudioArrayGUI.Add(entries, "Add Available Order", () => new OrderEntry { Name = "Order " + entries.arraySize });
-            DrawPools(catalog, serializedObject.FindProperty("Pools"));
-            serializedObject.ApplyModifiedProperties();
         }
 
         /// <summary>Authors dynamic pools that can reference any base order, variant or generated combo.</summary>

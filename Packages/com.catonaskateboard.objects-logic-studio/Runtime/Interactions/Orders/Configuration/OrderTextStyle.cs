@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Styles one order paragraph independently of its parent order and other combo members.</summary>
+    /// <summary>Stores shared catalog typography or an independent order paragraph override.</summary>
     [Serializable]
     public sealed class OrderTextStyle
     {
         #region Fields
 
         [Header("Board Text")]
-        [Tooltip("Use this paragraph's typography and layout. Disabled keeps the saved board appearance.")]
+        [Tooltip("Apply these text settings. A disabled order or variant inherits the catalog settings; a disabled catalog keeps the board appearance.")]
         public bool Enabled;
         [Tooltip("Optional TMP font asset. Empty keeps the board's font.")]
         public TMP_FontAsset Font;
@@ -81,6 +81,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
         #region Methods
         #region Presentation
+
+        /// <summary>Chooses a paragraph override before the shared catalog settings.</summary>
+        /// <param name="local">Optional settings for one order or recipe variant.</param>
+        /// <param name="shared">Optional catalog settings used by paragraphs without an override.</param>
+        /// <returns>The first enabled style, or null to retain the board appearance.</returns>
+        internal static OrderTextStyle Resolve(OrderTextStyle local, OrderTextStyle shared)
+        {
+            // Each combo paragraph resolves independently, preserving its own overrides.
+            return local is { Enabled: true } ? local : shared is { Enabled: true } ? shared : null;
+        }
 
         /// <summary>Applies an enabled paragraph override to existing TMP graphics.</summary>
         /// <param name="text">Existing paragraph, already restored to the board's baseline.</param>

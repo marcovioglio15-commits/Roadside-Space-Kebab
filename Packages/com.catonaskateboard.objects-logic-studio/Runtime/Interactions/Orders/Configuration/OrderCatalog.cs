@@ -11,6 +11,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
     {
         #region Fields
 
+        [Header("Board Text")]
+        [Tooltip("Shared board typography and paragraph spacing. Orders and recipe variants can override it independently. Disabled keeps the board appearance.")]
+        public OrderTextStyle TextStyle = new OrderTextStyle();
+
         [Header("Available Orders")]
         [Tooltip("Named candidates shared by every interaction referencing this catalog. Quantities occupy individual board slots.")]
         public OrderEntry[] Entries = Array.Empty<OrderEntry>();
@@ -27,6 +31,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when definitions and active extraction pools are valid.</returns>
         public bool TryValidate(out string warning)
         {
+            // Catalog typography is checked before individual paragraph overrides.
+            if (TextStyle != null && !TextStyle.TryValidate(out warning))
+                return false;
             // Names are stable keys for Consumption dialogue filters on all catalog consumers.
             warning = "Add at least one available order.";
             if (Entries == null || Entries.Length == 0)

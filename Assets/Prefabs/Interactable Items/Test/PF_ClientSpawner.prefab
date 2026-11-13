@@ -39,8 +39,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7299573035299854550}
   - component: {fileID: 7674711298056937319}
+  - component: {fileID: 7299573035299854550}
   - component: {fileID: 8843049610005925519}
   - component: {fileID: 7667976349241050314}
   - component: {fileID: 8798008648663988149}
@@ -67,6 +67,18 @@ Transform:
   - {fileID: 9111594684817849048}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7299573035299854550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7206794410215158791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08b984ae8b5989d429cca4f5058e033c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.MenuStudio.Runtime::CatOnASkateboard.MenuStudio.MenuSceneTransition
 --- !u!114 &8843049610005925519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,15 +193,3 @@ MonoBehaviour:
     MaximumAlive: 10
   staging: {fileID: 9111594684817849048}
   transition: {fileID: 7299573035299854550}
---- !u!114 &7299573035299854550
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7206794410215158791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08b984ae8b5989d429cca4f5058e033c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.MenuStudio.Runtime::CatOnASkateboard.MenuStudio.MenuSceneTransition
