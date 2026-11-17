@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.ExcelExchangeStudio.Editor::CatOnASkateboard.ExcelExchangeStudio.Editor.ExcelExchangePreset
   Target: {fileID: 11400000, guid: 66ec0f0a64b1494c86e47657a5933e7b, type: 2}
   Scope: 
-  WorkbookPath: C:/Users/PC/Desktop/GitLabRepos/Roadside-Space-Kebab/Assets/Editor/Excel Exchange/Test/Order CatalogUpdated.xlsx
-  Worksheet: Sheet1
+  WorkbookPath: C:/Users/crist/GameDev/KebabSpacetruck/Assets/Editor/Excel Exchange/Test/Order CatalogDelivery.xlsx
+  Worksheet: General
   TemplatePath: 
+  ColumnWidthRatio: 5
   UseFormulaResults: 0
   Rows: 12
   Columns: 12
