@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using CatOnASkateboard.StudioColors.Editor;
+using UnityEditor;
 
 namespace CatOnASkateboard.ExcelExchangeStudio.Editor
 {
@@ -70,7 +72,16 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         public static void Export(StudioPresetContext context, ExcelExchangePreset preset, string path)
         {
             ExcelWorkbook template = preset.TemplatePath.Length > 0 ? ExcelWorkbookReader.Read(preset.TemplatePath) : null;
-            ExcelWorkbookWriter.Write(path, Build(context, preset, template), preset.TemplatePath);
+            ExcelWorkbookWriter.Write(path, Build(context, preset, template), preset.TemplatePath, preset.ColumnWidthRatio);
+            // Import only this output, so its meta and Project entry exist before Export returns.
+            string fullPath = Path.GetFullPath(path).Replace('\\', '/');
+            string assetsPath = UnityEngine.Application.dataPath.Replace('\\', '/').TrimEnd('/') + "/";
+            if (fullPath.StartsWith(assetsPath, StringComparison.OrdinalIgnoreCase))
+            {
+                string asset = "Assets/" + fullPath.Substring(assetsPath.Length);
+                AssetDatabase.ImportAsset(asset, ImportAssetOptions.ForceSynchronousImport | ImportAssetOptions.ForceUpdate);
+                EditorApplication.RepaintProjectWindow();
+            }
         }
 
         /// <summary>Enumerates concrete element positions for a logical nested collection.</summary>

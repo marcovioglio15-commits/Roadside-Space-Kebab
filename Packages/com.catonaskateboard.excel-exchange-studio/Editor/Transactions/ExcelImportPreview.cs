@@ -8,6 +8,9 @@ using Object = UnityEngine.Object;
 
 namespace CatOnASkateboard.ExcelExchangeStudio.Editor
 {
+    /// <summary>Separates imported values, default resets and list-size changes in the review.</summary>
+    public enum ExcelPreviewKind { Value, Default, Collection }
+
     /// <summary>Stores a reviewable field change or a cell-specific diagnostic.</summary>
     public readonly struct ExcelPreviewRow
     {
@@ -19,6 +22,11 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         public readonly string After;
         public readonly string Message;
         public readonly bool Error;
+        public readonly string Item;
+        public readonly string Fix;
+        public readonly string Mapping;
+        public readonly string Anchor;
+        public readonly ExcelPreviewKind Kind;
 
         #endregion
         #region Methods
@@ -30,7 +38,13 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         /// <param name="after">Incoming value.</param>
         /// <param name="message">Optional diagnostic or reset explanation.</param>
         /// <param name="error">Whether this row blocks import.</param>
-        public ExcelPreviewRow(string cell, string field, string before, string after, string message = "", bool error = false)
+        /// <param name="item">Parent and item names used to group related changes.</param>
+        /// <param name="kind">Value, default reset or list-size change.</param>
+        /// <param name="fix">Concrete correction shown beside an error.</param>
+        /// <param name="mapping">Field path used by Edit Mapping.</param>
+        /// <param name="anchor">Starting cell of the affected mapping.</param>
+        public ExcelPreviewRow(string cell, string field, string before, string after, string message = "", bool error = false,
+            string item = "Preset values", ExcelPreviewKind kind = ExcelPreviewKind.Value, string fix = "", string mapping = "", string anchor = "")
         {
             Cell = cell;
             Field = field;
@@ -38,6 +52,11 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             After = after;
             Message = message;
             Error = error;
+            Item = item;
+            Kind = kind;
+            Fix = fix;
+            Mapping = mapping;
+            Anchor = anchor;
         }
 
         #endregion
@@ -65,13 +84,14 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         #region Properties
 
         public bool CanImport => !imported && !Rows.Exists(row => row.Error);
+        public bool Imported => imported;
         public int Changes
         {
             get
             {
                 int count = 0;
                 foreach (ExcelPreviewRow row in Rows)
-                    if (!row.Error && row.Before != row.After)
+                    if (!row.Error && row.Kind == ExcelPreviewKind.Value && row.Before != row.After)
                         count++;
                 return count;
             }
@@ -112,11 +132,11 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         public void Import()
         {
             if (!CanImport || !Context.IsCurrent() || Context.Source == null)
-                throw new InvalidOperationException("Resolve the preview errors and keep the same preset open before importing.");
+                throw new InvalidOperationException("Fix the listed cells and keep the same preset open before Import.");
             using Snapshot current = new Snapshot(Context.Capture());
             if (Hash(Path) != WorkbookHash || EditorJsonUtility.ToJson(Preset) != PresetStamp
                 || JsonUtility(current.Value) != SourceStamp || JsonUtility(Context.Source) != AssetStamp)
-                throw new InvalidOperationException("The workbook, mapping or preset changed. Run Preview again.");
+                throw new InvalidOperationException("The file, setup or preset values changed. Refresh Preview before Import.");
             Undo.IncrementCurrentGroup();
             int group = Undo.GetCurrentGroup();
             Undo.SetCurrentGroupName("Import With Excell");

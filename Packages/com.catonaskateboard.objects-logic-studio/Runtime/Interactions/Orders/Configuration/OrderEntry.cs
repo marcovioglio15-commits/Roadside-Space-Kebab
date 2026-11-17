@@ -43,7 +43,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Require all selected flags on the same consumed item. Otherwise any selected flag qualifies.")]
         public bool RequireAllFlags;
         [Header("Recipe Modifiers")]
-        [Tooltip("Add independently drawn variants requiring or excluding ingredient flags in a completed Assembly Product.")]
+        [Tooltip("Add separately drawn variants requiring or excluding inserted ingredient flags and applied sauce flags.")]
         public bool UseRecipeModifiers;
         [Tooltip("Keep the base order as a candidate alongside its variants. Base orders retain their normal identity filters; matching variant tickets are fulfilled first.")]
         public bool IncludeBaseOrder = true;

@@ -69,7 +69,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return "Physics";
             if (section is "trajectory")
                 return "Throw";
-            if (section.Contains("eject") || section is "ejection" || group.Parent.Contains(".Eject"))
+            if (section.Contains("eject") || section is "ejection" or "team rocket spin" || group.Parent.Contains(".Eject"))
                 return "Ejection";
             if (section.Contains("animation"))
                 return "Animation";

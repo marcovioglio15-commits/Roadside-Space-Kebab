@@ -11,30 +11,29 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
 
         /// <summary>Opens row or column actions only when the right button hits a cell boundary.</summary>
         /// <param name="preset">Current grid dimensions.</param>
-        /// <param name="width">Cell stride.</param>
-        /// <param name="height">Row stride.</param>
+        /// <param name="geometry">Shared cell and gap measurements.</param>
         /// <param name="edit">Runs one reversible structural edit.</param>
-        internal static void Draw(ExcelExchangePreset preset, float width, float height, Action<bool, bool, int> edit)
+        internal static void Draw(ExcelExchangePreset preset, ExcelGridGeometry geometry, Action<bool, bool, int> edit)
         {
             Event input = Event.current;
             if (input.type != EventType.ContextClick)
                 return;
             Vector2 point = input.mousePosition;
-            int row = Mathf.RoundToInt((point.y - 24f) / height);
-            int column = Mathf.RoundToInt((point.x - 42f) / width);
-            bool horizontal = row >= 0 && row <= preset.Rows && point.x >= 42f
-                && point.x <= 42f + preset.Columns * width && Mathf.Abs(point.y - 24f - row * height) <= 5f;
-            bool vertical = column >= 0 && column <= preset.Columns && point.y >= 24f
-                && point.y <= 24f + preset.Rows * height && Mathf.Abs(point.x - 42f - column * width) <= 5f;
+            int row = Mathf.RoundToInt((point.y - ExcelGridGeometry.Header + ExcelGridGeometry.Gap * 0.5f) / geometry.RowStride) + 1;
+            int column = Mathf.RoundToInt((point.x - ExcelGridGeometry.Gutter + ExcelGridGeometry.Gap * 0.5f) / geometry.ColumnStride) + 1;
+            bool horizontal = row >= 1 && row <= preset.Rows + 1 && point.x >= ExcelGridGeometry.Gutter
+                && point.x <= ExcelGridGeometry.Gutter + preset.Columns * geometry.ColumnStride && Mathf.Abs(point.y - geometry.Boundary(true, row)) <= ExcelGridGeometry.Gap * 0.5f;
+            bool vertical = column >= 1 && column <= preset.Columns + 1 && point.y >= ExcelGridGeometry.Header
+                && point.y <= ExcelGridGeometry.Header + preset.Rows * geometry.RowStride && Mathf.Abs(point.x - geometry.Boundary(false, column)) <= ExcelGridGeometry.Gap * 0.5f;
             if (!horizontal && !vertical)
                 return;
             GenericMenu menu = new GenericMenu();
             if (horizontal)
-                Add(menu, true, row + 1, preset.Rows, edit);
+                Add(menu, true, row, preset.Rows, edit);
             if (horizontal && vertical)
                 menu.AddSeparator(string.Empty);
             if (vertical)
-                Add(menu, false, column + 1, preset.Columns, edit);
+                Add(menu, false, column, preset.Columns, edit);
             menu.ShowAsContext();
             input.Use();
         }

@@ -19,6 +19,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly Dictionary<ObjectFlag, int> consumedFlags = new Dictionary<ObjectFlag, int>();
         private readonly List<(ObjectFlag[] Flags, int Units)> receipts = new List<(ObjectFlag[], int)>();
+        private readonly HashSet<ObjectFlag> appliedIngredients = new HashSet<ObjectFlag>();
         private readonly Dictionary<UnityEngine.Object, InteractionChannels> locks = new Dictionary<UnityEngine.Object, InteractionChannels>();
         private InteractionChannels blocked;
         private UnityEngine.Object reservation;
@@ -89,6 +90,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 item.reservation = null;
                 item.consumedFlags.Clear();
                 item.receipts.Clear();
+                item.appliedIngredients.Clear();
                 item.ConsumptionRevision++;
                 item.IsConsumed = false;
                 item.LastPlayerReleaseTime = double.NegativeInfinity;
@@ -305,8 +307,48 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             consumedFlags.Clear();
             receipts.Clear();
+            appliedIngredients.Clear();
             IsConsumed = false;
             ConsumptionRevision++;
+        }
+
+        #endregion
+
+        #region Recipe Applications
+
+        /// <summary>Retains sauce identities separately from targeting and the receiving object's identity.</summary>
+        /// <param name="flags">Sauce identities captured when the liquid left its source.</param>
+        internal void ApplyIngredient(ObjectFlag[] flags)
+        {
+            // Set membership makes repeated droplets and repeated sprays count as one application.
+            foreach (ObjectFlag flag in flags)
+                if (flag != null)
+                    appliedIngredients.Add(flag);
+        }
+
+        /// <summary>Combines inserted ingredients and applied sauces before consumption disables the item.</summary>
+        /// <returns>Unique recipe flags, or null when an assembly is unfinished or no recipe provenance exists.</returns>
+        internal ObjectFlag[] CaptureRecipeFlags()
+        {
+            // Unfinished assemblies retain their existing rejection behavior.
+            bool assembled = TryGetComponent(out ObjectAssemblyProduct product);
+            if (assembled && !product.IsComplete || !assembled && appliedIngredients.Count == 0)
+                return null;
+            HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>();
+            CollectRecipeFlags(flags);
+            ObjectFlag[] result = new ObjectFlag[flags.Count];
+            flags.CopyTo(result);
+            return result;
+        }
+
+        /// <summary>Retains sauce provenance when this item becomes an ingredient in another product.</summary>
+        /// <param name="destination">Set receiving applied sauces and any completed nested recipe.</param>
+        internal void CollectRecipeFlags(HashSet<ObjectFlag> destination)
+        {
+            // Insertion and delivery share this path, so nested products keep their sauces.
+            destination.UnionWith(appliedIngredients);
+            if (TryGetComponent(out ObjectAssemblyProduct product) && product.IsComplete)
+                product.CollectIngredientFlags(destination);
         }
 
         #endregion

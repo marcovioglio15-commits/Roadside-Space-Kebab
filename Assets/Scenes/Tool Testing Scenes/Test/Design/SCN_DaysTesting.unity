@@ -2623,6 +2623,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3596827793600545347, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3708504246687095788, guid: 1001cc9fddc73ac46abe62d64f5596bd, type: 3}
       propertyPath: m_FontData.m_Font
       value: 
@@ -4356,6 +4360,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
       propertyPath: showSlotObjects
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}
+      propertyPath: staggerSlotObjects
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4584737829633106159, guid: 40fb3c7320a76924ea1fee6ecc852d12, type: 3}

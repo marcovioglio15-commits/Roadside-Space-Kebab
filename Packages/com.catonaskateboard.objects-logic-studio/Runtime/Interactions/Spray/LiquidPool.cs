@@ -94,6 +94,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             droplets[index].Initialize();
             return droplets[index];
         }
+
+
         /// <summary>Creates one compact smooth sphere shared by every liquid body.</summary>
         /// <returns>Unit-radius geometry with outward normals and UV coordinates.</returns>
         private static Mesh BuildSphere()

@@ -42,6 +42,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Edit the saved preset directly instead of an object's draft.")]
         [SerializeField]
         private bool assetOnly;
+        [Tooltip("Show preset selection and transfer commands. Detailed fields stay in the parent editor.")]
+        [SerializeField]
+        private bool presetOptionsOnly;
         [Tooltip("Temporary object used to preview this preset.")]
         [SerializeField]
         private GameObject preview;
@@ -90,13 +93,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Group to edit.</param>
         /// <param name="field">Optional setting selected from the tree.</param>
         /// <param name="label">Selected field or section caption.</param>
-        internal static void Open(ObjectWorkspace state, ObjectGroupInfo settings, string field = null, string label = null)
+        /// <param name="optionsOnly">Opens preset management without drawing the interaction's controls.</param>
+        internal static void Open(ObjectWorkspace state, ObjectGroupInfo settings, string field = null, string label = null, bool optionsOnly = false)
         {
+            // Preset management and detailed field editing keep separate windows for the same group.
             foreach (ObjectGroupWindow existing in Resources.FindObjectsOfTypeAll<ObjectGroupWindow>())
-                if (existing.sourceKey == state.DraftKey && existing.group?.Key == settings.Key && existing.TryFocus(field, label))
+                if (existing.sourceKey == state.DraftKey && existing.group?.Key == settings.Key
+                    && existing.presetOptionsOnly == optionsOnly && existing.TryFocus(field, label))
                     return;
             ObjectGroupWindow window = CreateInstance<ObjectGroupWindow>();
             window.sourceKey = state.DraftKey;
+            window.presetOptionsOnly = optionsOnly;
             window.group = ObjectWorkspace.Copy(settings);
             window.document = CreateInstance<ObjectWorkspace>();
             window.opening = ObjectWorkspaceDraft.Capture(state);
@@ -106,7 +113,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             window.originalPreset = window.preset;
             window.presetBaseline = window.preset != null ? ObjectGroupPresetStore.AssetStamp(window.preset) : string.Empty;
             window.data = new SerializedObject(window.document);
-            window.titleContent = new GUIContent(ObjectInteractionCatalog.Name(ObjectWorkspaceDrafts.Selected(state)) + " · " + settings.Title);
+            window.titleContent = new GUIContent(ObjectInteractionCatalog.Name(ObjectWorkspaceDrafts.Selected(state)) + " · " + settings.Title
+                + (optionsOnly ? " · Preset" : string.Empty));
             window.minSize = new Vector2(370f, 260f);
             window.SetFocus(field, label);
             window.RefreshChanges();
@@ -199,7 +207,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Drawing
 
-        /// <summary>Shows one group's conditional controls and simple preset commands.</summary>
+        /// <summary>Shows preset commands and, in the detailed view, the group's conditional fields.</summary>
         private void OnGUI()
         {
             if (document == null || group == null)
@@ -227,8 +235,32 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     }
                 }
             }
-            using (new EditorGUI.DisabledScope(locked))
-                DrawPreset();
+            bool presetOpen = ObjectWorkspaceGUI.Foldout(document, "Preset." + group.Key, group.Title, group.Tooltip);
+            if (presetOpen)
+                using (new EditorGUI.DisabledScope(locked))
+                    DrawPreset();
+            if (presetOpen && !presetOptionsOnly)
+                DrawSettings(locked);
+            if (!string.IsNullOrEmpty(status))
+                EditorGUILayout.LabelField(status, EditorStyles.wordWrappedMiniLabel);
+            if (EditorGUI.EndChangeCheck())
+                RefreshChanges();
+            using (new EditorGUI.DisabledScope(locked || !HasChanges))
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                using (new EditorGUI.DisabledScope(!CanEdit))
+                    if (GUILayout.Button(new GUIContent("Apply", "Save this settings group now.")))
+                        ApplyChanges();
+                if (GUILayout.Button(new GUIContent("Discard", "Reload the applied settings for this group.")))
+                    Reload();
+            }
+        }
+
+        /// <summary>Draws detailed fields only for editors opened from a preset or settings node.</summary>
+        /// <param name="locked">Whether Play Mode currently prevents editing.</param>
+        private void DrawSettings(bool locked)
+        {
+            // Preset-options windows share the transfer commands without entering this field editor.
             Rect selection = default;
             if (!string.IsNullOrEmpty(focusLabel))
             {
@@ -262,19 +294,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 GUI.FocusControl("ObjectSetting." + focusPath);
                 focusPending = false;
                 Repaint();
-            }
-            if (!string.IsNullOrEmpty(status))
-                EditorGUILayout.LabelField(status, EditorStyles.wordWrappedMiniLabel);
-            if (EditorGUI.EndChangeCheck())
-                RefreshChanges();
-            using (new EditorGUI.DisabledScope(locked || !HasChanges))
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                using (new EditorGUI.DisabledScope(!CanEdit))
-                    if (GUILayout.Button(new GUIContent("Apply", "Save this settings group now.")))
-                        ApplyChanges();
-                if (GUILayout.Button(new GUIContent("Discard", "Reload the applied settings for this group.")))
-                    Reload();
             }
         }
 
@@ -361,13 +380,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (!window.assetOnly && window.HasChanges && window.document != null
                     && window.document.Target.PrefabGuid == prefabGuid && (componentId == 0 || window.document.Navigation.SelectedId == componentId))
                     return true;
-            return false;
+            return ObjectBranchWindow.HasPendingFor(prefabGuid, componentId);
         }
 
         /// <summary>Reconnects group controls after a layout preview writes into their detached document.</summary>
         /// <param name="changed">Document updated by a layout preview.</param>
         internal static void RefreshDocument(ObjectWorkspace changed)
         {
+            ObjectBranchWindow.RefreshDocument(changed);
             foreach (ObjectGroupWindow window in Resources.FindObjectsOfTypeAll<ObjectGroupWindow>())
                 if (window.document == changed)
                 {
@@ -402,7 +422,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             focusLabel = label ?? (focusPath.Length > 0 ? ObjectNames.NicifyVariableName(focusPath.Substring(focusPath.LastIndexOf('.') + 1)) : string.Empty);
             focusPending = !string.IsNullOrEmpty(focusPath);
             if (focusPending)
+            {
                 document.Navigation.Collapsed.RemoveAll(key => key.StartsWith("Group.", StringComparison.Ordinal));
+                document.Navigation.Collapsed.Remove("Preset." + group.Key);
+            }
             if (data != null)
                 fieldFocus.Configure(data, focusPath);
         }
@@ -534,6 +557,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="retained">Current proposal in the main workspace.</param>
         internal static void LayoutSaved(ObjectWorkspace changed, ObjectWorkspace retained)
         {
+            ObjectBranchWindow.LayoutSaved(changed, retained);
             foreach (ObjectGroupWindow window in Resources.FindObjectsOfTypeAll<ObjectGroupWindow>())
                 if (window.document == changed)
                 {

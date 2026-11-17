@@ -14,10 +14,10 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         #region Fields
 
         [Header("Mapping Session")]
-        [Tooltip("Recoverable changes to the exchange configuration, independent of preset values.")]
+        [Tooltip("Unsaved changes to the spreadsheet setup.")]
         [SerializeField]
         private StudioAssetSession session = new StudioAssetSession();
-        [Tooltip("Currently visible Layout, Import, Export or Preview page.")]
+        [Tooltip("Currently visible Layout, Import, Export or Import Review page.")]
         [SerializeField]
         private int page;
         private StudioPresetContext context;
@@ -25,9 +25,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         private string[] compatibleNames = Array.Empty<string>();
         private List<ExcelField> fields = new List<ExcelField>();
         private readonly ExcelLayoutView layout = new ExcelLayoutView();
-        private readonly List<ExcelPreviewRow> exportRows = new List<ExcelPreviewRow>();
+        private readonly ExcelPreviewView review = new ExcelPreviewView();
+        private Action<ExcelPreviewRow> editMapping;
         private ExcelImportPreview preview;
-        private Vector2 previewScroll;
         private string status = string.Empty;
         private string configurationStamp = string.Empty;
         private string worksheetPath;
@@ -37,7 +37,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             new GUIContent("Layout", "Choose fields and spreadsheet cells."),
             new GUIContent("Import", "Select a workbook and preview incoming values."),
             new GUIContent("Export", "Choose a template and export current values."),
-            new GUIContent("Preview", "Review mapped values and conversion messages.")
+            new GUIContent("Import Review", "Check changes and fix any import errors.")
         };
 
         #endregion
@@ -96,6 +96,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         private void OnEnable()
         {
             layout.Changed = MappingChanged;
+            editMapping = EditMapping;
             session.Restore();
             Undo.undoRedoPerformed += OnUndo;
             EditorApplication.projectChanged += RefreshLibrary;
@@ -211,7 +212,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         {
             bool changed = PathField("Workbook", "Spreadsheet supplying the imported values.", false);
             DrawWorksheet(changed);
-            Configuration.UseFormulaResults = StudioFieldGUI.Toggle(new GUIContent("Formula Results", "Use cached results saved by Excel. Missing or erroneous results block the cell."), Configuration.UseFormulaResults);
+            Configuration.UseFormulaResults = StudioFieldGUI.Toggle(new GUIContent("Formula Results", "Read formula results saved by Excel. Recalculate and save the file first."), Configuration.UseFormulaResults);
             DrawSummary(true);
             GUILayout.FlexibleSpace();
             if (StudioButton.Draw(new GUIContent("Preview Import", "Read the workbook and show changes before updating the preset."), expandWidth: true, minimumHeight: 30f))
@@ -222,11 +223,10 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         private void DrawExport()
         {
             PathField("Template", "Optional workbook whose other cells and formatting will be preserved.", true);
+            Configuration.ColumnWidthRatio = StudioFieldGUI.FloatField(new GUIContent("Column Width Limit", "Maximum column width compared with its shortest non-empty text. Longer values stay in the file without widening the column further."),
+                Configuration.ColumnWidthRatio, 1f, 20f);
             DrawSummary(false);
             GUILayout.FlexibleSpace();
-            using StudioButton.RowScope row = new StudioButton.RowScope();
-            if (StudioButton.Draw(new GUIContent("Preview Export", "Show the values written by these mappings."), expandWidth: true, minimumHeight: 30f))
-                PreviewExport();
             if (StudioButton.Draw(new GUIContent("Export…", "Choose where to save the workbook using the current preset values."), expandWidth: true, minimumHeight: 30f))
                 Export();
         }
@@ -234,29 +234,19 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         /// <summary>Compares incoming values and exposes import only for a valid current proposal.</summary>
         private void DrawPreview()
         {
-            if (preview == null && exportRows.Count == 0)
+            if (preview == null)
             {
-                EditorGUILayout.LabelField("Run Preview Import or Preview Export to review mapped values.", EditorStyles.wordWrappedLabel);
+                EditorGUILayout.LabelField("Choose Preview Import to see the changes.", EditorStyles.wordWrappedLabel);
                 GUILayout.FlexibleSpace();
                 return;
             }
-            if (preview != null)
-            {
-                EditorGUILayout.LabelField(preview.CanImport ? preview.Changes + " changes ready to review" : "Resolve the highlighted cells before importing.", EditorStyles.boldLabel);
-                ExcelPreviewView.Draw(preview.Rows, preview.Warnings, ref previewScroll);
-                using StudioButton.RowScope row = new StudioButton.RowScope();
-                if (StudioButton.Draw(new GUIContent("Refresh Preview", "Read current workbook and preset values again."), expandWidth: true))
-                    PreviewImport();
-                using (new EditorGUI.DisabledScope(preview == null || !preview.CanImport))
-                    if (StudioButton.Draw(new GUIContent("Import", "Update the values open in the tool. Review them there and use its normal Apply or Discard."), expandWidth: true))
-                        Import();
-            }
-            else
-            {
-                ExcelPreviewView.Draw(exportRows, Array.Empty<string>(), ref previewScroll, false);
-                if (StudioButton.Draw(new GUIContent("Export…", "Choose a destination for these current values."), expandWidth: true))
-                    Export();
-            }
+            review.Draw(preview, editMapping);
+            using StudioButton.RowScope row = new StudioButton.RowScope();
+            if (StudioButton.Draw(new GUIContent("Refresh Preview", "Read the file again and update this review."), expandWidth: true))
+                PreviewImport();
+            using (new EditorGUI.DisabledScope(preview == null || !preview.CanImport))
+                if (StudioButton.Draw(new GUIContent("Import", "Copy these changes to the preset tool. Use Apply there to save them."), expandWidth: true))
+                    Import();
         }
 
         /// <summary>Summarizes configured columns and row policies without extra help boxes.</summary>
@@ -273,7 +263,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                     group.Policy = ExcelCollectionControls.Draw(group.Policy);
             }
             if (Configuration.Mappings.Length == 0)
-                EditorGUILayout.LabelField("In Layout, select a field and click its first cell.", EditorStyles.wordWrappedMiniLabel);
+                EditorGUILayout.LabelField("In Layout, pick a field and left-click its first cell.", EditorStyles.wordWrappedMiniLabel);
         }
 
         /// <summary>Draws one workbook path and an explicit file picker.</summary>
@@ -376,24 +366,13 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             }
         }
 
-        /// <summary>Builds a read-only export preview from current tool values.</summary>
-        private void PreviewExport()
+        /// <summary>Shows the exact starting cell responsible for a review error.</summary>
+        /// <param name="row">Correction selected in the import review.</param>
+        private void EditMapping(ExcelPreviewRow row)
         {
-            ClearPreview();
-            try
-            {
-                ExcelWorkbook template = Configuration.TemplatePath.Length > 0 ? ExcelWorkbookReader.Read(Configuration.TemplatePath) : null;
-                foreach (ExcelSheet sheet in ExcelExportService.Build(context, Configuration, template).Sheets.Values)
-                    foreach (KeyValuePair<(int Row, int Column), ExcelCell> cell in sheet.Cells)
-                        exportRows.Add(new ExcelPreviewRow(sheet.Name + "!" + ExcelAddress.Format(cell.Key.Row, cell.Key.Column), string.Empty,
-                            string.Empty, cell.Value.Formula.Length > 0 ? "=" + cell.Value.Formula : cell.Value.Text));
-                page = 3;
-                status = "Export uses the values currently open in the preset tool.";
-            }
-            catch (Exception exception)
-            {
-                status = exception.Message;
-            }
+            layout.Focus(Configuration, fields, row.Mapping, row.Anchor);
+            page = 0;
+            Repaint();
         }
 
         /// <summary>Transfers the reviewed proposal without writing the persistent target.</summary>
@@ -468,12 +447,11 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             Repaint();
         }
 
-        /// <summary>Releases proposals and stale export rows after a mapping or source change.</summary>
+        /// <summary>Releases an import review after its file or settings change.</summary>
         private void ClearPreview()
         {
             preview?.Dispose();
             preview = null;
-            exportRows.Clear();
         }
 
         /// <summary>Saves only the exchange configuration and retains a failed proposal.</summary>

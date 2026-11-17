@@ -34,7 +34,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             if (last < anchor.Row && group.Policy == ExcelCollectionPolicy.ReplaceCollection)
                 return new List<int>();
             if (last < anchor.Row || last > 1048576)
-                throw new FormatException("The row boundary must include the anchor: " + guide.Cell);
+                throw new FormatException("Read Until ends before the first item. Check Last Row and the starting cell: " + guide.Cell);
             List<int> result = new List<int>();
             bool ended = false;
             for (int row = anchor.Row; row <= last; row++)
@@ -43,18 +43,18 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 if (string.IsNullOrEmpty(key.Text))
                 {
                     if (group.Extent != ExcelRowExtent.FirstBlankKey)
-                        throw new FormatException("Missing row key at " + ExcelAddress.Format(row, anchor.Column));
+                        throw new FormatException("An item name is missing in cell " + ExcelAddress.Format(row, anchor.Column));
                     ended = true;
                     if (columns.Any(mapping => !string.IsNullOrEmpty(sheet.Get(row, ExcelAddress.Parse(mapping.Cell).Column).Text)))
-                        throw new FormatException("A partially filled row has no key at " + ExcelAddress.Format(row, anchor.Column));
+                        throw new FormatException("This row has values but no item name. Fill in cell " + ExcelAddress.Format(row, anchor.Column));
                     continue;
                 }
                 if (ended)
-                    throw new FormatException("Data follows an empty row key at " + ExcelAddress.Format(row, anchor.Column) + ". Choose a fixed boundary for separate tables.");
+                    throw new FormatException("Data follows an empty row key at " + ExcelAddress.Format(row, anchor.Column) + ". Remove the empty row or select Last Row in Layout.");
                 result.Add(row);
             }
             if (result.Count == 0 && group.Policy != ExcelCollectionPolicy.ReplaceCollection)
-                throw new FormatException("No rows found at " + guide.Cell + ". Choose Replace Collection explicitly to clear an unambiguous collection.");
+                throw new FormatException("No rows found at " + guide.Cell + ". Use Replace All only if you intend to empty this list.");
             return result;
         }
 

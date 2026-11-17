@@ -20,18 +20,21 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         #region Fields
 
         [Header("Target")]
-        [Tooltip("Exact preset edited by these mappings. Other assets of the same type use separate configurations.")]
+        [Tooltip("Preset updated by this setup.")]
         public ScriptableObject Target;
-        [Tooltip("Logical settings group within the linked preset.")]
+        [Tooltip("Preset section used by this setup.")]
         public string Scope = string.Empty;
         [Header("Workbook")]
         [Tooltip("Workbook supplying imports and available worksheet tabs.")]
         public string WorkbookPath = string.Empty;
         [Tooltip("Worksheet tab selected from the import workbook. All mapped coordinates use this worksheet.")]
         public string Worksheet = "Sheet1";
-        [Tooltip("Optional workbook copied before export. Unmapped cells and formatting are preserved.")]
+        [Tooltip("Optional starting file for export. Other cells keep their contents and formatting.")]
         public string TemplatePath = string.Empty;
-        [Tooltip("Read stored Excel formula results. Missing results and Excel errors still block import.")]
+        [Tooltip("Limit each exported column to this multiple of its shortest non-empty text. Blank cells are ignored.")]
+        [Range(1f, 20f)]
+        public float ColumnWidthRatio = 5f;
+        [Tooltip("Use formula results saved by Excel. Recalculate and save the file first.")]
         public bool UseFormulaResults;
         [Header("Layout")]
         [Tooltip("Rows displayed in the mapping grid. Does not limit imported items.")]
@@ -40,9 +43,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         [Tooltip("Columns displayed in the mapping grid.")]
         [Range(1, 30)]
         public int Columns = 10;
-        [Tooltip("One mapping per anchor cell. Collection mappings continue vertically from their anchor.")]
+        [Tooltip("Place each field in its first cell. Lists continue down the column.")]
         public ExcelCellMapping[] Mappings = Array.Empty<ExcelCellMapping>();
-        [Tooltip("Shared row matching and replacement rules for each repeated collection.")]
+        [Tooltip("How spreadsheet rows update or replace each list.")]
         public ExcelCollectionGroup[] Groups = Array.Empty<ExcelCollectionGroup>();
 
         #endregion
@@ -55,23 +58,23 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         #region Fields
 
         [Header("Cell")]
-        [Tooltip("Anchor address, such as C2. Repeated fields continue down this column.")]
+        [Tooltip("First cell for this field, such as C2. List values continue below it.")]
         public string Cell = "A2";
-        [Tooltip("Field value, parent lookup, literal text or export formula.")]
+        [Tooltip("Preset field, parent name, export text or formula.")]
         public ExcelMappingKind Kind;
-        [Tooltip("Logical field path. Empty array tokens represent repeated elements.")]
+        [Tooltip("Field selected from the preset.")]
         public string Path = string.Empty;
-        [Tooltip("Repeated collection group. Empty maps a single value.")]
+        [Tooltip("List filled by this column. Leave empty for one value.")]
         public string Group = string.Empty;
-        [Tooltip("Explicit element positions when a field inside a collection maps to a single cell.")]
+        [Tooltip("Item positions used when reading or writing just one cell.")]
         public int[] Indices = Array.Empty<int>();
-        [Tooltip("Operations allowed to use this mapping.")]
+        [Tooltip("Use this cell for import, export or both.")]
         public ExcelDirection Direction;
-        [Tooltip("Workbook text or formula for a Literal or Formula mapping.")]
+        [Tooltip("Text or formula written when exporting.")]
         public string Text = string.Empty;
         [Tooltip("Leave the current value unchanged when an imported cell is empty.")]
         public bool KeepEmpty;
-        [Tooltip("Separator for an array of values stored in one cell. Quotes preserve embedded separators.")]
+        [Tooltip("Character between list entries, usually ;. Put quotes around entries containing that character.")]
         public string Separator = ";";
 
         #endregion
@@ -84,24 +87,24 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         #region Fields
 
         [Header("Collection")]
-        [Tooltip("Unique group label used by its column mappings.")]
+        [Tooltip("Name shared by the columns for this list.")]
         public string Name = "Rows";
-        [Tooltip("Collection replaced or updated by this group, such as Entries[] or Entries[].Variants[].")]
+        [Tooltip("Preset list updated by these columns.")]
         public string Path = string.Empty;
-        [Tooltip("Match by current element position or by an explicit unique field.")]
+        [Tooltip("Match rows by their order or by a field such as Name.")]
         public ExcelMatchMode Match;
-        [Tooltip("Element field identifying a row when matching by key, for example Name.")]
+        [Tooltip("Field identifying each item, usually Name.")]
         public string KeyPath = "Name";
-        [Tooltip("Keep existing elements, add missing ones, or rebuild the selected collection from declared defaults.")]
+        [Tooltip("Update existing items, add new ones or replace the list.")]
         public ExcelCollectionPolicy Policy;
-        [Tooltip("Anchor of the column defining row presence. Empty uses the first data column.")]
+        [Tooltip("First cell of the column used to find filled rows. Empty uses the Name column or first mapped field.")]
         public string GuideCell = string.Empty;
-        [Tooltip("Stop at the first empty row key, use a final row, or use an Excel table boundary.")]
+        [Tooltip("Stop at the first blank item, a chosen last row or the end of an Excel table.")]
         public ExcelRowExtent Extent;
-        [Tooltip("Last included worksheet row when using a fixed boundary.")]
+        [Tooltip("Last row to import when Read Until is set to Last Row.")]
         [Range(2, 1000)]
         public int LastRow = 100;
-        [Tooltip("Exact Excel table name when using a table boundary.")]
+        [Tooltip("Excel table whose rows will be imported.")]
         public string TableName = string.Empty;
 
         #endregion

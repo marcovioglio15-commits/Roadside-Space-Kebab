@@ -52,7 +52,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                         : candidate.Collection.Length > 0 && collection.StartsWith(candidate.Collection + ".", StringComparison.Ordinal))).ToList();
                 string[] names = choices.Select(candidate => candidate.Label).ToArray();
                 int selected = choices.FindIndex(candidate => candidate.Path == mapping.Path);
-                int next = StudioFieldGUI.Popup(new GUIContent("Field", "Logical property inside the linked preset."), selected, names);
+                int next = StudioFieldGUI.Popup(new GUIContent("Field", "Field to read from or write to the preset."), selected, names);
                 if (next >= 0 && next < choices.Count)
                 {
                     mapping.Path = choices[next].Path;
@@ -61,7 +61,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                         mapping.Indices = new int[ExcelPropertyPath.Collections(mapping.Path).Length];
                 }
                 if (field != null && ExcelPropertyPath.ElementType(field.Type) != null)
-                    mapping.Separator = StudioFieldGUI.TextField(new GUIContent("Separator", "List delimiter. Quoted items may contain the delimiter."), mapping.Separator);
+                    mapping.Separator = StudioFieldGUI.TextField(new GUIContent("Separator", "Character between list items. Put quotes around an item containing that character."), mapping.Separator);
                 if (mapping.Kind == ExcelMappingKind.Data && mapping.Direction != ExcelDirection.Export)
                     mapping.KeepEmpty = StudioFieldGUI.Toggle(new GUIContent("Keep Empty", "Leave the current value unchanged when this cell is empty. Disable to clear text or lists."), mapping.KeepEmpty);
             }
@@ -72,7 +72,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             {
                 string[] collections = ExcelPropertyPath.Collections(field.Path);
                 for (int index = 0; index < Math.Min(collections.Length, mapping.Indices.Length); index++)
-                    mapping.Indices[index] = StudioFieldGUI.IntField(new GUIContent("Element " + (index + 1), "Zero-based position in " + collections[index]), mapping.Indices[index], 0, 100);
+                    mapping.Indices[index] = StudioFieldGUI.IntField(new GUIContent("Element " + (index + 1), "Item position in " + collections[index] + ". 0 is the first item."), mapping.Indices[index], 0, 100);
             }
             if (mapping.Group.Length > 0)
             {
@@ -80,7 +80,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 DrawGroup(preset.Groups.First(group => group.Name == mapping.Group), fields);
             }
             GUILayout.FlexibleSpace();
-            if (StudioButton.Draw(new GUIContent("Remove Mapping", "Remove this anchor. Undo restores it.")))
+            if (StudioButton.Draw(new GUIContent("Remove Mapping", "Remove this cell mapping. Undo restores it.")))
             {
                 int remove = layout.SelectedMapping;
                 preset.Mappings = preset.Mappings.Where((candidate, index) => index != remove).ToArray();
@@ -127,20 +127,20 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             {
                 string[] keys = fields.Where(field => field.Collection == group.Path && ExcelPropertyPath.ElementType(field.Type) == null)
                     .Select(field => field.Path.Substring(group.Path.Length + 1)).ToArray();
-                int key = StudioFieldGUI.Popup(new GUIContent("Row Key", "Unique element property mapped into a data column."), Array.IndexOf(keys, group.KeyPath), keys);
+                int key = StudioFieldGUI.Popup(new GUIContent("Row Key", "Field that identifies each item, usually Name."), Array.IndexOf(keys, group.KeyPath), keys);
                 if (key >= 0 && key < keys.Length)
                     group.KeyPath = keys[key];
             }
-            group.GuideCell = StudioFieldGUI.TextField(new GUIContent("Row Guide", "Column anchor defining row presence. Empty uses the key or first data column."), group.GuideCell);
-            group.Extent = (ExcelRowExtent)StudioFieldGUI.Popup(new GUIContent("Read Until", "Choose the boundary shared by every mapped column."),
+            group.GuideCell = StudioFieldGUI.TextField(new GUIContent("Row Guide", "First cell used to find filled rows. Empty uses Name or the first mapped field."), group.GuideCell);
+            group.Extent = (ExcelRowExtent)StudioFieldGUI.Popup(new GUIContent("Read Until", "Choose where the imported list ends."),
                 (int)group.Extent, new[] { "First Empty Key", "Last Row", "Excel Table" });
             switch (group.Extent)
             {
                 case ExcelRowExtent.LastRow:
-                    group.LastRow = StudioFieldGUI.IntField(new GUIContent("Last Row", "Final included worksheet row."), group.LastRow, 2, 1000);
+                    group.LastRow = StudioFieldGUI.IntField(new GUIContent("Last Row", "Last row to import."), group.LastRow, 2, 1000);
                     break;
                 case ExcelRowExtent.ExcelTable:
-                    group.TableName = StudioFieldGUI.TextField(new GUIContent("Table", "Exact named Excel table providing the boundary."), group.TableName);
+                    group.TableName = StudioFieldGUI.TextField(new GUIContent("Table", "Excel table used to find the last row."), group.TableName);
                     break;
             }
         }

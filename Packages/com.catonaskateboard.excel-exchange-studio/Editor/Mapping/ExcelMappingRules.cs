@@ -28,7 +28,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             foreach (ExcelCollectionGroup group in preset.Groups)
                 if (group == null || string.IsNullOrWhiteSpace(group.Name) || !names.Add(group.Name)
                     || !fields.Any(field => field.Collection == group.Path))
-                    throw new InvalidOperationException("Each row group needs a unique name and an existing collection path.");
+                    throw new InvalidOperationException("A list is missing its preset fields. Choose the list in Layout and place its fields again.");
             HashSet<string> cells = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             HashSet<string> destinations = new HashSet<string>(StringComparer.Ordinal);
             int count = 0;
@@ -37,22 +37,22 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 count++;
                 ExcelAddress.Parse(mapping.Cell);
                 if (!cells.Add(mapping.Cell.ToUpperInvariant()))
-                    throw new InvalidOperationException("Two mappings use the same anchor cell: " + preset.Worksheet + "!" + mapping.Cell);
+                    throw new InvalidOperationException("Two fields use the same starting cell. Move one of them in Layout: " + preset.Worksheet + "!" + mapping.Cell);
                 ExcelCollectionGroup group = mapping.Group.Length == 0 ? null : preset.Groups.FirstOrDefault(candidate => candidate.Name == mapping.Group);
                 if (mapping.Group.Length > 0 && group == null)
-                    throw new InvalidOperationException("Missing row group: " + mapping.Group);
+                    throw new InvalidOperationException("Choose a list for this field in Layout: " + mapping.Group);
                 if (mapping.Kind is not (ExcelMappingKind.Data or ExcelMappingKind.ParentKey))
                     continue;
                 ExcelField field = fields.FirstOrDefault(candidate => candidate.Path == mapping.Path)
                     ?? throw new InvalidOperationException("Field no longer belongs to this preset: " + mapping.Path);
                 if (mapping.Kind == ExcelMappingKind.Data && !destinations.Add(mapping.Path + ":" + string.Join(",", mapping.Indices)))
-                    throw new InvalidOperationException("Two columns write the same field: " + field.Label);
+                    throw new InvalidOperationException("This field is placed more than once. Keep only the intended column: " + field.Label);
                 if (group == null && ExcelPropertyPath.Collections(mapping.Path).Length != mapping.Indices.Length
                     || group != null && mapping.Kind == ExcelMappingKind.Data && field.Collection != group.Path)
-                    throw new InvalidOperationException("Choose the correct row group or element positions for " + field.Label);
+                    throw new InvalidOperationException("In Layout, check Repeat For and the item positions for " + field.Label);
                 if (mapping.Kind == ExcelMappingKind.ParentKey && (group == null
                     || !group.Path.StartsWith(field.Collection + ".", StringComparison.Ordinal)))
-                    throw new InvalidOperationException("A parent key must identify a parent of its row group.");
+                    throw new InvalidOperationException("This parent field does not belong to the chosen list. Select the correct parent field in Layout.");
             }
             if (count == 0)
                 throw new InvalidOperationException("Map at least one cell for this operation.");
@@ -64,9 +64,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                     continue;
                 if (!columns.Any(mapping => mapping.Kind == ExcelMappingKind.Data)
                     || columns.Any(mapping => ExcelAddress.Parse(mapping.Cell).Row != ExcelAddress.Parse(columns[0].Cell).Row))
-                    throw new InvalidOperationException("A row group needs data columns on the same sheet and starting row: " + group.Name);
+                    throw new InvalidOperationException("All columns for a list must begin on the same row. Check their Cell settings in Layout: " + group.Name);
                 if (group.GuideCell.Length > 0 && ExcelAddress.Parse(group.GuideCell).Row != ExcelAddress.Parse(columns[0].Cell).Row)
-                    throw new InvalidOperationException("The row guide must start on the same row as its mapped columns: " + group.Name);
+                    throw new InvalidOperationException("Row Guide must begin on the same row as the other columns: " + group.Name);
                 if (group.Match == ExcelMatchMode.Key && !columns.Any(mapping => mapping.Kind == ExcelMappingKind.Data && mapping.Path == group.Path + "." + group.KeyPath))
                     throw new InvalidOperationException("Map the row key " + group.KeyPath + " for " + group.Name);
                 string[] parents = ExcelPropertyPath.Collections(group.Path);

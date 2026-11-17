@@ -11,9 +11,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
     {
         #region Types
 
-        /// <summary>Independent workspace panels and the optional settings map.</summary>
+        /// <summary>Optional workspace panels alongside the mandatory object tree.</summary>
         [Flags]
-        internal enum Panels { Object = 1, Interactions = 2, Presets = 4, SceneSetup = 8, SettingsTree = 16 }
+        internal enum Panels { Object = 1, Presets = 4, SceneSetup = 8 }
         /// <summary>Interaction categories combined through persistent checkboxes.</summary>
         [Flags]
         internal enum Categories { Nothing = 0, Inventory = 1, Physics = 2, Processes = 4, Dialogue = 8, Assembly = 16, Spawning = 32, Feedback = 64, Everything = 127 }
@@ -28,7 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         [Header("Views")]
         [Tooltip("Choose the panels to show.")]
-        public Panels Views = Panels.Object | Panels.Interactions;
+        public Panels Views = Panels.Object;
         [Tooltip("Choose which interaction categories to show.")]
         public Categories Filters = Categories.Everything;
         [Tooltip("Find an interaction, group or setting.")]
@@ -51,8 +51,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public List<string> Collapsed = new List<string>();
         [Tooltip("Scroll position in the interaction list.")]
         public Vector2 ListScroll;
-        [Tooltip("Scroll position in the selected interaction.")]
-        public Vector2 SettingsScroll;
         [Tooltip("Scroll position in the preset library.")]
         public Vector2 PresetsScroll;
 
@@ -98,7 +96,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Menus
 
-        /// <summary>Offers independent view checks, including the optional settings tree.</summary>
+        /// <summary>Offers auxiliary panels while the object tree remains available.</summary>
         /// <param name="state">Workspace retaining visibility.</param>
         private void ViewsMenu(ObjectWorkspace state)
         {
@@ -106,7 +104,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             foreach (Panels panel in Enum.GetValues(typeof(Panels)))
             {
                 Panels choice = panel;
-                menu.AddItem(new GUIContent(panel switch { Panels.SceneSetup => "Scene Setup", Panels.SettingsTree => "Settings tree", _ => panel.ToString() }), (Views & panel) != 0,
+                menu.AddItem(new GUIContent(panel == Panels.SceneSetup ? "Scene Setup" : panel.ToString()), (Views & panel) != 0,
                     () => { Views ^= choice; state.Persist(); ObjectsLogicStudioWindow.RefreshOpen(); });
             }
             menu.ShowAsContext();

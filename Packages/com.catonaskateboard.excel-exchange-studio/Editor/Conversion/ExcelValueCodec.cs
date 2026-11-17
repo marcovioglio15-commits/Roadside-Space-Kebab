@@ -25,7 +25,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 || type == typeof(Color32) || type == typeof(Quaternion) || type == typeof(LayerMask);
         }
 
-        /// <summary>Preserves native numeric and boolean types when exporting scalar values.</summary>
+        /// <summary>Keeps numbers numeric and writes booleans as visible TRUE/FALSE text across spreadsheet apps.</summary>
         /// <param name="value">Typed field value.</param>
         /// <param name="type">Declared field type.</param>
         /// <param name="separator">List separator.</param>
@@ -33,9 +33,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         public static ExcelCell Cell(object value, Type type, string separator = ";")
         {
             if (value is float single && !float.IsFinite(single) || value is double number && !double.IsFinite(number))
-                throw new FormatException("Use a finite number before exporting " + type.Name + ".");
-            return new ExcelCell(Format(value, type, separator), type == typeof(bool) ? ExcelCellKind.Boolean
-                : type.IsPrimitive && type != typeof(char) || type == typeof(decimal) ? ExcelCellKind.Number : ExcelCellKind.Text);
+                throw new FormatException("Use a regular number. NaN and Infinity cannot be exported.");
+            return new ExcelCell(Format(value, type, separator), type.IsPrimitive && type != typeof(char) && type != typeof(bool)
+                || type == typeof(decimal) ? ExcelCellKind.Number : ExcelCellKind.Text);
         }
 
         #endregion
@@ -80,7 +80,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 {
                     "true" or "1" => true,
                     "false" or "0" => false,
-                    _ => throw new FormatException("Use an Excel boolean, true/false or 1/0.")
+                    _ => throw new FormatException("Use TRUE or FALSE in this cell.")
                 };
             if (type.IsEnum)
             {
@@ -94,7 +94,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             {
                 object value = Convert.ChangeType(text, type, CultureInfo.InvariantCulture);
                 if (value is float single && !float.IsFinite(single) || value is double number && !double.IsFinite(number))
-                    throw new FormatException("Use a finite number.");
+                    throw new FormatException("Use a regular number. NaN and Infinity are not supported.");
                 return value;
             }
             if (type == typeof(LayerMask))
@@ -105,7 +105,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             string[] parts = text.Split('|');
             float[] components = Array.ConvertAll(parts, part => float.Parse(part, NumberStyles.Float, CultureInfo.InvariantCulture));
             if (Array.Exists(components, component => !float.IsFinite(component)))
-                throw new FormatException("Use finite components separated by |.");
+                throw new FormatException("Use regular numbers separated by |, for example 1|2|3.");
             // Component counts stay explicit; integer vectors never round decimal input.
             return type.Name switch
             {
@@ -149,7 +149,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             return value switch
             {
                 UnityEngine.Object asset => ExcelReferenceCache.Write(asset),
-                bool boolean => boolean ? "true" : "false",
+                bool boolean => boolean ? "TRUE" : "FALSE",
                 Vector2 vector => Components(vector.x, vector.y),
                 Vector3 vector => Components(vector.x, vector.y, vector.z),
                 Vector4 vector => Components(vector.x, vector.y, vector.z, vector.w),

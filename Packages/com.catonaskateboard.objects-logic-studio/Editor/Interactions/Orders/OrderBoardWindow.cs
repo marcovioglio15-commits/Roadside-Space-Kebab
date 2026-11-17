@@ -23,6 +23,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #region Methods
         #region Window
 
+        /// <summary>Opens shared scene-board editing directly from the Tools menu.</summary>
+        [MenuItem("Tools/Edit Scene Board")]
+        private static void OpenWindow()
+        {
+            // Reuse a selected gameplay board when the scene already contains one.
+            Open(Selection.activeGameObject != null ? Selection.activeGameObject.GetComponentInParent<OrderBoard>() : null);
+        }
+
         /// <summary>Opens board configuration independently of a locked Inspector or prefab stage.</summary>
         /// <param name="selected">Optional gameplay board selected from the prefab draft.</param>
         internal static void Open(OrderBoard selected = null)

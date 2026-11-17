@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Combines optional views, a searchable interaction catalog and small independent settings editors.</summary>
+    /// <summary>Combines one mandatory object tree with searchable interactions and nested settings editors.</summary>
     internal sealed class ObjectsLogicStudioWindow : EditorWindow
     {
         #region State
@@ -85,7 +85,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             ObjectsLogicStudioWindow window = GetWindow<ObjectsLogicStudioWindow>("Objects Logic Studio");
             if (ObjectWorkspaceDrafts.Select(window.state, feature, out window.status))
             {
-                window.state.Navigation.Views |= ObjectStudioNavigation.Panels.Interactions;
                 window.OpenPrefab();
                 window.Refresh();
             }
@@ -96,6 +95,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             foreach (ObjectsLogicStudioWindow window in Resources.FindObjectsOfTypeAll<ObjectsLogicStudioWindow>())
                 window.Refresh();
+        }
+
+        /// <summary>Reveals shared HUD controls when requested from any nested interaction editor.</summary>
+        internal static void ShowSceneSetup()
+        {
+            // Scene Setup belongs to the shared workspace rather than a detached interaction draft.
+            ObjectsLogicStudioWindow window = GetWindow<ObjectsLogicStudioWindow>("Objects Logic Studio");
+            window.state.Navigation.Views |= ObjectStudioNavigation.Panels.SceneSetup;
+            window.state.Navigation.Collapsed.Remove("View.SceneSetup");
+            window.state.Persist();
+            window.Repaint();
         }
 
         #endregion
@@ -147,6 +157,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             EditorApplication.delayCall -= RestoreEditing;
             data?.Dispose();
             library.Dispose();
+            tree.Dispose();
         }
 
         /// <summary>Retains both the active proposal and the workspace position.</summary>
@@ -281,11 +292,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     && ObjectWorkspaceGUI.Foldout(state, "View.Object", "Object", "Settings for the selected object."))
                     using (new StudioIndentScope())
                         DrawObject();
-                if ((state.Navigation.Views & (ObjectStudioNavigation.Panels.Interactions | ObjectStudioNavigation.Panels.Presets | ObjectStudioNavigation.Panels.SettingsTree)) != 0)
-                {
-                    state.Navigation.DrawFilters(state);
-                    DrawColumns();
-                }
+                state.Navigation.DrawFilters(state);
+                DrawColumns();
                 if ((state.Navigation.Views & ObjectStudioNavigation.Panels.SceneSetup) != 0
                     && ObjectWorkspaceGUI.Foldout(state, "View.SceneSetup", "Scene Setup", "Camera, player and shared displays."))
                     using (new StudioIndentScope())
@@ -302,7 +310,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             groups = ObjectInteractionPanel.Groups(state, data);
             ObjectSettingsSearch.Refresh(state, interactions, groups);
             catalog.Rebuild(state, interactions);
-            tree.Rebuild(state, groups);
+            tree.Rebuild(state, catalogOwner != null ? catalogOwner : currentObject, catalog.Visible);
             refreshGroups = false;
         }
 
@@ -346,31 +354,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Keeps catalog and settings beside a third preset column when requested.</summary>
         private void DrawColumns()
         {
-            bool showInteraction = (state.Navigation.Views & (ObjectStudioNavigation.Panels.Interactions | ObjectStudioNavigation.Panels.SettingsTree)) != 0;
             bool showPresets = (state.Navigation.Views & ObjectStudioNavigation.Panels.Presets) != 0;
             float height = Mathf.Clamp(position.height * 0.65f, 300f, 1000f);
-            float width = Mathf.Max(position.width - 24f, showInteraction ? showPresets ? 900f : 600f : 280f);
+            float width = Mathf.Max(position.width - 24f, showPresets ? 900f : 600f);
             float catalogWidth = Mathf.Clamp(width * 0.24f, 220f, 360f);
             float presetsWidth = showPresets ? Mathf.Clamp(width * 0.28f, 280f, 460f) : 0f;
             using EditorGUILayout.HorizontalScope columns = new EditorGUILayout.HorizontalScope(GUILayout.Width(width));
-            if (showInteraction)
-            {
-                using (new EditorGUILayout.VerticalScope(GUILayout.Width(catalogWidth)))
-                using (new StudioFieldLayout.WidthScope(catalogWidth))
-                    DrawCatalog(height);
-                GUILayout.Space(8f);
-                float interactionWidth = width - catalogWidth - presetsWidth - (showPresets ? 16f : 8f);
-                using (new EditorGUILayout.VerticalScope(GUILayout.Width(interactionWidth)))
-                using (new StudioFieldLayout.WidthScope(interactionWidth))
-                    DrawInteraction(height);
-            }
+            using (new EditorGUILayout.VerticalScope(GUILayout.Width(catalogWidth)))
+            using (new StudioFieldLayout.WidthScope(catalogWidth))
+                DrawCatalog(height);
+            GUILayout.Space(8f);
+            float interactionWidth = width - catalogWidth - presetsWidth - (showPresets ? 16f : 8f);
+            using (new EditorGUILayout.VerticalScope(GUILayout.Width(interactionWidth)))
+            using (new StudioFieldLayout.WidthScope(interactionWidth))
+                DrawInteraction(height);
             if (showPresets)
             {
                 GUILayout.Space(8f);
-                using EditorGUILayout.VerticalScope column = showInteraction
-                    ? new EditorGUILayout.VerticalScope(GUILayout.Width(presetsWidth))
-                    : new EditorGUILayout.VerticalScope(GUILayout.ExpandWidth(true));
-                using StudioFieldLayout.WidthScope pane = new StudioFieldLayout.WidthScope(showInteraction ? presetsWidth : width);
+                using EditorGUILayout.VerticalScope column = new EditorGUILayout.VerticalScope(GUILayout.Width(presetsWidth));
+                using StudioFieldLayout.WidthScope pane = new StudioFieldLayout.WidthScope(presetsWidth);
                 if (ObjectWorkspaceGUI.Foldout(state, "View.Presets", "Presets", "Presets for the visible interaction types."))
                     using (new StudioIndentScope())
                         using (EditorGUILayout.ScrollViewScope scroll = new EditorGUILayout.ScrollViewScope(state.Navigation.PresetsScroll, GUILayout.Height(height)))
@@ -401,6 +403,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     state.Persist();
                     catalog.Rebuild(state, interactions);
+                    refreshGroups = true;
                 }
                 using (new EditorGUI.DisabledScope(!CanEdit))
                     if (GUILayout.Button(new GUIContent("Add", "Add an interaction."), EditorStyles.miniPullDown, GUILayout.Width(48f)))
@@ -424,40 +427,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             DrawStructure();
         }
 
-        /// <summary>Shows broad settings groups or their optional navigable tree.</summary>
+        /// <summary>Shows every interaction in the mandatory object tree.</summary>
         /// <param name="height">Available column height.</param>
         private void DrawInteraction(float height)
         {
-            if (!ObjectWorkspaceGUI.Foldout(state, "View.Interaction", "Interaction", "Settings for the selected interaction."))
-                return;
-            using StudioIndentScope sectionContent5 = new StudioIndentScope();
             ObjectInteraction feature = ObjectWorkspaceDrafts.Selected(state);
-            if (feature == null || !ObjectSettingsSearch.Matches(state, feature))
-            {
-                EditorGUILayout.LabelField("Select an interaction from the list.", EditorStyles.miniLabel);
-                return;
-            }
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.LabelField(feature.InteractionName + " · " + ObjectInteractionCatalog.Name(feature), EditorStyles.boldLabel);
-                if (GUILayout.Button(new GUIContent("Tree", "Show or hide the settings tree."), EditorStyles.miniButton, GUILayout.Width(42f)))
-                {
-                    state.Navigation.Views ^= ObjectStudioNavigation.Panels.SettingsTree;
-                    state.Persist();
-                }
-                using (new EditorGUI.DisabledScope(!CanEdit))
+                EditorGUILayout.LabelField("Object Tree", EditorStyles.boldLabel);
+                using (new EditorGUI.DisabledScope(!CanEdit || feature == null))
                     if (GUILayout.Button(new GUIContent("Remove", "Stage removal for review."), EditorStyles.miniButton, GUILayout.Width(60f)))
                         ObjectStructureChanges.Remove(state, feature);
             }
-            if ((state.Navigation.Views & ObjectStudioNavigation.Panels.SettingsTree) != 0)
-                tree.Draw(state, height - 30f);
-            else
-                using (EditorGUILayout.ScrollViewScope scroll = new EditorGUILayout.ScrollViewScope(state.Navigation.SettingsScroll, GUILayout.Height(height - 30f)))
-                {
-                    state.Navigation.SettingsScroll = scroll.scrollPosition;
-                    ObjectInteractionPanel.Overview(state, groups, state.Navigation.Search);
-                    ObjectInteractionActions.Draw(state, feature);
-                }
+            tree.Draw(state, height - 30f);
         }
 
         /// <summary>Selects the first result, or opens a group when an explicit setting token is used.</summary>

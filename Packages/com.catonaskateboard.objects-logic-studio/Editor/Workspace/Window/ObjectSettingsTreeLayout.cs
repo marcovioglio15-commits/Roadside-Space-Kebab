@@ -6,12 +6,12 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
     /// <summary>Builds a detailed settings hierarchy, including sections, nested options and linked presets.</summary>
-    internal sealed class ObjectSettingsTreeLayout
+    internal sealed class ObjectSettingsTreeLayout : IDisposable
     {
         #region Types
 
         /// <summary>Distinguishes structural headings from individual option blocks.</summary>
-        internal enum NodeKind { Root, Theme, Section, Field }
+        internal enum NodeKind { Root, Interaction, Theme, Section, Field }
 
         /// <summary>Stores one navigable block and the metadata needed to expand its descendants.</summary>
         internal sealed class Node
@@ -30,6 +30,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             internal Rect Rect;
             internal bool Expandable;
             internal float Height;
+            internal ObjectBranchSession Branch;
 
             #region Methods
 
@@ -68,7 +69,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private readonly HashSet<string> expanded = new HashSet<string>(StringComparer.Ordinal);
         private readonly HashSet<string> collapsed = new HashSet<string>(StringComparer.Ordinal);
         private ObjectWorkspace document;
-        private List<ObjectGroupInfo> groups;
+        private GameObject owner;
+        private readonly List<ObjectBranchSession> branches = new List<ObjectBranchSession>();
         private bool expandAll;
 
         #endregion
@@ -77,45 +79,51 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Construction
 
-        /// <summary>Builds the selected type with themes, sections and their option names visible by default.</summary>
-        /// <param name="state">Selected draft.</param>
-        /// <param name="settings">Thematic groups belonging to that draft.</param>
-        internal void Build(ObjectWorkspace state, List<ObjectGroupInfo> settings)
+        /// <summary>Captures all visible interactions under one object root without changing workspace selection.</summary>
+        /// <param name="state">Shared interaction drafts.</param>
+        /// <param name="target">Object represented by the root node.</param>
+        /// <param name="features">Filtered interactions in the current object scope.</param>
+        internal void Build(ObjectWorkspace state, GameObject target, IReadOnlyList<ObjectInteraction> features)
         {
+            // Independent documents keep each interaction's typed paths available at the same time.
+            Dispose();
             document = state;
-            groups = settings;
+            if (owner != target)
+            {
+                expanded.Clear();
+                collapsed.Clear();
+                expandAll = false;
+            }
+            owner = target;
+            foreach (ObjectInteraction feature in features)
+                branches.Add(ObjectBranchSession.Create(state, feature));
+            BuildVisible();
+        }
+
+        /// <summary>Releases cached interaction snapshots when the object changes or its workspace closes.</summary>
+        public void Dispose()
+        {
+            // Release every interaction snapshot before rebuilding the object scope.
+            foreach (ObjectBranchSession branch in branches)
+                branch.Dispose();
+            branches.Clear();
+        }
+
+        /// <summary>Rebuilds visible nodes from cached documents after a branch arrow changes.</summary>
+        private void BuildVisible()
+        {
+            // Expansion changes only layout; no draft is reselected, instantiated or serialized here.
             Nodes.Clear();
-            ObjectInteraction feature = ObjectWorkspaceDrafts.Selected(state);
-            if (feature == null)
+            if (owner == null)
             {
                 Size = Vector2.zero;
                 return;
             }
-            Nodes.Add(new Node("Root", ObjectInteractionCatalog.Name(feature), feature.InteractionName, string.Empty, null, -1, 0, NodeKind.Root));
-            using SerializedObject data = new SerializedObject(state);
-            foreach (ObjectGroupInfo group in settings)
-            {
-                if (!string.IsNullOrEmpty(ObjectGroupAvailability.Requirement(data, group, out _)))
-                    continue;
-                int theme = Add(new Node(group.Key, group.Title, group.Tooltip, string.Empty, group, 0, 1, NodeKind.Theme));
-                Nodes[theme].Expandable = group.Paths.Length > 0;
-                if (!Expanded(Nodes[theme]))
-                    continue;
-                if (group.Segments is not { Length: > 0 })
-                {
-                    Fields(data, group.Paths, group, theme, 2);
-                    continue;
-                }
-                foreach (ObjectGroupInfo section in group.Segments)
-                {
-                    if (!string.IsNullOrEmpty(ObjectGroupAvailability.Requirement(data, section, out _)))
-                        continue;
-                    int branch = Add(new Node(group.Key + "/" + section.Key, section.Title, section.Tooltip, ObjectFieldFocus.SectionKey(section.Parent, section.Section), group, theme, 2, NodeKind.Section));
-                    Nodes[branch].Expandable = section.Paths.Length > 0;
-                    if (Expanded(Nodes[branch]))
-                        Fields(data, section.Paths, group, branch, 3);
-                }
-            }
+            Nodes.Add(new Node("Root", owner.name, "Open all interactions and their preset groups.", string.Empty, null, -1, 0, NodeKind.Root)
+                { Expandable = branches.Count > 0 });
+            if (Expanded(Nodes[0]))
+                foreach (ObjectBranchSession branch in branches)
+                    Interaction(branch);
             Measure(0);
             Position(0, 16f);
             Size = new Vector2(220f, Nodes[0].Height + 32f);
@@ -123,21 +131,87 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Size.x = Mathf.Max(Size.x, node.Rect.xMax + 20f);
         }
 
-        /// <summary>Expands option blocks only after a branch arrow is clicked.</summary>
+        /// <summary>Adds one interaction and exactly one node per reusable preset group.</summary>
+        /// <param name="branch">Cached interaction proposal.</param>
+        private void Interaction(ObjectBranchSession branch)
+        {
+            // Stable draft keys distinguish repeated types and preserve their expansion states.
+            ObjectInteraction feature = branch.Feature;
+            if (feature == null)
+                return;
+            int interaction = Add(new Node(branch.Document.DraftKey, feature.InteractionName + " · " + ObjectInteractionCatalog.Name(feature),
+                "Open every preset group for this interaction.", string.Empty, null, 0, 1, NodeKind.Interaction)
+                { Branch = branch, Expandable = branch.Groups.Count > 0 });
+            if (!Expanded(Nodes[interaction]))
+                return;
+            foreach (ObjectGroupInfo group in branch.Groups)
+            {
+                if (!string.IsNullOrEmpty(ObjectGroupAvailability.Requirement(branch.Data, group, out _)))
+                    continue;
+                string assignment = branch.Document.DraftKey + "|" + group.Key;
+                ObjectGroupPreset preset = document.GroupPresets.Find(entry => entry.Key == assignment)?.Preset;
+                int theme = Add(new Node(Nodes[interaction].Key + "/" + group.Key, preset != null ? group.Title + " · " + preset.name : group.Title,
+                    group.Tooltip, string.Empty, group, interaction, 2, NodeKind.Theme));
+                Nodes[theme].Expandable = group.Paths.Length > 0;
+                if (!Expanded(Nodes[theme]))
+                    continue;
+                Sections(branch.Data, group, theme);
+            }
+        }
+
+        /// <summary>Combines split metadata into one third-level node per actual section dropdown.</summary>
+        /// <param name="data">Interaction document.</param>
+        /// <param name="group">Single reusable preset group.</param>
+        /// <param name="parent">Second-level preset node.</param>
+        private void Sections(SerializedObject data, ObjectGroupInfo group, int parent)
+        {
+            // Several small field sets may belong to the same dropdown; display that dropdown only once.
+            Dictionary<string, List<string>> paths = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+            Dictionary<string, ObjectGroupInfo> sections = new Dictionary<string, ObjectGroupInfo>(StringComparer.Ordinal);
+            foreach (ObjectGroupInfo section in group.Segments.Length > 0 ? group.Segments : new[] { group })
+            {
+                if (!string.IsNullOrEmpty(ObjectGroupAvailability.Requirement(data, section, out _)))
+                    continue;
+                string key = ObjectFieldFocus.SectionKey(section.Parent, section.Section);
+                if (!paths.TryGetValue(key, out List<string> fields))
+                {
+                    fields = new List<string>();
+                    paths.Add(key, fields);
+                    sections.Add(key, section);
+                }
+                foreach (string path in section.Paths)
+                    if (!fields.Contains(path))
+                        fields.Add(path);
+            }
+            foreach (KeyValuePair<string, List<string>> section in paths)
+            {
+                ObjectGroupInfo info = sections[section.Key];
+                int index = Add(new Node(Nodes[parent].Key + "/" + section.Key, info.Section, info.Tooltip,
+                    section.Key, group, parent, 3, NodeKind.Section) { Expandable = section.Value.Count > 0 });
+                if (Expanded(Nodes[index]))
+                    Fields(data, section.Value.ToArray(), group, index, 4);
+            }
+        }
+
+        /// <summary>Toggles one branch while retaining every other expansion choice.</summary>
         /// <param name="node">Branch to toggle.</param>
         internal void Toggle(Node node)
         {
             if (expandAll)
             {
                 foreach (Node visible in Nodes)
-                    if (visible.Expandable && visible.Kind == NodeKind.Field)
+                    if (visible.Expandable)
                         expanded.Add(visible.Key);
                 expandAll = false;
             }
-            HashSet<string> keys = node.Kind == NodeKind.Field ? expanded : collapsed;
-            if (!keys.Add(node.Key))
-                keys.Remove(node.Key);
-            Build(document, groups);
+            bool open = Expanded(node);
+            expanded.Remove(node.Key);
+            collapsed.Remove(node.Key);
+            if (open)
+                collapsed.Add(node.Key);
+            else
+                expanded.Add(node.Key);
+            BuildVisible();
         }
 
         /// <summary>Expands all supported option branches or returns to the clear initial hierarchy.</summary>
@@ -147,7 +221,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             expandAll = all;
             expanded.Clear();
             collapsed.Clear();
-            Build(document, groups);
+            BuildVisible();
         }
 
         /// <summary>Reports whether a block currently shows its children.</summary>
@@ -155,7 +229,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>True for an expanded branch.</returns>
         internal bool Expanded(Node node)
         {
-            return expandAll || (node.Kind == NodeKind.Field ? expanded.Contains(node.Key) : !collapsed.Contains(node.Key));
+            return !collapsed.Contains(node.Key) && (expandAll || expanded.Contains(node.Key) || node.Depth == 0);
         }
 
         /// <summary>Adds option names while retaining exact paths for editor navigation.</summary>
@@ -180,6 +254,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private int Add(Node node)
         {
             int index = Nodes.Count;
+            node.Branch ??= Nodes[node.Parent].Branch;
             Nodes.Add(node);
             Nodes[node.Parent].Children.Add(index);
             return index;
@@ -193,7 +268,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="asset">Optional linked preset owning this option.</param>
         private void Field(SerializedProperty field, ObjectGroupInfo group, int parent, int depth, ScriptableObject asset)
         {
-            if (Nodes.Count >= 4096)
+            if (Nodes.Count >= 4096 || !ObjectTreeFieldVisibility.IsVisible(field))
                 return;
             ScriptableObject reference = field.propertyType == SerializedPropertyType.ObjectReference ? field.objectReferenceValue as ScriptableObject : null;
             if (reference != null && !ObjectSettingsTreeNavigation.Supports(reference))

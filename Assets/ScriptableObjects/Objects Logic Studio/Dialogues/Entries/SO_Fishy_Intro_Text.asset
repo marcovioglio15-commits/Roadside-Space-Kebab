@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Fishy Business Random Intro 1
   Lines:
   - Speaker: Fishy Business
-    Text: "Sir, I\u2019m here to eat, and I am to eat FAST. I\u2019ve got plenty of AMERICAN DOLLARS."
+    Text: "Sir, I\u2019m here to eat, and I am to eat FAST. I\u2019ve got plenty of [rotate=5]AMERICAN DOLLARS[/rotate]."
   TextEffects:
     Typewriter: 1
     LettersPerSecond: 35
@@ -29,3 +29,5 @@ MonoBehaviour:
     WaveAmount: 0.1
     WaveRate: 2
     RainbowRate: 0.4
+    RotationDegrees: 15
+    Colors: []

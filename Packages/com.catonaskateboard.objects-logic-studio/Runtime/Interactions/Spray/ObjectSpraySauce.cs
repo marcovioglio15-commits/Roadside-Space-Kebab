@@ -1,4 +1,5 @@
 using CatOnASkateboard.AudioStudio;
+using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -61,6 +62,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal LiquidDroplet Latest => latest;
         /// <summary>Prepared palette retained by emitted liquid after the source disappears.</summary>
         internal SurfacePalette Palette => palette;
+        /// <summary>Immutable source flags shared by liquid samples until the emitter's identity changes.</summary>
+        internal ObjectFlag[] IngredientFlags => exposure.CaptureFlags();
         /// <summary>Stops automatic start effects when the continuous flow finishes.</summary>
         internal override bool VfxRunning => active;
         #endregion
@@ -93,6 +96,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             elastic = GetComponent<ObjectElasticDeformation>();
+            exposure.Bind(Item.Identity);
             body = GetComponent<Rigidbody>();
             RefreshGeometry();
             base.OnEnable();
@@ -103,6 +107,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (InteractionRuntimeState.IsStaging)
                 return;
             StopEmission();
+            exposure.Release();
             ready = false;
             base.OnDisable();
         }
@@ -309,9 +314,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="point">World contact point.</param>
         /// <param name="normal">Outward receiver normal.</param>
         /// <param name="velocity">Incoming liquid motion.</param>
-        internal void Hit(Collider receiver, Vector3 point, Vector3 normal, Vector3 velocity)
+        /// <param name="item">Receiving item resolved once by the physical sample.</param>
+        internal void Hit(Collider receiver, Vector3 point, Vector3 normal, Vector3 velocity, ObjectItem item)
         {
-            SpraySurfaceRule rule = settings.ChangeAppearance ? exposure.Hit(this, receiver) : null;
+            SpraySurfaceRule rule = exposure.Hit(this, item);
             bool customTrail = rule != null && rule.TrailMode != SprayTrailMode.Normal;
             if ((settings.LeaveTrail || customTrail) && (receiver != depositReceiver || Time.time >= nextDeposit))
             {

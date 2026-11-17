@@ -16,7 +16,6 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         internal int SelectedMapping = -1;
         internal string Collection = string.Empty;
         internal Action Changed;
-        private string selectedCell = "A1";
         private ExcelCollectionPolicy importMode;
         private ExcelExchangePreset activePreset;
         private readonly Action<bool, bool, int> editStructure;
@@ -76,7 +75,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             ExcelLayoutSections.Vertical();
             using (new EditorGUILayout.VerticalScope(GUILayout.ExpandWidth(true)))
             {
-                DrawToolbar(preset);
+                DrawToolbar();
                 DrawGridSettings(preset);
                 ExcelLayoutSections.Horizontal();
                 if (preset.Rows < 1 || preset.Columns < 1 || cellWidth < 1)
@@ -100,9 +99,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         private void DrawDestination(ExcelExchangePreset preset, List<ExcelField> fields)
         {
             EditorGUILayout.LabelField("Mapping Destination", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField(new GUIContent("Rows Represent", "Each spreadsheet row supplies one item of this collection. Single values address explicit cells."));
+            EditorGUILayout.LabelField(new GUIContent("Rows Represent", "Choose which preset list each row fills. Single values use one cell per field."));
             int current = Array.IndexOf(collections, Collection);
-            int next = StudioFieldGUI.Popup(new GUIContent(string.Empty, "Choose a collection declared by this preset."), Math.Max(0, current), collectionLabels);
+            int next = StudioFieldGUI.Popup(new GUIContent(string.Empty, "Choose a list from this preset."), Math.Max(0, current), collectionLabels);
             if (next != current && next >= 0)
             {
                 Collection = collections[next];
@@ -123,9 +122,8 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                     group.Policy = importMode;
         }
 
-        /// <summary>Keeps the brush label beside its control and exposes structural edits for the selected cell.</summary>
-        /// <param name="preset">Current grid dimensions.</param>
-        private void DrawToolbar(ExcelExchangePreset preset)
+        /// <summary>Keeps the brush label and selected field beside their control.</summary>
+        private void DrawToolbar()
         {
             EditorGUILayout.LabelField("Mapping Grid", EditorStyles.boldLabel);
             using (new EditorGUILayout.HorizontalScope())
@@ -136,33 +134,17 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                     GUILayout.Label(new GUIContent(SelectedField.Label, SelectedField.Tooltip), EditorStyles.wordWrappedMiniLabel);
                 GUILayout.FlexibleSpace();
             }
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                GUILayout.Label(new GUIContent(selectedCell, "Right-click a cell to choose the row and column for these edits."), GUILayout.Width(42f));
-                (int Row, int Column) cell = ExcelAddress.Parse(selectedCell);
-                if (StudioButton.Draw(new GUIContent("+ Row", "Insert a row before the selected cell. Move mapping anchors; leave the workbook unchanged.")))
-                    EditStructure(true, true, cell.Row);
-                using (new EditorGUI.DisabledScope(preset.Rows <= 1))
-                    if (StudioButton.Draw(new GUIContent("− Row", "Remove the selected row and its mappings. Undo restores the edit.")))
-                        EditStructure(true, false, cell.Row);
-                if (StudioButton.Draw(new GUIContent("+ Column", "Insert a column before the selected cell. Move mapping anchors; leave the workbook unchanged.")))
-                    EditStructure(false, true, cell.Column);
-                using (new EditorGUI.DisabledScope(preset.Columns <= 1))
-                    if (StudioButton.Draw(new GUIContent("− Column", "Remove the selected column and its mappings. Undo restores the edit.")))
-                        EditStructure(false, false, cell.Column);
-                GUILayout.FlexibleSpace();
-            }
         }
 
         /// <summary>Keeps view dimensions separate from collection import boundaries.</summary>
         /// <param name="preset">Saved mapping grid dimensions.</param>
         private void DrawGridSettings(ExcelExchangePreset preset)
         {
-            gridSettings = EditorGUILayout.Foldout(gridSettings, new GUIContent("Grid View", "Display settings only. Imported rows follow the mapping boundary."), true);
+            gridSettings = EditorGUILayout.Foldout(gridSettings, new GUIContent("Grid View", "Change the grid display. This does not limit imported rows."), true);
             if (!gridSettings)
                 return;
-            preset.Rows = StudioFieldGUI.IntField(new GUIContent("Visible Rows", "Grid extent. Does not limit imported items."), preset.Rows, 1, 200);
-            preset.Columns = StudioFieldGUI.IntField(new GUIContent("Visible Columns", "Grid columns. Scroll horizontally for additional anchors."), preset.Columns, 1, 30);
+            preset.Rows = StudioFieldGUI.IntField(new GUIContent("Visible Rows", "Number of rows shown in Layout. More rows can still be imported."), preset.Rows, 1, 200);
+            preset.Columns = StudioFieldGUI.IntField(new GUIContent("Visible Columns", "Columns shown in Layout. Scroll horizontally to see more."), preset.Columns, 1, 30);
             cellWidth = StudioFieldGUI.IntField(new GUIContent("Cell Width", "Widen cells to display longer field paths."), cellWidth, 160, 360);
         }
 
@@ -176,9 +158,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             if (nested)
                 fieldRole = StudioFieldGUI.Popup(new GUIContent("Fields", "Item properties update this collection. Parent keys identify which parent receives each row."), fieldRole,
                     new[] { "Item properties", "Parent keys" });
-            search = StudioFieldGUI.TextField(new GUIContent("Search", "Match all words against field names, paths and tooltips."), search);
-            filter = StudioFieldGUI.Popup(new GUIContent("Value Type", "Show only compatible field types."), filter, filters);
-            mappedFilter = StudioFieldGUI.Popup(new GUIContent("Mapping", "Show all fields or only mapped or unmapped properties."), mappedFilter, mappingFilters);
+            search = StudioFieldGUI.TextField(new GUIContent("Search", "Find fields by name or description."), search);
+            filter = StudioFieldGUI.Popup(new GUIContent("Value Type", "Show text, numbers, checkboxes or other field types."), filter, filters);
+            mappedFilter = StudioFieldGUI.Popup(new GUIContent("Mapping", "Show all fields, those already placed or those still available."), mappedFilter, mappingFilters);
             string[] tokens = search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             fieldStyle ??= new GUIStyle(EditorStyles.miniButton) { fixedHeight = 0f, wordWrap = true,
                 alignment = TextAnchor.MiddleLeft, padding = new RectOffset(6, 6, 4, 4) };
@@ -198,13 +180,14 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 GUIContent label = new GUIContent((mapped ? "● " : string.Empty) + caption + (parent ? " (parent key)" : string.Empty),
                     field.Tooltip + "\n" + field.Path + "\nSelect, then click its first cell.");
                 Rect rect = GUILayoutUtility.GetRect(label, fieldStyle, GUILayout.ExpandWidth(true), GUILayout.MinHeight(32f));
-                if (SelectedField == field)
-                    EditorGUI.DrawRect(rect, new Color(0.25f, 0.55f, 0.75f, 0.35f));
+                Color background = GUI.backgroundColor;
+                GUI.backgroundColor = SelectedField == field && brush == 0 ? new Color(0.3f, 0.7f, 1f) : background;
                 if (GUI.Button(rect, label, fieldStyle))
                 {
                     SelectedField = field;
                     brush = 0;
                 }
+                GUI.backgroundColor = background;
             }
         }
 
@@ -229,6 +212,24 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         #endregion
         #region Mapping
 
+        /// <summary>Selects and reveals the mapping chosen from an import correction.</summary>
+        /// <param name="preset">Current mapping settings.</param>
+        /// <param name="fields">Available preset fields.</param>
+        /// <param name="path">Affected field path.</param>
+        /// <param name="anchor">Starting cell of the affected column.</param>
+        internal void Focus(ExcelExchangePreset preset, List<ExcelField> fields, string path, string anchor)
+        {
+            // Select the existing mapping without changing its cells or field binding.
+            int index = Array.FindIndex(preset.Mappings, mapping => mapping.Path == path && mapping.Cell == anchor);
+            if (index < 0)
+                return;
+            string message = string.Empty;
+            Click(preset, anchor, index, true, ref message);
+            SelectedField = fields.FirstOrDefault(field => field.Path == path);
+            brush = 0;
+            grid.Focus(anchor);
+        }
+
         /// <summary>Restores the destination from a selected mapping without inspecting workbook values.</summary>
         /// <param name="preset">Saved configuration or null for an empty selection.</param>
         internal void Select(ExcelExchangePreset preset)
@@ -239,7 +240,6 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             importMode = preset?.Groups.FirstOrDefault()?.Policy ?? ExcelCollectionPolicy.UpdateExisting;
             fieldRole = 0;
             fieldScroll = Vector2.zero;
-            selectedCell = "A1";
         }
 
         /// <summary>Places a generic anchor or selects the existing column, including its continuation.</summary>
@@ -250,7 +250,6 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         /// <param name="status">Receives concise next-step guidance.</param>
         private void Click(ExcelExchangePreset preset, string cell, int existing, bool select, ref string status)
         {
-            selectedCell = cell;
             if (select)
             {
                 SelectedMapping = existing;
@@ -299,7 +298,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             GUI.changed = true;
         }
 
-        /// <summary>Shares structural editing between toolbar buttons and separator context menus.</summary>
+        /// <summary>Shares structural editing between grid buttons and separator context menus.</summary>
         /// <param name="row">Whether to edit rows.</param>
         /// <param name="insert">Whether to insert a new coordinate.</param>
         /// <param name="position">One-based affected coordinate.</param>
@@ -312,7 +311,6 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             {
                 ExcelGridStructure.Change(activePreset, row, insert, position);
                 SelectedMapping = Array.IndexOf(activePreset.Mappings, selected);
-                selectedCell = ExcelAddress.Format(Math.Min(ExcelAddress.Parse(selectedCell).Row, activePreset.Rows), Math.Min(ExcelAddress.Parse(selectedCell).Column, activePreset.Columns));
                 Changed?.Invoke();
                 GUI.changed = true;
             }

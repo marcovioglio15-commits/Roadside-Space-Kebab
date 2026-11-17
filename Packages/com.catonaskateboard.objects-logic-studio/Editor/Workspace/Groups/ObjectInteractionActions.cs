@@ -34,10 +34,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ObjectDialogue:
                     if (StudioButton.Draw(new GUIContent("Dialogue HUD", "Show the scene's dialogue display settings.")))
-                    {
-                        state.Navigation.Views |= ObjectStudioNavigation.Panels.SceneSetup;
-                        state.Persist();
-                    }
+                        ObjectsLogicStudioWindow.ShowSceneSetup();
                     break;
                 case ObjectOutline outline:
                     using (new EditorGUI.DisabledScope(state.PrefabChanged))

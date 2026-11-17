@@ -5,7 +5,7 @@ using UnityEngine;
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
     /// <summary>Draws a detailed settings tree with mouse navigation and direct links to its editors.</summary>
-    internal sealed class ObjectSettingsTree
+    internal sealed class ObjectSettingsTree : System.IDisposable
     {
         #region State
 
@@ -13,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private readonly ObjectSettingsTreeViewport camera = new ObjectSettingsTreeViewport();
         private GUIStyle labelStyle;
         private GUIStyle arrowStyle;
-        private long selectedId;
+        private GameObject owner;
         private bool focus = true;
         private Vector2 viewportSize;
 
@@ -23,17 +23,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Canvas
 
-        /// <summary>Refreshes option blocks after interaction selection or settings changes.</summary>
-        /// <param name="state">Selected interaction draft.</param>
-        /// <param name="groups">Its thematic settings groups.</param>
-        internal void Rebuild(ObjectWorkspace state, List<ObjectGroupInfo> groups)
+        /// <summary>Refreshes one object tree containing every interaction in the current scope.</summary>
+        /// <param name="state">Shared interaction drafts.</param>
+        /// <param name="target">Object represented by the root.</param>
+        /// <param name="features">Filtered interactions on this object.</param>
+        internal void Rebuild(ObjectWorkspace state, GameObject target, IReadOnlyList<ObjectInteraction> features)
         {
-            if (selectedId != state.Navigation.SelectedId)
+            if (owner != target)
             {
-                selectedId = state.Navigation.SelectedId;
+                owner = target;
                 focus = true;
             }
-            layout.Build(state, groups);
+            layout.Build(state, target, features);
+        }
+
+        /// <summary>Releases cached interaction documents when the workspace closes.</summary>
+        public void Dispose()
+        {
+            // Cached tree documents belong to this canvas rather than the persistent workspace.
+            layout.Dispose();
         }
 
         /// <summary>Draws the clipped canvas and handles pan, wheel zoom and block navigation.</summary>
@@ -74,11 +82,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope(EditorStyles.toolbar);
             if (GUILayout.Button(new GUIContent("Fit", "Fit the tree in this view."), EditorStyles.toolbarButton, GUILayout.Width(30f)))
                 camera.Fit(layout.Size, viewportSize);
-            if (GUILayout.Button(new GUIContent("100%", "Return to the interaction block at normal size."), EditorStyles.toolbarButton, GUILayout.Width(42f)))
+            if (GUILayout.Button(new GUIContent("100%", "Return to the object block at normal size."), EditorStyles.toolbarButton, GUILayout.Width(42f)))
                 focus = true;
             if (GUILayout.Button(new GUIContent("Expand all", "Show nested options and linked presets."), EditorStyles.toolbarButton, GUILayout.Width(72f)))
                 layout.Expand(true);
-            if (GUILayout.Button(new GUIContent("Reset", "Show sections and their first options."), EditorStyles.toolbarButton, GUILayout.Width(42f)))
+            if (GUILayout.Button(new GUIContent("Reset", "Show only the object and its collapsed interactions."), EditorStyles.toolbarButton, GUILayout.Width(42f)))
                 layout.Expand(false);
             GUILayout.FlexibleSpace();
             EditorGUI.BeginChangeCheck();
@@ -153,15 +161,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 EditorGUI.DrawRect(block, node.Kind switch
                 {
                     ObjectSettingsTreeLayout.NodeKind.Root => new Color(0.24f, 0.40f, 0.52f),
+                    ObjectSettingsTreeLayout.NodeKind.Interaction => new Color(0.26f, 0.37f, 0.44f),
                     ObjectSettingsTreeLayout.NodeKind.Theme => new Color(0.24f, 0.32f, 0.39f),
                     ObjectSettingsTreeLayout.NodeKind.Section => new Color(0.24f, 0.28f, 0.32f),
                     _ => new Color(0.22f, 0.23f, 0.25f)
                 });
                 if (node.Expandable && GUI.Button(camera.ToScreen(new Rect(node.Rect.x + 2f, node.Rect.y + 4f, 20f, 30f)), new GUIContent(layout.Expanded(node) ? "▾" : "▸", "Show or hide the options inside."), arrowStyle))
                     toggle = node;
-                using (new EditorGUI.DisabledScope(node.Group == null))
-                    if (GUI.Button(camera.ToScreen(new Rect(node.Rect.x + 24f, node.Rect.y + 3f, node.Rect.width - 28f, node.Rect.height - 6f)), new GUIContent(node.Label, node.Tooltip), labelStyle))
-                        ObjectSettingsTreeNavigation.Open(state, node);
+                if (GUI.Button(camera.ToScreen(new Rect(node.Rect.x + 24f, node.Rect.y + 3f, node.Rect.width - 28f, node.Rect.height - 6f)), new GUIContent(node.Label, node.Tooltip), labelStyle))
+                    ObjectSettingsTreeNavigation.Open(state, owner, node);
             }
             if (toggle == null)
                 return;

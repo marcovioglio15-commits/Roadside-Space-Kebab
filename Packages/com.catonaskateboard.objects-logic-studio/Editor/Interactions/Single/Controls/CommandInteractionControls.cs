@@ -137,6 +137,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             bool self = settings.FindPropertyRelative("SelfEject").boolValue;
             if (self)
             {
+                if (sections.Draw("Team Rocket Spin", "Roll around local forward throughout self-ejection.", settings, "TeamRocketSpin", "SpinSpeed"))
+                    using (new StudioIndentScope())
+                    {
+                        HoverControls.Field(settings, "TeamRocketSpin");
+                        if (settings.FindPropertyRelative("TeamRocketSpin").boolValue)
+                            HoverControls.Field(settings, "SpinSpeed", "Spin Speed (°/s)");
+                    }
                 HoverControls.Field(settings, "TemporaryPhysics");
                 if (settings.FindPropertyRelative("TemporaryPhysics").boolValue)
                     SingleInteractionControls.DrawRelease(settings.FindPropertyRelative("Physics"), sections);

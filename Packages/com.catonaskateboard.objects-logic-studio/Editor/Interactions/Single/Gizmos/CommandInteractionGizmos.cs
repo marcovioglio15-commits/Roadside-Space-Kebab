@@ -66,6 +66,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Vector3 origin = feature.Target.SolidHitOnly ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
             float size = HandleUtility.GetHandleSize(origin) * 0.7f;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(1f, 0.65f, 0.2f));
+            if (feature.Settings.SelfEject && feature.Settings.TeamRocketSpin)
+                Spin(feature, size * 0.35f);
             if (feature.Settings.SelfEject && feature.Settings.UseBulletImpulse)
             {
                 // The incoming shot owns this direction; a fixed arrow would misrepresent the configured behavior.
@@ -82,6 +84,24 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Handles.ConeHandleCap(0, end, Quaternion.LookRotation(impulse), size * 0.12f, EventType.Repaint);
                 Handles.Label(end, "Impulse " + (index + 1) + " · " + impulse.magnitude.ToString("0.##"));
             }
+        }
+
+        /// <summary>Shows the local-forward roll axis and signed direction alongside the launch impulse.</summary>
+        /// <param name="feature">Self-ejection supplying the spin speed.</param>
+        /// <param name="radius">Screen-relative guide radius.</param>
+        private static void Spin(ObjectEject feature, float radius)
+        {
+            // A compact open arc distinguishes roll from the outgoing linear impulse.
+            using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.35f, 0.85f, 1f));
+            Vector3 origin = feature.transform.position;
+            Vector3 forward = feature.transform.forward;
+            Vector3 start = feature.transform.up;
+            float direction = Mathf.Sign(feature.Settings.SpinSpeed);
+            Vector3 end = Quaternion.AngleAxis(direction * 290f, forward) * start;
+            Handles.DrawWireArc(origin, forward, start, direction * 290f, radius);
+            Handles.ConeHandleCap(0, origin + end * radius, Quaternion.LookRotation(Vector3.Cross(forward, end) * direction),
+                radius * 0.2f, EventType.Repaint);
+            Handles.Label(origin + start * radius * 1.2f, "Roll " + feature.Settings.SpinSpeed.ToString("0.#") + "°/s");
         }
 
         #endregion

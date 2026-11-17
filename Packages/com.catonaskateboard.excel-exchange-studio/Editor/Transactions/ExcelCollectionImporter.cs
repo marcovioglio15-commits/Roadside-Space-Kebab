@@ -54,8 +54,17 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                     ExcelCellMapping key = columns.First(mapping => mapping.Kind == ExcelMappingKind.ParentKey
                         && fields.First(field => field.Path == mapping.Path).Collection == collections[depth]);
                     ExcelField field = fields.First(candidate => candidate.Path == key.Path);
-                    object incoming = ExcelValueCodec.Read(sheet.Get(row, ExcelAddress.Parse(key.Cell).Column), field.Type,
-                        key.Separator, preview.Preset.UseFormulaResults);
+                    object incoming;
+                    try
+                    {
+                        incoming = ExcelValueCodec.Read(sheet.Get(row, ExcelAddress.Parse(key.Cell).Column), field.Type,
+                            key.Separator, preview.Preset.UseFormulaResults);
+                    }
+                    catch (Exception exception)
+                    {
+                        ExcelImportMessages.Cell(preview, key, sheet, field, row, "Row " + row, exception);
+                        return;
+                    }
                     IList candidates = (IList)ExcelPropertyPath.Get(preview.Proposal, collections[depth], parents.ToArray());
                     int found = -1;
                     for (int index = 0; index < candidates.Count; index++)
@@ -64,12 +73,13 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                         if (!Equals(ExcelPropertyPath.Get(preview.Proposal, key.Path, indices), incoming))
                             continue;
                         if (found >= 0)
-                            throw new FormatException("Duplicate parent key: " + sheet.Get(row, ExcelAddress.Parse(key.Cell).Column).Text);
+                            throw ExcelImportMessages.Problem(preview, key, fields, row, "Row " + row, "More than one parent has this name.",
+                                "Give these parent items different names in the preset tool, then refresh the preview.", sheet.Get(row, ExcelAddress.Parse(key.Cell).Column).Text);
                         found = index;
                     }
                     if (found < 0)
-                        throw new FormatException("Parent not found at " + ExcelAddress.Format(row, ExcelAddress.Parse(key.Cell).Column)
-                            + ": " + sheet.Get(row, ExcelAddress.Parse(key.Cell).Column).Text);
+                        throw ExcelImportMessages.Problem(preview, key, fields, row, "Row " + row, "No parent item matches this value.",
+                            "Use an existing parent's name in this cell. Check the parent field and column in Layout.", sheet.Get(row, ExcelAddress.Parse(key.Cell).Column).Text);
                     parents.Add(found);
                 }
                 string identity = string.Join(",", parents);
@@ -111,9 +121,11 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             List<object> elements = group.Policy == ExcelCollectionPolicy.ReplaceCollection ? new List<object>()
                 : current == null ? new List<object>() : current.Cast<object>().ToList();
             int originalCount = current?.Count ?? 0;
+            string scope = ExcelImportMessages.Item(group, columns, sheet, bucket.Rows.FirstOrDefault(), false);
             if (group.Match == ExcelMatchMode.Position && group.Policy == ExcelCollectionPolicy.UpdateExisting && originalCount != bucket.Rows.Count)
-                throw new FormatException(group.Name + ": workbook has " + bucket.Rows.Count + " rows; preset has " + originalCount
-                    + ". Choose Merge or Replace Collection, then preview again.");
+                throw ExcelImportMessages.Problem(preview, columns.First(mapping => mapping.Kind == ExcelMappingKind.Data), fields,
+                    bucket.Rows.FirstOrDefault(), scope, "The file has " + bucket.Rows.Count + " items; this list currently has " + originalCount + ".",
+                    "Choose Update and Add to keep existing items, or Replace All to rebuild the list, then refresh the preview.");
             ExcelCellMapping key = group.Match == ExcelMatchMode.Key ? columns.First(mapping => mapping.Path == group.Path + "." + group.KeyPath) : null;
             Type keyType = key == null ? null : fields.First(field => field.Path == key.Path).Type;
             Dictionary<string, int> existing = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -123,7 +135,8 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                     object value = ExcelPropertyPath.Get(previous[index], group.KeyPath);
                     string identity = ExcelValueCodec.Format(value, keyType);
                     if (!existing.TryAdd(identity, index) && group.Policy != ExcelCollectionPolicy.ReplaceCollection)
-                        throw new FormatException("Duplicate existing key in " + group.Name + ": " + identity);
+                        throw ExcelImportMessages.Problem(preview, key, fields, bucket.Rows.FirstOrDefault(), scope,
+                            "More than one saved item is named '" + identity + "'.", "Rename one of them in the preset tool, or choose Replace All.", identity);
                 }
             HashSet<string> incomingKeys = new HashSet<string>(StringComparer.Ordinal);
             List<int> destinations = new List<int>();
@@ -135,16 +148,29 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 if (key != null)
                 {
                     ExcelCell cell = sheet.Get(bucket.Rows[position], ExcelAddress.Parse(key.Cell).Column);
-                    string identity = ExcelValueCodec.Format(ExcelValueCodec.Read(cell, keyType, key.Separator, preview.Preset.UseFormulaResults), keyType);
+                    string identity;
+                    try
+                    {
+                        identity = ExcelValueCodec.Format(ExcelValueCodec.Read(cell, keyType, key.Separator, preview.Preset.UseFormulaResults), keyType);
+                    }
+                    catch (Exception exception)
+                    {
+                        ExcelImportMessages.Cell(preview, key, sheet, fields.First(field => field.Path == key.Path), bucket.Rows[position], scope, exception);
+                        return;
+                    }
                     if (identity.Length == 0 || !incomingKeys.Add(identity))
-                        throw new FormatException("Empty or duplicate row key in " + group.Name + ": " + identity);
+                        throw ExcelImportMessages.Problem(preview, key, fields, bucket.Rows[position], scope,
+                            identity.Length == 0 ? "This item's name is empty." : "The file lists '" + identity + "' more than once.",
+                            "Give each item a different name. Correct this cell or remove the repeated row.", identity);
                     original = existing.TryGetValue(identity, out int matched) ? matched : -1;
                     destination = group.Policy == ExcelCollectionPolicy.ReplaceCollection ? elements.Count : original >= 0 ? original : elements.Count;
                 }
                 if (destination >= elements.Count)
                 {
                     if (group.Policy == ExcelCollectionPolicy.UpdateExisting)
-                        throw new FormatException("Row key not found in " + group.Name + ". Choose Merge or Replace Collection.");
+                        throw ExcelImportMessages.Problem(preview, key ?? columns.First(mapping => mapping.Kind == ExcelMappingKind.Data), fields,
+                            bucket.Rows[position], scope, "This item is not in the current list.",
+                            "Choose Update and Add to include new items, or Replace All to rebuild the list.", key != null ? sheet.Get(bucket.Rows[position], ExcelAddress.Parse(key.Cell).Column).Text : string.Empty);
                     elements.Add(Activator.CreateInstance(elementType));
                 }
                 destinations.Add(destination);
@@ -152,21 +178,23 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             }
             ExcelPropertyPath.Set(preview.Proposal, group.Path, ExcelPropertyPath.Collection(collectionType, elements), bucket.Parents);
             if (group.Policy == ExcelCollectionPolicy.ReplaceCollection || elements.Count != originalCount)
-                preview.Rows.Add(new ExcelPreviewRow(group.Name, group.Path, originalCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                preview.Rows.Add(new ExcelPreviewRow(preview.Preset.Worksheet, ExcelLayoutSchema.CollectionLabel(group.Path, fields), originalCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
                     elements.Count.ToString(System.Globalization.CultureInfo.InvariantCulture), group.Policy == ExcelCollectionPolicy.ReplaceCollection
-                        ? "Collection rebuilt. Every unmapped field uses its declared default." : "New elements use declared defaults."));
+                        ? "Replace this list. Other fields reset to their default values." : "Add new items. Their other fields start with default values.",
+                    item: scope, kind: ExcelPreviewKind.Collection));
             for (int position = 0; position < bucket.Rows.Count; position++)
             {
                 int[] indices = bucket.Parents.Concat(new[] { destinations[position] }).ToArray();
                 object original = originals[position] >= 0 ? previous[originals[position]] : null;
+                string item = ExcelImportMessages.Item(group, columns, sheet, bucket.Rows[position]);
                 if (group.Policy == ExcelCollectionPolicy.ReplaceCollection && original != null)
-                    AddDefaults(preview, group, columns, fields, original, elements[destinations[position]], bucket.Rows[position]);
+                    AddDefaults(preview, group, columns, fields, original, elements[destinations[position]], bucket.Rows[position], item);
                 foreach (ExcelCellMapping mapping in columns)
                 {
                     string before = mapping.Kind == ExcelMappingKind.Data ? ExcelValueCodec.Format(
                         original == null ? null : ExcelPropertyPath.Get(original, mapping.Path.Substring(group.Path.Length + 1)),
                         fields.First(field => field.Path == mapping.Path).Type, mapping.Separator) : null;
-                    ExcelImportService.ApplyCell(preview, mapping, sheets, fields, bucket.Rows[position], indices, occupied, before);
+                    ExcelImportService.ApplyCell(preview, mapping, sheets, fields, bucket.Rows[position], indices, occupied, before, item);
                 }
             }
         }
@@ -179,8 +207,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         /// <param name="before">Existing matched element.</param>
         /// <param name="after">Fresh element using declared defaults.</param>
         /// <param name="row">Source row identifying the replacement.</param>
+        /// <param name="item">Affected item name.</param>
         private static void AddDefaults(ExcelImportPreview preview, ExcelCollectionGroup group, ExcelCellMapping[] columns,
-            List<ExcelField> fields, object before, object after, int row)
+            List<ExcelField> fields, object before, object after, int row, string item)
         {
             foreach (ExcelField field in fields.Where(field => field.Collection == group.Path
                 && !columns.Any(mapping => mapping.Kind == ExcelMappingKind.Data && mapping.Path == field.Path)))
@@ -189,7 +218,8 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 string original = ExcelValueCodec.Format(ExcelPropertyPath.Get(before, relative), field.Type);
                 string replacement = ExcelValueCodec.Format(ExcelPropertyPath.Get(after, relative), field.Type);
                 if (original != replacement)
-                    preview.Rows.Add(new ExcelPreviewRow("Row " + row, field.Label, original, replacement, "Reset to default."));
+                    preview.Rows.Add(new ExcelPreviewRow(preview.Preset.Worksheet + " · row " + row, field.Label, original, replacement,
+                        "Reset to default.", item: item, kind: ExcelPreviewKind.Default));
             }
         }
 

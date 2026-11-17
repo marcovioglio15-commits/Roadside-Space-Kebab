@@ -26,6 +26,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool executing;
         private readonly BlackHoleRun attraction = new BlackHoleRun();
         private readonly EjectBodyState temporary = new EjectBodyState();
+        private readonly EjectSpin spin = new EjectSpin();
         private TriggerAnimationPlayback pendingAnimation;
         private bool effectStarted;
         private Vector3 bulletImpulse;
@@ -63,6 +64,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // An interrupted prerequisite must never launch a reused or re-enabled object later.
             CancelAnimation();
             attraction.Cancel();
+            spin.Restore();
             temporary.Restore();
             base.OnDisable();
         }
@@ -72,6 +74,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Keep an animation handle only while its prerequisite or forced return still needs coordination.
             UpdatePrerequisite();
+            spin.Tick();
             bool completed = attraction.Pending && attraction.Tick(Time.fixedDeltaTime);
             if (effectStarted && (!attraction.Active || settings.ReturnOverlap > 0f
                 && attraction.Progress >= 1f - settings.ReturnOverlap * 0.01f))
@@ -126,6 +129,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 ejector.CancelAnimation();
                 ejector.attraction.Cancel();
+                ejector.spin.Restore();
+                ejector.temporary.Restore();
             }
         }
 
@@ -256,7 +261,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the current item may apply its Eject effect.</returns>
         private bool CanApplyEffect()
         {
-            return !executing && !attraction.Active && !temporary.Active && Available(InteractionChannels.Eject, pendingTool)
+            return !executing && !attraction.Active && !temporary.Active && !spin.Active && Available(InteractionChannels.Eject, pendingTool)
                 && Item != null && (!Item.IsReserved || pendingAnimation != null && Item.IsOwnedBy(pendingAnimation.Source));
         }
 
@@ -336,6 +341,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Both force modes are single physics impulses; no Update loop reapplies the force.
             body.AddForce(UsesBulletImpulse ? bulletImpulse : rule.Space == Space.Self ? transform.rotation * rule.Impulse : rule.Impulse,
                 settings.Mode == EjectForceMode.Impulse ? ForceMode.Impulse : ForceMode.VelocityChange);
+            if (settings.SelfEject && settings.TeamRocketSpin)
+                spin.Begin(body, settings.SpinSpeed);
             ejected.Add(body);
             if (settings.Despawn)
                 Destroy(item != null ? item.gameObject : body.gameObject, settings.DespawnDelay);

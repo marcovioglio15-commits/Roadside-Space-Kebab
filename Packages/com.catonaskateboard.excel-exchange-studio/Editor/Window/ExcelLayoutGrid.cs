@@ -12,6 +12,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
 
         private Vector2 scroll;
         private GUIStyle cellStyle;
+        private string focusCell = string.Empty;
         private readonly Dictionary<(int Row, int Column), int> anchors = new Dictionary<(int Row, int Column), int>();
         private readonly Dictionary<int, List<(int Row, int Index)>> repeats = new Dictionary<int, List<(int Row, int Index)>>();
         private static readonly Color anchorTint = new Color(0.65f, 0.85f, 1f);
@@ -41,26 +42,31 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 fixedHeight = 0f, fixedWidth = 0f, fontSize = 12, padding = new RectOffset(9, 9, 5, 5) };
             BuildIndex(preset);
             // Reserve the scrollable extent, then draw only the visible coordinates.
-            const float height = 76f;
+            ExcelGridGeometry geometry = new ExcelGridGeometry(width);
             Rect viewport = GUILayoutUtility.GetRect(100f, 10000f, 240f, 10000f, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            if (ExcelAddress.TryParse(focusCell, out (int Row, int Column) focus))
+            {
+                Rect target = geometry.Cell(focus.Row, focus.Column);
+                scroll = new Vector2(Math.Max(0f, target.xMax - viewport.width + 30f), Math.Max(0f, target.yMax - viewport.height + 30f));
+                focusCell = string.Empty;
+            }
             bool hovered = viewport.Contains(Event.current.mousePosition);
-            scroll = GUI.BeginScrollView(viewport, scroll, new Rect(0f, 0f, 42f + preset.Columns * width, 24f + preset.Rows * height));
+            scroll = GUI.BeginScrollView(viewport, scroll, new Rect(0f, 0f, ExcelGridGeometry.Gutter + preset.Columns * geometry.ColumnStride,
+                ExcelGridGeometry.Header + preset.Rows * geometry.RowStride));
             if (hovered)
-                ExcelGridMenus.Draw(preset, width, height, edit);
-            int firstRow = Math.Max(1, (int)(scroll.y / height));
-            int lastRow = Math.Min(preset.Rows, firstRow + (int)(viewport.height / height) + 2);
-            int firstColumn = Math.Max(1, (int)(scroll.x / width));
-            int lastColumn = Math.Min(preset.Columns, firstColumn + (int)(viewport.width / width) + 2);
+                ExcelGridMenus.Draw(preset, geometry, edit);
+            int firstRow = Math.Max(1, (int)(scroll.y / geometry.RowStride));
+            int lastRow = Math.Min(preset.Rows, firstRow + (int)(viewport.height / geometry.RowStride) + 2);
+            int firstColumn = Math.Max(1, (int)(scroll.x / geometry.ColumnStride));
+            int lastColumn = Math.Min(preset.Columns, firstColumn + (int)(viewport.width / geometry.ColumnStride) + 2);
+            ExcelGridButtons.Draw(preset, geometry, firstRow, lastRow, firstColumn, lastColumn, out bool editRow, out bool insert, out int position);
             Color background = GUI.backgroundColor;
             // Labels belong to anchors; repeated cells stay empty and select their anchor.
-            for (int column = firstColumn; column <= lastColumn; column++)
-                GUI.Label(new Rect(42f + (column - 1) * width, 0f, width, 24f), ExcelAddress.Format(1, column).TrimEnd('1'), EditorStyles.centeredGreyMiniLabel);
             for (int row = firstRow; row <= lastRow; row++)
             {
-                GUI.Label(new Rect(0f, 24f + (row - 1) * height, 39f, height), row.ToString(), EditorStyles.centeredGreyMiniLabel);
                 for (int column = firstColumn; column <= lastColumn; column++)
                 {
-                    Rect rect = new Rect(42f + (column - 1) * width, 24f + (row - 1) * height, width - 6f, height - 6f);
+                    Rect rect = geometry.Cell(row, column);
                     int anchor = Find(row, column, out bool repeated);
                     ExcelCellMapping mapping = anchor >= 0 ? preset.Mappings[anchor] : null;
                     GUI.backgroundColor = mapping != null ? repeated ? repeatTint : anchor == selected ? selectionTint : anchorTint : background;
@@ -79,7 +85,16 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 }
             }
             GUI.EndScrollView();
+            if (position > 0)
+                edit(editRow, insert, position);
             return cell.Length > 0;
+        }
+
+        /// <summary>Brings a mapping into view after a preview correction is selected.</summary>
+        /// <param name="cell">Anchor address to reveal.</param>
+        internal void Focus(string cell)
+        {
+            focusCell = cell;
         }
 
         #endregion

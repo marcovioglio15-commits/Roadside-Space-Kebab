@@ -52,30 +52,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
         }
 
-        /// <summary>Draws one compact row per thematic group, with independent editing and presets.</summary>
-        /// <param name="state">Persistent workspace.</param>
-        /// <param name="groups">Cached groups for the selected draft.</param>
-        /// <param name="search">Current search terms.</param>
-        internal static void Overview(ObjectWorkspace state, List<ObjectGroupInfo> groups, string search)
-        {
-            using SerializedObject data = new SerializedObject(state);
-            foreach (ObjectGroupInfo group in groups)
-            {
-                if (!ObjectSettingsSearch.MatchesGroup(group, search))
-                    continue;
-                string requirement = ObjectGroupAvailability.Requirement(data, group, out _);
-                if (!string.IsNullOrEmpty(requirement) && string.IsNullOrWhiteSpace(search))
-                    continue;
-                using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
-                if (ObjectWorkspaceGUI.Row(group.Title, false, ObjectFieldText.Short(group.Tooltip)))
-                    ObjectGroupWindow.Open(state, group);
-                if (GUILayout.Button(new GUIContent("Edit", "Open these settings."), EditorStyles.miniButton, GUILayout.Width(42f)))
-                    ObjectGroupWindow.Open(state, group);
-                if (!string.IsNullOrEmpty(requirement))
-                    EditorGUILayout.LabelField(requirement, EditorStyles.wordWrappedMiniLabel);
-            }
-        }
-
         #endregion
 
         #region Hover

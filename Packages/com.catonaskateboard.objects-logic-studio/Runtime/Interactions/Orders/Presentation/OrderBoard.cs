@@ -40,6 +40,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Optional scene objects in text-slot order. Each assigned object is shown and tinted independently.")]
         [SerializeField]
         private GameObject[] slotObjects = Array.Empty<GameObject>();
+        [Tooltip("Reveal occupied slot objects and their text in sequence. The first slot appears immediately.")]
+        [SerializeField]
+        private bool staggerSlotObjects;
+        [Tooltip("Scaled seconds between successive slot reveals. Individual slots may override this interval.")]
+        [SerializeField]
+        [Range(0f, 10f)]
+        private float slotObjectDelay = 0.25f;
+        [Tooltip("Optional delay overrides in text-slot order. Unconfigured slots use the shared interval.")]
+        [SerializeField]
+        private OrderSlotRevealDelay[] slotObjectDelays = Array.Empty<OrderSlotRevealDelay>();
         [Tooltip("Multiply the assigned scene object's material colors by the order's delivery state.")]
         [SerializeField]
         private bool tintByState;
@@ -60,6 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private string[] originals = Array.Empty<string>();
         private bool registered;
         private int generation = -1;
+        private readonly OrderBoardReveal reveal = new OrderBoardReveal();
 
         #endregion
         #region Properties
@@ -106,6 +117,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             originals = new string[slots.Length];
             objectViews = showSlotObjects ? new OrderSlotObject[slots.Length] : Array.Empty<OrderSlotObject>();
             formatting = new OrderBoardText[slots.Length];
+            reveal.Initialize(this, slots.Length);
             for (int index = 0; index < slots.Length; index++)
             {
                 formatting[index] = slots[index].GetComponent<OrderBoardText>();
@@ -134,6 +146,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores authored presentation after leaving Play or disabling the board.</summary>
         private void Restore()
         {
+            // Hidden tickets must never reappear after their board leaves the queue.
+            reveal.Clear();
             // No text object is instantiated, destroyed or reparented during gameplay.
             foreach (OrderBoardText text in formatting)
                 if (text != null)
@@ -169,9 +183,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             occupied[index] = ticket;
             ticket.Board = this;
             ticket.Slot = index;
-            Draw(ticket);
-            ticket.Owner.NotifyDisplayed();
+            if (!showSlotObjects || !staggerSlotObjects || reveal.Schedule(ticket, RevealDelay(index)))
+            {
+                Draw(ticket);
+                if (ticket.Board == this && ticket.Owner != null)
+                    ticket.Owner.NotifyDisplayed();
+            }
             return true;
+        }
+
+        /// <summary>Resolves one slot's optional interval without modifying its stored configuration.</summary>
+        /// <param name="index">Assigned slot in text-slot order.</param>
+        /// <returns>The per-slot override or shared board interval.</returns>
+        private float RevealDelay(int index)
+        {
+            // Missing overrides inherit the common interval.
+            return slotObjectDelays != null && index < slotObjectDelays.Length && slotObjectDelays[index] is { Override: true }
+                ? slotObjectDelays[index].Delay : slotObjectDelay;
         }
 
         /// <summary>Finds a free slot that can present this catalog entry.</summary>
@@ -190,7 +218,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="ticket">Assigned order whose completion may have changed.</param>
         internal void Draw(OrderTicket ticket)
         {
-            if (!OwnsSlot(ticket))
+            if (!OwnsSlot(ticket) || reveal.IsPending(ticket.Slot))
                 return;
             int index = ticket.Slot;
             if (index < objectViews.Length)
@@ -239,6 +267,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (index >= 0 && index < occupied.Length && occupied[index] == ticket)
             {
                 occupied[index] = null;
+                reveal.Cancel(index);
                 if (index < objectViews.Length)
                     objectViews[index]?.Hide();
                 formatting[index]?.Clear();
@@ -277,6 +306,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (showSlotObjects)
             {
+                // Inactive delay options do not prevent a board from running.
+                warning = "Slot reveal delays must be finite and non-negative.";
+                if (staggerSlotObjects && (!float.IsFinite(slotObjectDelay) || slotObjectDelay < 0f
+                    || slotObjectDelays != null && Array.Exists(slotObjectDelays,
+                        delay => delay is { Override: true } && (!float.IsFinite(delay.Delay) || delay.Delay < 0f))))
+                    return false;
                 // A slot object can live anywhere in the scene as long as it cannot deactivate this board.
                 warning = "Assign distinct scene objects in text-slot order. Do not assign the board or one of its parents.";
                 if (slotObjects == null || slotObjects.Length > slots.Length)

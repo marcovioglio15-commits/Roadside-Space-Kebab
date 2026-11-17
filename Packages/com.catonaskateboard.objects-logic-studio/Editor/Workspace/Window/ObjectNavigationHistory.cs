@@ -82,7 +82,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             if ((input.control || input.command) && input.keyCode == KeyCode.F)
             {
-                state.Navigation.Views |= ObjectStudioNavigation.Panels.Interactions;
                 GUI.FocusControl("ObjectsLogicStudio.Search");
                 input.Use();
             }

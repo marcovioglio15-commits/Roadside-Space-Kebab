@@ -89,8 +89,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>(grab.Item.Identity.ActiveFlags);
             if (row != null && row.OrderFlag != null)
                 flags.Add(row.OrderFlag);
-            if (ingredient != null && ingredient.IsComplete)
-                ingredient.CollectIngredientFlags(flags);
+            grab.Item.CollectRecipeFlags(flags);
             ingredientFlags = new ObjectFlag[flags.Count];
             flags.CopyTo(ingredientFlags);
             Units = grab.Units;

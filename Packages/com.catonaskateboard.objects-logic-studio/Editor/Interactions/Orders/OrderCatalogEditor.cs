@@ -168,7 +168,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                                 HoverControls.Field(variant, "Quantity");
                         }
                     }
-                if (OrderSections.Draw(variant, "Variant Ingredients", "Required and forbidden ingredient flags.", "Flags", "RequireAllFlags", "ExcludedFlags"))
+                if (OrderSections.Draw(variant, "Variant Ingredients", "Required and forbidden ingredient or sprayed sauce flags.", "Flags", "RequireAllFlags", "ExcludedFlags"))
                     using (new StudioIndentScope())
                         Flags(variant, true);
             }
@@ -203,7 +203,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(entry, "RequireAllFlags");
             if (variant)
                 ObjectFlagSelector.Draw(entry.FindPropertyRelative("ExcludedFlags"),
-                    new GUIContent("Subtractive Flags", "None of these flags may belong to the assembled ingredients."));
+                    new GUIContent("Subtractive Flags", "None of these ingredient or sprayed sauce flags may be present."));
         }
 
         /// <summary>Exposes only the policies used by enabled variant combinations.</summary>

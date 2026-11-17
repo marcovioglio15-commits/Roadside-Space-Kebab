@@ -1,3 +1,5 @@
+using System;
+using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -27,6 +29,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int layers;
         private Transform receiverTransform;
         private Vector3 receiverPoint;
+        private ObjectFlag[] ingredientFlags = Array.Empty<ObjectFlag>();
+        private ObjectItem sourceItem;
         #endregion
         #region Properties
         /// <summary>Native body participating in collisions and gravity-generator leases.</summary>
@@ -86,6 +90,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             float radius, float age, LiquidDroplet older)
         {
             Source = source;
+            sourceItem = source.Item;
+            ingredientFlags = source.IngredientFlags;
             SpraySauceSettings settings = source.Settings;
             Generation++;
             previous = older;
@@ -152,6 +158,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Ignore(ignoredPlayer, false);
             ignored = ignoredPlayer = null;
             Source = null;
+            sourceItem = null;
+            ingredientFlags = Array.Empty<ObjectFlag>();
             previous = null;
             trail = null;
             palette = null;
@@ -286,8 +294,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Impacted = true;
             receiverTransform = receiver.transform;
             receiverPoint = receiverTransform.InverseTransformPoint(point + normal * Radius * 0.25f);
+            // Each sample keeps its emission identity even if the bottle changes flags or disappears in flight.
+            ObjectItem item = SprayExposure.ApplyFlags(receiver, sourceItem, ingredientFlags);
             if (Source != null)
-                Source.Hit(receiver, point, normal, velocity);
+                Source.Hit(receiver, point, normal, velocity, item);
             else if (leavesTrail && trail != null && palette != null)
                 SurfaceMarkPool.Deposit(receiver, point, normal, velocity, trail, palette);
             ObjectGravityGenerator.Forget(Body);

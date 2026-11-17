@@ -64,8 +64,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         public System.Collections.Generic.List<ObjectMasterAssignment> Masters = new System.Collections.Generic.List<ObjectMasterAssignment>();
         [Tooltip("Interaction category currently displayed in the workspace.")]
         public ObjectInteractionCategory Category;
-        [Tooltip("Expand the selected interaction to show its preset and object settings.")]
-        public bool InteractionExpanded = true;
         [Tooltip("Collapsed menus retained independently of pending data.")]
         public ObjectStudioSections Sections = new ObjectStudioSections();
         [Tooltip("Form scroll position restored on reopening.")]

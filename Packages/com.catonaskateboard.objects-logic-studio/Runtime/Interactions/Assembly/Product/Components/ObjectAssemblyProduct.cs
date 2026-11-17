@@ -481,19 +481,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                             destination.Add(flag);
         }
 
-        /// <summary>Captures recipe provenance before consumption deactivates the product hierarchy.</summary>
-        /// <returns>Inserted ingredient flags, or null when the recipe is unfinished.</returns>
-        internal ObjectFlag[] CaptureIngredientFlags()
-        {
-            if (!IsComplete)
-                return null;
-            HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>();
-            CollectIngredientFlags(flags);
-            ObjectFlag[] result = new ObjectFlag[flags.Count];
-            flags.CopyTo(result);
-            return result;
-        }
-
         /// <summary>Updates body mass and geometry caches only when the composition changes.</summary>
         private void RefreshGeometry()
         {

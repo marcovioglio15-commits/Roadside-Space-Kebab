@@ -11,9 +11,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
 
         private static readonly GUIContent[] modes =
         {
-            new GUIContent("Update Existing", "Update existing items. Preserve their unmapped properties."),
-            new GUIContent("Update and Add", "Update existing items and add missing ones using declared defaults."),
-            new GUIContent("Replace All", "Rebuild the involved collections. Reset every unmapped property to its declared default.")
+            new GUIContent("Update Existing", "Update existing items. Keep fields that are not in the file."),
+            new GUIContent("Update and Add", "Update existing items. Add new ones with default values for fields outside the file."),
+            new GUIContent("Replace All", "Replace this list with the file's items. Fields outside the file use default values.")
         };
 
         #endregion
@@ -28,7 +28,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             ExcelCollectionPolicy selected = (ExcelCollectionPolicy)StudioFieldGUI.Popup(GUIContent.none, (int)mode, modes);
             EditorGUILayout.LabelField(selected switch
             {
-                ExcelCollectionPolicy.ReplaceCollection => "Rebuild items. Unmapped properties use defaults.",
+                ExcelCollectionPolicy.ReplaceCollection => "Replace items. Fields outside the file use defaults.",
                 ExcelCollectionPolicy.Merge => "Update existing items and add missing ones.",
                 _ => "Update existing items. Preserve other properties."
             }, EditorStyles.wordWrappedMiniLabel);

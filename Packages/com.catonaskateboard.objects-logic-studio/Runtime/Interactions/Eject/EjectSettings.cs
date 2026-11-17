@@ -62,6 +62,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public BlackHoleSettings BlackHole = new BlackHoleSettings();
         [Tooltip("Apply one impulse to this object's own Rigidbody instead of searching for flagged contacts.")]
         public bool SelfEject;
+        [Tooltip("Roll around local forward until despawn or disable. Temporarily releases rotation constraints.")]
+        public bool TeamRocketSpin;
+        [Tooltip("Forward-axis rotation in degrees per second. Negative values reverse the spin.")]
+        [Range(-2160f, 2160f)]
+        public float SpinSpeed = 720f;
         [Tooltip("Use the matching shot's direction and speed instead of Self Impulse. Works with bullets and Cursor Interaction.")]
         public bool UseBulletImpulse;
         [Tooltip("Multiply the shot's direction and speed by this value. Impulse also accounts for the body's mass.")]
@@ -134,6 +139,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             }
             if (SelfEject && TemporaryPhysics && (Physics == null || !Physics.TryValidate(out warning)))
+                return false;
+            // Inactive spin settings never invalidate contact ejection or Black Hole.
+            warning = "Team Rocket Spin needs a finite, non-zero Spin Speed.";
+            if (SelfEject && TeamRocketSpin && (!float.IsFinite(SpinSpeed) || SpinSpeed == 0f))
                 return false;
             warning = "Bullet Impulse Multiplier must be positive and finite.";
             if (SelfEject && UseBulletImpulse && !InteractionValues.Positive(BulletImpulseMultiplier))

@@ -35,19 +35,38 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 foreach (ExcelCollectionGroup group in preset.Groups.OrderBy(group => ExcelPropertyPath.Collections(group.Path).Length))
                 {
                     ExcelCellMapping[] columns = ExcelMappingRules.Columns(preset, group, false);
-                    if (columns.Length > 0)
+                    if (columns.Length == 0)
+                        continue;
+                    try
+                    {
                         ExcelCollectionImporter.Apply(preview, group, columns, workbook.Sheets, fields, occupied);
+                    }
+                    catch (ExcelImportProblem problem)
+                    {
+                        preview.Rows.Add(problem.Row);
+                    }
+                    catch (Exception exception)
+                    {
+                        preview.Rows.Add(new ExcelPreviewRow(preset.Worksheet + "!" + columns[0].Cell, ExcelLayoutSchema.CollectionLabel(group.Path, fields),
+                            string.Empty, string.Empty, exception.Message, true, fix: "Check this list's columns and Import Mode, then refresh the preview.",
+                            mapping: columns[0].Path, anchor: columns[0].Cell));
+                    }
                 }
-                string warning = context.Validate?.Invoke(preview.Proposal) ?? Validate(preview.Proposal);
-                if (!string.IsNullOrEmpty(warning))
-                    preview.Warnings.Add(warning + " Review these settings before applying the preset.");
-                StudioPresetActions.Review(context.Source, preview.Before, preview.Proposal, preview.Warnings);
+                // Incomplete conversions must not produce misleading follow-on preset warnings.
+                if (!preview.Rows.Exists(row => row.Error))
+                {
+                    string warning = context.Validate?.Invoke(preview.Proposal) ?? Validate(preview.Proposal);
+                    if (!string.IsNullOrEmpty(warning))
+                        preview.Warnings.Add(ExcelImportMessages.Warning(warning) + " Check this item in the preset tool before Apply.");
+                    StudioPresetActions.Review(context.Source, preview.Before, preview.Proposal, preview.Warnings);
+                }
                 if (ExcelImportPreview.Hash(preview.Path) != preview.WorkbookHash)
                     throw new InvalidOperationException("The workbook changed while reading. Run Preview again.");
             }
             catch (Exception exception)
             {
-                preview.Rows.Add(new ExcelPreviewRow(string.Empty, string.Empty, string.Empty, string.Empty, exception.Message, true));
+                preview.Rows.Add(new ExcelPreviewRow("Import settings", "File and layout", string.Empty, string.Empty, exception.Message, true,
+                    fix: "Check the file, selected worksheet and Layout settings, then refresh the preview."));
             }
             return preview;
         }
@@ -61,8 +80,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         /// <param name="indices">Resolved collection element positions.</param>
         /// <param name="occupied">Coordinates already consumed by this layout.</param>
         /// <param name="original">Optional original element value for a rebuilt collection.</param>
+        /// <param name="item">Parent and item names shown in the review.</param>
         internal static void ApplyCell(ExcelImportPreview preview, ExcelCellMapping mapping,
-            Dictionary<string, ExcelSheet> sheets, List<ExcelField> fields, int row, int[] indices, HashSet<string> occupied, string original = null)
+            Dictionary<string, ExcelSheet> sheets, List<ExcelField> fields, int row, int[] indices, HashSet<string> occupied, string original = null, string item = "Preset values")
         {
             string address = preview.Preset.Worksheet + "!" + ExcelAddress.Format(row, ExcelAddress.Parse(mapping.Cell).Column);
             try
@@ -81,11 +101,12 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 object after = ExcelValueCodec.Read(cell, field.Type, mapping.Separator, preview.Preset.UseFormulaResults);
                 ExcelPropertyPath.Set(preview.Proposal, mapping.Path, after, indices);
                 preview.Rows.Add(new ExcelPreviewRow(address, field.Label, original ?? ExcelValueCodec.Format(before, field.Type, mapping.Separator),
-                    ExcelValueCodec.Format(after, field.Type, mapping.Separator)));
+                    ExcelValueCodec.Format(after, field.Type, mapping.Separator), item: item));
             }
             catch (Exception exception)
             {
-                preview.Rows.Add(new ExcelPreviewRow(address, mapping.Path, string.Empty, string.Empty, exception.Message, true));
+                sheets.TryGetValue(preview.Preset.Worksheet, out ExcelSheet sheet);
+                ExcelImportMessages.Cell(preview, mapping, sheet, fields.FirstOrDefault(field => field.Path == mapping.Path), row, item, exception);
             }
         }
 

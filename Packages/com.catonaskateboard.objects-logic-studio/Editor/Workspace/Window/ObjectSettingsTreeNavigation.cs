@@ -21,17 +21,34 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Navigates to an existing editor without editing any value from the canvas.</summary>
         /// <param name="state">Current object workspace.</param>
+        /// <param name="owner">Object represented by the tree root.</param>
         /// <param name="node">Clicked option or thematic block.</param>
-        internal static void Open(ObjectWorkspace state, ObjectSettingsTreeLayout.Node node)
+        internal static void Open(ObjectWorkspace state, GameObject owner, ObjectSettingsTreeLayout.Node node)
         {
+            // Broad nodes open complete nested editors rather than a single selected interaction's fields.
+            switch (node.Kind)
+            {
+                case ObjectSettingsTreeLayout.NodeKind.Root:
+                    ObjectBranchWindow.Open(state, owner);
+                    return;
+                case ObjectSettingsTreeLayout.NodeKind.Interaction:
+                    ObjectBranchWindow.Open(state, node.Branch.Feature.gameObject, node.Branch.Feature);
+                    return;
+            }
             if (node.Asset == null)
             {
-                if (node.Group != null)
+                if (node.Group != null && node.Branch?.Feature != null && ObjectWorkspaceDrafts.Select(state, node.Branch.Feature, out _))
+                {
                     ObjectGroupWindow.Open(state, node.Group, node.Path, node.Label);
+                    ObjectsLogicStudioWindow.RefreshOpen();
+                }
                 return;
             }
             switch (node.Asset)
             {
+                case ObjectGroupPreset preset:
+                    ObjectGroupWindow.OpenPreset(preset);
+                    break;
                 case DialogueEntry entry:
                     DialogueEntryWindow.Open(entry);
                     break;

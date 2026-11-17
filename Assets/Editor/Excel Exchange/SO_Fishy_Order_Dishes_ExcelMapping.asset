@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93360600987f6724eb5eb2e314ce8e50, type: 3}
-  m_Name: SO_Fishy_Order_Dishes Excel
+  m_Name: SO_Fishy_Order_Dishes_ExcelMapping
   m_EditorClassIdentifier: CatOnASkateboard.ExcelExchangeStudio.Editor::CatOnASkateboard.ExcelExchangeStudio.Editor.ExcelExchangePreset
   Target: {fileID: 11400000, guid: 66ec0f0a64b1494c86e47657a5933e7b, type: 2}
   Scope: 
+  WorkbookPath: C:/Users/PC/Desktop/GitLabRepos/Roadside-Space-Kebab/Assets/Editor/Excel Exchange/Test/Order CatalogUpdated.xlsx
   Worksheet: Sheet1
-  Rows: 12
-  Columns: 10
-  WorkbookPath: Assets/Editor/Excel Exchange/Examples/Order Catalog.xlsx
-  TemplatePath: Assets/Editor/Excel Exchange/Examples/Order Catalog.xlsx
+  TemplatePath: 
   UseFormulaResults: 0
+  Rows: 12
+  Columns: 12
   Mappings:
   - Cell: B2
     Kind: 1
@@ -48,7 +48,7 @@ MonoBehaviour:
     Text: 
     KeepEmpty: 0
     Separator: ;
-  - Cell: E2
+  - Cell: G2
     Kind: 0
     Path: Entries[].Variants[].Flags
     Group: Entries / Variants
@@ -57,7 +57,7 @@ MonoBehaviour:
     Text: 
     KeepEmpty: 0
     Separator: ;
-  - Cell: F2
+  - Cell: H2
     Kind: 0
     Path: Entries[].Variants[].ExcludedFlags
     Group: Entries / Variants
@@ -66,7 +66,7 @@ MonoBehaviour:
     Text: 
     KeepEmpty: 0
     Separator: ;
-  - Cell: G2
+  - Cell: I2
     Kind: 0
     Path: Entries[].Variants[].RequireAllFlags
     Group: Entries / Variants
@@ -102,7 +102,7 @@ MonoBehaviour:
     Text: Text
     KeepEmpty: 0
     Separator: ;
-  - Cell: E1
+  - Cell: G1
     Kind: 3
     Path: 
     Group: 
@@ -111,7 +111,7 @@ MonoBehaviour:
     Text: Flag
     KeepEmpty: 0
     Separator: ;
-  - Cell: F1
+  - Cell: H1
     Kind: 3
     Path: 
     Group: 
@@ -120,7 +120,7 @@ MonoBehaviour:
     Text: Subtractive Flags
     KeepEmpty: 0
     Separator: ;
-  - Cell: G1
+  - Cell: I1
     Kind: 3
     Path: 
     Group: 
@@ -129,12 +129,48 @@ MonoBehaviour:
     Text: Require All Flags
     KeepEmpty: 0
     Separator: ;
+  - Cell: E1
+    Kind: 3
+    Path: 
+    Group: 
+    Indices: 
+    Direction: 0
+    Text: Append Base Text
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: E2
+    Kind: 0
+    Path: Entries[].Variants[].AppendToBaseText
+    Group: Entries / Variants
+    Indices: 
+    Direction: 0
+    Text: 
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: F1
+    Kind: 3
+    Path: 
+    Group: 
+    Indices: 
+    Direction: 0
+    Text: Weight
+    KeepEmpty: 0
+    Separator: ;
+  - Cell: F2
+    Kind: 0
+    Path: Entries[].Variants[].Weight
+    Group: Entries / Variants
+    Indices: 
+    Direction: 0
+    Text: 
+    KeepEmpty: 0
+    Separator: ;
   Groups:
   - Name: Entries / Variants
     Path: 'Entries[].Variants[]'
     Match: 1
     KeyPath: Name
-    Policy: 0
+    Policy: 2
     GuideCell: C2
     Extent: 0
     LastRow: 100

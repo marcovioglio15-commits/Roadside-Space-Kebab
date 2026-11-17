@@ -51,9 +51,9 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                 return AssetDatabase.LoadAssetAtPath(text, type) ?? throw new FormatException("No matching asset at " + text);
             Dictionary<string, List<Object>> index = Index(type);
             if (!index.TryGetValue(text, out List<Object> found))
-                throw new FormatException("Unknown " + type.Name + ": " + text);
+                throw new FormatException("No project item named '" + text + "' was found.");
             if (found.Count != 1)
-                throw new FormatException("Ambiguous " + type.Name + ": " + text + ". Use an asset path or GUID.");
+                throw new FormatException("Several project items are named '" + text + "'. Use the file's project path instead.");
             return found[0];
         }
 

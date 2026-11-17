@@ -94,7 +94,7 @@ MonoBehaviour:
         Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -106,7 +106,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -116,7 +116,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -125,22 +125,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: WrapKebabNoTomato
       Text: '- Tomato'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -152,7 +152,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -162,7 +162,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -176,17 +176,17 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: WrapKebabNoLettuce
       Text: '- Lettuce'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -198,7 +198,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -208,7 +208,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -217,22 +217,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: WrapKebabNoOnion
       Text: '- Onion'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -244,7 +244,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -254,7 +254,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -263,22 +263,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: WrapKebabWithFries
       Text: + Fries
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -290,7 +290,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -300,7 +300,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -309,12 +309,288 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    - Name: WrapKebabNoTomatoNoLettuce
+      Text: '- Tomato;- Lettuce'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: WrapKebabNoTomatoNoOnion
+      Text: '- Tomato;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: WrapKebabNoTomatoWithFries
+      Text: '- Tomato;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+    - Name: WrapKebabNoLettuceNoOnion
+      Text: '- Lettuce;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: WrapKebabNoLettuceWithFries
+      Text: '- Lettuce;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: WrapKebabNoOnionWithFries
+      Text: '- Onion;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
     Combos:
       Enabled: 0
       MaximumVariants: 2
@@ -376,10 +652,10 @@ MonoBehaviour:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -391,7 +667,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -401,7 +677,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -410,22 +686,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PaninoKebabNoTomato
       Text: '- Tomato'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -437,7 +713,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -447,7 +723,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -461,17 +737,17 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PaninoKebabNoLettuce
       Text: '- Lettuce'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -483,7 +759,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -493,7 +769,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -502,22 +778,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PaninoKebabNoOnion
       Text: '- Onion'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -529,7 +805,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -539,7 +815,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -548,22 +824,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PaninoKebabWithFries
       Text: + Fries
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -575,7 +851,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -585,7 +861,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -594,12 +870,288 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    - Name: PaninoKebabNoTomatoNoLettuce
+      Text: '- Tomato;- Lettuce'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: PaninoKebabNoTomatoNoOnion
+      Text: '- Tomato;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: PaninoKebabNoTomatoWithFries
+      Text: '- Tomato;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+    - Name: PaninoKebabNoLettuceNoOnion
+      Text: '- Lettuce;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: PaninoKebabNoLettuceWithFries
+      Text: '- Lettuce;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: PaninoKebabNoOnionWithFries
+      Text: '- Onion;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
     Combos:
       Enabled: 0
       MaximumVariants: 2
@@ -661,10 +1213,10 @@ MonoBehaviour:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -676,7 +1228,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -686,7 +1238,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -695,22 +1247,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: WrapFalafelNoTomato
       Text: '- Tomato'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -722,7 +1274,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -732,7 +1284,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -746,17 +1298,17 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: WrapFalafelNoLettuce
       Text: '- Lettuce'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -768,7 +1320,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -778,7 +1330,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -787,22 +1339,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: WrapFalafelNoOnion
       Text: '- Onion'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -814,7 +1366,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -824,7 +1376,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -833,22 +1385,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: WrapFalafelWithFries
       Text: + Fries
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -860,7 +1412,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -870,7 +1422,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -879,12 +1431,288 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    - Name: WrapFalafelNoTomatoNoLettuce
+      Text: '- Tomato;- Lettuce'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: WrapFalafelNoTomatoNoOnion
+      Text: '- Tomato;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: WrapFalafelNoTomatoWithFries
+      Text: '- Tomato;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+    - Name: WrapFalafelNoLettuceNoOnion
+      Text: '- Lettuce;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: WrapFalafelNoLettuceWithFries
+      Text: '- Lettuce;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: WrapFalafelNoOnionWithFries
+      Text: '- Onion;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
     Combos:
       Enabled: 0
       MaximumVariants: 2
@@ -946,10 +1774,10 @@ MonoBehaviour:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -961,7 +1789,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -971,7 +1799,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -980,22 +1808,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PaninoFalafelNoTomato
       Text: '- Tomato'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1007,7 +1835,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1017,7 +1845,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -1031,17 +1859,17 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PaninoFalafelNoLettuce
       Text: '- Lettuce'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1053,7 +1881,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1063,7 +1891,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -1072,22 +1900,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PaninoFalafelNoOnion
       Text: '- Onion'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1099,7 +1927,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1109,7 +1937,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -1118,22 +1946,22 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PaninoFalafelWithFries
       Text: + Fries
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1145,7 +1973,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1155,7 +1983,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -1164,12 +1992,288 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    - Name: PaninoFalafelNoTomatoNoLettuce
+      Text: '- Tomato;- Lettuce'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: PaninoFalafelNoTomatoNoOnion
+      Text: '- Tomato;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: PaninoFalafelNoTomatoWithFries
+      Text: '- Tomato;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+    - Name: PaninoFalafelNoLettuceNoOnion
+      Text: '- Lettuce;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: PaninoFalafelNoLettuceWithFries
+      Text: '- Lettuce;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: PaninoFalafelNoOnionWithFries
+      Text: '- Onion;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: d3ccea3d0620aec418a2f90dce22d367, type: 2}
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
     Combos:
       Enabled: 0
       MaximumVariants: 2
@@ -1231,10 +2335,10 @@ MonoBehaviour:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1246,7 +2350,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1267,17 +2371,17 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PizzaRossaWithFries
       Text: + Fries
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1289,7 +2393,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1308,7 +2412,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
     Combos:
@@ -1372,10 +2476,10 @@ MonoBehaviour:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1387,7 +2491,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1408,17 +2512,17 @@ MonoBehaviour:
       Flags: []
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PizzaMargheritaWithFries
       Text: + Fries
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1430,7 +2534,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1449,7 +2553,7 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
     Combos:
@@ -1513,10 +2617,10 @@ MonoBehaviour:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1528,7 +2632,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1538,7 +2642,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -1551,17 +2655,17 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       RequireAllFlags: 1
       ExcludedFlags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PizzaKebabNoLettuce
       Text: '- Lettuce'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1573,7 +2677,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1583,7 +2687,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -1596,17 +2700,17 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PizzaKebabNoOnion
       Text: '- Onion'
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1618,7 +2722,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1628,7 +2732,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -1641,17 +2745,17 @@ MonoBehaviour:
       RequireAllFlags: 1
       ExcludedFlags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
     - Name: PizzaKebabWithFries
       Text: + Fries
       TextStyle:
         Enabled: 0
         Font: {fileID: 0}
         Material: {fileID: 0}
-        Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        Color: {r: 1, g: 1, b: 1, a: 1}
         Style: 0
         Weight: 400
-        Size: 0.35
+        Size: 3
         AutoSize: 0
         MinimumSize: 1
         MaximumSize: 3
@@ -1663,7 +2767,7 @@ MonoBehaviour:
         WordSpacing: 0
         LineSpacing: 0
         ParagraphSpacing: 0
-        Indent: 0.05
+        Indent: 0
         SpaceBefore: 0
         SpaceAfter: 0
         Margins: {x: 0, y: 0, z: 0, w: 0}
@@ -1673,7 +2777,7 @@ MonoBehaviour:
         BottomLeft: {r: 1, g: 1, b: 1, a: 1}
         BottomRight: {r: 1, g: 1, b: 1, a: 1}
       AppendToBaseText: 1
-      Weight: 0.3
+      Weight: 0.2
       UseQuantity: 0
       Quantity: 1
       UseDrawLimits: 0
@@ -1682,11 +2786,146 @@ MonoBehaviour:
       RequiredDrawRange: {x: 0, y: 1}
       MaximumDraws: 1
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
       RequireAllFlags: 1
       ExcludedFlags: []
+    - Name: PizzaKebabNoLettuceNoOnion
+      Text: '- Lettuce;- Onion'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags: []
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+    - Name: PizzaKebabNoLettuceWithFries
+      Text: '- Lettuce;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+    - Name: PizzaKebabNoOnionWithFries
+      Text: '- Onion;+ Fries'
+      TextStyle:
+        Enabled: 0
+        Font: {fileID: 0}
+        Material: {fileID: 0}
+        Color: {r: 1, g: 1, b: 1, a: 1}
+        Style: 0
+        Weight: 400
+        Size: 3
+        AutoSize: 0
+        MinimumSize: 1
+        MaximumSize: 3
+        Alignment: 257
+        Wrapping: 1
+        Overflow: 0
+        RichText: 1
+        CharacterSpacing: 0
+        WordSpacing: 0
+        LineSpacing: 0
+        ParagraphSpacing: 0
+        Indent: 0
+        SpaceBefore: 0
+        SpaceAfter: 0
+        Margins: {x: 0, y: 0, z: 0, w: 0}
+        UseGradient: 0
+        TopLeft: {r: 1, g: 1, b: 1, a: 1}
+        TopRight: {r: 1, g: 1, b: 1, a: 1}
+        BottomLeft: {r: 1, g: 1, b: 1, a: 1}
+        BottomRight: {r: 1, g: 1, b: 1, a: 1}
+      AppendToBaseText: 1
+      Weight: 0.2
+      UseQuantity: 0
+      Quantity: 1
+      UseDrawLimits: 0
+      RandomRequiredDraws: 0
+      MinimumDraws: 0
+      RequiredDrawRange: {x: 0, y: 1}
+      MaximumDraws: 1
+      Flags:
+      - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
+      - {fileID: 11400000, guid: c212095628ef5aa418c66bfdf405a5f1, type: 2}
+      RequireAllFlags: 1
+      ExcludedFlags:
+      - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
     Combos:
       Enabled: 0
       MaximumVariants: 2

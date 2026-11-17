@@ -743,6 +743,8 @@ MonoBehaviour:
       AirPath: 
       AirSpeed: 12
     SelfEject: 1
+    TeamRocketSpin: 1
+    SpinSpeed: 720
     UseBulletImpulse: 1
     BulletImpulseMultiplier: 6.5
     SelfImpulse:

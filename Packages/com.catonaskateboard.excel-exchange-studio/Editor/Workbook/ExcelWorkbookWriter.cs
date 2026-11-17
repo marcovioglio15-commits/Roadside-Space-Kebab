@@ -18,8 +18,11 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         /// <param name="path">Destination XLSX path.</param>
         /// <param name="workbook">Cells explicitly managed by the export plan.</param>
         /// <param name="template">Optional existing workbook to preserve.</param>
-        public static void Write(string path, ExcelWorkbook workbook, string template = "")
+        /// <param name="widthRatio">Longest-to-shortest text ratio limiting automatic column width.</param>
+        public static void Write(string path, ExcelWorkbook workbook, string template = "", double widthRatio = 5d)
         {
+            if (!double.IsFinite(widthRatio) || widthRatio < 1d)
+                throw new FormatException("Set the export column width limit to 1 or more.");
             if (!string.Equals(Path.GetExtension(path), ".xlsx", StringComparison.OrdinalIgnoreCase))
                 throw new FormatException("Choose an .xlsx destination.");
             string destination = Path.GetFullPath(path);
@@ -42,7 +45,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                             sheetPath = AddSheet(archive, sheet.Name);
                             sheets.Add(sheet.Name, sheetPath);
                         }
-                        WriteSheet(archive, sheetPath, sheet);
+                        WriteSheet(archive, sheetPath, sheet, widthRatio);
                     }
                     XDocument book = ExcelOpenXml.Read(archive, "xl/workbook.xml");
                     book.Root.Element(ExcelOpenXml.Main + "calcPr")?.Remove();
@@ -77,7 +80,8 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
         /// <param name="archive">Writable workbook package.</param>
         /// <param name="path">Worksheet part path.</param>
         /// <param name="sheet">Managed sparse output cells.</param>
-        private static void WriteSheet(ZipArchive archive, string path, ExcelSheet sheet)
+        /// <param name="widthRatio">Automatic column width limit.</param>
+        private static void WriteSheet(ZipArchive archive, string path, ExcelSheet sheet, double widthRatio)
         {
             XDocument document = ExcelOpenXml.Read(archive, path);
             XElement data = document.Root.Element(ExcelOpenXml.Main + "sheetData");
@@ -119,7 +123,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
                             break;
                         case ExcelCellKind.Boolean:
                             cell.SetAttributeValue("t", "b");
-                            cell.Add(new XElement(ExcelOpenXml.Main + "v", entry.Value.Text == "true" ? "1" : "0"));
+                            cell.Add(new XElement(ExcelOpenXml.Main + "v", string.Equals(entry.Value.Text, "true", StringComparison.OrdinalIgnoreCase) ? "1" : "0"));
                             break;
                         case ExcelCellKind.Number:
                             cell.Add(new XElement(ExcelOpenXml.Main + "v", entry.Value.Text));
@@ -133,6 +137,7 @@ namespace CatOnASkateboard.ExcelExchangeStudio.Editor
             }
             // Excel can derive the extent from cells, avoiding stale template dimensions.
             document.Root.Element(ExcelOpenXml.Main + "dimension")?.Remove();
+            ExcelWorkbookFormatting.Apply(archive, document, sheet, widthRatio);
             ExcelOpenXml.Write(archive, path, document);
             foreach (KeyValuePair<string, string> entry in ExcelOpenXml.TableParts(archive, path))
                 if (sheet.Tables.TryGetValue(entry.Key, out string range))
