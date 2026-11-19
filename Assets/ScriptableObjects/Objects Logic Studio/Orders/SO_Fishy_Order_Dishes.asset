@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TextStyle:
     Enabled: 1
-    Font: {fileID: 0}
+    Font: {fileID: 11400000, guid: 5000054dde0afa74cb69090abe00cd55, type: 2}
     Material: {fileID: 0}
-    Color: {r: 1, g: 1, b: 1, a: 1}
+    Color: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
     Style: 0
     Weight: 400
     Size: 0.35
@@ -31,7 +31,7 @@ MonoBehaviour:
     WordSpacing: 0
     LineSpacing: 0
     ParagraphSpacing: 0
-    Indent: 0.05
+    Indent: 0
     SpaceBefore: 0
     SpaceAfter: 0
     Margins: {x: 0, y: 0, z: 0, w: 0}
