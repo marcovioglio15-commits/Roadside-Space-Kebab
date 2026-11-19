@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: SO_BeerBottle_Open
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
   DisplayName: BeerBottle_Open
-  Group: Drinks
+  Group: Delivery
   Description: 

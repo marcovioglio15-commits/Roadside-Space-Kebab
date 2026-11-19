@@ -3066,7 +3066,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7948761776496962327, guid: f0e53aa6920ae0c4ebcd347b80fc8128, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.7183217
+      value: 0.72
       objectReference: {fileID: 0}
     - target: {fileID: 7948761776496962327, guid: f0e53aa6920ae0c4ebcd347b80fc8128, type: 3}
       propertyPath: m_LocalPosition.z
@@ -11193,7 +11193,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7948761776496962327, guid: f0e53aa6920ae0c4ebcd347b80fc8128, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.7183217
+      value: 0.72
       objectReference: {fileID: 0}
     - target: {fileID: 7948761776496962327, guid: f0e53aa6920ae0c4ebcd347b80fc8128, type: 3}
       propertyPath: m_LocalPosition.z
@@ -15325,6 +15325,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4512469906299410155, guid: caf845c831843b54fb5f0e10820123d2, type: 3}
+      propertyPath: flags.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4512469906299410155, guid: caf845c831843b54fb5f0e10820123d2, type: 3}
+      propertyPath: 'flags.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    - target: {fileID: 4512469906299410155, guid: caf845c831843b54fb5f0e10820123d2, type: 3}
+      propertyPath: 'flags.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
     - target: {fileID: 8999572922415677342, guid: caf845c831843b54fb5f0e10820123d2, type: 3}
       propertyPath: m_Name
       value: PF_Oven

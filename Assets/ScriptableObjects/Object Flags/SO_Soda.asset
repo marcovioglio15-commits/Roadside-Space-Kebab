@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: SO_Soda
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
   DisplayName: Soda
-  Group: Drinks
+  Group: Delivery
   Description: 

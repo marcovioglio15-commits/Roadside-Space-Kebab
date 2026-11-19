@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: SO_Nuggets_Delivery
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
   DisplayName: Nuggets_Delivery
-  Group: Cooked
+  Group: Delivery
   Description: Nuggets scooped into a box for delivery
