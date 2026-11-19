@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: SO_CrabClaw_Delivery
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectFlag
   DisplayName: CrabClaw_Delivery
-  Group: Cooked
+  Group: Delivery
   Description: Crab Claw scooped into a box for delivery

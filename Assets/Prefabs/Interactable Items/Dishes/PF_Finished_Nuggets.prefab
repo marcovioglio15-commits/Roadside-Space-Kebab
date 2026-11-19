@@ -104,7 +104,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
   flags:
-  - {fileID: 11400000, guid: e0346f390ba2c364dbfb01b2eaf1e52a, type: 2}
+  - {fileID: 11400000, guid: 06632cf155821d249fe6b348dca4f5d2, type: 2}
 --- !u!114 &-498666692583434684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -324,7 +324,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -365,6 +364,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!114 &4872342796762684492
 MonoBehaviour:
@@ -487,10 +487,12 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 2233b790a01fa404e895d36caea1b63b, type: 2}
       Count: 1
       Optional: 0
+      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: 8ea79f8ddaadf97469ae5ccc95dbb6c2, type: 2}
       Count: 1
       Optional: 0
+      OrderFlag: {fileID: 0}
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0
@@ -504,6 +506,10 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 1926761037992945242, guid: ab74849b39014cc468a4ec52d52c6e9d, type: 3}
     - Name: Magnet 2
       AnyIngredient: 0
@@ -514,6 +520,10 @@ MonoBehaviour:
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []
