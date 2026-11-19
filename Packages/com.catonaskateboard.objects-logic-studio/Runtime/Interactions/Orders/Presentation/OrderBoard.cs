@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Existing 3D TextMeshPro or world-space Canvas text objects, one per order slot. Runtime creates no UI.")]
         [SerializeField]
         private TMP_Text[] slots = Array.Empty<TMP_Text>();
-        [Tooltip("Paragraph capacity prepared in Edit mode per order slot. Include one per variant and one more for a custom-styled base; otherwise base text stays in the main slot.")]
+        [Tooltip("Paragraphs prepared per slot before Play. Count each variant fragment separated by ';'. Include base fragments when text contains ';' or uses custom typography.")]
         [SerializeField]
         [Range(1, 33)]
         private int paragraphCapacity = 9;
@@ -223,13 +223,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             int index = ticket.Slot;
             if (index < objectViews.Length)
                 objectViews[index]?.Show(Tint(ticket));
-            slots[index].text = ticket.Candidate.MainText;
+            slots[index].text = OrderTextParagraphs.PlainText(ticket.Candidate.MainText);
             slots[index].fontStyle = styles[index];
             // The active spawn catalog also covers occurrence-specific catalog overrides.
             OrderTextStyle shared = ticket.Owner.ActiveCatalog?.TextStyle;
-            if (formatting[index] == null && (ticket.Candidate.HasVariants
+            if (formatting[index] == null && (ticket.Candidate.HasVariants || ticket.Candidate.MainText.IndexOf(';') >= 0
                 || OrderTextStyle.Resolve(ticket.Entry.TextStyle, shared) != null))
-                Debug.LogWarning("Prepare text paragraphs on this Order Board before Play to display recipe variants or custom typography.", this);
+                Debug.LogWarning("Prepare text paragraphs on this Order Board before Play for ';' separators, recipe variants or custom typography.", this);
             else
                 formatting[index]?.Draw(ticket.Candidate, shared);
         }

@@ -13,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Order")]
         [Tooltip("Unique order name offered by Consumption dialogue filters on this object.")]
         public string Name = "Order";
-        [Tooltip("Order text shown until the object despawns. Completion adds strikethrough without freeing its slot.")]
+        [Tooltip("Board text shown until despawn. Each ';' starts the next Order Paragraph. Line breaks stay inside the current paragraph.")]
         [TextArea(2, 5)]
         public string Text = "Order";
         [Tooltip("Override the catalog typography and paragraph spacing for this order's base text.")]

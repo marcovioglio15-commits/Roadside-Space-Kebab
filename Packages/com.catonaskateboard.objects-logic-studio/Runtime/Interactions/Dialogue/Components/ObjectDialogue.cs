@@ -394,9 +394,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 DialogueTrigger.InputAction => ActionFor(trigger) is InputActionReference action
                     && buttons.TryGetValue(action, out InteractionButton button) && input.Read(this, button) != null,
                 DialogueTrigger.Proximity => !session.ProximityUsed.Contains(row.Id),
-                DialogueTrigger.Consumption => consumptionMatches.Contains(trigger) && (AwaitsContact(trigger)
-                    ? contact != null && session.ContactRevision != contact.ContactRevision : session.ConsumptionRevision != Item.ConsumptionRevision
-                        || session.Completed && armed && policy.ReplayOnReturn),
+                DialogueTrigger.Consumption => consumptionMatches.Contains(trigger) && session.HasConsumption(trigger.Consumption,
+                    Item.ConsumptionRevision, contact != null ? contact.ContactRevision : -1, orders != null ? orders.Revision : -1,
+                    session.Completed && armed && policy.ReplayOnReturn),
                 DialogueTrigger.SpawnArrival => false,
                 DialogueTrigger.OnEnter => true,
                 _ => false
@@ -419,18 +419,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (row.Trigger.Type == DialogueTrigger.Consumption)
                     {
                         DialogueConsumptionFilter filter = row.Trigger.Consumption;
-                        bool awaiting = AwaitsContact(row.Trigger);
-                        if ((awaiting ? contact != null && contact.AwaitingContact : Item.HasConsumption) && filter.Matches(Item, orders))
+                        if ((filter.AwaitsContact ? contact != null && contact.AwaitingContact : Item.HasConsumption) && filter.Matches(Item, orders))
                             consumptionMatches.Add(row.Trigger);
                     }
-        }
-
-        /// <summary>Distinguishes rejected contacts from real consumption receipts.</summary>
-        /// <param name="trigger">Consumption trigger evaluated for this entry.</param>
-        /// <returns>True when the enabled filter requests Awaiting Orders.</returns>
-        private static bool AwaitsContact(DialogueTriggerPreset trigger)
-        {
-            return trigger.Consumption.Enabled && trigger.Consumption.Result == DialogueOrderResult.AwaitingOrders;
         }
 
         /// <summary>Checks range and availability while this component presents a page.</summary>
@@ -501,13 +492,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             hud = presentation;
             if (!retained || session.Row == null)
+            {
                 session.Begin(pending);
+                session.AcceptConsumption(Item.ConsumptionRevision, contact != null ? contact.ContactRevision : -1, orders != null ? orders.Revision : -1);
+            }
             retained = false;
             armed = false;
             arrivalSession |= arrivalPending;
             arrivalPending = false;
-            session.ConsumptionRevision = Item.ConsumptionRevision;
-            session.ContactRevision = contact != null ? contact.ContactRevision : -1;
             if (session.ActivationTrigger.Type == DialogueTrigger.Proximity)
                 session.ProximityUsed.Add(session.ActivationId);
             projectileStarted = InteractionProjectileInput.PhysicalImpact;
@@ -541,12 +533,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             CompletedEntry = session.Row.Id;
             DialogueSession completed = session;
             session.Follow();
-            // A new block observes future receipts. A self-loop also retains deliveries received during its page.
-            if (session.Block.Id != CompletedBlock)
-            {
-                session.ConsumptionRevision = Item.ConsumptionRevision;
-                session.ContactRevision = contact != null ? contact.ContactRevision : -1;
-            }
+            // Deliveries received during this page remain pending across graph-block transitions.
             hud.Hide();
             IsSpeaking = false;
             retained = false;
@@ -580,7 +567,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             else if (!retained)
             {
                 session.Restart(false);
-                session.ConsumptionRevision = session.ContactRevision = -1;
+                session.ResetConsumption();
             }
         }
 

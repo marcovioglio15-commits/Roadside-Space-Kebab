@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -19,6 +20,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector2[] paragraphSizes = Array.Empty<Vector2>();
         private Vector2[] paragraphPositions = Array.Empty<Vector2>();
         private bool originalEnabled;
+        private readonly List<OrderTextParagraph> layout = new List<OrderTextParagraph>();
 
         #endregion
         #region Methods
@@ -69,7 +71,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
         #region Drawing
 
-        /// <summary>Keeps base text in the main slot and draws selected variants in separate authored paragraphs.</summary>
+        /// <summary>Maps base and variant fragments onto existing paragraphs, advancing at every semicolon.</summary>
         /// <param name="candidate">Base, single variant or combo currently occupying this slot.</param>
         /// <param name="shared">Typography from the catalog selected for this customer's spawn.</param>
         internal void Draw(OrderCandidate candidate, OrderTextStyle shared)
@@ -78,56 +80,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Clear();
             if (original == null)
                 return;
-            if (candidate.HasVariants)
-            {
-                DrawVariants(candidate, shared);
-                return;
-            }
-            // Base-only orders without custom styling keep the original slot's direct text path.
             OrderTextStyle style = OrderTextStyle.Resolve(candidate.Entry.TextStyle, shared);
-            if (style == null)
-                return;
-            if (paragraphs.Length == 0)
-            {
-                Debug.LogWarning("Prepare an Order Board text paragraph before Play to use custom base-order typography.", this);
-                return;
-            }
-            original.enabled = false;
-            float offset = 0f;
-            Present(0, candidate.Entry.Text, style, ref offset);
-        }
-
-        /// <summary>Draws recipe paragraphs while keeping base text in the main slot or its own styled paragraph.</summary>
-        /// <param name="candidate">Variant or combo currently occupying this slot.</param>
-        /// <param name="shared">Catalog appearance inherited independently by each paragraph.</param>
-        private void DrawVariants(OrderCandidate candidate, OrderTextStyle shared)
-        {
-            // Keep the main slot independent while applying optional paragraph typography.
-            OrderTextStyle style = OrderTextStyle.Resolve(candidate.Entry.TextStyle, shared);
-            bool styledBase = style != null;
-            bool includeBase = !string.IsNullOrWhiteSpace(candidate.MainText);
-            int count = (candidate.Combo?.Length ?? 1) + (styledBase && includeBase ? 1 : 0);
-            if (count > paragraphs.Length)
-            {
-                Debug.LogWarning("Prepare more Order Board text paragraphs before Play for this variant combo.", this);
-                return;
-            }
-            // A custom base style uses its own paragraph; otherwise variants begin below the main slot text.
-            float offset = 0f;
-            int index = 0;
-            if (styledBase && includeBase)
-            {
-                original.enabled = false;
-                Present(index++, candidate.MainText, style, ref offset);
-            }
-            else if (includeBase)
-                offset = original.preferredHeight;
-            // Variant members follow the base line and never enter the main order text.
+            string content = candidate.MainText;
+            bool includeBase = !string.IsNullOrWhiteSpace(content);
+            bool separateBase = includeBase && (style != null || content.IndexOf(';') >= 0);
+            // Build the whole layout before revealing any paragraph, including combo-specific styles.
+            layout.Clear();
+            if (separateBase)
+                OrderTextParagraphs.Append(layout, content, style);
             if (candidate.Combo != null)
                 foreach (OrderRecipeVariant variant in candidate.Combo)
-                    Present(index++, variant.Text, OrderTextStyle.Resolve(variant.TextStyle, shared), ref offset);
-            else
-                Present(index, candidate.Variant.Text, OrderTextStyle.Resolve(candidate.Variant.TextStyle, shared), ref offset);
+                    OrderTextParagraphs.Append(layout, variant.Text, OrderTextStyle.Resolve(variant.TextStyle, shared));
+            else if (candidate.Variant != null)
+                OrderTextParagraphs.Append(layout, candidate.Variant.Text, OrderTextStyle.Resolve(candidate.Variant.TextStyle, shared));
+            if (layout.Count > paragraphs.Length || Array.FindIndex(paragraphs, 0, layout.Count, text => text == null) >= 0)
+            {
+                Debug.LogWarning("Prepare enough Order Board paragraphs before Play for every base and variant text fragment separated by ';'.", this);
+                return;
+            }
+            // Unstyled text without separators keeps the original slot and its existing layout.
+            if (separateBase)
+                original.enabled = false;
+            float offset = includeBase && !separateBase ? original.preferredHeight : 0f;
+            for (int index = 0; index < layout.Count; index++)
+                Present(index, layout[index].Text, layout[index].Style, ref offset);
         }
 
         /// <summary>Restores the plain slot before clearing or replacing a ticket.</summary>
@@ -169,7 +145,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 text.rectTransform.sizeDelta = new Vector2(paragraphSizes[index].x - indent, paragraphSizes[index].y);
             if (indent > 0f || offset > 0f)
                 text.rectTransform.anchoredPosition = new Vector2(paragraphPositions[index].x + indent, paragraphPositions[index].y - offset);
-            text.text = content.Replace("\\n", "\n");
+            text.text = content;
             text.gameObject.SetActive(true);
             offset += text.preferredHeight + (style is { Enabled: true } ? style.SpaceAfter : 0f);
         }

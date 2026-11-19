@@ -20,8 +20,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal string ActivationId;
         internal int Page;
         internal float PageTime;
-        internal int ConsumptionRevision;
-        internal int ContactRevision;
+        private int consumptionRevision;
+        private int contactRevision;
+        private int completedOrderRevision = -1;
         internal bool Started;
 
         #endregion
@@ -51,8 +52,63 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (DialogueNode node in tree.Nodes)
                 nodes.Add(node.Id, node);
             Block = nodes[tree.Start];
-            ConsumptionRevision = receipt;
-            ContactRevision = contact;
+            consumptionRevision = receipt;
+            contactRevision = contact;
+        }
+
+        /// <summary>Checks pending delivery, contact or order-completion events without consuming another trigger's result.</summary>
+        /// <param name="filter">Consumption condition on the candidate entry or route.</param>
+        /// <param name="receipt">Current item receipt revision.</param>
+        /// <param name="contact">Current rejected-contact revision, or minus one without a contact interaction.</param>
+        /// <param name="order">Current order revision, or minus one without Available Orders.</param>
+        /// <param name="replay">Whether return-to-range explicitly permits replay of a completed request.</param>
+        /// <returns>True when this condition has an unhandled event or permits replay.</returns>
+        internal bool HasConsumption(DialogueConsumptionFilter filter, int receipt, int contact, int order, bool replay)
+        {
+            // Order completion remains pending even when delivery feedback already used the final receipt.
+            if (filter.AwaitsContact)
+                return contactRevision != contact;
+            return (filter.UsesOrderCompletion && order >= 0 ? completedOrderRevision != order : consumptionRevision != receipt) || replay;
+        }
+
+        /// <summary>Acknowledges the consumption conditions used by the selected route and text row.</summary>
+        /// <param name="receipt">Item receipt revision at request start.</param>
+        /// <param name="contact">Rejected-contact revision at request start.</param>
+        /// <param name="order">Available Orders revision, or minus one when absent.</param>
+        internal void AcceptConsumption(int receipt, int contact, int order)
+        {
+            // Routing and text rows can require different event streams for the same request.
+            AcceptTrigger(ActivationTrigger, receipt, contact, order);
+            if (Row.Trigger != ActivationTrigger)
+                AcceptTrigger(Row.Trigger, receipt, contact, order);
+        }
+
+        /// <summary>Acknowledges one matched trigger while leaving unrelated delivery and contact events pending.</summary>
+        /// <param name="trigger">Activation route or selected text row.</param>
+        /// <param name="receipt">Item receipt revision at request start.</param>
+        /// <param name="contact">Rejected-contact revision at request start.</param>
+        /// <param name="order">Available Orders revision, or minus one when absent.</param>
+        private void AcceptTrigger(DialogueTriggerPreset trigger, int receipt, int contact, int order)
+        {
+            // Input, proximity and automatic pages must not discard deliveries waiting in another graph block.
+            if (trigger.Type != DialogueTrigger.Consumption)
+                return;
+            DialogueConsumptionFilter filter = trigger.Consumption;
+            if (filter.AwaitsContact)
+                contactRevision = contact;
+            else
+            {
+                consumptionRevision = receipt;
+                if (filter.UsesOrderCompletion && order >= 0)
+                    completedOrderRevision = order;
+            }
+        }
+
+        /// <summary>Rearms consumption conditions when interruption explicitly restarts the tree.</summary>
+        internal void ResetConsumption()
+        {
+            // Retained-page resumes keep their original acknowledgements instead of reaching this reset.
+            consumptionRevision = contactRevision = completedOrderRevision = -1;
         }
 
         /// <summary>Selects among eligible rows without changing sequence cursors until Begin.</summary>

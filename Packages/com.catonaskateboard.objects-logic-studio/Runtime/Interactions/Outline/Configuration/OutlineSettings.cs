@@ -15,7 +15,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public float Thickness = 3f;
         [Tooltip("Glow tint and opacity. Black emits no light; the original surface material is preserved.")]
         public Color Color = Color.white;
-        [Tooltip("Light added at the edge. Values above one can feed the camera's configured Bloom effect.")]
+        [Tooltip("Edge brightness added after the camera's bloom. Other scene objects keep their normal bloom.")]
         [Range(0f, 10f)]
         public float Intensity = 2f;
         [Tooltip("Minimum normal change, in degrees, treated as a geometric crease. Silhouettes remain visible independently.")]
