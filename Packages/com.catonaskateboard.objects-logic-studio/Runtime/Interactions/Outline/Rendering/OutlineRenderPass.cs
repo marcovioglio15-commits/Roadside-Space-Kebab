@@ -45,13 +45,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Setup
 
-        /// <summary>Requests scene depth and schedules glow before camera post-processing.</summary>
+        /// <summary>Requests scene depth and composites outlines after bloom has processed the scene.</summary>
         /// <param name="sharedMaterial">Authored two-pass mask and glow shader.</param>
         internal OutlineRenderPass(Material sharedMaterial)
         {
-            // HDR glow can feed an existing Bloom volume, while occlusion follows the actual camera depth.
+            // Scene bloom stays active; the later outline composite cannot enter its source image.
             material = sharedMaterial;
-            renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing;
+            renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
             ConfigureInput(ScriptableRenderPassInput.Depth);
         }
 

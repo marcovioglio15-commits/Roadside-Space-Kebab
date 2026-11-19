@@ -14,7 +14,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Recipe Variant")]
         [Tooltip("Unique catalog name selected independently by Consumption dialogue filters.")]
         public string Name = "Variant";
-        [Tooltip("Board suffix or replacement. Empty displays only the base order text. Both actual line breaks and \\n are supported.")]
+        [Tooltip("Board suffix or replacement. Each ';' starts the next Order Paragraph. Actual line breaks and \\n stay inside that paragraph. Empty keeps base text only.")]
         [TextArea(2, 5)]
         public string Text = "Variant";
         [Tooltip("Override the catalog typography and paragraph spacing for this variant. Combo members keep their individual overrides.")]

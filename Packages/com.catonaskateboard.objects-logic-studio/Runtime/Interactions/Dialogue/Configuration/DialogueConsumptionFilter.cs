@@ -26,6 +26,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Whether this filter classifies the latest receipt against all open slots instead of named orders.</summary>
         public bool UsesPendingDelivery => Result is DialogueOrderResult.NotPendingOrder or DialogueOrderResult.PendingOrder;
+        /// <summary>Whether rejected contact attempts supply this filter's activation event.</summary>
+        internal bool AwaitsContact => Enabled && Result == DialogueOrderResult.AwaitingOrders;
+        /// <summary>Whether Available Orders supplies cumulative completion independently of delivery feedback.</summary>
+        internal bool UsesOrderCompletion => Enabled && Result == DialogueOrderResult.Completed;
 
         #endregion
         #region Methods
