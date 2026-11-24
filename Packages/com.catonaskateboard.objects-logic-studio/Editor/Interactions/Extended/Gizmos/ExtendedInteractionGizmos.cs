@@ -61,20 +61,26 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (collider.enabled && collider.GetComponentInParent<ObjectItem>() == item)
                     Gizmos.DrawWireCube(collider.bounds.center, collider.bounds.size + Vector3.one * (2f * tolerance));
             Gizmos.color = previous;
+            if (contact.Settings.MagnetLock is { Enabled: true } magnets && magnets.TryValidate(out _))
+                foreach (ContactMagnet magnet in magnets.Magnets)
+                    using (new Handles.DrawingScope(new Color(1f, 0.72f, 0.18f)))
+                        CommandInteractionGizmos.Endpoint(contact.transform,
+                            new PlayerToolPose { Position = magnet.Position, Rotation = magnet.Rotation, Scale = Vector3.one }, magnet.Name);
             if (contact.Settings.Modifications != null)
                 foreach (ContactModificationDefinition definition in contact.Settings.Modifications)
                     if (definition != null && definition.Settings?.Preparation != null && definition.Settings.Preparation.TryValidate(out _))
-                        Preparation(contact.transform, definition.Settings.Preparation, definition.Settings.Name);
+                        Preparation(contact.transform, definition.Settings.Preparation, definition.Settings.Name, contact.Settings.MagnetLock is { Enabled: true });
         }
 
         /// <summary>Projects snap and animation endpoints in the same reference spaces used by contact execution.</summary>
         /// <param name="owner">Modifying object's pivot.</param>
         /// <param name="settings">Validated preparation coordinates.</param>
         /// <param name="name">Modification name distinguishing overlapping guides.</param>
-        private static void Preparation(Transform owner, ContactPreparationSettings settings, string name)
+        /// <param name="magnetLocked">Hide the legacy snap that owner-local magnets replace.</param>
+        private static void Preparation(Transform owner, ContactPreparationSettings settings, string name, bool magnetLocked)
         {
             // Mark only authored stages and reuse the compact endpoint style from Trigger Animation.
-            if (settings.Snap)
+            if (settings.Snap && !magnetLocked)
                 using (new Handles.DrawingScope(new Color(0.35f, 1f, 0.65f, 0.85f)))
                 {
                     Vector3 snap = CommandInteractionGizmos.Endpoint(settings.SnapSpace == ContactPoseSpace.Owner ? owner : null,

@@ -427,7 +427,7 @@ MonoBehaviour:
     Tools: []
   flagChange:
     Enabled: 0
-    Flag: {fileID: 11400000, guid: 9f21b653268599643bc11188e560be94, type: 2}
+    Flag: {fileID: 0}
     Operation: 0
     Moment: 1
   visualEffect:
@@ -487,12 +487,10 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 2233b790a01fa404e895d36caea1b63b, type: 2}
       Count: 1
       Optional: 0
-      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: a7939210dde959248b2f93747141a805, type: 2}
       Count: 1
       Optional: 0
-      OrderFlag: {fileID: 0}
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0

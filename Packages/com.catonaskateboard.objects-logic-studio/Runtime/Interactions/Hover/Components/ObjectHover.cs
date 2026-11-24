@@ -143,7 +143,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             else if (!HoverInteractionText.TryValidate(interactionText, gameObject, out warning))
                 return false;
-            else if (configuration.Settings.TargetMode != HoverDetectionMode.ViewCenter && GetComponentInChildren<Collider>(true) == null
+            else if (configuration.Settings.TargetMode != HoverTargetMode.ViewCenter && GetComponentInChildren<Collider>(true) == null
                 && GetComponent<ObjectAssemblyProduct>() == null)
                 warning = "Collider hover requires a 3D collider on this object or one of its children.";
 

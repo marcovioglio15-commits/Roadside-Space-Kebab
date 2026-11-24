@@ -40,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     if (asset is DialogueTriggerPreset trigger && trigger.Consumption?.Orders != null
                         && Array.Exists(trigger.Consumption.Orders, removed.Contains))
                         warnings.Add("Dialogue trigger '" + trigger.name + "' contains a removed order key.");
-            foreach (OrderBoard board in UnityEngine.Object.FindObjectsByType<OrderBoard>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (OrderBoard board in UnityEngine.Object.FindObjectsByType<OrderBoard>(FindObjectsInactive.Include))
             {
                 using SerializedObject data = new SerializedObject(board);
                 if (data.FindProperty("mode").enumValueIndex != (int)OrderBoardMode.MatchingOrders)

@@ -4,196 +4,295 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Advances permanent tint and flag changes independently for each contacted item.</summary>
+    /// <summary>Runs independent counterpart preparation and effects while sharing read-only source restrictions.</summary>
     internal sealed class ContactParallelEffects
     {
         #region Types
 
-        /// <summary>Keeps per-item dwell timing and the acquired tint baseline.</summary>
+        /// <summary>Retains one item's dwell, preparation, appearance snapshot and completion timer.</summary>
         private sealed class Contact
         {
-            internal float Since;
+            internal float Entered;
+            internal float Started;
             internal ContactEffectRun Effect;
+            internal readonly ContactPreparationRun Preparation = new ContactPreparationRun();
+            internal bool StartedEffect;
+            internal bool Returning;
         }
 
         #endregion
-
         #region State
 
         private readonly Dictionary<ObjectItem, Contact> entries = new Dictionary<ObjectItem, Contact>();
-        private readonly List<ObjectItem> removed = new List<ObjectItem>();
-        private readonly List<ObjectItem> finishing = new List<ObjectItem>();
+        private readonly List<ObjectItem> snapshot = new List<ObjectItem>();
         private readonly HashSet<ObjectItem> completed = new HashSet<ObjectItem>();
+        private bool restricted;
 
         #endregion
-
         #region Properties
 
-        /// <summary>Whether at least one counterpart is visibly transitioning.</summary>
+        /// <summary>Whether preparation, an effect or its return animation is active.</summary>
         internal bool Running { get; private set; }
+        /// <summary>Whether any effect is currently advancing.</summary>
+        internal bool Audible { get; private set; }
+        /// <summary>Whether any prepared item awaits confirmation.</summary>
+        internal bool Waiting
+        {
+            get
+            {
+                foreach (Contact state in entries.Values)
+                    if (state.Preparation.Waiting)
+                        return true;
+                return false;
+            }
+        }
 
         #endregion
-
         #region Methods
+        #region Evaluation
 
-        #region Progress
-
-        /// <summary>Reconciles the measured contacts while retaining their independent dwell timers.</summary>
-        /// <param name="owner">Rule owning each counterpart reservation.</param>
-        /// <param name="contacts">Most recent measured contacts.</param>
+        /// <summary>Adds eligible physical contacts and resets completed history only after real separation.</summary>
+        /// <param name="owner">Rule accepting the counterparts.</param>
+        /// <param name="contacts">Physical contacts plus this rule's retained magnet leases.</param>
         internal void Scan(ContactModificationRun owner, HashSet<ObjectItem> contacts)
         {
-            ContactModificationRule settings = owner.Settings;
-            removed.Clear();
+            // Snapshot removals so callbacks cannot invalidate the history traversal.
+            snapshot.Clear();
             foreach (ObjectItem item in completed)
-                if (item == null || settings.RepeatAfterSeparation && !contacts.Contains(item))
-                    removed.Add(item);
-            foreach (ObjectItem item in removed)
+                if (item == null || owner.Settings.RepeatAfterSeparation && !contacts.Contains(item))
+                    snapshot.Add(item);
+            foreach (ObjectItem item in snapshot)
                 completed.Remove(item);
-
-            // Only a new eligible contact creates state. The animation loop reuses it until completion.
             foreach (ObjectItem item in contacts)
-                if (owner.Eligible(item) && item.Identity.Matches(settings.Flags) && !completed.Contains(item)
-                    && !entries.ContainsKey(item))
-                    entries.Add(item, new Contact { Since = Time.time });
+                if (Matches(owner, item) && !completed.Contains(item) && !entries.ContainsKey(item))
+                    entries.Add(item, new Contact { Entered = Time.time });
         }
 
-        /// <summary>Starts, advances or cancels each counterpart without reserving the source.</summary>
-        /// <param name="owner">Rule supplying effects and signals.</param>
-        /// <param name="contacts">Most recent measured contacts.</param>
+        /// <summary>Advances each prepared item without reserving the source's appearance.</summary>
+        /// <param name="owner">Rule owning each independent transition.</param>
+        /// <param name="contacts">Most recent contact set.</param>
         internal void Tick(ContactModificationRun owner, HashSet<ObjectItem> contacts)
         {
-            ContactModificationRule settings = owner.Settings;
-            Running = false;
-            removed.Clear();
-            finishing.Clear();
-            foreach (KeyValuePair<ObjectItem, Contact> pair in entries)
+            // Event listeners may remove participants; never iterate the live dictionary across signals.
+            snapshot.Clear();
+            snapshot.AddRange(entries.Keys);
+            Running = Audible = false;
+            for (int index = 0; index < snapshot.Count && owner.Active; index++)
+                if (entries.TryGetValue(snapshot[index], out Contact state))
+                    Advance(owner, snapshot[index], state, contacts.Contains(snapshot[index]));
+            if (!Running && restricted)
             {
-                ObjectItem item = pair.Key;
-                Contact state = pair.Value;
-                if (!Matches(owner, item)
-                    || !contacts.Contains(item) && (state.Effect == null || !settings.CompleteAfterSeparation)
-                    || state.Effect != null && !item.IsOwnedBy(owner))
-                {
-                    Cancel(owner, item, state);
-                    removed.Add(item);
-                    continue;
-                }
-                if (state.Effect == null && (Time.time - state.Since < settings.ContactDuration
-                    || item.IsBlocked(InteractionChannels.Passive) || !Begin(owner, item, state)))
-                    continue;
-                float progress = settings.Duration > 0f ? Mathf.Clamp01((Time.time - state.Since) / settings.Duration) : 1f;
-                if (progress < 1f)
-                {
-                    state.Effect.Animate(progress);
-                    Running = true;
-                }
-                else
-                    finishing.Add(item);
+                owner.Item.Release(owner);
+                restricted = false;
             }
-            foreach (ObjectItem item in removed)
-                entries.Remove(item);
-
-            // A flag listener may disable the rule. Finish outside the dictionary traversal.
-            for (int index = 0; index < finishing.Count; index++)
-                if (entries.TryGetValue(finishing[index], out Contact state))
-                    Complete(owner, finishing[index], state);
         }
 
-        /// <summary>Commits the final tint only when the requested flag operation succeeds.</summary>
-        /// <param name="owner">Rule that owns the counterpart.</param>
-        /// <param name="item">Counterpart reaching the end of cooking or another permanent effect.</param>
-        /// <param name="state">Original tint and its prepared transition.</param>
-        private void Complete(ContactModificationRun owner, ObjectItem item, Contact state)
+        /// <summary>Prepares, animates and completes one item using its own timer.</summary>
+        /// <param name="owner">Rule supplying preparation and effects.</param>
+        /// <param name="item">Accepted counterpart.</param>
+        /// <param name="state">Independent transition state.</param>
+        /// <param name="touching">Whether contact or docking remains valid.</param>
+        private void Advance(ContactModificationRun owner, ObjectItem item, Contact state, bool touching)
         {
-            // An earlier completion can invalidate another contact through a flag listener.
-            entries.Remove(item);
-            if (!Matches(owner, item) || !item.IsOwnedBy(owner))
+            // Returning animation may outlive the flag that originally selected this rule.
+            if (item == null || !item.isActiveAndEnabled || item.IsConsumed
+                || state.Effect != null && !item.IsOwnedBy(owner)
+                || !state.Returning && (!Matches(owner, item) || !touching && !owner.Settings.CompleteAfterSeparation))
             {
-                Cancel(owner, item, state);
+                ReleaseContact(owner, item);
                 return;
             }
-            ContactModificationRule settings = owner.Settings;
-            using ObjectIdentityChangeScope change = item.Identity.GroupChanges();
-            if (settings.ChangeContactFlag && !InteractionFlagChange.TryApplyFlag(item.gameObject, settings.ContactFlag,
-                out string warning, settings.ContactFlagOperation))
+            if (state.Effect == null)
             {
-                Cancel(owner, item, state);
-                Debug.LogWarning(warning, item);
+                if (Time.time - state.Entered < owner.Settings.ContactDuration || item.IsBlocked(InteractionChannels.Passive))
+                    return;
+                if (!owner.PrepareDock(item))
+                {
+                    Running |= owner.HasDock(item);
+                    return;
+                }
+                if (!Begin(owner, item, state))
+                    return;
             }
-            else
+            Running = true;
+            state.Preparation.Tick(Time.deltaTime);
+            if (state.Returning)
             {
-                state.Effect.Animate(1f);
-                state.Effect.Commit();
-                item.Release(owner);
+                if (!state.Preparation.Returning)
+                    Finish(owner, item, state);
+                return;
             }
-            completed.Add(item);
+            if (!state.Preparation.Ready)
+                return;
+            if (!state.StartedEffect)
+            {
+                state.StartedEffect = true;
+                state.Started = Time.time;
+                owner.Signal(InteractionMoment.Started, item);
+                if (!owner.Active || !entries.ContainsKey(item))
+                    return;
+            }
+            float progress = owner.Settings.Duration > 0f ? Mathf.Clamp01((Time.time - state.Started) / owner.Settings.Duration) : 1f;
+            state.Effect.Animate(progress);
+            Audible |= progress < 1f;
+            if (progress >= 1f)
+                Complete(owner, item, state);
         }
 
-        /// <summary>Checks whether an existing contact still qualifies for this rule.</summary>
-        /// <param name="owner">Rule defining the carry and flag filters.</param>
-        /// <param name="item">Counterpart retained by the current run.</param>
-        /// <returns>True when the counterpart is active and still passes both filters.</returns>
-        private static bool Matches(ContactModificationRun owner, ObjectItem item)
-        {
-            return item != null && item.isActiveAndEnabled && owner.Eligible(item) && item.Identity.Matches(owner.Settings.Flags);
-        }
-
-        /// <summary>Captures a single counterpart's tint baseline once it can be reserved.</summary>
-        /// <param name="owner">Rule owning the reservation.</param>
-        /// <param name="item">Eligible counterpart.</param>
-        /// <param name="state">Its dwell and effect state.</param>
-        /// <returns>True when the timed effect can begin.</returns>
+        /// <summary>Captures effects only after the item reaches its docking pose.</summary>
+        /// <param name="owner">Modification owning restrictions.</param>
+        /// <param name="item">Counterpart ready for preparation.</param>
+        /// <param name="state">Transition receiving the effect snapshot.</param>
+        /// <returns>True when preparation started successfully.</returns>
         private bool Begin(ContactModificationRun owner, ObjectItem item, Contact state)
         {
             if (!item.Acquire(owner, owner.Settings.BlockOther))
                 return false;
-            if (!ContactEffectRun.TryPrepare(item, owner.Settings.Other, out ContactEffectRun effect, out string warning))
+            if (!owner.Settings.Preparation.ValidateTarget(item, out string warning)
+                || !ContactEffectRun.TryPrepare(item, owner.Settings.Other, out state.Effect, out warning))
             {
-                item.Release(owner);
+                ReleaseContact(owner, item);
                 completed.Add(item);
-                removed.Add(item);
                 Debug.LogWarning(warning, item);
                 return false;
             }
-            state.Effect = effect;
-            state.Since = Time.time;
+            // Shared restrictions retain the source's existing component and reservation state.
+            owner.Item.Restrict(owner, owner.Settings.BlockSelf);
+            restricted = true;
+            state.Preparation.Begin(owner.Item.transform, item, owner.Settings.Preparation, owner.UsesMagnets);
             return true;
         }
 
-        #endregion
+        /// <summary>Commits only this counterpart and releases its slot after any return animation.</summary>
+        /// <param name="owner">Rule publishing the completion.</param>
+        /// <param name="item">Completed counterpart.</param>
+        /// <param name="state">Appearance and preparation transaction.</param>
+        private void Complete(ContactModificationRun owner, ObjectItem item, Contact state)
+        {
+            if (!state.Effect.CanCommit())
+            {
+                ReleaseContact(owner, item);
+                completed.Add(item);
+                return;
+            }
+            using ObjectIdentityChangeScope changes = item.Identity.GroupChanges();
+            if (owner.Settings.ChangeContactFlag && !InteractionFlagChange.TryApplyFlag(item.gameObject,
+                owner.Settings.ContactFlag, out string warning, owner.Settings.ContactFlagOperation))
+            {
+                ReleaseContact(owner, item);
+                Debug.LogWarning(warning, item);
+                return;
+            }
+            state.Effect.Commit();
+            completed.Add(item);
+            state.Returning = state.Preparation.Return();
+            if (!state.Returning)
+                Finish(owner, item, state);
+            owner.Signal(InteractionMoment.Completed, item);
+        }
 
+        /// <summary>Releases a committed counterpart without reverting its final appearance.</summary>
+        /// <param name="owner">Rule ending ownership.</param>
+        /// <param name="item">Participant whose return ended.</param>
+        /// <param name="state">Completed transaction.</param>
+        private void Finish(ContactModificationRun owner, ObjectItem item, Contact state)
+        {
+            entries.Remove(item);
+            state.Preparation.Release(false);
+            item.Release(owner);
+            owner.ReleaseDock(item);
+            ReleaseRestrictions(owner);
+        }
+
+        /// <summary>Checks counterpart activation and rule identity.</summary>
+        /// <param name="owner">Rule supplying filters.</param>
+        /// <param name="item">Candidate counterpart.</param>
+        /// <returns>True when active and compatible.</returns>
+        private static bool Matches(ContactModificationRun owner, ObjectItem item)
+        {
+            return item != null && item.isActiveAndEnabled && !item.IsConsumed && owner.Eligible(item)
+                && item.Identity != null && item.Identity.Matches(owner.Settings.Flags);
+        }
+
+        #endregion
+        #region Input And Timing
+
+        /// <summary>Keeps automatic feedback alive only for its own active counterpart effect.</summary>
+        /// <param name="item">Participant captured when the feedback started.</param>
+        /// <returns>True between this participant's effect start and completion or cancellation.</returns>
+        internal bool IsModifying(ObjectItem item)
+        {
+            // Preparation and return movement do not extend the modification's feedback.
+            return item != null && entries.TryGetValue(item, out Contact state) && state.StartedEffect && !state.Returning;
+        }
+
+        /// <summary>Confirms the first waiting item without replaying its attraction.</summary>
+        /// <returns>True when one waiting preparation consumed the input.</returns>
+        internal bool Confirm()
+        {
+            foreach (Contact state in entries.Values)
+                if (state.Preparation.Confirm())
+                    return true;
+            return false;
+        }
+
+        /// <summary>Estimates the selected item's completion for occupied-slot policies.</summary>
+        /// <param name="item">Participant being ranked.</param>
+        /// <param name="duration">Configured effect duration.</param>
+        /// <returns>Remaining preparation and effect time.</returns>
+        internal float Remaining(ObjectItem item, float duration)
+        {
+            return !entries.TryGetValue(item, out Contact state) ? duration
+                : state.Returning ? state.Preparation.Remaining
+                : state.Preparation.Remaining + (state.StartedEffect ? Mathf.Max(0f, duration - (Time.time - state.Started)) : duration);
+        }
+
+        #endregion
         #region Teardown
 
-        /// <summary>Restores pending changes when the source is unavailable.</summary>
-        /// <param name="owner">Rule releasing its counterpart reservations.</param>
-        /// <param name="resetHistory">Also allow completed pairs to run again on the next activation.</param>
+        /// <summary>Cancels only the participant leaving this rule.</summary>
+        /// <param name="owner">Rule retaining its effect and slot.</param>
+        /// <param name="item">Picked-up, disabled or incompatible item.</param>
+        internal void ReleaseContact(ContactModificationRun owner, ObjectItem item)
+        {
+            if (!entries.TryGetValue(item, out Contact state))
+                return;
+            entries.Remove(item);
+            state.Effect?.Cancel();
+            state.Preparation.Release(true);
+            if (item != null)
+                item.Release(owner);
+            owner.ReleaseDock(item);
+            ReleaseRestrictions(owner);
+        }
+
+        /// <summary>Restores source availability immediately after its last independent contact ends.</summary>
+        /// <param name="owner">Rule retaining shared restrictions.</param>
+        private void ReleaseRestrictions(ContactModificationRun owner)
+        {
+            if (entries.Count != 0 || !restricted)
+                return;
+            owner.Item.Release(owner);
+            restricted = false;
+        }
+
+        /// <summary>Releases transitions and restrictions when the source becomes unavailable.</summary>
+        /// <param name="owner">Rule ending its contact session.</param>
+        /// <param name="resetHistory">Whether completed items may start again after activation.</param>
         internal void Clear(ContactModificationRun owner, bool resetHistory = false)
         {
-            foreach (KeyValuePair<ObjectItem, Contact> pair in entries)
-                Cancel(owner, pair.Key, pair.Value);
-            entries.Clear();
-            finishing.Clear();
-            Running = false;
+            snapshot.Clear();
+            snapshot.AddRange(entries.Keys);
+            for (int index = 0; index < snapshot.Count; index++)
+                ReleaseContact(owner, snapshot[index]);
+            if (owner.Item != null)
+                owner.Item.Release(owner);
+            restricted = Running = Audible = false;
             if (resetHistory)
                 completed.Clear();
         }
 
-        /// <summary>Restores an unfinished tint and releases its exact owner.</summary>
-        /// <param name="owner">Rule that acquired the item.</param>
-        /// <param name="item">Counterpart leaving the rule.</param>
-        /// <param name="state">Tint baseline retained by the run.</param>
-        private static void Cancel(ContactModificationRun owner, ObjectItem item, Contact state)
-        {
-            if (state.Effect == null)
-                return;
-            state.Effect.Cancel();
-            if (item != null)
-                item.Release(owner);
-        }
-
         #endregion
-
         #endregion
     }
 }

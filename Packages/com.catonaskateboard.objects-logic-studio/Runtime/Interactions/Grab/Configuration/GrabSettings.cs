@@ -107,10 +107,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (Units <= 0)
                 warning = "Grab Units must be a positive whole number.";
-            else if (!InteractionValues.Positive(Distance) || !SolidHitOnly && !InteractionValues.Finite(TargetOffset)
+            else if (!InteractionValues.Positive(Distance) || TargetMode == HoverTargetMode.ViewCenter && !SolidHitOnly && !InteractionValues.Finite(TargetOffset)
                 || !InteractionValues.Finite(Offset) || !InteractionValues.Finite(Rotation))
                 warning = "Grab needs a positive finite distance and finite position/rotation values.";
-            else if (TargetMode is not (HoverTargetMode.ViewCenter or HoverTargetMode.Cursor)
+            else if (TargetMode is not (HoverTargetMode.ViewCenter or HoverTargetMode.Cursor or HoverTargetMode.CenterCollider)
                 || Space is not (CarrySpace.Camera or CarrySpace.Player))
                 warning = "Choose a supported grab target mode and carry space.";
             else if (!SolidHitOnly && TargetMode == HoverTargetMode.ViewCenter && (!InteractionValues.Positive(CenterRadius) || CenterRadius > 1f))

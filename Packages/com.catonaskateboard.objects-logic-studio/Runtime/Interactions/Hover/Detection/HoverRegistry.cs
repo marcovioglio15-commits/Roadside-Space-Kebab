@@ -97,7 +97,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     // Keep a fixed HUD through its authored release grace instead of flashing a background target on brief misses.
                     if (interaction.IsHovered && interaction.Settings.FixedHud && !interaction.Detected)
                         retainedHud = interaction;
-                    float candidate = interaction.Settings.TargetMode != HoverDetectionMode.ViewCenter ? 0f
+                    float candidate = interaction.Settings.TargetMode != HoverTargetMode.ViewCenter ? 0f
                         : ((Vector2)observer.View.WorldToScreenPoint(interaction.WorldAnchor) - observer.View.pixelRect.center).sqrMagnitude;
                     if (Closer(interaction, selected, candidate, score))
                     {
@@ -140,7 +140,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return candidate.Detected;
             if (score != best)
                 return score < best;
-            if (candidate.Settings.TargetMode != HoverDetectionMode.ViewCenter && selected.Settings.TargetMode != HoverDetectionMode.ViewCenter
+            if (candidate.Settings.TargetMode != HoverTargetMode.ViewCenter && selected.Settings.TargetMode != HoverTargetMode.ViewCenter
                 && candidate.HitDistance != selected.HitDistance)
                 return candidate.HitDistance < selected.HitDistance;
             if (candidate.IsHovered != selected.IsHovered)

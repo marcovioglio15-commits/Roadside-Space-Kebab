@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (feature.Target == null || !feature.Target.DrawGizmos || !feature.Target.TryValidate(out _))
                 return;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.3f, 0.85f, 1f));
-            Vector3 target = feature.Target.SolidHitOnly ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
+            Vector3 target = (feature.Target.SolidHitOnly || feature.Target.Mode == HoverTargetMode.CenterCollider) ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
             Handles.DrawWireDisc(target, Vector3.up, feature.Target.Distance);
             Handles.Label(target, feature.Kind + " · " + feature.Target.Distance.ToString("0.##") + " m");
             switch (feature)

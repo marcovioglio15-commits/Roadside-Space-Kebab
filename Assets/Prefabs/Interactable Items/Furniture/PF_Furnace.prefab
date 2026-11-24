@@ -1,0 +1,420 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5049049463900345670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8022962795252994976}
+  - component: {fileID: 7561974597832642363}
+  - component: {fileID: 8507123094855171264}
+  - component: {fileID: 3852493135364796890}
+  - component: {fileID: 7886962716839478431}
+  - component: {fileID: 6229206398965940034}
+  - component: {fileID: 2250534995049393571}
+  m_Layer: 0
+  m_Name: PF_Furnace
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8022962795252994976
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4, y: 0, z: -2.377}
+  m_LocalScale: {x: 1, y: 1.31, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8785031480204773592}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7561974597832642363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
+  flags: []
+--- !u!114 &8507123094855171264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
+--- !u!114 &3852493135364796890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d678bae4a18e477a9dc070b3c6d37546, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContactModifier
+  interactionName: Cooking
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 1
+    Prefab: {fileID: 2878869678474554673, guid: bf740f1a33186404e9b7e6c155d1b033, type: 3}
+    AutoTiming: 1
+    Duration: 1
+    OnContactObject: 1
+    FollowObject: 1
+    Position: {x: 0, y: 0.3, z: 0}
+    Rotation: {x: -90, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  action: {fileID: 0}
+  settings:
+    Modifications:
+    - {fileID: 11400000, guid: e7c78d2a700142718e559cead496d816, type: 2}
+    - {fileID: 11400000, guid: 7e3f727cfc4f4179a5a520801735af44, type: 2}
+    - {fileID: 11400000, guid: 0272116bbe70a614faf37a36a0493289, type: 2}
+    - {fileID: 11400000, guid: 58de2772da244ebe8573c26f9e10bcac, type: 2}
+    - {fileID: 11400000, guid: 6763c67936ae2294e9ce3fe604948064, type: 2}
+    - {fileID: 11400000, guid: dbff11e02218e5d46bd26ebe3ae97bfa, type: 2}
+    - {fileID: 11400000, guid: 83414fbcb3326904c917f60334fdfbfc, type: 2}
+    - {fileID: 11400000, guid: 3b4caac3d65454941bf695e65217a5bb, type: 2}
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    MagnetLock:
+      Enabled: 1
+      Instant: 0
+      Duration: 0.35
+      WhenOccupied: 0
+      Magnets:
+      - Name: Cooking Center
+        AnyItem: 1
+        Flags: []
+        Priority: 0
+        Position: {x: 0.5598936, y: 1.0035574, z: 0.51927155}
+        Rotation: {x: 0, y: 0, z: 0}
+        PreviewPrefab: {fileID: 2615674392044304233, guid: dbc2bd29052637e46920a7c7e7633213, type: 3}
+      PreviewPrefab: {fileID: 0}
+    ConsumeOn:
+      Enabled: 0
+      DialogueName: 
+      Occurrence: 0
+      Step:
+        Block: 
+        Entry: 
+    Price:
+      CollectPrice: 0
+      Sound: 1
+      DeferDisplay: 0
+      CompletionMode: 0
+      OnDespawn: 0
+      CompletionSources: []
+    FryingSound: 0
+--- !u!114 &7886962716839478431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
+  interactionName: Outline
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 11400000, guid: fca738ab4c1648a180332fca84300e7b, type: 2}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Thickness: 6
+    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
+    Intensity: 5
+    EdgeAngle: 30
+    HoverOnly: 1
+  renderers:
+  - {fileID: 6488965530054623316}
+--- !u!114 &6229206398965940034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 938429a5d51206345b01b27c9fb3a6a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectHover
+  interactionName: First Person Hover
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  anchor: {fileID: 0}
+  configuration:
+    settings:
+      targetMode: 2
+      playerDistance: 3
+      centerRadius: 0.7
+      queryInterval: 0.05
+      releaseDelay: 0.08
+      suspendCarried: 0
+      suspendMoving: 0
+      speedThreshold: 0.5
+      obstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967227
+      fixedHud: 1
+      anchorOffset: {x: 0, y: 0, z: 0}
+      worldOffset: {x: 0, y: 0.25, z: 0}
+      screenOffset: {x: 0, y: 35}
+      followSmoothing: 0.035
+      appearance: 1
+      duration: 0.18
+      startScale: 0.2
+      popIn: 1
+      exitDuration: 0.16
+    style:
+      content: Oven
+      font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+      fontSize: 20
+      fontStyle: 0
+      textColor: {r: 1, g: 1, b: 1, a: 1}
+      alignment: 4
+      richText: 1
+      horizontalOverflow: 0
+      verticalOverflow: 1
+      size: {x: 360, y: 64}
+      textSizeOffset: {x: -24, y: -12}
+      textOffset: {x: 0, y: 0}
+      showBackground: 0
+      backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
+      backgroundSprite: {fileID: 0}
+      backgroundType: 0
+  interactionText: []
+  drawGizmos: 1
+--- !u!114 &2250534995049393571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6896d969dd550f6469f26e3d6b6b2cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectPresenceCap
+  interactionName: Presence Cap
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Maximum: 20
+    UseOwnFlags: 1
+    IncludeFixedObjects: 0
+    Flags: []
+    OffscreenDelay: 0.25
+--- !u!1 &7637673994572382804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8785031480204773592}
+  - component: {fileID: 1449823934963188890}
+  - component: {fileID: 6488965530054623316}
+  - component: {fileID: 6930143285085301714}
+  m_Layer: 0
+  m_Name: SM_Furnace
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8785031480204773592
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7637673994572382804}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8022962795252994976}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &1449823934963188890
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7637673994572382804}
+  m_Mesh: {fileID: -2463483415993312504, guid: b74226f7a1097ce4a9a4e9cdb285ed2d, type: 3}
+--- !u!23 &6488965530054623316
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7637673994572382804}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: b4c54499bfa63404e83ec53945686245, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &6930143285085301714
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7637673994572382804}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2463483415993312504, guid: b74226f7a1097ce4a9a4e9cdb285ed2d, type: 3}

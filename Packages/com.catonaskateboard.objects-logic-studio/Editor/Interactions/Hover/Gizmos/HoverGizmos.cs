@@ -25,7 +25,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             using (new Handles.DrawingScope(color))
             {
                 // Three thin rings describe range without hiding the prefab mesh.
-                if (hover.Settings.TargetMode == HoverDetectionMode.ViewCenter)
+                if (hover.Settings.TargetMode == HoverTargetMode.ViewCenter)
                 {
                     Handles.DrawWireDisc(anchor, Vector3.up, hover.Settings.PlayerDistance);
                     Handles.DrawWireDisc(anchor, Vector3.right, hover.Settings.PlayerDistance);

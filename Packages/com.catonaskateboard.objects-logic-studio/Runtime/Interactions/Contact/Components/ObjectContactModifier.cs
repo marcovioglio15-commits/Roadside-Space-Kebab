@@ -27,6 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private int gateSpawn;
         private readonly ContactConsumptionRejections rejections = new ContactConsumptionRejections();
         private readonly ContactPriceRun price = new ContactPriceRun();
+        private readonly ContactMagnetRun magnets = new ContactMagnetRun();
         private readonly InteractionAudioLoop frying = new InteractionAudioLoop();
 
         #endregion
@@ -42,6 +43,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal int ConsumedUnits { get; private set; }
         /// <summary>Rule context available only while publishing its start or completion.</summary>
         internal ContactModificationRun SignalingRun => signaling;
+        /// <summary>Docking ownership shared by this interaction's independent rules.</summary>
+        internal ContactMagnetRun Magnets => magnets;
         /// <summary>Duration of the rule currently starting its visual effect.</summary>
         internal override float VfxDuration => signaling != null ? signaling.Settings.Duration : settings.MinimumDuration;
         /// <summary>Whether any rule still owns an active transition.</summary>
@@ -112,6 +115,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 gateGeneration = ObjectSpawnHistory.Generation;
                 gateSpawn = Item.Spawn.Index;
             }
+            magnets.Configure(this, settings.MagnetLock);
             price.Configure(settings.ConsumesAny ? settings.Price : null, this, newSpawn);
             consumeDialogue = settings.ConsumesAny && settings.ConsumeOn.Enabled ? settings.ConsumeOn.Resolve(gameObject) : null;
             ObjectInteraction.Signaled += ObserveDialogue;
@@ -139,6 +143,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!ready)
                 return;
             // A callback may disable this component while a preceding rule publishes an event.
+            magnets.Tick(Time.deltaTime);
             bool audible = false;
             for (int index = 0; index < runs.Length && isActiveAndEnabled; index++)
             {
@@ -166,6 +171,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (ContactModificationRun run in runs)
                 if (run != null)
                     run.Disable();
+            magnets.Clear();
             // Feature toggles and held animation/inventory suspension do not end the customer's lifetime.
             if (!gameObject.activeInHierarchy && Item != null && !Item.Spawn.IsRetained)
                 price.EndLifetime();
@@ -186,6 +192,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Discovery occurs only at explicit despawn boundaries, never during ordinary frame updates.
             foreach (ObjectContactModifier modifier in root.GetComponentsInChildren<ObjectContactModifier>(true))
                 modifier.price.EndLifetime();
+        }
+
+        /// <summary>Cancels active preparation before a docked item is picked up or despawned.</summary>
+        /// <param name="item">Participant leaving its magnet.</param>
+        internal void ReleaseMagnetContact(ObjectItem item)
+        {
+            foreach (ContactModificationRun run in runs)
+                if (run != null)
+                    run.ReleaseMagnetContact(item);
         }
 
         /// <summary>Disposes per-rule Unity ownership identities outside the frame update path.</summary>
@@ -263,14 +278,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
                 bool found = false;
                 foreach (Collider collider in colliders)
-                    if (collider.GetComponentInParent<ObjectItem>() == item && ContactDetection.Usable(collider, definition.Settings.IncludeTriggers))
+                    if (collider.GetComponentInParent<ObjectItem>(true) == item && ContactDetection.Configured(collider, definition.Settings.IncludeTriggers, item.transform))
                     {
                         found = true;
                         break;
                     }
                 if (!found && (Application.isPlaying || GetComponent<ObjectAssemblyProduct>() == null))
                 {
-                    warning = "Add an enabled Box, Sphere, Capsule or convex Mesh Collider compatible with every modification's trigger policy.";
+                    warning = "Add an enabled contact collider compatible with the trigger policy. Non-convex meshes require a static or kinematic body.";
                     return false;
                 }
             }

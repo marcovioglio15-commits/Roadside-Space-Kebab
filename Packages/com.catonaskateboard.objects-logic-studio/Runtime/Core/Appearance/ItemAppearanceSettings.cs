@@ -101,7 +101,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             HashSet<string> paths = new HashSet<string>(StringComparer.Ordinal);
             foreach (ContactMeshReplacement mesh in meshes)
-                if (mesh == null || mesh.Path == null || mesh.Mesh == null || !paths.Add(mesh.Path))
+                if (mesh == null || !mesh.PrimaryMesh && mesh.Path == null || mesh.Mesh == null || !paths.Add(mesh.PrimaryMesh ? "$primary" : mesh.Path))
                     return false;
             paths.Clear();
             foreach (ItemMaterialReplacement replacement in materials)

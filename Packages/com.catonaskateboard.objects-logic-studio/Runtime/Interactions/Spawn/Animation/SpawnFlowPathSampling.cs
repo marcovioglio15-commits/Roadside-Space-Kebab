@@ -8,6 +8,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Methods
         #region Sampling
 
+        /// <summary>Totals a validated track's holds and travel time during setup.</summary>
+        /// <param name="path">Animation containing valid keyframes.</param>
+        /// <returns>Scaled seconds required to reach its final pose.</returns>
+        internal static float Duration(SpawnFlowAnimation path)
+        {
+            float duration = 0f;
+            // Runtime playback caches this value instead of scanning keyframes each frame.
+            foreach (SpawnFlowKeyframe frame in path.Keyframes)
+                duration += frame.Delay + frame.Duration;
+            return duration;
+        }
+
         /// <summary>Finds the shared velocity at a keyframe that connects two moving segments.</summary>
         /// <param name="path">Validated walk path.</param>
         /// <param name="index">Segment ending at the current keyframe.</param>

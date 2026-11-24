@@ -116,6 +116,17 @@ MonoBehaviour:
     - {fileID: 11400000, guid: dbff11e02218e5d46bd26ebe3ae97bfa, type: 2}
     - {fileID: 11400000, guid: 83414fbcb3326904c917f60334fdfbfc, type: 2}
     - {fileID: 11400000, guid: 3b4caac3d65454941bf695e65217a5bb, type: 2}
+    MagnetLock:
+      Enabled: 1
+      Instant: 0
+      Duration: 0.35
+      Magnets:
+      - Name: Cooking Center
+        AnyItem: 1
+        Flags: []
+        Position: {x: 0, y: 0.0525, z: 0}
+        Rotation: {x: 0, y: 0, z: 0}
+        PreviewPrefab: {fileID: 3748823794255209065, guid: c684292326866854fb5205e178ec9fbe, type: 3}
     Target:
       Distance: 3
       Mode: 0
@@ -194,8 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flags:
-  - {fileID: 11400000, guid: 502cd1abface4603a56e2231e33003ff, type: 2}
+  flags: []
 --- !u!114 &8672783274044013755
 MonoBehaviour:
   m_ObjectHideFlags: 0

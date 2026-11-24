@@ -7,7 +7,7 @@ using StudioGUI = CatOnASkateboard.StudioColors.Editor.StudioFieldGUI;
 
 namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 {
-    /// <summary>Offers prefab Animators and exact controller states with their effective clips.</summary>
+    /// <summary>Offers independent animation modes with nested controller and transform controls.</summary>
     internal static class SpawnFlowAnimatorControls
     {
         #region Methods
@@ -20,75 +20,114 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // The target selector never accepts an Animator from another prefab or a scene instance.
             GameObject prefab = step.FindPropertyRelative("Prefab").objectReferenceValue as GameObject;
             SerializedProperty settings = step.FindPropertyRelative("CharacterAnimation");
-            Target(settings.FindPropertyRelative("Target"), prefab);
-            Animator animator = settings.FindPropertyRelative("Target").objectReferenceValue as Animator;
-            if (animator == null)
+            if (!SpawnFlowKeyframeControls.Section(settings, "Character Animations"))
                 return;
             using StudioIndentScope indent = new StudioIndentScope();
+            bool walking = step.FindPropertyRelative("WalkIn.Enabled").boolValue || step.FindPropertyRelative("WalkOut.Enabled").boolValue;
+            bool pay = SpawnFlowAnimatorSettings.SupportsPay(prefab);
+            bool death = SpawnFlowAnimatorSettings.SupportsDeath(prefab);
+            bool talk = SpawnFlowAnimatorSettings.SupportsTalk(prefab);
+            if (AnimatorMode(settings.FindPropertyRelative("Idle")) || walking && AnimatorMode(settings.FindPropertyRelative("Walk"))
+                || talk && AnimatorMode(settings.FindPropertyRelative("Talk"))
+                || pay && AnimatorMode(settings.FindPropertyRelative("Pay")) || death && AnimatorMode(settings.FindPropertyRelative("Death")))
+                Controller(settings, prefab);
+            Animator animator = settings.FindPropertyRelative("Target").objectReferenceValue as Animator;
+            Role(settings, prefab, animator, "Idle");
+            if (walking)
+                Role(settings, prefab, animator, "Walk");
+            if (talk)
+                Role(settings, prefab, animator, "Talk");
+            if (pay)
+                Role(settings, prefab, animator, "Pay");
+            if (death)
+                Role(settings, prefab, animator, "Death");
+            ClearUnavailable(settings, pay, death, talk);
+        }
+
+        /// <summary>Identifies roles whose current mode needs a controller selector.</summary>
+        /// <param name="role">Serialized character animation role.</param>
+        /// <returns>True when Animator mode is active.</returns>
+        private static bool AnimatorMode(SerializedProperty role)
+        {
+            // Inactive controller data does not make transform controls depend on an Animator.
+            return (SpawnFlowAnimationMode)role.FindPropertyRelative("Mode").enumValueIndex == SpawnFlowAnimationMode.Animator;
+        }
+
+        /// <summary>Shows one role's active playback settings while retaining inactive mode data.</summary>
+        /// <param name="settings">Character settings containing the requested role.</param>
+        /// <param name="prefab">Hierarchy supplying transform targets.</param>
+        /// <param name="animator">Optional shared controller target.</param>
+        /// <param name="label">Role caption.</param>
+        private static void Role(SerializedProperty settings, GameObject prefab, Animator animator, string label)
+        {
+            // Each role retains its own mode and expansion state.
+            SerializedProperty role = settings.FindPropertyRelative(label);
+            if (!SpawnFlowKeyframeControls.Section(role, label))
+                return;
+            using StudioIndentScope indent = new StudioIndentScope();
+            HoverControls.Field(role, "Mode");
+            // Only controls needed by the selected mode occupy the expanded section.
+            switch ((SpawnFlowAnimationMode)role.FindPropertyRelative("Mode").enumValueIndex)
+            {
+                case SpawnFlowAnimationMode.Animator:
+                    if (animator != null && animator.runtimeAnimatorController != null)
+                    {
+                        State(role, animator, label);
+                        if (label == "Walk" && role.FindPropertyRelative("Clip").objectReferenceValue != null)
+                        {
+                            HoverControls.Field(settings, "SynchronizeWalk");
+                            if (settings.FindPropertyRelative("SynchronizeWalk").boolValue)
+                                HoverControls.Field(settings, "WalkReferenceSpeed");
+                        }
+                    }
+                    break;
+                case SpawnFlowAnimationMode.TransformKeyframes:
+                    SpawnFlowKeyframeControls.Tracks(role, prefab, label is "Idle" or "Walk" or "Talk");
+                    break;
+            }
+        }
+
+        /// <summary>Groups the shared Animator and blending controls above the individual roles.</summary>
+        /// <param name="settings">Visitor's character animation settings.</param>
+        /// <param name="prefab">Prefab supplying controller candidates.</param>
+        private static void Controller(SerializedProperty settings, GameObject prefab)
+        {
+            // Shared controller controls are relevant only while at least one role uses Animator mode.
+            if (!SpawnFlowKeyframeControls.Section(settings.FindPropertyRelative("Target"), "Animator Settings"))
+                return;
+            using StudioIndentScope indent = new StudioIndentScope();
+            Target(settings.FindPropertyRelative("Target"), prefab);
+            if (settings.FindPropertyRelative("Target").objectReferenceValue is not Animator animator)
+                return;
             using (new EditorGUI.DisabledScope(true))
                 StudioGUI.ObjectField(new GUIContent("Controller", "Controller assigned to the selected prefab Animator."),
                     animator.runtimeAnimatorController, typeof(RuntimeAnimatorController), false);
-            if (animator.runtimeAnimatorController == null)
-                return;
-            if (step.FindPropertyRelative("WalkIn.Enabled").boolValue || step.FindPropertyRelative("WalkOut.Enabled").boolValue)
-                State(settings.FindPropertyRelative("Walk"), animator, "Walk");
-            State(settings.FindPropertyRelative("Idle"), animator, "Idle");
-            bool pay = SpawnFlowAnimatorSettings.SupportsPay(prefab);
-            bool death = SpawnFlowAnimatorSettings.SupportsDeath(prefab);
-            if (pay)
-                State(settings.FindPropertyRelative("Pay"), animator, "Pay");
-            if (death)
-                State(settings.FindPropertyRelative("Death"), animator, "Death");
-            HoverControls.Field(settings, "BlendDuration");
-            if (settings.FindPropertyRelative("Walk.Clip").objectReferenceValue != null
-                && (step.FindPropertyRelative("WalkIn.Enabled").boolValue || step.FindPropertyRelative("WalkOut.Enabled").boolValue))
-            {
-                HoverControls.Field(settings, "SynchronizeWalk");
-                if (settings.FindPropertyRelative("SynchronizeWalk").boolValue)
-                    HoverControls.Field(settings, "WalkReferenceSpeed");
-            }
-            ClearUnavailable(settings, pay, death);
-        }
-
-        /// <summary>Clears duplicated animation references only when a new spawn row is explicitly added.</summary>
-        /// <param name="step">New row copied by Unity's serialized array expansion.</param>
-        internal static void Clear(SerializedProperty step)
-        {
-            // Existing rows and validation never rewrite saved selections.
-            ClearSettings(step.FindPropertyRelative("CharacterAnimation"));
-        }
-
-        /// <summary>Clears roles after an explicit None choice or a newly added row.</summary>
-        /// <param name="settings">Character animation settings being disabled.</param>
-        private static void ClearSettings(SerializedProperty settings)
-        {
-            // Clearing the Animator also clears dependent roles instead of leaving an invalid row.
-            settings.FindPropertyRelative("Target").objectReferenceValue = null;
-            settings.FindPropertyRelative("BlendDuration").floatValue = 0f;
-            settings.FindPropertyRelative("SynchronizeWalk").boolValue = false;
-            settings.FindPropertyRelative("WalkReferenceSpeed").floatValue = 1.3f;
-            foreach (string role in new[] { "Walk", "Idle", "Pay", "Death" })
-                Assign(settings.FindPropertyRelative(role), string.Empty, null, 0);
+            if (animator.runtimeAnimatorController != null)
+                HoverControls.Field(settings, "BlendDuration");
         }
 
         /// <summary>Offers explicit cleanup when interaction changes make a saved role unavailable.</summary>
         /// <param name="settings">Animation roles retained by the spawn row.</param>
         /// <param name="pay">Whether this prefab can collect prices.</param>
         /// <param name="death">Whether this prefab has Self Eject.</param>
-        private static void ClearUnavailable(SerializedProperty settings, bool pay, bool death)
+        /// <param name="talk">Whether this prefab can present dialogue text.</param>
+        private static void ClearUnavailable(SerializedProperty settings, bool pay, bool death, bool talk)
         {
             // Hidden invalid choices remain correctable without silently rewriting validation data.
             SerializedProperty payment = settings.FindPropertyRelative("Pay");
             SerializedProperty ejection = settings.FindPropertyRelative("Death");
             bool clearPay = !pay && Selected(payment);
             bool clearDeath = !death && Selected(ejection);
-            if ((!clearPay && !clearDeath) || !StudioButton.Draw(new GUIContent("Clear Unavailable Roles",
-                "Remove saved Pay or Death selections whose required interactions are no longer configured.")))
+            bool clearTalk = !talk && Selected(settings.FindPropertyRelative("Talk"));
+            if ((!clearPay && !clearDeath && !clearTalk) || !StudioButton.Draw(new GUIContent("Clear Unavailable Roles",
+                "Remove saved Pay, Death or Talk selections whose required interactions are no longer configured.")))
                 return;
             if (clearPay)
-                Assign(payment, string.Empty, null, 0);
+                payment.boxedValue = new SpawnFlowAnimatorState();
             if (clearDeath)
-                Assign(ejection, string.Empty, null, 0);
+                ejection.boxedValue = new SpawnFlowAnimatorState();
+            if (clearTalk)
+                settings.FindPropertyRelative("Talk").boxedValue = new SpawnFlowAnimatorState { Mode = SpawnFlowAnimationMode.None };
         }
 
         /// <summary>Detects saved role data even when its clip reference has been removed.</summary>
@@ -97,8 +136,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private static bool Selected(SerializedProperty property)
         {
             // Missing assets retain their state paths so the tool can report and clear them.
-            return property.FindPropertyRelative("Clip").objectReferenceValue != null
-                || !string.IsNullOrWhiteSpace(property.FindPropertyRelative("Path").stringValue);
+            return (SpawnFlowAnimationMode)property.FindPropertyRelative("Mode").enumValueIndex == SpawnFlowAnimationMode.TransformKeyframes
+                || AnimatorMode(property) && (property.FindPropertyRelative("Clip").objectReferenceValue != null
+                || !string.IsNullOrWhiteSpace(property.FindPropertyRelative("Path").stringValue));
         }
 
         /// <summary>Selects an existing Animator while keeping invalid previous links visible for correction.</summary>
@@ -133,11 +173,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="target">Selected prefab Animator, or null.</param>
         private static void SetTarget(SerializedObject data, string path, Animator target)
         {
-            // Changing the Animator preserves roles; None explicitly clears their dependent bindings.
+            // Changing the Animator preserves all role settings for correction or reuse.
             data.Update();
             data.FindProperty(path).objectReferenceValue = target;
-            if (target == null)
-                ClearSettings(data.FindProperty(path.Substring(0, path.LastIndexOf('.'))));
             data.ApplyModifiedProperties();
         }
 
@@ -149,7 +187,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // Store the exact path so runtime playback needs no controller inspection or reflection.
             AnimationClip current = property.FindPropertyRelative("Clip").objectReferenceValue as AnimationClip;
-            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent(label, property.tooltip));
+            using StudioFieldLayout field = new StudioFieldLayout(new GUIContent("Controller State", property.tooltip));
             Rect rect = field.ValueRect(field.GetRect(EditorGUIUtility.singleLineHeight));
             if (!GUI.Button(rect, current != null ? current.name : "None", EditorStyles.popup))
                 return;
@@ -167,7 +205,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (runtime is AnimatorController controller)
                 for (int layer = 0; layer < controller.layers.Length; layer++)
                     States(menu, data, path, property, controller.layers[layer].stateMachine,
-                        controller.layers[layer].name, layer, overrides, label is "Walk" or "Idle");
+                        controller.layers[layer].name, layer, overrides, label is "Walk" or "Idle" or "Talk");
             menu.DropDown(rect);
         }
 

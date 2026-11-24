@@ -34,6 +34,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool Eligible(HoverObserver observer, Transform root, IReadOnlyList<Collider> colliders, Vector3 anchor,
             float distance, HoverTargetMode mode, float radius, int mask, bool solidHitOnly, out float score, bool centerCollider = false, ISet<Collider> extra = null)
         {
+            // Exact centre hits share Hover's collider and trigger policy across every action interaction.
+            centerCollider |= mode == HoverTargetMode.CenterCollider;
+            solidHitOnly &= !centerCollider;
             // An actual swept bullet hit already establishes target and line of fire, regardless of observer reach.
             if (InteractionProjectileInput.Active)
             {

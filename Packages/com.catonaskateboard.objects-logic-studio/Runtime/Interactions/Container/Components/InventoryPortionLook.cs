@@ -82,10 +82,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Creates one reusable visual unit without copying the ingredient hierarchy or its behaviours.</summary>
         /// <param name="container">Parent that moves with the box.</param>
-        /// <returns>Root containing only render components and transforms.</returns>
+        /// <returns>Marked visual root containing the ingredient's shared render geometry.</returns>
         internal Transform Build(Transform container)
         {
-            Transform unit = new GameObject("Fill Unit").transform;
+            // Mark generated contents without copying the ingredient's behaviours.
+            Transform unit = new GameObject("Fill Unit", typeof(InventoryVisualInstance)).transform;
             unit.SetParent(container, false);
             // Mesh and material references stay shared with the original ingredient.
             foreach (Part part in parts)

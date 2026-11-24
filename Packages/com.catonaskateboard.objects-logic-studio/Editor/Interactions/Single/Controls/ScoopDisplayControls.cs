@@ -24,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (unlimited)
                 HoverControls.Field(display, "VisibleCount");
             SerializedProperty drift = display.FindPropertyRelative("Drift");
-            ObjectNumericControls.Vector(drift, 0f, 0.25f);
+            StudioVectorControls.Draw(drift, 0f, 0.25f);
             HoverControls.Field(display, "ScoopLimit");
             HoverControls.Field(display, "RestockForNewContainer");
             if (display.FindPropertyRelative("RestockForNewContainer").boolValue)
@@ -53,7 +53,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 if (StudioArrayGUI.Header(magnets, index, new GUIContent(name, magnets.tooltip)))
                     break;
                 if (magnet.isExpanded)
-                    ObjectNumericControls.Vector(magnet, -2f, 2f, name);
+                    StudioVectorControls.Draw(magnet, -2f, 2f, name);
             }
             StudioArrayGUI.Add(magnets, "Add Magnet", () => Vector3.zero);
             DrawSteps(display.FindPropertyRelative("Steps"),

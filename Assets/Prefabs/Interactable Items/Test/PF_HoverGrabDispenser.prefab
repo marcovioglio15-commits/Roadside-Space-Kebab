@@ -232,6 +232,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!114 &6213792910319298494
 MonoBehaviour:
@@ -280,7 +281,18 @@ MonoBehaviour:
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 9017165495754910650, guid: eb773dd05cd83df4aa5ef91eb4a1abac, type: 3}
-    ScoopFlag: {fileID: 0}
+    ScoopDisplay:
+      ScoopLimit: 32
+      RestockForNewContainer: 0
+      RestockPrefab: {fileID: 0}
+      RestockScale: 1
+      VisibleCount: 1
+      Magnets:
+      - {x: 0, y: 0, z: 0}
+      Drift: {x: 0.02, y: 0.015, z: 0.02}
+      Speed: 0.45
+      BobCrestPower: 1
+      Steps: 
     Unlimited: 1
     Stock: 1
     DestroyWhenEmpty: 0
@@ -352,8 +364,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flags:
-  - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
+  flags: []
 --- !u!114 &7639767731750828902
 MonoBehaviour:
   m_ObjectHideFlags: 0

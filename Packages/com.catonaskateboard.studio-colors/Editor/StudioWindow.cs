@@ -47,6 +47,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             Undo.undoRedoPerformed += HandleUndo;
             StudioFieldMenu.Changed += FieldChanged;
             EditorApplication.projectChanged += HandleUndo;
+            StudioSourceChanges.Changed += HandleUndo;
             session.Restore();
             if (session.Draft != null)
                 serialized = new SerializedObject(session.Draft);
@@ -68,6 +69,7 @@ namespace CatOnASkateboard.StudioColors.Editor
             Undo.undoRedoPerformed -= HandleUndo;
             session.Retain();
             EditorApplication.projectChanged -= HandleUndo;
+            StudioSourceChanges.Changed -= HandleUndo;
             StudioFieldMenu.Changed -= FieldChanged;
             serialized?.Dispose();
             serialized = null;

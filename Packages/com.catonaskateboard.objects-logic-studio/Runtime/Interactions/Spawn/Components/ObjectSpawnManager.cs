@@ -270,6 +270,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
         }
 
+        /// <summary>Composes Day Flow character offsets after Animator evaluation.</summary>
+        private void LateUpdate()
+        {
+            // Completion rules have no character playback and need no additional sampling.
+            flow?.LateTick();
+        }
+
         /// <summary>Creates the selected prefabs at this object's configured output without creating runtime UI.</summary>
         /// <param name="state">Source instance whose condition cycle is being committed.</param>
         private void Spawn(SpawnProgress state)

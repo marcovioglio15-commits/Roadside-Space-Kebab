@@ -52,12 +52,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <returns>True when at least one assigned definition requires confirmation.</returns>
         internal static bool RequiresInput(SerializedProperty settings)
         {
-            SerializedProperty definitions = settings.FindPropertyRelative("Modifications");
-            for (int index = 0; index < definitions.arraySize; index++)
-                if (definitions.GetArrayElementAtIndex(index).objectReferenceValue is ContactModificationDefinition definition
-                    && definition.Settings?.Preparation is { Snap: true, RequireInput: true })
-                    return true;
-            return false;
+            return settings.boxedValue is ContactModificationSettings configuration && configuration.RequiresInput;
         }
 
         #endregion

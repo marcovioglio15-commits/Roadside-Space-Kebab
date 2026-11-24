@@ -85,10 +85,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             IngredientFlag = flag;
             AssemblyIngredient row = AssemblyIngredientSelection.FindRow(owner.Settings, flag);
             IsOptional = row != null && row.Optional;
-            // Keep the original ingredient flags and the row's explicit equivalent for order receipts.
+            // Order receipts retain the actual ingredient membership, including nested recipes.
             HashSet<ObjectFlag> flags = new HashSet<ObjectFlag>(grab.Item.Identity.ActiveFlags);
-            if (row != null && row.OrderFlag != null)
-                flags.Add(row.OrderFlag);
             grab.Item.CollectRecipeFlags(flags);
             ingredientFlags = new ObjectFlag[flags.Count];
             flags.CopyTo(ingredientFlags);

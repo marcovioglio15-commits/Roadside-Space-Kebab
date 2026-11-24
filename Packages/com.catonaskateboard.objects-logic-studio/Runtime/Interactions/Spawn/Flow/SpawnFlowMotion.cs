@@ -12,12 +12,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly Vector3 origin;
         private readonly Quaternion orientation;
         private readonly Vector3 scale;
-        private SpawnFlowAnimation path;
-        private PlayerToolPose from;
-        private int index;
-        private float elapsed;
-        private Vector3 entryVelocity;
-        private Vector3 exitVelocity;
+        private readonly SpawnFlowPosePlayback playback = new SpawnFlowPosePlayback();
+        private bool world;
+        private bool enabled;
 
         #endregion
 
@@ -47,12 +44,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Begin(SpawnFlowAnimation animation)
         {
             // Departure begins from the current pose rather than snapping back to the spawn origin.
-            path = animation;
-            index = 0;
-            elapsed = 0f;
+            world = animation.Space == SpawnFlowSpace.World;
+            enabled = animation.Enabled;
             Speed = 0f;
-            entryVelocity = Vector3.zero;
-            from = path.Space == SpawnFlowSpace.World ? new PlayerToolPose
+            playback.Begin(animation, world ? new PlayerToolPose
             {
                 Position = target.position,
                 Rotation = target.eulerAngles,
@@ -62,8 +57,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Position = Quaternion.Inverse(orientation) * (target.position - origin),
                 Rotation = (Quaternion.Inverse(orientation) * target.rotation).eulerAngles,
                 Scale = new Vector3(target.localScale.x / scale.x, target.localScale.y / scale.y, target.localScale.z / scale.z)
-            };
-            PrepareSegment();
+            });
             Tick(0f);
         }
 
@@ -74,43 +68,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             Speed = 0f;
             // Overshoot is retained across delays and zero-duration frames, keeping low frame rates accurate.
-            if (target == null || path == null || !path.Enabled)
+            if (target == null || !enabled)
                 return true;
-            elapsed += delta;
-            while (index < path.Keyframes.Length)
-            {
-                SpawnFlowKeyframe frame = path.Keyframes[index];
-                if (elapsed < frame.Delay)
-                    return false;
-                float amount = frame.Duration > 0f ? Mathf.Clamp01((elapsed - frame.Delay) / frame.Duration) : 1f;
-                float eased = Mathf.SmoothStep(0f, 1f, amount);
-                Vector3 position = SpawnFlowPathSampling.Position(path.Interpolation, from.Position, frame.Pose.Position,
-                    entryVelocity, exitVelocity, frame.Duration, amount);
-                Quaternion rotation = TransformRotation.Sample(from.Rotation, frame.Pose.Rotation, eased, frame.Direction);
-                Vector3 size = Vector3.Lerp(from.Scale, frame.Pose.Scale, eased);
-                bool world = path.Space == SpawnFlowSpace.World;
-                // Only physical travel drives the gait; zero-duration placement never accelerates the clip.
-                if (delta > 0f && frame.Duration > 0f)
-                    Speed += Vector3.Distance(target.position, world ? position : origin + orientation * position) / delta;
-                target.SetPositionAndRotation(world ? position : origin + orientation * position, world ? rotation : orientation * rotation);
-                target.localScale = world ? size : Vector3.Scale(scale, size);
-                if (amount < 1f)
-                    return false;
-                from = frame.Pose;
-                elapsed -= frame.Delay + frame.Duration;
-                index++;
-                entryVelocity = exitVelocity;
-                PrepareSegment();
-            }
-            return true;
-        }
-
-        /// <summary>Caches the next shared tangent only when a segment starts.</summary>
-        private void PrepareSegment()
-        {
-            // Path arrays are inspected at boundaries rather than rescanned during movement frames.
-            exitVelocity = path != null && path.Enabled && index < path.Keyframes.Length
-                ? SpawnFlowPathSampling.ExitVelocity(path, index, from.Position) : Vector3.zero;
+            bool finished = playback.Tick(delta);
+            PlayerToolPose pose = playback.Pose;
+            Quaternion rotation = Quaternion.Euler(pose.Rotation);
+            Speed = delta > 0f ? playback.Distance / delta : 0f;
+            target.SetPositionAndRotation(world ? pose.Position : origin + orientation * pose.Position, world ? rotation : orientation * rotation);
+            target.localScale = world ? pose.Scale : Vector3.Scale(scale, pose.Scale);
+            return finished;
         }
 
         #endregion

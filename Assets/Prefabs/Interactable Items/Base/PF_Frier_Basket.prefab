@@ -125,6 +125,11 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 4294967295
       DrawGizmos: 1
+    MagnetLock:
+      Enabled: 0
+      Instant: 0
+      Duration: 0.35
+      Magnets: []
     ConsumeOn:
       Enabled: 0
       DialogueName: 
@@ -219,13 +224,13 @@ MonoBehaviour:
   settings:
     Target:
       Distance: 3
-      Mode: 0
+      Mode: 2
       SolidHitOnly: 0
       CenterRadius: 0.2
       Offset: {x: -0.155, y: 0.325, z: 0.292}
       ObstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967295
+        m_Bits: 32567
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 3003482873436781798, guid: 41cb897d69e4ec29524fca6075973c2e, type: 3}
@@ -303,13 +308,13 @@ MonoBehaviour:
   settings:
     Target:
       Distance: 3
-      Mode: 0
+      Mode: 2
       SolidHitOnly: 0
       CenterRadius: 0.2
       Offset: {x: -0.155, y: 0.325, z: 0.292}
       ObstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967295
+        m_Bits: 32567
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 7576674769820030107, guid: da1b7bc7b4ce7196a9667b388f0f253c, type: 3}
@@ -387,13 +392,13 @@ MonoBehaviour:
   settings:
     Target:
       Distance: 3
-      Mode: 0
+      Mode: 2
       SolidHitOnly: 0
       CenterRadius: 0.2
       Offset: {x: -0.155, y: 0.325, z: 0.292}
       ObstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967295
+        m_Bits: 32567
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 2578056937270180844, guid: 2e346e4f55b1dde43ce0a7274433952b, type: 3}
@@ -471,13 +476,13 @@ MonoBehaviour:
   settings:
     Target:
       Distance: 3
-      Mode: 0
+      Mode: 2
       SolidHitOnly: 0
       CenterRadius: 0.2
       Offset: {x: -0.155, y: 0.325, z: 0.292}
       ObstacleMask:
         serializedVersion: 2
-        m_Bits: 4294967295
+        m_Bits: 32567
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 4872291968861290408, guid: 165fadd03675918042b41667cca4bf37, type: 3}

@@ -2,10 +2,10 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace CatOnASkateboard.ObjectsLogicStudio.Editor
+namespace CatOnASkateboard.StudioColors.Editor
 {
     /// <summary>Renders preview geometry and maps native handle picking to the same viewport at any editor DPI.</summary>
-    internal sealed class ObjectLayoutViewport : IDisposable
+    public sealed class StudioLayoutViewport : IDisposable
     {
         #region State
 
@@ -21,6 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         private readonly PreviewRenderUtility preview = new PreviewRenderUtility();
         private Rect lastRect;
+        private int handleControl;
 
         #endregion
 
@@ -28,8 +29,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Lifecycle
 
-        /// <summary>Sets a common camera and lighting treatment for Object Logic Studio placement tools.</summary>
-        internal ObjectLayoutViewport()
+        /// <summary>Sets a common camera and lighting treatment for Studio placement tools.</summary>
+        public StudioLayoutViewport()
         {
             preview.cameraFieldOfView = 35f;
             preview.camera.clearFlags = CameraClearFlags.Color;
@@ -51,8 +52,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="mode">Retained move, rotate, scale or hand index.</param>
         /// <param name="rotate">Whether the selected point has an orientation.</param>
         /// <param name="scale">Whether the selected point has an editable scale.</param>
-        internal static void DrawTools(ref int mode, bool rotate = true, bool scale = false)
+        public static void DrawTools(ref int mode, bool rotate = true, bool scale = false)
         {
+            // Hidden handle modes cannot remain active after a shortcut from another layout.
+            if (mode == 1 && !rotate || mode == 2 && !scale)
+                mode = 0;
             // Preserve keyboard shortcuts even when some tools are hidden.
             for (int index = 0; index < tools.Length; index++)
                 if ((index != 1 || rotate) && (index != 2 || scale)
@@ -61,7 +65,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         }
 
         /// <summary>Displays navigation shortcuts in each placement preview.</summary>
-        internal static void DrawNavigationHint()
+        public static void DrawNavigationHint()
         {
             GUILayout.Label(navigationHint, EditorStyles.miniLabel);
         }
@@ -69,7 +73,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Uses the last drawn rectangle when GUILayout is only measuring controls.</summary>
         /// <param name="measured">Viewport rectangle returned by the caller's layout.</param>
         /// <returns>Stable viewport in window GUI points.</returns>
-        internal Rect ResolveRect(Rect measured)
+        public Rect ResolveRect(Rect measured)
         {
             // GUILayout returns a dummy rectangle during Layout, when handles register their pick distances.
             if (Event.current.type == EventType.Repaint)
@@ -86,10 +90,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="context">Current layout settings.</param>
         /// <param name="meshes">Callback that submits cached preview meshes.</param>
         /// <param name="handles">Callback that draws or updates the current handles.</param>
-        internal void Draw<T>(Rect rect, Vector2 orbit, Vector3 pivot, float distance, T context,
+        public void Draw<T>(Rect rect, Vector2 orbit, Vector3 pivot, float distance, T context,
             Action<PreviewRenderUtility, T> meshes, Action<T> handles)
         {
-            if (rect.width < 2f || rect.height < 2f || Event.current.type == EventType.Used)
+            if (rect.width < 2f || rect.height < 2f)
                 return;
 
             // Keep field of view and pixel scale consistent between display and handle picking.
@@ -100,39 +104,43 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             camera.farClipPlane = Mathf.Max(100f, distance * 20f);
             camera.aspect = rect.width / rect.height;
             Camera previous = Camera.current;
+            Matrix4x4 matrix = GUI.matrix;
+            GUI.BeginGroup(rect);
             try
             {
+                Rect local = new Rect(0f, 0f, rect.width, rect.height);
                 if (Event.current.type == EventType.Repaint)
-                    Render(rect, context, meshes, handles);
-                else if (Event.current.type == EventType.Layout || !Event.current.isMouse || rect.Contains(Event.current.mousePosition)
-                    || GUIUtility.hotControl != 0)
+                    Render(local, context, meshes, handles);
+                else
                 {
-                    // Keep the render target fixed while translating the picking projection into window space.
-                    SetInputProjection(camera, rect);
+                    // Allocate the same handle IDs on every event, even when the pointer is over another panel.
+                    EventType type = Event.current.type;
+                    bool ignored = Event.current.isMouse && !local.Contains(Event.current.mousePosition)
+                        && (handleControl == 0 || GUIUtility.hotControl != handleControl);
+                    int previousControl = GUIUtility.hotControl;
+                    if (ignored)
+                        Event.current.type = EventType.Ignore;
                     try
                     {
                         DrawHandles(camera, context, handles);
                     }
                     finally
                     {
-                        camera.ResetProjectionMatrix();
+                        if (ignored)
+                            Event.current.type = type;
+                        if (GUIUtility.hotControl == 0)
+                            handleControl = 0;
+                        else if (!ignored && previousControl == 0)
+                            handleControl = GUIUtility.hotControl;
                     }
                 }
             }
             finally
             {
                 Camera.SetupCurrent(previous);
+                GUI.matrix = matrix;
+                GUI.EndGroup();
             }
-        }
-
-        /// <summary>Aligns Unity's GUI projection and picking rays with the viewport's position in the window.</summary>
-        /// <param name="camera">Preview camera with a zero-based render target.</param>
-        /// <param name="rect">Viewport in window GUI points.</param>
-        internal static void SetInputProjection(Camera camera, Rect rect)
-        {
-            // Translate in clip space to keep the camera viewport within its render target.
-            Vector3 offset = new Vector3(2f * rect.x / rect.width, -2f * rect.y / rect.height, 0f);
-            camera.projectionMatrix = Matrix4x4.Translate(offset) * camera.projectionMatrix;
         }
 
         /// <summary>Renders the geometry and handle overlay into a single preview texture.</summary>
@@ -143,30 +151,21 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="handles">Callback that draws the handle overlay.</param>
         private void Render<T>(Rect rect, T context, Action<PreviewRenderUtility, T> meshes, Action<T> handles)
         {
-            // The render target uses a zero-based viewport while input uses the window offset.
-            GUI.BeginGroup(rect);
+            // Rendering and input share the same clipped, local viewport coordinates.
+            preview.BeginPreview(rect, GUIStyle.none);
+            Texture texture;
             try
             {
-                Rect local = new Rect(0f, 0f, rect.width, rect.height);
-                preview.BeginPreview(local, GUIStyle.none);
-                Texture texture;
-                try
-                {
-                    meshes(preview, context);
-                    preview.Render(true, false);
-                    RenderTexture.active = preview.camera.targetTexture;
-                    DrawHandles(preview.camera, context, handles);
-                }
-                finally
-                {
-                    texture = preview.EndPreview();
-                }
-                GUI.DrawTexture(local, texture, ScaleMode.StretchToFill, false);
+                meshes(preview, context);
+                preview.Render(true, false);
+                RenderTexture.active = preview.camera.targetTexture;
+                DrawHandles(preview.camera, context, handles);
             }
             finally
             {
-                GUI.EndGroup();
+                texture = preview.EndPreview();
             }
+            GUI.DrawTexture(rect, texture, ScaleMode.StretchToFill, false);
         }
 
         /// <summary>Scopes native transform handles to this camera without changing their transforms.</summary>

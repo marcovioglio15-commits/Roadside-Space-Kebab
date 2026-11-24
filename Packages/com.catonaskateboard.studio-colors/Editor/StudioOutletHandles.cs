@@ -9,16 +9,6 @@ namespace CatOnASkateboard.StudioColors.Editor
         #region Methods
         #region Drawing
 
-        /// <summary>Draws the same native position and rotation symbols in each outlet preview.</summary>
-        /// <param name="mode">Retained tool index; zero moves and one rotates.</param>
-        public static void Toolbar(ref int mode)
-        {
-            if (GUILayout.Toggle(mode == 0, new GUIContent(EditorGUIUtility.IconContent("MoveTool").image, "Move outlet (W)"), EditorStyles.toolbarButton, GUILayout.Width(36f)))
-                mode = 0;
-            if (GUILayout.Toggle(mode == 1, new GUIContent(EditorGUIUtility.IconContent("RotateTool").image, "Rotate outlet (E)"), EditorStyles.toolbarButton, GUILayout.Width(36f)))
-                mode = 1;
-        }
-
         /// <summary>Draws a compact positive-Z arrow using the same colour and screen-relative size.</summary>
         /// <param name="position">Outlet position in the current drawing frame.</param>
         /// <param name="rotation">Outlet orientation in the current drawing frame.</param>

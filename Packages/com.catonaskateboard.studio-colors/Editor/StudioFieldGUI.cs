@@ -320,6 +320,11 @@ namespace CatOnASkateboard.StudioColors.Editor
                 return property.isExpanded;
             // Unity remains responsible for custom drawers and validation of native field types.
             StudioFieldMenu.TakeNext();
+            if (property.propertyType == SerializedPropertyType.LayerMask)
+            {
+                StudioLayerMaskGUI.Draw(property, label);
+                return false;
+            }
             if (includeChildren && property.isArray && property.propertyType == SerializedPropertyType.Generic)
                 return StudioArrayGUI.Draw(property, label);
             if (includeChildren && property.propertyType == SerializedPropertyType.Generic)

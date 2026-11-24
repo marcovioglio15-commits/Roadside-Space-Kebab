@@ -30,7 +30,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private readonly AssemblyPreviewGeometry geometry = new AssemblyPreviewGeometry();
         private readonly StudioPreviewNavigation navigation = new StudioPreviewNavigation();
         private readonly AssemblyProductSettings geometrySettings = new AssemblyProductSettings();
-        private ObjectLayoutViewport viewport;
+        private StudioLayoutViewport viewport;
         private System.Action<PreviewRenderUtility, AssemblyProductSettings> drawMeshes;
         private System.Action<AssemblyProductSettings> drawHandle;
         private SerializedObject data;
@@ -94,7 +94,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             minSize = new Vector2(500f, 400f);
             data = new SerializedObject(this);
-            viewport = new ObjectLayoutViewport();
+            viewport = new StudioLayoutViewport();
             drawMeshes = geometry.Draw;
             drawHandle = DrawHandle;
             wantsMouseMove = true;
@@ -169,9 +169,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             RefreshGeometry(root);
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                ObjectLayoutViewport.DrawTools(ref mode, session.Rotatable);
+                StudioLayoutViewport.DrawTools(ref mode, session.Rotatable);
                 GUILayout.FlexibleSpace();
-                ObjectLayoutViewport.DrawNavigationHint();
+                StudioLayoutViewport.DrawNavigationHint();
                 if (GUILayout.Button(new GUIContent("Frame", "Fit the object in the preview."), EditorStyles.toolbarButton, GUILayout.Width(60f)))
                     Frame();
             }
@@ -183,9 +183,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 data.Update();
                 SerializedProperty point = data.FindProperty("session.Draft.Points").GetArrayElementAtIndex(selected);
                 float positionRange = session.Layout == ObjectPointLayout.OrbitCenters ? 20f : 2f;
-                ObjectNumericControls.Vector(point.FindPropertyRelative("Position"), -positionRange, positionRange);
+                StudioVectorControls.Draw(point.FindPropertyRelative("Position"), -positionRange, positionRange);
                 if (session.Rotatable)
-                    ObjectNumericControls.Vector(point.FindPropertyRelative("Rotation"), -360f, 360f);
+                    StudioVectorControls.Draw(point.FindPropertyRelative("Rotation"), -360f, 360f);
                 if (data.ApplyModifiedProperties())
                     hasUnsavedChanges = session.HasChanges;
                 // Reserve the viewport after Unity has measured headers and wrapped vector controls.

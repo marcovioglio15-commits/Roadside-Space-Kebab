@@ -1,67 +1,67 @@
-using CatOnASkateboard.StudioColors.Editor;
+using System;
 using UnityEditor;
 using UnityEngine;
 
 namespace CatOnASkateboard.StudioIdentity.Editor
 {
-    /// <summary>Opens flag editing independently of a closed or locked Inspector.</summary>
+    /// <summary>Edits one detached definition in the management window's shared proposal.</summary>
     internal sealed class ObjectFlagEditWindow : EditorWindow
     {
-        #region State
+        #region Fields
 
         [Header("Definition")]
-        [Tooltip("Flag being edited. Renaming preserves all existing references.")]
+        [Tooltip("Original flag identity being edited.")]
         [SerializeField]
         private ObjectFlag flag;
-        private UnityEditor.Editor inspector;
+        [Tooltip("Management proposal receiving these edits.")]
+        [SerializeField]
+        private ObjectFlagDraftSession session;
 
         #endregion
-
         #region Methods
+        #region Window
 
-        #region Lifecycle
-
-        /// <summary>Focuses a visible editor on the selected catalog entry.</summary>
-        /// <param name="target">Persistent flag definition.</param>
-        internal static void Open(ObjectFlag target)
+        /// <summary>Opens current proposed metadata without writing the source asset.</summary>
+        /// <param name="target">Selected flag identity.</param>
+        /// <param name="draft">Shared management proposal.</param>
+        internal static void Open(ObjectFlag target, ObjectFlagDraftSession draft)
         {
-            // The tool must not depend on the main Inspector's selection or lock state.
-            ObjectFlagEditWindow window = GetWindow<ObjectFlagEditWindow>("Edit Object Flag");
-            if (window.flag != null && window.flag != target)
-                AssetDatabase.SaveAssetIfDirty(window.flag);
-            window.flag = target;
-            window.minSize = new Vector2(320f, 180f);
-            window.Show();
-            window.Focus();
+            try
+            {
+                draft.Editable(target);
+                ObjectFlagEditWindow window = GetWindow<ObjectFlagEditWindow>("Edit Object Flag");
+                window.flag = target;
+                window.session = draft;
+                window.minSize = new Vector2(380f, 240f);
+                window.Show();
+                window.Focus();
+            }
+            catch (InvalidOperationException exception)
+            {
+                ObjectFlagOperations.Report(exception.Message, Array.Empty<string>());
+            }
         }
 
-        /// <summary>Saves pending definition edits and releases the embedded Inspector.</summary>
-        private void OnDisable()
-        {
-            if (flag != null)
-                AssetDatabase.SaveAssetIfDirty(flag);
-            if (inspector != null)
-                DestroyImmediate(inspector);
-        }
-
-        #endregion
-
-        #region Drawing
-
-        /// <summary>Reuses the flag Inspector's validation, Undo and catalog invalidation.</summary>
+        /// <summary>Draws the working copy with native property Undo and a multiline description.</summary>
         private void OnGUI()
         {
-            // A deleted definition never redirects editing to another flag.
-            if (flag == null)
+            // The parent owns the proposal; closing this editor never commits it.
+            if (session == null || session.Released || flag == null || session.IsDeleted(flag))
                 return;
-            UnityEditor.Editor.CreateCachedEditor(flag, null, ref inspector);
-            inspector.OnInspectorGUI();
-            if (StudioButton.Draw(new GUIContent("Save", "Save this definition without changing its identity.")))
-                AssetDatabase.SaveAssetIfDirty(flag);
+            using SerializedObject data = new SerializedObject(session.Editable(flag));
+            EditorGUILayout.PropertyField(data.FindProperty("DisplayName"));
+            EditorGUILayout.PropertyField(data.FindProperty("Group"));
+            SerializedProperty description = data.FindProperty("Description");
+            EditorGUILayout.LabelField(new GUIContent("Description", description.tooltip));
+            description.stringValue = EditorGUILayout.TextArea(description.stringValue, GUILayout.MinHeight(90f), GUILayout.ExpandHeight(true));
+            if (data.ApplyModifiedProperties())
+                session.Notify();
+            EditorGUILayout.LabelField("Changes remain in the main draft.", EditorStyles.miniLabel);
+            if (GUILayout.Button(new GUIContent("Done", "Close this editor and keep the pending changes.")))
+                Close();
         }
 
         #endregion
-
         #endregion
     }
 }

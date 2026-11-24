@@ -48,7 +48,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
 
         private readonly PlayerToolPreviewGeometry geometry = new PlayerToolPreviewGeometry();
         private readonly StudioPreviewNavigation navigation = new StudioPreviewNavigation();
-        private PreviewRenderUtility preview;
+        private StudioLayoutViewport viewport;
+        private System.Action<PreviewRenderUtility, Transform> drawMeshes;
+        private System.Action<Transform> drawHandle;
         private SerializedObject data;
         private bool dirty = true;
         private string status = string.Empty;
@@ -103,11 +105,9 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         {
             minSize = new Vector2(480f, 420f);
             data = new SerializedObject(this);
-            preview = new PreviewRenderUtility();
-            preview.cameraFieldOfView = 35f;
-            preview.camera.clearFlags = CameraClearFlags.Color;
-            preview.camera.backgroundColor = new Color(0.12f, 0.13f, 0.15f);
-            preview.ambientColor = Color.gray;
+            viewport = new StudioLayoutViewport();
+            drawMeshes = DrawGeometry;
+            drawHandle = DrawHandle;
             EditorApplication.projectChanged += Refresh;
             EditorApplication.hierarchyChanged += Refresh;
             Undo.undoRedoPerformed += Refresh;
@@ -125,7 +125,7 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             navigation.Release();
             geometry.Dispose();
             data?.Dispose();
-            preview?.Cleanup();
+            viewport?.Dispose();
         }
 
         /// <summary>Invalidates cached geometry after hierarchy, import or Undo changes.</summary>
@@ -170,14 +170,16 @@ namespace CatOnASkateboard.PlayerStudio.Editor
             // Keep source conflicts visible at Apply; a repaint never reloads a pending proposal.
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                StudioOutletHandles.Toolbar(ref mode);
+                StudioLayoutViewport.DrawTools(ref mode);
+                if (position.width >= 650f)
+                    StudioLayoutViewport.DrawNavigationHint();
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button(new GUIContent("Frame", "Fit the source geometry. Alt-drag or right-drag: orbit; middle-drag: pan; wheel: zoom."), EditorStyles.toolbarButton))
+                if (GUILayout.Button(new GUIContent("Frame", "Fit the source geometry. Alt + left drag orbits. Right drag looks and flies. Middle drag pans. Wheel zooms."), EditorStyles.toolbarButton))
                     Frame();
             }
             data.Update();
-            PlayerToolFields.Vector(data.FindProperty("pose.Position"), -5f, 5f);
-            PlayerToolFields.Vector(data.FindProperty("pose.Rotation"), -180f, 180f);
+            StudioVectorControls.Draw(data.FindProperty("pose.Position"), -5f, 5f);
+            StudioVectorControls.Draw(data.FindProperty("pose.Rotation"), -180f, 180f);
             data.ApplyModifiedProperties();
             Transform anchor = PlayerHierarchy.Resolve(hierarchySource.transform, baselinePath);
             if (anchor != null && pose.IsValid())
@@ -211,39 +213,18 @@ namespace CatOnASkateboard.PlayerStudio.Editor
         /// <param name="anchor">Existing transform carrying the muzzle offset.</param>
         private void DrawViewport(Rect rect, Transform anchor)
         {
-            if (rect.width < 2f || rect.height < 2f)
-                return;
-            GUI.BeginGroup(rect);
-            Rect local = new Rect(0f, 0f, rect.width, rect.height);
-            if (navigation.Handle(local, ref orbit, ref focus, ref distance, ref mode))
+            Rect area = viewport.ResolveRect(rect);
+            if (navigation.Handle(area, ref orbit, ref focus, ref distance, ref mode))
                 Frame();
-            Quaternion rotation = Quaternion.Euler(orbit.x, orbit.y, 0f);
-            preview.camera.transform.SetPositionAndRotation(focus - rotation * Vector3.forward * distance, rotation);
-            preview.camera.nearClipPlane = Mathf.Max(0.001f, distance * 0.001f);
-            preview.camera.farClipPlane = Mathf.Max(100f, distance * 20f);
-            preview.camera.aspect = local.width / local.height;
-            preview.BeginPreview(local, GUIStyle.none);
-            Texture texture;
-            try
-            {
-                if (Event.current.type == EventType.Repaint)
-                {
-                    geometry.Draw(preview);
-                    preview.Render(true, false);
-                }
-                using (new Handles.DrawingScope(Matrix4x4.identity))
-                {
-                    Handles.SetCamera(preview.camera);
-                    DrawHandle(anchor);
-                }
-            }
-            finally
-            {
-                texture = preview.EndPreview();
-            }
-            if (Event.current.type == EventType.Repaint)
-                GUI.DrawTexture(local, texture, ScaleMode.StretchToFill, false);
-            GUI.EndGroup();
+            viewport.Draw(area, orbit, focus, distance, anchor, drawMeshes, drawHandle);
+        }
+
+        /// <summary>Submits cached tool meshes through the shared Studio viewport renderer.</summary>
+        /// <param name="preview">Current preview renderer.</param>
+        /// <param name="anchor">Muzzle parent used by the matching handle callback.</param>
+        private void DrawGeometry(PreviewRenderUtility preview, Transform anchor)
+        {
+            geometry.Draw(preview);
         }
 
         /// <summary>Converts handle changes back into the selected muzzle parent's coordinates.</summary>

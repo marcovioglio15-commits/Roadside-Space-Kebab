@@ -180,13 +180,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="offset">Name of the optional anchor offset field.</param>
         internal static void Aim(SerializedProperty target, string mode, string offset)
         {
-            // Solid hits use the actual ray intersection, so centre tolerance and anchor offsets are unused.
+            // Centre-collider hits always use Hover's exact ray policy, including triggers.
+            if (target.FindPropertyRelative(mode).enumValueIndex == (int)HoverTargetMode.CenterCollider)
+                return;
             HoverControls.Field(target, "SolidHitOnly");
             if (target.FindPropertyRelative("SolidHitOnly").boolValue)
                 return;
             if (target.FindPropertyRelative(mode).enumValueIndex == (int)HoverTargetMode.ViewCenter)
+            {
                 HoverControls.Field(target, "CenterRadius");
-            HoverControls.Field(target, offset);
+                HoverControls.Field(target, offset);
+            }
         }
 
         /// <summary>Allows only prefab assets in a serialized GameObject field.</summary>

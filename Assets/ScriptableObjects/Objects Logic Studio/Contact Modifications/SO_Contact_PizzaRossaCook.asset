@@ -41,13 +41,17 @@ MonoBehaviour:
       ReturnRotation: 0
     Flags:
     - {fileID: 11400000, guid: c57d81d06e9bf5a4e8738ebe4f6e6647, type: 2}
-    ContactDuration: 0.2
+    ContactDuration: 0
     ContactTolerance: 0.02
     QueryInterval: 0.02
     IncludeTriggers: 0
+    IgnoreBlackHole: 1
+    IgnoreGravityGenerator: 0
+    GravityReleaseGrace: 0.75
     AllowCarriedSelf: 1
     AllowCarriedOther: 0
     Duration: 10
+    ParallelOther: 0
     CompleteAfterSeparation: 0
     ResumeAfterInterruption: 0
     RepeatAfterSeparation: 1
@@ -61,6 +65,7 @@ MonoBehaviour:
       MaterialSlot: -1
       Meshes: []
       Consume: 0
+      Interactions: []
     Other:
       Tint: 1
       Multiplier: {r: 0.6855345, g: 0.5369151, b: 0.36432487, a: 0.3019608}
@@ -69,6 +74,7 @@ MonoBehaviour:
       MaterialSlot: -1
       Meshes: []
       Consume: 0
+      Interactions: []
     ChangeContactFlag: 1
     ContactFlag: {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
     ContactFlagOperation: 0

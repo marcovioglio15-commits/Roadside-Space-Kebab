@@ -13,6 +13,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Mesh Replacement")]
         [Tooltip("Child path relative to the affected item, such as Visual/Body. Empty selects its root.")]
         public string Path = string.Empty;
+        [Tooltip("Replace the item's unique directly owned visible mesh, regardless of its child name. Use a path when several meshes qualify.")]
+        public bool PrimaryMesh;
         [Tooltip("Mesh assigned to the existing MeshFilter or SkinnedMeshRenderer at completion.")]
         public Mesh Mesh;
         [Tooltip("Also replace an existing MeshCollider's mesh on this same child. Primitive colliders keep their authored dimensions.")]
@@ -177,6 +179,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             && Preparation is { Snap: false, Animate: false }
             && Self is { HasAppearance: false, Consume: false, Interactions: { Length: 0 } }
             && Other is { Consume: false, Interactions: { Length: 0 }, Meshes: { Length: 0 } };
+
+        /// <summary>Whether magnets can prepare independent counterparts without competing source effects.</summary>
+        internal bool SupportsMagnetParallel => !WhileContact && Self is { HasAppearance: false, Consume: false, Interactions: { Length: 0 } }
+            && Other is { Consume: false } && Preparation != null && (!Preparation.Animate || Preparation.AnimateOther);
 
         #endregion
 

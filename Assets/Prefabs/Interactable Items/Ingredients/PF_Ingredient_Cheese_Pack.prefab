@@ -151,7 +151,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -194,6 +193,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!114 &3027891722544293535
 MonoBehaviour:
@@ -416,8 +416,7 @@ MonoBehaviour:
     Priority: 99
     Contact:
       Enabled: 0
-      Flags:
-      - {fileID: 11400000, guid: 502cd1abface4603a56e2231e33003ff, type: 2}
+      Flags: []
       Match: 0
       Tolerance: 0.1
       IncludeTriggers: 1
@@ -426,6 +425,7 @@ MonoBehaviour:
     - Name: Slice 1
       Consume: 1
       KeepOutputsHeld: 1
+      ThrowAsShuriken: 1
       Meshes: []
       Materials: []
       Spawns:
@@ -436,6 +436,7 @@ MonoBehaviour:
         Position: {x: 0, y: 0.1, z: 0}
         Rotation: {x: 0, y: 0, z: 0}
     Sound: 1
+    SoundEvent: 0
     Ingredient: 2
   action: {fileID: -514035382857878761, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
 --- !u!114 &4698496195298647205

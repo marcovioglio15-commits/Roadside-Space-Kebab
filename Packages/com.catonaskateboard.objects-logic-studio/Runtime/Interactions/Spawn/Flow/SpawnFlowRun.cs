@@ -208,6 +208,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Advances one visitor outside interaction callback stacks and honors gameplay pause.</summary>
         internal void Tick()
         {
+            // Remove additive poses before path sampling, including frames paused by an interaction lock.
+            characterAnimation?.RestoreTransforms();
             if (phase == Phase.Entering)
             {
                 EnterFirstDay();
@@ -239,7 +241,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 FinishStep();
                 return;
             }
-            characterAnimation?.Tick();
+            characterAnimation?.Tick(Time.deltaTime);
             switch (phase)
             {
                 case Phase.AwaitingStart:
@@ -284,6 +286,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         FinishStep();
                     break;
             }
+        }
+
+        /// <summary>Applies character offsets after controller animation and the current travel sample.</summary>
+        internal void LateTick()
+        {
+            // Reapply the frozen sample during pause without advancing animation time.
+            characterAnimation?.ApplyTransforms();
         }
 
         /// <summary>Creates an inactive clone and resolves its exact completion component before activation.</summary>

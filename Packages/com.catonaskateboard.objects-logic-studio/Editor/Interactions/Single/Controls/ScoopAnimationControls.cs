@@ -68,14 +68,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     if (reference)
                         HoverControls.Field(frame, "Space", "Position Reference");
-                    ObjectNumericControls.Vector(frame.FindPropertyRelative("Position"), caption: reference ? "Position Offset" : named ? "Previous Target Offset" : "Pivot Offset");
+                    StudioVectorControls.Draw(frame.FindPropertyRelative("Position"), caption: reference ? "Position Offset" : named ? "Previous Target Offset" : "Pivot Offset");
                 }
             if (Group(frame.FindPropertyRelative("Rotation"), "Rotation Settings"))
                 using (new StudioIndentScope())
                 {
                     HoverControls.Field(frame, "Rotate");
                     if (frame.FindPropertyRelative("Rotate").boolValue)
-                        ObjectNumericControls.Vector(frame.FindPropertyRelative("Rotation"), -180f, 180f, "Rotation Offset");
+                        StudioVectorControls.Draw(frame.FindPropertyRelative("Rotation"), -180f, 180f, "Rotation Offset");
                 }
             if (Group(frame.FindPropertyRelative("Duration"), "Travel Settings"))
                 using (new StudioIndentScope())
@@ -88,7 +88,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     HoverControls.Field(frame, "Resize");
                     if (frame.FindPropertyRelative("Resize").boolValue)
-                        ObjectNumericControls.Vector(frame.FindPropertyRelative("Scale"), 0.01f, 5f);
+                        StudioVectorControls.Draw(frame.FindPropertyRelative("Scale"), 0.01f, 5f);
                 }
         }
 

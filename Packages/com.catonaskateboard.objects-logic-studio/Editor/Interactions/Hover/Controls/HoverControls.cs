@@ -31,7 +31,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     Field(settings, "targetMode");
                     Field(settings, "playerDistance");
-                    if ((HoverDetectionMode)settings.FindPropertyRelative("targetMode").enumValueIndex == HoverDetectionMode.ViewCenter)
+                    if ((HoverTargetMode)settings.FindPropertyRelative("targetMode").enumValueIndex == HoverTargetMode.ViewCenter)
                         Field(settings, "centerRadius");
                     Field(settings, "queryInterval");
                     Field(settings, "releaseDelay");

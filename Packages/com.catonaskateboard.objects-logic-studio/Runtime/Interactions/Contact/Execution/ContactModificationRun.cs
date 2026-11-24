@@ -33,6 +33,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool running;
         private bool retained;
         private bool effectsStarted;
+        private bool preparationStarted;
         private bool returning;
         private float revertAt = -1f;
         private string lastWarning = string.Empty;
@@ -43,6 +44,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Flags, timing and effects owned by this independent modification.</summary>
         internal ContactModificationRule Settings => settings;
+        /// <summary>Whether owner-local docking replaces the rule's legacy snap.</summary>
+        internal bool UsesMagnets => owner.Settings.MagnetLock.Enabled;
         /// <summary>Exact counterpart retained by this rule until its transaction releases.</summary>
         internal ObjectItem Counterpart => signalingOther != null ? signalingOther : other;
         /// <summary>Shared item whose reservations use this run as a distinct ownership token.</summary>
@@ -56,11 +59,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Whether any transition owned by this rule is running.</summary>
         internal bool IsRunning => running || returning || identityRun.IsRunning || parallel is { Running: true };
         /// <summary>Whether this rule retains a snapped item while awaiting its Button.</summary>
-        internal bool Waiting => preparation.Waiting;
+        internal bool Waiting => preparation.Waiting || parallel is { Waiting: true };
         /// <summary>Whether an interrupted visual transition retains its counterpart.</summary>
         internal bool IsPaused => paused;
         /// <summary>Whether the effect is actively advancing rather than preparing, retaining or returning.</summary>
-        internal bool IsAudible => parallel is { Running: true } || running && effectsStarted && !paused && !IsLocked && ToolAllowed;
+        internal bool IsAudible => parallel is { Audible: true } || running && effectsStarted && !paused && !IsLocked && ToolAllowed;
 
         #endregion
 
@@ -77,7 +80,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             owner = component;
             parallel?.Clear(this, true);
             settings = configuration;
-            parallel = settings.ParallelOther ? parallel ?? new ContactParallelEffects() : null;
+            parallel = settings.ParallelOther || owner.Settings.MagnetLock.Enabled && settings.SupportsMagnetParallel
+                ? parallel ?? new ContactParallelEffects() : null;
             contacts.Clear();
             entered.Clear();
             completed.Clear();
@@ -140,7 +144,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (Time.time >= nextQuery)
                 {
                     nextQuery = Time.time + settings.QueryInterval;
-                    detection.Query(Item, settings, contacts);
+                    QueryContacts();
                     identityRun.Tick(this, contacts);
                 }
                 return;
@@ -149,10 +153,52 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if ((!IsLocked && ToolAllowed || settings.WhileContact && (running || retained)) && Time.time >= nextQuery)
             {
                 nextQuery = Time.time + settings.QueryInterval;
-                detection.Query(Item, settings, contacts);
+                QueryContacts();
                 UpdateContacts();
             }
             Advance(false);
+        }
+
+        /// <summary>Combines physical contacts with retained docking ownership for this rule.</summary>
+        private void QueryContacts()
+        {
+            detection.Query(Item, settings, contacts);
+            owner.Magnets.Collect(contacts, this);
+        }
+
+        /// <summary>Cancels the current counterpart before its magnet releases physics.</summary>
+        /// <param name="item">Participant leaving the docking slot.</param>
+        internal void ReleaseMagnetContact(ObjectItem item)
+        {
+            if (other == item)
+                Cancel();
+            identityRun.ReleaseContact(this, item);
+            parallel?.ReleaseContact(this, item);
+            contacts.Remove(item);
+            entered.Remove(item);
+        }
+
+        /// <summary>Claims a free slot and waits for attraction before starting independent effects.</summary>
+        /// <param name="item">Participant accepted by this rule.</param>
+        /// <returns>True when docking is disabled or this item reached its slot.</returns>
+        internal bool PrepareDock(ObjectItem item)
+        {
+            return owner.Magnets.Accepts(item, this) && owner.Magnets.Ready(item);
+        }
+
+        /// <summary>Checks whether attraction already owns this participant.</summary>
+        /// <param name="item">Participant waiting for preparation.</param>
+        /// <returns>True while this rule owns its magnet lease.</returns>
+        internal bool HasDock(ObjectItem item)
+        {
+            return owner.Magnets.Owns(item, this);
+        }
+
+        /// <summary>Restores docking physics when this modification finishes or is cancelled.</summary>
+        /// <param name="item">Participant whose modification ended.</param>
+        internal void ReleaseDock(ObjectItem item)
+        {
+            owner.Magnets.ReleaseOwned(item, this);
         }
 
         /// <summary>Shares one contact query among all independent tint transitions on this rule.</summary>
@@ -167,7 +213,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (Time.time >= nextQuery)
             {
                 nextQuery = Time.time + settings.QueryInterval;
-                detection.Query(Item, settings, contacts);
+                QueryContacts();
                 parallel.Scan(this, contacts);
             }
             parallel.Tick(this, contacts);
@@ -195,6 +241,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 if (IsLocked || !ToolAllowed)
                     return;
+                if (!owner.Magnets.Ready(other))
+                    return;
+                if (!preparationStarted)
+                {
+                    preparation.Begin(owner.transform, other, settings.Preparation, owner.Settings.MagnetLock.Enabled);
+                    preparationStarted = true;
+                }
                 preparation.Tick(Time.deltaTime);
                 if (!preparation.Ready)
                     return;
@@ -235,7 +288,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when the component may start this modification.</returns>
         internal bool Available(InteractionChannels channels)
         {
-            return owner.Available(channels);
+            return parallel == null ? owner.Available(channels) : owner.isActiveAndEnabled && !owner.IsLocked && owner.ToolAllowed
+                && Item != null && !Item.IsBlockedByOthers(this, channels);
         }
 
         /// <summary>Publishes a rule event while preserving its duration and reversible identity context.</summary>
@@ -260,7 +314,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True while this contact still owns its timed operation.</returns>
         internal bool KeepsEffect(ObjectItem participant)
         {
-            return settings.IdentityOnly ? identityRun.IsModifying(participant) : other == participant && (IsRunning || IsPaused);
+            return settings.IdentityOnly ? identityRun.IsModifying(participant)
+                : parallel != null ? parallel.IsModifying(participant) : other == participant && (IsRunning || IsPaused);
         }
 
         #endregion
@@ -303,6 +358,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return processed;
         }
 
+        /// <summary>Estimates completion time for occupied-magnet selection.</summary>
+        /// <param name="item">Participant whose remaining transition is requested.</param>
+        /// <returns>Remaining preparation and effect seconds, or infinity while awaiting input.</returns>
+        internal float Remaining(ObjectItem item)
+        {
+            // Independent contacts retain their own start time and preparation sequence.
+            return parallel != null ? parallel.Remaining(item, settings.Duration)
+                : !effectsStarted ? settings.Duration + preparation.Remaining
+                : Mathf.Max(0f, settings.Duration - (Time.time - started));
+        }
+
         /// <summary>Checks transaction state and shared restrictions before selecting a matching contact.</summary>
         /// <param name="candidate">Already matched counterpart being considered.</param>
         /// <returns>True when this rule can acquire or resume the counterpart.</returns>
@@ -330,7 +396,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when this rule was awaiting the request.</returns>
         internal bool Confirm()
         {
-            return preparation.Confirm();
+            return parallel != null ? parallel.Confirm() : preparation.Confirm();
         }
 
         /// <summary>Maintains continuous per-item timing and selects one deterministic ready participant.</summary>
@@ -417,9 +483,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Failed ownership acquisition does not consume contact time or modify either object.
             if (!Item.Acquire(this, InteractionChannels.None))
                 return;
-            if (!candidate.Acquire(this, InteractionChannels.None))
+            if (!owner.Magnets.Accepts(candidate, this) || !candidate.Acquire(this, InteractionChannels.None))
             {
                 Item.Release(this);
+                ReleaseDock(candidate);
                 return;
             }
             if (!settings.Preparation.ValidateTarget(settings.Preparation.AnimateOther ? candidate : Item, out string warning)
@@ -430,6 +497,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 otherEffect?.Cancel();
                 Item.Release(this);
                 candidate.Release(this);
+                ReleaseDock(candidate);
                 Report(warning);
                 // Invalid bindings are retried only after separation, avoiding recurring allocations and warnings.
                 failed.Add(candidate);
@@ -438,13 +506,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             other = candidate;
             revertAt = -1f;
             Item.Acquire(this, settings.BlockSelf);
-            candidate.Acquire(this, settings.BlockOther | (settings.Preparation.HoldsOther ? InteractionChannels.Grab : InteractionChannels.None));
+            candidate.Acquire(this, settings.BlockOther | (settings.Preparation.HoldsOther && !owner.Settings.MagnetLock.Enabled ? InteractionChannels.Grab : InteractionChannels.None));
             started = Time.time;
             elapsed = 0f;
             running = true;
             effectsStarted = false;
             lastWarning = string.Empty;
-            preparation.Begin(owner.transform, candidate, settings.Preparation);
+            preparationStarted = !owner.Settings.MagnetLock.Enabled;
+            if (preparationStarted)
+                preparation.Begin(owner.transform, candidate, settings.Preparation);
         }
 
         #endregion
@@ -507,6 +577,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.WhileContact)
             {
                 // Keep visual ownership but release interaction restrictions so either item may move away.
+                ReleaseDock(other);
                 retained = true;
                 Item.Acquire(this, InteractionChannels.None);
                 other.Acquire(this, InteractionChannels.None);
@@ -573,6 +644,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Item.Release(this);
             if (other != null)
                 other.Release(this);
+            ReleaseDock(other);
             other = null;
             revertAt = -1f;
             selfEffect = otherEffect = null;

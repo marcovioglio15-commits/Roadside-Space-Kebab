@@ -60,11 +60,14 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                 return;
             dirty = false;
             List<ObjectFlag> found = new List<ObjectFlag>();
+            HashSet<string> paths = new HashSet<string>();
             foreach (string guid in AssetDatabase.FindAssets("t:ObjectFlag"))
             {
-                ObjectFlag flag = AssetDatabase.LoadAssetAtPath<ObjectFlag>(AssetDatabase.GUIDToAssetPath(guid));
-                if (flag != null)
-                    found.Add(flag);
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                if (paths.Add(path))
+                    foreach (UnityEngine.Object asset in AssetDatabase.LoadAllAssetsAtPath(path))
+                        if (asset is ObjectFlag flag)
+                            found.Add(flag);
             }
             found.Sort((first, second) => StringComparer.OrdinalIgnoreCase.Compare(first.DisplayName, second.DisplayName));
             flags = found.ToArray();
@@ -96,19 +99,27 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             // Validate before allocating an asset or creating project folders.
             if (string.IsNullOrWhiteSpace(name) || Find(name.Trim()) != null)
                 throw new InvalidOperationException("Choose a nonempty flag name that is not already in the catalog.");
-            EnsureFolder(folder);
-            string fileName = name.Trim();
-            foreach (char invalid in Path.GetInvalidFileNameChars())
-                fileName = fileName.Replace(invalid, '_');
             ObjectFlag flag = ScriptableObject.CreateInstance<ObjectFlag>();
             flag.DisplayName = name.Trim();
             flag.Group = group ?? string.Empty;
             flag.Description = description ?? string.Empty;
-            AssetDatabase.CreateAsset(flag, AssetDatabase.GenerateUniqueAssetPath(folder + "/" + fileName + ".asset"));
+            AssetDatabase.CreateAsset(flag, NewAssetPath(name));
             Undo.RegisterCreatedObjectUndo(flag, "Create object flag");
             AssetDatabase.SaveAssetIfDirty(flag);
             Invalidate();
             return flag;
+        }
+
+        /// <summary>Chooses a safe path only when an explicit creation or Apply is requested.</summary>
+        /// <param name="name">Flag display name.</param>
+        /// <returns>A unique project path for the new definition.</returns>
+        internal static string NewAssetPath(string name)
+        {
+            EnsureFolder(folder);
+            string fileName = name.Trim();
+            foreach (char invalid in Path.GetInvalidFileNameChars())
+                fileName = fileName.Replace(invalid, '_');
+            return AssetDatabase.GenerateUniqueAssetPath(folder + "/" + fileName + ".asset");
         }
 
         /// <summary>Creates missing project folders for an explicitly requested flag asset.</summary>

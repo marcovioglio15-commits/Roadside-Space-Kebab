@@ -110,9 +110,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Inactive renderers are excluded from neutral placement guides.
             Matrix4x4 basis = (includeRootScale ? Matrix4x4.Scale(source.transform.localScale) : Matrix4x4.identity)
                 * source.transform.worldToLocalMatrix;
-            foreach (Renderer renderer in source.GetComponentsInChildren<Renderer>())
+            // A product used as an ingredient reaches this slot with its completed mesh already applied.
+            ItemAppearanceSettings guideAppearance = magnet >= 0 && source.TryGetComponent(out ObjectAssemblyProduct guide)
+                ? guide.Settings.CompletedAppearance : null;
+            foreach (Renderer renderer in source.GetComponentsInChildren<Renderer>(true))
             {
-                if (!renderer.enabled)
+                if (!renderer.enabled || !InteractionHierarchy.ActiveWithin(renderer.transform, source.transform))
                     continue;
                 Mesh mesh = renderer switch
                 {
@@ -122,8 +125,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 };
                 Material[] materials = renderer.sharedMaterials;
                 string path = AnimationUtility.CalculateTransformPath(renderer.transform, source.transform);
-                ApplyAppearance(appearance, path, ref mesh, ref materials);
-                ApplyAppearance(completion, path, ref mesh, ref materials);
+                ApplyAppearance(guideAppearance, path, source, renderer.transform, ref mesh, ref materials);
+                ApplyAppearance(appearance, path, source, renderer.transform, ref mesh, ref materials);
+                ApplyAppearance(completion, path, source, renderer.transform, ref mesh, ref materials);
                 if (mesh != null)
                     entries.Add(new Entry(mesh, materials, basis * renderer.transform.localToWorldMatrix, magnet));
             }
@@ -132,14 +136,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Applies one visual layer to the preview without modifying any prefab renderer.</summary>
         /// <param name="appearance">Placement or completion appearance settings.</param>
         /// <param name="path">Renderer's path relative to its source.</param>
+        /// <param name="source">Source object providing renderer ownership.</param>
+        /// <param name="branch">Renderer branch currently being cached.</param>
         /// <param name="mesh">Current shared preview mesh.</param>
         /// <param name="materials">Current shared preview materials.</param>
-        private static void ApplyAppearance(ItemAppearanceSettings appearance, string path, ref Mesh mesh, ref Material[] materials)
+        private static void ApplyAppearance(ItemAppearanceSettings appearance, string path, GameObject source, Transform branch, ref Mesh mesh, ref Material[] materials)
         {
             if (appearance == null)
                 return;
             foreach (ContactMeshReplacement replacement in appearance.Meshes)
-                if (replacement != null && replacement.Path == path && replacement.Mesh != null)
+                if (replacement != null && replacement.Mesh != null
+                    && (replacement.PrimaryMesh ? ItemAppearanceBindings.PrimaryMesh(source.GetComponent<ObjectItem>()) == branch : replacement.Path == path))
                     mesh = replacement.Mesh;
             foreach (ItemMaterialReplacement replacement in appearance.Materials)
                 if (replacement != null && replacement.Path == path && replacement.Materials != null)

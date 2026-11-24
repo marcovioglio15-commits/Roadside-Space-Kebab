@@ -126,7 +126,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -167,6 +166,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!114 &5794248098843545310
 MonoBehaviour:
@@ -365,8 +365,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d9d61cbc39642958c94f18bc41c645b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flags:
-  - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
+  flags: []
 --- !u!114 &1447669328399265982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -405,6 +404,7 @@ MonoBehaviour:
     Operation: 1
     InitiallyLocked: 1
     Repeat: 1
+    ReleaseOnEmptyScoop: 0
     Target: {fileID: 9045658246367959723}
     Replacement: {fileID: 0}
     RequireAll: 1
@@ -412,6 +412,9 @@ MonoBehaviour:
     - Trigger: 0
       Source: {fileID: 5794248098843545310}
       Moment: 0
+      Step:
+        Block: 
+        Entry: 
       Action: {fileID: 0}
       Distance: 3
       Count: 1
@@ -455,6 +458,7 @@ MonoBehaviour:
     Operation: 0
     InitiallyLocked: 1
     Repeat: 1
+    ReleaseOnEmptyScoop: 0
     Target: {fileID: 9045658246367959723}
     Replacement: {fileID: 0}
     RequireAll: 1
@@ -462,6 +466,9 @@ MonoBehaviour:
     - Trigger: 0
       Source: {fileID: -223255509274549693}
       Moment: 1
+      Step:
+        Block: 
+        Entry: 
       Action: {fileID: 0}
       Distance: 3
       Count: 1
@@ -470,6 +477,9 @@ MonoBehaviour:
     - Trigger: 0
       Source: {fileID: -4224281006891219117}
       Moment: 1
+      Step:
+        Block: 
+        Entry: 
       Action: {fileID: 0}
       Distance: 3
       Count: 1

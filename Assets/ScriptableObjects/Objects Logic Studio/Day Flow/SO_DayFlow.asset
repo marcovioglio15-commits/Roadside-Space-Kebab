@@ -43,7 +43,7 @@ MonoBehaviour:
     Count: 1
     Minimum: 1
     Maximum: 3
-    Selection: 2
+    Selection: 1
     Steps:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 1ffcb0b9b0141834faf18db62ddc6bc4, type: 3}
@@ -111,21 +111,36 @@ MonoBehaviour:
       CharacterAnimation:
         Target: {fileID: 8094522055128292449, guid: 1ffcb0b9b0141834faf18db62ddc6bc4, type: 3}
         Walk:
+          Mode: 0
+          Tracks: []
           Path: Base Layer.Walk
           Clip: {fileID: -3661132242451996280, guid: 20a7daef952a00b4daa659ef4fb3dd53, type: 3}
           Layer: 0
           SpeedParameter: WalkSpeed
         Idle:
+          Mode: 0
+          Tracks: []
           Path: Base Layer.Idle
           Clip: {fileID: 4616504228028260366, guid: 20a7daef952a00b4daa659ef4fb3dd53, type: 3}
           Layer: 0
           SpeedParameter: 
+        Talk:
+          Mode: 2
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
         Pay:
+          Mode: 0
+          Tracks: []
           Path: Base Layer.Pay
           Clip: {fileID: -5090220924670980960, guid: 20a7daef952a00b4daa659ef4fb3dd53, type: 3}
           Layer: 0
           SpeedParameter: 
         Death:
+          Mode: 0
+          Tracks: []
           Path: Base Layer.Death
           Clip: {fileID: 789342168842323621, guid: 20a7daef952a00b4daa659ef4fb3dd53, type: 3}
           Layer: 0
@@ -133,6 +148,333 @@ MonoBehaviour:
         BlendDuration: 0.16
         SynchronizeWalk: 1
         WalkReferenceSpeed: 0.95
+    - Name: FishyBusiness
+      Prefab: {fileID: 3097014450015891093, guid: 48d58fce57e595642aec8428247dc3c8, type: 3}
+      Completions:
+      - {fileID: 4488316828472950241, guid: 48d58fce57e595642aec8428247dc3c8, type: 3}
+      - {fileID: 4488316828472950241, guid: 48d58fce57e595642aec8428247dc3c8, type: 3}
+      CompletionSteps:
+      - Block: correct
+        Entry: 
+      - Block: wrong
+        Entry: 
+      RequireAll: 0
+      ArrivalDialogueEnabled: 0
+      ArrivalDialogue: {fileID: 0}
+      NewCustomerSound: 1
+      Weight: 1
+      Delay: 0
+      Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 165, z: 0}
+      WalkIn:
+        Enabled: 1
+        Space: 1
+        Interpolation: 2
+        Keyframes:
+        - Pose:
+            Position: {x: 1.5, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1.6
+          Direction: 1
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 1.1
+          Direction: 1
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 0, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 0.35
+          Direction: 1
+      WalkOut:
+        Enabled: 1
+        Space: 1
+        Interpolation: 2
+        Keyframes:
+        - Pose:
+            Position: {x: 3, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 0.35
+          Direction: 1
+        - Pose:
+            Position: {x: 6, y: 1, z: -5}
+            Rotation: {x: 0, y: 90, z: 0}
+            Scale: {x: 1, y: 1, z: 1}
+          Delay: 0
+          Duration: 2.3
+          Direction: 1
+      CharacterAnimation:
+        Target: {fileID: 0}
+        Walk:
+          Mode: 2
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        Idle:
+          Mode: 1
+          Tracks:
+          - Target: {fileID: 4495010944617333392, guid: 48d58fce57e595642aec8428247dc3c8, type: 3}
+            IndependentLoop: 1
+            Animation:
+              Enabled: 1
+              Space: 0
+              Interpolation: 1
+              Keyframes:
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0
+                Direction: 1
+              - Pose:
+                  Position: {x: -0.011043999, y: 0.0055219997, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.051999997
+                Direction: 1
+              - Pose:
+                  Position: {x: 0.0082829995, y: -0.008973249, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.071499996
+                Direction: 1
+              - Pose:
+                  Position: {x: -0.0055219997, y: -0.011043999, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.0585
+                Direction: 1
+              - Pose:
+                  Position: {x: 0.01035375, y: 0.00759275, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.08449999
+                Direction: 1
+              - Pose:
+                  Position: {x: -0.009663499, y: 0.01173425, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.051999997
+                Direction: 1
+              - Pose:
+                  Position: {x: 0.0027609998, y: -0.0034512498, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.065
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.071499996
+                Direction: 1
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        Talk:
+          Mode: 1
+          Tracks:
+          - Target: {fileID: 3807456274776170459, guid: 48d58fce57e595642aec8428247dc3c8, type: 3}
+            IndependentLoop: 1
+            Animation:
+              Enabled: 1
+              Space: 0
+              Interpolation: 0
+              Keyframes:
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 0.92, y: 0.92, z: 0.92}
+                Delay: 0
+                Duration: 0.06
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1.08, y: 1.08, z: 1.08}
+                Delay: 0
+                Duration: 0.065
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 0.95, y: 0.95, z: 0.95}
+                Delay: 0
+                Duration: 0.055
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1.05, y: 1.05, z: 1.05}
+                Delay: 0
+                Duration: 0.06
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.05
+                Direction: 1
+          - Target: {fileID: 7978762668784895017, guid: 48d58fce57e595642aec8428247dc3c8, type: 3}
+            IndependentLoop: 1
+            Animation:
+              Enabled: 1
+              Space: 0
+              Interpolation: 0
+              Keyframes:
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 3.5, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.025
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: -2.5, y: -0, z: -0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.03
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 4, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.025
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: -3, y: -0, z: -0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.03
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.025
+                Direction: 1
+          - Target: {fileID: 4495010944617333392, guid: 48d58fce57e595642aec8428247dc3c8, type: 3}
+            IndependentLoop: 1
+            Animation:
+              Enabled: 1
+              Space: 0
+              Interpolation: 1
+              Keyframes:
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0
+                Direction: 1
+              - Pose:
+                  Position: {x: -0.011043999, y: 0.0055219997, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.04
+                Direction: 1
+              - Pose:
+                  Position: {x: 0.0082829995, y: -0.008973249, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.055
+                Direction: 1
+              - Pose:
+                  Position: {x: -0.0055219997, y: -0.011043999, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.045
+                Direction: 1
+              - Pose:
+                  Position: {x: 0.01035375, y: 0.00759275, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.065
+                Direction: 1
+              - Pose:
+                  Position: {x: -0.009663499, y: 0.01173425, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.04
+                Direction: 1
+              - Pose:
+                  Position: {x: 0.0027609998, y: -0.0034512498, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.05
+                Direction: 1
+              - Pose:
+                  Position: {x: 0, y: 0, z: 0}
+                  Rotation: {x: 0, y: 0, z: 0}
+                  Scale: {x: 1, y: 1, z: 1}
+                Delay: 0
+                Duration: 0.055
+                Direction: 1
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        Pay:
+          Mode: 2
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        Death:
+          Mode: 2
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        BlendDuration: 0
+        SynchronizeWalk: 0
+        WalkReferenceSpeed: 1.3
   Loop: 1
   PreserveScene: 1
   MainMenu: 

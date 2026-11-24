@@ -3,15 +3,8 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Selects proximity to the view center or an exact cursor hit on an owned collider.</summary>
+    /// <summary>Selects a nearby screen anchor, cursor collider hit or fixed centre-reticle collider hit.</summary>
     public enum HoverTargetMode
-    {
-        ViewCenter,
-        Cursor
-    }
-
-    /// <summary>Selects an anchor near the view centre, the mouse cursor, or an exact centre-reticle collider hit.</summary>
-    public enum HoverDetectionMode
     {
         ViewCenter,
         Cursor,
@@ -34,7 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Detection")]
         [Tooltip("View Center selects the nearest screen anchor. Cursor hits a collider with the mouse pointer. Center Collider hits a root or child collider with the fixed centre reticle, even with a locked mouse.")]
         [SerializeField]
-        private HoverDetectionMode targetMode;
+        private HoverTargetMode targetMode;
 
         [Tooltip("Maximum distance from the flagged player root to the anchor in View Center mode, or to the hit surface in collider modes.")]
         [SerializeField]
@@ -125,7 +118,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Properties
 
         /// <summary>Detection route chosen for this interaction.</summary>
-        public HoverDetectionMode TargetMode => targetMode;
+        public HoverTargetMode TargetMode => targetMode;
         /// <summary>Maximum player-to-target distance in metres.</summary>
         public float PlayerDistance => playerDistance;
         /// <summary>Center tolerance relative to viewport height.</summary>
@@ -212,7 +205,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Hidden fields are checked only when their mode uses them.
             warning = string.Empty;
-            if (targetMode is not (HoverDetectionMode.ViewCenter or HoverDetectionMode.Cursor or HoverDetectionMode.CenterCollider))
+            if (targetMode is not (HoverTargetMode.ViewCenter or HoverTargetMode.Cursor or HoverTargetMode.CenterCollider))
                 warning = "Choose a supported hover target mode.";
             else if (!float.IsFinite(playerDistance) || playerDistance <= 0f || playerDistance > 100000f)
                 warning = "Player Distance must be greater than zero and at most 100000 world units.";
@@ -224,7 +217,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Speed Threshold must be positive and finite.";
             else if (popIn && !InteractionValues.Positive(exitDuration))
                 warning = "Exit Duration must be positive and finite.";
-            else if (targetMode == HoverDetectionMode.ViewCenter && (!float.IsFinite(centerRadius) || centerRadius < 0f || centerRadius > 1f))
+            else if (targetMode == HoverTargetMode.ViewCenter && (!float.IsFinite(centerRadius) || centerRadius < 0f || centerRadius > 1f))
                 warning = "Center Radius must be between zero and one.";
             else if (obstacleMask.value == 0)
                 warning = "Obstacle Mask must include the layers that can block sight.";

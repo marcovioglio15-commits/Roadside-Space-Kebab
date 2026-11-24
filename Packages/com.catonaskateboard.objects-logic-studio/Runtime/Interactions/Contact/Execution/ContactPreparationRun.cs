@@ -24,6 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float elapsed;
         private Stage stage;
         private bool bound;
+        private bool snap;
 
         #endregion
         #region Properties
@@ -34,6 +35,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool Returning => bound && stage == Stage.Return;
         /// <summary>Whether preparation has reached the effect boundary.</summary>
         internal bool Ready => !bound || stage == Stage.Ready;
+        /// <summary>Estimated remaining preparation time; confirmation has no automatic deadline.</summary>
+        internal float Remaining => !bound ? 0f : stage switch
+        {
+            Stage.AwaitInput => float.PositiveInfinity,
+            Stage.Snap => (settings.Instant ? 0f : Mathf.Max(0f, settings.Duration - elapsed))
+                + (settings.RequireInput ? float.PositiveInfinity : settings.Animate ? settings.AnimationDuration : 0f),
+            Stage.Forward => Mathf.Max(0f, settings.AnimationDuration - elapsed),
+            Stage.Return => Mathf.Max(0f, settings.ReturnDuration - elapsed),
+            _ => 0f
+        };
 
         #endregion
         #region Methods
@@ -43,9 +54,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="root">Owner whose pivot defines the snap.</param>
         /// <param name="other">Reserved counterpart.</param>
         /// <param name="configuration">Validated preparation stages.</param>
-        internal void Begin(Transform root, ObjectItem other, ContactPreparationSettings configuration)
+        /// <param name="magnetLocked">Suppress the legacy snap when owner-local magnets already aligned this item.</param>
+        internal void Begin(Transform root, ObjectItem other, ContactPreparationSettings configuration, bool magnetLocked = false)
         {
             settings = configuration;
+            snap = configuration.Snap && !magnetLocked;
             owner = root;
             ownerFrame = root.localToWorldMatrix;
             ownerRotation = root.rotation;
@@ -57,7 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (animated != null)
                 original = PlayerToolPose.Read(animated);
             // Pickup has already been cancelled by the transaction's temporary Grab restriction.
-            body = settings.HoldsOther ? other.GetComponent<Rigidbody>() : null;
+            body = !magnetLocked && (snap || settings.Animate && settings.AnimateOther) ? other.GetComponent<Rigidbody>() : null;
             if (body != null)
             {
                 physics = new CarryBodyState(body);
@@ -67,8 +80,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             bound = true;
             elapsed = 0f;
-            stage = settings.Snap ? Stage.Snap : Stage.Forward;
-            if (!settings.Snap)
+            stage = snap ? Stage.Snap : magnetLocked && settings.RequireInput ? Stage.AwaitInput : Stage.Forward;
+            if (!snap && stage != Stage.AwaitInput)
                 StartAnimation();
             Tick(0f);
         }
@@ -81,7 +94,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             elapsed += delta;
             // Align the parent before posing an animated child in world or owner space.
-            if (settings.Snap && (!rootAnimation || stage == Stage.AwaitInput) && stage != Stage.Snap
+            if (snap && (!rootAnimation || stage == Stage.AwaitInput) && stage != Stage.Snap
                 && counterpart != null && counterpart.gameObject.activeInHierarchy)
                 Align(1f);
             switch (stage)
@@ -114,7 +127,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     break;
             }
             // An animated owner pivot may have moved after the initial alignment above.
-            if (settings.Snap && animated == owner && stage != Stage.Snap
+            if (snap && animated == owner && stage != Stage.Snap
                 && counterpart != null && counterpart.gameObject.activeInHierarchy)
                 Align(1f);
         }
@@ -152,7 +165,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 if (animated != null)
                     original.Apply(animated);
-                if (settings.Snap && counterpart != null)
+                if (snap && counterpart != null)
                     counterpart.SetPositionAndRotation(position, rotation);
             }
             else if (stage == Stage.Return && animated != null)
