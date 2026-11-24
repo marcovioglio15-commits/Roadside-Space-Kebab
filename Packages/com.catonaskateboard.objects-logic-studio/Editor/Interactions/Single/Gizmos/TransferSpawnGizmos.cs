@@ -63,6 +63,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             ScoopDisplaySettings display = dispenser.Settings.ScoopDisplay;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(0.52f, 0.91f, 0.78f), dispenser.transform.localToWorldMatrix);
+            if (display.Placement == ScoopMagnetMode.ContactMagnet)
+            {
+                if (Application.isPlaying && dispenser.RemainingCount > 0)
+                {
+                    Handles.DrawWireCube(dispenser.ScoopOrigin.position, display.Drift * 2f + Vector3.one * 0.015f);
+                    Handles.Label(dispenser.ScoopOrigin.position, "Contact supply");
+                }
+                return;
+            }
             for (int index = 0; index < display.Magnets.Length; index++)
             {
                 Vector3 magnet = display.Magnets[index];

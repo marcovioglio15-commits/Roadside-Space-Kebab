@@ -541,7 +541,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Commits mesh effects and a single consumption receipt before releasing ownership.</summary>
         private void Complete()
         {
-            if (!selfEffect.CanCommit() || !otherEffect.CanCommit())
+            if (!selfEffect.CanCommit(other) || !otherEffect.CanCommit(Item))
             {
                 ObjectItem rejected = other;
                 Cancel();
@@ -549,8 +549,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             // Clear running first: deactivating the victim must not roll back an already completed tint.
-            selfEffect.Commit();
-            otherEffect.Commit();
+            selfEffect.Commit(other);
+            otherEffect.Commit(Item);
             bool consumes = settings.Self.Consume || settings.Other.Consume;
             if (!consumes)
                 completed.Add(other);

@@ -169,7 +169,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="state">Appearance and preparation transaction.</param>
         private void Complete(ContactModificationRun owner, ObjectItem item, Contact state)
         {
-            if (!state.Effect.CanCommit())
+            if (!state.Effect.CanCommit(owner.Item))
             {
                 ReleaseContact(owner, item);
                 completed.Add(item);
@@ -183,7 +183,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning(warning, item);
                 return;
             }
-            state.Effect.Commit();
+            state.Effect.Commit(owner.Item);
             completed.Add(item);
             state.Returning = state.Preparation.Return();
             if (!state.Returning)

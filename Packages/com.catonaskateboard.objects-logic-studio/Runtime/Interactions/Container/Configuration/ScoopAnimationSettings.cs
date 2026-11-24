@@ -24,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public string Name = "Scoop";
         [Tooltip("Reference used in Reference Poses mode.")]
         public ScoopPoseSpace Space;
-        [Tooltip("Target offset from its reference. Chain keyframes use the preceding target; the automatic approach uses the dispenser pivot.")]
+        [Tooltip("Target offset from its reference. Dispenser uses the selected portion in Contact Magnet. Chain keyframes use the preceding target.")]
         public Vector3 Position;
         [Tooltip("Interpolate rotation during this segment. Disabled preserves the preceding orientation.")]
         public bool Rotate;
@@ -75,7 +75,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public bool Enabled;
         [Tooltip("Use independent pose references or start at the dispenser offset and chain subsequent offsets.")]
         public ScoopAnimationMode Mode;
-        [Tooltip("Automatic first target for Relative Chain. Position and optional rotation are offsets from the dispenser pivot.")]
+        [Tooltip("First target for Relative Chain. Relative to the dispenser pivot, or the selected portion in Contact Magnet.")]
         public ScoopKeyframe Approach = new ScoopKeyframe { Id = "dispenser-approach", Name = "Dispenser Approach" };
         [Tooltip("Consecutive target poses. Durations are measured from the preceding step.")]
         public ScoopKeyframe[] Keyframes = Array.Empty<ScoopKeyframe>();

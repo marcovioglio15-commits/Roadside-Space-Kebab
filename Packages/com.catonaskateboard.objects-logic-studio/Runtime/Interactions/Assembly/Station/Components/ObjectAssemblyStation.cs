@@ -44,8 +44,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Shared visual placements that have not yet committed to a recipe.</summary>
         internal AssemblyPendingIngredients Pending { get; } = new AssemblyPendingIngredients();
         /// <summary>Whether this configured empty station can take part in choosing a new recipe.</summary>
-        internal bool CanPlan => CurrentProduct == null && Available(InteractionChannels.Assembly) && Item != null && !Item.IsReserved
-            && Template != null && (settings.Trigger == AssemblyStationTrigger.InputAction ? TryValidate(out _) : contactReady);
+        internal bool CanPlan => CanPlanFor(null);
         /// <summary>Player command used to insert a carried ingredient.</summary>
         public InputActionReference Action => action;
         /// <summary>World-space pose at which a product begins or returns.</summary>
@@ -172,6 +171,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Assembly
 
+        /// <summary>Reserves shared recipe choices for one product while allowing its explicit continuation.</summary>
+        /// <param name="previous">Product being revised, or null for a new independent assembly.</param>
+        /// <returns>True when this empty recipe may use its table without overlapping another product.</returns>
+        internal bool CanPlanFor(ObjectAssemblyProduct previous)
+        {
+            // Sibling recipes share a surface; distinct input commands retain independent choices.
+            return CurrentProduct == null && Available(InteractionChannels.Assembly) && Item != null && !Item.IsReserved
+                && Template != null && (settings.Trigger == AssemblyStationTrigger.InputAction ? TryValidate(out _) : contactReady)
+                && !AssemblyInteractionRegistry.HasOtherProduct(this, previous);
+        }
+
         /// <summary>Releases only the product that was picked up from this table.</summary>
         /// <param name="product">Product beginning carry ownership.</param>
         internal void Release(ObjectAssemblyProduct product)
@@ -192,6 +202,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 || requireHeld && !held.IsHeld || !requireHeld && !AssemblyIngredientDock.Allows(this, held))
                 return false;
             current = CurrentProduct;
+            if (current == null && !CanPlan)
+                return false;
             if (CanReturn(held, requireHeld, out _))
                 return true;
             if (current != null)

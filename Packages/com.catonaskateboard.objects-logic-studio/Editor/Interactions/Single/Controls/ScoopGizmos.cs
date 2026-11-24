@@ -24,7 +24,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 return;
             ScoopAnimationSettings settings = receiver.Settings.ScoopAnimation;
             Pose initial = new Pose(receiver.transform.position, receiver.transform.rotation);
-            ScoopPath path = new ScoopPath(settings, initial, new Pose(source.transform.position, source.transform.rotation),
+            ScoopPath path = new ScoopPath(settings, initial, source.ScoopPose(receiver),
                 held.CarryPose, Vector3.one);
             Vector3 previous = initial.position;
             // Colors distinguish the fill boundary while labels remain sufficient without color.

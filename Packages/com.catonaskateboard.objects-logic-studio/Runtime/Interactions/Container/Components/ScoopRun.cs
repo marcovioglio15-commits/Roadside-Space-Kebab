@@ -55,7 +55,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             from = new Pose(grab.transform.position, grab.transform.rotation);
             initialScale = visual != null ? visual.localScale : Vector3.one;
             fromScale = initialScale;
-            ScoopPath path = new ScoopPath(settings, from, new Pose(source.transform.position, source.transform.rotation),
+            ScoopPath path = new ScoopPath(settings, from, source.ScoopPose(receiver),
                 grab.CarryPose, initialScale);
             targets = path.Targets;
             frames = path.Frames;

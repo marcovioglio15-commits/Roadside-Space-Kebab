@@ -157,7 +157,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (ContactEffectRun.TryPrepare(item, contact.Rule.Tint, out ContactEffectRun tint, out warning))
                     {
                         tint.Animate(1f);
-                        tint.Commit();
+                        tint.Commit(source.Item);
                         contact.Applied = true;
                     }
                     else

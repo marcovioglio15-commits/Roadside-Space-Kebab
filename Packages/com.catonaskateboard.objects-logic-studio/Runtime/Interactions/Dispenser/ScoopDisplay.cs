@@ -51,6 +51,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Collider[] combinedTargets;
         private bool active = true;
         private int count;
+        private ScoopDisplayAnchor anchor;
 
         #endregion
 
@@ -71,11 +72,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Creates the initial supply once at the activation boundary.</summary>
         /// <param name="owner">Dispenser owning this supply cycle.</param>
-        internal ScoopDisplay(ObjectDispenser owner)
+        /// <param name="anchor">Optional contact slot retained by the loading transaction.</param>
+        internal ScoopDisplay(ObjectDispenser owner, ScoopDisplayAnchor anchor)
         {
             this.owner = owner;
             settings = owner.Settings.ScoopDisplay;
-            portions = new Portion[settings.Magnets.Length];
+            this.anchor = settings.Placement == ScoopMagnetMode.ContactMagnet ? anchor : default;
+            portions = new Portion[owner.Settings.Unlimited ? settings.VisibleCount : owner.Settings.Stock];
             lastPositions = new Vector3[portions.Length];
             rotation = owner.Settings.Prefab.transform.rotation;
             restockPrefab = settings.RestockPrefab != null ? settings.RestockPrefab : owner.Settings.Prefab;
@@ -92,7 +95,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             float time = Time.time * settings.Speed * (Mathf.PI * 2f);
             Matrix4x4 frame = owner.transform.localToWorldMatrix;
-            Quaternion orientation = owner.transform.rotation * rotation;
+            Pose origin = owner.ScoopOrigin;
+            Quaternion orientation = owner.transform.rotation * origin.rotation * rotation;
             for (int index = 0; index < portions.Length; index++)
             {
                 Portion portion = portions[index];
@@ -116,7 +120,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     0.72f * Mathf.Sin(orbit) + 0.28f * Mathf.Sin(localTime * 0.58f + portion.Phase.z),
                     bob * 2f - 1f,
                     0.72f * Mathf.Cos(orbit) + 0.28f * Mathf.Sin(localTime * 0.86f + portion.Phase.y)));
-                lastPositions[index] = frame.MultiplyPoint3x4(settings.Magnets[index] + drift);
+                lastPositions[index] = frame.MultiplyPoint3x4(origin.position + origin.rotation * (Offset(index) + drift));
                 portion.Item.transform.SetPositionAndRotation(lastPositions[index], orientation);
             }
         }
@@ -125,6 +129,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal void Stop()
         {
             active = false;
+            anchor.Source?.SupplyOccupancy(this, anchor.Index, false);
             // Re-enabling starts a fresh cycle with the prefab's initial flags and appearance.
             for (int index = 0; index < portions.Length; index++)
                 if (portions[index].Item != null)
@@ -301,6 +306,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Magnets
 
+        /// <summary>Moves an empty display to a newly loaded contact slot.</summary>
+        /// <param name="value">Anchor captured by the current loading transaction.</param>
+        internal void SetAnchor(ScoopDisplayAnchor value)
+        {
+            // Unregister the previous slot before retaining a new loading frame.
+            anchor.Source?.SupplyOccupancy(this, anchor.Index, false);
+            anchor = value;
+            if (active && count > 0)
+                anchor.Source?.SupplyOccupancy(this, anchor.Index, true);
+        }
+
+        /// <summary>Uses the contact pose directly for one portion and local offsets for a batch.</summary>
+        /// <param name="index">Portion being positioned.</param>
+        /// <returns>Offset relative to the selected supply frame.</returns>
+        private Vector3 Offset(int index)
+        {
+            return settings.Placement == ScoopMagnetMode.ContactMagnet && portions.Length == 1 ? Vector3.zero : settings.Magnets[index];
+        }
+
         /// <summary>Removes a spent clone after releasing any effects that should finish independently.</summary>
         /// <param name="index">Occupied magnet being cleared.</param>
         private void Consume(int index)
@@ -316,14 +340,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="index">Vacant magnet index.</param>
         private void Spawn(int index)
         {
+            Pose origin = owner.ScoopOrigin;
             GameObject portion = Object.Instantiate(currentPrefab,
-                owner.transform.TransformPoint(settings.Magnets[index]), owner.transform.rotation * rotation);
+                owner.transform.TransformPoint(origin.position + origin.rotation * Offset(index)), owner.transform.rotation * origin.rotation * rotation);
             // Instantiation without a parent uses the active scene, which may differ from the dispenser's scene.
             if (portion.scene != owner.gameObject.scene)
                 UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(portion, owner.gameObject.scene);
             if (usingRestockPrefab)
                 portion.transform.localScale *= settings.RestockScale;
-            Attach(index, portion.GetComponent<ObjectItem>());
+            // Preserve recipe variants without adding ingredient flags to the portion's targeting identity.
+            ObjectItem item = portion.GetComponent<ObjectItem>();
+            if (anchor.Ingredients != null)
+                item.ApplyIngredient(anchor.Ingredients);
+            Attach(index, item);
         }
 
         /// <summary>Occupies a magnet and suspends only motion driven by physics.</summary>
@@ -341,9 +370,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 supplyColliders.Add(collider);
             combinedTargets = null;
             count++;
+            anchor.Source?.SupplyOccupancy(this, anchor.Index, true);
             item.IsFloatingSupply = true;
-            lastPositions[index] = owner.transform.TransformPoint(settings.Magnets[index]);
-            item.transform.SetPositionAndRotation(lastPositions[index], owner.transform.rotation * rotation);
+            Pose origin = owner.ScoopOrigin;
+            lastPositions[index] = owner.transform.TransformPoint(origin.position + origin.rotation * Offset(index));
+            item.transform.SetPositionAndRotation(lastPositions[index], owner.transform.rotation * origin.rotation * rotation);
             if (body != null)
             {
                 body.collisionDetectionMode = CollisionDetectionMode.Discrete;
@@ -368,6 +399,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 supplyColliders.Remove(collider);
             combinedTargets = null;
             count--;
+            if (count == 0)
+                anchor.Source?.SupplyOccupancy(this, anchor.Index, false);
             if (departed)
                 WithdrawnCount++;
             if (portion.Item != null)

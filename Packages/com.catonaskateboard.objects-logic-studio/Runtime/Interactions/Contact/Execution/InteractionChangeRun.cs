@@ -50,6 +50,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly Dictionary<ObjectInteraction, bool> availability = new Dictionary<ObjectInteraction, bool>();
         private bool applied;
         private bool cancelled;
+        private ScoopDisplayAnchor supplyAnchor;
+        private bool contactSupply;
 
         #endregion
 
@@ -178,7 +180,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 bool reload = enable && feature is ObjectDispenser { CanReloadScoopSupply: true };
                 if (feature.enabled == enable && !reload)
                     return false;
-                if (enable && feature is ObjectDispenser { Settings: { ScoopOnly: true, ScoopDisplay: { RestockForNewContainer: true } } } dispenser)
+                if (enable && feature is ObjectDispenser { SupportsScoopLoading: true } dispenser)
                     StageDepletedSupply(dispenser);
                 if (enable && HasEnabled(change.Kind, feature))
                     return false;
@@ -259,10 +261,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Confirms that a transition can still commit after its contact delay.</summary>
+        /// <param name="trigger">Live counterpart, or null when applying an already captured transaction.</param>
         /// <returns>True when no target disappeared or changed availability.</returns>
-        internal bool CanCommit()
+        internal bool CanCommit(ObjectItem trigger)
         {
             if (item == null || item.IsConsumed)
+                return false;
+            // Resolve placement before consumption; deferred application retains this same slot.
+            if (contactSupply && supplyAnchor.Source == null)
+                supplyAnchor = ScoopDisplayAnchor.Capture(item, trigger);
+            if (contactSupply && supplyAnchor.Source == null)
                 return false;
             foreach (Operation operation in operations)
             {
@@ -328,6 +336,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             snapshots.Clear();
             removed.Clear();
             availability.Clear();
+            contactSupply = false;
             warning = "An interaction changed or disappeared before the contact completed.";
             foreach (Operation operation in operations)
             {
@@ -357,9 +366,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     return false;
             }
             foreach (ObjectInteraction feature in snapshots.Keys)
+            {
+                if (!removed.Contains(feature) && feature is ObjectDispenser { Settings: { ScoopOnly: true, ScoopDisplay: { Placement: ScoopMagnetMode.ContactMagnet } } }
+                    && (!availability.TryGetValue(feature, out bool available) || available))
+                    contactSupply = true;
                 if (!removed.Contains(feature) && (!availability.TryGetValue(feature, out bool enable) || enable)
                     && !InteractionRuntimeCatalog.Validate(feature, out warning))
                     return false;
+            }
             warning = string.Empty;
             return true;
         }
@@ -369,10 +383,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Commit And Reversal
 
         /// <summary>Queues this batch after visual and consumption effects have committed.</summary>
-        internal void Commit()
+        /// <param name="trigger">Counterpart retained until deferred supply placement has been captured.</param>
+        internal void Commit(ObjectItem trigger)
         {
-            if (!cancelled && !applied)
+            if (!cancelled && !applied && CanCommit(trigger))
+            {
+                supplyAnchor.Source?.SupplyOccupancy(this, supplyAnchor.Index, true);
                 InteractionRuntimeState.Enqueue(this);
+            }
         }
 
         /// <summary>Applies final values outside the modifier's active rule iteration.</summary>
@@ -381,7 +399,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             claimed.Remove(this);
             if (cancelled || applied)
                 return;
-            if (!CanCommit())
+            if (!CanCommit(null))
             {
                 Cancel();
                 return;
@@ -409,6 +427,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         operation.Feature.enabled = false;
                 foreach (ObjectInteraction feature in snapshots.Keys)
                 {
+                    if (feature is ObjectDispenser dispenser)
+                        dispenser.SetScoopAnchor(supplyAnchor);
                     if (created.Contains(feature))
                         InteractionRuntimeState.Include(feature);
                     InteractionRuntimeState.SetRemoved(feature, removed.Contains(feature));
@@ -430,6 +450,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 Debug.LogWarning("Contact interaction edit: " + exception.Message, item);
                 Cancel();
             }
+            finally
+            {
+                supplyAnchor.Source?.SupplyOccupancy(this, supplyAnchor.Index, false);
+            }
         }
 
         /// <summary>Reverses a temporary batch or discards an unfinished prepared batch.</summary>
@@ -438,6 +462,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (cancelled)
                 return;
             cancelled = true;
+            supplyAnchor.Source?.SupplyOccupancy(this, supplyAnchor.Index, false);
             claimed.Remove(this);
             if (applied)
                 Restore(true);

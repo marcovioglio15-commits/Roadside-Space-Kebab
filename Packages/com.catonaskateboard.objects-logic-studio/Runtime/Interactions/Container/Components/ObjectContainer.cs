@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CatOnASkateboard.StudioIdentity;
 using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
@@ -360,10 +361,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 && Array.Exists(settings.FillSteps, step => step is { Mode: InventoryFillMode.ActualItemFill });
         }
 
-        /// <summary>Captures a successfully withdrawn portion before it is consumed.</summary>
-        /// <param name="source">Original item or prefab supplying its appearance.</param>
+        /// <summary>Retains a withdrawn portion's recipe provenance and optional fill appearance.</summary>
+        /// <param name="source">Original item or prefab supplying ingredients and appearance.</param>
         internal void RecordScoopPortion(GameObject source)
         {
+            // Recipe variants survive packaging even when the box shows only its own mesh.
+            if (source.TryGetComponent(out ObjectItem portion) && portion.CaptureRecipeFlags() is ObjectFlag[] ingredients)
+                Item.ApplyIngredient(ingredients);
             if (!hasItemFill)
                 return;
             itemFill ??= new ContainerFillVisuals(transform);

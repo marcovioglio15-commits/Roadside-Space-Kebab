@@ -18,9 +18,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             SerializedProperty display = settings.FindPropertyRelative("ScoopDisplay");
             bool unlimited = settings.FindPropertyRelative("Unlimited").boolValue;
-            if (!sections.Draw("Floating Supply", "Place one magnet per visible portion.", settings, "ScoopDisplay"))
+            if (!sections.Draw("Floating Supply", "Choose supply placement, motion and scoop limits.", settings, "ScoopDisplay"))
                 return;
             using StudioIndentScope indent = new StudioIndentScope();
+            HoverControls.Field(display, "Placement");
+            bool contact = display.FindPropertyRelative("Placement").enumValueIndex == (int)ScoopMagnetMode.ContactMagnet;
             if (unlimited)
                 HoverControls.Field(display, "VisibleCount");
             SerializedProperty drift = display.FindPropertyRelative("Drift");
@@ -38,7 +40,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 HoverControls.Field(display, "BobCrestPower");
 
             // Reuse the isolated outlet viewport without instantiating the source prefab.
-            if (settings.serializedObject.targetObject is ObjectWorkspace workspace
+            if (!contact && settings.serializedObject.targetObject is ObjectWorkspace workspace
                 && StudioButton.Draw(new GUIContent("Magnet Layout", "Place floating portions against the dispenser mesh.")))
             {
                 settings.serializedObject.ApplyModifiedProperties();
@@ -46,16 +48,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
 
             SerializedProperty magnets = display.FindPropertyRelative("Magnets");
-            for (int index = 0; index < magnets.arraySize; index++)
+            int count = unlimited ? display.FindPropertyRelative("VisibleCount").intValue : settings.FindPropertyRelative("Stock").intValue;
+            for (int index = 0; (!contact || count > 1) && index < magnets.arraySize; index++)
             {
                 SerializedProperty magnet = magnets.GetArrayElementAtIndex(index);
-                string name = "Magnet " + (index + 1);
+                string name = (contact ? "Offset " : "Magnet ") + (index + 1);
                 if (StudioArrayGUI.Header(magnets, index, new GUIContent(name, magnets.tooltip)))
                     break;
                 if (magnet.isExpanded)
                     StudioVectorControls.Draw(magnet, -2f, 2f, name);
             }
-            StudioArrayGUI.Add(magnets, "Add Magnet", () => Vector3.zero);
+            if (!contact || count > 1)
+                StudioArrayGUI.Add(magnets, contact ? "Add Offset" : "Add Magnet", () => Vector3.zero);
             DrawSteps(display.FindPropertyRelative("Steps"),
                 unlimited ? display.FindPropertyRelative("VisibleCount").intValue : settings.FindPropertyRelative("Stock").intValue);
         }

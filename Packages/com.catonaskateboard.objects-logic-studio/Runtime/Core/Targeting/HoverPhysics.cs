@@ -75,9 +75,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (IsFull(count, overlaps.Length, observer))
                 return false;
 
+            // Carried items belong to the player even when Grab keeps them outside the player hierarchy.
+            Transform carried = observer.HeldObject != null ? observer.HeldObject.transform : null;
             // Rays do not report a collider containing their origin; check that case explicitly.
             for (int index = 0; index < count; index++)
-                if (Blocks(overlaps[index], observer.Player, target, extra))
+                if (Blocks(overlaps[index], observer.Player, target, carried, extra))
                     return false;
             if (segment.sqrMagnitude < 0.000001f)
                 return true;
@@ -87,7 +89,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
             // Results are unordered, so every returned collider must be inspected.
             for (int index = 0; index < count; index++)
-                if (Blocks(hits[index].collider, observer.Player, target, extra))
+                if (Blocks(hits[index].collider, observer.Player, target, carried, extra))
                     return false;
             return true;
         }
@@ -100,12 +102,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="collider">Collider returned by the physics scene.</param>
         /// <param name="player">Flagged player root.</param>
         /// <param name="target">Hovered object root.</param>
+        /// <param name="carried">Player's held object root, or null when empty-handed.</param>
         /// <param name="extra">Additional shapes owned by the target.</param>
         /// <returns>True for an external solid collider.</returns>
-        private static bool Blocks(Collider collider, Transform player, Transform target, ISet<Collider> extra)
+        private static bool Blocks(Collider collider, Transform player, Transform target, Transform carried, ISet<Collider> extra)
         {
             // Transform ownership avoids runtime reflection and per-query component searches.
             return collider != null && !collider.transform.IsChildOf(player) && !collider.transform.IsChildOf(target)
+                && (carried == null || !collider.transform.IsChildOf(carried))
                 && (extra == null || !extra.Contains(collider));
         }
 

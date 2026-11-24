@@ -76,7 +76,7 @@ MonoBehaviour:
       Consume: 0
       Interactions: []
     ChangeContactFlag: 1
-    ContactFlag: {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+    ContactFlag: {fileID: 11400000, guid: 0776dd6347327264fb8c9a000f5a1304, type: 2}
     ContactFlagOperation: 0
     BlockSelf: 1
     BlockOther: 1

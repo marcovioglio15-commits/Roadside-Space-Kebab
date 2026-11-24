@@ -114,18 +114,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Rechecks availability before either participant commits effects or consumption.</summary>
+        /// <param name="trigger">Counterpart needed to validate contact-driven supply placement.</param>
         /// <returns>True when all prepared interaction changes remain valid.</returns>
-        internal bool CanCommit()
+        internal bool CanCommit(ObjectItem trigger)
         {
-            return interactions == null || interactions.CanCommit();
+            return interactions == null || interactions.CanCommit(trigger);
         }
 
         /// <summary>Commits discrete mesh replacements only after the timed transition finishes.</summary>
-        internal void Commit()
+        /// <param name="trigger">Counterpart determining newly enabled supply placement.</param>
+        internal void Commit(ObjectItem trigger)
         {
             // Reuse authored components; no renderer, collider or UI object is instantiated at runtime.
             meshes.Commit();
-            interactions?.Commit();
+            interactions?.Commit(trigger);
         }
 
         /// <summary>Restores the pre-transition appearance when continuous contact is interrupted.</summary>

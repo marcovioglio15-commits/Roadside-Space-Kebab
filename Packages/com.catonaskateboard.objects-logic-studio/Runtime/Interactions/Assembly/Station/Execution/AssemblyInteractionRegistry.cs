@@ -78,6 +78,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Recipe Alternatives
 
+        /// <summary>Prevents alternative recipes on the same table from building overlapping products.</summary>
+        /// <param name="station">Recipe requesting the shared assembly surface.</param>
+        /// <param name="previous">Current product allowed to transfer into a continuation.</param>
+        /// <returns>True when another sibling retains a product that is not being revised.</returns>
+        internal static bool HasOtherProduct(ObjectAssemblyStation station, ObjectAssemblyProduct previous)
+        {
+            // Read registered choices without allocating collections or searching the scene.
+            foreach (ObjectAssemblyStation other in items)
+                if (other != station && SharesChoices(station, other) && other.CurrentProduct is ObjectAssemblyProduct product
+                    && product != previous)
+                    return true;
+            return false;
+        }
+
         /// <summary>Shares pending placements across recipes driven by the same table interaction mode.</summary>
         /// <param name="station">Station collecting candidate ingredients.</param>
         /// <param name="ingredients">Reusable destination receiving distinct pending objects.</param>
@@ -153,7 +167,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Different tables, commands and already occupied alternatives cannot take ownership of this prefix.
             foreach (ObjectAssemblyStation other in items)
             {
-                if (other == station || !SharesChoices(station, other) || !other.CanPlan
+                if (other == station || !SharesChoices(station, other) || !other.CanPlanFor(previous)
                     || other.Settings.ProductPrefab == previous.SourcePrefab
                     || !requireHeld && !AssemblyIngredientDock.Allows(other, ingredients[ingredients.Count - 1])
                     || !other.Template.CanAcceptSequence(ingredients, out bool complete, previous)

@@ -89,8 +89,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.4507923, y: 0.06249873, z: 0.4466531}
-  m_Center: {x: -0.001249373, y: 0.028750634, z: 0.0008329004}
+  m_Size: {x: 0.5, y: 0.1, z: 0.5}
+  m_Center: {x: 0, y: 0.04, z: 0}
 --- !u!114 &4618882619329559663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104,7 +104,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.StudioIdentity.Runtime::CatOnASkateboard.StudioIdentity.ObjectIdentity
   flags:
-  - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+  - {fileID: 11400000, guid: f47676de99e70274ea99fa18473345c3, type: 2}
 --- !u!114 &4872677472222106807
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -348,7 +348,7 @@ MonoBehaviour:
       popIn: 1
       exitDuration: 0.16
     style:
-      content: Pizza Kebab
+      content: Pizza Kebab (Delivery)
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0
@@ -442,7 +442,7 @@ MonoBehaviour:
     WaitForNextIngredient: 0
     Ingredients:
     - Flags:
-      - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+      - {fileID: 11400000, guid: 0776dd6347327264fb8c9a000f5a1304, type: 2}
       Count: 1
       Optional: 0
     - Flags:
@@ -461,12 +461,16 @@ MonoBehaviour:
       - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       Count: 1
       Optional: 1
+    - Flags:
+      - {fileID: 11400000, guid: f47676de99e70274ea99fa18473345c3, type: 2}
+      Count: 1
+      Optional: 0
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0
       Flags:
-      - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
-      Order: 1
+      - {fileID: 11400000, guid: 0776dd6347327264fb8c9a000f5a1304, type: 2}
+      Order: 0
       Position: {x: 0, y: 0, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
@@ -478,15 +482,15 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
-      PreviewPrefab: {fileID: 3748823794255209065, guid: c684292326866854fb5205e178ec9fbe, type: 3}
+      PreviewPrefab: {fileID: 1851592354125701395, guid: 8e72e7801d85085408097e80f2889ec9, type: 3}
     - Name: Magnet 2
       AnyIngredient: 0
       Flags:
       - {fileID: 11400000, guid: c69745f27196e29439f70f5d1d5c1ea1, type: 2}
-      Order: 2
-      Position: {x: 0, y: 0.015, z: 0}
+      Order: 0
+      Position: {x: 0, y: 0.045, z: 0}
       Rotation: {x: 0, y: 0, z: 0}
-      Scale: {x: 1, y: 1, z: 1}
+      Scale: {x: 1, y: 0.35, z: 1}
       Appearance:
         Meshes: []
         Materials: []
@@ -501,7 +505,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: 187d0874b7515704a853f787672f5d18, type: 2}
       Order: 0
-      Position: {x: -0.06, y: 0.035, z: -0.06}
+      Position: {x: -0.06, y: 0.068, z: -0.06}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
@@ -518,7 +522,7 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: 1b1ce060041987443a0feb8b9e18c7eb, type: 2}
       Order: 0
-      Position: {x: 0.06, y: 0.035, z: 0.06}
+      Position: {x: 0.06, y: 0.068, z: 0.06}
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
@@ -535,12 +539,12 @@ MonoBehaviour:
       Flags:
       - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       Order: 0
-      Position: {x: 0, y: 0.025, z: 0}
+      Position: {x: 0, y: 0.083, z: 0}
       Rotation: {x: 0, y: -45, z: 0}
       Scale: {x: 0.7, y: 0.7, z: 0.7}
       Appearance:
         Meshes:
-        - Path: ""
+        - Path:
           PrimaryMesh: 1
           Mesh: {fileID: 4279741042369765514, guid: d154d209501b94e4283f1267de1bfb15, type: 3}
           UpdateCollider: 0
@@ -551,6 +555,23 @@ MonoBehaviour:
         Materials: []
         Visibility: []
       PreviewPrefab: {fileID: 6484676068278646964, guid: a7f8a1a708ab7fc4db668aa796f19a34, type: 3}
+    - Name: Pizza Box
+      AnyIngredient: 0
+      Flags:
+      - {fileID: 11400000, guid: f47676de99e70274ea99fa18473345c3, type: 2}
+      Order: 0
+      Position: {x: 0, y: -0.008, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      PreviewPrefab: {fileID: 1229832333385971152, guid: 98cdb19e581558f4a9fce17f64e509c1, type: 3}
     InteractionRules:
     - Target: {fileID: 4060919288793665968}
       RequireComplete: 1
@@ -565,8 +586,15 @@ MonoBehaviour:
       MinimumIngredients: 1
       Ingredients: []
     CompletedAppearance:
-      Meshes: []
-      Materials: []
+      Meshes:
+      - Path: SM_Finished_PizzaMargherita
+        PrimaryMesh: 0
+        Mesh: {fileID: 2603588498265785519, guid: 9e57e4c2fde7c3345b2be6295a0e90fe, type: 3}
+        UpdateCollider: 0
+      Materials:
+      - Path: SM_Finished_PizzaMargherita
+        Materials:
+        - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
       Visibility: []
     HideIngredients: 1
 --- !u!114 &8358541987961235531
@@ -651,86 +679,88 @@ MonoBehaviour:
     IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
---- !u!1001 &6099070564039620069
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 6046597421291686553}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -3.7493994e-33
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -6.123234e-17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 6.123234e-17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_Name
-      value: SM_Finished_PizzaMargherita
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      propertyPath: m_Layer
-      value: 6
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: -5754084199372789682, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6480718798285180254}
-  m_SourcePrefab: {fileID: 100100000, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
---- !u!23 &4856523054974364001 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-  m_PrefabInstance: {fileID: 6099070564039620069}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &5994002071574155790 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-  m_PrefabInstance: {fileID: 6099070564039620069}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &6369542933444708532 stripped
+--- !u!1 &6369542933444708532
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: a972014fdbcc5ab4fb1f06384b1df0ed, type: 3}
-  m_PrefabInstance: {fileID: 6099070564039620069}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5994002071574155790}
+  - component: {fileID: 4856523054974364001}
+  - component: {fileID: 6480718798285180254}
+  m_Layer: 6
+  m_Name: SM_Finished_PizzaMargherita
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5994002071574155790
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6369542933444708532}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6046597421291686553}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &4856523054974364001
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6369542933444708532}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &6480718798285180254
 MeshFilter:
   m_ObjectHideFlags: 0

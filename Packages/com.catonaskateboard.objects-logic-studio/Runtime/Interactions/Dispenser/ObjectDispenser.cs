@@ -29,6 +29,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool scoopStored;
         private bool destructionPending;
         private ScoopDisplay display;
+        private ScoopDisplayAnchor scoopAnchor;
         internal event System.Action<ObjectDispenser> ScoopEmptied;
 
         #endregion
@@ -61,11 +62,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal Collider[] AimColliders => display?.Targets() ?? Colliders;
         /// <summary>Floating shapes excluded from their source's visibility checks.</summary>
         internal ISet<Collider> FloatingColliders => display?.SupplyColliders;
+        /// <summary>Captured contact pose used by the active supply, in dispenser-local coordinates.</summary>
+        internal Pose ScoopOrigin => settings.ScoopDisplay.Placement == ScoopMagnetMode.ContactMagnet ? scoopAnchor.LocalPose : new Pose(Vector3.zero, Quaternion.identity);
         /// <summary>Whether an idle, empty Scoop Only card may yield to a new recipe.</summary>
         internal bool CanYieldSupply => settings.ScoopOnly && !transferring && RemainingCount == 0;
+        /// <summary>Whether a completed contact may load a fresh supply cycle.</summary>
+        internal bool SupportsScoopLoading => settings.ScoopOnly && (settings.ScoopDisplay.RestockForNewContainer
+            || settings.ScoopDisplay.Placement == ScoopMagnetMode.ContactMagnet);
         /// <summary>Whether contact may reload this empty card with its initial portion prefab.</summary>
         internal bool CanReloadScoopSupply => isActiveAndEnabled && !IsLocked && display != null
-            && settings.ScoopDisplay.RestockForNewContainer && CanYieldSupply;
+            && SupportsScoopLoading && CanYieldSupply;
 
         #endregion
 
@@ -82,6 +88,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 dispenser.display?.Stop();
                 dispenser.display = null;
+                dispenser.scoopAnchor = default;
                 dispenser.dispensed = 0;
                 dispenser.withdrawals = 0;
                 dispenser.transferring = false;
@@ -121,8 +128,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             display = null;
             if (!settings.ScoopOnly)
                 return;
-            if (TryValidate(out string warning))
-                display = new ScoopDisplay(this);
+            if (settings.ScoopDisplay.Placement == ScoopMagnetMode.ContactMagnet && scoopAnchor.Source == null)
+                Debug.LogWarning("Contact Magnet supply needs a loading contact. Enable this dispenser through Modify By Contact.", this);
+            else if (TryValidate(out string warning))
+                display = new ScoopDisplay(this, scoopAnchor);
             else
                 Debug.LogWarning(warning, this);
         }
@@ -132,6 +141,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // A deposited pack uses initial stock. Scoop-triggered restock can still use its own prefab.
             display.Restock(initialSupply: true);
+        }
+
+        /// <summary>Receives the loading contact's pose before the deferred edit enables or reloads stock.</summary>
+        /// <param name="anchor">Contact slot captured before its trigger was consumed.</param>
+        internal void SetScoopAnchor(ScoopDisplayAnchor anchor)
+        {
+            if (settings.ScoopDisplay.Placement != ScoopMagnetMode.ContactMagnet)
+                return;
+            scoopAnchor = anchor;
+            display?.SetAnchor(anchor);
         }
 
         /// <summary>Stops floating supply without touching already withdrawn originals.</summary>
@@ -192,6 +211,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return false;
             if (configuration.StoredSupply && GetComponent<ObjectContainer>() == null)
                 warning = "Add Container to this same object before linking its stored items.";
+            else if (configuration.ScoopOnly && configuration.ScoopDisplay.Placement == ScoopMagnetMode.ContactMagnet && !ScoopDisplayAnchor.HasSetup(this))
+                warning = "Contact Magnet supply needs an enabled Modify By Contact with valid magnets on this object.";
             else if (!configuration.ScoopOnly && GetComponent<ObjectContainer>() is ObjectContainer refill && refill.Settings.RefillDispenser
                 && (configuration.StoredSupply || configuration.Unlimited))
                 warning = "A refill Container requires finite prefab supply, not stored-only or unlimited supply.";
@@ -370,6 +391,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #endregion
 
         #region Scoop
+
+        /// <summary>Anchors contact-driven scoop movement to the selected portion instead of the source pivot.</summary>
+        /// <param name="receiver">Container selecting or already reserving a portion.</param>
+        /// <returns>The portion's world pose for Contact Magnet, or the dispenser pivot for other supply modes.</returns>
+        internal Pose ScoopPose(ObjectContainer receiver)
+        {
+            // Custom layouts retain their existing animation frame, including multi-portion baskets.
+            if (!settings.ScoopOnly || settings.ScoopDisplay.Placement != ScoopMagnetMode.ContactMagnet)
+                return new Pose(transform.position, transform.rotation);
+            ObjectItem portion = scoopOwner == receiver ? scoopOutput : display?.Find(receiver, false);
+            // A live reservation captures drift and per-portion offsets once before movement begins.
+            return portion != null ? new Pose(portion.transform.position, portion.transform.rotation)
+                : new Pose(transform.TransformPoint(ScoopOrigin.position), transform.rotation * ScoopOrigin.rotation);
+        }
 
         /// <summary>Checks output identity without creating a prefab or revealing stored supply.</summary>
         /// <param name="receiver">Held container whose accepted flags are checked.</param>

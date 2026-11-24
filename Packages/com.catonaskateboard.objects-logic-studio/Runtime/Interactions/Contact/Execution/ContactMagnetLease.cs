@@ -36,6 +36,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             && owner != null && Item.transform.parent == parent;
         /// <summary>Whether attraction reached the docking pose.</summary>
         internal bool Ready => ready;
+        /// <summary>Reserved world pose, including clearance for shared slots.</summary>
+        internal Pose TargetPose => new Pose(TargetPosition, TargetRotation);
         /// <summary>Local collision volume cached at acquisition.</summary>
         internal Bounds Shape => shape;
         /// <summary>Reserved final collision volume used by other docking operations.</summary>

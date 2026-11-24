@@ -10,6 +10,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private static readonly Dictionary<ObjectItem, ContactMagnetRun> owners = new Dictionary<ObjectItem, ContactMagnetRun>();
         private readonly List<ContactMagnetLease> held = new List<ContactMagnetLease>();
+        private readonly Dictionary<object, int> supplies = new Dictionary<object, int>();
         private readonly Dictionary<ObjectItem, ContactModificationRun> rejected = new Dictionary<ObjectItem, ContactModificationRun>();
         private readonly List<ObjectItem> separated = new List<ObjectItem>();
         private readonly ContactMagnetPlacement placement = new ContactMagnetPlacement();
@@ -206,7 +207,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         taken = true;
                         remaining = Mathf.Min(remaining, lease.Remaining);
                     }
-                if (taken != occupied)
+                bool supplied = false;
+                foreach (int supply in supplies.Values)
+                    supplied |= supply == index;
+                taken |= supplied;
+                if (taken != occupied || occupied && supplied)
                     continue;
                 float score = (owner.transform.TransformPoint(magnet.Position) - item.transform.position).sqrMagnitude;
                 if (selected >= 0 && (occupied && remaining > completion
@@ -239,6 +244,42 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (lease.Item == item)
                     return lease;
             return null;
+        }
+
+        /// <summary>Resolves a supply origin using the same slot selection as contact docking.</summary>
+        /// <param name="item">Trigger being replaced by supply portions.</param>
+        /// <param name="frame">Dispenser's receiving item frame.</param>
+        /// <param name="requireLease">Whether only this trigger's existing lease may qualify.</param>
+        /// <param name="anchor">Receives the slot and its retained local pose.</param>
+        /// <returns>True when a compatible contact slot is available.</returns>
+        internal bool TrySupplyAnchor(ObjectItem item, Transform frame, bool requireLease, out ScoopDisplayAnchor anchor)
+        {
+            anchor = default;
+            if (settings is not { Enabled: true })
+                return false;
+            // A lease preserves its exact selection and shared-slot clearance.
+            ContactMagnetLease lease = Find(item);
+            int index = lease != null ? lease.Index : requireLease ? -1 : Select(item, false);
+            if (index < 0)
+                return false;
+            Pose pose = lease != null ? lease.TargetPose : new Pose(owner.transform.TransformPoint(settings.Magnets[index].Position),
+                owner.transform.rotation * Quaternion.Euler(settings.Magnets[index].Rotation));
+            anchor = new ScoopDisplayAnchor(this, index, new Pose(frame.InverseTransformPoint(pose.position), Quaternion.Inverse(frame.rotation) * pose.rotation),
+                item.CaptureRecipeFlags());
+            return true;
+        }
+
+        /// <summary>Retains a displayed supply's slot until its last portion leaves.</summary>
+        /// <param name="display">Live supply or deferred loading transaction retaining the slot.</param>
+        /// <param name="index">Contact magnet represented by this supply.</param>
+        /// <param name="occupied">Whether the display still has portions.</param>
+        internal void SupplyOccupancy(object display, int index, bool occupied)
+        {
+            // Cooked supply participates in the existing occupied-slot policy.
+            if (occupied)
+                supplies[display] = index;
+            else
+                supplies.Remove(display);
         }
 
         #endregion

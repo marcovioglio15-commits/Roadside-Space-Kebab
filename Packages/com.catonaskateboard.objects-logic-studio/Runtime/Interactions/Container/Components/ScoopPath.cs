@@ -21,7 +21,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Resolves every relative offset once before the first movement segment.</summary>
         /// <param name="settings">Validated optional sequence.</param>
         /// <param name="initial">Held object's starting world pose.</param>
-        /// <param name="dispenser">Supply pivot used by the first relative target.</param>
+        /// <param name="dispenser">Supply reference pose. Contact Magnet uses the selected portion.</param>
         /// <param name="carry">Current grab pose for independent keyframes and the return preview.</param>
         /// <param name="initialScale">Visual branch's original local scale.</param>
         internal ScoopPath(ScoopAnimationSettings settings, Pose initial, Pose dispenser, Pose carry, Vector3 initialScale)

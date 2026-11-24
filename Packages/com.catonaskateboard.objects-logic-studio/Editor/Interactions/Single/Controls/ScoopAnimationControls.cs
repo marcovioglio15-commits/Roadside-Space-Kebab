@@ -68,7 +68,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     if (reference)
                         HoverControls.Field(frame, "Space", "Position Reference");
-                    StudioVectorControls.Draw(frame.FindPropertyRelative("Position"), caption: reference ? "Position Offset" : named ? "Previous Target Offset" : "Pivot Offset");
+                    StudioVectorControls.Draw(frame.FindPropertyRelative("Position"), caption: reference ? "Position Offset" : named ? "Previous Target Offset" : "Supply Offset");
                 }
             if (Group(frame.FindPropertyRelative("Rotation"), "Rotation Settings"))
                 using (new StudioIndentScope())

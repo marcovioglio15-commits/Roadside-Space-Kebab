@@ -19,6 +19,10 @@ GameObject:
   - component: {fileID: 8048883720205107946}
   - component: {fileID: 2922238438970346272}
   - component: {fileID: 3516200788165464314}
+  - component: {fileID: 4075011540961968110}
+  - component: {fileID: 5176723442728227944}
+  - component: {fileID: 7085557934977674765}
+  - component: {fileID: 6464014623747192775}
   m_Layer: 6
   m_Name: PF_Base_PizzaBox_Open
   m_TagString: Untagged
@@ -323,7 +327,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -348,7 +351,7 @@ MonoBehaviour:
       popIn: 1
       exitDuration: 0.16
     style:
-      content: Pizza Box
+      content: Pizza Box (Open)
       font: {fileID: 0}
       fontSize: 24
       fontStyle: 0
@@ -364,6 +367,27 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText:
+  - Source:
+      Assigned: 1
+      Kind: 5
+      Name: Box Pizza Rossa
+      Occurrence: 0
+      Step:
+        Block:
+        Entry:
+    Condition: 1
+    Text: Pizza Rossa (Delivery)
+  - Source:
+      Assigned: 1
+      Kind: 5
+      Name: Box Pizza Margherita
+      Occurrence: 0
+      Step:
+        Block:
+        Entry:
+    Condition: 1
+    Text: Pizza Margherita (Delivery)
   drawGizmos: 1
 --- !u!114 &2922238438970346272
 MonoBehaviour:
@@ -447,74 +471,461 @@ MonoBehaviour:
     IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
---- !u!1001 &4307998966095972847
-PrefabInstance:
+--- !u!114 &4075011540961968110
+MonoBehaviour:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 6762525786067770511}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -3.7493994e-33
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -6.123234e-17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 6.123234e-17
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_Name
-      value: SM_Base_PizzaBox_Open
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-      propertyPath: m_Layer
-      value: 6
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
---- !u!23 &3172930651846612331 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-  m_PrefabInstance: {fileID: 4307998966095972847}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &4342507160972553732 stripped
+  m_GameObject: {fileID: 1229832333385971152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89758c4d4eb24359b9fa12c3ef130a73, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContainer
+  interactionName: Box Pizza Rossa
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    Mode: 2
+    AllowedFlags:
+    - {fileID: 11400000, guid: 5cb7fee5035e19b48bd270467095e538, type: 2}
+    Match: 0
+    Unlimited: 0
+    Capacity: 1
+    LimitToDispenserSpace: 0
+    KeepVisible: 0
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Spacing: {x: 0, y: 0.2, z: 0}
+    InitialFill: 0
+    ScoopAmount: 1
+    ScoopAnimation:
+      Enabled: 1
+      Mode: 0
+      Approach:
+        Id: dispenser-approach
+        Name: Dispenser Approach
+        Space: 0
+        Position: {x: 0, y: 0, z: 0}
+        Rotate: 0
+        Rotation: {x: 0, y: 0, z: 0}
+        Duration: 0.3
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      Keyframes:
+      - Id: pizza-approach
+        Name: Approach Pizza
+        Space: 0
+        Position: {x: 0.45, y: 0.03, z: 0}
+        Rotate: 1
+        Rotation: {x: 0, y: 270, z: 0}
+        Duration: 0.32
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      - Id: pizza-collect
+        Name: Collect Pizza
+        Space: 0
+        Position: {x: 0, y: -0.008, z: 0}
+        Rotate: 1
+        Rotation: {x: 0, y: 270, z: 0}
+        Duration: 0.42
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      - Id: pizza-lift
+        Name: Withdraw Closed Box
+        Space: 0
+        Position: {x: 0.35, y: 0.06, z: 0}
+        Rotate: 1
+        Rotation: {x: 0, y: 270, z: 0}
+        Duration: 0.22
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      FillAfter: pizza-collect
+      ReturnToStart: 1
+      ReturnDuration: 0.35
+      ObstacleMargin: 1.2
+      VisualPath:
+    FillSteps:
+    - Count: 1
+      Mode: 0
+      ItemFill:
+        VisualPrefab: {fileID: 0}
+        Magnets: []
+      Appearance:
+        Meshes:
+        - Path:
+          PrimaryMesh: 1
+          Mesh: {fileID: 2603588498265785519, guid: 9e57e4c2fde7c3345b2be6295a0e90fe, type: 3}
+          UpdateCollider: 0
+        Materials:
+        - Path: SM_Base_PizzaBox_Open
+          Materials:
+          - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
+        Visibility: []
+      Flags:
+        Mode: 1
+        Flags:
+        - {fileID: 11400000, guid: ae053a3313ceb424097eb2fee4c8ed26, type: 2}
+        Remove: []
+--- !u!114 &5176723442728227944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1229832333385971152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89758c4d4eb24359b9fa12c3ef130a73, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectContainer
+  interactionName: Box Pizza Margherita
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: -3563837913674936160, guid: 555956dca2c71774c9ae3793f85fc02b, type: 3}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 0
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    Mode: 2
+    AllowedFlags:
+    - {fileID: 11400000, guid: 0776dd6347327264fb8c9a000f5a1304, type: 2}
+    Match: 0
+    Unlimited: 0
+    Capacity: 1
+    LimitToDispenserSpace: 0
+    KeepVisible: 0
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Spacing: {x: 0, y: 0.2, z: 0}
+    InitialFill: 0
+    ScoopAmount: 1
+    ScoopAnimation:
+      Enabled: 1
+      Mode: 0
+      Approach:
+        Id: dispenser-approach
+        Name: Dispenser Approach
+        Space: 0
+        Position: {x: 0, y: 0, z: 0}
+        Rotate: 0
+        Rotation: {x: 0, y: 0, z: 0}
+        Duration: 0.3
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      Keyframes:
+      - Id: pizza-approach
+        Name: Approach Pizza
+        Space: 0
+        Position: {x: 0.45, y: 0.03, z: 0}
+        Rotate: 1
+        Rotation: {x: 0, y: 270, z: 0}
+        Duration: 0.32
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      - Id: pizza-collect
+        Name: Collect Pizza
+        Space: 0
+        Position: {x: 0, y: -0.008, z: 0}
+        Rotate: 1
+        Rotation: {x: 0, y: 270, z: 0}
+        Duration: 0.42
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      - Id: pizza-lift
+        Name: Withdraw Closed Box
+        Space: 0
+        Position: {x: 0.35, y: 0.06, z: 0}
+        Rotate: 1
+        Rotation: {x: 0, y: 270, z: 0}
+        Duration: 0.22
+        Easing: 1
+        Resize: 0
+        Scale: {x: 1, y: 1, z: 1}
+      FillAfter: pizza-collect
+      ReturnToStart: 1
+      ReturnDuration: 0.35
+      ObstacleMargin: 1.2
+      VisualPath:
+    FillSteps:
+    - Count: 1
+      Mode: 0
+      ItemFill:
+        VisualPrefab: {fileID: 0}
+        Magnets: []
+      Appearance:
+        Meshes:
+        - Path:
+          PrimaryMesh: 1
+          Mesh: {fileID: 2603588498265785519, guid: 9e57e4c2fde7c3345b2be6295a0e90fe, type: 3}
+          UpdateCollider: 0
+        Materials:
+        - Path: SM_Base_PizzaBox_Open
+          Materials:
+          - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
+        Visibility: []
+      Flags:
+        Mode: 1
+        Flags:
+        - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
+        Remove: []
+--- !u!114 &7085557934977674765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1229832333385971152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 994c55d568d64030bf050b32ec59ecf9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
+  interactionName: Lock Box Pizza Rossa
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Operation: 1
+    InitiallyLocked: 0
+    Repeat: 0
+    ReleaseOnEmptyScoop: 0
+    Target: {fileID: 4075011540961968110}
+    Replacement: {fileID: 0}
+    RequireAll: 0
+    Conditions:
+    - Trigger: 0
+      Source: {fileID: 5176723442728227944}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+--- !u!114 &6464014623747192775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1229832333385971152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 994c55d568d64030bf050b32ec59ecf9, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectInteractionUnlock
+  interactionName: Lock Box Pizza Margherita
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  drawGizmos: 1
+  settings:
+    Operation: 1
+    InitiallyLocked: 0
+    Repeat: 0
+    ReleaseOnEmptyScoop: 0
+    Target: {fileID: 5176723442728227944}
+    Replacement: {fileID: 0}
+    RequireAll: 0
+    Conditions:
+    - Trigger: 0
+      Source: {fileID: 4075011540961968110}
+      Moment: 0
+      Step:
+        Block:
+        Entry:
+      Action: {fileID: 0}
+      Distance: 3
+      Count: 1
+      FilterConsumed: 0
+      ConsumedFlags: []
+--- !u!1 &3965560131121034430
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4342507160972553732}
+  - component: {fileID: 859190083244581281}
+  - component: {fileID: 3172930651846612331}
+  m_Layer: 6
+  m_Name: SM_Base_PizzaBox_Open
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4342507160972553732
 Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
-  m_PrefabInstance: {fileID: 4307998966095972847}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3965560131121034430}
+  serializedVersion: 2
+  m_LocalRotation: {x: -6.123234e-17, y: 1, z: 6.123234e-17, w: -3.7493994e-33}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6762525786067770511}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &859190083244581281
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3965560131121034430}
+  m_Mesh: {fileID: -6270569212199898718, guid: a9ef488ce2872b44a8d425604dbfe6d0, type: 3}
+--- !u!23 &3172930651846612331
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3965560131121034430}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 5f08a45698d291c4aa4b9487050a8be2, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}

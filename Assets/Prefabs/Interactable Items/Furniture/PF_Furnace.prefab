@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 7886962716839478431}
   - component: {fileID: 6229206398965940034}
   - component: {fileID: 2250534995049393571}
+  - component: {fileID: 3604145573733478674}
+  - component: {fileID: 6977877330275472017}
   m_Layer: 0
   m_Name: PF_Furnace
   m_TagString: Untagged
@@ -102,8 +104,8 @@ MonoBehaviour:
     Modifications:
     - {fileID: 11400000, guid: e7c78d2a700142718e559cead496d816, type: 2}
     - {fileID: 11400000, guid: 7e3f727cfc4f4179a5a520801735af44, type: 2}
-    - {fileID: 11400000, guid: 0272116bbe70a614faf37a36a0493289, type: 2}
-    - {fileID: 11400000, guid: 58de2772da244ebe8573c26f9e10bcac, type: 2}
+    - {fileID: 11400000, guid: 5d92d43b7a6cd9b4aadf4771843a1863, type: 2}
+    - {fileID: 11400000, guid: 24c74934172104c4d9b2c9156f504c50, type: 2}
     - {fileID: 11400000, guid: 6763c67936ae2294e9ce3fe604948064, type: 2}
     - {fileID: 11400000, guid: dbff11e02218e5d46bd26ebe3ae97bfa, type: 2}
     - {fileID: 11400000, guid: 83414fbcb3326904c917f60334fdfbfc, type: 2}
@@ -305,6 +307,160 @@ MonoBehaviour:
     IncludeFixedObjects: 0
     Flags: []
     OffscreenDelay: 0.25
+--- !u!114 &3604145573733478674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d69ddefe9b2499095a570e106dd4e91, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+  interactionName: Scoop Pizza Rossa
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: 0}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 2
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    UseContainer: 0
+    Prefab: {fileID: 796526925438680946, guid: 0c7171b15cba3b94d9be5010afd3d648, type: 3}
+    ScoopDisplay:
+      Placement: 1
+      ScoopLimit: 1
+      RestockForNewContainer: 0
+      RestockPrefab: {fileID: 0}
+      RestockScale: 1
+      VisibleCount: 1
+      Magnets:
+      - {x: 0, y: 0, z: 0}
+      Drift: {x: 0, y: 0, z: 0}
+      Speed: 0.45
+      BobCrestPower: 1
+      Steps: 00000000i
+    Unlimited: 0
+    Stock: 1
+    DestroyWhenEmpty: 0
+    Mode: 3
+    SeparateToolOutput: 0
+    ToolMode: 2
+    Interval: 0.25
+    OutputsPerShot: 1
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 1
+    Outlets:
+    - Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+    PickupDuration: 0.35
+    OutputRotation: {x: 0, y: 0, z: 0}
+    StepCounter: 0
+    FillSteps: []
+--- !u!114 &6977877330275472017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5049049463900345670}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d69ddefe9b2499095a570e106dd4e91, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectDispenser
+  interactionName: Scoop Pizza Margherita
+  toolRequirement:
+    Mode: 0
+    Tool: {fileID: 0}
+    Tools: []
+  flagChange:
+    Enabled: 0
+    Flag: {fileID: 0}
+    Operation: 0
+    Moment: 1
+  visualEffect:
+    Enabled: 0
+    Prefab: {fileID: 0}
+    AutoTiming: 0
+    Duration: 1
+    OnContactObject: 0
+    FollowObject: 1
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  completionBindings: []
+  action: {fileID: 0}
+  settings:
+    Target:
+      Distance: 3
+      Mode: 2
+      SolidHitOnly: 0
+      CenterRadius: 0.15
+      Offset: {x: 0, y: 0, z: 0}
+      ObstacleMask:
+        serializedVersion: 2
+        m_Bits: 4294967295
+      DrawGizmos: 1
+    UseContainer: 0
+    Prefab: {fileID: 1851592354125701395, guid: 8e72e7801d85085408097e80f2889ec9, type: 3}
+    ScoopDisplay:
+      Placement: 1
+      ScoopLimit: 1
+      RestockForNewContainer: 0
+      RestockPrefab: {fileID: 0}
+      RestockScale: 1
+      VisibleCount: 1
+      Magnets:
+      - {x: 0, y: 0, z: 0}
+      Drift: {x: 0, y: 0, z: 0}
+      Speed: 0.45
+      BobCrestPower: 1
+      Steps: 00000000i
+    Unlimited: 0
+    Stock: 1
+    DestroyWhenEmpty: 0
+    Mode: 3
+    SeparateToolOutput: 0
+    ToolMode: 2
+    Interval: 0.25
+    OutputsPerShot: 1
+    ScatterShotOutputs: 1
+    ScatterDistanceMultiplier: 1
+    Outlets:
+    - Position: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+    PickupDuration: 0.35
+    OutputRotation: {x: 0, y: 0, z: 0}
+    StepCounter: 0
+    FillSteps: []
 --- !u!1 &7637673994572382804
 GameObject:
   m_ObjectHideFlags: 0
