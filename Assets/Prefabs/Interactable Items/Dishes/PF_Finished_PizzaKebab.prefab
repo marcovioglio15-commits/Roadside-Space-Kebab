@@ -442,7 +442,7 @@ MonoBehaviour:
     WaitForNextIngredient: 0
     Ingredients:
     - Flags:
-      - {fileID: 11400000, guid: 0776dd6347327264fb8c9a000f5a1304, type: 2}
+      - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
       Count: 1
       Optional: 0
     - Flags:
@@ -461,21 +461,21 @@ MonoBehaviour:
       - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       Count: 1
       Optional: 1
-    - Flags:
-      - {fileID: 11400000, guid: f47676de99e70274ea99fa18473345c3, type: 2}
-      Count: 1
-      Optional: 0
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0
       Flags:
-      - {fileID: 11400000, guid: 0776dd6347327264fb8c9a000f5a1304, type: 2}
+      - {fileID: 11400000, guid: 321ff08bcce692e42862323aa8405de2, type: 2}
       Order: 0
       Position: {x: 0, y: 0, z: 0}
-      Rotation: {x: 0, y: 0, z: 0}
+      Rotation: {x: 90, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
-        Meshes: []
+        Meshes:
+        - Path: SM_Finished_PizzaMargherita
+          PrimaryMesh: 1
+          Mesh: {fileID: 4564368869480974242, guid: c3384dbbd6cac4a4a8357e335989f49c, type: 3}
+          UpdateCollider: 0
         Materials: []
         Visibility: []
       CompletedAppearance:
@@ -544,7 +544,7 @@ MonoBehaviour:
       Scale: {x: 0.7, y: 0.7, z: 0.7}
       Appearance:
         Meshes:
-        - Path:
+        - Path: 
           PrimaryMesh: 1
           Mesh: {fileID: 4279741042369765514, guid: d154d209501b94e4283f1267de1bfb15, type: 3}
           UpdateCollider: 0
@@ -555,23 +555,6 @@ MonoBehaviour:
         Materials: []
         Visibility: []
       PreviewPrefab: {fileID: 6484676068278646964, guid: a7f8a1a708ab7fc4db668aa796f19a34, type: 3}
-    - Name: Pizza Box
-      AnyIngredient: 0
-      Flags:
-      - {fileID: 11400000, guid: f47676de99e70274ea99fa18473345c3, type: 2}
-      Order: 0
-      Position: {x: 0, y: -0.008, z: 0}
-      Rotation: {x: 0, y: 0, z: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Appearance:
-        Meshes: []
-        Materials: []
-        Visibility: []
-      CompletedAppearance:
-        Meshes: []
-        Materials: []
-        Visibility: []
-      PreviewPrefab: {fileID: 1229832333385971152, guid: 98cdb19e581558f4a9fce17f64e509c1, type: 3}
     InteractionRules:
     - Target: {fileID: 4060919288793665968}
       RequireComplete: 1
