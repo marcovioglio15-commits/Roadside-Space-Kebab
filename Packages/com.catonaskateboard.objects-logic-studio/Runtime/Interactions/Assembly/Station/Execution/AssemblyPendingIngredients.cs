@@ -12,6 +12,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private readonly Dictionary<ObjectItem, uint> withdrawn = new Dictionary<ObjectItem, uint>();
         private readonly List<ObjectItem> removed = new List<ObjectItem>();
         private readonly AssemblyIngredientSelection selection = new AssemblyIngredientSelection();
+        private readonly AssemblyPreviewAppearance appearance = new AssemblyPreviewAppearance();
 
         #endregion
 
@@ -40,6 +41,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True until separation or a new deliberate player release.</returns>
         internal bool IsWithdrawn(ObjectItem item) => withdrawn.ContainsKey(item);
 
+        /// <summary>Prevents a recipe proposal from abandoning ingredients already retained on the shared table.</summary>
+        /// <param name="ingredients">Objects included in the proposed composition.</param>
+        /// <returns>True when every live preview participates in this proposal.</returns>
+        internal bool IsIncluded(IReadOnlyList<ObjectGrab> ingredients)
+        {
+            // Preview ownership is refreshed by contact collection before proposals are built.
+            foreach (AssemblyIngredientDock dock in docks)
+            {
+                if (dock.Ingredient == null)
+                    continue;
+                bool included = false;
+                for (int index = 0; index < ingredients.Count && !included; index++)
+                    included = ingredients[index] == dock.Ingredient;
+                if (!included)
+                    return false;
+            }
+            return true;
+        }
+
         /// <summary>Shares live preview ingredients with every competing recipe on the same table.</summary>
         /// <param name="ingredients">Reusable collection receiving distinct candidates.</param>
         internal void Collect(List<ObjectGrab> ingredients)
@@ -64,6 +84,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (dock.Ingredient == null)
                     docks.RemoveAt(index);
             }
+            if (docks.Count == 0)
+                appearance.Clear();
         }
 
         #endregion
@@ -89,6 +111,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (dock.Ingredient != null)
                     docks.Add(dock);
             }
+            if (docks.Count > 0)
+                appearance.Refresh(station, ingredients);
         }
 
         /// <summary>Restores temporary poses and physics overrides when this station becomes unavailable.</summary>
@@ -99,6 +123,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 dock.Release();
             docks.Clear();
             withdrawn.Clear();
+            appearance.Clear();
         }
 
         #endregion

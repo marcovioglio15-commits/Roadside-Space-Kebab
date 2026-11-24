@@ -18,6 +18,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         private readonly List<ObjectInteraction> filterBuffer = new List<ObjectInteraction>();
         private Rigidbody body;
+        private ObjectGrab grab;
+        private ObjectAssemblyProduct product;
         private Pose rest;
         private Vector3 direction;
         private Vector3 axis;
@@ -51,7 +53,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             // An invalid component stays available for editing without handling physics.
             if (TryValidate(out string warning))
+            {
                 body = GetComponent<Rigidbody>();
+                grab = GetComponent<ObjectGrab>();
+                product = GetComponent<ObjectAssemblyProduct>();
+            }
             else
                 Debug.LogWarning(warning, this);
         }
@@ -69,6 +75,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             reacting = false;
             body = null;
+            grab = null;
+            product = null;
         }
 
         /// <summary>Validates the applied reaction against the receiver's Rigidbody.</summary>
@@ -177,11 +185,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Checks that another interaction has not taken ownership of this body.</summary>
-        /// <returns>True while the receiver can move as a kinematic body.</returns>
+        /// <returns>True while the receiver can wobble without moving a retained assembly.</returns>
         private bool CanWobble()
         {
+            // Provisional ingredients and station-owned products retain their magnet poses through impacts.
             return body != null && body.isKinematic && Item != null && !Item.IsCarried && !Item.IsReserved
-                && !Item.IsConsumed && !BlackHoleRun.Contains(body);
+                && !Item.IsConsumed && !BlackHoleRun.Contains(body) && (grab == null || grab.Dock == null)
+                && (product == null || product.Table == null);
         }
 
         #endregion

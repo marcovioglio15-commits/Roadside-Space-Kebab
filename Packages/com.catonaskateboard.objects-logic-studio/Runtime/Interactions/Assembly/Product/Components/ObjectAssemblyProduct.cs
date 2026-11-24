@@ -279,8 +279,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="ingredients">Ordered physical ingredients proposed for an empty recipe.</param>
         /// <param name="complete">Receives whether the proposal finishes this recipe.</param>
         /// <param name="previous">Unfinished product whose retained ingredients participate in this proposal.</param>
-        /// <returns>True when all objects fit in order without overlapping ownership.</returns>
-        internal bool CanAcceptSequence(IReadOnlyList<ObjectGrab> ingredients, out bool complete, ObjectAssemblyProduct previous = null)
+        /// <param name="enforceOrder">Disable only to keep competing recipes pending until their earlier ingredients arrive.</param>
+        /// <returns>True when all objects fit compatible magnets without overlapping ownership.</returns>
+        internal bool CanAcceptSequence(IReadOnlyList<ObjectGrab> ingredients, out bool complete, ObjectAssemblyProduct previous = null,
+            bool enforceOrder = true)
         {
             // Validate ownership before any scratch selection accesses recipe arrays.
             complete = false;
@@ -296,7 +298,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (ingredient.transform.IsChildOf(ingredients[earlier].transform)
                         || ingredients[earlier].transform.IsChildOf(ingredient.transform))
                         return false;
-                if (!selection.Append(settings, ingredient, index + 1, out _, out _))
+                if (!selection.Append(settings, ingredient, index + 1, out _, out _, enforceOrder))
                     return false;
             }
             complete = selection.Completes(settings);
@@ -350,8 +352,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!TrySelectIngredient(grab, out int magnet, out ObjectFlag flag, requireHeld))
                 return false;
             Initialize();
-            if (!initialized || !ItemAppearanceChanges.TryPrepare(grab.Item, settings.Magnets[magnet].Appearance,
-                out ItemAppearanceChanges appearance, out _))
+            if (!initialized || !AssemblyIngredientDock.TryPrepareAppearance(grab, settings.Magnets[magnet].Appearance,
+                out ItemAppearanceChanges appearance))
                 return false;
             AttachIngredient(grab, magnet, flag, appearance);
             return true;
@@ -374,8 +376,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             for (int index = 0; index < ingredients.Count; index++)
             {
                 if (!selection.Append(settings, ingredients[index], index + 1, out int magnet, out ObjectFlag flag)
-                    || !ItemAppearanceChanges.TryPrepare(ingredients[index].Item, settings.Magnets[magnet].Appearance,
-                        out ItemAppearanceChanges appearance, out _))
+                    || !AssemblyIngredientDock.TryPrepareAppearance(ingredients[index], settings.Magnets[magnet].Appearance,
+                        out ItemAppearanceChanges appearance))
                     return false;
                 prepared[index] = (magnet, flag, appearance);
             }

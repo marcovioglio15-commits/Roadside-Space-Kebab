@@ -27,6 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ScoopRun scoop;
         private ContainerFillVisuals itemFill;
         private bool hasItemFill;
+        private bool itemFillSuppressed;
 
         #endregion
 
@@ -69,6 +70,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 container.scoop?.Cancel();
                 container.scoop = null;
                 container.fillInitialized = false;
+                container.itemFillSuppressed = false;
             }
         }
 
@@ -390,7 +392,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             }
             itemFill ??= new ContainerFillVisuals(transform);
+            itemFill.SetSuppressed(itemFillSuppressed);
             itemFill.Update(step.ItemFill, FillCount, settings.InitialFill, settings.ScoopFromDispenser ? null : stored);
+        }
+
+        /// <summary>Suppresses Container Step objects without changing their fill count, identity or stored originals.</summary>
+        /// <param name="suppressed">Whether a provisional assembly mesh replaces those visual copies.</param>
+        internal void SetItemFillSuppressed(bool suppressed)
+        {
+            if (itemFillSuppressed == suppressed)
+                return;
+            itemFillSuppressed = suppressed;
+            itemFill?.SetSuppressed(suppressed);
         }
 
         /// <summary>Releases mesh copies if this component is removed from a live box.</summary>

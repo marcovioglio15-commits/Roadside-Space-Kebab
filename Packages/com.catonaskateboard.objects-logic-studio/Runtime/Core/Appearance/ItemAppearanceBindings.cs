@@ -45,6 +45,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             if (item == null)
                 return null;
+            // A common preview may hide the renderer; insertion still targets the original standalone branch.
+            if (item.TryGetComponent(out ObjectGrab grab) && grab.Dock != null)
+                return grab.Dock.PrimaryMesh;
             // Fill copies remain owned for tinting, but never identify the container mesh.
             Transform selected = null;
             foreach (Renderer renderer in item.AppearanceRenderers)

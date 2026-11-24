@@ -59,9 +59,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="grab">Eligible incoming ingredient.</param>
         /// <param name="magnet">Receives the selected magnet index.</param>
         /// <param name="flag">Receives the single recipe flag counted for this ingredient.</param>
+        /// <param name="enforceOrder">False only when checking whether a competing recipe can wait for earlier magnets.</param>
         /// <returns>True when order, capacity and appearance bindings permit insertion.</returns>
         internal bool TrySelect(AssemblyProductSettings settings, IReadOnlyDictionary<ObjectFlag, int> counts,
-            bool[] occupied, int insertion, ObjectGrab grab, out int magnet, out ObjectFlag flag)
+            bool[] occupied, int insertion, ObjectGrab grab, out int magnet, out ObjectFlag flag, bool enforceOrder = true)
         {
             // Prefer restricted magnets; recipe order resolves generic alternatives consistently.
             magnet = -1;
@@ -71,7 +72,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 {
                     AssemblyMagnet slot = settings.Magnets[index];
                     if (occupied != null && occupied[index] || slot.AnyIngredient != (pass == 1)
-                        || !AssemblySlotOrder.Allows(settings.Magnets, occupied, index, insertion))
+                        || enforceOrder && !AssemblySlotOrder.Allows(settings.Magnets, occupied, index, insertion))
                         continue;
                     foreach (AssemblyIngredient ingredient in settings.Ingredients)
                         if (grab.Units > 0 && grab.Units <= ingredient.Count - AssemblyCapacity.Count(counts, ingredient.Flags))
@@ -108,11 +109,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="insertion">One-based proposed insertion number.</param>
         /// <param name="magnet">Receives the chosen magnet.</param>
         /// <param name="flag">Receives the counted recipe flag.</param>
+        /// <param name="enforceOrder">Keep insertion order for actual proposals; disable it only for pending alternatives.</param>
         /// <returns>True when the ingredient fits after every previously proposed insertion.</returns>
-        internal bool Append(AssemblyProductSettings settings, ObjectGrab grab, int insertion, out int magnet, out ObjectFlag flag)
+        internal bool Append(AssemblyProductSettings settings, ObjectGrab grab, int insertion, out int magnet, out ObjectFlag flag,
+            bool enforceOrder = true)
         {
             // A rejected candidate leaves scratch progress unchanged for the next alternative.
-            if (!TrySelect(settings, proposedCounts, proposedSlots, insertion, grab, out magnet, out flag))
+            if (!TrySelect(settings, proposedCounts, proposedSlots, insertion, grab, out magnet, out flag, enforceOrder))
                 return false;
             proposedSlots[magnet] = true;
             proposedCounts.TryGetValue(flag, out int count);

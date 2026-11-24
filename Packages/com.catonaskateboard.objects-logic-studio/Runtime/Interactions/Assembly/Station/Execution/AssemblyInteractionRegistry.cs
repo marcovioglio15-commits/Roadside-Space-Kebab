@@ -103,6 +103,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     other.Pending.Collect(ingredients);
         }
 
+        /// <summary>Collects available sibling recipes before evaluating their common provisional appearance.</summary>
+        /// <param name="station">Station owning the waiting ingredients.</param>
+        /// <param name="choices">Reusable destination for available alternatives.</param>
+        internal static void CollectChoices(ObjectAssemblyStation station, List<ObjectAssemblyStation> choices)
+        {
+            choices.Clear();
+            foreach (ObjectAssemblyStation other in items)
+                if (SharesChoices(station, other) && other.CanPlan)
+                    choices.Add(other);
+        }
+
+        /// <summary>Requires alternative recipes to preserve the full composition waiting on their shared surface.</summary>
+        /// <param name="station">Recipe proposing a preview or a new product.</param>
+        /// <param name="ingredients">Physical ingredients included in the proposal.</param>
+        /// <returns>True when no sibling's retained ingredient would be abandoned.</returns>
+        internal static bool IncludesPending(ObjectAssemblyStation station, IReadOnlyList<ObjectGrab> ingredients)
+        {
+            // Loose unrelated contacts do not select a recipe; existing magnet previews do constrain it.
+            foreach (ObjectAssemblyStation other in items)
+                if (SharesChoices(station, other) && !other.Pending.IsIncluded(ingredients))
+                    return false;
+            return true;
+        }
+
         /// <summary>Preserves a manual withdrawal for every competing contact recipe on the same table.</summary>
         /// <param name="station">Station evaluating a physical contact.</param>
         /// <param name="item">Object moved by a different interaction.</param>
@@ -123,11 +147,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True while another available recipe keeps this choice unresolved or takes priority.</returns>
         internal static bool IsAmbiguous(ObjectAssemblyStation station, IReadOnlyList<ObjectGrab> ingredients, bool complete)
         {
-            // A completed shorter recipe wins over an unfinished extension; identical completed recipes use stable identity.
+            // Missing earlier magnets may keep an alternative pending; actual insertion still enforces their order.
             foreach (ObjectAssemblyStation other in items)
             {
                 if (other == station || !SharesChoices(station, other) || !other.CanPlan
-                    || !other.Template.CanAcceptSequence(ingredients, out bool otherComplete))
+                    || !other.Template.CanAcceptSequence(ingredients, out bool otherComplete, enforceOrder: false))
                     continue;
                 if (station.Settings.ProductPrefab == other.Settings.ProductPrefab || complete && otherComplete)
                 {

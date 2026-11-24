@@ -355,11 +355,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Recipe Applications
 
-        /// <summary>Retains sauce identities separately from targeting and the receiving object's identity.</summary>
-        /// <param name="flags">Sauce identities captured when the liquid left its source.</param>
+        /// <summary>Retains ingredient provenance through spraying, cooking and container transfers.</summary>
+        /// <param name="flags">Ingredient identities captured from the source before its transfer or consumption.</param>
         internal void ApplyIngredient(ObjectFlag[] flags)
         {
-            // Set membership makes repeated droplets and repeated sprays count as one application.
+            // Repeated applications and nested transfers retain each ingredient flag once.
             foreach (ObjectFlag flag in flags)
                 if (flag != null)
                     appliedIngredients.Add(flag);
@@ -380,11 +380,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return result;
         }
 
-        /// <summary>Retains sauce provenance when this item becomes an ingredient in another product.</summary>
-        /// <param name="destination">Set receiving applied sauces and any completed nested recipe.</param>
+        /// <summary>Collects ingredient provenance retained by completed recipes and intermediate items.</summary>
+        /// <param name="destination">Set receiving ingredients and sauces, including every retained nested base.</param>
         internal void CollectRecipeFlags(HashSet<ObjectFlag> destination)
         {
-            // Insertion and delivery share this path, so nested products keep their sauces.
+            // Ingredient snapshots include nested bases; targeting identity remains separate.
             destination.UnionWith(appliedIngredients);
             if (TryGetComponent(out ObjectAssemblyProduct product) && product.IsComplete)
                 product.CollectIngredientFlags(destination);

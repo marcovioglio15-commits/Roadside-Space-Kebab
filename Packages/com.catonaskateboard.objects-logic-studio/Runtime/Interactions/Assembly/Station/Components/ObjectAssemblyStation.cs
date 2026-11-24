@@ -250,7 +250,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal bool CanStart(IReadOnlyList<ObjectGrab> ingredients, bool requireHeld = false)
         {
             // Contact previews wait for a companion; an explicit command keeps its original insertion behavior.
-            if (ingredients.Count == 0 || !CanPlan || !requireHeld && ingredients.Count == 1 && WaitsForIngredient(ingredients[0]))
+            if (ingredients.Count == 0 || !CanPlan || !AssemblyInteractionRegistry.IncludesPending(this, ingredients)
+                || !requireHeld && ingredients.Count == 1 && WaitsForIngredient(ingredients[0]))
                 return false;
             foreach (ObjectGrab ingredient in ingredients)
                 if (!requireHeld && !AssemblyIngredientDock.Allows(this, ingredient))

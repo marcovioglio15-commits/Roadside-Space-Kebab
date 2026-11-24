@@ -40,19 +40,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Maximum draws of this variant, including required draws. Zero excludes it from extraction.")]
         public int MaximumDraws = 1;
         [Header("Recipe Modifiers")]
-        [Tooltip("Flags from inserted ingredients or sauces sprayed onto the delivered item. Sauce targeting rules do not affect these requirements.")]
+        [Tooltip("Ingredient and sauce flags, including nested bases retained through cooking and packaging.")]
         public ObjectFlag[] Flags = Array.Empty<ObjectFlag>();
         [Tooltip("Require every selected ingredient or sauce flag. Otherwise any selected flag qualifies.")]
         public bool RequireAllFlags = true;
-        [Tooltip("Ingredient or sprayed sauce flags that must all be absent. Combined with the additive flags above.")]
+        [Tooltip("Ingredient or sauce flags that must be absent, including those retained by nested bases.")]
         public ObjectFlag[] ExcludedFlags = Array.Empty<ObjectFlag>();
 
         #endregion
         #region Methods
         #region Matching
 
-        /// <summary>Checks an immutable ingredient receipt captured before consumption disables the assembled product.</summary>
-        /// <param name="ingredients">All inserted ingredient flags, or an empty array for non-assembled items.</param>
+        /// <summary>Checks the complete ingredient snapshot captured before consuming the delivered item.</summary>
+        /// <param name="ingredients">Ingredient and sauce flags from all retained recipe levels; null for an unfinished assembly.</param>
         /// <returns>True when the assembled recipe satisfies this variant's modifiers.</returns>
         internal bool Matches(ObjectFlag[] ingredients)
         {

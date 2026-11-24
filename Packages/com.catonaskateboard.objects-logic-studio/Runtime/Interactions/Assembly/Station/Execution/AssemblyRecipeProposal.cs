@@ -50,6 +50,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (!appended)
                     break;
             }
+            // An incompatible subset must neither replace the current previews nor start a competing product.
+            if (!AssemblyInteractionRegistry.IncludesPending(station, ingredients))
+                ingredients.Clear();
         }
 
         #endregion

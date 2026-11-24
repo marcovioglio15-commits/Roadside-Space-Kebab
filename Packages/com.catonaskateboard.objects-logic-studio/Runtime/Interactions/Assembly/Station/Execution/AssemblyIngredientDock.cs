@@ -22,6 +22,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private float started;
         private float duration;
         private bool settled;
+        private ItemAppearanceChanges appearance;
+        private bool hidesItemFill;
 
         #endregion
 
@@ -31,6 +33,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         internal ObjectAssemblyStation Station { get; private set; }
         /// <summary>Usable ingredient retained even when its magnet lies beyond the station's contact surface.</summary>
         internal ObjectGrab Ingredient { get; private set; }
+        /// <summary>Original primary mesh branch, including a renderer temporarily hidden by common preview settings.</summary>
+        internal Transform PrimaryMesh { get; private set; }
 
         #endregion
 
@@ -111,6 +115,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Ingredient = ingredient;
             placed = ++sequence;
             optional = optionalIngredient;
+            PrimaryMesh = ItemAppearanceBindings.PrimaryMesh(ingredient.Item);
             ingredient.Dock = this;
             body = ingredient.Body;
             ObjectGravityGenerator.Forget(body);
@@ -165,6 +170,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Restores temporary preview overrides before pickup, actual assembly or station teardown.</summary>
         internal void Release()
         {
+            appearance?.Restore();
+            appearance = null;
+            SetItemFillSuppressed(false);
+            hidesItemFill = false;
             // Clear ownership first so reentrant component callbacks cannot release the same preview twice.
             if (Ingredient != null && Ingredient.Dock == this)
                 Ingredient.Dock = null;
@@ -180,6 +189,63 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             Station = null;
             body = null;
             parent = null;
+            PrimaryMesh = null;
+        }
+
+        #endregion
+
+        #region Appearance
+
+        /// <summary>Restores original geometry before comparing recipe alternatives or capturing insertion snapshots.</summary>
+        internal void SuspendAppearance()
+        {
+            appearance?.Restore();
+        }
+
+        /// <summary>Reapplies the common preview after a binding check has finished.</summary>
+        internal void ResumeAppearance()
+        {
+            appearance?.Commit();
+            SetItemFillSuppressed(hidesItemFill);
+        }
+
+        /// <summary>Prepares the new shared appearance while the ingredient still displays its original geometry.</summary>
+        /// <param name="settings">Common insertion substitutions, possibly empty.</param>
+        internal void PrepareAppearance(ItemAppearanceSettings settings)
+        {
+            appearance = null;
+            if (settings.HasChanges)
+                ItemAppearanceChanges.TryPrepare(Ingredient.Item, settings, out appearance, out _);
+            hidesItemFill = appearance != null && settings.Meshes.Length > 0;
+        }
+
+        /// <summary>Shares preview visibility with each existing container card on this ingredient.</summary>
+        /// <param name="suppressed">Whether the common mesh replaces Container Step objects.</param>
+        private void SetItemFillSuppressed(bool suppressed)
+        {
+            if (Ingredient == null || Ingredient.CarryContainers == null)
+                return;
+            foreach (ObjectContainer container in Ingredient.CarryContainers)
+                if (container != null)
+                    container.SetItemFillSuppressed(suppressed);
+        }
+
+        /// <summary>Captures the standalone appearance for a real insertion without ending a provisional placement.</summary>
+        /// <param name="ingredient">Ingredient whose preview must remain reversible if preparation fails.</param>
+        /// <param name="settings">Selected recipe's insertion appearance.</param>
+        /// <param name="changes">Receives the real insertion transaction with the original standalone snapshot.</param>
+        /// <returns>True when every appearance binding is valid.</returns>
+        internal static bool TryPrepareAppearance(ObjectGrab ingredient, ItemAppearanceSettings settings, out ItemAppearanceChanges changes)
+        {
+            ingredient.Dock?.SuspendAppearance();
+            try
+            {
+                return ItemAppearanceChanges.TryPrepare(ingredient.Item, settings, out changes, out _);
+            }
+            finally
+            {
+                ingredient.Dock?.ResumeAppearance();
+            }
         }
 
         #endregion

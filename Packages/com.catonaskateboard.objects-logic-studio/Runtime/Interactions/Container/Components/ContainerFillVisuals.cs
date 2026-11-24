@@ -14,12 +14,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             internal Transform Root;
             internal GameObject Source;
             internal InventoryPortionLook Look;
+            internal bool Visible;
         }
 
         private readonly Transform owner;
         private readonly List<InventoryPortionLook> scooped = new List<InventoryPortionLook>();
         private readonly List<Unit> units = new List<Unit>();
         private readonly Dictionary<GameObject, InventoryPortionLook> models = new Dictionary<GameObject, InventoryPortionLook>();
+        private bool suppressed;
 
         #endregion
 
@@ -97,6 +99,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Lifecycle
 
+        /// <summary>Temporarily hides step objects while retaining their requested fill visibility.</summary>
+        /// <param name="value">Whether an assembly preview replaces the container's visible contents.</param>
+        internal void SetSuppressed(bool value)
+        {
+            // Repeated preview checks never toggle objects or overwrite their fill state.
+            if (suppressed == value)
+                return;
+            suppressed = value;
+            foreach (Unit unit in units)
+                ApplyVisibility(unit);
+        }
+
         /// <summary>Hides copies while their container interaction is disabled.</summary>
         internal void Hide()
         {
@@ -117,15 +131,25 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Changes visibility only when the unit crosses a fill or activation boundary.</summary>
         /// <param name="unit">Reusable mesh instance.</param>
         /// <param name="visible">Whether this position is occupied.</param>
-        private static void SetVisible(Unit unit, bool visible)
+        private void SetVisible(Unit unit, bool visible)
         {
+            // Count changes remain authoritative even while the copies are temporarily suppressed.
+            unit.Visible = visible;
+            ApplyVisibility(unit);
+        }
+
+        /// <summary>Combines the selected fill step with temporary assembly suppression.</summary>
+        /// <param name="unit">Existing visual copy whose activation may need to change.</param>
+        private void ApplyVisibility(Unit unit)
+        {
+            bool visible = unit.Visible && !suppressed;
             if (unit.Root != null && unit.Root.gameObject.activeSelf != visible)
                 unit.Root.gameObject.SetActive(visible);
         }
 
         /// <summary>Hides and removes the render objects before replacing their geometry.</summary>
         /// <param name="unit">Visual instance being replaced or cleared.</param>
-        private static void Release(Unit unit)
+        private void Release(Unit unit)
         {
             if (unit.Root == null)
                 return;
