@@ -2540,7 +2540,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: bd83eb0b51385164a85ac1acb691d037, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: e2d59c719f67f4441b09ca4de6139711, type: 2}
+      objectReference: {fileID: 2100000, guid: 93d7f1c1d890670439bd65ffe8f9d024, type: 2}
     - target: {fileID: 919132149155446097, guid: bd83eb0b51385164a85ac1acb691d037, type: 3}
       propertyPath: m_Name
       value: SM_TestTextureWall
@@ -8432,7 +8432,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6532623392894031009, guid: 57f22dde91c8e424782ad7cb314fdaef, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.0737946
+      value: 0.076
       objectReference: {fileID: 0}
     - target: {fileID: 7448650281828425776, guid: 57f22dde91c8e424782ad7cb314fdaef, type: 3}
       propertyPath: m_LocalPosition.x
