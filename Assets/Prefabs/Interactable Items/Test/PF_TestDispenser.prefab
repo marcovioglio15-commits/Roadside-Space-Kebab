@@ -176,7 +176,18 @@ MonoBehaviour:
       DrawGizmos: 1
     UseContainer: 0
     Prefab: {fileID: 9017165495754910650, guid: eb773dd05cd83df4aa5ef91eb4a1abac, type: 3}
-    ScoopFlag: {fileID: 0}
+    ScoopDisplay:
+      ScoopLimit: 32
+      RestockForNewContainer: 0
+      RestockPrefab: {fileID: 0}
+      RestockScale: 1
+      VisibleCount: 1
+      Magnets:
+      - {x: 0, y: 0, z: 0}
+      Drift: {x: 0.02, y: 0.015, z: 0.02}
+      Speed: 0.45
+      BobCrestPower: 1
+      Steps: 
     Unlimited: 1
     Stock: 1
     DestroyWhenEmpty: 0
@@ -240,8 +251,7 @@ MonoBehaviour:
         m_Bits: 4294967295
       DrawGizmos: 1
     Mode: 0
-    AllowedFlags:
-    - {fileID: 11400000, guid: b642625e69d74496995bd0f22cbd6cfc, type: 2}
+    AllowedFlags: []
     Match: 0
     Unlimited: 1
     Capacity: 10
@@ -251,6 +261,7 @@ MonoBehaviour:
     Rotation: {x: 0, y: 0, z: 0}
     Spacing: {x: 0, y: 0.2, z: 0}
     InitialFill: 0
+    ScoopAmount: 1
     ScoopAnimation:
       Enabled: 0
       Mode: 0

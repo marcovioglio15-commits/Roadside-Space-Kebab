@@ -53,8 +53,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 if (!center.isExpanded)
                     continue;
-                ObjectNumericControls.Vector(center.FindPropertyRelative("Position"), -20f, 20f);
-                ObjectNumericControls.Vector(center.FindPropertyRelative("Rotation"), -360f, 360f);
+                StudioVectorControls.Draw(center.FindPropertyRelative("Position"), -20f, 20f);
+                StudioVectorControls.Draw(center.FindPropertyRelative("Rotation"), -360f, 360f);
             }
             StudioArrayGUI.Add(centers, "Add Orbit Center", () => new GravityOrbitCenter());
         }

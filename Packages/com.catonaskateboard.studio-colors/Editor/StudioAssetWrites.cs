@@ -87,6 +87,7 @@ namespace CatOnASkateboard.StudioColors.Editor
                 }
                 throw;
             }
+            StudioSourceChanges.Notify();
         }
 
         #endregion

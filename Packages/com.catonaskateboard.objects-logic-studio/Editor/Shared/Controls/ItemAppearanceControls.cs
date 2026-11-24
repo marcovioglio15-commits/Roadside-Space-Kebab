@@ -74,7 +74,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         break;
                     }
                 }
-                HierarchyPathMenu.Draw(entry.FindPropertyRelative("Path"), source, mesh);
+                if (mesh)
+                    HoverControls.Field(entry, "PrimaryMesh");
+                if (!mesh || !entry.FindPropertyRelative("PrimaryMesh").boolValue)
+                    HierarchyPathMenu.Draw(entry.FindPropertyRelative("Path"), source, mesh);
                 HoverControls.Field(entry, mesh ? "Mesh" : "Materials");
                 if (mesh)
                     HoverControls.Field(entry, "UpdateCollider");
@@ -86,6 +89,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             added.FindPropertyRelative("Path").stringValue = string.Empty;
             if (mesh)
             {
+                added.FindPropertyRelative("PrimaryMesh").boolValue = false;
                 added.FindPropertyRelative("Mesh").objectReferenceValue = null;
                 added.FindPropertyRelative("UpdateCollider").boolValue = false;
             }

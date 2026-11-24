@@ -63,7 +63,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 BlackHoleGizmos.Draw(feature);
                 return;
             }
-            Vector3 origin = feature.Target.SolidHitOnly ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
+            Vector3 origin = (feature.Target.SolidHitOnly || feature.Target.Mode == HoverTargetMode.CenterCollider) ? feature.transform.position : feature.transform.TransformPoint(feature.Target.Offset);
             float size = HandleUtility.GetHandleSize(origin) * 0.7f;
             using Handles.DrawingScope scope = new Handles.DrawingScope(new Color(1f, 0.65f, 0.2f));
             if (feature.Settings.SelfEject && feature.Settings.TeamRocketSpin)

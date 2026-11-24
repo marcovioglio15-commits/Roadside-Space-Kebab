@@ -18,23 +18,42 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // A dedicated asset editor makes changes visible to every manager referencing the same plan.
             serializedObject.Update();
-            Field(serializedObject, "Loop");
-            Field(serializedObject, "PreserveScene");
-            if (!serializedObject.FindProperty("Loop").boolValue)
-                Scene(serializedObject.FindProperty("MainMenu"), "Main Menu");
-            Scene(serializedObject.FindProperty("PauseScene"), "Pause Scene");
-            Field(serializedObject, "FadeOut");
-            Field(serializedObject, "BlackDelay");
-            Field(serializedObject, "FadeIn");
-            Field(serializedObject, "FixedSeed");
-            if (serializedObject.FindProperty("FixedSeed").boolValue)
-                Field(serializedObject, "Seed");
+            PlanSettings();
             Days(serializedObject.FindProperty("Days"));
             serializedObject.ApplyModifiedProperties();
             if (!((SpawnFlowPlan)target).TryValidate(out string warning))
                 EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
             if (StudioButton.Draw(new GUIContent("Register Scenes", "Enable the plan's days, pause scene and final menu in Build Settings without removing existing entries.")))
                 RegisterScenes((SpawnFlowPlan)target);
+        }
+
+        /// <summary>Groups plan-wide scene, transition and random settings into themed dropdowns.</summary>
+        private void PlanSettings()
+        {
+            // Independent expansion states keep long plans compact while editing a single visitor.
+            if (SpawnFlowKeyframeControls.Section(serializedObject.FindProperty("Loop"), "Flow and Scenes"))
+                using (new StudioIndentScope())
+                {
+                    Field(serializedObject, "Loop");
+                    Field(serializedObject, "PreserveScene");
+                    if (!serializedObject.FindProperty("Loop").boolValue)
+                        Scene(serializedObject.FindProperty("MainMenu"), "Main Menu");
+                    Scene(serializedObject.FindProperty("PauseScene"), "Pause Scene");
+                }
+            if (SpawnFlowKeyframeControls.Section(serializedObject.FindProperty("FadeOut"), "Scene Transitions"))
+                using (new StudioIndentScope())
+                {
+                    Field(serializedObject, "FadeOut");
+                    Field(serializedObject, "BlackDelay");
+                    Field(serializedObject, "FadeIn");
+                }
+            if (SpawnFlowKeyframeControls.Section(serializedObject.FindProperty("FixedSeed"), "Randomness"))
+                using (new StudioIndentScope())
+                {
+                    Field(serializedObject, "FixedSeed");
+                    if (serializedObject.FindProperty("FixedSeed").boolValue)
+                        Integer(serializedObject.FindProperty("Seed"), -10000, 10000);
+                }
         }
 
         /// <summary>Links a plan from an interaction card with direct creation and editing commands.</summary>
@@ -69,51 +88,56 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
                     SerializedProperty day = days.GetArrayElementAtIndex(index);
-                    if (Header(days, index, "Day " + (index + 1)))
+                    if (StudioArrayGUI.Header(days, index, new GUIContent("Day " + (index + 1) + " · " + day.FindPropertyRelative("Name").stringValue, days.tooltip)))
                         break;
                     if (!day.isExpanded)
                         continue;
                     using StudioIndentScope indent = new StudioIndentScope();
                     HoverControls.Field(day, "Name");
-                    Scene(day.FindPropertyRelative("Scene"), "Scene");
-                    SpawnFlowSceneControls.Draw(day);
-                    HoverControls.Field(day, "LengthMode");
-                    if ((DayLengthMode)day.FindPropertyRelative("LengthMode").enumValueIndex == DayLengthMode.Timer)
-                        HoverControls.Field(day, "DayDuration");
-                    else
-                    {
-                        HoverControls.Field(day, "RandomCount");
-                        if (day.FindPropertyRelative("RandomCount").boolValue)
+                    if (SpawnFlowKeyframeControls.Section(day.FindPropertyRelative("Scene"), "Scene and Events"))
+                        using (new StudioIndentScope())
                         {
-                            HoverControls.Field(day, "Minimum");
-                            HoverControls.Field(day, "Maximum");
+                            Scene(day.FindPropertyRelative("Scene"), "Scene");
+                            SpawnFlowSceneControls.Draw(day);
                         }
-                        else
-                            HoverControls.Field(day, "Count");
-                    }
-                    HoverControls.Field(day, "Selection");
+                    DayLength(day);
                     Steps(day.FindPropertyRelative("Steps"), day.FindPropertyRelative("Selection").enumValueIndex == (int)SpawnSelection.WeightedRandom);
                 }
             if (StudioButton.Draw(new GUIContent("+ Add Day", "Append a new day to the scene sequence.")))
             {
                 days.arraySize++;
                 SerializedProperty added = days.GetArrayElementAtIndex(days.arraySize - 1);
-                added.FindPropertyRelative("Name").stringValue = "Day " + days.arraySize;
-                added.FindPropertyRelative("Scene").stringValue = string.Empty;
-                added.FindPropertyRelative("WaitBeforeFirstSpawn").boolValue = false;
-                added.FindPropertyRelative("StartInteraction").boxedValue = new SceneInteractionReference();
-                added.FindPropertyRelative("ResetAnimations").enumValueIndex = (int)DayAnimationReset.None;
-                added.FindPropertyRelative("AnimationsToReset").arraySize = 0;
-                added.FindPropertyRelative("RandomCount").boolValue = false;
-                added.FindPropertyRelative("LengthMode").enumValueIndex = (int)DayLengthMode.SpawnCount;
-                added.FindPropertyRelative("DayDuration").floatValue = 300f;
-                added.FindPropertyRelative("Count").intValue = 1;
-                added.FindPropertyRelative("Minimum").intValue = 1;
-                added.FindPropertyRelative("Maximum").intValue = 3;
-                added.FindPropertyRelative("Selection").enumValueIndex = (int)SpawnSelection.Sequence;
-                added.FindPropertyRelative("Steps").arraySize = 0;
+                added.boxedValue = new SpawnFlowDay { Name = "Day " + days.arraySize };
                 added.isExpanded = true;
             }
+        }
+
+        /// <summary>Shows only the budget controls used by this day's admission policy.</summary>
+        /// <param name="day">Day whose length and selection are being edited.</param>
+        private static void DayLength(SerializedProperty day)
+        {
+            // Timer and count policies expose only their active budget settings.
+            if (!SpawnFlowKeyframeControls.Section(day.FindPropertyRelative("LengthMode"), "Duration and Selection"))
+                return;
+            using StudioIndentScope indent = new StudioIndentScope();
+            HoverControls.Field(day, "LengthMode");
+            switch ((DayLengthMode)day.FindPropertyRelative("LengthMode").enumValueIndex)
+            {
+                case DayLengthMode.Timer:
+                    HoverControls.Field(day, "DayDuration");
+                    break;
+                case DayLengthMode.SpawnCount:
+                    HoverControls.Field(day, "RandomCount");
+                    if (day.FindPropertyRelative("RandomCount").boolValue)
+                    {
+                        Integer(day.FindPropertyRelative("Minimum"), 1, 100);
+                        Integer(day.FindPropertyRelative("Maximum"), 1, 100);
+                    }
+                    else
+                        Integer(day.FindPropertyRelative("Count"), 1, 100);
+                    break;
+            }
+            HoverControls.Field(day, "Selection");
         }
 
         /// <summary>Draws independent prefab templates and exact completion component selectors.</summary>
@@ -126,52 +150,47 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
                 {
                     SerializedProperty step = steps.GetArrayElementAtIndex(index);
-                    if (Header(steps, index, "Spawn " + (index + 1)))
+                    if (StudioArrayGUI.Header(steps, index, new GUIContent("Spawn " + (index + 1) + " · " + step.FindPropertyRelative("Name").stringValue, steps.tooltip)))
                         break;
                     if (!step.isExpanded)
                         continue;
                     using StudioIndentScope indent = new StudioIndentScope();
                     HoverControls.Field(step, "Name");
                     TransferInteractionControls.Prefab(step.FindPropertyRelative("Prefab"));
-                    Completions(step);
-                    HoverControls.Field(step, "ArrivalDialogueEnabled", "Walk-in Dialogue");
-                    if (step.FindPropertyRelative("ArrivalDialogueEnabled").boolValue)
-                    {
-                        Completion(step, step.FindPropertyRelative("ArrivalDialogue"), "Dialogue", true);
-                    }
-                    HoverControls.Field(step, "NewCustomerSound", "Arrival Sound");
+                    if (SpawnFlowKeyframeControls.Section(step.FindPropertyRelative("Completions"), "Completion Rules"))
+                        using (new StudioIndentScope())
+                            Completions(step);
+                    if (SpawnFlowKeyframeControls.Section(step.FindPropertyRelative("ArrivalDialogueEnabled"), "Arrival Events"))
+                        using (new StudioIndentScope())
+                        {
+                            HoverControls.Field(step, "ArrivalDialogueEnabled", "Walk-in Dialogue");
+                            if (step.FindPropertyRelative("ArrivalDialogueEnabled").boolValue)
+                                Completion(step, step.FindPropertyRelative("ArrivalDialogue"), "Dialogue", true);
+                            HoverControls.Field(step, "NewCustomerSound", "Arrival Sound");
+                        }
                     if (weighted)
                         HoverControls.Field(step, "Weight");
                     HoverControls.Field(step, "Delay");
-                    HoverControls.Field(step, "Position");
-                    HoverControls.Field(step, "Rotation");
-                    Animation(step.FindPropertyRelative("WalkIn"), "Walk In");
-                    Animation(step.FindPropertyRelative("WalkOut"), "Walk Out");
+                    if (SpawnFlowKeyframeControls.Section(step.FindPropertyRelative("Position"), "Spawn Placement"))
+                        using (new StudioIndentScope())
+                        {
+                            StudioVectorControls.Draw(step.FindPropertyRelative("Position"), -20f, 20f);
+                            StudioVectorControls.Draw(step.FindPropertyRelative("Rotation"), -360f, 360f);
+                        }
+                    SpawnFlowKeyframeControls.Path(step.FindPropertyRelative("WalkIn"), "Walk In · Travel Path");
+                    SpawnFlowKeyframeControls.Path(step.FindPropertyRelative("WalkOut"), "Walk Out · Travel Path");
                     SpawnFlowAnimatorControls.Draw(step);
                 }
             if (StudioButton.Draw(new GUIContent("+ Add Spawn", "Append a prefab template with its own completion interaction.")))
             {
                 steps.arraySize++;
                 SerializedProperty added = steps.GetArrayElementAtIndex(steps.arraySize - 1);
-                added.FindPropertyRelative("Name").stringValue = "Spawn " + steps.arraySize;
-                added.FindPropertyRelative("Prefab").objectReferenceValue = null;
-                added.FindPropertyRelative("Completions").arraySize = 0;
-                added.FindPropertyRelative("RequireAll").boolValue = true;
-                added.FindPropertyRelative("ArrivalDialogueEnabled").boolValue = false;
-                added.FindPropertyRelative("ArrivalDialogue").objectReferenceValue = null;
-                added.FindPropertyRelative("NewCustomerSound").boolValue = true;
-                added.FindPropertyRelative("Weight").floatValue = 1f;
-                added.FindPropertyRelative("Delay").floatValue = 0f;
-                added.FindPropertyRelative("Position").vector3Value = Vector3.zero;
-                added.FindPropertyRelative("Rotation").vector3Value = Vector3.zero;
-                SpawnFlowAnimatorControls.Clear(added);
-                foreach (string name in new[] { "WalkIn", "WalkOut" })
+                added.boxedValue = new SpawnFlowStep
                 {
-                    added.FindPropertyRelative(name + ".Enabled").boolValue = false;
-                    added.FindPropertyRelative(name + ".Space").enumValueIndex = (int)SpawnFlowSpace.World;
-                    added.FindPropertyRelative(name + ".Interpolation").enumValueIndex = (int)SpawnFlowInterpolation.EaseInOut;
-                    added.FindPropertyRelative(name + ".Keyframes").arraySize = 0;
-                }
+                    Name = "Spawn " + steps.arraySize,
+                    WalkIn = new SpawnFlowAnimation { Space = SpawnFlowSpace.World },
+                    WalkOut = new SpawnFlowAnimation { Space = SpawnFlowSpace.World }
+                };
                 added.isExpanded = true;
             }
         }
@@ -243,75 +262,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             menu.DropDown(rect);
         }
 
-        /// <summary>Edits explicit transform keyframes with independent delays and rotation directions.</summary>
-        /// <param name="animation">Walk-in or walk-out path.</param>
-        /// <param name="label">Section label.</param>
-        private static void Animation(SerializedProperty animation, string label)
-        {
-            // Disabled paths keep their saved keys without showing irrelevant pose controls.
-            SerializedProperty enabled = animation.FindPropertyRelative("Enabled");
-            enabled.boolValue = StudioGUI.Toggle(StudioFieldMenu.Value(enabled, new GUIContent(label, enabled.tooltip)), enabled.boolValue);
-            if (!enabled.boolValue)
-                return;
-            using StudioIndentScope indent = new StudioIndentScope();
-            HoverControls.Field(animation, "Space", "Key Space");
-            HoverControls.Field(animation, "Interpolation");
-            SerializedProperty frames = animation.FindPropertyRelative("Keyframes");
-            for (int index = 0; index < frames.arraySize; index++)
-            {
-                SerializedProperty frame = frames.GetArrayElementAtIndex(index);
-                if (Header(frames, index, "Keyframe " + (index + 1)))
-                    break;
-                if (!frame.isExpanded)
-                    continue;
-                using StudioIndentScope entry = new StudioIndentScope();
-                SerializedProperty pose = frame.FindPropertyRelative("Pose");
-                HoverControls.Field(pose, "Position");
-                HoverControls.Field(pose, "Rotation");
-                HoverControls.Field(pose, "Scale");
-                HoverControls.Field(frame, "Delay");
-                HoverControls.Field(frame, "Duration");
-                HoverControls.Field(frame, "Direction");
-            }
-            if (StudioButton.Draw(new GUIContent("+ Add Keyframe", "Append a destination reached after its delay and travel duration.")))
-            {
-                frames.arraySize++;
-                SerializedProperty added = frames.GetArrayElementAtIndex(frames.arraySize - 1);
-                added.FindPropertyRelative("Pose.Position").vector3Value = Vector3.zero;
-                added.FindPropertyRelative("Pose.Rotation").vector3Value = Vector3.zero;
-                added.FindPropertyRelative("Pose.Scale").vector3Value = Vector3.one;
-                added.FindPropertyRelative("Delay").floatValue = 0f;
-                added.FindPropertyRelative("Duration").floatValue = 1f;
-                added.FindPropertyRelative("Direction").enumValueIndex = 1;
-                added.isExpanded = true;
-            }
-        }
-
         #endregion
         #region Shared Controls
-
-        /// <summary>Provides compact ordering and removal commands for an array entry.</summary>
-        /// <param name="array">Ordered entries.</param>
-        /// <param name="index">Current entry.</param>
-        /// <param name="label">Foldout label.</param>
-        /// <returns>True when structural changes require drawing to stop.</returns>
-        private static bool Header(SerializedProperty array, int index, string label)
-        {
-            // Array edits stop the current loop before any stale property handles are reused.
-            using EditorGUILayout.HorizontalScope row = new EditorGUILayout.HorizontalScope();
-            SerializedProperty entry = array.GetArrayElementAtIndex(index);
-            entry.isExpanded = StudioArrayGUI.Foldout(entry, new GUIContent(label, entry.tooltip));
-            using (new EditorGUI.DisabledScope(index == 0))
-                if (GUILayout.Button(new GUIContent("↑", "Move earlier."), GUILayout.Width(24f)))
-                    return array.MoveArrayElement(index, index - 1);
-            using (new EditorGUI.DisabledScope(index == array.arraySize - 1))
-                if (GUILayout.Button(new GUIContent("↓", "Move later."), GUILayout.Width(24f)))
-                    return array.MoveArrayElement(index, index + 1);
-            if (!GUILayout.Button(new GUIContent("−", "Remove this entry."), GUILayout.Width(24f)))
-                return false;
-            array.DeleteArrayElementAtIndex(index);
-            return true;
-        }
 
         /// <summary>Draws a scene asset selector while retaining its runtime-safe path.</summary>
         /// <param name="property">Serialized scene path.</param>
@@ -326,13 +278,40 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 property.stringValue = selected != null ? AssetDatabase.GetAssetPath(selected) : string.Empty;
         }
 
-        /// <summary>Draws a top-level plan field with its authored tooltip.</summary>
+        /// <summary>Draws a top-level plan field with its declared tooltip.</summary>
         /// <param name="data">Plan serializer.</param>
         /// <param name="name">Serialized field name.</param>
         private static void Field(SerializedObject data, string name)
         {
             // Unity handles native Undo and scalar field types on the shared asset.
             StudioGUI.PropertyField(data.FindProperty(name));
+        }
+
+        /// <summary>Draws an integer with a slider while preserving saved values on repaint.</summary>
+        /// <param name="property">Serialized integer receiving explicit edits.</param>
+        /// <param name="minimum">Slider's lower guide.</param>
+        /// <param name="maximum">Slider's upper guide.</param>
+        private static void Integer(SerializedProperty property, int minimum, int maximum)
+        {
+            // Numeric entry remains unrestricted; the slider supplies a suggested interval.
+            using StudioFieldLayout layout = new StudioFieldLayout(new GUIContent(property.displayName, property.tooltip));
+            Rect row = layout.GetRect(EditorGUIUtility.singleLineHeight);
+            StudioFieldMenu.Context(row, property);
+            using StudioFieldColors colors = new StudioFieldColors(row, StudioFieldColors.Key(property));
+            Rect value = layout.ValueRect(row);
+            using EditorGUI.IndentLevelScope indent = new EditorGUI.IndentLevelScope(-EditorGUI.indentLevel);
+            Rect number = new Rect(value.x, value.y, Mathf.Min(72f, value.width * 0.45f), value.height);
+            EditorGUI.BeginChangeCheck();
+            int selected = EditorGUI.IntField(number, property.intValue);
+            if (EditorGUI.EndChangeCheck())
+                property.intValue = selected;
+            if (value.xMax - number.xMax < 34f)
+                return;
+            EditorGUI.BeginChangeCheck();
+            float guided = GUI.HorizontalSlider(new Rect(number.xMax + 6f, value.y, value.xMax - number.xMax - 6f, value.height),
+                Mathf.Clamp(property.intValue, minimum, maximum), minimum, maximum);
+            if (EditorGUI.EndChangeCheck())
+                property.intValue = Mathf.RoundToInt(guided);
         }
 
         /// <summary>Enables referenced scenes without replacing the project's existing build order.</summary>

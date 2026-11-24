@@ -506,7 +506,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             ignoreExitRange = InteractionProjectileInput.IgnoreRange;
             IsSpeaking = true;
             audio.Begin(Presentation.Audio, transform);
-            hud.Show(session.Line, session.Row.Entry.TextEffects, Presentation.Box, session.PageTime);
+            hud.Show(this, session.Line, session.Row.Entry.TextEffects, Presentation.Box, session.PageTime);
             if (!session.Started)
             {
                 session.Started = true;
@@ -526,7 +526,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             if (!session.Advance())
             {
-                hud.Show(session.Line, session.Row.Entry.TextEffects, Presentation.Box, 0f);
+                hud.Show(this, session.Line, session.Row.Entry.TextEffects, Presentation.Box, 0f);
                 return;
             }
             CompletedBlock = session.Block.Id;

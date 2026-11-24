@@ -44,6 +44,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             exchangeContext = CaptureExchangeContext;
             session.Restore();
             EditorApplication.projectChanged += RefreshSource;
+            StudioSourceChanges.Changed += RefreshSource;
             Undo.undoRedoPerformed += RefreshSource;
             StudioFieldMenu.Changed += FieldChanged;
             UpdatePending();
@@ -182,6 +183,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             session.Retain();
             EditorApplication.projectChanged -= RefreshSource;
+            StudioSourceChanges.Changed -= RefreshSource;
             Undo.undoRedoPerformed -= RefreshSource;
             StudioFieldMenu.Changed -= FieldChanged;
             ReleaseInspector();

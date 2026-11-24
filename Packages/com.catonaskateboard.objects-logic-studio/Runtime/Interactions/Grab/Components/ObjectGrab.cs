@@ -287,7 +287,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 bool solid = false;
                 foreach (Collider collider in target.GetComponentsInChildren<Collider>(true))
                 {
-                    if (!collider.enabled || collider.isTrigger || !AssemblyGeometry.ActiveWithin(collider.transform, target.transform))
+                    if (!collider.enabled || collider.isTrigger || !InteractionHierarchy.ActiveWithin(collider.transform, target.transform))
                         continue;
                     if (collider is not (BoxCollider or SphereCollider or CapsuleCollider or MeshCollider { convex: true, sharedMesh: not null }))
                     {
@@ -348,6 +348,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             }
             if (source != null && !InteractionValues.Positive(duration))
                 return false;
+            ContactMagnetRun.Release(Item);
             BlackHoleRun.ReleaseForGrab(body);
             Dock?.Release();
             ScoopDisplay pickupSupply = Item.IsFloatingSupply ? ScoopSupply : null;

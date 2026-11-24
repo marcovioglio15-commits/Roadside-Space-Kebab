@@ -38,7 +38,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         private readonly StudioPreviewNavigation navigation = new StudioPreviewNavigation();
         private readonly AssemblyPreviewGeometry geometry = new AssemblyPreviewGeometry();
-        private ObjectLayoutViewport viewport;
+        private StudioLayoutViewport viewport;
         private System.Action<PreviewRenderUtility, AssemblyProductSettings> drawMeshes;
         private System.Action<AssemblyProductSettings> drawHandles;
         private SerializedObject data;
@@ -49,6 +49,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private bool framePending = true;
         private Vector2 scroll;
         private string status = string.Empty;
+        private GUIContent[] magnetLabels = System.Array.Empty<GUIContent>();
 
         #endregion
 
@@ -105,6 +106,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
         }
 
+        /// <summary>Opens the shared placement viewport for contact docking slots.</summary>
+        /// <param name="workspace">Contact interaction draft retaining the source.</param>
+        internal static void OpenContact(ObjectWorkspace workspace)
+        {
+            AssemblyPreviewWindow window = GetWindow<AssemblyPreviewWindow>("Contact Magnet Layout");
+            if (!window.CanOpen())
+                return;
+            window.session.ReadContact(workspace);
+            window.ShowLayout("Contact Magnet Layout");
+        }
+
         /// <summary>Keeps pending changes attached to their original source before switching previews.</summary>
         /// <returns>True when the window can show another layout.</returns>
         private bool CanOpen()
@@ -121,6 +133,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void ShowLayout(string title)
         {
             titleContent = new GUIContent(title);
+            selected = 0;
             completed = false;
             status = string.Empty;
             dirty = framePending = resolvePending = true;
@@ -133,7 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             // PreviewRenderUtility owns a private preview scene; gameplay and native prefab stages stay untouched.
             data = new SerializedObject(this);
-            viewport = new ObjectLayoutViewport();
+            viewport = new StudioLayoutViewport();
             drawMeshes = geometry.Draw;
             drawHandles = DrawHandles;
             wantsMouseMove = true;
@@ -142,6 +155,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             minSize = new Vector2(740f, 480f);
             EditorApplication.hierarchyChanged += Refresh;
             EditorApplication.projectChanged += Refresh;
+            StudioSourceChanges.Changed += Refresh;
             Undo.undoRedoPerformed += Refresh;
             StudioFieldMenu.Changed += FieldChanged;
             EditorApplication.update += UpdateNavigation;
@@ -153,6 +167,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Every private preview scene and render texture has one deterministic owner.
             EditorApplication.hierarchyChanged -= Refresh;
             EditorApplication.projectChanged -= Refresh;
+            StudioSourceChanges.Changed -= Refresh;
             Undo.undoRedoPerformed -= Refresh;
             StudioFieldMenu.Changed -= FieldChanged;
             EditorApplication.update -= UpdateNavigation;
@@ -226,7 +241,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             AssemblyProductSettings settings = session.Draft.Settings;
             if (dirty || cachedRoot != root)
             {
-                geometry.Refresh(root, settings, completed);
+                geometry.Refresh(session.PreviewPrefab != null ? session.PreviewPrefab : root, settings, completed);
+                RefreshMagnetLabels(settings);
                 cachedRoot = root;
                 dirty = false;
             }
@@ -237,10 +253,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             }
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                ObjectLayoutViewport.DrawTools(ref mode, scale: true);
+                StudioLayoutViewport.DrawTools(ref mode, scale: !session.IsContact);
                 if (GUILayout.Button(new GUIContent("Frame All", "Fit the product and all guide prefabs in the viewport."), EditorStyles.toolbarButton, GUILayout.Width(80f)))
                     Frame(settings);
-                if (!session.IsItemFill)
+                if (!session.IsItemFill && !session.IsContact)
                 {
                     EditorGUI.BeginChangeCheck();
                     completed = GUILayout.Toggle(completed, new GUIContent("Completed", "Show the final mesh and ingredient visibility after the recipe completes."),
@@ -249,7 +265,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                         Refresh();
                 }
                 GUILayout.FlexibleSpace();
-                ObjectLayoutViewport.DrawNavigationHint();
+                StudioLayoutViewport.DrawNavigationHint();
             }
             Rect viewport = new Rect(0f, 22f, Mathf.Max(200f, position.width - 390f), position.height - 78f);
             DrawViewport(viewport, settings);
@@ -276,30 +292,62 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="settings">Current recipe layout.</param>
         private void DrawSelection(AssemblyProductSettings settings)
         {
-            // Slots are created in the product card; this panel focuses on placement and guide selection.
+            // The background remains editable before the first slot is added.
+            data.Update();
+            if (session.IsContact)
+                ContactMagnetControls.DrawBackground(data.FindProperty("session.contact.Settings.PreviewPrefab"), resolvedRoot);
             if (settings.Magnets.Length == 0)
             {
                 EditorGUILayout.LabelField("Add magnets in the interaction settings to place them here.", EditorStyles.wordWrappedLabel);
+                CommitSelection();
                 return;
             }
             selected = Mathf.Clamp(selected, 0, settings.Magnets.Length - 1);
-            for (int index = 0; index < settings.Magnets.Length; index++)
-                if (GUILayout.Toggle(selected == index, new GUIContent((index + 1) + ". " + settings.Magnets[index].Name,
-                    "Select this ingredient placement slot."), EditorStyles.miniButton))
-                    selected = index;
+            SelectMagnet(GUILayout.SelectionGrid(selected, magnetLabels, 1, EditorStyles.miniButton));
             EditorGUILayout.Space(8f);
-            data.Update();
-            SerializedProperty magnet = data.FindProperty("session.Draft.Settings.Magnets").GetArrayElementAtIndex(selected);
-            if (session.IsItemFill)
+            SerializedProperty magnet = data.FindProperty(session.IsContact ? "session.contact.Settings.Magnets" : "session.Draft.Settings.Magnets").GetArrayElementAtIndex(selected);
+            if (session.IsContact)
+                ContactMagnetControls.DrawMagnet(magnet);
+            else if (session.IsItemFill)
                 InventoryFillMagnetControls.Pose(magnet);
             else
                 AssemblyControls.DrawMagnet(magnet);
+            CommitSelection();
+        }
+
+        /// <summary>Updates the independent preview after a serialized field edit.</summary>
+        private void CommitSelection()
+        {
+            // Rebuild only the contact render projection; source settings remain pending until Apply.
             if (data.ApplyModifiedProperties())
             {
+                if (session.IsContact)
+                    session.RefreshContactProjection();
                 dirty = true;
                 hasUnsavedChanges = session.HasChanges;
                 Repaint();
             }
+        }
+
+        /// <summary>Rebuilds slot labels only when source geometry or editable settings change.</summary>
+        /// <param name="settings">Current retained layout.</param>
+        private void RefreshMagnetLabels(AssemblyProductSettings settings)
+        {
+            magnetLabels = new GUIContent[settings.Magnets.Length];
+            for (int index = 0; index < magnetLabels.Length; index++)
+                magnetLabels[index] = new GUIContent((index + 1) + ". " + (settings.Magnets[index]?.Name ?? "Missing magnet"),
+                    "Select this ingredient placement slot.");
+        }
+
+        /// <summary>Changes selection without retaining keyboard focus in the previous magnet's fields.</summary>
+        /// <param name="index">Slot chosen by the list or viewport marker.</param>
+        private void SelectMagnet(int index)
+        {
+            if (selected == index)
+                return;
+            selected = index;
+            GUI.FocusControl(null);
+            Repaint();
         }
 
         /// <summary>Commits this window's layout and resolves the native unsaved-change prompt.</summary>
@@ -359,10 +407,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 Handles.color = index == selected ? new Color(1f, 0.72f, 0.18f) : new Color(0.3f, 0.8f, 0.95f);
                 float size = HandleUtility.GetHandleSize(marker.Position) * 0.06f;
                 if (Handles.Button(marker.Position, Quaternion.identity, size, size * 1.3f, Handles.SphereHandleCap))
-                {
-                    selected = index;
-                    Repaint();
-                }
+                    SelectMagnet(index);
                 Handles.Label(marker.Position + Vector3.up * size * 2f, marker.Name);
             }
             if (selected < 0 || selected >= settings.Magnets.Length || Event.current.alt || navigation.Active || mode == 3)
@@ -382,7 +427,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 case 1:
                     rotation = Handles.RotationHandle(rotation, position);
                     break;
-                case 2:
+                case 2 when !session.IsContact:
                     scale = Handles.ScaleHandle(scale, position, rotation, HandleUtility.GetHandleSize(position));
                     break;
             }
@@ -392,6 +437,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             magnet.Position = position;
             magnet.Rotation = rotation.eulerAngles;
             magnet.Scale = scale;
+            if (session.IsContact)
+                session.SetContactPose(selected, position, rotation.eulerAngles);
             hasUnsavedChanges = session.HasChanges;
             Repaint();
         }

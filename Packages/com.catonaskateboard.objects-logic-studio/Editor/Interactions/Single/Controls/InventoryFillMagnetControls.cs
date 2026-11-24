@@ -40,11 +40,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         /// <summary>Draws the transform fields shared by the list and the 3D preview.</summary>
         /// <param name="magnet">One fill placement or its equivalent preview magnet.</param>
-        internal static void Pose(SerializedProperty magnet)
+        /// <param name="scale">Whether this layout also changes the item scale.</param>
+        internal static void Pose(SerializedProperty magnet, bool scale = true)
         {
-            ObjectNumericControls.Vector(magnet.FindPropertyRelative("Position"), -1f, 1f);
-            ObjectNumericControls.Vector(magnet.FindPropertyRelative("Rotation"), -360f, 360f);
-            ObjectNumericControls.Vector(magnet.FindPropertyRelative("Scale"), 0.01f, 5f);
+            StudioVectorControls.Draw(magnet.FindPropertyRelative("Position"), -1f, 1f);
+            StudioVectorControls.Draw(magnet.FindPropertyRelative("Rotation"), -360f, 360f);
+            if (scale)
+                StudioVectorControls.Draw(magnet.FindPropertyRelative("Scale"), 0.01f, 5f);
         }
 
         #endregion

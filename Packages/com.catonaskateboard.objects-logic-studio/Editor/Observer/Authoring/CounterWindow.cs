@@ -86,8 +86,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             if (display == CounterDisplay.World)
             {
                 StudioFieldGUI.PropertyField(data.FindProperty("parent"));
-                ObjectNumericControls.Vector(data.FindProperty("offset"));
-                ObjectNumericControls.Vector(data.FindProperty("rotation"), -180f, 180f);
+                StudioVectorControls.Draw(data.FindProperty("offset"));
+                StudioVectorControls.Draw(data.FindProperty("rotation"), -180f, 180f);
                 foreach (string name in new[] { "font", "fontSize", "faceCamera" })
                     StudioFieldGUI.PropertyField(data.FindProperty(name));
                 if (kind == CounterKind.OrderTimer)

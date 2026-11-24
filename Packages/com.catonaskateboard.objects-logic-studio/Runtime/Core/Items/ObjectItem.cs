@@ -26,12 +26,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private ObjectGrab grab;
         private ObjectContactModifier contactModifier;
         private ObjectIdentity identity;
+        private Renderer[] appearanceRenderers;
         /// <summary>Shared prefab occurrence retained through technical suspension.</summary>
         internal readonly ObjectSpawnLifetime Spawn = new ObjectSpawnLifetime();
 
         #endregion
 
         #region Properties
+
+        /// <summary>Renderer discovery cached until activation or a direct hierarchy change.</summary>
+        internal Renderer[] AppearanceRenderers => appearanceRenderers ??= GetComponentsInChildren<Renderer>(true);
 
         /// <summary>Flags belonging to this item, cached at activation.</summary>
         public ObjectIdentity Identity => identity != null ? identity : identity = GetComponent<ObjectIdentity>();
@@ -73,9 +77,16 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Refreshes optional dependencies after an explicit runtime card change.</summary>
         internal void RefreshRuntimeBindings()
         {
+            appearanceRenderers = null;
             grab = GetComponent<ObjectGrab>();
             contactModifier = GetComponent<ObjectContactModifier>();
             identity = GetComponent<ObjectIdentity>();
+        }
+
+        /// <summary>Invalidates appearance discovery when assembly changes this item's direct branches.</summary>
+        private void OnTransformChildrenChanged()
+        {
+            appearanceRenderers = null;
         }
 
         /// <summary>Clears transient ownership and receipts before a Play session that retains scene instances.</summary>
@@ -102,6 +113,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Releases transient ownership when an item leaves the active scene.</summary>
         private void OnDisable()
         {
+            ContactMagnetRun.Release(this);
             Spawn.Disable(gameObject);
             // Receipts survive disable/enable; resetting a pooled item is an explicit operation.
             locks.Clear();
@@ -160,6 +172,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             return IsConsumed || (blocked & channels) != 0;
         }
 
+        /// <summary>Checks restrictions from other operations while an independent contact retains its own source lock.</summary>
+        /// <param name="owner">Rule whose own restriction is excluded.</param>
+        /// <param name="channels">Requested interaction families.</param>
+        /// <returns>True when another operation blocks this request.</returns>
+        internal bool IsBlockedByOthers(UnityEngine.Object owner, InteractionChannels channels)
+        {
+            if (IsConsumed)
+                return true;
+            foreach (KeyValuePair<UnityEngine.Object, InteractionChannels> restriction in locks)
+                if (restriction.Key != owner && (restriction.Value & channels) != 0)
+                    return true;
+            return false;
+        }
+
         /// <summary>Reserves this item against overlapping modification transactions.</summary>
         /// <param name="owner">Running modification requesting exclusive visual and consumption ownership.</param>
         /// <param name="channels">Additional interactions suspended until release.</param>
@@ -170,12 +196,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (IsConsumed || !isActiveAndEnabled || reservation != null && reservation != owner)
                 return false;
             reservation = owner;
-            locks[owner] = channels;
-            blocked = InteractionChannels.None;
-            foreach (InteractionChannels restriction in locks.Values)
-                blocked |= restriction;
-            if ((channels & InteractionChannels.Grab) != 0 && grab != null)
-                grab.Cancel();
+            Restrict(owner, channels);
             return true;
         }
 
@@ -188,9 +209,27 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 reservation = null;
             if (!locks.Remove(owner))
                 return;
+            RefreshRestrictions();
+        }
+
+        /// <summary>Applies shared interaction restrictions without claiming exclusive appearance ownership.</summary>
+        /// <param name="owner">Independent contact rule affecting only its counterparts.</param>
+        /// <param name="channels">Restrictions retained while this rule has active contacts.</param>
+        internal void Restrict(UnityEngine.Object owner, InteractionChannels channels)
+        {
+            // Read-only sources can serve several contact modifications at once.
+            locks[owner] = channels;
+            RefreshRestrictions();
+            if ((channels & InteractionChannels.Grab) != 0 && grab != null)
+                grab.Cancel();
+        }
+
+        /// <summary>Combines active restrictions only when an operation acquires or releases ownership.</summary>
+        private void RefreshRestrictions()
+        {
             blocked = InteractionChannels.None;
-            foreach (InteractionChannels channels in locks.Values)
-                blocked |= channels;
+            foreach (InteractionChannels restriction in locks.Values)
+                blocked |= restriction;
         }
 
         /// <summary>Checks retained ownership before a paused modification resumes.</summary>

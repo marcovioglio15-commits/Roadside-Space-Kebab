@@ -16,6 +16,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         private string description = string.Empty;
         private string warning = string.Empty;
         private Action<ObjectFlag> created;
+        private ObjectFlagDraftSession session;
 
         #endregion
 
@@ -26,12 +27,16 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         /// <summary>Opens a nonmodal creation form and retains an optional destination field callback.</summary>
         /// <param name="onCreated">Receives the newly saved flag.</param>
         /// <param name="suggested">Optional name copied from the selector search.</param>
-        internal static void Open(Action<ObjectFlag> onCreated, string suggested = "")
+        /// <param name="suggestedGroup">Group selected in catalog management.</param>
+        /// <param name="draft">Optional management proposal receiving the new flag.</param>
+        internal static void Open(Action<ObjectFlag> onCreated, string suggested = "", string suggestedGroup = "", ObjectFlagDraftSession draft = null)
         {
             // A separate form preserves the original selector's field and its current draft.
             ObjectFlagCreateWindow window = CreateInstance<ObjectFlagCreateWindow>();
             window.titleContent = new GUIContent("Create Object Flag");
             window.flagName = suggested;
+            window.group = suggestedGroup;
+            window.session = draft;
             window.created = onCreated;
             window.minSize = new Vector2(360f, 190f);
             window.ShowUtility();
@@ -52,10 +57,12 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             if (warning.Length > 0)
                 EditorGUILayout.LabelField(warning, EditorStyles.wordWrappedMiniLabel);
             using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(flagName)))
-                if (StudioButton.Draw(new GUIContent("Create Flag", "Save this definition and assign it to the field that opened this form.")))
+                if (StudioButton.Draw(new GUIContent("Create Flag", session != null
+                    ? "Add this definition to the main draft. Apply saves its asset."
+                    : "Save this definition and assign it to the field that opened this form.")))
                     try
                     {
-                        ObjectFlag flag = ObjectFlagCatalog.Create(flagName, group, description);
+                        ObjectFlag flag = session != null ? session.Create(flagName, group, description) : ObjectFlagCatalog.Create(flagName, group, description);
                         created?.Invoke(flag);
                         Close();
                     }

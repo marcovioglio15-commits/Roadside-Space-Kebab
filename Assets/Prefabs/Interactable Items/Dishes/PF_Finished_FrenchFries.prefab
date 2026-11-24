@@ -487,12 +487,10 @@ MonoBehaviour:
       - {fileID: 11400000, guid: 2233b790a01fa404e895d36caea1b63b, type: 2}
       Count: 1
       Optional: 0
-      OrderFlag: {fileID: 0}
     - Flags:
       - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       Count: 1
       Optional: 0
-      OrderFlag: {fileID: 0}
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0

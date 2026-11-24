@@ -41,7 +41,7 @@ MonoBehaviour:
       ReturnRotation: 0
     Flags:
     - {fileID: 11400000, guid: 95c227864d0206a4a8fd8132be822ff7, type: 2}
-    ContactDuration: 0.2
+    ContactDuration: 0
     ContactTolerance: 0.02
     QueryInterval: 0.02
     IncludeTriggers: 0

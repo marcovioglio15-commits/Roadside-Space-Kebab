@@ -12,6 +12,22 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Selection
 
+        /// <summary>Reloads clean interaction proposals after another Studio editor changes their saved source.</summary>
+        /// <param name="state">Workspace whose pending edits must remain intact.</param>
+        internal static void RefreshSources(ObjectWorkspace state)
+        {
+            GameObject target = state.Target.Resolve();
+            if (target == null)
+                return;
+            if (!state.Single.HasChanges)
+                state.Single.Read(target);
+            if (!state.Extended.HasChanges)
+                state.Extended.Read(target);
+            if (!state.InteractionChanged)
+                ReadHover(state);
+            state.Persist();
+        }
+
         /// <summary>Opens an object's hover without replacing another unfinished draft.</summary>
         /// <param name="state">Durable workspace.</param>
         /// <param name="target">Object selected in a prefab stage or asset.</param>
@@ -36,14 +52,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             state.Single.Read(target);
             state.Extended.ComponentId = 0;
             state.Extended.Read(target);
-            ObjectHover hover = Resolve(state);
-            state.HasBinding = hover != null;
-            state.Binding = HoverBindingDraft.Capture(hover);
-            state.OriginalBinding = ObjectWorkspace.Copy(state.Binding);
-            state.Hierarchy = hover != null ? HoverHierarchy.Signature(hover.transform) : string.Empty;
-            if (hover != null)
-                state.Draft = ObjectWorkspace.Copy(hover.Configuration);
-            state.Baseline = ObjectWorkspace.Copy(state.Draft);
+            ReadHover(state);
             state.Persist();
             return true;
         }
@@ -69,14 +78,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // A missing target retains its identity so reopening its prefab can recover navigation.
             if (recordUndo)
                 Undo.RecordObject(state, "Discard object interaction draft");
-            ObjectHover hover = Resolve(state);
-            state.Binding = HoverBindingDraft.Capture(hover);
-            state.OriginalBinding = ObjectWorkspace.Copy(state.Binding);
-            state.Hierarchy = hover != null ? HoverHierarchy.Signature(hover.transform) : string.Empty;
-            state.HasBinding = hover != null;
-            if (hover != null)
-                state.Draft = ObjectWorkspace.Copy(hover.Configuration);
-            state.Baseline = ObjectWorkspace.Copy(state.Draft);
+            ReadHover(state);
             if (includeScene)
                 state.Observer.Discard();
             state.Single.Read(state.Target.Resolve());
@@ -87,6 +89,20 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         #endregion
 
         #region Validation
+
+        /// <summary>Captures hover values and their source baseline without changing other interaction drafts.</summary>
+        /// <param name="state">Workspace retaining the current hover selection.</param>
+        private static void ReadHover(ObjectWorkspace state)
+        {
+            ObjectHover hover = Resolve(state);
+            state.HasBinding = hover != null;
+            state.Binding = HoverBindingDraft.Capture(hover);
+            state.OriginalBinding = ObjectWorkspace.Copy(state.Binding);
+            state.Hierarchy = hover != null ? HoverHierarchy.Signature(hover.transform) : string.Empty;
+            if (hover != null)
+                state.Draft = ObjectWorkspace.Copy(hover.Configuration);
+            state.Baseline = ObjectWorkspace.Copy(state.Draft);
+        }
 
         /// <summary>Prepares every pending domain before any asset or scene is changed.</summary>
         /// <param name="state">Workspace proposal and original baselines.</param>
@@ -134,7 +150,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     warning = "The selected interaction or its hierarchy changed. Discard to reload it.";
                 else if (state.Binding.AnchorPath != "-" && HoverHierarchy.Resolve(hover.transform, state.Binding.AnchorPath) == null)
                     warning = "The proposed anchor is no longer inside the selected object.";
-                else if (state.Draft.Settings.TargetMode != HoverDetectionMode.ViewCenter && hover.GetComponentInChildren<Collider>(true) == null
+                else if (state.Draft.Settings.TargetMode != HoverTargetMode.ViewCenter && hover.GetComponentInChildren<Collider>(true) == null
                     && hover.GetComponent<ObjectAssemblyProduct>() == null)
                     warning = "Collider hover requires an existing 3D collider on the object or its children.";
                 else if (EditorUtility.IsPersistent(hover) && !AssetDatabase.IsOpenForEdit(hover))

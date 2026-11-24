@@ -290,7 +290,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             hitDistance = float.PositiveInfinity;
             switch (settings.TargetMode)
             {
-                case HoverDetectionMode.ViewCenter:
+                case HoverTargetMode.ViewCenter:
                     Vector3 projected = resolvedView.WorldToScreenPoint(anchor);
                     float radius = viewport.height * settings.CenterRadius;
                     if (projected.z < resolvedView.nearClipPlane || projected.z > resolvedView.farClipPlane
@@ -298,10 +298,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         || ((Vector2)projected - viewport.center).sqrMagnitude > radius * radius)
                         return false;
                     break;
-                case HoverDetectionMode.Cursor:
-                case HoverDetectionMode.CenterCollider:
+                case HoverTargetMode.Cursor:
+                case HoverTargetMode.CenterCollider:
                     Vector2 cursor = viewport.center;
-                    if (settings.TargetMode == HoverDetectionMode.Cursor)
+                    if (settings.TargetMode == HoverTargetMode.Cursor)
                     {
                         if (Mouse.current == null || Cursor.lockState == CursorLockMode.Locked || resolvedView.targetDisplay != 0)
                             return false;

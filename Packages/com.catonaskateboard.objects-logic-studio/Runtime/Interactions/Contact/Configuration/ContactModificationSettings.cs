@@ -14,6 +14,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public ContactModificationDefinition[] Modifications = Array.Empty<ContactModificationDefinition>();
         [Tooltip("Reach and aim used when a modification waits for confirmation after snapping.")]
         public TransferTargetSettings Target = new TransferTargetSettings();
+        [Tooltip("Optional owner-local magnets that retain compatible items during modification.")]
+        public ContactMagnetSettings MagnetLock = new ContactMagnetSettings();
         [Header("Consumption")]
         [Tooltip("Optional local dialogue completion required before consuming modifications may start. Non-consuming modifications remain available.")]
         public ContactDialogueGate ConsumeOn = new ContactDialogueGate();
@@ -33,7 +35,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Whether any rule requests the interaction's local Button binding.</summary>
         public bool RequiresInput => Modifications != null && Array.Exists(Modifications,
-            definition => definition != null && definition.Settings?.Preparation is { Snap: true, RequireInput: true });
+            definition => definition != null && definition.Settings?.Preparation is { RequireInput: true } preparation && (preparation.Snap || MagnetLock is { Enabled: true }));
 
         /// <summary>Whether any permanent modification consumes the contacted participant.</summary>
         public bool ConsumesOther => Modifications != null && Array.Exists(Modifications,
@@ -99,7 +101,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 warning = "Select the local Dialogue that enables consumption.";
                 return false;
             }
-            return !RequiresInput || Target != null && Target.TryValidate(out warning);
+            if (MagnetLock is { Enabled: true, WhenOccupied: ContactMagnetOverflow.ShareNearestCompletion }
+                && Array.Exists(Modifications, definition => !definition.Settings.SupportsMagnetParallel && !definition.Settings.IdentityOnly))
+            {
+                warning = "Shared magnets require independent effects on contacted items. Source effects and consumption retain exclusive ownership.";
+                return false;
+            }
+            return MagnetLock != null && MagnetLock.TryValidate(out warning)
+                && (!RequiresInput || Target != null && Target.TryValidate(out warning));
         }
 
         #endregion

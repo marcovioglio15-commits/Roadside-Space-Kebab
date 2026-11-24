@@ -131,6 +131,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             exchangeContext = CaptureExchangeContext;
             Undo.undoRedoPerformed += RefreshChanges;
+            StudioSourceChanges.Changed += SourcesChanged;
             StudioFieldMenu.Changed += FieldChanged;
             ObjectFlagSelector.SelectionChanged += FieldChanged;
             if (document != null)
@@ -145,6 +146,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         private void OnDisable()
         {
             Undo.undoRedoPerformed -= RefreshChanges;
+            StudioSourceChanges.Changed -= SourcesChanged;
             StudioFieldMenu.Changed -= FieldChanged;
             ObjectFlagSelector.SelectionChanged -= FieldChanged;
             data?.Dispose();
@@ -360,6 +362,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             hasUnsavedChanges = pendingChanges;
             saveChangesMessage = "Apply or discard the unsaved changes in " + group?.Title + ".";
             Repaint();
+        }
+
+        /// <summary>Refreshes clean groups without replacing edits retained in this or the main workspace.</summary>
+        private void SourcesChanged()
+        {
+            if (document == null || group == null)
+                return;
+            RefreshChanges();
+            ObjectWorkspace state = ObjectWorkspace.instance;
+            if (!pendingChanges && (assetOnly || state.DraftKey == sourceKey && !ObjectSectionChanges.HasPending(state, group.Paths)))
+                Reload();
         }
 
         /// <summary>Refreshes a group changed through a delayed field context menu.</summary>

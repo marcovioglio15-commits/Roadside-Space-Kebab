@@ -13,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Maximum interaction distance from the flagged player, in metres.")]
         [Range(0.1f, 20f)]
         public float Distance = 3f;
-        [Tooltip("Select an object near the view centre or under the unlocked cursor.")]
+        [Tooltip("Select a nearby screen anchor, an unlocked cursor hit or an exact centre-reticle collider hit. Center Collider also works with a locked cursor.")]
         public HoverTargetMode Mode;
         [Tooltip("Require the view-centre or cursor ray to hit a non-trigger collider on this object. Trigger volumes and nearby anchors cannot activate it; triggers in front of a solid hit are ignored.")]
         public bool SolidHitOnly;
@@ -40,8 +40,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Centre tolerance has no effect on exact cursor selection.
             warning = string.Empty;
-            if (!InteractionValues.Positive(Distance) || !SolidHitOnly && !InteractionValues.Finite(Offset)
-                || Mode is not (HoverTargetMode.ViewCenter or HoverTargetMode.Cursor)
+            if (!InteractionValues.Positive(Distance) || Mode == HoverTargetMode.ViewCenter && !SolidHitOnly && !InteractionValues.Finite(Offset)
+                || Mode is not (HoverTargetMode.ViewCenter or HoverTargetMode.Cursor or HoverTargetMode.CenterCollider)
                 || !SolidHitOnly && Mode == HoverTargetMode.ViewCenter && (!InteractionValues.Positive(CenterRadius) || CenterRadius > 1f))
                 warning = "Use a positive finite distance, finite offset and centre radius in (0, 1].";
             return warning.Length == 0;

@@ -37,6 +37,11 @@ namespace CatOnASkateboard.StudioIdentity
         /// <summary>Reports committed runtime membership changes so active systems can reevaluate their filters.</summary>
         public static event Action<ObjectIdentity> Changed;
 
+#if UNITY_EDITOR
+        /// <summary>Queues editor validation after serialized asset references have finished loading.</summary>
+        public static event Action<ObjectIdentity> ValidationRequested;
+#endif
+
         /// <summary>Authored flags used by editor tools and restored on each new Play session.</summary>
         public IReadOnlyList<ObjectFlag> AuthoredFlags => flags;
         /// <summary>Current runtime membership for consumption receipts and diagnostics.</summary>
@@ -56,13 +61,14 @@ namespace CatOnASkateboard.StudioIdentity
 
         #region Lifecycle
 
-        /// <summary>Reports invalid authored membership without changing the saved selection.</summary>
+#if UNITY_EDITOR
+        /// <summary>Requests editor validation after loading without changing the saved selection.</summary>
         private void OnValidate()
         {
-            // Invalid references remain available for explicit correction and native Undo.
-            if (!ObjectFlagRules.TryValidate(flags, true, out string warning))
-                Debug.LogWarning(warning, this);
+            // OnValidate may run before referenced assets are ready or on a loading thread.
+            ValidationRequested?.Invoke(this);
         }
+#endif
 
         /// <summary>Registers this identity without discarding changes retained through pooling or storage.</summary>
         private void OnEnable()

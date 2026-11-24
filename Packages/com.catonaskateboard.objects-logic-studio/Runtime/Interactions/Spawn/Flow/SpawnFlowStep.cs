@@ -48,7 +48,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public SpawnFlowAnimation WalkIn = new SpawnFlowAnimation();
         [Tooltip("Optional transform path performed after completion and before despawning.")]
         public SpawnFlowAnimation WalkOut = new SpawnFlowAnimation();
-        [Tooltip("Optional controller states for walking, waiting, payment and Self Eject.")]
+        [Tooltip("Independent Animator or transform-keyframe animations for walking, waiting, payment and Self Eject.")]
         public SpawnFlowAnimatorSettings CharacterAnimation = new SpawnFlowAnimatorSettings();
 
         #endregion
@@ -142,11 +142,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when disabled or every frame has a valid pose and timing.</returns>
         public bool TryValidate(out string warning)
         {
-            // Disabled paths preserve their authored data for later reuse.
+            // Disabled paths preserve their settings for later reuse.
             warning = string.Empty;
             if (!Enabled)
                 return true;
-            warning = "Enabled walk paths need keyframes with finite poses, positive scale and nonnegative timing.";
+            warning = "Enabled animations need keyframes with finite poses, positive scale and nonnegative timing.";
             if (Keyframes == null || Keyframes.Length == 0 || Space is not (SpawnFlowSpace.Relative or SpawnFlowSpace.World)
                 || Interpolation is not (SpawnFlowInterpolation.EaseInOut or SpawnFlowInterpolation.Linear or SpawnFlowInterpolation.Continuous))
                 return false;
@@ -177,7 +177,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Scaled seconds spent moving to this keyframe. Zero applies the destination immediately.")]
         [Range(0f, 120f)]
         public float Duration = 1f;
-        [Tooltip("Choose signed clockwise/counterclockwise Euler travel, authored turns or the shortest orientation path.")]
+        [Tooltip("Choose signed clockwise/counterclockwise Euler travel, explicit turns or the shortest orientation path.")]
         public TransformRotationDirection Direction = TransformRotationDirection.Shortest;
 
         #endregion

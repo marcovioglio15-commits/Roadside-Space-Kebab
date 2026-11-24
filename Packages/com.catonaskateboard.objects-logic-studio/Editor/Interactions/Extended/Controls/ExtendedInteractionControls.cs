@@ -91,6 +91,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     break;
                 case ExtendedInteractionKind.ModifyByContact:
                     DrawContact(draft.FindPropertyRelative("Contact"), state.Sections);
+                    ContactMagnetControls.Draw(draft.FindPropertyRelative("Contact.MagnetLock"), state);
                     break;
                 case ExtendedInteractionKind.Dialogue:
                     DrawDialogue(draft.FindPropertyRelative("Dialogue"), state.Sections);

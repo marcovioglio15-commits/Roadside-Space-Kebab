@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CatOnASkateboard.StudioColors.Editor;
+using CatOnASkateboard.StudioIdentity.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -123,6 +124,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.undoRedoPerformed += HandleUndo;
             EditorApplication.hierarchyChanged += Refresh;
             EditorApplication.projectChanged += Refresh;
+            StudioSourceChanges.Changed += SourcesChanged;
             Selection.selectionChanged += FollowSelection;
             PrefabStage.prefabStageOpened += StageChanged;
             PrefabStage.prefabStageClosing += StageChanged;
@@ -148,6 +150,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             Undo.undoRedoPerformed -= HandleUndo;
             EditorApplication.hierarchyChanged -= Refresh;
             EditorApplication.projectChanged -= Refresh;
+            StudioSourceChanges.Changed -= SourcesChanged;
             Selection.selectionChanged -= FollowSelection;
             PrefabStage.prefabStageOpened -= StageChanged;
             PrefabStage.prefabStageClosing -= StageChanged;
@@ -189,6 +192,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <summary>Updates retained drafts after Undo and saves restored prefab contents.</summary>
         private void HandleUndo()
         {
+            // Flag history already restores the saved prefab and its native stage copy.
+            if (ObjectFlagProject.UndoRestored)
+            {
+                SourcesChanged();
+                return;
+            }
             GameObject target = state.Target.Resolve();
             if (target != null && state.Target.IsOpen)
                 ObjectAuthoringSave.Save(target);
@@ -224,6 +233,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             library.Invalidate();
             refreshGroups = true;
             Repaint();
+        }
+
+        /// <summary>Reloads clean interaction sources after an explicit save in another Studio tool.</summary>
+        private void SourcesChanged()
+        {
+            if (state == null || EditorApplication.isPlayingOrWillChangePlaymode)
+                return;
+            ObjectWorkspaceSession.RefreshSources(state);
+            Refresh();
         }
 
         /// <summary>Waits until Unity finishes replacing a prefab stage before resolving its objects.</summary>

@@ -20,14 +20,46 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // Missing data never becomes an implicit root selection.
             target = null;
             warning = "Assign a mesh replacement and its mesh asset.";
-            if (replacement == null || replacement.Mesh == null
-                || !TryTarget(item, replacement.Path, out target, out warning))
+            if (replacement == null || replacement.Mesh == null)
+                return false;
+            if (replacement.PrimaryMesh)
+            {
+                target = PrimaryMesh(item);
+                warning = target != null ? string.Empty : "Select an explicit mesh path. The item needs one directly owned visible mesh for Primary Mesh.";
+            }
+            else if (!TryTarget(item, replacement.Path, out target, out warning))
+                return false;
+            if (target == null)
                 return false;
             if (target.GetComponent<MeshFilter>() == null && target.GetComponent<SkinnedMeshRenderer>() == null)
                 warning = Describe(item, replacement.Path) + " needs a MeshFilter or SkinnedMeshRenderer. Select an existing mesh target or add its components in the prefab.";
             else if (replacement.UpdateCollider && target.GetComponent<MeshCollider>() == null)
                 warning = Describe(item, replacement.Path) + " needs a MeshCollider while Update Collider is enabled.";
             return warning.Length == 0;
+        }
+
+        /// <summary>Finds one visible item mesh, excluding stored-content visuals, nested ingredients and VFX.</summary>
+        /// <param name="item">Expected mesh owner.</param>
+        /// <returns>Unique mesh transform, or null for a missing or ambiguous selection.</returns>
+        internal static Transform PrimaryMesh(ObjectItem item)
+        {
+            if (item == null)
+                return null;
+            // Fill copies remain owned for tinting, but never identify the container mesh.
+            Transform selected = null;
+            foreach (Renderer renderer in item.AppearanceRenderers)
+            {
+                if (!renderer.enabled || renderer is not (MeshRenderer or SkinnedMeshRenderer)
+                    || renderer.GetComponentInParent<ObjectItem>(true) != item || !item.Owns(renderer.transform)
+                    || renderer.GetComponentInParent<InventoryVisualInstance>(true) != null
+                    || !InteractionHierarchy.ActiveWithin(renderer.transform, item.transform)
+                    || renderer is MeshRenderer && renderer.GetComponent<MeshFilter>() == null)
+                    continue;
+                if (selected != null)
+                    return null;
+                selected = renderer.transform;
+            }
+            return selected;
         }
 
         /// <summary>Resolves an existing renderer without capturing material arrays.</summary>

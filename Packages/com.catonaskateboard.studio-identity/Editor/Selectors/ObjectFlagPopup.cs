@@ -17,6 +17,8 @@ namespace CatOnASkateboard.StudioIdentity.Editor
         private readonly HashSet<ObjectFlag> selected;
         private readonly bool multiple;
         private readonly Func<bool> current;
+        private readonly ObjectFlagAssignment assignment;
+        private readonly ObjectFlagDraftSession session;
         private string search = string.Empty;
         private string[] groups;
         private int group;
@@ -44,14 +46,33 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             RefreshGroups();
         }
 
+        /// <summary>Opens the same picker for a project field that may belong to a closed scene or portable preset.</summary>
+        /// <param name="field">Scanned destination with stable owner identity.</param>
+        /// <param name="changed">Refreshes the assignment view after a saved change.</param>
+        /// <param name="draft">Optional management proposal.</param>
+        internal ObjectFlagPopup(ObjectFlagField field, Action changed, ObjectFlagDraftSession draft = null)
+        {
+            session = draft;
+            assignment = new ObjectFlagAssignment(field, changed, draft);
+            current = () => assignment.Valid;
+            selected = new HashSet<ObjectFlag>(draft != null ? draft.Values(field) : field.Flags);
+            selected.Remove(null);
+            multiple = field.Multiple;
+            missing = (draft != null ? draft.Missing(field) : field.Missing) > 0;
+            RefreshGroups();
+        }
+
         /// <summary>Rebuilds group filters after explicit catalog creation or import.</summary>
         private void RefreshGroups()
         {
             // A newly imported group becomes available without closing the selector.
             List<string> names = new List<string> { "All Groups" };
-            foreach (ObjectFlag flag in ObjectFlagCatalog.Flags)
-                if (!string.IsNullOrEmpty(flag.Group) && !names.Contains(flag.Group))
-                    names.Add(flag.Group);
+            foreach (ObjectFlag flag in session != null ? session.Flags : ObjectFlagCatalog.Flags)
+            {
+                ObjectFlag definition = session != null ? session.Definition(flag) : flag;
+                if (!string.IsNullOrEmpty(definition.Group) && !names.Contains(definition.Group))
+                    names.Add(definition.Group);
+            }
             groups = names.ToArray();
             group = 0;
         }
@@ -85,7 +106,7 @@ namespace CatOnASkateboard.StudioIdentity.Editor
                 selectedOnly = StudioGUI.Toggle(new GUIContent("Selected Only", "Show only flags included in this field."), selectedOnly);
             if (StudioButton.Draw(new GUIContent("Clear Selection", "Remove this field's selected flags."), EditorStyles.miniButton))
             {
-                ObjectFlagSelector.Assign(owner, path, null, false);
+                Assign(null, false);
                 selected.Clear();
                 missing = false;
                 if (!multiple)
@@ -93,22 +114,26 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             }
             if (missing && StudioButton.Draw(new GUIContent("Remove Missing Flags", "Remove unassigned or deleted references from this selection. Assigned flags are preserved."), EditorStyles.miniButton))
             {
-                ObjectFlagSelector.RemoveMissing(owner, path);
+                if (assignment != null)
+                    assignment.RemoveMissing();
+                else
+                    ObjectFlagSelector.RemoveMissing(owner, path);
                 missing = false;
             }
             scroll = EditorGUILayout.BeginScrollView(scroll);
-            foreach (ObjectFlag flag in ObjectFlagCatalog.Flags)
+            foreach (ObjectFlag flag in session != null ? session.Flags : ObjectFlagCatalog.Flags)
             {
-                if (selectedOnly && !selected.Contains(flag) || group > 0 && flag.Group != groups[group]
-                    || search.Length > 0 && (flag.DisplayName?.IndexOf(search, StringComparison.OrdinalIgnoreCase) ?? -1) < 0
-                    && (flag.Group?.IndexOf(search, StringComparison.OrdinalIgnoreCase) ?? -1) < 0)
+                ObjectFlag definition = session != null ? session.Definition(flag) : flag;
+                if (selectedOnly && !selected.Contains(flag) || group > 0 && definition.Group != groups[group]
+                    || search.Length > 0 && (definition.DisplayName?.IndexOf(search, StringComparison.OrdinalIgnoreCase) ?? -1) < 0
+                    && (definition.Group?.IndexOf(search, StringComparison.OrdinalIgnoreCase) ?? -1) < 0)
                     continue;
-                GUIContent label = new GUIContent(flag.DisplayName + (!string.IsNullOrEmpty(flag.Group) ? " · " + flag.Group : string.Empty), flag.Description);
+                GUIContent label = new GUIContent(definition.DisplayName + (!string.IsNullOrEmpty(definition.Group) ? " · " + definition.Group : string.Empty), definition.Description);
                 bool wasSelected = selected.Contains(flag);
                 bool chosen = GUILayout.Toggle(wasSelected, label, multiple ? EditorStyles.toggle : EditorStyles.miniButton);
                 if (chosen == wasSelected)
                     continue;
-                ObjectFlagSelector.Assign(owner, path, flag, chosen);
+                Assign(flag, chosen);
                 if (chosen)
                     selected.Add(flag);
                 else
@@ -124,15 +149,36 @@ namespace CatOnASkateboard.StudioIdentity.Editor
             }
             if (StudioButton.Draw(new GUIContent("+ Create Object Flag", "Define a new custom flag and assign it to this field.")))
             {
-                ObjectFlagSelector.Create(owner, path, current, search);
+                if (assignment != null)
+                    ObjectFlagCreateWindow.Open(flag => assignment.Assign(flag, true), search, string.Empty, session);
+                else
+                    ObjectFlagSelector.Create(owner, path, current, search);
                 editorWindow.Close();
             }
             if (StudioButton.Draw(new GUIContent("Create Missing Flags from Unity Tags", "Create one definition for each project tag without a same-named flag. Existing flags are preserved.")))
             {
-                ObjectFlagCatalog.ImportProjectTags();
+                if (session != null)
+                    session.ImportTags();
+                else
+                    ObjectFlagCatalog.ImportProjectTags();
                 RefreshGroups();
                 editorWindow.Repaint();
             }
+        }
+
+        #endregion
+
+        #region Assignment
+
+        /// <summary>Routes popup changes through native workspace guards or stable project field resolution.</summary>
+        /// <param name="flag">Selected flag, or null to clear.</param>
+        /// <param name="include">Whether this flag is selected.</param>
+        private void Assign(ObjectFlag flag, bool include)
+        {
+            if (assignment != null)
+                assignment.Assign(flag, include);
+            else
+                ObjectFlagSelector.Assign(owner, path, flag, include);
         }
 
         #endregion

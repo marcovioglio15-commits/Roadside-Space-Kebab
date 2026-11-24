@@ -324,7 +324,6 @@ MonoBehaviour:
     Scale: {x: 1, y: 1, z: 1}
   completionBindings: []
   anchor: {fileID: 0}
-  preset: {fileID: 0}
   configuration:
     settings:
       targetMode: 2
@@ -365,6 +364,7 @@ MonoBehaviour:
       backgroundColor: {r: 0.04, g: 0.06, b: 0.08, a: 0.88}
       backgroundSprite: {fileID: 0}
       backgroundType: 0
+  interactionText: []
   drawGizmos: 1
 --- !u!114 &313421414926010583
 MonoBehaviour:
@@ -458,11 +458,9 @@ MonoBehaviour:
       Count: 1
       Optional: 1
     - Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       Count: 1
       Optional: 1
-      OrderFlag: {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
     Magnets:
     - Name: Magnet 1
       AnyIngredient: 0
@@ -473,6 +471,10 @@ MonoBehaviour:
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []
@@ -489,6 +491,10 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 3974403703203748344, guid: 536ae3a8429f3e447bb8cd6f50472260, type: 3}
     - Name: Magnet 3
       AnyIngredient: 0
@@ -499,6 +505,10 @@ MonoBehaviour:
       Rotation: {x: 0, y: 0, z: 0}
       Scale: {x: 1, y: 1, z: 1}
       Appearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []
@@ -515,17 +525,28 @@ MonoBehaviour:
         Meshes: []
         Materials: []
         Visibility: []
+      CompletedAppearance:
+        Meshes: []
+        Materials: []
+        Visibility: []
       PreviewPrefab: {fileID: 2891034634997325463, guid: 750a7a35b9d541f4b805396137f7c6b6, type: 3}
     - Name: Magnet 5
       AnyIngredient: 0
       Flags:
-      - {fileID: 11400000, guid: 684aac8719ad7e34e9baa1ae40845bc0, type: 2}
       - {fileID: 11400000, guid: e6c64d44fdffdcb4eaddfdf3645a2084, type: 2}
       Order: 0
       Position: {x: 0, y: 0.025, z: 0}
       Rotation: {x: 0, y: -45, z: 0}
       Scale: {x: 0.7, y: 0.7, z: 0.7}
       Appearance:
+        Meshes:
+        - Path: ""
+          PrimaryMesh: 1
+          Mesh: {fileID: 4279741042369765514, guid: d154d209501b94e4283f1267de1bfb15, type: 3}
+          UpdateCollider: 0
+        Materials: []
+        Visibility: []
+      CompletedAppearance:
         Meshes: []
         Materials: []
         Visibility: []

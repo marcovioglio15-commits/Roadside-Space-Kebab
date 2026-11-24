@@ -134,12 +134,49 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Checks collider availability and supported exact-distance geometry.</summary>
         /// <param name="collider">Potential contact shape.</param>
         /// <param name="triggers">Whether trigger shapes are eligible.</param>
-        /// <returns>True for active primitive or convex mesh geometry.</returns>
+        /// <returns>True for active primitive, convex or static concave mesh geometry.</returns>
         internal static bool Usable(Collider collider, bool triggers)
         {
-            // ClosestPoint supports these shapes and avoids treating a concave mesh's bounds as solid contact.
-            return collider != null && collider.enabled && collider.gameObject.activeInHierarchy && (triggers || !collider.isTrigger)
-                && collider is BoxCollider or SphereCollider or CapsuleCollider or MeshCollider { convex: true, sharedMesh: not null };
+            return Supported(collider, triggers) && ActiveHierarchy(collider.transform);
+        }
+
+        /// <summary>Checks stored collider configuration without requiring an isolated preview to be active.</summary>
+        /// <param name="collider">Collider inside the interaction owner.</param>
+        /// <param name="triggers">Whether trigger surfaces are accepted.</param>
+        /// <param name="root">Owner whose external activation is ignored.</param>
+        /// <returns>True when the configured shape and descendant switches are usable.</returns>
+        internal static bool Configured(Collider collider, bool triggers, Transform root)
+        {
+            return Supported(collider, triggers) && InteractionHierarchy.ActiveWithin(collider.transform, root);
+        }
+
+        /// <summary>Checks shape support without changing collider geometry or activation.</summary>
+        /// <param name="collider">Proposed contact shape.</param>
+        /// <param name="triggers">Whether trigger surfaces are accepted.</param>
+        /// <returns>True for supported primitive, convex or static concave geometry.</returns>
+        private static bool Supported(Collider collider, bool triggers)
+        {
+            // Concave surfaces use virtual penetration probes instead of unsupported closest points.
+            return collider != null && collider.enabled && (triggers || !collider.isTrigger)
+                && (collider is BoxCollider or SphereCollider or CapsuleCollider
+                    || collider is MeshCollider { sharedMesh: not null } mesh
+                        && (mesh.convex || !mesh.isTrigger && (mesh.attachedRigidbody == null || mesh.attachedRigidbody.isKinematic)));
+        }
+
+        /// <summary>Checks live activation or the stored active path of a prefab asset during editor validation.</summary>
+        /// <param name="target">Collider transform being validated.</param>
+        /// <returns>True for an active hierarchy, including an enabled prefab asset outside a scene.</returns>
+        private static bool ActiveHierarchy(Transform target)
+        {
+            // Prefab assets have no active scene hierarchy; their saved switches still need validation.
+            if (target.gameObject.activeInHierarchy)
+                return true;
+            if (Application.isPlaying || target.gameObject.scene.IsValid())
+                return false;
+            for (Transform branch = target; branch != null; branch = branch.parent)
+                if (!branch.gameObject.activeSelf)
+                    return false;
+            return true;
         }
 
         /// <summary>Measures actual shape proximity instead of accepting broad-phase bounds as contact.</summary>
@@ -149,6 +186,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when shapes overlap or their surface points are within tolerance.</returns>
         internal static bool Touches(Collider first, Collider second, float tolerance)
         {
+            // A furnace may retain its open concave compartment as the real contact surface.
+            if (first is MeshCollider { convex: false } || second is MeshCollider { convex: false })
+                return ContactMeshProximity.Touches(first, second, tolerance);
             // Exact penetration handles overlap; closest-point refinement handles solver and carry clearance.
             if (Physics.ComputePenetration(first, first.transform.position, first.transform.rotation,
                 second, second.transform.position, second.transform.rotation, out _, out _))

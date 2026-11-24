@@ -20,9 +20,6 @@ GameObject:
   - component: {fileID: 2236367251346473938}
   - component: {fileID: 5370390019909497021}
   - component: {fileID: 5245573820002899312}
-  - component: {fileID: 5228134902972582300}
-  - component: {fileID: 3636574319120910313}
-  - component: {fileID: 4271513465245405958}
   - component: {fileID: 2844999493522304275}
   m_Layer: 0
   m_Name: PF_AssemblyStation
@@ -168,7 +165,7 @@ MonoBehaviour:
   completionBindings: []
   drawGizmos: 1
   settings:
-    ProductPrefab: {fileID: 8185305472320031931, guid: cb5b9e2b1ebd6f8499423dbc9781807a, type: 3}
+    ProductPrefab: {fileID: 3176775191320682383, guid: df2a34812f3fced4c94972c3861e05a5, type: 3}
     Trigger: 2
     ContactDuration: 0.5
     ContactQueryInterval: 0.02
@@ -276,7 +273,7 @@ MonoBehaviour:
   completionBindings: []
   drawGizmos: 1
   settings:
-    ProductPrefab: {fileID: 5984455871580098207, guid: f67dd383e0afd174e8de4fbf06303230, type: 3}
+    ProductPrefab: {fileID: 3748823794255209065, guid: c684292326866854fb5205e178ec9fbe, type: 3}
     Trigger: 2
     ContactDuration: 0.5
     ContactQueryInterval: 0.02
@@ -511,168 +508,6 @@ MonoBehaviour:
     AcceptReturnedProduct: 1
   action: {fileID: 0}
   staging: {fileID: 4524236599516636299}
---- !u!114 &5228134902972582300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly French Fries
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  drawGizmos: 1
-  settings:
-    ProductPrefab: {fileID: 224706048140884364, guid: 93f264b92da22d14998edcc0969a41f2, type: 3}
-    Trigger: 2
-    ContactDuration: 0.5
-    ContactQueryInterval: 0.02
-    ContactTolerance: 0.005
-    IncludeTriggers: 1
-    IgnoreCarriedIngredients: 1
-    Distance: 3
-    RequireSight: 1
-    Obstacles:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    OutputPosition: {x: 0, y: 0.02, z: 0}
-    OutputRotation: {x: 0, y: 0, z: 0}
-    AnimatePlacement: 1
-    PlacementDuration: 0.25
-    AcceptReturnedProduct: 1
-  action: {fileID: 0}
-  staging: {fileID: 7480781073803684815}
---- !u!114 &3636574319120910313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Crab Claw
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  drawGizmos: 1
-  settings:
-    ProductPrefab: {fileID: 7759833384075562368, guid: 84bdd427fa97c9040b22320f5adcdc4a, type: 3}
-    Trigger: 2
-    ContactDuration: 0.5
-    ContactQueryInterval: 0.02
-    ContactTolerance: 0.005
-    IncludeTriggers: 1
-    IgnoreCarriedIngredients: 1
-    Distance: 3
-    RequireSight: 1
-    Obstacles:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    OutputPosition: {x: 0, y: 0.02, z: 0}
-    OutputRotation: {x: 0, y: 0, z: 0}
-    AnimatePlacement: 1
-    PlacementDuration: 0.25
-    AcceptReturnedProduct: 1
-  action: {fileID: 0}
-  staging: {fileID: 6239475461044599083}
---- !u!114 &4271513465245405958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379141897293873495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd1e9082780d4425991310193cbff1b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectAssemblyStation
-  interactionName: Assembly Nuggets
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  drawGizmos: 1
-  settings:
-    ProductPrefab: {fileID: 7371184249265839609, guid: 6045ed5dc564c16468e5ddd4a935560b, type: 3}
-    Trigger: 2
-    ContactDuration: 0.5
-    ContactQueryInterval: 0.02
-    ContactTolerance: 0.005
-    IncludeTriggers: 1
-    IgnoreCarriedIngredients: 1
-    Distance: 3
-    RequireSight: 1
-    Obstacles:
-      serializedVersion: 2
-      m_Bits: 4294967295
-    OutputPosition: {x: 0, y: 0.02, z: 0}
-    OutputRotation: {x: 0, y: 0, z: 0}
-    AnimatePlacement: 1
-    PlacementDuration: 0.25
-    AcceptReturnedProduct: 1
-  action: {fileID: 0}
-  staging: {fileID: 2760922670105443173}
 --- !u!114 &2844999493522304275
 MonoBehaviour:
   m_ObjectHideFlags: 0

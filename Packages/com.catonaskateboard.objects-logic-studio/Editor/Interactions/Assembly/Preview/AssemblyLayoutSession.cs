@@ -22,6 +22,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         [Tooltip("Container count threshold opened by the fill preview. Negative means Assembly Product.")]
         [SerializeField]
         private int fillThreshold = -1;
+        [Tooltip("Whether these poses belong to contact docking rather than a recipe or fill step.")]
+        [SerializeField]
+        private bool contactMagnets;
+        [Tooltip("Independent docking layout and background geometry.")]
+        [SerializeField]
+        private ContactMagnetLayout contact = new ContactMagnetLayout();
 
         #endregion
 
@@ -33,9 +39,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         internal ObjectLayoutSource Source => source;
         /// <summary>Whether these placements belong to a container threshold.</summary>
         internal bool IsItemFill => fillThreshold >= 0;
+        /// <summary>Whether this layout controls contact docking.</summary>
+        internal bool IsContact => contactMagnets;
 
         /// <summary>Whether the preview contains changes beyond its opening draft.</summary>
-        internal bool HasChanges => baseline != null && Capture(Draft.Settings) != Capture(baseline);
+        internal bool HasChanges => IsContact ? contact.HasChanges : baseline != null && Capture(Draft.Settings) != Capture(baseline);
+        /// <summary>Optional contact layout background, independent of individual guides.</summary>
+        internal GameObject PreviewPrefab => IsContact ? contact.Settings.PreviewPrefab : null;
 
         #endregion
 
@@ -68,6 +78,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             // Reject mismatched callers before retaining their transaction.
             if (ObjectWorkspaceDrafts.Selected(workspace) != product)
                 throw new InvalidOperationException("Open this preview from the product's settings.");
+            contactMagnets = false;
             fillThreshold = -1;
             source.Capture(workspace);
             ReadDraft(workspace);
@@ -78,7 +89,18 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="threshold">Unique count identifying the selected step.</param>
         internal void ReadFill(ObjectWorkspace workspace, int threshold)
         {
+            contactMagnets = false;
             fillThreshold = threshold;
+            source.Capture(workspace);
+            ReadDraft(workspace);
+        }
+
+        /// <summary>Opens owner-local docking poses from a contact interaction draft.</summary>
+        /// <param name="workspace">Workspace retaining the contact interaction.</param>
+        internal void ReadContact(ObjectWorkspace workspace)
+        {
+            contactMagnets = true;
+            fillThreshold = -1;
             source.Capture(workspace);
             ReadDraft(workspace);
         }
@@ -97,6 +119,11 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         {
             return source.Apply(workspace =>
             {
+                if (IsContact)
+                {
+                    contact.Apply(workspace.Extended.Draft.Contact.MagnetLock);
+                    return;
+                }
                 if (IsItemFill)
                 {
                     ApplyFill(workspace);
@@ -106,12 +133,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 AssemblyProductSettings current = workspace.Extended.Draft.AssemblyProduct.Settings;
                 if (Capture(current) != Capture(baseline))
                     throw new InvalidOperationException("The layout changed in another window. Discard to reload it.");
-                AssemblyProductSettings proposal = ObjectWorkspace.Copy(current);
+                // Resolve stable interaction IDs before validating the destination-bound recipe.
+                GameObject owner = workspace.Target.Resolve();
+                AssemblyProductSettings proposal = workspace.Extended.Draft.AssemblyProduct.Resolve(owner.transform);
                 proposal.Magnets = ObjectWorkspace.Copy(Draft).Settings.Magnets;
-                if (!AssemblyValidation.TryValidate(Target.Resolve(), proposal, out string detail))
+                if (!AssemblyValidation.TryValidate(owner, proposal, out string detail))
                     throw new InvalidOperationException(detail);
                 current.Magnets = proposal.Magnets;
-            }, IsItemFill ? Array.Empty<string>() : new[] { "Extended.Draft.AssemblyProduct.Settings.Magnets" }, ReadDraft, out warning, fillThreshold);
+            }, IsItemFill ? Array.Empty<string>() : IsContact ? new[] { "Extended.Draft.Contact.MagnetLock.Magnets", "Extended.Draft.Contact.MagnetLock.PreviewPrefab" } : new[] { "Extended.Draft.AssemblyProduct.Settings.Magnets" }, ReadDraft, out warning, fillThreshold);
         }
 
         #endregion
@@ -122,9 +151,30 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
         /// <param name="workspace">Exact product draft retained by the preview.</param>
         private void ReadDraft(ObjectWorkspace workspace)
         {
-            Draft = IsItemFill ? new AssemblyProductDraft { Settings = FillPreview(FindStep(workspace).ItemFill) }
+            if (IsContact)
+                contact.Read(workspace.Extended.Draft.Contact.MagnetLock);
+            Draft = IsContact ? new AssemblyProductDraft { Settings = ContactMagnetControls.Preview(contact.Settings) }
+                : IsItemFill ? new AssemblyProductDraft { Settings = FillPreview(FindStep(workspace).ItemFill) }
                 : ObjectWorkspace.Copy(workspace.Extended.Draft.AssemblyProduct);
             baseline = ObjectWorkspace.Copy(new AssemblyProductSettings { Magnets = Draft.Settings.Magnets });
+        }
+
+        /// <summary>Refreshes render projections after the contact form changes.</summary>
+        internal void RefreshContactProjection()
+        {
+            // Render values stay separate from the full filter and priority data.
+            Draft.Settings = ContactMagnetControls.Preview(contact.Settings);
+        }
+
+        /// <summary>Copies native handle edits into the independent contact settings.</summary>
+        /// <param name="index">Selected docking slot.</param>
+        /// <param name="position">Owner-local position.</param>
+        /// <param name="rotation">Owner-local rotation in degrees.</param>
+        internal void SetContactPose(int index, Vector3 position, Vector3 rotation)
+        {
+            // Mirror handles before the next serialized property pass.
+            contact.Settings.Magnets[index].Position = position;
+            contact.Settings.Magnets[index].Rotation = rotation;
         }
 
         /// <summary>Applies a fill layout only if its original step and magnet values still match.</summary>

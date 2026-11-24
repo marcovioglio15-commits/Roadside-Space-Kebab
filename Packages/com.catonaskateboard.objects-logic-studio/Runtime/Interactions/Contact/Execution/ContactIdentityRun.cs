@@ -134,7 +134,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Acquiring no restrictions first avoids releasing a held object if the counterpart is unavailable.
             if (!owner.Available(InteractionChannels.Passive) || item.IsBlocked(InteractionChannels.Passive)
-                || !owner.Item.Acquire(owner, running > 0 ? owner.Settings.BlockSelf : InteractionChannels.None))
+                || !owner.PrepareDock(item) || !owner.Item.Acquire(owner, running > 0 ? owner.Settings.BlockSelf : InteractionChannels.None))
                 return false;
             if (!item.Acquire(owner, InteractionChannels.None))
             {
@@ -166,6 +166,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 return;
             contact.Running = false;
             running--;
+            owner.ReleaseDock(item);
             if (item != null)
                 item.Release(owner);
             if (running == 0 && owner.Item != null)
@@ -180,9 +181,19 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Dictionary keys remain removable even after Unity destroys their native object.
             ReleaseTransition(owner, item, contact);
+            owner.ReleaseDock(item);
             if (item != null && item.Identity != null)
                 item.Identity.RemoveTemporary(owner);
             entries.Remove(item);
+        }
+
+        /// <summary>Withdraws one picked-up item while retaining unrelated contacts.</summary>
+        /// <param name="owner">Modification owning its temporary flags.</param>
+        /// <param name="item">Participant leaving docking.</param>
+        internal void ReleaseContact(ContactModificationRun owner, ObjectItem item)
+        {
+            if (entries.TryGetValue(item, out Contact contact))
+                Remove(owner, item, contact);
         }
 
         /// <summary>Restores all temporary identities when the modifier is disabled or refreshed.</summary>
@@ -193,6 +204,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             foreach (KeyValuePair<ObjectItem, Contact> entry in entries)
             {
                 ReleaseTransition(owner, entry.Key, entry.Value);
+                owner.ReleaseDock(entry.Key);
                 if (entry.Key != null && entry.Key.Identity != null)
                     entry.Key.Identity.RemoveTemporary(owner);
             }

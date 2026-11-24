@@ -7772,6 +7772,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PF_TestDispenser
       objectReference: {fileID: 0}
+    - target: {fileID: 5438683417763415203, guid: 8f929d8892e8a3c4bae89da0eaa47e17, type: 3}
+      propertyPath: settings.AllowedFlags.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7125130132030366780, guid: 8f929d8892e8a3c4bae89da0eaa47e17, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.5
