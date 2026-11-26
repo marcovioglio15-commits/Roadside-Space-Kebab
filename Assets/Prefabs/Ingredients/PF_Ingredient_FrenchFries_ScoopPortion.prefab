@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 8848015718460716284}
   - component: {fileID: 832429267205358134}
   - component: {fileID: 1227115120691720151}
-  - component: {fileID: 7016335738347341644}
   - component: {fileID: 3736181417804772347}
   m_Layer: 6
   m_Name: PF_Ingredient_FrenchFries_ScoopPortion
@@ -189,48 +188,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a9886fb28c64aaa9e6dcbb4d783985c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectItem
---- !u!114 &7016335738347341644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2578056937270180844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
-  interactionName: Outline
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  drawGizmos: 1
-  settings:
-    Thickness: 6
-    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
-    Intensity: 5
-    EdgeAngle: 30
-    HoverOnly: 1
-  renderers:
-  - {fileID: 6243601882805062418}
 --- !u!114 &3736181417804772347
 MonoBehaviour:
   m_ObjectHideFlags: 0

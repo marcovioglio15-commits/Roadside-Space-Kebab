@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 8314023349035442061}
   - component: {fileID: 9018276716959874924}
   - component: {fileID: 6231772488958487172}
-  - component: {fileID: 1520687784819443102}
   - component: {fileID: 363009027456349219}
   m_Layer: 6
   m_Name: PF_Ingredient_Nuggets_ScoopPortion
@@ -189,48 +188,6 @@ MonoBehaviour:
       backgroundType: 0
   interactionText: []
   drawGizmos: 1
---- !u!114 &1520687784819443102
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4872291968861290408}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdec929355c740c9b7a231bd48eb3e21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.ObjectOutline
-  interactionName: Outline
-  toolRequirement:
-    Mode: 0
-    Tool: {fileID: 0}
-    Tools: []
-  flagChange:
-    Enabled: 0
-    Flag: {fileID: 0}
-    Operation: 0
-    Moment: 1
-  visualEffect:
-    Enabled: 0
-    Prefab: {fileID: 0}
-    AutoTiming: 0
-    Duration: 1
-    OnContactObject: 0
-    FollowObject: 1
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-  completionBindings: []
-  drawGizmos: 1
-  settings:
-    Thickness: 6
-    Color: {r: 1, g: 0.74509805, b: 0, a: 1}
-    Intensity: 5
-    EdgeAngle: 30
-    HoverOnly: 1
-  renderers:
-  - {fileID: 6243601882805062418}
 --- !u!114 &363009027456349219
 MonoBehaviour:
   m_ObjectHideFlags: 0
