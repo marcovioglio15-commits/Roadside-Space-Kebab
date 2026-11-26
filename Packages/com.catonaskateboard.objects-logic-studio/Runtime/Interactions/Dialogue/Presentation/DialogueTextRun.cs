@@ -18,6 +18,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             internal float Time;
             internal float Height;
             internal bool Visible;
+            internal bool Character;
         }
 
         #endregion
@@ -32,6 +33,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private Vector3[][] vertices = Array.Empty<Vector3[]>();
         private Color32[][] colors = Array.Empty<Color32[]>();
         private int count;
+        private int revealed;
         private float started;
         private float offset;
         private float frozen;
@@ -46,6 +48,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Scaled page time retained when its dialogue is interrupted.</summary>
         internal float Elapsed => playing ? Time.time - started + offset : frozen;
+        /// <summary>Visible text glyphs reached by the reveal cursor, excluding whitespace and sprites.</summary>
+        internal int PrintedCharacters { get; private set; }
+        /// <summary>Whether this page still has characters waiting for their reveal time.</summary>
+        internal bool IsRevealing => playing && revealed < count;
 
         #endregion
 
@@ -95,6 +101,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 text.OnPreRenderText -= Regenerated;
             text = null;
             playing = false;
+            PrintedCharacters = revealed = count = 0;
         }
 
         /// <summary>Finishes pending letters and landing poses without advancing the page.</summary>
@@ -126,6 +133,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private void Capture(TMP_TextInfo info)
         {
             count = info.characterCount;
+            PrintedCharacters = revealed = 0;
             if (glyphs.Length < count)
                 glyphs = new Glyph[count];
             if (vertices.Length < info.materialCount)
@@ -161,7 +169,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                         time += document.Styles[marker].Pause;
                 previousSource = source + 1;
                 Glyph glyph = new Glyph { Style = style, Material = character.materialReferenceIndex, Vertex = character.vertexIndex,
-                    Visible = character.isVisible, Time = settings.Typewriter ? time : 0f, Height = Mathf.Max(0.001f, character.ascender - character.descender) };
+                    Visible = character.isVisible, Character = character.elementType == TMP_TextElementType.Character,
+                    Time = settings.Typewriter ? time : 0f, Height = Mathf.Max(0.001f, character.ascender - character.descender) };
                 glyphs[index] = glyph;
                 revealEnd = glyph.Time;
                 if (glyph.Visible)
@@ -199,6 +208,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <param name="elapsed">Current scaled page time.</param>
         private void Apply(float elapsed)
         {
+            // Advance once per character, independently of repeated word-effect or layout updates.
+            while (revealed < count && elapsed >= glyphs[revealed].Time)
+            {
+                if (glyphs[revealed].Visible && glyphs[revealed].Character)
+                    PrintedCharacters++;
+                revealed++;
+            }
+            // Restore and animate only glyphs with mesh geometry.
             for (int index = 0; index < count; index++)
             {
                 Glyph glyph = glyphs[index];

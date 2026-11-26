@@ -349,7 +349,9 @@ MonoBehaviour:
     ReplayOnInput: 1
     Audio:
       Voice: 3
+      Mode: 1
       Interval: 0.1
+      CharactersPerVoice: 1
       Completion: 0
     Box:
       FadeIn: 0

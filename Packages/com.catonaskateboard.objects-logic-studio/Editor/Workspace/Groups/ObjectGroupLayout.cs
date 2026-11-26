@@ -107,7 +107,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             },
             ["Dialogue Audio"] = new[]
             {
-                new Split("Phrase audio", "Audio.Voice", "Audio.Interval"),
+                new Split("Phrase audio", "Audio.Voice", "Audio.Mode", "Audio.Interval", "Audio.CharactersPerVoice"),
                 new Split("Result audio", "Audio.Completion")
             },
             ["Detection"] = new[]

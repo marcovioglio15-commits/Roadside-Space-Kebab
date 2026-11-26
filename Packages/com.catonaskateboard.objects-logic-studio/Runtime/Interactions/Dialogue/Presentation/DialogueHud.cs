@@ -37,10 +37,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private bool visible;
         private float speakerPosition = 0.5f;
         private ObjectDialogue source;
-        private bool presented;
+        private bool talking;
 
-        /// <summary>Publishes actual text-box visibility without polling visitor hierarchies.</summary>
-        internal static event Action<ObjectDialogue, bool> PresentationChanged;
+        /// <summary>Publishes Talk boundaries from text reveal, voice playback and box visibility.</summary>
+        internal static event Action<ObjectDialogue, bool> TalkingChanged;
 
         #endregion
 
@@ -57,10 +57,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         /// <summary>Clears scene subscribers before a new Play session, including retained-domain sessions.</summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetPresentation()
+        private static void ResetTalking()
         {
             // Visitors subscribe again when their day-flow run is created.
-            PresentationChanged = null;
+            TalkingChanged = null;
         }
 
         /// <summary>Checks existing text references before the scene HUD claims this panel.</summary>
@@ -82,7 +82,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             // A replacement owner releases the previous visitor before presenting the next page.
             if (source != dialogue)
             {
-                Present(false);
+                SetTalking(false);
                 source = dialogue;
             }
             // Open saved graphics before asking TMP for the full, stable page geometry.
@@ -94,6 +94,8 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             fadeOut = transition.FadeOut;
             Fade(1f, transition.FadeIn);
             textRun.Begin(body, line, effects, elapsed);
+            // Resumed or instantaneous pages do not turn their existing text into new voice requests.
+            dialogue.ResetCharacterVoice(elapsed > 0f || !effects.Typewriter ? textRun.PrintedCharacters : 0);
             if (speaker != null)
             {
                 speaker.text = line.Speaker;
@@ -102,7 +104,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 if (speaker.enabled)
                     DialogueSpeakerLayout.Apply(speaker, Panel, speakerPosition);
             }
-            RefreshPresentation();
+            RefreshTalking();
         }
 
         /// <summary>Keeps the saved speaker aligned when the existing HUD changes size.</summary>
@@ -116,7 +118,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <returns>True when this press completed the current text reveal.</returns>
         internal bool RevealPage()
         {
-            return textRun.RevealAll();
+            // Completing the page by input never emits a burst for the skipped characters.
+            if (!textRun.RevealAll())
+                return false;
+            source.ResetCharacterVoice(textRun.PrintedCharacters);
+            RefreshTalking();
+            return true;
         }
 
         /// <summary>Fades the existing box out while freezing the page at its retained reveal time.</summary>
@@ -127,6 +134,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             {
                 visible = false;
                 Fade(0f, fadeOut);
+                RefreshTalking();
                 return;
             }
             if (isActiveAndEnabled && fading && fadeTo <= 0f)
@@ -135,7 +143,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (box != null)
                 box.alpha = 0f;
             textRun.Stop();
-            Present(false);
+            SetTalking(false);
             source = null;
             base.Hide();
         }
@@ -143,38 +151,38 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Updates only active letter effects and an unfinished box transition.</summary>
         private void Update()
         {
-            // External panel or Canvas changes also release talking while the text is hidden.
-            RefreshPresentation();
+            // Reveal before speech and Talk selection so a letter and its voice share one frame.
             if (visible)
                 textRun.Tick();
-            if (!fading || Time.deltaTime <= 0f)
-                return;
-            float progress = Mathf.Clamp01((Time.time - fadeStarted) / fadeDuration);
-            box.alpha = Mathf.Lerp(fadeFrom, fadeTo, Mathf.SmoothStep(0f, 1f, progress));
-            if (progress >= 1f)
-                EndFade();
-            RefreshPresentation();
+            if (fading && Time.deltaTime > 0f)
+            {
+                float progress = Mathf.Clamp01((Time.time - fadeStarted) / fadeDuration);
+                box.alpha = Mathf.Lerp(fadeFrom, fadeTo, Mathf.SmoothStep(0f, 1f, progress));
+                if (progress >= 1f)
+                    EndFade();
+            }
+            RefreshTalking();
         }
 
         /// <summary>Checks the existing graphics only while an interaction owns this box.</summary>
-        private void RefreshPresentation()
+        private void RefreshTalking()
         {
-            // Fade-out remains part of presentation until the box becomes fully transparent.
+            // Interval mode retains box visibility; Characters mode follows reveal and the final voice.
             if (source != null)
-                Present(PresentationReady && Panel.gameObject.activeInHierarchy && body != null
-                    && body.isActiveAndEnabled && box != null && box.alpha > 0f);
+                SetTalking(source.UpdateTalking(PresentationReady && Panel.gameObject.activeInHierarchy && body != null
+                    && body.isActiveAndEnabled && box != null && box.alpha > 0f, textRun.PrintedCharacters, textRun.IsRevealing));
         }
 
-        /// <summary>Publishes visibility boundaries once without restarting animation between pages.</summary>
-        /// <param name="showing">Whether this interaction's text is currently rendered.</param>
-        private void Present(bool showing)
+        /// <summary>Publishes Talk changes once without restarting animation on repeated updates.</summary>
+        /// <param name="active">Whether this interaction currently requires the Talk role.</param>
+        private void SetTalking(bool active)
         {
             // Repaints and repeated pages do not produce duplicate role changes.
-            if (presented == showing)
+            if (talking == active)
                 return;
-            presented = showing;
+            talking = active;
             if (source != null)
-                PresentationChanged?.Invoke(source, showing);
+                TalkingChanged?.Invoke(source, active);
         }
 
         /// <summary>Retargets an interrupted transition from the current box alpha.</summary>
@@ -199,7 +207,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (fadeTo > 0f)
                 return;
             textRun.Stop();
-            Present(false);
+            SetTalking(false);
             source = null;
             base.Hide();
         }

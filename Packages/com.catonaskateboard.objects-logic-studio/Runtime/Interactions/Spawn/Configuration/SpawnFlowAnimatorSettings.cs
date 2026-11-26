@@ -16,7 +16,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public SpawnFlowAnimatorState Walk = new SpawnFlowAnimatorState();
         [Tooltip("Looping animation while waiting, during path delays and after payment.")]
         public SpawnFlowAnimatorState Idle = new SpawnFlowAnimatorState();
-        [Tooltip("Looping animation while this visitor's dialogue text is visible in the HUD. Overrides Idle and Walk. Pay and Death take priority.")]
+        [Tooltip("Looping dialogue animation. Characters audio: during text reveal and remaining Voice. Interval audio: while the box is visible. Overrides Idle and Walk. Pay and Death take priority.")]
         public SpawnFlowAnimatorState Talk = new SpawnFlowAnimatorState { Mode = SpawnFlowAnimationMode.None };
         [Tooltip("One-shot animation when Collect Prices releases a positive payment. Departure waits for it to finish.")]
         public SpawnFlowAnimatorState Pay = new SpawnFlowAnimatorState();

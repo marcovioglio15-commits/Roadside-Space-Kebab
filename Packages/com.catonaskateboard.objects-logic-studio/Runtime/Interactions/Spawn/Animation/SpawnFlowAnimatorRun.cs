@@ -86,7 +86,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (settings.Talk is { Selected: true })
             {
                 speakers = new HashSet<ObjectDialogue>();
-                DialogueHud.PresentationChanged += Talk;
+                DialogueHud.TalkingChanged += Talk;
             }
         }
 
@@ -94,7 +94,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         public void Dispose()
         {
             transformAnimation?.Restore();
-            DialogueHud.PresentationChanged -= Talk;
+            DialogueHud.TalkingChanged -= Talk;
             // Unsubscribe before lifetime settlement can publish a final pending balance.
             foreach (ObjectContactModifier collector in collectors)
                 if (collector != null)
@@ -120,15 +120,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 RestoreLayer();
         }
 
-        /// <summary>Changes the speaking role only when this visitor gains or loses a visible text box.</summary>
+        /// <summary>Changes this visitor's speaking role when its dialogue's Talk requirement changes.</summary>
         /// <param name="source">Dialogue owning the HUD presentation.</param>
-        /// <param name="visible">Whether its text box is rendered.</param>
-        private void Talk(ObjectDialogue source, bool visible)
+        /// <param name="talking">Whether text reveal, speech or box visibility requires Talk.</param>
+        private void Talk(ObjectDialogue source, bool talking)
         {
             // Unrelated visitors and observers never change this clone's animation.
             if (source == null || !source.transform.IsChildOf(root))
                 return;
-            if (visible)
+            if (talking)
                 speakers.Add(source);
             else
                 speakers.Remove(source);

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Schedules character phrases while reserving dialogue effects against voice overlap.</summary>
+    /// <summary>Schedules timed phrases or text-driven voice restarts without overlapping dialogue effects.</summary>
     internal sealed class DialogueAudioRun
     {
         #region State
@@ -11,6 +11,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         private static IAudioVoice cue;
         private IAudioVoice voice;
         private float nextVoice;
+        private int printedCharacters;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>Includes queued and paused speech until its audio backend releases it.</summary>
+        internal bool IsPlaying => voice != null && voice.IsPlaying;
 
         #endregion
 
@@ -24,8 +32,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         {
             // Arrival cues take precedence over the first voice phrase.
             Stop();
+            ResetCharacters(0);
             nextVoice = Time.time;
-            Tick(settings, source);
+            Tick(settings, source, 0);
+        }
+
+        /// <summary>Starts a page's cadence or skips letters exposed by an instant reveal.</summary>
+        /// <param name="characters">Already visible characters that must not emit another voice.</param>
+        internal void ResetCharacters(int characters)
+        {
+            // Retained and instantly completed text never replays its earlier letters.
+            printedCharacters = characters;
         }
 
         /// <summary>Announces completed walk-in immediately while preventing dialogue voices from masking the cue.</summary>
@@ -35,11 +52,15 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             PlayCue("sfx_newcustomer", source);
         }
 
-        /// <summary>Plays due phrases while no dialogue cue occupies the shared audio channel.</summary>
+        /// <summary>Emits due speech from the same text snapshot used to select the Talk animation.</summary>
         /// <param name="settings">Selected voice and cadence.</param>
         /// <param name="source">Current speaker transform.</param>
-        internal void Tick(DialogueAudioSettings settings, Transform source)
+        /// <param name="characters">Visible text characters revealed so far on this page.</param>
+        internal void Tick(DialogueAudioSettings settings, Transform source, int characters)
         {
+            // Consume reveal progress even when voices are disabled or a cue takes precedence.
+            int previous = printedCharacters;
+            printedCharacters = characters;
             // Result and arrival cues suspend voice emission across consecutive dialogues.
             if (settings == null || settings.Voice == DialogueVoice.None)
                 return;
@@ -49,8 +70,23 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 nextVoice = Time.time + settings.Interval;
                 return;
             }
-            if (Time.time < nextVoice || voice != null && voice.IsPlaying)
-                return;
+            switch (settings.Mode)
+            {
+                case DialogueAudioMode.Interval:
+                    if (Time.time < nextVoice || IsPlaying)
+                        return;
+                    nextVoice = Time.time + settings.Interval;
+                    break;
+                case DialogueAudioMode.Characters:
+                    if (characters <= previous || settings.CharactersPerVoice < 1
+                        || characters / settings.CharactersPerVoice <= previous / settings.CharactersPerVoice)
+                        return;
+                    // Coalesce thresholds crossed in one frame; never queue speech after printing ends.
+                    Stop();
+                    break;
+                default:
+                    return;
+            }
             string key = settings.Voice switch
             {
                 DialogueVoice.Hellfury => "vo_hellfury",
@@ -59,7 +95,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 _ => string.Empty
             };
             voice = StudioAudio.Play(key, source);
-            nextVoice = Time.time + settings.Interval;
         }
 
         /// <summary>Stops speech and plays the optional successful-completion cue.</summary>

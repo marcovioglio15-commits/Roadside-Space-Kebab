@@ -171,13 +171,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             content = settings?.ResolveTree(SpawnIndex);
         }
 
-        /// <summary>Ticks voice intervals only while this dialogue presents a page.</summary>
-        private void Update()
-        {
-            if (IsSpeaking && Time.timeScale > 0f)
-                audio.Tick(Presentation.Audio, transform);
-        }
-
         #endregion
 
         #region Validation And Input
@@ -465,6 +458,28 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Flow
 
+        /// <summary>Aligns speech cadence with a new page, retained progress or an instant reveal.</summary>
+        /// <param name="characters">Characters already printed without requesting new speech.</param>
+        internal void ResetCharacterVoice(int characters)
+        {
+            // Existing characters establish the next threshold without replaying earlier speech.
+            audio.ResetCharacters(characters);
+        }
+
+        /// <summary>Updates speech after text reveal and reports the visitor's current Talk requirement.</summary>
+        /// <param name="visible">Whether the saved text box is currently rendered.</param>
+        /// <param name="characters">Visible text characters revealed on this page.</param>
+        /// <param name="printing">Whether this page still has pending characters.</param>
+        /// <returns>True while the selected audio mode requires the Talk role.</returns>
+        internal bool UpdateTalking(bool visible, int characters, bool printing)
+        {
+            // HUD updates provide one ordered snapshot for voice emission and animation selection.
+            if (IsSpeaking && Time.timeScale > 0f)
+                audio.Tick(Presentation.Audio, transform, characters);
+            return Presentation.Audio.Mode == DialogueAudioMode.Characters
+                ? IsSpeaking && (visible && printing || audio.IsPlaying) : visible;
+        }
+
         /// <summary>Reserves this clone's first request for Day Flow arrival.</summary>
         internal void ConfigureArrival()
         {
@@ -534,10 +549,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             DialogueSession completed = session;
             session.Follow();
             // Deliveries received during this page remain pending across graph-block transitions.
-            hud.Hide();
             IsSpeaking = false;
             retained = false;
             audio.Stop();
+            hud.Hide();
             // Step listeners see the new graph cursor but cannot mistake a checkpoint for tree completion.
             Signal(InteractionMoment.Progressed);
             CompletedBlock = CompletedEntry = string.Empty;
@@ -554,10 +569,10 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             if (!IsSpeaking)
                 return;
             session.PageTime = hud != null ? hud.PageTime : session.PageTime;
-            if (hud != null)
-                hud.Hide();
             IsSpeaking = false;
             audio.Stop();
+            if (hud != null)
+                hud.Hide();
             retained = Presentation.Interruption != DialogueInterruption.RestartTree;
             if (Presentation.Interruption == DialogueInterruption.Restart)
             {

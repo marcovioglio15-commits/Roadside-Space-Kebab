@@ -346,8 +346,17 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                 {
                     SerializedProperty audio = settings.FindPropertyRelative("Audio");
                     Field(audio, "Voice");
+                    Field(audio, "Mode");
                     if (audio.FindPropertyRelative("Voice").enumValueIndex != 0)
-                        Field(audio, "Interval");
+                        switch ((DialogueAudioMode)audio.FindPropertyRelative("Mode").enumValueIndex)
+                        {
+                            case DialogueAudioMode.Interval:
+                                Field(audio, "Interval");
+                                break;
+                            case DialogueAudioMode.Characters:
+                                Field(audio, "CharactersPerVoice");
+                                break;
+                        }
                     Field(audio, "Completion");
                 }
         }
