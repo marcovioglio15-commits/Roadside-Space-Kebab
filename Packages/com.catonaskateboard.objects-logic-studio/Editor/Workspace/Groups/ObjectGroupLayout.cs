@@ -195,7 +195,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
             {
                 new Split("Outline activation", "HoverOnly"),
                 new Split("Outline edges", "Thickness", "Color"),
-                new Split("Outline lighting", "Intensity", "EdgeAngle")
+                new Split("Outline lighting", "Intensity")
             },
             ["Order Board & Reveal"] = new[]
             {

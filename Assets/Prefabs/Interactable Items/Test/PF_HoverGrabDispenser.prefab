@@ -348,7 +348,6 @@ MonoBehaviour:
     Thickness: 1
     Color: {r: 0.8207547, g: 0.80139726, b: 0.80139726, a: 1}
     Intensity: 5
-    EdgeAngle: 30
     HoverOnly: 0
   renderers:
   - {fileID: 8881516529544936468}

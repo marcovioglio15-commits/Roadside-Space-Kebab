@@ -3,7 +3,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Schedules a shared visible-surface mask and edge-glow composite for active object outlines.</summary>
+    /// <summary>Schedules the shared silhouette mask and glow composite for active object outlines.</summary>
     public sealed class OutlineRendererFeature : ScriptableRendererFeature
     {
         #region Serialized Fields
@@ -28,7 +28,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         /// <summary>Creates only the reusable pass object when the renderer configuration changes.</summary>
         public override void Create()
         {
-            // The authored material is shared; no per-camera material clone is created.
+            // The saved material is shared; no per-camera material clone is created.
             pass = material != null ? new OutlineRenderPass(material) : null;
         }
 

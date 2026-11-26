@@ -13,7 +13,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         #region Serialized Fields
 
         [Header("Edge Glow")]
-        [Tooltip("Visible-edge color, pixel width, intensity and crease angle.")]
+        [Tooltip("Silhouette color, inner pixel width and intensity.")]
         [SerializeField]
         private OutlineSettings settings = new OutlineSettings();
         [Tooltip("Original renderers collected by prefab authoring. No duplicate shell geometry is required.")]

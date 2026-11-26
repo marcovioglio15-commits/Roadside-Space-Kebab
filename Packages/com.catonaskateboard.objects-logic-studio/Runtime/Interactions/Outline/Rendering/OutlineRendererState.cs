@@ -9,7 +9,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         internal const uint RenderingLayer = 1u << 31;
         private static readonly int colorId = Shader.PropertyToID("_ObjectGlowColor");
-        private static readonly int shapeId = Shader.PropertyToID("_ObjectGlowShape");
+        private static readonly int widthId = Shader.PropertyToID("_ObjectGlowWidth");
         private static int session;
         private readonly Renderer source;
         private readonly MaterialPropertyBlock properties = new MaterialPropertyBlock();
@@ -94,12 +94,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         }
 
         /// <summary>Updates only private effect properties in the retained material property block.</summary>
-        /// <param name="settings">Validated width, light and crease threshold.</param>
+        /// <param name="settings">Validated silhouette width and radiance.</param>
         private void Write(OutlineSettings settings)
         {
             // Premultiplication makes color alpha an intensity control without altering source transparency.
             properties.SetColor(colorId, settings.Color * (settings.Intensity * settings.Color.a));
-            properties.SetVector(shapeId, new Vector4(settings.Thickness, Mathf.Cos(settings.EdgeAngle * Mathf.Deg2Rad), 0f, 0f));
+            properties.SetFloat(widthId, settings.Thickness);
         }
 
         #endregion

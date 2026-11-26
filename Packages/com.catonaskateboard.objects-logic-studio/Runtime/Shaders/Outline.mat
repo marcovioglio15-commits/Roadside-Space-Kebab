@@ -18,7 +18,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _ObjectGlowWidth: 3
     m_Colors:
     - _ObjectGlowColor: {r: 1, g: 1, b: 1, a: 1}
-    - _ObjectGlowShape: {r: 3, g: 0.8660254, b: 0, a: 0}

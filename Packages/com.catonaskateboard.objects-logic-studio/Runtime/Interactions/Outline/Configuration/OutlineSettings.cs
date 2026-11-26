@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Controls the glow on visible silhouettes and geometric creases.</summary>
+    /// <summary>Controls the glow confined to visible silhouette borders.</summary>
     [Serializable]
     public sealed class OutlineSettings
     {
         #region Fields
 
         [Header("Edge Glow")]
-        [Tooltip("Glow width in render pixels, from zero to sixteen. Zero hides the effect.")]
+        [Tooltip("Inner silhouette width in render pixels. Zero hides the effect.")]
         [Range(0f, 16f)]
         public float Thickness = 3f;
         [Tooltip("Glow tint and opacity. Black emits no light; the original surface material is preserved.")]
@@ -18,9 +18,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Tooltip("Edge brightness added after the camera's bloom. Other scene objects keep their normal bloom.")]
         [Range(0f, 10f)]
         public float Intensity = 2f;
-        [Tooltip("Minimum normal change, in degrees, treated as a geometric crease. Silhouettes remain visible independently.")]
-        [Range(0.1f, 180f)]
-        public float EdgeAngle = 30f;
         [Tooltip("When this object has Hover, show its outline only while at least one Hover interaction is active.")]
         public bool HoverOnly;
 
@@ -30,7 +27,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 
         #region Validation
 
-        /// <summary>Reports invalid shader parameters without rewriting authored values.</summary>
+        /// <summary>Reports invalid shader parameters without changing saved values.</summary>
         /// <param name="warning">Receives the first invalid quantity.</param>
         /// <returns>True when all enabled glow settings can be rendered.</returns>
         public bool TryValidate(out string warning)
@@ -39,10 +36,9 @@ namespace CatOnASkateboard.ObjectsLogicStudio
             warning = string.Empty;
             if (!InteractionValues.Finite(Thickness) || Thickness < 0f || Thickness > 16f
                 || !InteractionValues.Finite(Intensity) || Intensity < 0f
-                || !InteractionValues.Finite(EdgeAngle) || EdgeAngle <= 0f || EdgeAngle > 180f
                 || !InteractionValues.Finite(new Vector3(Color.r, Color.g, Color.b))
                 || !InteractionValues.Finite(Color.a) || Color.a < 0f || Color.a > 1f)
-                warning = "Use width from 0 to 16 pixels, non-negative intensity, an edge angle above 0 up to 180, and finite color/opacity.";
+                warning = "Use width from 0 to 16 pixels, non-negative intensity, and finite color/opacity.";
             return warning.Length == 0;
         }
 

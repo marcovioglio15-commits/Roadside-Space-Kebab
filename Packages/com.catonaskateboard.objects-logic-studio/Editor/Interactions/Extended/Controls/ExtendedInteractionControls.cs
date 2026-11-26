@@ -122,14 +122,14 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
 
         #region Outline
 
-        /// <summary>Edits reusable shell appearance independently of configured geometry.</summary>
+        /// <summary>Edits silhouette appearance and shows Hover activation only when available.</summary>
         /// <param name="settings">Serialized outline shader configuration.</param>
         /// <param name="sections">Retained foldout visibility.</param>
         /// <param name="hasHover">Whether the edited object supplies Hover targeting.</param>
         internal static void DrawOutline(SerializedProperty settings, ObjectStudioSections sections, bool hasHover = false)
         {
             // The shared render pass uses the original visible surfaces.
-            if (sections.Draw("Outline Appearance", "Configure visible-edge width in pixels, color, light intensity and crease angle.", settings))
+            if (sections.Draw("Outline Appearance", "Set silhouette width in pixels, color and intensity.", settings))
                 using (new StudioIndentScope())
                 {
                     if (hasHover)
@@ -139,7 +139,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio.Editor
                     {
                         Field(settings, "Color");
                         Field(settings, "Intensity");
-                        Field(settings, "EdgeAngle");
                     }
                 }
         }
