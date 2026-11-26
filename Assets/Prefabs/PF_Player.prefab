@@ -33,7 +33,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 2.6352763, z: -3.8637033}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
+  m_Children: []
   m_Father: {fileID: 5508817289086114045}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &4478434006657166066
@@ -153,6 +153,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: CatOnASkateboard.ObjectsLogicStudio.Runtime::CatOnASkateboard.ObjectsLogicStudio.HoverObserver
   view: {fileID: 4478434006657166066}
   playerFlag: {fileID: 11400000, guid: 281d8342d7ff4b9c8c600666d1bf4d00, type: 2}
+  sceneHud: {fileID: 0}
 --- !u!114 &3704240097567904753
 MonoBehaviour:
   m_ObjectHideFlags: 0

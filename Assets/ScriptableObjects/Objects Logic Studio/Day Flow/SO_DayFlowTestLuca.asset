@@ -23,6 +23,9 @@ MonoBehaviour:
         Kind: 0
         Name: 
         Occurrence: 0
+        Step:
+          Block: 
+          Entry: 
     ResetAnimations: 0
     AnimationsToReset: []
     RandomCount: 0
@@ -36,6 +39,7 @@ MonoBehaviour:
     - Name: Spawn 1
       Prefab: {fileID: 3097014450015891093, guid: 1c159a42d5a557349b42b3a3ba794245, type: 3}
       Completions: []
+      CompletionSteps: []
       RequireAll: 1
       ArrivalDialogueEnabled: 1
       ArrivalDialogue: {fileID: 0}
@@ -47,11 +51,53 @@ MonoBehaviour:
       WalkIn:
         Enabled: 0
         Space: 1
+        Interpolation: 0
         Keyframes: []
       WalkOut:
         Enabled: 0
         Space: 1
+        Interpolation: 0
         Keyframes: []
+      CharacterAnimation:
+        Target: {fileID: 0}
+        Walk:
+          Mode: 0
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        Idle:
+          Mode: 0
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        Talk:
+          Mode: 2
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        Pay:
+          Mode: 0
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        Death:
+          Mode: 0
+          Tracks: []
+          Path: 
+          Clip: {fileID: 0}
+          Layer: 0
+          SpeedParameter: 
+        BlendDuration: 0
+        SynchronizeWalk: 0
+        WalkReferenceSpeed: 1.3
   Loop: 1
   PreserveScene: 1
   MainMenu: 

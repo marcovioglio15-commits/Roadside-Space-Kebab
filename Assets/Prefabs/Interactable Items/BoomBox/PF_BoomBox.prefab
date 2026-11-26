@@ -105,7 +105,7 @@ MonoBehaviour:
     Event: amb_traffic
     Radius: 20
     Radio:
-      SeparateBackgroundMusic: 1
+      SeparateBackgroundMusic: 0
       Parameter: Channels
       InitialChannel: 3
       Channels:

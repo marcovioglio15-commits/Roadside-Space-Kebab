@@ -33,16 +33,7 @@ MonoBehaviour:
     SfxVolume: 1
     MusicVolume: 1
   MusicCrossfadeSeconds: 1.5
-  Music:
-  - Context: Gameplay
-    Enabled: 1
-    EventPath: event:/MUS/mus_radio
-    EventGuid: '{8249f50a-625c-4be4-b7a7-406891480d82}'
-    Bank: MUS
-    Volume: 1
-    AutoStart: 1
-    RestartWhenPathChanges: 1
-    StopWhenDisabled: 1
+  Music: []
   Events:
   - Key: sfx_footstep
     DisplayName: sfx_footstep
@@ -78,7 +69,7 @@ MonoBehaviour:
     Parameters: []
   - Key: sfx_reload
     DisplayName: Shotgun Reload
-    Description:
+    Description: 
     EventPath: event:/SFX/PLAYER/sfx_shotgunreload
     EventGuid: '{1a30c012-7130-494d-9d2c-42e104241740}'
     Volume: 1
@@ -94,7 +85,7 @@ MonoBehaviour:
     Parameters: []
   - Key: sfx_shoot
     DisplayName: Shotgun
-    Description:
+    Description: 
     EventPath: event:/SFX/PLAYER/sfx_shotgun
     EventGuid: '{03248f13-1d61-47cc-a549-93758f8e98e4}'
     Volume: 1
