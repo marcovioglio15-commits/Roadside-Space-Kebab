@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CatOnASkateboard.ObjectsLogicStudio
 {
-    /// <summary>Schedules timed phrases or text-driven voice restarts without overlapping dialogue effects.</summary>
+    /// <summary>Schedules timed or text-driven phrases without overlapping dialogue audio.</summary>
     internal sealed class DialogueAudioRun
     {
         #region State
@@ -70,10 +70,13 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                 nextVoice = Time.time + settings.Interval;
                 return;
             }
+            // Consume busy thresholds without cutting speech or queuing it after text reveal.
+            if (IsPlaying)
+                return;
             switch (settings.Mode)
             {
                 case DialogueAudioMode.Interval:
-                    if (Time.time < nextVoice || IsPlaying)
+                    if (Time.time < nextVoice)
                         return;
                     nextVoice = Time.time + settings.Interval;
                     break;
@@ -81,8 +84,6 @@ namespace CatOnASkateboard.ObjectsLogicStudio
                     if (characters <= previous || settings.CharactersPerVoice < 1
                         || characters / settings.CharactersPerVoice <= previous / settings.CharactersPerVoice)
                         return;
-                    // Coalesce thresholds crossed in one frame; never queue speech after printing ends.
-                    Stop();
                     break;
                 default:
                     return;

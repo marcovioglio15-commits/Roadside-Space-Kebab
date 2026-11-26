@@ -5,7 +5,7 @@ namespace CatOnASkateboard.ObjectsLogicStudio
 {
     /// <summary>Selects the optional voice used during dialogue presentation.</summary>
     public enum DialogueVoice { None, Hellfury, Mothman, Fishy }
-    /// <summary>Selects timed phrases or voice restarts driven by newly revealed text.</summary>
+    /// <summary>Selects timed phrases or speech triggered by newly revealed text.</summary>
     public enum DialogueAudioMode { Interval, Characters }
     /// <summary>Selects the optional cue after the final page is completed.</summary>
     public enum DialogueResultSound { None, OrderOK, OrderNO }
@@ -19,12 +19,12 @@ namespace CatOnASkateboard.ObjectsLogicStudio
         [Header("Dialogue Audio")]
         [Tooltip("Optional character voice played while this dialogue is visible.")]
         public DialogueVoice Voice;
-        [Tooltip("Interval repeats phrases while the box is visible. Characters restarts Voice during text reveal. Talk follows reveal and any remaining Voice in Characters mode.")]
+        [Tooltip("Interval repeats Voice while the box is visible. Characters uses text reveal without interrupting active Voice. Talk follows reveal and remaining Voice in Characters mode.")]
         public DialogueAudioMode Mode = DialogueAudioMode.Characters;
         [Tooltip("Seconds between voice phrases. A phrase never overlaps another dialogue sound.")]
         [Range(0.01f, 30f)]
         public float Interval = 3f;
-        [Tooltip("Visible text characters per Voice restart. Excludes spaces, tags and sprites. Resets per page. Instant reveal stays silent.")]
+        [Tooltip("Visible text characters per Voice trigger. Excludes spaces, tags and sprites. Busy triggers are skipped. Resets per page. Instant reveal stays silent.")]
         [Range(1, 120)]
         public int CharactersPerVoice = 1;
         [Tooltip("Optional sound after advancing beyond the final page; interruption does not play it.")]
